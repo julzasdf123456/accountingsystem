@@ -1,0 +1,139 @@
+package com.boheco1.dev.integratedaccountingsystem;
+
+import com.boheco1.dev.integratedaccountingsystem.helpers.ColorPalette;
+import com.boheco1.dev.integratedaccountingsystem.helpers.ContentHandler;
+import com.boheco1.dev.integratedaccountingsystem.helpers.DrawerMenuHelper;
+import com.jfoenix.controls.JFXButton;
+import javafx.animation.*;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Paint;
+import javafx.util.Duration;
+import org.kordamp.ikonli.javafx.FontIcon;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
+public class HomeController implements Initializable {
+
+    @FXML StackPane homeStackPane;
+
+    @FXML AnchorPane contentPane, drawerAnchorPane;
+
+    @FXML GridPane gridPane;
+
+    @FXML Label accountingLabel, billingLabel, telleringLabel, warehouseLabel;
+
+    @FXML JFXButton budget, journalEntries, myAcctBtn, logoutBtn, allAccounts, collection, otherPayments;
+
+    // DRAWER MENU ARRAYS
+    public List<JFXButton> drawerMenus;
+    public List<Label> labelList;
+
+    // DRAWER
+    @FXML JFXButton hamburger;
+    public boolean isDrawerExpanded = true;
+    public Double drawerMinWidth = 70.0;
+    public FontIcon hamburgerIcon;
+
+    @FXML
+    public FlowPane subToolbar;
+    public List<JFXButton> submenuList;
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        submenuList = new ArrayList<>();
+        // INITIALIZE HAMBURGER
+        hamburgerIcon = new FontIcon("mdi2a-arrow-left");
+        hamburgerIcon.setIconColor(Paint.valueOf(ColorPalette.GREY_DARK));
+        hamburger.setGraphic(hamburgerIcon);
+
+        // initialize main menu labels
+        labelList = new ArrayList<>();
+        DrawerMenuHelper.setMenuLabels(accountingLabel, new FontIcon("mdi2f-finance"), labelList);
+        DrawerMenuHelper.setMenuLabels(billingLabel, new FontIcon("mdi2r-receipt"), labelList);
+        DrawerMenuHelper.setMenuLabels(telleringLabel, new FontIcon("mdi2c-contactless-payment-circle"), labelList);
+        DrawerMenuHelper.setMenuLabels(warehouseLabel, new FontIcon("mdi2s-sitemap"), labelList);
+
+
+        // INITIALIZE MENU ICONS
+        drawerMenus = new ArrayList<>();
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(budget,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, budget.getText(), contentPane, "budget_layout.fxml", subToolbar, new BudgetController());
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(journalEntries,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, journalEntries.getText(), contentPane, "journal_entries_layout.fxml", subToolbar, new JournalEntriesController());
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(allAccounts, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, allAccounts.getText(), contentPane, "all_accounts_layout.fxml", subToolbar, new AllAccountsController());
+        DrawerMenuHelper.setMenuButtonWithView(collection, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, collection.getText(), contentPane, "all_accounts_layout.fxml");
+        DrawerMenuHelper.setMenuButtonWithView(otherPayments, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, otherPayments.getText(), contentPane, "all_accounts_layout.fxml");
+        DrawerMenuHelper.setMenuButton(myAcctBtn,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "My Account");
+        DrawerMenuHelper.setMenuButton(logoutBtn,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "Logout");
+    }
+
+    @FXML
+    private void toggleDrawer() {
+        Timeline timeline = null;
+
+        if (isDrawerExpanded) {
+            timeline = new Timeline(new KeyFrame(Duration.millis(200),
+                    new KeyValue(gridPane.getColumnConstraints().get(0).maxWidthProperty(),
+                            drawerMinWidth,
+                            Interpolator.EASE_BOTH)));
+            gridPane.getColumnConstraints().get(0).minWidthProperty().setValue(drawerMinWidth);
+
+        } else {
+            DoubleProperty max = new SimpleDoubleProperty(246);
+            timeline = new Timeline(new KeyFrame(Duration.millis(200),
+                    new KeyValue(gridPane.getColumnConstraints().get(0).minWidthProperty(),
+                            max.get(),
+                            Interpolator.EASE_BOTH)));
+        }
+        timeline.play();
+
+        timeline.setOnFinished(actionEvent -> {
+            if (isDrawerExpanded) {
+                isDrawerExpanded = false;
+
+                hamburgerIcon = new FontIcon("mdi2m-menu");
+                hamburgerIcon.setIconColor(Paint.valueOf(ColorPalette.GREY_DARK));
+                hamburger.setGraphic(hamburgerIcon);
+
+                // SET DRAWER MENU BUTTONS TO HIDE TEXT
+                DrawerMenuHelper.setMenuButtonsIconOnly(drawerMenus);
+                DrawerMenuHelper.setMenuLabelsIconOnly(labelList);
+            } else {
+                isDrawerExpanded = true;
+
+                hamburgerIcon = new FontIcon("mdi2a-arrow-left");
+                hamburgerIcon.setIconColor(Paint.valueOf(ColorPalette.GREY_DARK));
+                hamburger.setGraphic(hamburgerIcon);
+                gridPane.getColumnConstraints().get(0).maxWidthProperty().setValue(246);
+
+                // SET DRAWER MENU BUTTONS TO SHOW TEXT
+                DrawerMenuHelper.setMenuButtonsFullDisplay(drawerMenus);
+                DrawerMenuHelper.setMenuLabelsFullDisplay(labelList);
+            }
+        });
+    }
+
+    @FXML
+    private void newClick() {
+        contentPane.getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "budget_layout.fxml"));
+    }
+
+    public void replaceContent(String fxml) {
+        contentPane.getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, fxml));
+    }
+
+    @FXML
+    private void logout() throws IOException {
+        HostWindow.setRoot("login_controller");
+    }
+}
