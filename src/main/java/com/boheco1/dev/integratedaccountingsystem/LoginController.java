@@ -2,9 +2,9 @@ package com.boheco1.dev.integratedaccountingsystem;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.usermgt.User;
+import com.boheco1.dev.integratedaccountingsystem.usermgt.UserDAO;
 import com.jfoenix.controls.*;
-import com.lentrix.usermanager.User;
-import com.lentrix.usermanager.UserDAO;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

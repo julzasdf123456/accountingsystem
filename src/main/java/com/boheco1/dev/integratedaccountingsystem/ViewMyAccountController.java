@@ -1,8 +1,8 @@
 package com.boheco1.dev.integratedaccountingsystem;
 
-import com.lentrix.usermanager.ActiveUser;
-import com.lentrix.usermanager.Permission;
-import com.lentrix.usermanager.User;
+import com.boheco1.dev.integratedaccountingsystem.usermgt.ActiveUser;
+import com.boheco1.dev.integratedaccountingsystem.usermgt.Permission;
+import com.boheco1.dev.integratedaccountingsystem.usermgt.User;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;

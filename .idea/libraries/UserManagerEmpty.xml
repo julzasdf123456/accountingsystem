@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="UserManagerEmpty">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../UserManager/out/artifacts/UserManagerEmpty/UserManagerEmpty.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

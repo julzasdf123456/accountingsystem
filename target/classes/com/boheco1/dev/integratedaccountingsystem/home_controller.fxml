@@ -2,17 +2,17 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.control.Label?>
 <AnchorPane prefHeight="683.0" prefWidth="1284.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.HomeController">
    <children>
       <StackPane fx:id="homeStackPane" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -28,22 +28,22 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="ALWAYS" />
                      </rowConstraints>
                      <children>
-                        <AnchorPane fx:id="drawerAnchorPane" prefHeight="683.0" GridPane.columnIndex="0" prefWidth="235.0" style="-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 10, 0, 0, 0);">
+                        <AnchorPane fx:id="drawerAnchorPane" prefHeight="683.0" prefWidth="235.0" style="-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 10, 0, 0, 0);" GridPane.columnIndex="0">
                            <children>
-                              <ScrollPane hbarPolicy="NEVER" fitToHeight="true" AnchorPane.rightAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.topAnchor="0" fitToWidth="true" prefHeight="200.0" prefWidth="200.0">
+                              <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
                                  <content>
                                     <AnchorPane minWidth="60.0" prefHeight="764.0" prefWidth="922.0">
                                        <VBox layoutX="21.0" layoutY="169.0" prefHeight="200.0" prefWidth="100.0" spacing="1.0" style="-fx-background-color: #00AD8E;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
                                           <children>
-                                             <Label text="Accounting" prefHeight="30" textAlignment="CENTER" alignment="CENTER" textFill="#FFFFFF">
+                                             <Label alignment="CENTER" prefHeight="30" text="Accounting" textAlignment="CENTER" textFill="#FFFFFF">
                                                 <padding>
-                                                   <Insets left="10"/>
+                                                   <Insets left="10" />
                                                 </padding>
                                              </Label>
                                              <!--Accounting -->
-                                             <Label fx:id="accountingLabel" text="Finance" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="246.0" textFill="#FFFFFF" style="-fx-background-color: #00ba99;">
+                                             <Label fx:id="accountingLabel" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="246.0" style="-fx-background-color: #00ba99;" text="Finance" textFill="#FFFFFF">
                                                 <padding>
-                                                   <Insets top="10" bottom="10"/>
+                                                   <Insets bottom="10" top="10" />
                                                 </padding>
                                              </Label>
                                              <JFXButton fx:id="journalEntries" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="246.0" style="-fx-alignment: LEFT;" text="Journal Entries">
@@ -57,20 +57,20 @@
                                                 </font>
                                              </JFXButton>
                                              <!--Billing -->
-                                             <Label fx:id="billingLabel" text="Billing" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="246.0" textFill="#FFFFFF" style="-fx-background-color: #00ba99;">
+                                             <Label fx:id="billingLabel" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="246.0" style="-fx-background-color: #00ba99;" text="Billing" textFill="#FFFFFF">
                                                 <padding>
-                                                   <Insets top="10" bottom="10"/>
+                                                   <Insets bottom="10" top="10" />
                                                 </padding>
                                              </Label>
-                                             <JFXButton fx:id="allAccounts"  prefHeight="25.0" prefWidth="236.0" style="-fx-alignment: LEFT;" text="All Accounts">
+                                             <JFXButton fx:id="allAccounts" prefHeight="25.0" prefWidth="236.0" style="-fx-alignment: LEFT;" text="All Accounts">
                                                 <font>
                                                    <Font size="13.0" />
                                                 </font>
                                              </JFXButton>
                                              <!-- Teller -->
-                                             <Label fx:id="telleringLabel" text="Tellering" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="246.0" textFill="#FFFFFF" style="-fx-background-color: #00ba99;">
+                                             <Label fx:id="telleringLabel" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="246.0" style="-fx-background-color: #00ba99;" text="Tellering" textFill="#FFFFFF">
                                                 <padding>
-                                                   <Insets top="10" bottom="10"/>
+                                                   <Insets bottom="10" top="10" />
                                                 </padding>
                                              </Label>
                                              <JFXButton fx:id="collection" onAction="#newClick" prefHeight="25.0" prefWidth="236.0" style="-fx-alignment: LEFT;" text="Collection">
@@ -84,23 +84,23 @@
                                                 </font>
                                              </JFXButton>
                                              <!--Warehouse -->
-                                             <Label fx:id="warehouseLabel" text="Warehouse" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="246.0" textFill="#FFFFFF" style="-fx-background-color: #00ba99;">
+                                             <Label fx:id="warehouseLabel" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="246.0" style="-fx-background-color: #00ba99;" text="Warehouse" textFill="#FFFFFF">
                                                 <padding>
-                                                   <Insets top="10" bottom="10"/>
+                                                   <Insets bottom="10" top="10" />
                                                 </padding>
                                              </Label>
                                              <!--Divider -->
-                                             <AnchorPane AnchorPane.leftAnchor="5" AnchorPane.rightAnchor="3"  prefWidth="-Infinity" prefHeight="1" style="-fx-background-color: #b2dfdb;" >
+                                             <AnchorPane prefHeight="1" prefWidth="-Infinity" style="-fx-background-color: #b2dfdb;" AnchorPane.leftAnchor="5" AnchorPane.rightAnchor="3">
                                                 <VBox.margin>
-                                                   <Insets left="8" right="8"/>
+                                                   <Insets left="8" right="8" />
                                                 </VBox.margin>
                                              </AnchorPane>
-                                             <JFXButton fx:id="myAcctBtn" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="246.0" style="-fx-alignment: LEFT;" text="My Account">
+                                             <JFXButton fx:id="myAcctBtn" nodeOrientation="LEFT_TO_RIGHT" onAction="#viewMyAccount" prefHeight="25.0" prefWidth="246.0" style="-fx-alignment: LEFT;" text="My Account">
                                                 <font>
                                                    <Font size="13.0" />
                                                 </font>
                                              </JFXButton>
-                                             <JFXButton fx:id="logoutBtn" onAction="#logout" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="246.0" style="-fx-alignment: LEFT;" text="Logout">
+                                             <JFXButton fx:id="logoutBtn" nodeOrientation="LEFT_TO_RIGHT" onAction="#logout" prefHeight="25.0" prefWidth="246.0" style="-fx-alignment: LEFT;" text="Logout">
                                                 <font>
                                                    <Font size="13.0" />
                                                 </font>
@@ -115,11 +115,11 @@
                               </ScrollPane>
                            </children>
                         </AnchorPane>
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" >
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
                            <children>
                               <AnchorPane layoutX="14.0" prefHeight="48.0" prefWidth="1202.0" style="-fx-background-color: #ffffff; -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 10, 0, 0, 0);" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <JFXButton AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" fx:id="hamburger" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" onAction="#toggleDrawer" prefHeight="25.0" prefWidth="40.0" style="-fx-alignment: LEFT;">
+                                    <JFXButton fx:id="hamburger" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" onAction="#toggleDrawer" prefHeight="25.0" prefWidth="40.0" style="-fx-alignment: LEFT;" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.topAnchor="0">
                                        <font>
                                           <Font size="13.0" />
                                        </font>
@@ -136,10 +136,10 @@
                                     </FlowPane>
                                  </children>
                               </AnchorPane>
-                              <ScrollPane fitToHeight="true" AnchorPane.rightAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.topAnchor="48" fitToWidth="true" prefHeight="200.0" prefWidth="200.0">
+                              <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="48">
                                  <content>
                                     <AnchorPane prefHeight="764.0" prefWidth="922.0">
-                                       <AnchorPane fx:id="contentPane" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS"/>
+                                       <AnchorPane fx:id="contentPane" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
                                     </AnchorPane>
                                  </content>
                               </ScrollPane>
