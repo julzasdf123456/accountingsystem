@@ -1,9 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.usermgt;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -114,17 +111,22 @@ public class UserDAO {
 
     public static void addUser(User user, Connection conn) throws Exception {
         String passwordHash = Hash.hash(user.getPassword());
-        CallableStatement cs = conn.prepareCall("{call Add_user (?,?,?,?,?)}");
-        cs.setString(1, user.getUserName());
-        cs.setString(2, user.getFullName());
-        cs.setString(3, user.getDesignation());
-        cs.setString(4, user.getPhone());
-        cs.setString(5, passwordHash);
+        CallableStatement cs = conn.prepareCall("{? = call Add_user (?,?,?,?,?)}");
+        cs.registerOutParameter(1, Types.INTEGER);
+        cs.setString(2, user.getUserName());
+        cs.setString(3, user.getFullName());
+        cs.setString(4, user.getDesignation());
+        cs.setString(5, user.getPhone());
+        cs.setString(6, passwordHash);
 
         System.out.println("Password Hash:");
         System.out.println(passwordHash);
 
         cs.executeUpdate();
+
+        int id = cs.getInt(1);
+
+        user.setId(id);
     }
 
     public static void updatePassword(User user, String newPassword, Connection conn) throws Exception {
@@ -137,6 +139,20 @@ public class UserDAO {
     public static void deleteUser(User user, Connection conn) throws SQLException  {
         CallableStatement cs = conn.prepareCall("{call Remove_user (?)}");
         cs.setInt(1, user.getId());
+        cs.executeUpdate();
+    }
+
+    public static void addPermission(User user, Permission permission, Connection conn) throws SQLException {
+        CallableStatement cs = conn.prepareCall("{call Add_permission_to_user (?,?)}");
+        cs.setInt(1, user.getId());
+        cs.setInt(2, permission.getId());
+        cs.executeUpdate();
+    }
+
+    public static void removePermission(User user, Permission permission, Connection conn) throws SQLException {
+        CallableStatement cs = conn.prepareCall("{call Remove_user_permission (?,?)}");
+        cs.setInt(1, user.getId());
+        cs.setInt(2, permission.getId());
         cs.executeUpdate();
     }
 }

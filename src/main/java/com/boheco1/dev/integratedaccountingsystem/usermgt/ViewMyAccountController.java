@@ -1,4 +1,4 @@
-package com.boheco1.dev.integratedaccountingsystem;
+package com.boheco1.dev.integratedaccountingsystem.usermgt;
 
 import com.boheco1.dev.integratedaccountingsystem.usermgt.ActiveUser;
 import com.boheco1.dev.integratedaccountingsystem.usermgt.Permission;

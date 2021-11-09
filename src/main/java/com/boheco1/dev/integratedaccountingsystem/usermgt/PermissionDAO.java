@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PermissionDAO {
+
     public static List<Permission> getAll(Connection conn) throws SQLException {
         CallableStatement cs = conn.prepareCall("{call Get_all_permissions}");
         ResultSet rs = cs.executeQuery();
@@ -75,5 +76,21 @@ public class PermissionDAO {
         CallableStatement cs = conn.prepareCall("{call Remove_permission (?)}");
         cs.setInt(1, permission.getId());
         cs.executeUpdate();
+    }
+
+    public static List<Permission> permissionsOfRole(Role role, Connection conn) throws SQLException {
+        CallableStatement cs = conn.prepareCall("{call Permissions_of_a_role (?)}");
+        cs.setInt(1, role.getId());
+        ResultSet rs = cs.executeQuery();
+
+        ArrayList<Permission> list = new ArrayList();
+        while(rs.next()) {
+            list.add(new Permission(
+                    rs.getInt("id"),
+                    rs.getString("permission"),
+                    rs.getString("remarks")
+            ));
+        }
+        return list;
     }
 }

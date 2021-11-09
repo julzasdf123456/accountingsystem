@@ -11,7 +11,7 @@ public class DB {
     public static Connection getConnection() throws SQLException, ClassNotFoundException {
         if(connection==null) {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            String conString = "jdbc:sqlserver://DESKTOP-JKEV4AP;Database=lntrxdb;IntegratedSecurity=true";
+            String conString = "jdbc:sqlserver://DESKTOP-JKEV4AP;Database=Accounting;IntegratedSecurity=true";
             connection = DriverManager.getConnection(conString);
         }
 

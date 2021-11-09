@@ -17,7 +17,7 @@ public class HostWindow extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("home_controller.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("login_controller.fxml"));
         Rectangle2D screenBounds = Screen.getPrimary().getBounds();
         scene = new Scene(root, screenBounds.getWidth(), screenBounds.getHeight()-60);
         scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
