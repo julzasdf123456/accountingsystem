@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ColorPalette;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ContentHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DrawerMenuHelper;
+import com.boheco1.dev.integratedaccountingsystem.warehouse.DashboardController;
 import com.jfoenix.controls.JFXButton;
 import javafx.animation.*;
 import javafx.beans.property.DoubleProperty;
@@ -35,6 +36,8 @@ public class HomeController implements Initializable {
     @FXML Label accountingLabel, billingLabel, telleringLabel, warehouseLabel;
 
     @FXML JFXButton budget, journalEntries, myAcctBtn, logoutBtn, allAccounts, collection, otherPayments;
+
+    @FXML JFXButton warehouseDashboardBtn;
 
     // DRAWER MENU ARRAYS
     public List<JFXButton> drawerMenus;
@@ -75,6 +78,8 @@ public class HomeController implements Initializable {
         DrawerMenuHelper.setMenuButtonWithView(otherPayments, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, otherPayments.getText(), contentPane, "all_accounts_layout.fxml");
         DrawerMenuHelper.setMenuButton(myAcctBtn,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "My Account");
         DrawerMenuHelper.setMenuButton(logoutBtn,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "Logout");
+        // WAREHOUSE
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(warehouseDashboardBtn, new FontIcon("mdi2v-view-dashboard"), drawerMenus, "Warehouse Dashboard", contentPane, "warehouse_dashboard_controller.fxml", subToolbar, new DashboardController());
     }
 
     @FXML

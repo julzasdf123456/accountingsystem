@@ -89,6 +89,11 @@
                                                    <Insets top="10" bottom="10"/>
                                                 </padding>
                                              </Label>
+                                             <JFXButton fx:id="warehouseDashboardBtn" prefHeight="25.0" prefWidth="236.0" style="-fx-alignment: LEFT;" text="Dashboard">
+                                                <font>
+                                                   <Font size="13.0" />
+                                                </font>
+                                             </JFXButton>
                                              <!--Divider -->
                                              <AnchorPane AnchorPane.leftAnchor="5" AnchorPane.rightAnchor="3"  prefWidth="-Infinity" prefHeight="1" style="-fx-background-color: #b2dfdb;" >
                                                 <VBox.margin>
