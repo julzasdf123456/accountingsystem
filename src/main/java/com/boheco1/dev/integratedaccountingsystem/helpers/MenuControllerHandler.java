@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.helpers;
 
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 
@@ -10,7 +11,7 @@ public class MenuControllerHandler implements SubMenuHelper {
     }
 
     @Override
-    public void handleContentReplacements(AnchorPane container) {
+    public void handleContentReplacements(AnchorPane container, Label titleHolder) {
 
     }
 }

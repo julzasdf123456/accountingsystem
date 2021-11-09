@@ -4,6 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.SubMenuHelper;
 import com.jfoenix.controls.JFXButton;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 
@@ -38,7 +39,7 @@ public class BudgetController extends MenuControllerHandler implements Initializ
     }
 
     @Override
-    public void handleContentReplacements(AnchorPane container) {
-        super.handleContentReplacements(container);
+    public void handleContentReplacements(AnchorPane container, Label titleHolder) {
+
     }
 }

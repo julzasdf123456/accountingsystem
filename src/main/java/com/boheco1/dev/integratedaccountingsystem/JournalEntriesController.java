@@ -4,6 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.jfoenix.controls.JFXButton;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
@@ -62,7 +63,7 @@ public class JournalEntriesController extends MenuControllerHandler implements I
     }
 
     @Override
-    public void handleContentReplacements(AnchorPane container) {
+    public void handleContentReplacements(AnchorPane container, Label titleHolder) {
         changeView.setOnAction(actionEvent -> {
             container.getChildren().setAll(ContentHandler.getNodeFromFxml(JournalEntriesController.class, "budget_layout.fxml"));
         });

@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.helpers;
 
 import com.jfoenix.controls.JFXButton;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 
@@ -17,5 +18,5 @@ public interface SubMenuHelper {
      * Set menu events inside this function
      * @param container
      */
-    public void handleContentReplacements(AnchorPane container);
+    public void handleContentReplacements(AnchorPane container, Label titleHolder);
 }

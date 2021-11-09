@@ -6,6 +6,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.SubMenuHelper;
 import com.jfoenix.controls.JFXButton;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
@@ -45,8 +46,8 @@ public class AllAccountsController extends MenuControllerHandler implements Init
     }
 
     @Override
-    public void handleContentReplacements(AnchorPane container) {
-        super.handleContentReplacements(container);
+    public void handleContentReplacements(AnchorPane container, Label titleHolder) {
+
     }
 
     @FXML

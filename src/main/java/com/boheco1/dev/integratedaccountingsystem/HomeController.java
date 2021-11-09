@@ -3,7 +3,12 @@ package com.boheco1.dev.integratedaccountingsystem;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ColorPalette;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ContentHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DrawerMenuHelper;
-import com.boheco1.dev.integratedaccountingsystem.warehouse.DashboardController;
+
+import com.boheco1.dev.integratedaccountingsystem.warehouse.FileMIRS;
+import com.boheco1.dev.integratedaccountingsystem.warehouse.WarehouseDashboardController;
+
+import com.boheco1.dev.integratedaccountingsystem.usermgt.ActiveUser;
+
 import com.jfoenix.controls.JFXButton;
 import javafx.animation.*;
 import javafx.beans.property.DoubleProperty;
@@ -37,7 +42,9 @@ public class HomeController implements Initializable {
 
     @FXML JFXButton budget, journalEntries, myAcctBtn, logoutBtn, allAccounts, collection, otherPayments;
 
-    @FXML JFXButton warehouseDashboardBtn;
+    @FXML JFXButton warehouseDashboardBtn, mirsBtn;
+
+    @FXML Label title;
 
     // DRAWER MENU ARRAYS
     public List<JFXButton> drawerMenus;
@@ -71,15 +78,17 @@ public class HomeController implements Initializable {
 
         // INITIALIZE MENU ICONS
         drawerMenus = new ArrayList<>();
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(budget,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, budget.getText(), contentPane, "budget_layout.fxml", subToolbar, new BudgetController());
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(journalEntries,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, journalEntries.getText(), contentPane, "journal_entries_layout.fxml", subToolbar, new JournalEntriesController());
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(allAccounts, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, allAccounts.getText(), contentPane, "all_accounts_layout.fxml", subToolbar, new AllAccountsController());
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(budget,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, budget.getText(), contentPane, "budget_layout.fxml", subToolbar, new BudgetController(), "budget", homeStackPane, title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(journalEntries,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, journalEntries.getText(), contentPane, "journal_entries_layout.fxml", subToolbar, new JournalEntriesController(), title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(allAccounts, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, allAccounts.getText(), contentPane, "all_accounts_layout.fxml", subToolbar, new AllAccountsController(), title);
         DrawerMenuHelper.setMenuButtonWithView(collection, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, collection.getText(), contentPane, "all_accounts_layout.fxml");
-        DrawerMenuHelper.setMenuButtonWithView(otherPayments, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, otherPayments.getText(), contentPane, "all_accounts_layout.fxml");
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(otherPayments, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, otherPayments.getText(), contentPane, "all_accounts_layout.fxml", subToolbar, null, title);
         DrawerMenuHelper.setMenuButton(myAcctBtn,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "My Account");
         DrawerMenuHelper.setMenuButton(logoutBtn,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "Logout");
+
         // WAREHOUSE
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(warehouseDashboardBtn, new FontIcon("mdi2v-view-dashboard"), drawerMenus, "Warehouse Dashboard", contentPane, "warehouse_dashboard_controller.fxml", subToolbar, new DashboardController());
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(warehouseDashboardBtn, new FontIcon("mdi2v-view-dashboard"), drawerMenus, "Warehouse Dashboard", contentPane, "warehouse_dashboard_controller.fxml", subToolbar, new WarehouseDashboardController(), title); // PERMISSION TO VIEW WAREHOUSE: warehouse-view
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(mirsBtn, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "File for MIRS", contentPane, "warehouse_file_mirs.fxml", subToolbar, new FileMIRS(), title); // PERMISSION TO VIEW WAREHOUSE: warehouse-view
     }
 
     @FXML
@@ -130,15 +139,21 @@ public class HomeController implements Initializable {
 
     @FXML
     private void newClick() {
-        contentPane.getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "budget_layout.fxml"));
     }
 
     public void replaceContent(String fxml) {
         contentPane.getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, fxml));
+        subToolbar = null;
     }
 
     @FXML
     private void logout() throws IOException {
+        ActiveUser.setUser(null);
         HostWindow.setRoot("login_controller");
+    }
+
+    @FXML
+    private void viewMyAccount() {
+        this.replaceContent("view_my_account.fxml");
     }
 }

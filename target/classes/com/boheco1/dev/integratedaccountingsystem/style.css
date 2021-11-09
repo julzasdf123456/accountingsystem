@@ -69,3 +69,39 @@
     -fx-background-color: white;
     -fx-text-fill: #00AD8E;
 }
+
+// CARDS
+.card {
+    -fx-background-color: #fdfdfd;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 7, 0, 0, 0);
+}
+
+.card:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3),10, 0, 0, 0);
+}
+
+.card:pressed {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5),11, 0, 0, 0);
+}
+
+.card-success {
+    -fx-background-color: #388e3c;
+}
+
+.card-danger {
+    -fx-background-color: #f44336;
+}
+
+.card-warning {
+    -fx-background-color: #ff9800;
+}
+
+.card-info {
+    -fx-background-color: #2196f3;
+}
+
+.card-theme {
+    -fx-background-color: #00AD8E;
+}

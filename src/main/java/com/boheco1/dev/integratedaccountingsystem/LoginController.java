@@ -1,6 +1,9 @@
 package com.boheco1.dev.integratedaccountingsystem;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
+import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.usermgt.User;
+import com.boheco1.dev.integratedaccountingsystem.usermgt.UserDAO;
 import com.jfoenix.controls.*;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -28,16 +31,18 @@ public class LoginController implements Initializable {
     @FXML
     private void loginEvent(Event event) {
         try {
-            if (username.getText().equals("user") && password.getText().equals("user")) {
+            if (login()) {
                 HostWindow.setRoot("home_controller");
-            } else {
-                AlertDialogBuilder.messgeDialog("Test Login", "This is a test login message " + username.getText() + " - " + password.getText(), loginStackPane, AlertDialogBuilder.WARNING_DIALOG);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            AlertDialogBuilder.messgeDialog("Cannot Log you In", ex.getMessage(), loginStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }
     }
 
-
+    private boolean login() throws Exception {
+        User user = UserDAO.login(username.getText(), password.getText(), DB.getConnection());
+        return user!=null;
+    }
 
 }
