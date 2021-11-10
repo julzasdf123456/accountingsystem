@@ -11,6 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StockDAO {
+    /**
+     * Create a new Stock record
+     * @param stock the Stock record to be created
+     * @throws Exception obligatory from DB.getConnection()
+     */
     public static void add(Stock stock) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "INSERT INTO Stocks " +
@@ -53,6 +58,12 @@ public class StockDAO {
         ps.close();
     }
 
+    /**
+     * Retrieves a single Stock record
+     * @param id the identifier of the Stock record to be retrieved
+     * @return Stock object
+     * @throws Exception obligatory from DB.getConnection()
+     */
     public static Stock get(int id) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM Stocks WHERE id=?");
@@ -91,6 +102,12 @@ public class StockDAO {
         return null;
     }
 
+    /**
+     * Retrieves a list of SlimStocks as a search result based on a search Key
+     * @param key The search key
+     * @return A list of SlimStock that qualifies with the search key
+     * @throws Exception obligatory from DB.getConnection()
+     */
     public static List<SlimStock> search(String key) throws Exception  {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "Select TOP 50 id, StockName, Brand, Model FROM Stocks " +
@@ -118,6 +135,12 @@ public class StockDAO {
         return stocks;
     }
 
+    /**
+     * Change the quantity of a Stock as a result of entry of release.
+     * @param stock The stock record to be updated
+     * @param quantity the new quantity to given to the stock
+     * @throws Exception obligatory from DB.getConnection()
+     */
     private static void changeQuantity(Stock stock, int quantity) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE Stocks SET quantity=?, UpdatedAt=NOW(), UserIDUpdated=? " +
@@ -131,16 +154,33 @@ public class StockDAO {
         ps.close();
     }
 
+    /**
+     * Add quantity to a stock as a result of stock entry
+     * @param stock the stock record to be updated
+     * @param quantity the quantity to be added to the stock
+     * @throws Exception obligatory from DB.getConnection()
+     */
     public static void addStockQuantity(Stock stock, int quantity) throws Exception {
         int newQty = stock.getQuantity() + quantity;
         changeQuantity(stock, newQty);
     }
 
+    /**
+     * Deducts quantity from a stock as a result of releasing
+     * @param stock the stock record to be udpated
+     * @param quantity the quantity to be deducted from the stock
+     * @throws Exception obligatory from DB.getConnection()
+     */
     public static void deductStockQuantity(Stock stock, int quantity) throws Exception {
         int newQty = stock.getQuantity() - quantity;
         changeQuantity(stock, newQty);
     }
 
+    /**
+     * Tags a stock as trashed
+     * @param stock the stock to be trashed
+     * @throws Exception obligatory from DB.getConnection()
+     */
     public static void trash(Stock stock) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE Stocks SET IsTrashed=1, TrashedAt=NOW(), UserIDTrashed=? WHERE id=?");
@@ -150,6 +190,12 @@ public class StockDAO {
         ps.close();
     }
 
+    /**
+     * Implementation of the stock entry transaction
+     * @param stock the stock entered
+     * @param log entry log containing data such as quantity, source, etc.
+     * @throws Exception obligatory from DB.getConnection()
+     */
     public static void stockEntry(Stock stock, StockEntryLog log) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "INSERT INTO StockEntryLogs " +
