@@ -1,2 +1,142 @@
-package com.boheco1.dev.integratedaccountingsystem.dao;public class StockDAO {
+package com.boheco1.dev.integratedaccountingsystem.dao;
+
+import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
+import com.boheco1.dev.integratedaccountingsystem.objects.SlimStock;
+import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class StockDAO {
+    public static void add(Stock stock) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "INSERT INTO Stocks " +
+                        "(StockName, Description, SerialNumber, " +
+                        "Brand, Model, ManufacturingDate, " +
+                        "ValidityDate, TypeID, Unit, " +
+                        "Quantity, Price, NEACode, " +
+                        "IsTrashed, Comments, CreatedAt, " +
+                        "UserIDCreated) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        ps.setString(1, stock.getStockName());
+        ps.setString(2, stock.getDescription());
+        ps.setInt(3, stock.getSerialNumber());
+
+        ps.setString(4, stock.getBrand());
+        ps.setString(5, stock.getModel());
+        ps.setDate(6, stock.getManufacturingDate()!=null ? Date.valueOf(stock.getManufacturingDate()) : null);
+
+        ps.setDate(7, stock.getValidityDate()!=null ? Date.valueOf(stock.getValidityDate()) : null);
+        ps.setInt(8, stock.getTypeID());
+        ps.setString(9, stock.getUnit());
+
+        ps.setInt(10, stock.getQuantity());
+        ps.setDouble(11, stock.getPrice());
+        ps.setString(12, stock.getNeaCode());
+
+        ps.setBoolean(13, stock.isTrashed());
+        ps.setString(14, stock.getComments());
+        ps.setTimestamp(15, stock.getCreatedAt()!=null ? Timestamp.valueOf(stock.getCreatedAt()) : null);
+        ps.setInt(16, stock.getUserIDCreated());
+
+        ps.executeUpdate();
+
+        ResultSet rs = ps.getGeneratedKeys();
+        if(rs.next()) {
+            stock.setId(rs.getInt(1));
+        }
+
+        rs.close();
+        ps.close();
+    }
+
+    public static Stock get(int id) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM Stocks WHERE id=?");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        if(rs.next()) {
+            Stock stock = new Stock(
+                    rs.getInt("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Description"),
+                    rs.getInt("SerialNumber"),
+                    rs.getString("Brand"),
+                    rs.getString("Model"),
+                    rs.getDate("ManufacturingDate").toLocalDate(),
+                    rs.getDate("ValidityDate").toLocalDate(),
+                    rs.getInt("TypeID"),
+                    rs.getString("Unit"),
+                    rs.getInt("Quantity"),
+                    rs.getDouble("Price"),
+                    rs.getString("NEACode"),
+                    rs.getBoolean("IsTrashed"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
+                    rs.getInt("UserIDCreated"),
+                    rs.getInt("UserIDUpdated"),
+                    rs.getInt("UserIDTrashed")
+            );
+
+            rs.close();
+
+            return stock;
+        }
+        rs.close();
+        return null;
+    }
+
+    public static List<SlimStock> search(String key) throws Exception  {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "Select TOP 50 id, StockName, Brand, Model FROM Stocks " +
+                        "WHERE (StockName LIKE '%?%' OR Brand LIKE '%?%' OR Model LIKE '%?%' ) " +
+                        "AND IsTrashed=0 ORDER BY StockName");
+        ps.setString(1, key);
+        ps.setString(2, key);
+        ps.setString(3, key);
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<SlimStock> stocks = new ArrayList();
+        while(rs.next()) {
+            stocks.add(new SlimStock(
+                    rs.getInt("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Model"),
+                    rs.getString("Brand")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return stocks;
+    }
+
+    private static void changeQuantity(Stock stock, int quantity) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE Stocks SET quantity=?, UpdatedAt=NOW(), UserIDUpdated=? " +
+                        "WHERE id = ?");
+        ps.setInt(1, quantity);
+        ps.setInt(2, ActiveUser.getUser().getId());
+        ps.setInt(3, stock.getId());
+
+        ps.executeUpdate();
+
+        ps.close();
+    }
+
+    public static void addStockQuantity(Stock stock, int quantity) throws Exception {
+        int newQty = stock.getQuantity() + quantity;
+        changeQuantity(stock, newQty);
+    }
+
+    public static void deductStockQuantity(Stock stock, int quantity) throws Exception {
+        int newQty = stock.getQuantity() - quantity;
+        changeQuantity(stock, newQty);
+    }
 }
