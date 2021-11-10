@@ -4,6 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 import com.boheco1.dev.integratedaccountingsystem.objects.SlimStock;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
+import com.boheco1.dev.integratedaccountingsystem.objects.StockEntryLog;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -138,5 +139,38 @@ public class StockDAO {
     public static void deductStockQuantity(Stock stock, int quantity) throws Exception {
         int newQty = stock.getQuantity() - quantity;
         changeQuantity(stock, newQty);
+    }
+
+    public static void trash(Stock stock) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE Stocks SET IsTrashed=1, TrashedAt=NOW(), UserIDTrashed=? WHERE id=?");
+        ps.setInt(1, ActiveUser.getUser().getId());
+        ps.setInt(2, stock.getId());
+        ps.executeUpdate();
+        ps.close();
+    }
+
+    public static void stockEntry(Stock stock, StockEntryLog log) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "INSERT INTO StockEntryLogs " +
+                        "(StockID, Quantity, Source, Price, UserID, CreatedAt, UpdatedAt) " +
+                        "VALUES " +
+                        "(?,?,?,?,?,Now(),Now())", Statement.RETURN_GENERATED_KEYS);
+        ps.setInt(1, stock.getId());
+        ps.setInt(2, log.getQuantity());
+        ps.setString(3, log.getSource());
+        ps.setDouble(4, log.getPrice());
+        ps.setInt(5, ActiveUser.getUser().getId());
+        ps.executeUpdate();
+
+        ResultSet rs = ps.getGeneratedKeys();
+        if(rs.first()) {
+            int id = rs.getInt(1);
+            log.setId(id);
+        }
+        rs.close();
+        ps.close();
+
+        addStockQuantity(stock, log.getQuantity());
     }
 }
