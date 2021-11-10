@@ -1,7 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.helpers;
 
 import com.boheco1.dev.integratedaccountingsystem.HomeController;
-import com.boheco1.dev.integratedaccountingsystem.usermgt.ActiveUser;
+import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 import com.jfoenix.controls.JFXButton;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

@@ -1,4 +1,8 @@
-package com.boheco1.dev.integratedaccountingsystem.usermgt;
+package com.boheco1.dev.integratedaccountingsystem.dao;
+
+import com.boheco1.dev.integratedaccountingsystem.objects.Permission;
+import com.boheco1.dev.integratedaccountingsystem.objects.Role;
+import com.boheco1.dev.integratedaccountingsystem.objects.User;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;

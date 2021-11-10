@@ -1,25 +1,55 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 public class EmployeeInfo {
-    private String id;
+    private int id;
     private String employeeFirstName;
     private String employeeMidName;
     private String employeeLastName;
+    private String employeeAddress;
+    private String phone;
     private String designation;
+    private int departmentID;
 
-    public EmployeeInfo(String id, String employeeFirstName, String employeeMidName, String employeeLastName, String designation) {
+    public EmployeeInfo(int id, String employeeFirstName, String employeeMidName, String employeeLastName, String employeeAddress, String phone, String designation, int departmentID) {
         this.id = id;
         this.employeeFirstName = employeeFirstName;
         this.employeeMidName = employeeMidName;
         this.employeeLastName = employeeLastName;
         this.designation = designation;
+        this.employeeAddress = employeeAddress;
+        this.phone = phone;
+        this.departmentID = departmentID;
     }
 
-    public String getId() {
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmployeeAddress() {
+        return employeeAddress;
+    }
+
+    public void setEmployeeAddress(String employeeAddress) {
+        this.employeeAddress = employeeAddress;
+    }
+
+    public int getDepartmentID() {
+        return departmentID;
+    }
+
+    public void setDepartmentID(int departmentID) {
+        this.departmentID = departmentID;
+    }
+
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

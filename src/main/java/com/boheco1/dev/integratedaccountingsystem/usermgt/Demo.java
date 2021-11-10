@@ -1,9 +1,10 @@
 package com.boheco1.dev.integratedaccountingsystem.usermgt;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
+import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Demo {
@@ -18,8 +19,16 @@ public class Demo {
 
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            String conString = "jdbc:sqlserver://DESKTOP-JKEV4AP;Database=lntrxdb;IntegratedSecurity=true";
+            String conString = "jdbc:sqlserver://DESKTOP-JKEV4AP;Database=Accounting;IntegratedSecurity=true";
             Connection connection = DriverManager.getConnection(conString);
+
+//            User u = new User(-1,1,"lentrix","Benjie B. Lenteria","Programmer","12345678");
+//            u.setPassword("password");
+//
+//            UserDAO.addUser(u, connection);
+
+            EmployeeInfo emp = new EmployeeInfo(3, "Julio","","Lopez","Tubigon, Bohol","","Programmer",5);
+            EmployeeDAO.addEmployee(emp, connection);
 
 //            User user = UserDAO.login(user1, pass1, connection);
 //            String[] perms = {"create-user","update-user","view-own-profile","view-other-profile","delete-user"};
@@ -36,10 +45,10 @@ public class Demo {
 //            for(Role role: RoleDAO.getAll(connection)) {
 //                System.out.println(role.getRole());
 //            }
-            List<User> users = UserDAO.getAll(connection);
-            for(User user: users) {
-                UserDAO.updatePassword(user, "password123",connection);
-            }
+//            List<User> users = UserDAO.getAll(connection);
+//            for(User user: users) {
+//                UserDAO.updatePassword(user, "password123",connection);
+//            }
 
         }catch(Exception ex) {
             ex.printStackTrace();

@@ -1,31 +1,31 @@
-package com.boheco1.dev.integratedaccountingsystem.usermgt;
+package com.boheco1.dev.integratedaccountingsystem.objects;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
 import java.util.List;
 
 public class User {
     private int id;
     private String userName;
     private String fullName;
-    private String designation;
-    private String phone;
     private String passwordHash;
     private String password;
+    private int employeeID;
     private List<Permission> permissions;
     private static final String KEY = "ubhc1@securityxc";
 
-    public User(int id, String userName, String fullName, String designation, String phone) {
+    public User(int id, int employeeID, String userName, String fullName) {
         this.id = id;
+        this.employeeID = employeeID;
         this.userName = userName;
         this.fullName = fullName;
-        this.designation = designation;
-        this.phone = phone;
     }
 
-    public User(int id, String userName, String fullName, String designation, String phone, String passwordHash) {
-        this(id, userName, fullName, designation, phone);
+    public User(int id, int employeeID, String userName, String fullName, String passwordHash) {
+        this(id, employeeID, userName, fullName);
         this.passwordHash = passwordHash;
+    }
+
+    public int getEmployeeID() {
+        return employeeID;
     }
 
     public String getPassword() {
@@ -50,22 +50,6 @@ public class User {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
-    }
-
-    public String getDesignation() {
-        return designation;
-    }
-
-    public void setDesignation(String designation) {
-        this.designation = designation;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 
     public int getId() {

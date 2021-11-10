@@ -1,9 +1,14 @@
-package com.boheco1.dev.integratedaccountingsystem.usermgt;
+package com.boheco1.dev.integratedaccountingsystem.dao;
+
+import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
+import com.boheco1.dev.integratedaccountingsystem.objects.Permission;
+import com.boheco1.dev.integratedaccountingsystem.objects.Role;
+import com.boheco1.dev.integratedaccountingsystem.objects.User;
+import com.boheco1.dev.integratedaccountingsystem.usermgt.*;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 public class UserDAO {
 
@@ -18,10 +23,9 @@ public class UserDAO {
 
         User user = new User(
                 rs.getInt("id"),
+                rs.getInt("EmployeeID"),
                 rs.getString("username"),
-                rs.getString("fullname"),
-                rs.getString("designation"),
-                rs.getString("phone")
+                rs.getString("fullname")
         );
 
         user.setPermissions(getPermissions(user, cxn));
@@ -41,10 +45,8 @@ public class UserDAO {
 
         return new User(
                 rs.getInt("id"),
+                rs.getInt("EmployeeID"),
                 rs.getString("username"),
-                rs.getString("fullname"),
-                rs.getString("designation"),
-                rs.getString("phone"),
                 rs.getString("password")
         );
     }
@@ -100,10 +102,9 @@ public class UserDAO {
         while(rs.next()) {
             users.add(new User(
                     rs.getInt("id"),
+                    rs.getInt("EmployeeID"),
                     rs.getString("username"),
-                    rs.getString("fullname"),
-                    rs.getString("designation"),
-                    rs.getString("phone")
+                    rs.getString("fullname")
             ));
         }
         return users;
@@ -111,16 +112,12 @@ public class UserDAO {
 
     public static void addUser(User user, Connection conn) throws Exception {
         String passwordHash = Hash.hash(user.getPassword());
-        CallableStatement cs = conn.prepareCall("{? = call Add_user (?,?,?,?,?)}");
+        CallableStatement cs = conn.prepareCall("{? = call Add_user (?,?,?,?)}");
         cs.registerOutParameter(1, Types.INTEGER);
         cs.setString(2, user.getUserName());
         cs.setString(3, user.getFullName());
-        cs.setString(4, user.getDesignation());
-        cs.setString(5, user.getPhone());
-        cs.setString(6, passwordHash);
-
-        System.out.println("Password Hash:");
-        System.out.println(passwordHash);
+        cs.setString(4, passwordHash);
+        cs.setInt(5, user.getEmployeeID());
 
         cs.executeUpdate();
 

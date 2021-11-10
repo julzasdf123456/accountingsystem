@@ -1,8 +1,11 @@
 package com.boheco1.dev.integratedaccountingsystem.usermgt;
 
-import com.boheco1.dev.integratedaccountingsystem.usermgt.ActiveUser;
-import com.boheco1.dev.integratedaccountingsystem.usermgt.Permission;
-import com.boheco1.dev.integratedaccountingsystem.usermgt.User;
+import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
+import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
+import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
+import com.boheco1.dev.integratedaccountingsystem.objects.Permission;
+import com.boheco1.dev.integratedaccountingsystem.objects.User;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -20,19 +23,24 @@ public class ViewMyAccountController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        User user = ActiveUser.getUser();
+        try {
+            User user = ActiveUser.getUser();
+            EmployeeInfo emp = EmployeeDAO.getOne(user.getEmployeeID(), DB.getConnection());
+            userNameField.setText(user.getUserName());
+            fullNameField.setText(user.getFullName());
+            designationField.setText(emp.getDesignation());
+            phoneNumberField.setText(emp.getPhone());
 
-        userNameField.setText(user.getUserName());
-        fullNameField.setText(user.getFullName());
-        designationField.setText(user.getDesignation());
-        phoneNumberField.setText(user.getPhone());
+            StringBuffer permissions = new StringBuffer();
 
-        StringBuffer permissions = new StringBuffer();
+            for(Permission p: user.getPermissions()) {
+                permissions.append(p.getPermission() + ", ");
+            }
 
-        for(Permission p: user.getPermissions()) {
-            permissions.append(p.getPermission() + ", ");
+            if(permissions.length()>0)
+                permissionsField.setText(permissions.substring(0, permissions.length()-2));
+        }catch(Exception ex) {
+            ex.printStackTrace();
         }
-
-        permissionsField.setText(permissions.substring(0, permissions.length()-2));
     }
 }

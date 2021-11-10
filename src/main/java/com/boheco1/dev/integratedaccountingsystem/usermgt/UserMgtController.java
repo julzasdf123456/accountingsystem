@@ -1,32 +1,34 @@
 package com.boheco1.dev.integratedaccountingsystem.usermgt;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
-import com.boheco1.dev.integratedaccountingsystem.usermgt.*;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class UserMgtController extends MenuControllerHandler implements Initializable {
-    @FXML JFXComboBox selectUserCombo, selectRoleCombo, selectPermissionCombo, selectPermissionForRoleCombo;
+    @FXML JFXComboBox selectUserCombo, selectRoleCombo, selectPermissionCombo,
+            selectPermissionForRoleCombo, departmentCombo;
 
-    @FXML JFXTextField userNameField, fullNameField, designationField, phoneNumberField, roleNameField, permissionNameField;
+    @FXML JFXTextField userNameField, designationField, phoneNumberField, roleNameField,
+            permissionNameField, lastNameField, middleNameField, firstNameField;
 
-    @FXML JFXTextArea roleDescriptionField, permissionDescriptionField;
+    @FXML JFXTextArea roleDescriptionField, permissionDescriptionField, addressField;
 
     @FXML JFXPasswordField newPasswordField, confirmPasswordField;
 
@@ -36,9 +38,11 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
     StackPane userMgtStackPane;
 
     private User currentUser = null;
+    private EmployeeInfo currentEmployee = null;
     private Role currentRole = null;
     private Permission currentPermission = null;
     private ObservableList<User> listOfUsers;
+    private ObservableList<Department> listOfDepartments;
     private ObservableList<Permission> listOfAvailablePermissions;
     private ObservableList<Permission> listOfUserPermissions;
     private ObservableList<Permission> listOfPermissions;
@@ -58,6 +62,9 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
             listOfUsers = FXCollections.observableArrayList(UserDAO.getAll(conn));
             selectUserCombo.setItems(listOfUsers);
 
+            listOfDepartments = FXCollections.observableArrayList(DepartmentDAO.getAll(conn));
+            departmentCombo.setItems(listOfDepartments);
+
             listOfRoles = FXCollections.observableArrayList(RoleDAO.getAll(conn));
             listOfPermissions = FXCollections.observableArrayList(PermissionDAO.getAll(conn));
 
@@ -73,6 +80,7 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
 
         }catch(Exception ex) {
             AlertDialogBuilder.messgeDialog("Exception", ex.getMessage(),userMgtStackPane,AlertDialogBuilder.DANGER_DIALOG);
+            ex.printStackTrace();
         }
     }
 
@@ -81,6 +89,8 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
             this.currentUser = (User)selectUserCombo.getSelectionModel().getSelectedItem();
 
             if(currentUser==null) return;
+
+            this.currentEmployee = EmployeeDAO.getOne(currentUser.getEmployeeID(), conn);
 
             renderUser();
 
@@ -92,10 +102,14 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
 
     private void renderUser() throws Exception {
         userNameField.setText(currentUser.getUserName());
-        fullNameField.setText(currentUser.getFullName());
-        designationField.setText(currentUser.getDesignation());
-        phoneNumberField.setText(currentUser.getPhone());
-
+        designationField.setText(currentEmployee.getDesignation());
+        phoneNumberField.setText(currentEmployee.getPhone());
+        firstNameField.setText(currentEmployee.getEmployeeFirstName());
+        middleNameField.setText(currentEmployee.getEmployeeMidName());
+        lastNameField.setText(currentEmployee.getEmployeeLastName());
+        phoneNumberField.setText(currentEmployee.getPhone());
+        addressField.setText(currentEmployee.getEmployeeAddress());
+        departmentCombo.getSelectionModel().select(findDepartment(currentEmployee.getDepartmentID()));
         //populate user Permissions
         this.listOfUserPermissions = FXCollections.observableArrayList(PermissionDAO.permissionsOfUser(this.currentUser, conn));
         userPermissionsList.setItems(this.listOfUserPermissions);
@@ -111,10 +125,28 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
         selectRoleCombo.setItems(listOfAvailableRoles);
     }
 
+    private Department findDepartment(int departmentID) {
+        for(Department dept: listOfDepartments) {
+            if(dept.getDepartmentID()==departmentID) return dept;
+        }
+        return null;
+    }
+
     public void saveUser() {
         try {
             if(currentUser==null) {
-                currentUser = new User(-1, userNameField.getText(), fullNameField.getText(),designationField.getText(),phoneNumberField.getText());
+                Department dept = (Department) departmentCombo.getSelectionModel().getSelectedItem();
+
+                if(dept==null) {
+                    AlertDialogBuilder.messgeDialog("No Department","It is required that an employee be assigned to a department.",userMgtStackPane,AlertDialogBuilder.WARNING_DIALOG);;
+                    return;
+                }
+
+                currentEmployee = new EmployeeInfo(-1,firstNameField.getText(),middleNameField.getText(),lastNameField.getText(),addressField.getText(),phoneNumberField.getText(),designationField.getText(),dept.getDepartmentID());
+                String fullName = currentEmployee.getEmployeeFirstName() + " " + currentEmployee.getEmployeeLastName();
+                EmployeeDAO.addEmployee(currentEmployee, conn);
+
+                currentUser = new User(-1, currentEmployee.getId(), userNameField.getText(), fullName);
                 currentUser.setPassword("Boheco1");
                 UserDAO.addUser(currentUser, conn);
 
@@ -123,9 +155,11 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
             }else {
                 AlertDialogBuilder.messgeDialog("Unavailable","This feature is not available yet.",userMgtStackPane,AlertDialogBuilder.WARNING_DIALOG);;
             }
-        }catch(Exception ex) {
+        }catch(SQLException ex) {
             ex.printStackTrace();
             AlertDialogBuilder.messgeDialog("Exception",ex.getMessage(),userMgtStackPane,AlertDialogBuilder.DANGER_DIALOG);;
+        }catch(Exception ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -135,19 +169,24 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
         try {
 
             currentUser = null;
+            currentEmployee = null;
 
             selectUserCombo.getSelectionModel().clearSelection();
 
             userNameField.setText(null);
-            fullNameField.setText(null);
+            firstNameField.setText(null);
+            middleNameField.setText(null);
+            lastNameField.setText(null);
+            addressField.setText(null);
             designationField.setText(null);
             phoneNumberField.setText(null);
+            departmentCombo.getSelectionModel().clearSelection();
 
             listOfAvailablePermissions = FXCollections.observableArrayList(PermissionDAO.getAll(conn));
             listOfAvailableRoles = FXCollections.observableArrayList(RoleDAO.getAll(conn));
 
-            listOfUserRoles.clear();
-            listOfUserPermissions.clear();
+            if(listOfUserRoles!=null) listOfUserRoles.clear();
+            if(listOfUserPermissions!=null) listOfUserPermissions.clear();
 
             userNameField.requestFocus();
         }catch(Exception ex) {

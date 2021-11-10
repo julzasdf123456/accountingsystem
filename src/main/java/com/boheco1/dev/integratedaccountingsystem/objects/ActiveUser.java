@@ -1,4 +1,4 @@
-package com.boheco1.dev.integratedaccountingsystem.usermgt;
+package com.boheco1.dev.integratedaccountingsystem.objects;
 
 public class ActiveUser  {
     private static User user;

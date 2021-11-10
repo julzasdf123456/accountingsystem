@@ -9,7 +9,7 @@ import com.boheco1.dev.integratedaccountingsystem.usermgt.UserMgtController;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.FileMIRS;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.WarehouseDashboardController;
 
-import com.boheco1.dev.integratedaccountingsystem.usermgt.ActiveUser;
+import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 
 import com.jfoenix.controls.JFXButton;
 import javafx.animation.*;
