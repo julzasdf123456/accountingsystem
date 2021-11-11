@@ -1,6 +1,11 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 
+import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
+import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -26,6 +31,9 @@ public class Stock {
     private int userIDCreated;
     private int userIDUpdated;
     private int userIDTrashed;
+
+    private String type;
+    private User userCreated, userUpdated, userTrashed;
 
     public Stock(int id, String stockName, String description, int serialNumber, String brand, String model, LocalDate manufacturingDate, LocalDate validityDate, int typeID, String unit, int quantity, double price, String neaCode, boolean isTrashed, String comments, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime trashedAt, int userIDCreated, int userIDUpdated, int userIDTrashed) {
         this.id = id;
@@ -217,5 +225,46 @@ public class Stock {
 
     public void setUserIDTrashed(int userIDTrashed) {
         this.userIDTrashed = userIDTrashed;
+    }
+
+    /**
+     * Since I did not bother to make a Model class for Types
+     * Direct database access will be done to retrieve the type
+     * @return
+     * @throws Exception
+     */
+    public String getType() throws Exception {
+        if(type==null) {
+            PreparedStatement ps = DB.getConnection().prepareStatement(
+                    "SELECT * FROM StockTypes WHERE id=?");
+            ps.setInt(1, typeID);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()) {
+                type = rs.getString("StockType");
+            }
+        }
+
+        return type;
+    }
+
+    public User getUserCreated() throws Exception {
+        if(userCreated==null) {
+            userCreated = UserDAO.get(userIDCreated);
+        }
+        return userCreated;
+    }
+
+    public User getUserUpdated() throws Exception {
+        if(userUpdated==null) {
+            userUpdated = UserDAO.get(userIDUpdated);
+        }
+        return userUpdated;
+    }
+
+    public User getUserTrashed() throws Exception {
+        if(userTrashed==null) {
+            userTrashed = UserDAO.get(userIDTrashed);
+        }
+        return userTrashed;
     }
 }

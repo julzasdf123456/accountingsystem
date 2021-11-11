@@ -1,5 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
+
 import java.time.LocalDateTime;
 
 public class Signatory {
@@ -10,6 +12,8 @@ public class Signatory {
     private String comments;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    private User user;
 
     public Signatory(int id, String type, int userID, int rank, String comments, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
@@ -75,5 +79,12 @@ public class Signatory {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public User getUser() throws Exception {
+        if(user==null) {
+            user = UserDAO.get(userID);
+        }
+        return user;
     }
 }

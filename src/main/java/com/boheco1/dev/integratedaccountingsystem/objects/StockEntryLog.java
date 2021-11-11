@@ -1,5 +1,9 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
+import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+
 import java.time.LocalDateTime;
 
 public class StockEntryLog {
@@ -11,6 +15,9 @@ public class StockEntryLog {
     private int userID;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    private Stock stock;
+    private User user;
 
     public StockEntryLog(int id, int stockID, int quantity, String source, double price, int userID, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
@@ -85,5 +92,19 @@ public class StockEntryLog {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public User getUser() throws Exception {
+        if(user==null) {
+            user = UserDAO.get(this.userID);
+        }
+        return user;
+    }
+
+    public Stock getStock() throws Exception {
+        if(stock==null) {
+            stock = StockDAO.get(stockID);
+        }
+        return stock;
     }
 }

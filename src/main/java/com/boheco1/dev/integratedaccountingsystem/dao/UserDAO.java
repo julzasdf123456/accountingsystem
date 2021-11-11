@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
+import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 import com.boheco1.dev.integratedaccountingsystem.objects.Permission;
 import com.boheco1.dev.integratedaccountingsystem.objects.Role;
@@ -49,6 +50,30 @@ public class UserDAO {
                 rs.getString("username"),
                 rs.getString("password")
         );
+    }
+
+    public static User get(int id) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM users WHERE id=?");
+        ps.setInt(1, id);
+
+        ResultSet rs = ps.executeQuery();
+
+        User user = null;
+
+        if(rs.next()) {
+            user = new User(
+                    rs.getInt("id"),
+                    rs.getInt("EmployeeID"),
+                    rs.getString("username"),
+                    rs.getString("password")
+            );
+        }
+
+        rs.close();
+        ps.close();
+
+        return user;
     }
 
     public static List<Role> getRoles(User user, Connection connection) throws SQLException {

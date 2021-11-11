@@ -27,13 +27,13 @@ public class Demo {
 
             Connection connection = DB.getConnection();
 
-            EmployeeInfo emp = new EmployeeInfo(1, "Benjie","Basio","Lenteria","Tubigon, Bohol","","Programmer",5);
-            EmployeeDAO.addEmployee(emp, connection);
-
-            User u = new User(-1,1,"lentrix","Benjie B. Lenteria");
-            u.setPassword("password");
-
-            UserDAO.addUser(u, connection);
+//            EmployeeInfo emp = new EmployeeInfo(1, "Benjie","Basio","Lenteria","Tubigon, Bohol","","Programmer",5);
+//            EmployeeDAO.addEmployee(emp, connection);
+//
+//            User u = new User(-1,1,"lentrix","Benjie B. Lenteria");
+//            u.setPassword("password");
+//
+//            UserDAO.addUser(u, connection);
 
 //            EmployeeInfo emp = new EmployeeInfo(3, "Julio","","Lopez","Tubigon, Bohol","","Programmer",5);
 //            EmployeeDAO.addEmployee(emp, connection);
