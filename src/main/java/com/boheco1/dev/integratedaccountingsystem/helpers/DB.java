@@ -14,7 +14,7 @@ public class DB {
             String conString = "jdbc:sqlserver://localhost;" +
                     "Database=Accounting;" +
                     "user=SA;" +
-                    "password=ThePressured1!;" +
+                    "password=Boheco_2021;" +
                     "encrypt=false;" +
                     "trustServerCertificate=false;" +
                     "loginTimeout=60";
