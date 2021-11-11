@@ -25,7 +25,7 @@ public class StockDAO {
                         "Quantity, Price, NEACode, " +
                         "IsTrashed, Comments, CreatedAt, " +
                         "UserIDCreated) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),?)");
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
         ps.setInt(3, stock.getSerialNumber());
@@ -44,8 +44,7 @@ public class StockDAO {
 
         ps.setBoolean(13, stock.isTrashed());
         ps.setString(14, stock.getComments());
-        ps.setTimestamp(15, stock.getCreatedAt()!=null ? Timestamp.valueOf(stock.getCreatedAt()) : null);
-        ps.setInt(16, stock.getUserIDCreated());
+        ps.setInt(15, stock.getUserIDCreated());
 
         ps.executeUpdate();
 
@@ -100,6 +99,45 @@ public class StockDAO {
         }
         rs.close();
         return null;
+    }
+
+    /**
+     * Updates an existing Stock record
+     * @param stock the record to be updated
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void update(Stock stock) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE Stocks SET " +
+                        "StockName=?, Description=?, SerialNumber=?," +
+                        "Brand=?, Model=?, ManufacturingDate=?, " +
+                        "ValidityDate=?, TypeID=?, Unit=?," +
+                        "Quantity=?, Price=?, NEACode=?," +
+                        "Comments=?, UpdatedAt=NOW(), UserIDCreated=? " +
+                        "WHERE id=?");
+        ps.setString(1, stock.getStockName());
+        ps.setString(2, stock.getDescription());
+        ps.setInt(3, stock.getSerialNumber());
+
+        ps.setString(4, stock.getBrand());
+        ps.setString(5, stock.getModel());
+        ps.setDate(6, Date.valueOf(stock.getManufacturingDate()));
+
+        ps.setDate(7, Date.valueOf(stock.getValidityDate()));
+        ps.setInt(8,stock.getTypeID());
+        ps.setString(9, stock.getUnit());
+
+        ps.setInt(10, stock.getQuantity());
+        ps.setDouble(11, stock.getPrice());
+        ps.setString(12, stock.getNeaCode());
+
+        ps.setString(13, stock.getComments());
+        ps.setInt(14, ActiveUser.getUser().getId());
+        ps.setInt(15, stock.getId());
+
+        ps.executeUpdate();
+
+        ps.close();
     }
 
     /**
@@ -218,5 +256,28 @@ public class StockDAO {
         ps.close();
 
         addStockQuantity(stock, log.getQuantity());
+    }
+
+    /**
+     * Update an existing StockEntryLog
+     * @param log the StockEntryLog to be updated
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void updateStockEntry(StockEntryLog log) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE StockEntryLogs SET " +
+                        "StockID=?, Quantity=?, Source=?, " +
+                        "Price=?, UserID=?, UpdatedAt=NOW() " +
+                        "WHERE id=?");
+        ps.setInt(1, log.getStockID());
+        ps.setInt(2, log.getQuantity());
+        ps.setString(3, log.getSource());
+        ps.setDouble(4, log.getPrice());
+        ps.setInt(5, ActiveUser.getUser().getId());
+        ps.setInt(6, log.getId());
+
+        ps.executeUpdate();
+
+        ps.close();
     }
 }
