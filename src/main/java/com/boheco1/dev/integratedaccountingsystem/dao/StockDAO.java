@@ -25,7 +25,7 @@ public class StockDAO {
                         "Quantity, Price, NEACode, " +
                         "IsTrashed, Comments, CreatedAt, " +
                         "UserIDCreated) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?)");
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?)", Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
         ps.setInt(3, stock.getSerialNumber());

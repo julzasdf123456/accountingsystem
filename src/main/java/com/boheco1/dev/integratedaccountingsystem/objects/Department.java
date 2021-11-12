@@ -39,4 +39,9 @@ public class Department {
     public String toString() {
         return this.departmentName;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof Department && ((Department)obj).getDepartmentID()==departmentID);
+    }
 }

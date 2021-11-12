@@ -1,11 +1,9 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
+import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.Department;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,5 +22,28 @@ public class DepartmentDAO {
         }
 
         return departments;
+    }
+
+    public static Department get(int id) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM Departments WHERE DepartmentID=?");
+        ps.setInt(1, id);
+
+        ResultSet rs = ps.executeQuery();
+
+        Department dept = null;
+
+        if(rs.next()) {
+            dept = new Department(
+                    rs.getInt("DepartmentID"),
+                    rs.getString("DepartmentName"),
+                    rs.getInt("DepartmentHead")
+            );
+        }
+
+        rs.close();
+        ps.close();
+
+        return dept;
     }
 }
