@@ -105,3 +105,22 @@
 .card-theme {
     -fx-background-color: #00AD8E;
 }
+
+.btn-sucess {
+    -fx-background-color: #388e3c;
+}
+.btn-danger {
+    -fx-background-color: #f44336;
+}
+
+.btn-warning {
+    -fx-background-color: #ff9800;
+}
+
+.btn-info {
+    -fx-background-color: #2196f3;
+}
+
+.btn-theme {
+    -fx-background-color: #00AD8E;
+}
