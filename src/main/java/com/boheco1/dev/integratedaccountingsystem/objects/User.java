@@ -1,5 +1,8 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
+import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+
 import java.util.List;
 
 public class User {
@@ -11,6 +14,8 @@ public class User {
     private int employeeID;
     private List<Permission> permissions;
     private static final String KEY = "ubhc1@securityxc";
+
+    private EmployeeInfo employeeInfo;
 
     public User(int id, int employeeID, String userName, String fullName) {
         this.id = id;
@@ -77,8 +82,13 @@ public class User {
         return false;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
+    public EmployeeInfo getEmployeeInfo() throws Exception {
+
+        if(employeeInfo==null) {
+            employeeInfo = EmployeeDAO.getOne(this.employeeID, DB.getConnection());
+        }
+
+        return employeeInfo;
     }
 
     @Override

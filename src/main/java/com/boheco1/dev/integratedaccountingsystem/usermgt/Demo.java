@@ -1,7 +1,10 @@
 package com.boheco1.dev.integratedaccountingsystem.usermgt;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
+import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
+import com.boheco1.dev.integratedaccountingsystem.objects.User;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,17 +21,22 @@ public class Demo {
 //        String pass1 = sc.nextLine();
 
         try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            String conString = "jdbc:sqlserver://DESKTOP-JKEV4AP;Database=Accounting;IntegratedSecurity=true";
-            Connection connection = DriverManager.getConnection(conString);
+//            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+//            String conString = "jdbc:sqlserver://DESKTOP-JKEV4AP;Database=Accounting;IntegratedSecurity=true";
+//            Connection connection = DriverManager.getConnection(conString);
 
-//            User u = new User(-1,1,"lentrix","Benjie B. Lenteria","Programmer","12345678");
+            Connection connection = DB.getConnection();
+
+//            EmployeeInfo emp = new EmployeeInfo(1, "Benjie","Basio","Lenteria","Tubigon, Bohol","","Programmer",5);
+//            EmployeeDAO.addEmployee(emp, connection);
+//
+//            User u = new User(-1,1,"lentrix","Benjie B. Lenteria");
 //            u.setPassword("password");
 //
 //            UserDAO.addUser(u, connection);
 
-            EmployeeInfo emp = new EmployeeInfo(3, "Julio","","Lopez","Tubigon, Bohol","","Programmer",5);
-            EmployeeDAO.addEmployee(emp, connection);
+//            EmployeeInfo emp = new EmployeeInfo(3, "Julio","","Lopez","Tubigon, Bohol","","Programmer",5);
+//            EmployeeDAO.addEmployee(emp, connection);
 
 //            User user = UserDAO.login(user1, pass1, connection);
 //            String[] perms = {"create-user","update-user","view-own-profile","view-other-profile","delete-user"};

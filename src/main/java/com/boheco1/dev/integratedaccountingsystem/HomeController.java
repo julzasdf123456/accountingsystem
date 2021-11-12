@@ -4,7 +4,6 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.ColorPalette;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ContentHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DrawerMenuHelper;
 
-import com.boheco1.dev.integratedaccountingsystem.usermgt.EmployeeMgtController;
 import com.boheco1.dev.integratedaccountingsystem.usermgt.UserMgtController;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.FileMIRS;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.WarehouseDashboardController;
@@ -82,7 +81,6 @@ public class HomeController implements Initializable {
         drawerMenus = new ArrayList<>();
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(budget,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, budget.getText(), contentPane, "budget_layout.fxml", subToolbar, new BudgetController(), "budget", homeStackPane, title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(usersBtn,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, usersBtn.getText(), contentPane, "user_mgt.fxml", subToolbar, new UserMgtController(), "manage-user", homeStackPane, title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(employeesBtn,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, employeesBtn.getText(), contentPane, "employee_mgt.fxml", subToolbar, new EmployeeMgtController(), "manage-user", homeStackPane, title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(journalEntries,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, journalEntries.getText(), contentPane, "journal_entries_layout.fxml", subToolbar, new JournalEntriesController(), title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(allAccounts, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, allAccounts.getText(), contentPane, "all_accounts_layout.fxml", subToolbar, new AllAccountsController(), title);
         DrawerMenuHelper.setMenuButtonWithView(collection, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, collection.getText(), contentPane, "all_accounts_layout.fxml");
