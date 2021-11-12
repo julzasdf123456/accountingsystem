@@ -182,7 +182,7 @@ public class StockDAO {
      */
     public static List<Stock> getList(int limit, int offset) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "Select StockName, Brand, Model FROM Stocks " +
+                "Select * FROM Stocks " +
                         "ORDER BY UpdatedAt, StockName " +
                         "OFFSET ? ROWS " +
                         "FETCH ? ROWS ONLY");
