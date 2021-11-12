@@ -1,5 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.DepartmentDAO;
+
 public class EmployeeInfo {
     private int id;
     private String employeeFirstName;
@@ -10,7 +12,10 @@ public class EmployeeInfo {
     private String designation;
     private int departmentID;
 
-    public EmployeeInfo(int id, String employeeFirstName, String employeeMidName, String employeeLastName, String employeeAddress, String phone, String designation, int departmentID) {
+    private String fullName;
+    private String departmentName;
+
+    public EmployeeInfo(int id, String employeeFirstName, String employeeMidName, String employeeLastName, String employeeAddress, String phone, String designation, int departmentID) throws Exception {
         this.id = id;
         this.employeeFirstName = employeeFirstName;
         this.employeeMidName = employeeMidName;
@@ -19,6 +24,14 @@ public class EmployeeInfo {
         this.employeeAddress = employeeAddress;
         this.phone = phone;
         this.departmentID = departmentID;
+    }
+
+    public String getFullName() {
+        return employeeLastName + ", " + employeeFirstName + " " + employeeMidName.substring(0,1)  + ".";
+    }
+
+    public String getDepartmentName() throws Exception {
+        return DepartmentDAO.get(departmentID).getDepartmentName();
     }
 
     public String getPhone() {
@@ -83,5 +96,9 @@ public class EmployeeInfo {
 
     public void setDesignation(String designation) {
         this.designation = designation;
+    }
+
+    public Department getDepartment() throws Exception {
+        return DepartmentDAO.get(departmentID);
     }
 }

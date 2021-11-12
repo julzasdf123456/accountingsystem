@@ -1,8 +1,12 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
+import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class EmployeeDAO {
 
@@ -24,7 +28,7 @@ public class EmployeeDAO {
         employee.setId(id);
     }
 
-    public static EmployeeInfo getOne(int id, Connection conn) throws SQLException {
+    public static EmployeeInfo getOne(int id, Connection conn) throws Exception {
         CallableStatement cs = conn.prepareCall("{call Get_employee (?)}");
         cs.setInt(1, id);
         ResultSet rs = cs.executeQuery();
@@ -44,4 +48,53 @@ public class EmployeeDAO {
             return null;
         }
     }
+
+    public static List<EmployeeInfo> getAll(Connection conn) throws Exception
+    {
+        PreparedStatement ps = conn.prepareStatement(
+                "SELECT * FROM EmployeeInfo " +
+                        "ORDER BY EmployeeLastName, EmployeeFirstName");
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<EmployeeInfo> employeeInfos = new ArrayList<>();
+
+        while(rs.next()) {
+            employeeInfos.add(new EmployeeInfo(
+                    rs.getInt("EmployeeID"),
+                    rs.getString("EmployeeFirstName"),
+                    rs.getString("EmployeeMidName"),
+                    rs.getString("EmployeeLastName"),
+                    rs.getString("Address"),
+                    rs.getString("Phone"),
+                    rs.getString("Designation"),
+                    rs.getInt("DepartmentID")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return employeeInfos;
+    }
+
+    public static void update(EmployeeInfo employeeInfo) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE EmployeeInfo SET " +
+                        "EmployeeFirstName=?, EmployeeMidName=?, EmployeeLastName=?, " +
+                        "Address=?, Designation=?, DepartmentId=?, Phone=? " +
+                        "WHERE EmployeeID=?");
+        ps.setString(1, employeeInfo.getEmployeeFirstName());
+        ps.setString(2, employeeInfo.getEmployeeMidName());
+        ps.setString(3, employeeInfo.getEmployeeLastName());
+        ps.setString(4, employeeInfo.getEmployeeAddress());
+        ps.setString(5, employeeInfo.getDesignation());
+        ps.setInt(6, employeeInfo.getDepartmentID());
+        ps.setString(7, employeeInfo.getPhone());
+        ps.setInt(8, employeeInfo.getId());
+
+        ps.executeUpdate();
+
+        ps.close();
+    }
+
 }

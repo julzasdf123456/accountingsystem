@@ -16,7 +16,7 @@ public class MIRSSignatoryDAO {
                 "INSERT INTO MIRSignatories " +
                         "(MIRSID, SignatoriesID, Status, Comments, CreatedAt, UpdatedAt) " +
                         "VALUES " +
-                        "(?,?,?,?,NOW(),NOW())", Statement.RETURN_GENERATED_KEYS);
+                        "(?,?,?,?,GETDATE(),GETDATE())", Statement.RETURN_GENERATED_KEYS);
         ps.setInt(1, msig.getMirsID());
         ps.setInt(2, msig.getSignatoryID());
         ps.setString(3, msig.getStatus());
@@ -35,7 +35,7 @@ public class MIRSSignatoryDAO {
     public static void update(MIRSSignatory msig) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE MIRSSignatories SET " +
-                        "MIRSID=?, SignatoriesID=?, Status=?, Comments=?, UpdatedAt=now() " +
+                        "MIRSID=?, SignatoriesID=?, Status=?, Comments=?, UpdatedAt=GETDATE() " +
                         "WHERE id=?");
         ps.setInt(1, msig.getMirsID());
         ps.setInt(2, msig.getSignatoryID());

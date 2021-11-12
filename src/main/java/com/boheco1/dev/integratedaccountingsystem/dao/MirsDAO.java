@@ -21,7 +21,7 @@ public class MirsDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "INSERT INTO MIRS (DateFiled, Purpose, Details, Status, RequisitionerID, UserID, CreatedAt, UpdateAt) " +
                         "VALUES " +
-                        "(?,?,?,?,?,?,now(), now())");
+                        "(?,?,?,?,?,?,GETDATE(), GETDATE())");
         ps.setDate(1, Date.valueOf(mirs.getDateFiled()));
         ps.setString(2, mirs.getPurpose());
         ps.setString(3, mirs.getDetails());
@@ -43,7 +43,7 @@ public class MirsDAO {
     public static void update(MIRS mirs) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE MIRS SET " +
-                        "DateFiled=?, Purpose=?, Details=?, Status=?, RequisitionerID=?, UpdatedAt=NOW() " +
+                        "DateFiled=?, Purpose=?, Details=?, Status=?, RequisitionerID=?, UpdatedAt=GETDATE() " +
                         "WHERE id=?");
         ps.setDate(1, Date.valueOf(mirs.getDateFiled()));
         ps.setString(2, mirs.getPurpose());
@@ -66,7 +66,7 @@ public class MirsDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt) " +
                         "VALUES " +
-                        "(?,?,?,?,?,NOW(),NOW())");
+                        "(?,?,?,?,?,GETDATE(),GETDATE())");
         ps.setInt(1, mirs.getId());
         ps.setInt(2, item.getStockID());
         ps.setInt(3, item.getQuantity());
@@ -88,7 +88,7 @@ public class MirsDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt) " +
                         "VALUES " +
-                        "(?,?,?,?,?,NOW(),NOW())");
+                        "(?,?,?,?,?,GETDATE(),GETDATE())");
 
         for(MIRSItem item: items) {
             ps.setInt(1, mirs.getId());
@@ -112,7 +112,7 @@ public class MirsDAO {
      */
     public static void updateMIRSItem(MIRSItem item) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "UPDATE MIRSItems SET StockID=?, Quantity=?, Price=?, Comments=?, UpdatedAt=NOW() " +
+                "UPDATE MIRSItems SET StockID=?, Quantity=?, Price=?, Comments=?, UpdatedAt=GETDATE() " +
                         "WHERE id=?");
         ps.setInt(1, item.getStockID());
         ps.setInt(2, item.getQuantity());

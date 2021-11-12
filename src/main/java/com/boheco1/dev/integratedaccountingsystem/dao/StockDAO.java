@@ -25,7 +25,7 @@ public class StockDAO {
                         "Quantity, Price, NEACode, " +
                         "IsTrashed, Comments, CreatedAt, " +
                         "UserIDCreated) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),?)");
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?)", Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
         ps.setInt(3, stock.getSerialNumber());
@@ -113,7 +113,7 @@ public class StockDAO {
                         "Brand=?, Model=?, ManufacturingDate=?, " +
                         "ValidityDate=?, TypeID=?, Unit=?," +
                         "Quantity=?, Price=?, NEACode=?," +
-                        "Comments=?, UpdatedAt=NOW(), UserIDCreated=? " +
+                        "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=? " +
                         "WHERE id=?");
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
@@ -233,7 +233,7 @@ public class StockDAO {
      */
     private static void changeQuantity(Stock stock, int quantity) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "UPDATE Stocks SET quantity=?, UpdatedAt=NOW(), UserIDUpdated=? " +
+                "UPDATE Stocks SET quantity=?, UpdatedAt=GETDATE(), UserIDUpdated=? " +
                         "WHERE id = ?");
         ps.setInt(1, quantity);
         ps.setInt(2, ActiveUser.getUser().getId());
@@ -273,7 +273,7 @@ public class StockDAO {
      */
     public static void trash(Stock stock) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "UPDATE Stocks SET IsTrashed=1, TrashedAt=NOW(), UserIDTrashed=? WHERE id=?");
+                "UPDATE Stocks SET IsTrashed=1, TrashedAt=GETDATE(), UserIDTrashed=? WHERE id=?");
         ps.setInt(1, ActiveUser.getUser().getId());
         ps.setInt(2, stock.getId());
         ps.executeUpdate();
@@ -291,7 +291,7 @@ public class StockDAO {
                 "INSERT INTO StockEntryLogs " +
                         "(StockID, Quantity, Source, Price, UserID, CreatedAt, UpdatedAt) " +
                         "VALUES " +
-                        "(?,?,?,?,?,Now(),Now())", Statement.RETURN_GENERATED_KEYS);
+                        "(?,?,?,?,?,GETDATE(),GETDATE())", Statement.RETURN_GENERATED_KEYS);
         ps.setInt(1, stock.getId());
         ps.setInt(2, log.getQuantity());
         ps.setString(3, log.getSource());
@@ -319,7 +319,7 @@ public class StockDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE StockEntryLogs SET " +
                         "StockID=?, Quantity=?, Source=?, " +
-                        "Price=?, UserID=?, UpdatedAt=NOW() " +
+                        "Price=?, UserID=?, UpdatedAt=GETDATE() " +
                         "WHERE id=?");
         ps.setInt(1, log.getStockID());
         ps.setInt(2, log.getQuantity());
