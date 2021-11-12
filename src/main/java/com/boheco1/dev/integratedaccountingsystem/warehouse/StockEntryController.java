@@ -3,8 +3,11 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AutoCompleteHelper;
+import com.boheco1.dev.integratedaccountingsystem.helpers.ParseHelper;
 import com.boheco1.dev.integratedaccountingsystem.helpers.SubMenuHelper;
+import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
+import com.boheco1.dev.integratedaccountingsystem.objects.StockType;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextArea;
@@ -24,6 +27,7 @@ import org.controlsfx.control.textfield.TextFields;
 
 import javax.swing.*;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -47,7 +51,9 @@ public class StockEntryController implements Initializable {
     private DatePicker manuDate, valDate;
 
     @FXML
-    private JFXComboBox<?> type, source;
+    private JFXComboBox<String> source;
+
+    @FXML JFXComboBox<StockType> type;
 
     @FXML
     private JFXButton saveBtn;
@@ -69,7 +75,29 @@ public class StockEntryController implements Initializable {
         // double price, String neaCode, boolean isTrashed, String comments,
         // LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime trashedAt,
         // int userIDCreated, int userIDUpdated, int userIDTrashed
-        StockDAO.add(new Stock(stockName.getText(),Integer.parseInt(quantity.getText()),Double.parseDouble(price.getText())));
+        Stock stock = new Stock(
+                -1, stockName.getText(),
+                description.getText(),
+                Integer.parseInt(serialNumber.getText()),
+                brand.getText(),
+                model.getText(),
+                manuDate.getValue(),
+                valDate.getValue(),
+                type.getSelectionModel().getSelectedItem().getId(),
+                unit.getText(),
+                ParseHelper.intifyOrZero(quantity.getText()),
+                ParseHelper.doublifyOrZero(price.getText()),
+                neaCode.getText(),
+                false,
+                comments.getText(),
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                null,
+                ActiveUser.getUser().getId(),
+                ActiveUser.getUser().getId(),
+                -1
+        );
+        StockDAO.add(stock);
         AlertDialogBuilder.messgeDialog("Stock Entry","New stock added",stockStackPane,AlertDialogBuilder.INFO_DIALOG);
     }
 

@@ -1,10 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
-import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
-import com.boheco1.dev.integratedaccountingsystem.objects.SlimStock;
-import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
-import com.boheco1.dev.integratedaccountingsystem.objects.StockEntryLog;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -331,5 +328,21 @@ public class StockDAO {
         ps.executeUpdate();
 
         ps.close();
+    }
+
+    public static List<StockType> getTypes() throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM StockType ORDER BY StockType");
+        ResultSet rs = ps.executeQuery();
+        ArrayList<StockType> stockTypes = new ArrayList<>();
+
+        while(rs.next()) {
+            stockTypes.add(new StockType(rs.getInt("id"), rs.getString("StockType")));
+        }
+
+        rs.close();
+        ps.close();
+
+        return stockTypes;
     }
 }
