@@ -185,7 +185,7 @@ public class StockDAO {
                 "Select * FROM Stocks " +
                         "ORDER BY UpdatedAt, StockName " +
                         "OFFSET ? ROWS " +
-                        "FETCH ? ROWS ONLY");
+                        "FETCH NEXT ? ROWS ONLY");
         ps.setInt(1, offset);
         ps.setInt(2, limit);
 
