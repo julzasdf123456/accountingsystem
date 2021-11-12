@@ -13,11 +13,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -54,7 +56,8 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
     private static Connection conn;
     
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+    public void initialize(URL url, ResourceBundle resourceBundle)
+    {
         try {
             
             conn = DB.getConnection();
@@ -84,7 +87,8 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
         }
     }
 
-    public void onSelectUser(ActionEvent ev) {
+    public void onSelectUser(ActionEvent ev)
+    {
         try {
             this.currentUser = (User)selectUserCombo.getSelectionModel().getSelectedItem();
 
@@ -100,7 +104,8 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
         }
     }
 
-    private void renderUser() throws Exception {
+    private void renderUser() throws Exception
+    {
         userNameField.setText(currentUser.getUserName());
         designationField.setText(currentEmployee.getDesignation());
         phoneNumberField.setText(currentEmployee.getPhone());
@@ -125,14 +130,16 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
         selectRoleCombo.setItems(listOfAvailableRoles);
     }
 
-    private Department findDepartment(int departmentID) {
+    private Department findDepartment(int departmentID)
+    {
         for(Department dept: listOfDepartments) {
             if(dept.getDepartmentID()==departmentID) return dept;
         }
         return null;
     }
 
-    public void saveUser() {
+    public void saveUser()
+    {
         try {
             if(currentUser==null) {
                 Department dept = (Department) departmentCombo.getSelectionModel().getSelectedItem();
@@ -195,9 +202,28 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
         }
     }
 
-    public void clearPasswords() {}
+    public void clearPasswords() {
+        newPasswordField.setText(null);
+        confirmPasswordField.setText(null);
+        newPasswordField.requestFocus();
+    }
 
-    public void savePassword() {}
+    public void savePassword() {
+        String password = newPasswordField.getText();
+        String confirmation = confirmPasswordField.getText();
+
+        if(password.equals(confirmation)) {
+            try {
+                UserDAO.updatePassword(currentUser, password, DB.getConnection());
+                AlertDialogBuilder.messgeDialog("Password Changed","The user's password has been changed.", userMgtStackPane, AlertDialogBuilder.INFO_DIALOG);
+            }catch(Exception ex) {
+                AlertDialogBuilder.messgeDialog("Exception!", ex.getMessage(), userMgtStackPane, AlertDialogBuilder.DANGER_DIALOG);
+            }
+
+        }else {
+            AlertDialogBuilder.messgeDialog("Invalid Password!","The passwords did not match!", userMgtStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }
+    }
 
     public void removeUserRole() {}
 
@@ -247,7 +273,8 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
 
     public void addRolePermission() {}
 
-    public void removeUserPermission() {
+    public void removeUserPermission()
+    {
         try {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Remove Permission?");
@@ -271,7 +298,8 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
 
     }
 
-    public void addUserPermission() {
+    public void addUserPermission()
+    {
         try {
             Permission p = (Permission)selectPermissionCombo.getSelectionModel().getSelectedItem();
             if(p!=null) {
@@ -342,5 +370,11 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
         permissionNameField.setText(currentPermission.getPermission());
         permissionDescriptionField.setText(currentPermission.getRemarks());
         permissionNameField.requestFocus();
+    }
+
+    @Override
+    public void setSubMenus(FlowPane flowPane) {
+        flowPane.getChildren().removeAll();
+        flowPane.getChildren().setAll(new ArrayList<>());
     }
 }

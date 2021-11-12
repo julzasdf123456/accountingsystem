@@ -104,12 +104,12 @@
                                                    <Insets bottom="10" top="10" />
                                                 </padding>
                                              </Label>
-                                             <JFXButton fx:id="employeesBtn" layoutX="10.0" layoutY="534.0" nodeOrientation="LEFT_TO_RIGHT" onAction="#logout" prefHeight="25.0" prefWidth="246.0" style="-fx-alignment: LEFT;" text="Employees">
+                                             <JFXButton fx:id="employeesBtn" layoutX="10.0" layoutY="534.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="246.0" style="-fx-alignment: LEFT;" text="Employees">
                                                 <font>
                                                    <Font size="13.0" />
                                                 </font>
                                              </JFXButton>
-                                             <JFXButton fx:id="usersBtn" layoutX="10.0" layoutY="565.0" nodeOrientation="LEFT_TO_RIGHT" onAction="#logout" prefHeight="25.0" prefWidth="246.0" style="-fx-alignment: LEFT;" text="Users">
+                                             <JFXButton fx:id="usersBtn" layoutX="10.0" layoutY="565.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="246.0" style="-fx-alignment: LEFT;" text="Users">
                                                 <font>
                                                    <Font size="13.0" />
                                                 </font>

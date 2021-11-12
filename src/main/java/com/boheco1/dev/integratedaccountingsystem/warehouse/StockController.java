@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 import com.jfoenix.controls.JFXButton;
@@ -28,18 +29,23 @@ public class StockController extends MenuControllerHandler implements Initializa
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        List<Stock> stockList = new ArrayList<>();
-        stockList.add(new Stock("Digital Meter",45,4000));
-        stockList.add(new Stock("Wire Cutter",50,600));
-        stockList.add(new Stock("Hard Hat",100,900));
-        stockList.add(new Stock("Copper Wire",455,4000));
-        stockList.add(new Stock("Steel Bolt",500,600));
-        stockList.add(new Stock("Cover All Suite",132,900));
+//        List<Stock> stockList = new ArrayList<>();
+//        stockList.add(new Stock("Digital Meter",45,4000));
+//        stockList.add(new Stock("Wire Cutter",50,600));
+//        stockList.add(new Stock("Hard Hat",100,900));
+//        stockList.add(new Stock("Copper Wire",455,4000));
+//        stockList.add(new Stock("Steel Bolt",500,600));
+//        stockList.add(new Stock("Cover All Suite",132,900));
+        try {
+            List<Stock> stockList = StockDAO.getList(50, 0);
 
+            stockListView.getItems().clear();
+            stockListView.getItems().addAll(stockList);
+            stockListView.setCellFactory(list -> new StockListController());
+        }catch(Exception ex) {
+            ex.printStackTrace();
+        }
 
-        stockListView.getItems().clear();
-        stockListView.getItems().addAll(stockList);
-        stockListView.setCellFactory(list -> new StockListController());
     }
 
     @FXML

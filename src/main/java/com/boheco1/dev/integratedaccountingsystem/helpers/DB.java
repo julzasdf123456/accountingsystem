@@ -13,7 +13,7 @@ public class DB {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             String conString = "jdbc:sqlserver://localhost;" +
                     "Database=Accounting;" +
-                    "user=SA;" +
+                    "user=app_user;" +
                     "password=Boheco_2021;" +
                     "encrypt=false;" +
                     "trustServerCertificate=false;" +
