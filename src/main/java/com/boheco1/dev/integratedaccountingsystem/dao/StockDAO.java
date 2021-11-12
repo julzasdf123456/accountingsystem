@@ -157,13 +157,65 @@ public class StockDAO {
 
         ResultSet rs = ps.executeQuery();
 
-        ArrayList<SlimStock> stocks = new ArrayList();
+        ArrayList<SlimStock> stocks = new ArrayList<>();
         while(rs.next()) {
             stocks.add(new SlimStock(
                     rs.getInt("id"),
                     rs.getString("StockName"),
                     rs.getString("Model"),
                     rs.getString("Brand")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return stocks;
+    }
+
+    /**
+     * Get a list of Stocks with offset and limit
+     * @param limit number of rows to fetch
+     * @param offset number of rows to skip
+     * @return ArrayList of Stocks
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<Stock> getList(int limit, int offset) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "Select StockName, Brand, Model FROM Stocks " +
+                        "ORDER BY UpdatedAt, StockName " +
+                        "OFFSET ? ROWS " +
+                        "FETCH ? ROWS ONLY");
+        ps.setInt(1, offset);
+        ps.setInt(2, limit);
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<Stock> stocks = new ArrayList<>();
+
+        while(rs.next()) {
+            stocks.add(new Stock(
+                    rs.getInt("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Description"),
+                    rs.getInt("SerialNumber"),
+                    rs.getString("Brand"),
+                    rs.getString("Model"),
+                    rs.getDate("ManufacturingDate").toLocalDate(),
+                    rs.getDate("ValidityDate").toLocalDate(),
+                    rs.getInt("TypeID"),
+                    rs.getString("Unit"),
+                    rs.getInt("Quantity"),
+                    rs.getDouble("Price"),
+                    rs.getString("NEACode"),
+                    rs.getBoolean("IsTrashed"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
+                    rs.getInt("UserIDCreated"),
+                    rs.getInt("UserIDUpdated"),
+                    rs.getInt("UserIDTrashed")
             ));
         }
 
@@ -205,7 +257,7 @@ public class StockDAO {
 
     /**
      * Deducts quantity from a stock as a result of releasing
-     * @param stock the stock record to be udpated
+     * @param stock the stock record to be updated
      * @param quantity the quantity to be deducted from the stock
      * @throws Exception obligatory from DB.getConnection()
      */
