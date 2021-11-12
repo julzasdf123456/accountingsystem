@@ -75,8 +75,8 @@ public class StockListController extends ListCell<Stock> {
             }
 
             stockName.setText(model.getStockName().toUpperCase());
-            qty.setText("Qty: "+model.getQuantity());
-            price.setText("Price: "+model.getPrice());
+            qty.setText("Qty: "+ model.getQuantity())   ;
+            price.setText("Price: "+String.format("%,.2f", model.getPrice()));
             setText(null);
             setGraphic(anchorPane);
         }

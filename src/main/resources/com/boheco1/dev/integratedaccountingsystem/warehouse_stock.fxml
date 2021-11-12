@@ -16,7 +16,7 @@
          </font>
       </JFXTextField>
       <ListView fx:id="stockListView" focusTraversable="false" layoutX="39.0" layoutY="88.0" prefHeight="526.0" prefWidth="753.0" style="-fx-control-inner-background-alt: -fx-control-inner-background;" AnchorPane.bottomAnchor="25.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="88.0" />
-      <JFXButton fx:id="newStockBtn" layoutX="322.0" layoutY="42.0" onAction="#newStockBtn" prefHeight="30.0" prefWidth="91.0" styleClass="btn-sucess" text="New Stock" textFill="WHITE">
+      <JFXButton fx:id="newStockBtn" layoutX="322.0" layoutY="42.0" onAction="#newStockBtn" prefHeight="30.0" prefWidth="91.0" style="-fx-background-color: #00AD8E;" text="New Stock" textFill="WHITE">
          <graphic>
             <FontIcon iconColor="WHITE" iconLiteral="mdi2f-file-plus" iconSize="14" />
          </graphic>

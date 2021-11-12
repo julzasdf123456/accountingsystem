@@ -1,22 +1,10 @@
-package com.boheco1.dev.integratedaccountingsystem.warehouse;
+package com.boheco1.dev.integratedaccountingsystem.helpers;
 
-import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
-import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
-import com.boheco1.dev.integratedaccountingsystem.helpers.AutoCompleteHelper;
-import com.boheco1.dev.integratedaccountingsystem.helpers.SubMenuHelper;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.DatePicker;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
@@ -24,56 +12,13 @@ import org.controlsfx.control.textfield.TextFields;
 
 import javax.swing.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
-public class StockEntryController implements Initializable {
+public class AutoCompleteHelper {
 
-    @FXML
-    private AnchorPane contentPane;
+    private static Stock result = null;
 
-    @FXML
-    private StackPane stockStackPane;
-
-    @FXML
-    private JFXTextField stockName, serialNumber, brand, model, quantity, unit, price, neaCode;
-
-    @FXML
-    private JFXTextArea comments, description;
-
-    @FXML
-    private DatePicker manuDate, valDate;
-
-    @FXML
-    private JFXComboBox<?> type, source;
-
-    @FXML
-    private JFXButton saveBtn;
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        try {
-            bindAutocomplete(stockName,StockDAO.getList(10,0));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    private void saveBtn(ActionEvent event) throws Exception {
-        //int id, String stockName, String description, int serialNumber,
-        // String brand, String model, LocalDate manufacturingDate,
-        // LocalDate validityDate, int typeID, String unit, int quantity,
-        // double price, String neaCode, boolean isTrashed, String comments,
-        // LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime trashedAt,
-        // int userIDCreated, int userIDUpdated, int userIDTrashed
-        StockDAO.add(new Stock(stockName.getText(),Integer.parseInt(quantity.getText()),Double.parseDouble(price.getText())));
-        AlertDialogBuilder.messgeDialog("Stock Entry","New stock added",stockStackPane,AlertDialogBuilder.INFO_DIALOG);
-    }
-
-    public void bindAutocomplete(JFXTextField textField, List<Stock> data){
+    public static void bindAutocomplete(JFXTextField textField, List<Stock> data){
         AutoCompletionBinding<Stock> stockSuggest = TextFields.bindAutoCompletion(textField,
                 new Callback<AutoCompletionBinding.ISuggestionRequest, Collection<Stock>>() {
                     @Override
@@ -120,11 +65,21 @@ public class StockEntryController implements Initializable {
         stockSuggest.setOnAutoCompleted(new EventHandler<AutoCompletionBinding.AutoCompletionEvent<Stock>>() {
             @Override
             public void handle(AutoCompletionBinding.AutoCompletionEvent<Stock> event) {
-                Stock result = event.getCompletion();
-                stockName.setText(result.getStockName());
-                quantity.setText(""+result.getQuantity());
-                price.setText(""+result.getPrice());
+                result = event.getCompletion();
+
+                //Temporary display to get the information on selected stock. Replace this with the codes to set the text of the respected textfields
+                //String information = "ID: " + result.getId() + "\n";
+                //information += "Stock: " + result.getStockName() + "\n";
+                //information += "Quantity: " + result.getQuantity() + "\n";
+                //information += "Price: " + result.getPrice() + "\n";
+                //JOptionPane.showMessageDialog(null, information);
+                //return result;
             }
         });
+        //return result;
+    }
+
+    public static Stock getResult(){
+        return result;
     }
 }
