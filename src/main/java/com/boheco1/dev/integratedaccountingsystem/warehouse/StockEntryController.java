@@ -2,38 +2,30 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
-import com.boheco1.dev.integratedaccountingsystem.helpers.AutoCompleteHelper;
-import com.boheco1.dev.integratedaccountingsystem.helpers.ParseHelper;
-import com.boheco1.dev.integratedaccountingsystem.helpers.SubMenuHelper;
-import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
-import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
-import com.boheco1.dev.integratedaccountingsystem.objects.StockType;
+import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.DatePicker;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 
-import javax.swing.*;
 import java.net.URL;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class StockEntryController implements Initializable {
+public class StockEntryController extends MenuControllerHandler implements Initializable {
 
     @FXML
     private AnchorPane contentPane;
@@ -51,108 +43,282 @@ public class StockEntryController implements Initializable {
     private DatePicker manuDate, valDate;
 
     @FXML
-    private JFXComboBox<String> source;
+    private JFXComboBox<StockType> type;
 
-    @FXML JFXComboBox<StockType> type;
+    @FXML
+    private JFXComboBox<String> source;
 
     @FXML
     private JFXButton saveBtn;
 
+    private Stock stock = null;
+
+    private boolean isNew = true;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
-            bindAutocomplete(stockName,StockDAO.getList(10,0));
+            this.bindAutocomplete(stockName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        this.bindSources();
+        this.bindStockTypes();
+        this.bindNumbers();
+    }
+
+    @FXML
+    private void saveBtn(ActionEvent event)  {
+        String name = this.stockName.getText();
+        String brand = this.brand.getText();
+        String model = this.model.getText();
+        String unit = this.unit.getText();
+        StockType stockType = this.type.getSelectionModel().getSelectedItem();
+        LocalDate manDate = this.manuDate.getValue();
+        LocalDate valDate = this.valDate.getValue();
+        String source = this.source.getSelectionModel().getSelectedItem();
+
+        int serialNumber = 0;
+        int quantity = 0;
+        double price = 0;
+
+        try {
+            quantity = Integer.parseInt(this.quantity.getText());
+        }catch (Exception e){
+            AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), this.stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }
+
+        try {
+            price = Double.parseDouble(this.price.getText());
+        }catch (Exception e){
+            AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), this.stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }
+
+        try {
+            serialNumber = Integer.parseInt(this.serialNumber.getText());
+        }catch (Exception e){
+            AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), this.stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }
+
+        if (this.stock == null) this.stock = new Stock();
+
+        //Mandatory fields
+        this.stock.setStockName(name);
+        this.stock.setBrand(brand);
+        this.stock.setModel(model);
+        this.stock.setPrice(price);
+
+        this.stock.setTrashed(false);
+        this.stock.setUserIDCreated(ActiveUser.getUser().getId());
+        if (stockType != null) this.stock.setTypeID(stockType.getId());
+        this.stock.setUnit(this.unit.getText());
+
+        //Optional Fields
+        this.stock.setDescription(this.description.getText());
+        this.stock.setComments(comments.getText());
+        if (serialNumber > 0) this.stock.setSerialNumber(serialNumber);
+        if (manDate != null) this.stock.setManufacturingDate(manDate);
+        if (valDate != null) this.stock.setValidityDate(valDate);
+        this.stock.setNeaCode(this.neaCode.getText());
+
+        if (name.length() == 0) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for stock name!",
+                        stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (brand.length() == 0) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for brand!",
+                        stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (price == 0) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for price!",
+                        stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (quantity == 0) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for quantity!",
+                        stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (unit.length() == 0) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for unit!",
+                        stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (stockType == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please select a valid stock type!",
+                    stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (source == null){
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please select a valid source type!",
+                    stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else{
+            if (isNew) {
+                //If new Stock item, set stock quantity to 0 and insert Stock to database
+                this.stock.setQuantity(0);
+                try {
+                    StockDAO.add(this.stock);
+
+                    //Create StockEntryLog object
+                    StockEntryLog stockEntryLog = new StockEntryLog();
+                    stockEntryLog.setQuantity(quantity);
+                    if (source != null)
+                        stockEntryLog.setSource(source);
+                    stockEntryLog.setPrice(this.stock.getPrice());
+
+                    //Insert StockEntryLog to database
+                    StockDAO.stockEntry(this.stock, stockEntryLog);
+                    AlertDialogBuilder.messgeDialog("Stock Entry", "New stock was successfully added!", stockStackPane, AlertDialogBuilder.INFO_DIALOG);
+                }catch (Exception e){
+                    AlertDialogBuilder.messgeDialog("System Error", "New stock was not successfully added due to:"+e.getMessage()+".", stockStackPane, AlertDialogBuilder.INFO_DIALOG);
+                }
+                this.reset();
+            }else{
+                //If existing Stock item, update the stock basic details based on new entry, insert to StockEntryLog and update the Stock quantity.
+                try {
+                    StockDAO.updateDetails(this.stock);
+
+                    //Create StockEntryLog object
+                    StockEntryLog stockEntryLog = new StockEntryLog();
+                    stockEntryLog.setQuantity(quantity);
+                    if (source != null)
+                        stockEntryLog.setSource(source);
+                    stockEntryLog.setPrice(this.stock.getPrice());
+
+                    //Insert StockEntryLog to database
+                    StockDAO.stockEntry(this.stock, stockEntryLog);
+                    AlertDialogBuilder.messgeDialog("Stock Entry", "New stock was successfully added!", stockStackPane, AlertDialogBuilder.INFO_DIALOG);
+                    this.reset();
+                }catch (Exception e){
+                    AlertDialogBuilder.messgeDialog("System Error", "New stock was not successfully added due to:"+e.getMessage()+" error.", stockStackPane, AlertDialogBuilder.INFO_DIALOG);
+                }
+            }
+
+        }
+    }
+
+    public void bindNumbers(){
+        this.restrictNumbersOnly(this.quantity);
+        this.restrictNumbersOnly(this.price);
+        this.restrictNumbersOnly(this.serialNumber);
+    }
+
+    public void bindStockTypes(){
+        try {
+            List<StockType> types = StockDAO.getTypes();
+            for (StockType t : types){
+                type.getItems().add(t);
+            }
+            type.setConverter(new StringConverter<>() {
+                @Override
+                public String toString(StockType object) {
+                    return object==null? "" : object.getStockType();
+                }
+                @Override
+                public StockType fromString(String string) {
+                    try {
+                        return StockDAO.getStockType(string);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    @FXML
-    private void saveBtn(ActionEvent event) throws Exception {
-        //int id, String stockName, String description, int serialNumber,
-        // String brand, String model, LocalDate manufacturingDate,
-        // LocalDate validityDate, int typeID, String unit, int quantity,
-        // double price, String neaCode, boolean isTrashed, String comments,
-        // LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime trashedAt,
-        // int userIDCreated, int userIDUpdated, int userIDTrashed
-        Stock stock = new Stock(
-                -1, stockName.getText(),
-                description.getText(),
-                Integer.parseInt(serialNumber.getText()),
-                brand.getText(),
-                model.getText(),
-                manuDate.getValue(),
-                valDate.getValue(),
-                type.getSelectionModel().getSelectedItem().getId(),
-                unit.getText(),
-                ParseHelper.intifyOrZero(quantity.getText()),
-                ParseHelper.doublifyOrZero(price.getText()),
-                neaCode.getText(),
-                false,
-                comments.getText(),
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                null,
-                ActiveUser.getUser().getId(),
-                ActiveUser.getUser().getId(),
-                -1
-        );
-        StockDAO.add(stock);
-        AlertDialogBuilder.messgeDialog("Stock Entry","New stock added",stockStackPane,AlertDialogBuilder.INFO_DIALOG);
+    public void bindSources(){
+        source.getItems().add("Purchased");
+        source.getItems().add("Returned");
     }
 
-    public void bindAutocomplete(JFXTextField textField, List<Stock> data){
-        AutoCompletionBinding<Stock> stockSuggest = TextFields.bindAutoCompletion(textField,
-                new Callback<AutoCompletionBinding.ISuggestionRequest, Collection<Stock>>() {
-                    @Override
-                    public Collection<Stock> call(AutoCompletionBinding.ISuggestionRequest param) {
+    public void bindAutocomplete(JFXTextField textField){
+        AutoCompletionBinding<SlimStock> stockSuggest = TextFields.bindAutoCompletion(textField,
+                param -> {
+                    //Value typed in the textfield
+                    String query = param.getUserText();
 
-                        //Value typed in the textfield
-                        String query = param.getUserText();
+                    //Initialize list of stocks
+                    List<SlimStock> list = new ArrayList<>();
 
-                        //Initialize list of stocks
-                        List<Stock> list = new ArrayList<>();
-
-                        //Perform DB query when length of search string is 4 or above
-                        if (query.length() > 3){
-                            /*try {
-                                StockDAO here...
-                            } catch (IOException ex) {
-                                Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
-                            }*/
-
-                            //Linear search to test search stocks on keypress
-                            //Remove this code when the StockDAO returns the search results
-                            for (Stock s : data){
-                                if (s.getStockName().toLowerCase().contains(query.toLowerCase())){
-                                    list.add(s);
-                                }
-                            }
+                    //Perform DB query when length of search string is 4 or above
+                    if (query.length() > 3){
+                        try {
+                            list = StockDAO.search(query);
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                        return list;
                     }
-                }, new StringConverter<Stock>() {
+
+                    if (list.size() == 0) {
+                        isNew = true;
+                        stock = null;
+                    }
+
+                    return list;
+                }, new StringConverter<>() {
                     //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
                     @Override
-                    public String toString(Stock object) {
+                    public String toString(SlimStock object) {
                         return object.getStockName();
                     }
 
                     @Override
-                    public Stock fromString(String string) {
+                    public SlimStock fromString(String string) {
                         throw new UnsupportedOperationException();
                     }
                 });
 
         //This will set the actions once the user clicks an item from the popupmenu.
-        stockSuggest.setOnAutoCompleted(new EventHandler<AutoCompletionBinding.AutoCompletionEvent<Stock>>() {
-            @Override
-            public void handle(AutoCompletionBinding.AutoCompletionEvent<Stock> event) {
-                Stock result = event.getCompletion();
-                stockName.setText(result.getStockName());
-                quantity.setText(""+result.getQuantity());
-                price.setText(""+result.getPrice());
+        stockSuggest.setOnAutoCompleted(event -> {
+            SlimStock result = event.getCompletion();
+            try {
+                isNew = false;
+                stock = StockDAO.get(result.getId());
+                stockName.setText(stock.getStockName());
+                //quantity.setText(""+stock.getQuantity());
+                price.setText(""+stock.getPrice());
+                if (stock.getSerialNumber() > 0) serialNumber.setText(""+stock.getSerialNumber());
+                brand.setText(stock.getBrand());
+                model.setText(stock.getModel());
+                unit.setText(stock.getUnit());
+                neaCode.setText(stock.getNeaCode());
+                comments.setText(stock.getComments());
+                description.setText(stock.getDescription());
+                manuDate.setValue(stock.getManufacturingDate());
+                valDate.setValue(stock.getValidityDate());
+                ObservableList<StockType> stocktypes = type.getItems();
+                int index = 0;
+                for (int i=0;  i < stocktypes.size(); i++){
+                    if (stocktypes.get(i).getId() == stock.getTypeID()) {
+                        index = i;
+                        break;
+                    }
+                }
+                type.getSelectionModel().select(index);
+            } catch (Exception e) {
+                AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), this.stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
             }
         });
+    }
+
+    public void restrictNumbersOnly(JFXTextField tf){
+        tf.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("|[-\\+]?|[-\\+]?\\d+\\.?|[-\\+]?\\d+\\.?\\d+")){
+                tf.setText(oldValue);
+            }
+        });
+    }
+
+    public void reset(){
+        this.stock = null;
+        this.isNew = true;
+
+        this.stockName.setText("");
+        this.brand.setText("");
+        this.quantity.setText("");
+        this.unit.setText("");
+        this.price.setText("");
+        this.source.getSelectionModel().clearSelection();
+        this.type.getSelectionModel().clearSelection();
+        this.description.setText("");
+        this.model.setText("");
+        this.serialNumber.setText("");
+        this.neaCode.setText("");
+        this.comments.setText("");
+        this.manuDate.setValue(null);
+        this.valDate.setValue(null);
     }
 }
