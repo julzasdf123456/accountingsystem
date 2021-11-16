@@ -19,6 +19,8 @@ public class StockEntryLog {
     private Stock stock;
     private User user;
 
+    public StockEntryLog() {}
+
     public StockEntryLog(int id, int stockID, int quantity, String source, double price, int userID, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.stockID = stockID;
