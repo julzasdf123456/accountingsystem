@@ -73,8 +73,8 @@ public class StockDAO {
                     rs.getInt("SerialNumber"),
                     rs.getString("Brand"),
                     rs.getString("Model"),
-                    rs.getDate("ManufacturingDate").toLocalDate(),
-                    rs.getDate("ValidityDate").toLocalDate(),
+                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
+                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
                     rs.getInt("TypeID"),
                     rs.getString("Unit"),
                     rs.getInt("Quantity"),
@@ -138,6 +138,54 @@ public class StockDAO {
     }
 
     /**
+     * Updates an existing Stock record
+     * @param stock the record to be updated
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void updateDetails(Stock stock) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE Stocks SET " +
+                        "StockName=?, Description=?, SerialNumber=?," +
+                        "Brand=?, Model=?, ManufacturingDate=?, " +
+                        "ValidityDate=?, TypeID=?, Unit=?," +
+                        "Price=?, NEACode=?," +
+                        "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=? " +
+                        "WHERE id=?");
+        ps.setString(1, stock.getStockName());
+        ps.setString(2, stock.getDescription());
+        ps.setInt(3, stock.getSerialNumber());
+
+        ps.setString(4, stock.getBrand());
+        ps.setString(5, stock.getModel());
+
+        if (stock.getManufacturingDate() != null) {
+            ps.setDate(6, Date.valueOf(stock.getManufacturingDate()));
+        }else{
+            ps.setDate(6, null);
+        }
+
+        if (stock.getManufacturingDate() != null) {
+            ps.setDate(7, Date.valueOf(stock.getValidityDate()));
+        }else{
+            ps.setDate(7, null);
+        }
+
+        ps.setInt(8,stock.getTypeID());
+        ps.setString(9, stock.getUnit());
+
+        ps.setDouble(10, stock.getPrice());
+        ps.setString(11, stock.getNeaCode());
+
+        ps.setString(12, stock.getComments());
+        ps.setInt(13, ActiveUser.getUser().getId());
+        ps.setInt(14, stock.getId());
+
+        ps.executeUpdate();
+
+        ps.close();
+    }
+
+    /**
      * Retrieves a list of SlimStocks as a search result based on a search Key
      * @param key The search key
      * @return A list of SlimStock that qualifies with the search key
@@ -146,11 +194,11 @@ public class StockDAO {
     public static List<SlimStock> search(String key) throws Exception  {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "Select TOP 50 id, StockName, Brand, Model FROM Stocks " +
-                        "WHERE (StockName LIKE '%?%' OR Brand LIKE '%?%' OR Model LIKE '%?%' ) " +
+                        "WHERE (StockName LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
                         "AND IsTrashed=0 ORDER BY StockName");
-        ps.setString(1, key);
-        ps.setString(2, key);
-        ps.setString(3, key);
+        ps.setString(1, "%" + key + "%");
+        ps.setString(2, "%" + key + "%");
+        ps.setString(3, "%" + key + "%");
 
         ResultSet rs = ps.executeQuery();
 
@@ -198,8 +246,8 @@ public class StockDAO {
                     rs.getInt("SerialNumber"),
                     rs.getString("Brand"),
                     rs.getString("Model"),
-                    rs.getDate("ManufacturingDate").toLocalDate(),
-                    rs.getDate("ValidityDate").toLocalDate(),
+                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
+                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
                     rs.getInt("TypeID"),
                     rs.getString("Unit"),
                     rs.getInt("Quantity"),
@@ -297,7 +345,7 @@ public class StockDAO {
         ps.executeUpdate();
 
         ResultSet rs = ps.getGeneratedKeys();
-        if(rs.first()) {
+        if(rs.next()) {
             int id = rs.getInt(1);
             log.setId(id);
         }
@@ -332,7 +380,7 @@ public class StockDAO {
 
     public static List<StockType> getTypes() throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM StockType ORDER BY StockType");
+                "SELECT * FROM StockTypes ORDER BY StockType");
         ResultSet rs = ps.executeQuery();
         ArrayList<StockType> stockTypes = new ArrayList<>();
 
@@ -344,5 +392,55 @@ public class StockDAO {
         ps.close();
 
         return stockTypes;
+    }
+
+    /**
+     * Retrieves a single StockType record
+     * @param type the name of the StockType record to be retrieved
+     * @return StockType object
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static StockType getStockType(String type) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM StockTypes WHERE StockType=?");
+        ps.setString(1, type);
+        ResultSet rs = ps.executeQuery();
+        if(rs.next()) {
+            StockType stock = new StockType(
+                    rs.getInt("id"),
+                    rs.getString("StockType")
+            );
+
+            rs.close();
+
+            return stock;
+        }
+        rs.close();
+        return null;
+    }
+
+    /**
+     * Retrieves a single StockType record
+     * @param id the identifier of the StockType record to be retrieved
+     * @return StockType object
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static StockType getStockType(int id) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM StockTypes WHERE id=?");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            StockType stock = new StockType(
+                    rs.getInt("id"),
+                    rs.getString("StockType")
+            );
+
+            rs.close();
+
+            return stock;
+        }
+        rs.close();
+        return null;
     }
 }
