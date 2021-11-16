@@ -27,6 +27,15 @@ public class Stock {
     private int userIDUpdated;
     private int userIDTrashed;
 
+    public Stock() {}
+
+    public Stock(int id, String stockName, String model, String brand) {
+        this.id = id;
+        this.stockName = stockName;
+        this.model = model;
+        this.brand = brand;
+    }
+
     public Stock(int id, String stockName, String description, int serialNumber, String brand, String model, LocalDate manufacturingDate, LocalDate validityDate, int typeID, String unit, int quantity, double price, String neaCode, boolean isTrashed, String comments, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime trashedAt, int userIDCreated, int userIDUpdated, int userIDTrashed) {
         this.id = id;
         this.stockName = stockName;
