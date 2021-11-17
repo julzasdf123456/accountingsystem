@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StockDAO {
+
+    private static final int CRITICAL = 50;
     /**
      * Create a new Stock record
      * @param stock the Stock record to be created
@@ -378,6 +380,11 @@ public class StockDAO {
         ps.close();
     }
 
+    /**
+     * Get all the stock types
+     * @return the List of StockTypes from the database
+     * @throws Exception
+     */
     public static List<StockType> getTypes() throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM StockTypes ORDER BY StockType");
@@ -443,4 +450,183 @@ public class StockDAO {
         rs.close();
         return null;
     }
+
+    /**
+     * returns the number of stocks that are not trashed
+     * @return int the number of rows in the Stocks table whose isTrashed is 0 or false
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static int countStocks() throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT COUNT(ID) AS 'count' FROM Stocks WHERE IsTrashed=0;");
+        ResultSet rs = ps.executeQuery();
+        if(rs.next()) {
+            return rs.getInt("count");
+        }
+
+        return 0;
+    }
+
+    /**
+     * returns the number of stocks that are trashed
+     * @return int the number of rows in the Stocks table whose isTrashed is 1 or true
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static int countTrashed() throws Exception{
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT COUNT(ID) AS 'count' FROM Stocks WHERE IsTrashed=1;");
+        ResultSet rs = ps.executeQuery();
+        if(rs.next()) {
+            return rs.getInt("count");
+        }
+
+        return 0;
+    }
+
+    /**
+     * Get all the stocks which were trashed
+     * @return List of trashed Stocks
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<Stock> getTrashed() throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM Stocks WHERE isTrashed=1 ORDER BY TrashedAt ASC");
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<Stock> trashedStocks = new ArrayList<>();
+
+        while(rs.next()) {
+            trashedStocks.add(new Stock(
+                    rs.getInt("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Description"),
+                    rs.getInt("SerialNumber"),
+                    rs.getString("Brand"),
+                    rs.getString("Model"),
+                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
+                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
+                    rs.getInt("TypeID"),
+                    rs.getString("Unit"),
+                    rs.getInt("Quantity"),
+                    rs.getDouble("Price"),
+                    rs.getString("NEACode"),
+                    rs.getBoolean("IsTrashed"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
+                    rs.getInt("UserIDCreated"),
+                    rs.getInt("UserIDUpdated"),
+                    rs.getInt("UserIDTrashed")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return trashedStocks;
+    }
+
+    /**
+     * Get the list of Critical Stocks
+     * @return The List of stocks that are in at critical level
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<Stock> getCritical() throws Exception {
+
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM Stocks WHERE Quantity < ? ORDER BY Quantity");
+        ps.setInt(1, CRITICAL);
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<Stock> criticalStocks = new ArrayList<>();
+
+        while(rs.next()) {
+            criticalStocks.add(new Stock(
+                    rs.getInt("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Description"),
+                    rs.getInt("SerialNumber"),
+                    rs.getString("Brand"),
+                    rs.getString("Model"),
+                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
+                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
+                    rs.getInt("TypeID"),
+                    rs.getString("Unit"),
+                    rs.getInt("Quantity"),
+                    rs.getDouble("Price"),
+                    rs.getString("NEACode"),
+                    rs.getBoolean("IsTrashed"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
+                    rs.getInt("UserIDCreated"),
+                    rs.getInt("UserIDUpdated"),
+                    rs.getInt("UserIDTrashed")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return criticalStocks;
+    }
+
+    /**
+     * Count the number of Stocks which are at critical level
+     * @return The number of Stocks in critical level.
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static int countCritical() throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT COUNT(ID) AS 'count' FROM Stocks WHERE IsTrashed=0 AND Quantity<?;");
+        ps.setInt(1, CRITICAL);
+        ResultSet rs = ps.executeQuery();
+
+        int count = 0;
+
+        if(rs.next()) {
+            count = rs.getInt("count");
+        }
+        rs.close();
+        ps.close();
+
+        return count;
+    }
+
+    /**
+     * Get the entry logs of a given Stock
+     * @param stock
+     * @return The List of StockEntryLogs for this particular Stock
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<StockEntryLog> getEntryLogs(Stock stock) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM StockEntryLogs WHERE StockID=?;");
+        ps.setInt(1, stock.getId());
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<StockEntryLog> entryLogs = new ArrayList<>();
+
+        while(rs.next()) {
+            entryLogs.add(
+                    new StockEntryLog(
+                            rs.getInt("id"),
+                            rs.getInt("StockID"),
+                            rs.getInt("Quantity"),
+                            rs.getString("Source"),
+                            rs.getDouble("Price"),
+                            rs.getInt("UserID"),
+                            rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                            rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                    )
+            );
+        }
+
+        rs.close();
+        ps.close();
+
+        return entryLogs;
+    }
+
 }
