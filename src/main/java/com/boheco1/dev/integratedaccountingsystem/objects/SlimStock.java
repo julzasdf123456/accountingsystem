@@ -1,10 +1,17 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import java.util.Objects;
+
 public class SlimStock {
+
     private int id;
     private String StockName;
     private String Model;
     private String Brand;
+    private String Description;
+    private int Quantity;
+    private String Unit;
+    private double Price;
 
     public SlimStock(int id, String stockName, String model, String brand) {
         this.id = id;
@@ -43,5 +50,50 @@ public class SlimStock {
 
     public void setBrand(String brand) {
         Brand = brand;
+    }
+
+    public String getDescription() {
+        return Description;
+    }
+
+    public void setDescription(String description) {
+        this.Description = description;
+    }
+
+    public int getQuantity() {
+        return Quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.Quantity = quantity;
+    }
+
+    public String getUnit() {
+        return Unit;
+    }
+
+    public void setUnit(String unit) {
+        this.Unit = unit;
+    }
+
+    public double getPrice() {
+        return Price;
+    }
+
+    public void setPrice(double price) {
+        this.Price = price;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SlimStock slimStock = (SlimStock) o;
+        return id == slimStock.id && StockName.equals(slimStock.StockName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, StockName);
     }
 }
