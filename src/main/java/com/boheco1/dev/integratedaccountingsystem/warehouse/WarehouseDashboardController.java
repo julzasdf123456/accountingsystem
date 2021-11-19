@@ -73,5 +73,15 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
             titleHolder.setText("Create Inventory");
             container.getChildren().setAll(ContentHandler.getNodeFromFxml(JournalEntriesController.class, "warehouse_create_inventory_controller.fxml"));
         });
+
+        viewAllStocks.setOnAction(actionEvent -> {
+            titleHolder.setText("View All Stocks");
+            container.getChildren().setAll(ContentHandler.getNodeFromFxml(StockController.class, "../warehouse_stock.fxml"));
+        });
+
+        trash.setOnAction(actionEvent -> {
+            titleHolder.setText("Trash");
+            container.getChildren().setAll(ContentHandler.getNodeFromFxml(TrashStockController.class, "../warehouse_trash_stock.fxml"));
+        });
     }
 }
