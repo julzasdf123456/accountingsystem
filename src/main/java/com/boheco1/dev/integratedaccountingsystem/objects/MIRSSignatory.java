@@ -11,6 +11,8 @@ public class MIRSSignatory {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    public MIRSSignatory(){}
+
     public MIRSSignatory(int id, int mirsID, int signatoryID, String status, String comments, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.mirsID = mirsID;

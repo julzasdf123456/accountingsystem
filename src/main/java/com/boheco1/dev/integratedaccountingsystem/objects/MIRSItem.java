@@ -12,6 +12,8 @@ public class MIRSItem {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    public MIRSItem(){}
+
     public MIRSItem(int id, int mirsID, int stockID, int quantity, double price, String comments, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.mirsID = mirsID;

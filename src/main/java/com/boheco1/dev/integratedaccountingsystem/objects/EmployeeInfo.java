@@ -15,6 +15,8 @@ public class EmployeeInfo {
     private String fullName;
     private String departmentName;
 
+    public EmployeeInfo(){}
+
     public EmployeeInfo(int id, String employeeFirstName, String employeeMidName, String employeeLastName, String employeeAddress, String phone, String designation, int departmentID) throws Exception {
         this.id = id;
         this.employeeFirstName = employeeFirstName;

@@ -21,6 +21,8 @@ public class MIRS {
     private User user;
     private EmployeeInfo requisitioner;
 
+    public MIRS(){}
+
     public MIRS(int id, LocalDate dateFiled, String purpose, String details, String status, int requisitionerID, int userID, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.dateFiled = dateFiled;
