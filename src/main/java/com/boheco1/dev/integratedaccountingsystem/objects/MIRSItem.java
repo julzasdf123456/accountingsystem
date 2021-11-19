@@ -8,19 +8,21 @@ public class MIRSItem {
     private int stockID;
     private int quantity;
     private double price;
-    private String comments;
+    private String remarks;
+    private String particulars;
+    private String unit;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public MIRSItem(){}
 
-    public MIRSItem(int id, int mirsID, int stockID, int quantity, double price, String comments, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public MIRSItem(int id, int mirsID, int stockID, int quantity, double price, String remarks, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.mirsID = mirsID;
         this.stockID = stockID;
         this.quantity = quantity;
         this.price = price;
-        this.comments = comments;
+        this.remarks = remarks;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -65,12 +67,28 @@ public class MIRSItem {
         this.price = price;
     }
 
-    public String getComments() {
-        return comments;
+    public String getParticulars() {
+        return particulars;
     }
 
-    public void setComments(String comments) {
-        this.comments = comments;
+    public void setParticulars(String particulars) {
+        this.particulars = particulars;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 
     public LocalDateTime getCreatedAt() {
