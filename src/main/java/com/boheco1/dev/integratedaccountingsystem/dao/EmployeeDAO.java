@@ -97,4 +97,37 @@ public class EmployeeDAO {
         ps.close();
     }
 
+    /**
+     * Retrieves a list of EmployeeInfo as a search result based on a search Key
+     * @param key The search key
+     * @return A list of EmployeeInfo that qualifies with the search key
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<EmployeeInfo> getEmployeeInfo(String key) throws Exception  {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "Select EmployeeID, EmployeeFirstName, EmployeeMidName, EmployeeLastName FROM EmployeeInfo " +
+                        "WHERE (EmployeeFirstName LIKE ? OR EmployeeMidName LIKE ? OR EmployeeLastName LIKE ? ) " +
+                        "ORDER BY EmployeeLastName");
+        ps.setString(1, '%'+ key+'%');
+        ps.setString(2, '%'+ key+'%');
+        ps.setString(3, '%'+ key+'%');
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<EmployeeInfo> list = new ArrayList<>();
+        while(rs.next()) {
+            EmployeeInfo employeeInfo = new EmployeeInfo();
+            employeeInfo.setId(rs.getInt("EmployeeID"));
+            employeeInfo.setEmployeeFirstName(rs.getString("EmployeeFirstName"));
+            employeeInfo.setEmployeeMidName(rs.getString("EmployeeMidName"));
+            employeeInfo.setEmployeeLastName(rs.getString("EmployeeLastName"));
+            list.add(employeeInfo);
+        }
+
+        rs.close();
+        ps.close();
+
+        return list;
+    }
+
 }
