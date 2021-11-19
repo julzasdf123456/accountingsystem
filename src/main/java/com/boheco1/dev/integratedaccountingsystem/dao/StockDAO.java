@@ -166,7 +166,7 @@ public class StockDAO {
             ps.setDate(6, null);
         }
 
-        if (stock.getManufacturingDate() != null) {
+        if (stock.getValidityDate() != null) {
             ps.setDate(7, Date.valueOf(stock.getValidityDate()));
         }else{
             ps.setDate(7, null);
@@ -190,28 +190,77 @@ public class StockDAO {
     /**
      * Retrieves a list of SlimStocks as a search result based on a search Key
      * @param key The search key
+     * @param trashed Stock status whether trashed or not
      * @return A list of SlimStock that qualifies with the search key
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static List<SlimStock> search(String key) throws Exception  {
+    public static List<SlimStock> search(String key, int trashed) throws Exception  {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "Select TOP 50 id, StockName, Brand, Model FROM Stocks " +
+                "Select TOP 50 id, StockName, Brand, Model, Description, Price, Unit, Quantity FROM Stocks " +
                         "WHERE (StockName LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
-                        "AND IsTrashed=0 ORDER BY StockName");
+                        "AND IsTrashed=? ORDER BY StockName");
         ps.setString(1, "%" + key + "%");
         ps.setString(2, "%" + key + "%");
         ps.setString(3, "%" + key + "%");
+        ps.setInt(4, trashed);
 
         ResultSet rs = ps.executeQuery();
 
         ArrayList<SlimStock> stocks = new ArrayList<>();
         while(rs.next()) {
-            stocks.add(new SlimStock(
+            SlimStock stock = new SlimStock(
                     rs.getInt("id"),
                     rs.getString("StockName"),
                     rs.getString("Model"),
-                    rs.getString("Brand")
-            ));
+                    rs.getString("Brand"));
+            stock.setDescription(rs.getString("Description"));
+            stock.setPrice(rs.getDouble("Price"));
+            stock.setUnit(rs.getString("Unit"));
+            stock.setQuantity(rs.getInt("Quantity"));
+            stocks.add(stock);
+        }
+
+        rs.close();
+        ps.close();
+
+        return stocks;
+    }
+
+    /**
+     * Get a list of Stocks with offset and limit. Used in viewing list stocks.
+     * @param limit number of rows to fetch
+     * @param offset number of rows to skip
+     * @param trashed Stock status whether trashed or not
+     * @return ArrayList of SlimStocks
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<SlimStock> getSlimStockList(int limit, int offset, int trashed) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "Select * FROM Stocks " +
+                        "WHERE IsTrashed=? "+
+                        "ORDER BY StockName " +
+                        "OFFSET ? ROWS " +
+                        "FETCH NEXT ? ROWS ONLY");
+        ps.setInt(1, trashed);
+        ps.setInt(2, offset);
+        ps.setInt(3, limit);
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<SlimStock> stocks = new ArrayList<>();
+
+        while(rs.next()) {
+            SlimStock stock = new SlimStock(
+                    rs.getInt("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Model"),
+                    rs.getString("Brand"));
+
+            stock.setDescription(rs.getString("Description"));
+            stock.setPrice(rs.getDouble("Price"));
+            stock.setUnit(rs.getString("Unit"));
+            stock.setQuantity(rs.getInt("Quantity"));
+            stocks.add(stock);
         }
 
         rs.close();
@@ -328,6 +377,20 @@ public class StockDAO {
     }
 
     /**
+     * Restores a trashed stock
+     * @param trash the stock to be trashed
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void restore(Stock trash) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE Stocks SET IsTrashed=0, UpdatedAt=GETDATE(), UserIDTrashed=? WHERE id=?");
+        ps.setInt(1, ActiveUser.getUser().getId());
+        ps.setInt(2, trash.getId());
+        ps.executeUpdate();
+        ps.close();
+    }
+
+    /**
      * Implementation of the stock entry transaction
      * @param stock the stock entered
      * @param log entry log containing data such as quantity, source, etc.
@@ -383,7 +446,7 @@ public class StockDAO {
     /**
      * Get all the stock types
      * @return the List of StockTypes from the database
-     * @throws Exception
+     * @throws Exception obligatory from DB.getConnection()
      */
     public static List<StockType> getTypes() throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
@@ -595,7 +658,7 @@ public class StockDAO {
 
     /**
      * Get the entry logs of a given Stock
-     * @param stock
+     * @param stock the stock to get the entries
      * @return The List of StockEntryLogs for this particular Stock
      * @throws Exception obligatory from DB.getConnection()
      */
