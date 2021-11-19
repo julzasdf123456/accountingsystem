@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.DatePicker;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
@@ -85,19 +86,19 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         try {
             quantity = Integer.parseInt(this.quantity.getText());
         }catch (Exception e){
-            AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), this.stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+
         }
 
         try {
             price = Double.parseDouble(this.price.getText());
         }catch (Exception e){
-            AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), this.stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+
         }
 
         try {
             serialNumber = Integer.parseInt(this.serialNumber.getText());
         }catch (Exception e){
-            AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), this.stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+
         }
 
         if (this.stock == null) this.stock = new Stock();
@@ -236,7 +237,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                     //Perform DB query when length of search string is 4 or above
                     if (query.length() > 3){
                         try {
-                            list = StockDAO.search(query);
+                            list = StockDAO.search(query, 0);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -320,5 +321,11 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.comments.setText("");
         this.manuDate.setValue(null);
         this.valDate.setValue(null);
+    }
+
+    @Override
+    public void setSubMenus(FlowPane flowPane) {
+        flowPane.getChildren().removeAll();
+        flowPane.getChildren().setAll(new ArrayList<>());
     }
 }
