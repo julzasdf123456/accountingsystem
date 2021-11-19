@@ -6,6 +6,8 @@ import com.boheco1.dev.integratedaccountingsystem.objects.Signatory;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class SignatoryDAO {
@@ -73,4 +75,37 @@ public class SignatoryDAO {
 
         return sig;
     }
+
+    /**
+     * Retrieves a list of Signatory as a search result based on a search Key
+     * @param key The search key
+     * @return A list of Signatory that qualifies with the search key
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<Signatory> getSignatories(String key) throws Exception  {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM signatories WHERE  type = ? ORDER BY rank");
+        ps.setString(1, key );
+
+        ResultSet rs = ps.executeQuery();
+        //int id, String type, int userID, int rank, String comments, LocalDateTime createdAt, LocalDateTime updatedAt
+        ArrayList<Signatory> signatories = new ArrayList<>();
+        while(rs.next()) {
+            signatories.add(new Signatory(
+                    rs.getInt("id"),
+                    rs.getString("Type"),
+                    rs.getInt("UserID"),
+                    rs.getInt("Rank"),
+                    rs.getString("Comments"),
+                    rs.getDate("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                    rs.getDate("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return signatories;
+    }
+
 }
