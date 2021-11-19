@@ -78,7 +78,7 @@ public class MirsDAO {
         ps.setInt(2, item.getStockID());
         ps.setInt(3, item.getQuantity());
         ps.setDouble(4, item.getPrice());
-        ps.setString(5, item.getComments());
+        ps.setString(5, item.getRemarks());
 
         ps.executeUpdate();
 
@@ -106,7 +106,7 @@ public class MirsDAO {
             ps.setInt(2, item.getStockID());
             ps.setInt(3, item.getQuantity());
             ps.setDouble(4, item.getPrice());
-            ps.setString(5, item.getComments());
+            ps.setString(5, item.getRemarks());
 
             ps.addBatch();
         }
@@ -128,7 +128,7 @@ public class MirsDAO {
         ps.setInt(1, item.getStockID());
         ps.setInt(2, item.getQuantity());
         ps.setDouble(3, item.getPrice());
-        ps.setString(4, item.getComments());
+        ps.setString(4, item.getRemarks());
 
         ps.executeUpdate();
 
