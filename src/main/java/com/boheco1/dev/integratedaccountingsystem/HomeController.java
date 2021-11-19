@@ -4,8 +4,11 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.ColorPalette;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ContentHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DrawerMenuHelper;
 
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.usermgt.UserMgtController;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.FileMIRS;
+import com.boheco1.dev.integratedaccountingsystem.warehouse.StockController;
+import com.boheco1.dev.integratedaccountingsystem.warehouse.StockEntryController;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.WarehouseDashboardController;
 
 import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
@@ -41,7 +44,7 @@ public class HomeController implements Initializable {
 
     @FXML Label accountingLabel, billingLabel, telleringLabel, warehouseLabel, userLabel, adminLabel;
 
-    @FXML JFXButton budget, journalEntries, myAcctBtn, logoutBtn, allAccounts, collection, otherPayments, usersBtn, employeesBtn;
+    @FXML JFXButton budget, journalEntries, myAcctBtn, logoutBtn, allAccounts, collection, otherPayments, usersBtn, employeesBtn, stockBtn;
 
     @FXML JFXButton warehouseDashboardBtn, mirsBtn;
 
@@ -63,6 +66,7 @@ public class HomeController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        Utility.setContentPane(contentPane);
         submenuList = new ArrayList<>();
         // INITIALIZE HAMBURGER
         hamburgerIcon = new FontIcon("mdi2a-arrow-left");
@@ -89,8 +93,9 @@ public class HomeController implements Initializable {
         DrawerMenuHelper.setMenuButton(logoutBtn,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "Logout");
 
         // WAREHOUSE
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(warehouseDashboardBtn, new FontIcon("mdi2v-view-dashboard"), drawerMenus, "Warehouse Dashboard", contentPane, "warehouse_dashboard_controller.fxml", subToolbar, new WarehouseDashboardController(), title); // PERMISSION TO VIEW WAREHOUSE: warehouse-view
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(mirsBtn, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "File for MIRS", contentPane, "warehouse_file_mirs.fxml", subToolbar, new FileMIRS(), title); // PERMISSION TO VIEW WAREHOUSE: warehouse-view
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(warehouseDashboardBtn, new FontIcon("mdi2v-view-dashboard"), drawerMenus, "Warehouse Dashboard", contentPane, "warehouse_dashboard_controller.fxml", subToolbar, new WarehouseDashboardController(), title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(mirsBtn, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "File for MIRS", contentPane, "warehouse_file_mirs.fxml", subToolbar, new FileMIRS(), title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(stockBtn, new FontIcon("mdi2w-warehouse"), drawerMenus, "Stock", contentPane, "warehouse_stock_entry.fxml", subToolbar, new StockEntryController(), title);
     }
 
     @FXML
@@ -158,4 +163,5 @@ public class HomeController implements Initializable {
     private void viewMyAccount() {
         this.replaceContent("view_my_account.fxml");
     }
+
 }
