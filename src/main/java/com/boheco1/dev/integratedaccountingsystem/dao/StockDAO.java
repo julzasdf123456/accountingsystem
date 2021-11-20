@@ -605,7 +605,8 @@ public class StockDAO {
     public static List<Stock> getCritical() throws Exception {
 
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM Stocks WHERE Quantity < Critical ORDER BY Quantity");
+                "SELECT * FROM Stocks WHERE Quantity <= Critical " +
+                        "WHERE IsTrashed=0 ORDER BY Quantity");
         ps.setInt(1, CRITICAL);
         ResultSet rs = ps.executeQuery();
 
