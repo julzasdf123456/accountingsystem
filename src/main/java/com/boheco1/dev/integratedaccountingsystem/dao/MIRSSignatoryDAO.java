@@ -14,11 +14,11 @@ public class MIRSSignatoryDAO {
     public static void add(MIRSSignatory msig) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "INSERT INTO MIRSignatories " +
-                        "(MIRSID, SignatoriesID, Status, Comments, CreatedAt, UpdatedAt) " +
+                        "(MIRSID, userID, Status, Comments, CreatedAt, UpdatedAt) " +
                         "VALUES " +
                         "(?,?,?,?,GETDATE(),GETDATE())", Statement.RETURN_GENERATED_KEYS);
         ps.setInt(1, msig.getMirsID());
-        ps.setInt(2, msig.getSignatoryID());
+        ps.setInt(2, msig.getUserID());
         ps.setString(3, msig.getStatus());
         ps.setString(4, msig.getComments());
 
@@ -35,10 +35,10 @@ public class MIRSSignatoryDAO {
     public static void update(MIRSSignatory msig) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE MIRSSignatories SET " +
-                        "MIRSID=?, SignatoriesID=?, Status=?, Comments=?, UpdatedAt=GETDATE() " +
+                        "MIRSID=?, userID=?, Status=?, Comments=?, UpdatedAt=GETDATE() " +
                         "WHERE id=?");
         ps.setInt(1, msig.getMirsID());
-        ps.setInt(2, msig.getSignatoryID());
+        ps.setInt(2, msig.getUserID());
         ps.setString(3, msig.getStatus());
         ps.setString(4, msig.getComments());
         ps.setInt(5, msig.getId());
@@ -61,7 +61,7 @@ public class MIRSSignatoryDAO {
             msig = new MIRSSignatory(
                     rs.getInt("id"),
                     rs.getInt("MIRSID"),
-                    rs.getInt("SignatoriesID"),
+                    rs.getInt("userID"),
                     rs.getString("Status"),
                     rs.getString("Comments"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
@@ -88,7 +88,7 @@ public class MIRSSignatoryDAO {
             mirsSignatories.add(new MIRSSignatory(
                     rs.getInt("id"),
                     rs.getInt("MIRSID"),
-                    rs.getInt("SignatoriesID"),
+                    rs.getInt("userID"),
                     rs.getString("Status"),
                     rs.getString("Comments"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),

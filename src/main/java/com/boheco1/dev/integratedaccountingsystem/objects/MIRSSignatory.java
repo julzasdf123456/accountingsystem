@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public class MIRSSignatory {
     private int id;
     private int mirsID;
-    private int signatoryID;
+    private int userID;
     private String status;
     private String comments;
     private LocalDateTime createdAt;
@@ -13,10 +13,10 @@ public class MIRSSignatory {
 
     public MIRSSignatory(){}
 
-    public MIRSSignatory(int id, int mirsID, int signatoryID, String status, String comments, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public MIRSSignatory(int id, int mirsID, int userID, String status, String comments, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.mirsID = mirsID;
-        this.signatoryID = signatoryID;
+        this.userID = userID;
         this.status = status;
         this.comments = comments;
         this.createdAt = createdAt;
@@ -39,12 +39,12 @@ public class MIRSSignatory {
         this.mirsID = mirsID;
     }
 
-    public int getSignatoryID() {
-        return signatoryID;
+    public int getUserID() {
+        return userID;
     }
 
-    public void setSignatoryID(int signatoryID) {
-        this.signatoryID = signatoryID;
+    public void setUserID(int userID) {
+        this.userID = userID;
     }
 
     public String getStatus() {

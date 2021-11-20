@@ -156,7 +156,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             for(Signatory s : signatories){
                 MIRSSignatory mirsSignatory = new MIRSSignatory();
                 mirsSignatory.setMirsID(Integer.parseInt(mirsNum.getText()));
-                mirsSignatory.setSignatoryID(s.getUserID());
+                mirsSignatory.setUserID(s.getUserID());
                 mirsSignatory.setStatus("for approval");
                 mirsSignatory.setComments("No comment");
                 MIRSSignatoryDAO.add(mirsSignatory); //saving signatories for the MIRS request
