@@ -20,15 +20,16 @@ public class MirsDAO {
      */
     public static void create(MIRS mirs) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO MIRS (DateFiled, Purpose, Details, Status, RequisitionerID, UserID, CreatedAt, UpdatedAt) " +
+                "INSERT INTO MIRS (DateFiled, Purpose, Details, Status, RequisitionerID, UserID, id, CreatedAt, UpdatedAt) " +
                         "VALUES " +
-                        "(?,?,?,?,?,?,GETDATE(), GETDATE())", Statement.RETURN_GENERATED_KEYS);
+                        "(?,?,?,?,?,?,?,GETDATE(), GETDATE())", Statement.RETURN_GENERATED_KEYS);
         ps.setDate(1, Date.valueOf(mirs.getDateFiled()));
         ps.setString(2, mirs.getPurpose());
         ps.setString(3, mirs.getDetails());
         ps.setString(4, mirs.getStatus());
         ps.setInt(5, mirs.getRequisitionerID());
         ps.setInt(6, mirs.getUserID());
+        ps.setInt(7, mirs.getId());
 
         ps.executeUpdate();
 
