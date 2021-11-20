@@ -280,6 +280,7 @@ public class StockDAO {
     public static List<Stock> getList(int limit, int offset) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "Select * FROM Stocks " +
+                        "WHERE IsTrashed=0 " +
                         "ORDER BY UpdatedAt, StockName " +
                         "OFFSET ? ROWS " +
                         "FETCH NEXT ? ROWS ONLY");
@@ -457,7 +458,10 @@ public class StockDAO {
         ArrayList<StockType> stockTypes = new ArrayList<>();
 
         while(rs.next()) {
-            stockTypes.add(new StockType(rs.getInt("id"), rs.getString("StockType")));
+            stockTypes.add(new StockType(
+                    rs.getInt("id"),
+                    rs.getString("StockType"),
+                    rs.getString("Unit")));
         }
 
         rs.close();
@@ -480,7 +484,8 @@ public class StockDAO {
         if(rs.next()) {
             StockType stock = new StockType(
                     rs.getInt("id"),
-                    rs.getString("StockType")
+                    rs.getString("StockType"),
+                    rs.getString("Unit")
             );
 
             rs.close();
@@ -505,7 +510,8 @@ public class StockDAO {
         if (rs.next()) {
             StockType stock = new StockType(
                     rs.getInt("id"),
-                    rs.getString("StockType")
+                    rs.getString("StockType"),
+                    rs.getString("Unit")
             );
 
             rs.close();
