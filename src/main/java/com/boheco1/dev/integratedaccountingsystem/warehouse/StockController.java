@@ -191,8 +191,8 @@ public class StockController extends MenuControllerHandler implements Initializa
                         LocalDate manDate = manuDate_dp.getValue();
                         LocalDate valDate = valDate_dp.getValue();
                         String source = (String) source_cb.getSelectionModel().getSelectedItem();
+                        String serialNumber = serialNumber_tf.getText();
 
-                        int serialNumber = 0;
                         int quantity = 0;
                         double price = 0;
 
@@ -204,12 +204,6 @@ public class StockController extends MenuControllerHandler implements Initializa
 
                         try {
                             price = Double.parseDouble(price_tf.getText());
-                        }catch (Exception e){
-
-                        }
-
-                        try {
-                            serialNumber = Integer.parseInt(serialNumber_tf.getText());
                         }catch (Exception e){
 
                         }
@@ -231,7 +225,7 @@ public class StockController extends MenuControllerHandler implements Initializa
                         //Optional Fields
                         updated_stock.setDescription(desc_tf.getText());
                         updated_stock.setComments(comments_tf.getText());
-                        if (serialNumber > 0) updated_stock.setSerialNumber(serialNumber);
+                        updated_stock.setSerialNumber(serialNumber);
                         if (manDate != null) updated_stock.setManufacturingDate(manDate);
                         if (valDate != null) updated_stock.setValidityDate(valDate);
                         updated_stock.setNeaCode(neaCode_tf.getText());

@@ -8,7 +8,7 @@ public class Stock {
     private int id;
     private String stockName;
     private String description;
-    private int serialNumber;
+    private String serialNumber;
     private String brand;
     private String model;
     private LocalDate manufacturingDate;
@@ -16,6 +16,7 @@ public class Stock {
     private int typeID;
     private String unit;
     private int quantity;
+    private int critical;
     private double price;
     private String neaCode;
     private boolean isTrashed;
@@ -35,8 +36,8 @@ public class Stock {
         this.model = model;
         this.brand = brand;
     }
-
-    public Stock(int id, String stockName, String description, int serialNumber, String brand, String model, LocalDate manufacturingDate, LocalDate validityDate, int typeID, String unit, int quantity, double price, String neaCode, boolean isTrashed, String comments, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime trashedAt, int userIDCreated, int userIDUpdated, int userIDTrashed) {
+    /** Constructor with critical **/
+    public Stock(int id, String stockName, String description, String serialNumber, String brand, String model, LocalDate manufacturingDate, LocalDate validityDate, int typeID, String unit, int quantity, int critical, double price, String neaCode, boolean isTrashed, String comments, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime trashedAt, int userIDCreated, int userIDUpdated, int userIDTrashed) {
         this.id = id;
         this.stockName = stockName;
         this.description = description;
@@ -48,6 +49,7 @@ public class Stock {
         this.typeID = typeID;
         this.unit = unit;
         this.quantity = quantity;
+        this.critical = critical;
         this.price = price;
         this.neaCode = neaCode;
         this.isTrashed = isTrashed;
@@ -58,6 +60,16 @@ public class Stock {
         this.userIDCreated = userIDCreated;
         this.userIDUpdated = userIDUpdated;
         this.userIDTrashed = userIDTrashed;
+    }
+
+
+
+    public int getCritical() {
+        return critical;
+    }
+
+    public void setCritical(int critical) {
+        this.critical = critical;
     }
 
     public int getId() {
@@ -84,11 +96,11 @@ public class Stock {
         this.description = description;
     }
 
-    public int getSerialNumber() {
+    public String getSerialNumber() {
         return serialNumber;
     }
 
-    public void setSerialNumber(int serialNumber) {
+    public void setSerialNumber(String serialNumber) {
         this.serialNumber = serialNumber;
     }
 

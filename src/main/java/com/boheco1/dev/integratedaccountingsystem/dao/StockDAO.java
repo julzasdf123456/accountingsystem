@@ -27,7 +27,7 @@ public class StockDAO {
                         "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?)", Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
-        ps.setInt(3, stock.getSerialNumber());
+        ps.setString(3, stock.getSerialNumber());
 
         ps.setString(4, stock.getBrand());
         ps.setString(5, stock.getModel());
@@ -72,7 +72,7 @@ public class StockDAO {
                     rs.getInt("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
-                    rs.getInt("SerialNumber"),
+                    rs.getString("SerialNumber"),
                     rs.getString("Brand"),
                     rs.getString("Model"),
                     rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
@@ -80,6 +80,7 @@ public class StockDAO {
                     rs.getInt("TypeID"),
                     rs.getString("Unit"),
                     rs.getInt("Quantity"),
+                    rs.getInt("Critical"),
                     rs.getDouble("Price"),
                     rs.getString("NEACode"),
                     rs.getBoolean("IsTrashed"),
@@ -116,7 +117,7 @@ public class StockDAO {
                         "WHERE id=?");
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
-        ps.setInt(3, stock.getSerialNumber());
+        ps.setString(3, stock.getSerialNumber());
 
         ps.setString(4, stock.getBrand());
         ps.setString(5, stock.getModel());
@@ -155,7 +156,7 @@ public class StockDAO {
                         "WHERE id=?");
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
-        ps.setInt(3, stock.getSerialNumber());
+        ps.setString(3, stock.getSerialNumber());
 
         ps.setString(4, stock.getBrand());
         ps.setString(5, stock.getModel());
@@ -294,7 +295,7 @@ public class StockDAO {
                     rs.getInt("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
-                    rs.getInt("SerialNumber"),
+                    rs.getString("SerialNumber"),
                     rs.getString("Brand"),
                     rs.getString("Model"),
                     rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
@@ -302,6 +303,7 @@ public class StockDAO {
                     rs.getInt("TypeID"),
                     rs.getString("Unit"),
                     rs.getInt("Quantity"),
+                    rs.getInt("Critical"),
                     rs.getDouble("Price"),
                     rs.getString("NEACode"),
                     rs.getBoolean("IsTrashed"),
@@ -561,7 +563,7 @@ public class StockDAO {
                     rs.getInt("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
-                    rs.getInt("SerialNumber"),
+                    rs.getString("SerialNumber"),
                     rs.getString("Brand"),
                     rs.getString("Model"),
                     rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
@@ -569,6 +571,7 @@ public class StockDAO {
                     rs.getInt("TypeID"),
                     rs.getString("Unit"),
                     rs.getInt("Quantity"),
+                    rs.getInt("Critical"),
                     rs.getDouble("Price"),
                     rs.getString("NEACode"),
                     rs.getBoolean("IsTrashed"),
@@ -596,7 +599,7 @@ public class StockDAO {
     public static List<Stock> getCritical() throws Exception {
 
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM Stocks WHERE Quantity < ? ORDER BY Quantity");
+                "SELECT * FROM Stocks WHERE Quantity < Critical ORDER BY Quantity");
         ps.setInt(1, CRITICAL);
         ResultSet rs = ps.executeQuery();
 
@@ -607,7 +610,7 @@ public class StockDAO {
                     rs.getInt("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
-                    rs.getInt("SerialNumber"),
+                    rs.getString("SerialNumber"),
                     rs.getString("Brand"),
                     rs.getString("Model"),
                     rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
@@ -615,6 +618,7 @@ public class StockDAO {
                     rs.getInt("TypeID"),
                     rs.getString("Unit"),
                     rs.getInt("Quantity"),
+                    rs.getInt("Critical"),
                     rs.getDouble("Price"),
                     rs.getString("NEACode"),
                     rs.getBoolean("IsTrashed"),
@@ -641,7 +645,7 @@ public class StockDAO {
      */
     public static int countCritical() throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT COUNT(ID) AS 'count' FROM Stocks WHERE IsTrashed=0 AND Quantity<?;");
+                "SELECT COUNT(ID) AS 'count' FROM Stocks WHERE IsTrashed=0 AND Quantity<=Critical;");
         ps.setInt(1, CRITICAL);
         ResultSet rs = ps.executeQuery();
 

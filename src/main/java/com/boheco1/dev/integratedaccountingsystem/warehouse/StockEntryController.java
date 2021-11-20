@@ -78,8 +78,8 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         LocalDate manDate = this.manuDate.getValue();
         LocalDate valDate = this.valDate.getValue();
         String source = this.source.getSelectionModel().getSelectedItem();
+        String serialNumber = this.serialNumber.getText();
 
-        int serialNumber = 0;
         int quantity = 0;
         double price = 0;
 
@@ -91,12 +91,6 @@ public class StockEntryController extends MenuControllerHandler implements Initi
 
         try {
             price = Double.parseDouble(this.price.getText());
-        }catch (Exception e){
-
-        }
-
-        try {
-            serialNumber = Integer.parseInt(this.serialNumber.getText());
         }catch (Exception e){
 
         }
@@ -117,7 +111,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         //Optional Fields
         this.stock.setDescription(this.description.getText());
         this.stock.setComments(comments.getText());
-        if (serialNumber > 0) this.stock.setSerialNumber(serialNumber);
+        this.stock.setSerialNumber(serialNumber);
         if (manDate != null) this.stock.setManufacturingDate(manDate);
         if (valDate != null) this.stock.setValidityDate(valDate);
         this.stock.setNeaCode(this.neaCode.getText());
@@ -271,7 +265,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                 stockName.setText(stock.getStockName());
                 //quantity.setText(""+stock.getQuantity());
                 price.setText(""+stock.getPrice());
-                if (stock.getSerialNumber() > 0) serialNumber.setText(""+stock.getSerialNumber());
+                serialNumber.setText(stock.getSerialNumber());
                 brand.setText(stock.getBrand());
                 model.setText(stock.getModel());
                 unit.setText(stock.getUnit());
