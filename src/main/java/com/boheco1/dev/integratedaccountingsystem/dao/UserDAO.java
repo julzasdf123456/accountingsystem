@@ -14,7 +14,7 @@ import java.util.List;
 public class UserDAO {
 
     public static User login(String userName, String password, Connection cxn) throws Exception {
-        CallableStatement cs = cxn.prepareCall("{call usrLogin (?,?)}");
+        PreparedStatement cs = cxn.prepareStatement("SELECT * FROM users WHERE username=? AND password=?");
         cs.setString(1, userName);
         cs.setString(2, Hash.hash(password));
         ResultSet rs = cs.executeQuery();
@@ -33,23 +33,31 @@ public class UserDAO {
 
         ActiveUser.setUser(user);
 
+        rs.close();
+        cs.close();
+
         return user;
     }
 
     public static User getUserByUserName(String username, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call Get_user_by_username (?)}");
+        PreparedStatement cs = conn.prepareStatement("SELECT * FROM users WHERE username=?");
         cs.setString(1, username);
         ResultSet rs = cs.executeQuery();
         if(!rs.next()) {
             throw new SQLException("The user name '" + username + "' cannot be found!");
         }
 
-        return new User(
+        User user =  new User(
                 rs.getInt("id"),
                 rs.getInt("EmployeeID"),
                 rs.getString("username"),
                 rs.getString("password")
         );
+
+        rs.close();
+        cs.close();
+
+        return user;
     }
 
     public static User get(int id) throws Exception {
@@ -78,7 +86,7 @@ public class UserDAO {
     }
 
     public static List<Role> getRoles(User user, Connection connection) throws SQLException {
-        CallableStatement cs = connection.prepareCall("{call Roles_of_a_user (?)}");
+        PreparedStatement cs = connection.prepareStatement("SELECT roles.* FROM roles LEFT JOIN user_roles ON user_roles.role_id=roles.id WHERE user_roles.user_id=?");
         cs.setInt(1, user.getId());
         ResultSet rs = cs.executeQuery();
 
@@ -92,11 +100,14 @@ public class UserDAO {
             ));
         }
 
+        rs.close();
+        cs.close();
+
         return roles;
     }
 
     private static List<Permission> getPermissions(User user, Connection cxn) throws SQLException {
-        CallableStatement cs = cxn.prepareCall("{call Permissions_of_a_user (?)}");
+        PreparedStatement cs = cxn.prepareStatement("SELECT permissions.* FROM permissions LEFT JOIN user_permissions ON user_permissions.permission_id=permissions.id WHERE user_permissions.user_id=?");
         cs.setInt(1, user.getId());
         ResultSet rs = cs.executeQuery();
         List<Permission> permissions = new ArrayList<Permission>();
@@ -112,6 +123,9 @@ public class UserDAO {
             }
         }
 
+        rs.close();
+        cs.close();
+
         return permissions;
     }
 
@@ -122,7 +136,7 @@ public class UserDAO {
     }
 
     public static List<User> getAll(Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call Get_all_users}");
+        PreparedStatement cs = conn.prepareStatement("SELECT * FROM users ORDER BY fullname");
         ResultSet rs = cs.executeQuery();
         ArrayList<User> users = new ArrayList();
         while(rs.next()) {
@@ -133,13 +147,16 @@ public class UserDAO {
                     rs.getString("fullname")
             ));
         }
+        rs.close();
+        cs.close();
         return users;
     }
 
     public static void addUser(User user, Connection conn) throws Exception {
         String passwordHash = Hash.hash(user.getPassword());
-        CallableStatement cs = conn.prepareCall("{? = call Add_user (?,?,?,?)}");
-        cs.registerOutParameter(1, Types.INTEGER);
+        PreparedStatement cs = conn.prepareStatement("INSERT INTO users (username, fullname, passsword, EmployeeID) " +
+                "VALUES (?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+
         cs.setString(2, user.getUserName());
         cs.setString(3, user.getFullName());
         cs.setString(4, passwordHash);
@@ -147,35 +164,45 @@ public class UserDAO {
 
         cs.executeUpdate();
 
-        int id = cs.getInt(1);
+        ResultSet rs = cs.getGeneratedKeys();
 
-        user.setId(id);
+        if(rs.next()) {
+            int id = rs.getInt(1);
+            user.setId(id);
+        }
+
+        rs.close();
+        cs.close();
     }
 
     public static void updatePassword(User user, String newPassword, Connection conn) throws Exception {
-        CallableStatement cs = conn.prepareCall("{call Change_password (?,?)}");
-        cs.setInt(1, user.getId());
-        cs.setString(2, Hash.hash(newPassword));
+        PreparedStatement cs = conn.prepareStatement("UPDATE users SET password=? WHERE id=?");
+        cs.setInt(2, user.getId());
+        cs.setString(1, Hash.hash(newPassword));
         cs.executeUpdate();
+        cs.close();
     }
 
     public static void deleteUser(User user, Connection conn) throws SQLException  {
-        CallableStatement cs = conn.prepareCall("{call Remove_user (?)}");
+        PreparedStatement cs = conn.prepareStatement("DELETE FROM users WHERE id=?");
         cs.setInt(1, user.getId());
         cs.executeUpdate();
+        cs.close();
     }
 
     public static void addPermission(User user, Permission permission, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call Add_permission_to_user (?,?)}");
+        CallableStatement cs = conn.prepareCall("INSERT INTO user_permissions (user_id, permission_id) VALUES (?,?)");
         cs.setInt(1, user.getId());
         cs.setInt(2, permission.getId());
         cs.executeUpdate();
+        cs.close();
     }
 
     public static void removePermission(User user, Permission permission, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call Remove_user_permission (?,?)}");
+        PreparedStatement cs = conn.prepareStatement("DELETE FROM user_permissions WHERE user_id=?, AND permission_id=?");
         cs.setInt(1, user.getId());
         cs.setInt(2, permission.getId());
         cs.executeUpdate();
+        cs.close();
     }
 }
