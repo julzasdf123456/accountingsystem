@@ -10,9 +10,9 @@ import java.util.List;
 
 public class RoleDAO {
     public static List<Role> getAll(Connection cxn) throws SQLException {
-        CallableStatement cs = cxn.prepareCall("{call Get_all_roles}");
+        PreparedStatement cs = cxn.prepareStatement("SELECT * FROM roles ORDER BY role");
         ResultSet rs = cs.executeQuery();
-        ArrayList<Role> roles = new ArrayList<Role>();
+        ArrayList<Role> roles = new ArrayList<>();
 
         while(rs.next()) {
             roles.add(new Role(
@@ -22,11 +22,14 @@ public class RoleDAO {
             ));
         }
 
+        rs.close();
+        cs.close();
+
         return roles;
     }
 
     public static List<Permission> getPermissions(Role role, Connection cxn) throws SQLException {
-        CallableStatement cs = cxn.prepareCall("{call Permissions_of_a_role (?)}");
+        PreparedStatement cs = cxn.prepareStatement("SELECT * FROM permissions WHERE id IN (SELECT permission_id FROM role_permissions WHERE role_id=?)");
         cs.setInt(1, role.getId());
         ResultSet rs = cs.executeQuery();
 
@@ -43,20 +46,26 @@ public class RoleDAO {
     }
 
     public static void add(Role role, Connection cxn) throws SQLException {
-        CallableStatement cs = cxn.prepareCall("{? = call Add_role (?,?)}");
-        cs.registerOutParameter(1, Types.INTEGER);
-        cs.setString(2, role.getRole());
-        cs.setString(3, role.getDescription());
+        PreparedStatement cs = cxn.prepareStatement("INSERT INTO roles (role, description) VALUES (?,?)", Statement.RETURN_GENERATED_KEYS);
+
+        cs.setString(1, role.getRole());
+        cs.setString(2, role.getDescription());
 
         cs.executeUpdate();
 
-        int id = cs.getInt(1);
+        ResultSet rs = cs.getGeneratedKeys();
 
-        role.setId(id);
+        if(rs.next()) {
+            int id = rs.getInt(1);
+            role.setId(id);
+        }
+
+        rs.close();
+        cs.close();
     }
 
     public static List<Role> rolesOfUser(User user, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call Roles_of_a_user (?)}");
+        PreparedStatement cs = conn.prepareStatement("SELECT * FROM roles WHERE id IN (SELECT role_id FROM user_roles WHERE user_id=?)");
         cs.setInt(1, user.getId());
         ResultSet rs = cs.executeQuery();
         ArrayList<Role> userRoles = new ArrayList();
@@ -69,11 +78,14 @@ public class RoleDAO {
             ));
         }
 
+        rs.close();
+        cs.close();
+
         return userRoles;
     }
 
     public static List<Role> userAvailableRoles(User user, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call User_available_roles (?)}");
+        PreparedStatement cs = conn.prepareStatement("SELECT * FROM roles WHERE id NOT IN (SELECT role_id FROM user_roles WHERE user_id=?)");
         cs.setInt(1, user.getId());
         ResultSet rs = cs.executeQuery();
         ArrayList<Role> availableRoles = new ArrayList();
@@ -85,17 +97,22 @@ public class RoleDAO {
             ));
         }
 
+        rs.close();
+        cs.close();
+
         return availableRoles;
     }
 
     public static void deleteRole(Role role, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call Remove_role (?)}");
+        PreparedStatement cs = conn.prepareStatement("DELETE FROM roles WHERE id=?");
         cs.setInt(1, role.getId());
         cs.executeUpdate();
+
+        cs.close();
     }
 
     public static List<Permission> availablePermissions(Role role, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call Role_available_permissions (?)}");
+        PreparedStatement cs = conn.prepareStatement("SELECT * FROM permissions WHERE id NOT IN (SELECT permission_id FROM role_permissions WHERE role_id=?)");
         cs.setInt(1, role.getId());
         ResultSet rs = cs.executeQuery();
         ArrayList<Permission> availablePermissions = new ArrayList();
@@ -106,14 +123,20 @@ public class RoleDAO {
                     rs.getString("remarks")
             ));
         }
+
+        rs.close();
+        cs.close();
+
         return availablePermissions;
     }
 
     public static void updateRole(Role role, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call Update_role (?,?,?)}");
-        cs.setInt(1, role.getId());
-        cs.setString(2, role.getRole());
-        cs.setString(3, role.getDescription());
+        PreparedStatement cs = conn.prepareStatement("UPDATE roles SET role=?, description=? WHERE id=?");
+        cs.setInt(3, role.getId());
+        cs.setString(1, role.getRole());
+        cs.setString(2, role.getDescription());
         cs.executeUpdate();
+
+        cs.close();
     }
 }

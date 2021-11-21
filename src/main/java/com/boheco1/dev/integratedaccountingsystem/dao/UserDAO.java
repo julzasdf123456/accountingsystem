@@ -157,10 +157,10 @@ public class UserDAO {
         PreparedStatement cs = conn.prepareStatement("INSERT INTO users (username, fullname, passsword, EmployeeID) " +
                 "VALUES (?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
 
-        cs.setString(2, user.getUserName());
-        cs.setString(3, user.getFullName());
-        cs.setString(4, passwordHash);
-        cs.setInt(5, user.getEmployeeID());
+        cs.setString(1, user.getUserName());
+        cs.setString(2, user.getFullName());
+        cs.setString(3, passwordHash);
+        cs.setInt(4, user.getEmployeeID());
 
         cs.executeUpdate();
 
