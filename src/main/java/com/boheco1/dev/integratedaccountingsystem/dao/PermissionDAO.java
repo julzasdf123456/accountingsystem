@@ -4,6 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.Permission;
 import com.boheco1.dev.integratedaccountingsystem.objects.Role;
 import com.boheco1.dev.integratedaccountingsystem.objects.User;
 
+import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 public class PermissionDAO {
 
     public static List<Permission> getAll(Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call Get_all_permissions}");
+        PreparedStatement cs = conn.prepareStatement("SELECT * FROM permissions ORDER BY permission");
         ResultSet rs = cs.executeQuery();
         ArrayList<Permission> permissions = new ArrayList();
         while(rs.next()) {
@@ -22,21 +23,31 @@ public class PermissionDAO {
             ));
         }
 
+        cs.close();
+
         return permissions;
     }
 
     public static void add(Permission permission, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{? = call Add_permission (?,?)}");
-        cs.registerOutParameter(1, Types.INTEGER);
-        cs.setString(2, permission.getPermission());
-        cs.setString(3, permission.getRemarks());
+        PreparedStatement cs = conn.prepareStatement("INSERT INTO permissions (permission, remarks) VALUES (?,?)", Statement.RETURN_GENERATED_KEYS);
+
+        cs.setString(1, permission.getPermission());
+        cs.setString(2, permission.getRemarks());
         cs.executeUpdate();
-        int id = cs.getInt(1);
-        permission.setId(id);
+
+        ResultSet rs = cs.getGeneratedKeys();
+
+        if(rs.next()) {
+            int id = rs.getInt(1);
+            permission.setId(id);
+        }
+
+        rs.close();
+        cs.close();
     }
 
     public static List<Permission> permissionsOfUser(User user, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call Permissions_of_a_user (?)}");
+        PreparedStatement cs = conn.prepareStatement("SELECT * FROM permissions WHERE id IN (SELECT permission_id FROM user_permissions WHERE user_id=?)");
         cs.setInt(1, user.getId());
         ResultSet rs = cs.executeQuery();
 
@@ -49,11 +60,13 @@ public class PermissionDAO {
             ));
         }
 
+        cs.close();
+
         return userPermissions;
     }
 
     public static List<Permission> userAvailablePermissions(User user, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call User_available_permissions (?)}");
+        PreparedStatement cs = conn.prepareStatement("SELECT * FROM permissions WHERE id NOT IN (SELECT permission_id from user_permissions WHERE user_id=?)");
         cs.setInt(1, user.getId());
         ResultSet rs = cs.executeQuery();
         ArrayList<Permission> availablePermissions = new ArrayList();
@@ -69,32 +82,20 @@ public class PermissionDAO {
     }
 
     public static void updatePermission(Permission permission, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call Update_permission  (?,?,?)}");
-        cs.setInt(1, permission.getId());
-        cs.setString(2, permission.getPermission());
-        cs.setString(3, permission.getRemarks());
+        PreparedStatement cs = conn.prepareStatement("UPDATE permissions SET permission=?, remakrs=? WHERE id=?");
+        cs.setInt(3, permission.getId());
+        cs.setString(1, permission.getPermission());
+        cs.setString(2, permission.getRemarks());
         cs.executeUpdate();
+
+        cs.close();
     }
 
     public static void removePermission(Permission permission, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call Remove_permission (?)}");
+        PreparedStatement cs = conn.prepareStatement("DELETE FROM permissions WHERE id=?");
         cs.setInt(1, permission.getId());
         cs.executeUpdate();
-    }
 
-    public static List<Permission> permissionsOfRole(Role role, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call Permissions_of_a_role (?)}");
-        cs.setInt(1, role.getId());
-        ResultSet rs = cs.executeQuery();
-
-        ArrayList<Permission> list = new ArrayList();
-        while(rs.next()) {
-            list.add(new Permission(
-                    rs.getInt("id"),
-                    rs.getString("permission"),
-                    rs.getString("remarks")
-            ));
-        }
-        return list;
+        cs.close();
     }
 }
