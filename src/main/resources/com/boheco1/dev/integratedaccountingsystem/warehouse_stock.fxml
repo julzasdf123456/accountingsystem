@@ -4,6 +4,7 @@
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -37,7 +38,7 @@
                      <left>
                         <Pane prefHeight="66.0" prefWidth="653.0" BorderPane.alignment="CENTER">
                            <children>
-                              <JFXButton layoutX="363.0" layoutY="18.0" onAction="#newStock" prefHeight="30.0" prefWidth="75.0" style="-fx-background-color: #00AD8E;" text="New" textFill="WHITE">
+                              <JFXButton layoutX="363.0" layoutY="18.0" onAction="#newStock" prefHeight="30.0" prefWidth="75.0" styleClass="btn-theme" stylesheets="@style.css" text="New" textFill="WHITE">
                                  <graphic>
                                     <FontIcon iconColor="WHITE" iconLiteral="mdi2f-file-document-outline" iconSize="14" />
                                  </graphic>
@@ -50,7 +51,7 @@
                                     <Font size="14.0" />
                                  </font>
                               </JFXTextField>
-                              <JFXButton layoutX="583.0" layoutY="18.0" onAction="#trashStock" prefHeight="30.0" prefWidth="50.0" style="-fx-background-color: #b71c1c;" textFill="WHITE">
+                              <JFXButton layoutX="583.0" layoutY="18.0" onAction="#trashStock" prefHeight="30.0" prefWidth="50.0" styleClass="btn-danger" stylesheets="@style.css" textFill="WHITE">
                                  <graphic>
                                     <FontIcon iconColor="WHITE" iconLiteral="mdi2t-trash-can-outline" iconSize="14" />
                                  </graphic>
@@ -58,7 +59,7 @@
                                     <DropShadow />
                                  </effect>
                               </JFXButton>
-                              <JFXButton layoutX="458.0" layoutY="18.0" onAction="#viewStock" prefHeight="30.0" prefWidth="50.0" style="-fx-background-color: #0d47a1;" textFill="WHITE">
+                              <JFXButton layoutX="458.0" layoutY="18.0" onAction="#viewStock" prefHeight="30.0" prefWidth="50.0" styleClass="btn-info" stylesheets="@style.css" textFill="WHITE">
                                  <graphic>
                                     <FontIcon iconColor="WHITE" iconLiteral="mdi2f-file-eye-outline" iconSize="14" />
                                  </graphic>
@@ -66,6 +67,11 @@
                                     <DropShadow />
                                  </effect>
                               </JFXButton>
+                              <Label fx:id="num_stocks_lbl" layoutX="282.0" layoutY="23.0" text="Label">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
                            </children>
                         </Pane>
                      </left>

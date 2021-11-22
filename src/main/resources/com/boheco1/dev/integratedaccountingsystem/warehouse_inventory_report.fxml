@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane prefHeight="554.0" prefWidth="726.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.InventoryReportController">
+<AnchorPane fx:id="anchorPane" prefHeight="554.0" prefWidth="726.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.InventoryReportController">
    <children>
       <StackPane fx:id="stackPane" style="-fx-background-color: #FFFFFF;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -59,7 +59,7 @@
                                           <DatePicker fx:id="to_dp" prefHeight="31.0" prefWidth="211.0" promptText="Select Date" />
                                        </children>
                                     </VBox>
-                                    <JFXButton fx:id="generate_btn" onAction="#generateReport" prefHeight="30.0" prefWidth="75.0" style="-fx-background-color: #00AD8E;" text="Generate" textFill="WHITE">
+                                    <JFXButton fx:id="generate_btn" onAction="#generateReport" prefHeight="30.0" prefWidth="75.0" styleClass="btn-theme" stylesheets="@style.css" text="Generate" textFill="WHITE">
                                        <effect>
                                           <DropShadow />
                                        </effect>
@@ -67,7 +67,7 @@
                                           <Insets right="48.0" />
                                        </HBox.margin>
                                     </JFXButton>
-                                    <JFXButton fx:id="downloadReport_btn" onAction="#downloadReport" prefHeight="30.0" prefWidth="50.0" style="-fx-background-color: #0d47a1;" textFill="WHITE">
+                                    <JFXButton fx:id="downloadReport_btn" onAction="#downloadReport" prefHeight="30.0" prefWidth="50.0" styleClass="btn-info" stylesheets="@style.css" textFill="WHITE">
                                        <graphic>
                                           <FontIcon iconColor="WHITE" iconLiteral="mdi2f-file-download-outline" iconSize="14" />
                                        </graphic>
