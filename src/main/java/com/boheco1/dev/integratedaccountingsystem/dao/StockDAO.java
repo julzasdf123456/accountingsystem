@@ -25,8 +25,8 @@ public class StockDAO {
                         "ValidityDate, TypeID, Unit, " +
                         "Quantity, Price, NEACode, " +
                         "IsTrashed, Comments, CreatedAt, " +
-                        "UserIDCreated) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?)", Statement.RETURN_GENERATED_KEYS);
+                        "UserIDCreated, Critical) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?,?)", Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
         ps.setString(3, stock.getSerialNumber());
@@ -46,6 +46,8 @@ public class StockDAO {
         ps.setBoolean(13, stock.isTrashed());
         ps.setString(14, stock.getComments());
         ps.setInt(15, stock.getUserIDCreated());
+
+        ps.setInt(16, stock.getCritical());
 
         ps.executeUpdate();
 
