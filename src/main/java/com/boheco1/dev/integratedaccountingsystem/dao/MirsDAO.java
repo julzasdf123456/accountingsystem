@@ -22,7 +22,7 @@ public class MirsDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "INSERT INTO MIRS (DateFiled, Purpose, Details, Status, RequisitionerID, UserID, id, CreatedAt, UpdatedAt) " +
                         "VALUES " +
-                        "(?,?,?,?,?,?,?,GETDATE(), GETDATE())");
+                        "(?,?,?,?,?,?,?,GETDATE(), GETDATE())", Statement.RETURN_GENERATED_KEYS);
         ps.setDate(1, Date.valueOf(mirs.getDateFiled()));
         ps.setString(2, mirs.getPurpose());
         ps.setString(3, mirs.getDetails());
@@ -33,7 +33,13 @@ public class MirsDAO {
 
         ps.executeUpdate();
 
+        ResultSet rs = ps.getGeneratedKeys();
+
+        if(rs.next()) mirs.setId(rs.getInt(1));
+
+        rs.close();
         ps.close();
+
     }
 
     /**
