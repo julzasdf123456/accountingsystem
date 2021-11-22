@@ -25,8 +25,6 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
-
-import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
@@ -39,6 +37,9 @@ public class StockController extends MenuControllerHandler implements Initializa
 
     @FXML
     private TableView<SlimStock> stocksTable;
+
+    @FXML
+    private Label num_stocks_lbl;
 
     @FXML
     private JFXTextField query_tf;
@@ -56,8 +57,8 @@ public class StockController extends MenuControllerHandler implements Initializa
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.createTable();
-        this.initializeStocks();
         this.bindPages();
+        this.setStocksCount();
     }
 
     @Override
@@ -124,6 +125,7 @@ public class StockController extends MenuControllerHandler implements Initializa
                 if (ok){
                     AlertDialogBuilder.messgeDialog("System Information", "Stock item(s) were put to trash!", stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
                     bindPages();
+                    setStocksCount();
                     dialog.close();
                 }
             });
@@ -174,7 +176,6 @@ public class StockController extends MenuControllerHandler implements Initializa
                 valDate_lbl.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 11));
                 valDate_lbl.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
 
-                this.bindNumbers(serialNumber_tf);
                 this.bindNumbers(quantity_tf);
                 this.bindNumbers(price_tf);
                 this.bindStockTypes(type_cb);
@@ -419,9 +420,11 @@ public class StockController extends MenuControllerHandler implements Initializa
 
         this.page_cb.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
             try {
-                int offset = (page_cb.getSelectionModel().getSelectedItem()-1)*LIMIT;
-                ObservableList<SlimStock> stocks = FXCollections.observableList(StockDAO.getSlimStockList(LIMIT, offset, 0));
-                this.stocksTable.getItems().setAll(stocks);
+                if (!page_cb.getSelectionModel().isEmpty()) {
+                    int offset = (page_cb.getSelectionModel().getSelectedItem()-1)*LIMIT;
+                    ObservableList<SlimStock> stocks = FXCollections.observableList(StockDAO.getSlimStockList(LIMIT, offset, 0));
+                    this.stocksTable.getItems().setAll(stocks);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -470,6 +473,14 @@ public class StockController extends MenuControllerHandler implements Initializa
     public void bindSources(JFXComboBox source){
         source.getItems().add("Purchased");
         source.getItems().add("Returned");
+    }
+
+    private void setStocksCount() {
+        try {
+            this.num_stocks_lbl.setText(StockDAO.countStocks()+" records");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -35,6 +35,9 @@ public class TrashStockController extends MenuControllerHandler implements Initi
     private TableView<SlimStock> stocksTable;
 
     @FXML
+    private Label num_stocks_lbl;
+
+    @FXML
     private JFXTextField query_tf;
 
     @FXML
@@ -50,8 +53,8 @@ public class TrashStockController extends MenuControllerHandler implements Initi
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.createTable();
-        this.initializeTrashStocks();
         this.bindPages();
+        this.setTrashCount();
     }
 
     @Override
@@ -112,6 +115,7 @@ public class TrashStockController extends MenuControllerHandler implements Initi
                 if (ok){
                     AlertDialogBuilder.messgeDialog("System Information", "Stock item(s) were restored from trash!", stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
                     bindPages();
+                    setTrashCount();
                     dialog.close();
                 }
             });
@@ -208,13 +212,22 @@ public class TrashStockController extends MenuControllerHandler implements Initi
 
         this.page_cb.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
             try {
-                int offset = (page_cb.getSelectionModel().getSelectedItem()-1)*LIMIT;
-                ObservableList<SlimStock> stocks = FXCollections.observableList(StockDAO.getSlimStockList(LIMIT, offset, 1));
-                this.stocksTable.getItems().setAll(stocks);
+                if (!page_cb.getSelectionModel().isEmpty()) {
+                    int offset = (page_cb.getSelectionModel().getSelectedItem() - 1) * LIMIT;
+                    ObservableList<SlimStock> stocks = FXCollections.observableList(StockDAO.getSlimStockList(LIMIT, offset, 1));
+                    this.stocksTable.getItems().setAll(stocks);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
     }
 
+    private void setTrashCount() {
+        try {
+            this.num_stocks_lbl.setText(StockDAO.countTrashed()+" records");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

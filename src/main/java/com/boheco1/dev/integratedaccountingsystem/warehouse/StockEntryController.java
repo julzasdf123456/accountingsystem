@@ -92,6 +92,12 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         }
 
         try {
+            price  = Double.parseDouble(this.price.getText());
+        }catch (Exception e){
+
+        }
+
+        try {
             threshold  = Integer.parseInt(this.threshold.getText());
         }catch (Exception e){
 
@@ -124,18 +130,18 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                         stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (brand.length() == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for brand!",
-                        stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (price == 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for price!",
-                        stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+                    stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (stockType == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please select a valid stock type!",
+                    stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (quantity == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for quantity!",
                         stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (unit.length() == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for unit!",
                         stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (stockType == null) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please select a valid stock type!",
+        }else if (price == 0) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for price!",
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (source == null){
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please select a valid source type!",
@@ -218,7 +224,8 @@ public class StockEntryController extends MenuControllerHandler implements Initi
 
             type.setOnAction(actionEvent -> {
                 StockType selected = type.getSelectionModel().getSelectedItem();
-                unit.setText(selected.getUnit());
+                if (selected != null)
+                    unit.setText(selected.getUnit());
             });
         } catch (Exception e) {
             e.printStackTrace();
@@ -296,6 +303,19 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                     }
                 }
                 type.getSelectionModel().select(index);
+                stockName.setDisable(true);
+                serialNumber.setDisable(true);
+                brand.setDisable(true);
+                model.setDisable(true);
+                unit.setDisable(true);
+                neaCode.setDisable(true);
+                comments.setDisable(true);
+                description.setDisable(true);
+                manuDate.setDisable(true);
+                valDate.setDisable(true);
+                threshold.setDisable(true);
+                type.setDisable(true);
+                source.getSelectionModel().select(0);
             } catch (Exception e) {
                 AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), this.stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
             }
@@ -319,8 +339,8 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.quantity.setText("");
         this.unit.setText("");
         this.price.setText("");
-        this.source.getSelectionModel().clearSelection();
-        this.type.getSelectionModel().clearSelection();
+        this.source.getSelectionModel().select(null);
+        this.type.getSelectionModel().select(null);
         this.description.setText("");
         this.model.setText("");
         this.serialNumber.setText("");
@@ -328,11 +348,31 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.comments.setText("");
         this.manuDate.setValue(null);
         this.valDate.setValue(null);
+
+        this.stockName.setDisable(false);
+        this.serialNumber.setDisable(false);
+        this.brand.setDisable(false);
+        this.model.setDisable(false);
+        this.unit.setDisable(false);
+        this.neaCode.setDisable(false);
+        this.comments.setDisable(false);
+        this.description.setDisable(false);
+        this.manuDate.setDisable(false);
+        this.valDate.setDisable(false);
+        this.threshold.setDisable(false);
+        this.type.setDisable(false);
+
+        source.getSelectionModel().select(0);
     }
 
     @Override
     public void setSubMenus(FlowPane flowPane) {
         flowPane.getChildren().removeAll();
         flowPane.getChildren().setAll(new ArrayList<>());
+    }
+
+    @FXML
+    private void clear()  {
+        reset();
     }
 }
