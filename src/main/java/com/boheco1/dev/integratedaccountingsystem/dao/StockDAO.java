@@ -800,4 +800,31 @@ public class StockDAO {
         ps.close();
         return stocks;
     }
+
+    /**
+     * Return the pending quantity of a MIRSItem
+     * @param stock
+     * @return
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static int countPendingRequest(Stock stock) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT SUM(Quantity) AS 'pending' FROM MIRSItems mi LEFT JOIN MIRS m ON m.id = mi.MIRSID WHERE m.Status = 'Pending' AND mi.StockID = ?; ");
+        ps.setInt(1, stock.getId());
+        ResultSet rs = ps.executeQuery();
+
+        int count = 0;
+
+        if(rs.next()) {
+            count = rs.getInt("pending");
+        }
+
+        return count;
+    }
+
+    public static int countAvailable(Stock stock) throws Exception {
+        int pending = countPendingRequest(stock);
+
+        return stock.getQuantity()-pending;
+    }
 }
