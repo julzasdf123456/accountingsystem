@@ -257,7 +257,7 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
                 roleNameField.setText(role.getRole());
                 roleDescriptionField.setText(role.getDescription());
 
-                listOfRolePermissions = FXCollections.observableArrayList(PermissionDAO.permissionsOfRole(role, conn));
+                listOfRolePermissions = FXCollections.observableArrayList(RoleDAO.getPermissions(role, conn));
             }
         }
         catch (Exception ex)
