@@ -461,7 +461,7 @@ public class StockDAO {
             stockTypes.add(new StockType(
                     rs.getInt("id"),
                     rs.getString("StockType"),
-                    rs.getString("Unit")));
+                    rs.getString("Units")));
         }
 
         rs.close();
@@ -485,7 +485,7 @@ public class StockDAO {
             StockType stock = new StockType(
                     rs.getInt("id"),
                     rs.getString("StockType"),
-                    rs.getString("Unit")
+                    rs.getString("Units")
             );
 
             rs.close();
@@ -511,7 +511,7 @@ public class StockDAO {
             StockType stock = new StockType(
                     rs.getInt("id"),
                     rs.getString("StockType"),
-                    rs.getString("Unit")
+                    rs.getString("Units")
             );
 
             rs.close();
