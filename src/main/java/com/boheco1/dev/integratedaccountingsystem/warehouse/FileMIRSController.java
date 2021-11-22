@@ -20,9 +20,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
@@ -37,6 +35,9 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
     @FXML
     private AnchorPane contentPane;
+
+    @FXML
+    private VBox tablePane, signaturePane;
 
     @FXML
     private StackPane stackPane;
@@ -80,32 +81,56 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         bindRequisitionerAutocomplete(requisitioner);
         InputValidation.restrictNumbersOnly(mirsNum);
         setSignatories();
-        setItemTable();
+        initializeItemTable();
+    }
+
+    private void resetInputFields() {
+        stock = null;
+        requisitionerEmployee = null;
+        signatories = null;
+        requestItem = null;
+        particularsTable.getItems().clear();
+        mirsNum.setText("");
+        requisitioner.setText("");
+        purpose.setText("");
+        particulars.setText("");
+        quantity.getItems().clear();
+        remarks.setText("");
+        tablePane.setDisable(true);
+        signaturePane.setDisable(true);
     }
 
     @FXML
     private void addBtn(ActionEvent event) {
-        if(stock == null){
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
-            return;
-        }else if(quantity.getSelectionModel().getSelectedIndex() == 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid request quantity!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
-            return;
-        }
-        MIRSItem mirsItem = new MIRSItem();
-        mirsItem.setMirsID(Integer.parseInt(mirsNum.getText()));
-        mirsItem.setStockID(stock.getId());
-        mirsItem.setParticulars(stock.getStockName());
-        mirsItem.setUnit(stock.getUnit());
-        mirsItem.setQuantity(quantity.getValue());
-        mirsItem.setPrice(stock.getPrice());
-        mirsItem.setRemarks(remarks.getText());
+        System.out.println(quantity.getSelectionModel().getSelectedIndex());
+        try{
+            if(stock == null){
+                AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
+                        stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                return;
+            }else if(quantity.getSelectionModel().getSelectedIndex() ==  -1) {
+                AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid request quantity!",
+                        stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                return;
+            }
+            MIRSItem mirsItem = new MIRSItem();
+            mirsItem.setMirsID(Integer.parseInt(mirsNum.getText()));
+            mirsItem.setStockID(stock.getId());
+            mirsItem.setParticulars(stock.getStockName());
+            mirsItem.setUnit(stock.getUnit());
+            mirsItem.setQuantity(quantity.getValue());
+            mirsItem.setPrice(stock.getPrice());
+            mirsItem.setRemarks(remarks.getText());
 
-        stock = null; //set to null for validation
-        requestItem.add(mirsItem);
-        particularsTable.setItems(requestItem);
+            stock = null; //set to null for validation
+            requestItem.add(mirsItem);
+            particularsTable.setItems(requestItem);
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertDialogBuilder.messgeDialog("System Error", e.getMessage(),
+                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }
+
     }
 
     @FXML
@@ -140,29 +165,44 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             return;
         }
 
-        MIRS mirs = new MIRS();
-        mirs.setId(Integer.parseInt(mirsNum.getText()));
-        mirs.setDetails("Details");
-        mirs.setStatus("pending");
-        mirs.setDateFiled(date.getValue());
-        mirs.setPurpose(purpose.getText());
-        mirs.setRequisitionerID(requisitionerEmployee.getId());
-        mirs.setUserID(ActiveUser.getUser().getId());
         try {
             List<MIRSItem> mirsItemList = requestItem; //from ObservableList to List
+            MIRS mirs = new MIRS();
+            mirs.setId(Integer.parseInt(mirsNum.getText())); //id mean MIRS number from user input
+            mirs.setDetails(null);
+            mirs.setStatus(null);
+            mirs.setDateFiled(date.getValue());
+            mirs.setPurpose(purpose.getText());
+            mirs.setRequisitionerID(requisitionerEmployee.getId());
+            mirs.setUserID(ActiveUser.getUser().getId());
+
             MirsDAO.create(mirs); //add a new MIRS to the database
+
             MirsDAO.addMIRSItems(mirs, mirsItemList); //add the items request from the MIRS filled
 
+            for(MIRSItem mirsItem : mirsItemList){
+                Stock request = StockDAO.get(mirsItem.getStockID());
+                StockDAO.deductStockQuantity(request, mirsItem.getQuantity());
+
+
+            }
+
+            System.out.println(mirs.getId() + "-" + Integer.parseInt(mirsNum.getText()));
             for(Signatory s : signatories){
                 MIRSSignatory mirsSignatory = new MIRSSignatory();
-                mirsSignatory.setMirsID(Integer.parseInt(mirsNum.getText()));
+                mirsSignatory.setMirsID(mirs.getId());
                 mirsSignatory.setUserID(s.getUserID());
-                mirsSignatory.setStatus("for approval");
-                mirsSignatory.setComments("No comment");
+                mirsSignatory.setStatus(null);
+                mirsSignatory.setComments(null);
                 MIRSSignatoryDAO.add(mirsSignatory); //saving signatories for the MIRS request
             }
+            AlertDialogBuilder.messgeDialog("System Message", "MIRS request successfully filed, please wait for the approval, thank you!",
+                    stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
+            resetInputFields();
         } catch (Exception e) {
             e.printStackTrace();
+            AlertDialogBuilder.messgeDialog("System Error", e.getMessage(),
+                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }
     }
 
@@ -172,7 +212,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         flowPane.getChildren().setAll(new ArrayList<>());
     }
 
-    private void setItemTable() {
+    private void initializeItemTable() {
         codeCol.setCellValueFactory(new PropertyValueFactory<>("StockID"));
         particularsCol.setCellValueFactory(new PropertyValueFactory<>("Particulars"));
         unitCol.setCellValueFactory(new PropertyValueFactory<>("Unit"));
@@ -269,6 +309,11 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                         }
                     }
 
+                    if(query.length() == 0){
+                        tablePane.setDisable(true);
+                        signaturePane.setDisable(true);
+                    }
+
                     if (list.size() == 0) {
                         requisitionerEmployee = null;
                     }
@@ -290,6 +335,8 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         //This will set the actions once the user clicks an item from the popupmenu.
         employeeSuggest.setOnAutoCompleted(event -> {
             requisitionerEmployee = event.getCompletion();
+            tablePane.setDisable(false);
+            signaturePane.setDisable(false);
             requisitioner.setText(requisitionerEmployee.getEmployeeFirstName() + " " + requisitionerEmployee.getEmployeeLastName());
         });
     }

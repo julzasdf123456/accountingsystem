@@ -35,7 +35,7 @@ public class MirsDAO {
 
         ResultSet rs = ps.getGeneratedKeys();
 
-        if(rs.next()) mirs.setId(rs.getInt(1));
+        //if(rs.next()) mirs.setId(rs.getInt(1));
 
         rs.close();
         ps.close();
@@ -97,6 +97,7 @@ public class MirsDAO {
      * @throws Exception
      */
     public static void addMIRSItems(MIRS mirs, List<MIRSItem> items) throws Exception {
+        System.out.println(mirs.getId());
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt) " +
                         "VALUES " +
