@@ -4,6 +4,8 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -461,7 +463,7 @@ public class StockDAO {
             stockTypes.add(new StockType(
                     rs.getInt("id"),
                     rs.getString("StockType"),
-                    rs.getString("Unit")));
+                    rs.getString("Units")));
         }
 
         rs.close();
@@ -485,7 +487,7 @@ public class StockDAO {
             StockType stock = new StockType(
                     rs.getInt("id"),
                     rs.getString("StockType"),
-                    rs.getString("Unit")
+                    rs.getString("Units")
             );
 
             rs.close();
@@ -511,7 +513,7 @@ public class StockDAO {
             StockType stock = new StockType(
                     rs.getInt("id"),
                     rs.getString("StockType"),
-                    rs.getString("Unit")
+                    rs.getString("Units")
             );
 
             rs.close();
@@ -703,4 +705,97 @@ public class StockDAO {
         return entryLogs;
     }
 
+    public static List<Stock> getInventory(LocalDate from, LocalDate to, int limit, int offset) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT Stocks.* FROM Stocks LEFT JOIN StockEntryLogs " +
+                        "ON StockEntryLogs.StockID=Stocks.id " +
+                        "WHERE StockEntryLogs.UpdatedAt BETWEEN ? AND ? " +
+                        "ORDER BY StockEntryLogs.UpdatedAt " +
+                        "OFFSET ? ROWS " +
+                        "FETCH NEXT ? ROWS ONLY");
+
+        ps.setDate(1, Date.valueOf(from));
+        ps.setDate(2, Date.valueOf(to));
+        ps.setInt(3, offset);
+        ps.setInt(4, limit);
+
+        ResultSet rs = ps.executeQuery();
+        ArrayList<Stock> stocks = new ArrayList<>();
+
+        while(rs.next()) {
+            stocks.add(new Stock(
+                    rs.getInt("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Description"),
+                    rs.getString("SerialNumber"),
+                    rs.getString("Brand"),
+                    rs.getString("Model"),
+                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
+                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
+                    rs.getInt("TypeID"),
+                    rs.getString("Unit"),
+                    rs.getInt("Quantity"),
+                    rs.getInt("Critical"),
+                    rs.getDouble("Price"),
+                    rs.getString("NEACode"),
+                    rs.getBoolean("IsTrashed"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
+                    rs.getInt("UserIDCreated"),
+                    rs.getInt("UserIDUpdated"),
+                    rs.getInt("UserIDTrashed")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+        return stocks;
+    }
+
+    public static List<Stock> getInventory(LocalDate from, LocalDate to) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT Stocks.* FROM Stocks LEFT JOIN StockEntryLogs " +
+                        "ON StockEntryLogs.StockID=Stocks.id " +
+                        "WHERE StockEntryLogs.UpdatedAt BETWEEN ? AND ? " +
+                        "ORDER BY StockEntryLogs.UpdatedAt");
+
+        ps.setDate(1, Date.valueOf(from));
+        ps.setDate(2, Date.valueOf(to));
+
+        ResultSet rs = ps.executeQuery();
+        ArrayList<Stock> stocks = new ArrayList<>();
+
+        while(rs.next()) {
+            stocks.add(new Stock(
+                    rs.getInt("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Description"),
+                    rs.getString("SerialNumber"),
+                    rs.getString("Brand"),
+                    rs.getString("Model"),
+                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
+                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
+                    rs.getInt("TypeID"),
+                    rs.getString("Unit"),
+                    rs.getInt("Quantity"),
+                    rs.getInt("Critical"),
+                    rs.getDouble("Price"),
+                    rs.getString("NEACode"),
+                    rs.getBoolean("IsTrashed"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
+                    rs.getInt("UserIDCreated"),
+                    rs.getInt("UserIDUpdated"),
+                    rs.getInt("UserIDTrashed")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+        return stocks;
+    }
 }
