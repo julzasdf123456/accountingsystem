@@ -819,4 +819,10 @@ public class StockDAO {
 
         return count;
     }
+
+    public static int countAvailable(Stock stock) throws Exception {
+        int pending = countPendingRequest(stock);
+
+        return stock.getQuantity()-pending;
+    }
 }
