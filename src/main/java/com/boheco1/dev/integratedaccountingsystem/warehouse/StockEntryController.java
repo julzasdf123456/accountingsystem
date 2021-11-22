@@ -10,6 +10,7 @@ import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.DatePicker;
@@ -35,7 +36,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
     private StackPane stockStackPane;
 
     @FXML
-    private JFXTextField stockName, serialNumber, brand, model, quantity, unit, price, neaCode;
+    private JFXTextField stockName, serialNumber, brand, model, quantity, unit, price, neaCode, threshold;
 
     @FXML
     private JFXTextArea comments, description;
@@ -69,7 +70,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
     }
 
     @FXML
-    private void saveBtn(ActionEvent event)  {
+    private void saveBtn()  {
         String name = this.stockName.getText();
         String brand = this.brand.getText();
         String model = this.model.getText();
@@ -80,6 +81,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         String source = this.source.getSelectionModel().getSelectedItem();
         String serialNumber = this.serialNumber.getText();
 
+        int threshold = 0;
         int quantity = 0;
         double price = 0;
 
@@ -90,7 +92,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         }
 
         try {
-            price = Double.parseDouble(this.price.getText());
+            threshold  = Integer.parseInt(this.threshold.getText());
         }catch (Exception e){
 
         }
@@ -115,6 +117,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         if (manDate != null) this.stock.setManufacturingDate(manDate);
         if (valDate != null) this.stock.setValidityDate(valDate);
         this.stock.setNeaCode(this.neaCode.getText());
+        this.stock.setCritical(threshold);
 
         if (name.length() == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for stock name!",
@@ -136,6 +139,9 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (source == null){
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please select a valid source type!",
+                    stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (threshold == 0){
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please select enter a valid threshold remaining limit for the stock!",
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else{
             if (isNew) {
@@ -185,7 +191,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
     public void bindNumbers(){
         this.restrictNumbersOnly(this.quantity);
         this.restrictNumbersOnly(this.price);
-        this.restrictNumbersOnly(this.serialNumber);
+        this.restrictNumbersOnly(this.threshold);
     }
 
     public void bindStockTypes(){
@@ -209,6 +215,11 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                     return null;
                 }
             });
+
+            type.setOnAction(actionEvent -> {
+                StockType selected = type.getSelectionModel().getSelectedItem();
+                unit.setText(selected.getUnit());
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -216,6 +227,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
 
     public void bindSources(){
         source.getItems().add("Purchased");
+        source.getSelectionModel().select(0);
         source.getItems().add("Returned");
     }
 
@@ -274,6 +286,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                 description.setText(stock.getDescription());
                 manuDate.setValue(stock.getManufacturingDate());
                 valDate.setValue(stock.getValidityDate());
+                threshold.setText(""+stock.getCritical());
                 ObservableList<StockType> stocktypes = type.getItems();
                 int index = 0;
                 for (int i=0;  i < stocktypes.size(); i++){
