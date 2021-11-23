@@ -268,4 +268,38 @@ public class MirsDAO {
 
         return pending;
     }
+
+    public static int countPending() throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT COUNT(id) AS 'count' FROM MIRS WHERE Status='Pending'");
+        ResultSet rs = ps.executeQuery();
+
+        int count = 0;
+
+        if(rs.next()) {
+            count = rs.getInt("count");
+        }
+
+        rs.close();
+        ps.close();
+
+        return count;
+    }
+
+    public static int countPendingReleases() throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT COUNT(id) AS 'count' FROM Releasing WHERE Status='Pending'");
+
+        ResultSet rs = ps.executeQuery();
+        int count = 0;
+
+        if(rs.next()) {
+            count = rs.getInt("count");
+        }
+
+        rs.close();
+        ps.close();
+
+        return count;
+    }
 }
