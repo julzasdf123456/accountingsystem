@@ -1,12 +1,13 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
+import com.boheco1.dev.integratedaccountingsystem.HomeController;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.SubMenuHelper;
-import com.boheco1.dev.integratedaccountingsystem.objects.SlimStock;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 import com.jfoenix.controls.JFXComboBox;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -15,7 +16,12 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
+import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
@@ -26,6 +32,9 @@ public class InventoryReportController extends MenuControllerHandler implements 
     private StackPane stackPane;
 
     @FXML
+    private AnchorPane anchorPane;
+
+    @FXML
     private DatePicker to_dp, from_dp;
 
     @FXML
@@ -34,7 +43,7 @@ public class InventoryReportController extends MenuControllerHandler implements 
     @FXML
     private JFXComboBox<Integer> page_cb;
 
-    private int LIMIT = 3;
+    private int LIMIT = HomeController.ROW_PER_PAGE;
     private int COUNT = 0;
 
     @Override
@@ -48,6 +57,30 @@ public class InventoryReportController extends MenuControllerHandler implements 
         LocalDate from = from_dp.getValue();
         LocalDate to = to_dp.getValue();
 
+        if (from == null) {
+            AlertDialogBuilder.messgeDialog("System Warning", "Please select a valid start date!",
+                            stackPane, AlertDialogBuilder.WARNING_DIALOG);
+        } else if (to == null) {AlertDialogBuilder.messgeDialog("System Warning", "Please select a valid end date!",
+
+                            stackPane, AlertDialogBuilder.WARNING_DIALOG);
+        } else {
+            Platform.runLater(() -> {
+                try {
+                    ObservableList<Stock> stocks = FXCollections.observableList(StockDAO.getInventory(from, to));
+                    this.bindPages(stocks.size());
+                    this.stocksTable.getItems().setAll(stocks);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+    }
+
+    @FXML
+    public void downloadReport() {
+        LocalDate from = from_dp.getValue();
+        LocalDate to = to_dp.getValue();
+
         if (from == null){
             AlertDialogBuilder.messgeDialog("System Warning", "Please select a valid start date!",
                     stackPane, AlertDialogBuilder.WARNING_DIALOG);
@@ -55,20 +88,22 @@ public class InventoryReportController extends MenuControllerHandler implements 
             AlertDialogBuilder.messgeDialog("System Warning", "Please select a valid end date!",
                     stackPane, AlertDialogBuilder.WARNING_DIALOG);
         }else {
+            Stage stage = (Stage) anchorPane.getScene().getWindow();
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Excel Files", "*.xlsx")
+            );
+            fileChooser.setInitialFileName("inventory.xlsx");
+            File selectedFile = fileChooser.showSaveDialog(stage);
             /*
             try {
                 ObservableList<Stock> stocks = FXCollections.observableList(StockDAO.getInventory(from, to));
+                this.bindPages(stocks.size());
                 this.stocksTable.getItems().setAll(stocks);
             } catch (Exception e) {
                 e.printStackTrace();
-            }
-            */
+            }*/
         }
-    }
-
-    @FXML
-    public void downloadReport() {
-
     }
 
     public void createTable(){
@@ -96,7 +131,7 @@ public class InventoryReportController extends MenuControllerHandler implements 
 
         TableColumn<Stock, String> column7 = new TableColumn<>("Price");
         column7.setCellValueFactory(new PropertyValueFactory<>("price"));
-
+        this.stocksTable.getColumns().removeAll();
         this.stocksTable.getColumns().add(column1);
         this.stocksTable.getColumns().add(column2);
         this.stocksTable.getColumns().add(column3);
@@ -106,17 +141,12 @@ public class InventoryReportController extends MenuControllerHandler implements 
         this.stocksTable.getColumns().add(column6);
     }
 
-    public void bindPages(){
-        try {
-            COUNT = StockDAO.countStocks();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void bindPages(int count){
 
-        double div = COUNT/LIMIT;
+        double div = count/LIMIT;
         double pages = Math.ceil(div);
 
-        if (COUNT % LIMIT >0 )
+        if (count % LIMIT >0 )
             pages++;
 
         this.page_cb.getItems().clear();
@@ -125,13 +155,19 @@ public class InventoryReportController extends MenuControllerHandler implements 
         }
 
         this.page_cb.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
-            try {
-                int offset = (page_cb.getSelectionModel().getSelectedItem()-1)*LIMIT;
-                ObservableList<SlimStock> stocks = FXCollections.observableList(StockDAO.getSlimStockList(LIMIT, offset, 0));
-                this.stocksTable.getItems().setAll(stocks);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            LocalDate from = from_dp.getValue();
+            LocalDate to = to_dp.getValue();
+            Platform.runLater(() -> {
+                try {
+                    if (!page_cb.getSelectionModel().isEmpty() && from != null && to != null ) {
+                        int offset = (page_cb.getSelectionModel().getSelectedItem()-1)*LIMIT;
+                        ObservableList<Stock> stocks = FXCollections.observableList(StockDAO.getInventory(from, to, LIMIT, offset));
+                        this.stocksTable.getItems().setAll(stocks);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
         });
     }
 }

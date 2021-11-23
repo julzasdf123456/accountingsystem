@@ -53,6 +53,8 @@ public class HomeController implements Initializable {
     public List<JFXButton> drawerMenus;
     public List<Label> labelList;
 
+    public static int ROW_PER_PAGE = 25;
+
     // DRAWER
     @FXML JFXButton hamburger;
     public boolean isDrawerExpanded = true;
