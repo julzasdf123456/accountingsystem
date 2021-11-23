@@ -1,11 +1,13 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
+import com.boheco1.dev.integratedaccountingsystem.HomeController;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.SubMenuHelper;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 import com.jfoenix.controls.JFXComboBox;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -41,7 +43,7 @@ public class InventoryReportController extends MenuControllerHandler implements 
     @FXML
     private JFXComboBox<Integer> page_cb;
 
-    private int LIMIT = 3;
+    private int LIMIT = HomeController.ROW_PER_PAGE;
     private int COUNT = 0;
 
     @Override
@@ -55,20 +57,22 @@ public class InventoryReportController extends MenuControllerHandler implements 
         LocalDate from = from_dp.getValue();
         LocalDate to = to_dp.getValue();
 
-        if (from == null){
+        if (from == null) {
             AlertDialogBuilder.messgeDialog("System Warning", "Please select a valid start date!",
-                    stackPane, AlertDialogBuilder.WARNING_DIALOG);
-        }else if (to == null) {
-            AlertDialogBuilder.messgeDialog("System Warning", "Please select a valid end date!",
-                    stackPane, AlertDialogBuilder.WARNING_DIALOG);
-        }else {
-            try {
-                ObservableList<Stock> stocks = FXCollections.observableList(StockDAO.getInventory(from, to));
-                this.bindPages(stocks.size());
-                this.stocksTable.getItems().setAll(stocks);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                            stackPane, AlertDialogBuilder.WARNING_DIALOG);
+        } else if (to == null) {AlertDialogBuilder.messgeDialog("System Warning", "Please select a valid end date!",
+
+                            stackPane, AlertDialogBuilder.WARNING_DIALOG);
+        } else {
+            Platform.runLater(() -> {
+                try {
+                    ObservableList<Stock> stocks = FXCollections.observableList(StockDAO.getInventory(from, to));
+                    this.bindPages(stocks.size());
+                    this.stocksTable.getItems().setAll(stocks);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
         }
     }
 
@@ -127,7 +131,7 @@ public class InventoryReportController extends MenuControllerHandler implements 
 
         TableColumn<Stock, String> column7 = new TableColumn<>("Price");
         column7.setCellValueFactory(new PropertyValueFactory<>("price"));
-
+        this.stocksTable.getColumns().removeAll();
         this.stocksTable.getColumns().add(column1);
         this.stocksTable.getColumns().add(column2);
         this.stocksTable.getColumns().add(column3);
@@ -153,15 +157,17 @@ public class InventoryReportController extends MenuControllerHandler implements 
         this.page_cb.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
             LocalDate from = from_dp.getValue();
             LocalDate to = to_dp.getValue();
-            try {
-                if (!page_cb.getSelectionModel().isEmpty() && from != null && to != null ) {
-                    int offset = (page_cb.getSelectionModel().getSelectedItem()-1)*LIMIT;
-                    ObservableList<Stock> stocks = FXCollections.observableList(StockDAO.getInventory(from, to, LIMIT, offset));
-                    this.stocksTable.getItems().setAll(stocks);
+            Platform.runLater(() -> {
+                try {
+                    if (!page_cb.getSelectionModel().isEmpty() && from != null && to != null ) {
+                        int offset = (page_cb.getSelectionModel().getSelectedItem()-1)*LIMIT;
+                        ObservableList<Stock> stocks = FXCollections.observableList(StockDAO.getInventory(from, to, LIMIT, offset));
+                        this.stocksTable.getItems().setAll(stocks);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            });
         });
     }
 }

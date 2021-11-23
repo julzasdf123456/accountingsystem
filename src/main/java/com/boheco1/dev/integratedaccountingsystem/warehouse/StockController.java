@@ -1,9 +1,11 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
+import com.boheco1.dev.integratedaccountingsystem.HomeController;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.*;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -51,14 +53,14 @@ public class StockController extends MenuControllerHandler implements Initializa
 
     private JFXDialog dialog;
 
-    private int LIMIT = 3;
+    private int LIMIT = HomeController.ROW_PER_PAGE;
     private int COUNT = 0;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.createTable();
         this.bindPages();
         this.setStocksCount();
+        this.initializeStocks();
     }
 
     @Override
@@ -80,12 +82,14 @@ public class StockController extends MenuControllerHandler implements Initializa
         if (key.length() == 0) {
             this.initializeStocks();
         }else {
-            try {
-                ObservableList<SlimStock> stocks = FXCollections.observableList(StockDAO.search(key, 0));
-                this.stocksTable.getItems().setAll(stocks);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            Platform.runLater(() -> {
+                try {
+                    ObservableList<SlimStock> stocks = FXCollections.observableList(StockDAO.search(key, 0));
+                    this.stocksTable.getItems().setAll(stocks);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
         }
     }
 
@@ -348,7 +352,7 @@ public class StockController extends MenuControllerHandler implements Initializa
 
         TableColumn<SlimStock, String> column7 = new TableColumn<>("Price");
         column7.setCellValueFactory(new PropertyValueFactory<>("price"));
-
+        stocksTable.getColumns().removeAll();
         stocksTable.getColumns().add(select);
         stocksTable.getColumns().add(column1);
         stocksTable.getColumns().add(column2);
@@ -383,12 +387,15 @@ public class StockController extends MenuControllerHandler implements Initializa
     }
 
     public void initializeStocks(){
-        try {
-            ObservableList<SlimStock> stocks = FXCollections.observableList(StockDAO.getSlimStockList(LIMIT,0, 0));
-            this.stocksTable.getItems().setAll(stocks);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Platform.runLater(() -> {
+            try {
+                this.createTable();
+                ObservableList<SlimStock> stocks = FXCollections.observableList(StockDAO.getSlimStockList(LIMIT, 0, 0));
+                this.stocksTable.getItems().setAll(stocks);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public void initializeStockEntries(TableView table, Stock stock){
@@ -401,73 +408,72 @@ public class StockController extends MenuControllerHandler implements Initializa
     }
 
     public void bindPages(){
-        try {
-            COUNT = StockDAO.countStocks();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        double div = COUNT/LIMIT;
-        double pages = Math.ceil(div);
-
-        if (COUNT % LIMIT >0 )
-            pages++;
-
-        this.page_cb.getItems().clear();
-        for (int i = 1; i <= pages; i++){
-            this.page_cb.getItems().add(i);
-        }
-
-        this.page_cb.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+        Platform.runLater(() -> {
             try {
-                if (!page_cb.getSelectionModel().isEmpty()) {
-                    int offset = (page_cb.getSelectionModel().getSelectedItem()-1)*LIMIT;
-                    ObservableList<SlimStock> stocks = FXCollections.observableList(StockDAO.getSlimStockList(LIMIT, offset, 0));
-                    this.stocksTable.getItems().setAll(stocks);
-                }
+                COUNT = StockDAO.countStocks();
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            double div = COUNT / LIMIT;
+            double pages = Math.ceil(div);
+
+            if (COUNT % LIMIT > 0)
+                pages++;
+
+            this.page_cb.getItems().clear();
+            for (int i = 1; i <= pages; i++) {
+                this.page_cb.getItems().add(i);
+            }
+
+            this.page_cb.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+                Platform.runLater(() -> {
+                    try {
+                        if (!page_cb.getSelectionModel().isEmpty()) {
+                            int offset = (page_cb.getSelectionModel().getSelectedItem() - 1) * LIMIT;
+                            ObservableList<SlimStock> stocks = FXCollections.observableList(StockDAO.getSlimStockList(LIMIT, offset, 0));
+                            this.stocksTable.getItems().setAll(stocks);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+            });
         });
     }
 
     public void bindNumbers(JFXTextField tf){
-        this.restrictNumbersOnly(tf);
+        InputHelper.restrictNumbersOnly(tf);
     }
 
-    public void restrictNumbersOnly(JFXTextField tf){
-        tf.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("|[-\\+]?|[-\\+]?\\d+\\.?|[-\\+]?\\d+\\.?\\d+")){
-                tf.setText(oldValue);
-            }
-        });
-    }
 
     public void bindStockTypes(JFXComboBox type){
-        try {
-            List<StockType> types = StockDAO.getTypes();
-            for (StockType t : types){
-                type.getItems().add(t);
-            }
-            type.setConverter(new StringConverter<StockType>() {
-                @Override
-                public String toString(StockType object) {
-                    return object==null? "" : object.getStockType();
+        Platform.runLater(() -> {
+            try {
+                List<StockType> types = StockDAO.getTypes();
+                for (StockType t : types){
+                    type.getItems().add(t);
                 }
-
-                @Override
-                public StockType fromString(String string) {
-                    try {
-                        return StockDAO.getStockType(string);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                type.setConverter(new StringConverter<StockType>() {
+                    @Override
+                    public String toString(StockType object) {
+                        return object==null? "" : object.getStockType();
                     }
-                    return null;
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+                    @Override
+                    public StockType fromString(String string) {
+                        try {
+                            return StockDAO.getStockType(string);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public void bindSources(JFXComboBox source){
@@ -476,11 +482,13 @@ public class StockController extends MenuControllerHandler implements Initializa
     }
 
     private void setStocksCount() {
-        try {
-            this.num_stocks_lbl.setText(StockDAO.countStocks()+" records");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Platform.runLater(() -> {
+            try {
+                this.num_stocks_lbl.setText(StockDAO.countStocks() + " rows");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
 }

@@ -1,9 +1,11 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
+import com.boheco1.dev.integratedaccountingsystem.HomeController;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.SlimStock;
 import com.jfoenix.controls.*;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -47,14 +49,14 @@ public class TrashStockController extends MenuControllerHandler implements Initi
 
     private JFXDialog dialog;
 
-    private int LIMIT = 3;
+    private int LIMIT = HomeController.ROW_PER_PAGE;
     private int COUNT = 0;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.createTable();
         this.bindPages();
         this.setTrashCount();
+        this.initializeTrashStocks();
     }
 
     @Override
@@ -70,12 +72,14 @@ public class TrashStockController extends MenuControllerHandler implements Initi
         if (key.length() == 0) {
             this.initializeTrashStocks();
         }else {
-            try {
-                ObservableList<SlimStock> stocks = FXCollections.observableList(StockDAO.search(key, 1));
-                this.stocksTable.getItems().setAll(stocks);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            Platform.runLater(() -> {
+                try {
+                    ObservableList<SlimStock> stocks = FXCollections.observableList(StockDAO.search(key, 1));
+                    this.stocksTable.getItems().setAll(stocks);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
         }
     }
 
@@ -171,7 +175,7 @@ public class TrashStockController extends MenuControllerHandler implements Initi
 
         TableColumn<SlimStock, String> column7 = new TableColumn<>("Price");
         column7.setCellValueFactory(new PropertyValueFactory<>("price"));
-
+        stocksTable.getColumns().removeAll();
         stocksTable.getColumns().add(select);
         stocksTable.getColumns().add(column1);
         stocksTable.getColumns().add(column2);
@@ -183,51 +187,59 @@ public class TrashStockController extends MenuControllerHandler implements Initi
     }
 
     public void initializeTrashStocks(){
-        try {
-            ObservableList<SlimStock> stocks = FXCollections.observableList(StockDAO.getSlimStockList(LIMIT,0, 1));
-            this.stocksTable.getItems().setAll(stocks);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void bindPages(){
-
-        try {
-            COUNT = StockDAO.countTrashed();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        double div = COUNT/LIMIT;
-        double pages = Math.ceil(div);
-
-        if (COUNT % LIMIT >0 )
-            pages++;
-
-        this.page_cb.getItems().clear();
-        for (int i = 1; i <= pages; i++){
-            this.page_cb.getItems().add(i);
-        }
-
-        this.page_cb.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+        Platform.runLater(() -> {
             try {
-                if (!page_cb.getSelectionModel().isEmpty()) {
-                    int offset = (page_cb.getSelectionModel().getSelectedItem() - 1) * LIMIT;
-                    ObservableList<SlimStock> stocks = FXCollections.observableList(StockDAO.getSlimStockList(LIMIT, offset, 1));
-                    this.stocksTable.getItems().setAll(stocks);
-                }
+                this.createTable();
+                ObservableList<SlimStock> stocks = FXCollections.observableList(StockDAO.getSlimStockList(LIMIT,0, 1));
+                this.stocksTable.getItems().setAll(stocks);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
     }
 
+    public void bindPages(){
+        Platform.runLater(() -> {
+            try {
+                COUNT = StockDAO.countTrashed();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            double div = COUNT / LIMIT;
+            double pages = Math.ceil(div);
+
+            if (COUNT % LIMIT > 0)
+                pages++;
+
+            this.page_cb.getItems().clear();
+            for (int i = 1; i <= pages; i++) {
+                this.page_cb.getItems().add(i);
+            }
+
+            this.page_cb.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+                Platform.runLater(() -> {
+                    try {
+                        if (!page_cb.getSelectionModel().isEmpty()) {
+                            int offset = (page_cb.getSelectionModel().getSelectedItem() - 1) * LIMIT;
+                            ObservableList<SlimStock> stocks = FXCollections.observableList(StockDAO.getSlimStockList(LIMIT, offset, 1));
+                            this.stocksTable.getItems().setAll(stocks);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+            });
+        });
+    }
+
     private void setTrashCount() {
-        try {
-            this.num_stocks_lbl.setText(StockDAO.countTrashed()+" records");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Platform.runLater(() -> {
+            try {
+                this.num_stocks_lbl.setText(StockDAO.countTrashed()+" rows");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 }
