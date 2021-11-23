@@ -339,7 +339,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.comments.setText("");
         this.manuDate.setValue(null);
         this.valDate.setValue(null);
-
+        this.threshold.setText("");
         this.stockName.setDisable(false);
         this.serialNumber.setDisable(false);
         this.brand.setDisable(false);

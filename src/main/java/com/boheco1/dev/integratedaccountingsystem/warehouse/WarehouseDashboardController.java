@@ -1,8 +1,10 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
-import com.boheco1.dev.integratedaccountingsystem.JournalEntriesController;
+import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.jfoenix.controls.JFXButton;
+import javafx.application.Platform;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -22,12 +24,14 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
     public List<JFXButton> subMenus;
     public JFXButton options, reports;
 
+    @FXML
+    private Label critical_lbl;
+
     /**
      * Initialize Sub Menu Context Menu Items
      */
     ContextMenuHelper contextMenuHelper;
     // FOR OPTIONS
-    MenuItem createInventory = new MenuItem("Create Inventory");
     MenuItem viewAllStocks = new MenuItem("View All Stocks");
     MenuItem trash = new MenuItem("Trash");
 
@@ -41,8 +45,9 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
         reports = new JFXButton("Reports");
 
         contextMenuHelper = new ContextMenuHelper();
+
         options.setOnAction(actionEvent -> {
-            contextMenuHelper.initializePopupContextMenu(options, createInventory, viewAllStocks, trash)
+            contextMenuHelper.initializePopupContextMenu(options, viewAllStocks, trash)
                     .show(options, NodeLocator.getNodeX(options), NodeLocator.getNodeY(options));
         });
 
@@ -54,7 +59,7 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        this.initializeCriticalStocks();
     }
 
     @Override
@@ -69,10 +74,6 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
 
     @Override
     public void handleContentReplacements(AnchorPane container, Label titleHolder) {
-        createInventory.setOnAction(actionEvent -> {
-            titleHolder.setText("Create Inventory");
-            container.getChildren().setAll(ContentHandler.getNodeFromFxml(JournalEntriesController.class, "warehouse_create_inventory_controller.fxml"));
-        });
 
         viewAllStocks.setOnAction(actionEvent -> {
             titleHolder.setText("View All Stocks");
@@ -87,6 +88,16 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
         inventoryReport.setOnAction(actionEvent -> {
             titleHolder.setText("Inventory Report");
             container.getChildren().setAll(ContentHandler.getNodeFromFxml(InventoryReportController.class, "../warehouse_inventory_report.fxml"));
+        });
+    }
+
+    public void initializeCriticalStocks(){
+        Platform.runLater(() -> {
+            try {
+                critical_lbl.setText(""+ StockDAO.countCritical());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
 }

@@ -78,7 +78,7 @@
                         <VBox alignment="CENTER" prefHeight="98.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
                               <Label text="Critical Stocks" textFill="WHITE" />
-                              <Label text="17" textFill="WHITE">
+                              <Label fx:id="critical_lbl" text="17" textFill="WHITE">
                                  <font>
                                     <Font name="System Bold" size="25.0" />
                                  </font>
