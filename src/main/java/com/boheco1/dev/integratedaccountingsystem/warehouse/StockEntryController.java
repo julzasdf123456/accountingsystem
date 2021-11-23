@@ -2,6 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
+import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
@@ -9,8 +10,6 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.DatePicker;
@@ -195,9 +194,9 @@ public class StockEntryController extends MenuControllerHandler implements Initi
     }
 
     public void bindNumbers(){
-        this.restrictNumbersOnly(this.quantity);
-        this.restrictNumbersOnly(this.price);
-        this.restrictNumbersOnly(this.threshold);
+        InputHelper.restrictNumbersOnly(this.quantity);
+        InputHelper.restrictNumbersOnly(this.price);
+        InputHelper.restrictNumbersOnly(this.threshold);
     }
 
     public void bindStockTypes(){
@@ -318,14 +317,6 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                 source.getSelectionModel().select(0);
             } catch (Exception e) {
                 AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), this.stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
-            }
-        });
-    }
-
-    public void restrictNumbersOnly(JFXTextField tf){
-        tf.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("|[-\\+]?|[-\\+]?\\d+\\.?|[-\\+]?\\d+\\.?\\d+")){
-                tf.setText(oldValue);
             }
         });
     }
