@@ -650,6 +650,59 @@ public class StockDAO {
     }
 
     /**
+     * Get the list of Critical Stocks with pagination
+     * @param limit row per page
+     * @param offset page
+     * @return The List of stocks that are in at critical level
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<Stock> getCritical(int limit, int offset) throws Exception {
+
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM Stocks WHERE Quantity <= Critical " +
+                        "AND IsTrashed=0 ORDER BY Quantity "+
+                        "OFFSET ? ROWS " +
+                        "FETCH NEXT ? ROWS ONLY");
+        ps.setInt(1, offset);
+        ps.setInt(2, limit);
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<Stock> criticalStocks = new ArrayList<>();
+
+        while(rs.next()) {
+            criticalStocks.add(new Stock(
+                    rs.getInt("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Description"),
+                    rs.getString("SerialNumber"),
+                    rs.getString("Brand"),
+                    rs.getString("Model"),
+                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
+                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
+                    rs.getInt("TypeID"),
+                    rs.getString("Unit"),
+                    rs.getInt("Quantity"),
+                    rs.getInt("Critical"),
+                    rs.getDouble("Price"),
+                    rs.getString("NEACode"),
+                    rs.getBoolean("IsTrashed"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
+                    rs.getInt("UserIDCreated"),
+                    rs.getInt("UserIDUpdated"),
+                    rs.getInt("UserIDTrashed")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return criticalStocks;
+    }
+
+    /**
      * Count the number of Stocks which are at critical level
      * @return The number of Stocks in critical level.
      * @throws Exception obligatory from DB.getConnection()
@@ -657,7 +710,6 @@ public class StockDAO {
     public static int countCritical() throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT COUNT(ID) AS 'count' FROM Stocks WHERE IsTrashed=0 AND Quantity<=Critical;");
-        ps.setInt(1, CRITICAL);
         ResultSet rs = ps.executeQuery();
 
         int count = 0;
