@@ -80,14 +80,46 @@
                                                 <Insets bottom="10.0" top="24.0" />
                                             </VBox.margin>
                                         </HBox>
-                                        <Label fx:id="available" maxWidth="1.7976931348623157E308" text="Available Stock: 0">
-                                            <font>
-                                                <Font size="14.0" />
-                                            </font>
-                                            <VBox.margin>
-                                                <Insets left="18.0" />
-                                            </VBox.margin>
-                                        </Label>
+                              <HBox>
+                                 <VBox.margin>
+                                    <Insets left="18.0" />
+                                 </VBox.margin>
+                                 <children>
+                                              <Label fx:id="inStock" maxWidth="1.7976931348623157E308" style="-fx-background-radius: 4;" styleClass="btn-info" text="In Stock: 0" textFill="WHITE">
+                                                  <font>
+                                                      <Font size="14.0" />
+                                                  </font>
+                                       <HBox.margin>
+                                          <Insets right="20.0" />
+                                       </HBox.margin>
+                                       <padding>
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                       </padding>
+                                              </Label>
+                                    <Label fx:id="pending" maxWidth="1.7976931348623157E308" style="-fx-background-radius: 4;" styleClass="btn-sucess" text="Pending: 0" textFill="WHITE">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                       <HBox.margin>
+                                          <Insets right="20.0" />
+                                       </HBox.margin>
+                                       <padding>
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label fx:id="available" maxWidth="1.7976931348623157E308" style="-fx-background-radius: 4;" styleClass="btn-warning" text="Available: 0" textFill="WHITE">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                       <HBox.margin>
+                                          <Insets right="20.0" />
+                                       </HBox.margin>
+                                       <padding>
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                       </padding>
+                                    </Label>
+                                 </children>
+                              </HBox>
                                     </children>
                                     <padding>
                                         <Insets left="16.0" right="16.0" />
