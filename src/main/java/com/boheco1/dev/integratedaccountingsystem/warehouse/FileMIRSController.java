@@ -55,7 +55,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     private JFXTextArea purpose;
 
     @FXML
-    private Label available;
+    private Label available, inStock, pending;
 
     @FXML
     private TableView<MIRSItem> particularsTable;
@@ -102,7 +102,6 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
     @FXML
     private void addBtn(ActionEvent event) {
-        System.out.println(quantity.getSelectionModel().getSelectedIndex());
         try{
             if(stock == null){
                 AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
@@ -125,12 +124,18 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             stock = null; //set to null for validation
             requestItem.add(mirsItem);
             particularsTable.setItems(requestItem);
+
+            particulars.setText("");
+            quantity.getItems().clear();
+            particulars.requestFocus();
+            inStock.setText("In Stock: 0");
+            pending.setText("Pending: 0");
+            available.setText("Available: 0");
         } catch (Exception e) {
             e.printStackTrace();
             AlertDialogBuilder.messgeDialog("System Error", e.getMessage(),
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }
-
     }
 
     @FXML
@@ -170,7 +175,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             MIRS mirs = new MIRS();
             mirs.setId(Integer.parseInt(mirsNum.getText())); //id mean MIRS number from user input
             mirs.setDetails(null);
-            mirs.setStatus(null);
+            mirs.setStatus("Pending");
             mirs.setDateFiled(date.getValue());
             mirs.setPurpose(purpose.getText());
             mirs.setRequisitionerID(requisitionerEmployee.getId());
@@ -182,12 +187,9 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
             for(MIRSItem mirsItem : mirsItemList){
                 Stock request = StockDAO.get(mirsItem.getStockID());
-                StockDAO.deductStockQuantity(request, mirsItem.getQuantity());
-
-
+                //StockDAO.deductStockQuantity(request, mirsItem.getQuantity());
             }
 
-            System.out.println(mirs.getId() + "-" + Integer.parseInt(mirsNum.getText()));
             for(Signatory s : signatories){
                 MIRSSignatory mirsSignatory = new MIRSSignatory();
                 mirsSignatory.setMirsID(mirs.getId());
@@ -279,10 +281,13 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             SlimStock result = event.getCompletion();
             try {
                 stock = StockDAO.get(result.getId());
-                available.setText("Available Stock: "+stock.getQuantity());
+                inStock.setText("In Stock: "+stock.getQuantity());
+                pending.setText("Pending: "+ StockDAO.countPendingRequest(stock));
+                int av = StockDAO.countAvailable(stock);
+                available.setText("Available: "+ av);
 
                 quantity.getItems().clear();
-                for(int q=1;q<=stock.getQuantity();q++){
+                for(int q=1;q<=av;q++){
                     quantity.getItems().add(q);
                 }
             } catch (Exception e) {
@@ -338,6 +343,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             tablePane.setDisable(false);
             signaturePane.setDisable(false);
             requisitioner.setText(requisitionerEmployee.getEmployeeFirstName() + " " + requisitionerEmployee.getEmployeeLastName());
+            purpose.requestFocus();
         });
     }
 }
