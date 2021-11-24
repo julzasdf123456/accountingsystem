@@ -8,12 +8,7 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 import com.boheco1.dev.integratedaccountingsystem.JournalEntriesController;
 import com.boheco1.dev.integratedaccountingsystem.dao.MirsDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
-import com.boheco1.dev.integratedaccountingsystem.helpers.ContentHandler;
-import com.boheco1.dev.integratedaccountingsystem.helpers.ContextMenuHelper;
-import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
-import com.boheco1.dev.integratedaccountingsystem.helpers.ModalBuilder;
-import com.boheco1.dev.integratedaccountingsystem.helpers.NodeLocator;
-import com.boheco1.dev.integratedaccountingsystem.helpers.SubMenuHelper;
+import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.jfoenix.controls.JFXButton;
 import java.net.URL;
 import java.util.ArrayList;
@@ -66,14 +61,7 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
     }
 
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.initializeCriticalStocks();
-        try {
-            pendingApprovals_lbl.setText(""+MirsDAO.countPending());
-            pendingReleases_lbl.setText(""+MirsDAO.countPendingReleases());
-        } catch (Exception var4) {
-            var4.printStackTrace();
-        }
-
+        this.initializeCounts();
     }
 
     @FXML
@@ -84,6 +72,12 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
     @FXML
     private void mirsPendingReleases(MouseEvent event) {
         ModalBuilder.showModalFromXML(this.getClass(), "../warehouse_pending_mirs.fxml", this.stackPane);
+    }
+
+    @FXML
+    void viewCriticalItems(MouseEvent event) {
+        System.out.println("Clicked critical");
+        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(CriticalStockController.class, "../warehouse_critical_stock.fxml"));
     }
 
     public void setSubMenus(FlowPane flowPane) {
@@ -115,10 +109,12 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
         });
     }
 
-    public void initializeCriticalStocks(){
+    public void initializeCounts(){
         Platform.runLater(() -> {
             try {
                 critical_lbl.setText(""+ StockDAO.countCritical());
+                pendingApprovals_lbl.setText(""+MirsDAO.countPending());
+                pendingReleases_lbl.setText(""+MirsDAO.countPendingReleases());
             } catch (Exception e) {
                 e.printStackTrace();
             }
