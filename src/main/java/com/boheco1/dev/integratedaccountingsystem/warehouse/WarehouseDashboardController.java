@@ -9,22 +9,35 @@ import com.boheco1.dev.integratedaccountingsystem.JournalEntriesController;
 import com.boheco1.dev.integratedaccountingsystem.dao.MirsDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
+import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
+import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
 import com.jfoenix.controls.JFXButton;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import com.jfoenix.controls.JFXTreeTableView;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
+import javafx.util.Callback;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 public class WarehouseDashboardController extends MenuControllerHandler implements Initializable, SubMenuHelper {
     public List<JFXButton> subMenus;
@@ -33,7 +46,12 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
     @FXML
     private StackPane stackPane;
     @FXML
-    private Label pendingApprovals_lbl, pendingReleases_lbl, critical_lbl;
+    private VBox displayBox;
+
+    @FXML
+    private TableView<MIRS> tableView;
+    @FXML
+    private Label pendingApprovals_lbl, pendingReleases_lbl, critical_lbl, display_lbl;
 
     ContextMenuHelper contextMenuHelper = new ContextMenuHelper();
     MenuItem createInventory = new MenuItem("Create Inventory");
@@ -62,16 +80,96 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
 
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.initializeCounts();
+        display_lbl.setText(" ");
     }
 
     @FXML
     private void mirsPendingApproval(MouseEvent event) {
-        ModalBuilder.showModalFromXML(this.getClass(), "../warehouse_pending_mirs.fxml", this.stackPane);
+        display_lbl.setText("Pending Approval");
+        tableView.getColumns().clear();
+        TableColumn<MIRS, String> column1 = new TableColumn<>("Date Filed");
+        column1.setCellValueFactory(new PropertyValueFactory<>("DateFiled"));
+        column1.setMinWidth(150);
+
+        TableColumn<MIRS, String> column2 = new TableColumn<>("Requisitioner");
+        //column2.setCellValueFactory(new PropertyValueFactory<>("Requisitioner.FullName"));
+        /*column2.setCellValueFactory(cellData -> {
+            try {
+                return new SimpleStringProperty(cellData.getValue().getRequisitioner().getFullName());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        });*/
+        column2.setMinWidth(200);
+
+        TableColumn<MIRS, String> column3 = new TableColumn<>("Purpose");
+        column3.setCellValueFactory(new PropertyValueFactory<>("Purpose"));
+        column3.setMinWidth(250);
+
+        TableColumn<MIRS, String> column4 = new TableColumn<>("Action");
+        column4.setStyle("-fx-alignment: CENTER;");
+
+        Callback<TableColumn<MIRS, String>, TableCell<MIRS, String>> viewBtn
+        = //
+        new Callback<TableColumn<MIRS, String>, TableCell<MIRS, String>>() {
+            @Override
+            public TableCell call(final TableColumn<MIRS, String> param) {
+                final TableCell<MIRS, String> cell = new TableCell<MIRS, String>() {
+
+                    Button btn = new Button("view");
+                    FontIcon icon = new FontIcon("mdi2e-eye");
+
+
+                    @Override
+                    public void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
+                        btn.setStyle("-fx-background-color: #2196f3");
+                        btn.setGraphic(icon);
+                        btn.setGraphicTextGap(15);
+                        btn.setTextFill(Paint.valueOf(ColorPalette.WHITE));
+                        if (empty) {
+                            setGraphic(null);
+                            setText(null);
+                        } else {
+                            btn.setOnAction(event -> {
+                                MIRS mirs = getTableView().getItems().get(getIndex());
+                                try {
+                                    System.out.println(mirs.getId()
+                                            + "   " + mirs.getPurpose());
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            });
+                            setGraphic(btn);
+                            setText(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
+        column4.setCellFactory(viewBtn);
+
+
+        tableView.setPlaceholder(new Label("No rows to display"));
+        tableView.getColumns().add(column1);
+        tableView.getColumns().add(column2);
+        tableView.getColumns().add(column3);
+        tableView.getColumns().add(column4);
+
+        try {
+            ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getAllPending());
+            tableView.getItems().setAll(observableList);
+        } catch (Exception e) {
+            AlertDialogBuilder.messgeDialog("System Error", this.getClass().getName() +": "+ e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }
     }
 
     @FXML
     private void mirsPendingReleases(MouseEvent event) {
-        ModalBuilder.showModalFromXML(this.getClass(), "../warehouse_pending_mirs.fxml", this.stackPane);
+        display_lbl.setText("Pending Releases");
     }
 
     @FXML
@@ -79,6 +177,8 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
         System.out.println("Clicked critical");
         Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(CriticalStockController.class, "../warehouse_critical_stock.fxml"));
     }
+
+
 
     public void setSubMenus(FlowPane flowPane) {
         this.subMenus = new ArrayList();
