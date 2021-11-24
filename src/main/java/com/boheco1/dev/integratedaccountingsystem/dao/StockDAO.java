@@ -50,13 +50,6 @@ public class StockDAO {
         ps.setInt(16, stock.getCritical());
 
         ps.executeUpdate();
-
-        ResultSet rs = ps.getGeneratedKeys();
-        if(rs.next()) {
-            stock.setId(rs.getInt(1));
-        }
-
-        rs.close();
         ps.close();
     }
 
