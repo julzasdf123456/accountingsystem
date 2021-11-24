@@ -164,9 +164,9 @@ public class StockEntryController extends MenuControllerHandler implements Initi
 
                     //Insert StockEntryLog to database
                     StockDAO.stockEntry(this.stock, stockEntryLog);
-                    AlertDialogBuilder.messgeDialog("Stock Entry", "New stock was successfully added!", stockStackPane, AlertDialogBuilder.INFO_DIALOG);
+                    AlertDialogBuilder.messgeDialog("Stock Entry", "New stock was successfully added!", stockStackPane, AlertDialogBuilder.SUCCESS_DIALOG);
                 }catch (Exception e){
-                    AlertDialogBuilder.messgeDialog("System Error", "New stock was not successfully added due to:"+e.getMessage()+".", stockStackPane, AlertDialogBuilder.INFO_DIALOG);
+                    AlertDialogBuilder.messgeDialog("System Error", "New stock was not successfully added due to:"+e.getMessage()+".", stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
                 }
                 this.reset();
             }else{
@@ -183,10 +183,10 @@ public class StockEntryController extends MenuControllerHandler implements Initi
 
                     //Insert StockEntryLog to database
                     StockDAO.stockEntry(this.stock, stockEntryLog);
-                    AlertDialogBuilder.messgeDialog("Stock Entry", "New stock was successfully added!", stockStackPane, AlertDialogBuilder.INFO_DIALOG);
+                    AlertDialogBuilder.messgeDialog("Stock Entry", "New stock was successfully added!", stockStackPane, AlertDialogBuilder.SUCCESS_DIALOG);
                     this.reset();
                 }catch (Exception e){
-                    AlertDialogBuilder.messgeDialog("System Error", "New stock was not successfully added due to:"+e.getMessage()+" error.", stockStackPane, AlertDialogBuilder.INFO_DIALOG);
+                    AlertDialogBuilder.messgeDialog("System Error", "New stock was not successfully added due to:"+e.getMessage()+" error.", stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
                 }
             }
 

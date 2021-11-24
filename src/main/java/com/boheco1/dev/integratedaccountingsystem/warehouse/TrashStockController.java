@@ -70,7 +70,7 @@ public class TrashStockController extends MenuControllerHandler implements Initi
         selected = new HashMap<>();
         String key = this.query_tf.getText();
         if (key.length() == 0) {
-            this.initializeTrashStocks();
+            AlertDialogBuilder.messgeDialog("System Information", "Please enter search string before proceeding!", stackPane, AlertDialogBuilder.INFO_DIALOG);
         }else {
             Platform.runLater(() -> {
                 try {
@@ -86,7 +86,7 @@ public class TrashStockController extends MenuControllerHandler implements Initi
     @FXML
     public void restoreTrash(){
         if (selected.size() == 0) {
-            AlertDialogBuilder.messgeDialog("System Warning", "Select item(s) before proceeding!", stackPane, AlertDialogBuilder.WARNING_DIALOG);
+            AlertDialogBuilder.messgeDialog("System Information", "Select item(s) before proceeding!", stackPane, AlertDialogBuilder.INFO_DIALOG);
         }else {
 
             JFXDialogLayout dialogLayout = new JFXDialogLayout();

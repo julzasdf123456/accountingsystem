@@ -117,7 +117,7 @@ public class StockDAO {
                         "Brand=?, Model=?, ManufacturingDate=?, " +
                         "ValidityDate=?, TypeID=?, Unit=?," +
                         "Quantity=?, Price=?, NEACode=?," +
-                        "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=? " +
+                        "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=?, Critical=? " +
                         "WHERE id=?");
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
@@ -125,9 +125,19 @@ public class StockDAO {
 
         ps.setString(4, stock.getBrand());
         ps.setString(5, stock.getModel());
-        ps.setDate(6, Date.valueOf(stock.getManufacturingDate()));
 
-        ps.setDate(7, Date.valueOf(stock.getValidityDate()));
+        try {
+            ps.setDate(6, Date.valueOf(stock.getManufacturingDate()));
+        }catch(Exception e){
+            ps.setDate(6, null);
+        }
+
+        try {
+            ps.setDate(7, Date.valueOf(stock.getValidityDate()));
+        }catch(Exception e){
+            ps.setDate(7, null);
+        }
+
         ps.setInt(8,stock.getTypeID());
         ps.setString(9, stock.getUnit());
 
@@ -137,7 +147,8 @@ public class StockDAO {
 
         ps.setString(13, stock.getComments());
         ps.setInt(14, ActiveUser.getUser().getId());
-        ps.setInt(15, stock.getId());
+        ps.setInt(15, stock.getCritical());
+        ps.setInt(16, stock.getId());
 
         ps.executeUpdate();
 
