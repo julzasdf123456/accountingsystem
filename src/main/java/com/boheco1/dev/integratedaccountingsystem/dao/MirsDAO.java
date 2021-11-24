@@ -32,12 +32,6 @@ public class MirsDAO {
         ps.setInt(7, mirs.getId());
 
         ps.executeUpdate();
-
-        ResultSet rs = ps.getGeneratedKeys();
-
-        if(rs.next()) mirs.setId(rs.getInt(1));
-
-        rs.close();
         ps.close();
 
     }
