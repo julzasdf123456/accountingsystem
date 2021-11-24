@@ -87,8 +87,6 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     private void resetInputFields() {
         stock = null;
         requisitionerEmployee = null;
-        signatories = null;
-        requestItem = null;
         particularsTable.getItems().clear();
         mirsNum.setText("");
         requisitioner.setText("");
@@ -221,7 +219,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         quantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
         remarksCol.setCellValueFactory(new PropertyValueFactory<>("Remarks"));
 
-        requestItem =  FXCollections.<MIRSItem>observableArrayList();
+        requestItem =  FXCollections.observableArrayList();
         particularsTable.setPlaceholder(new Label("No item Added"));
     }
 
