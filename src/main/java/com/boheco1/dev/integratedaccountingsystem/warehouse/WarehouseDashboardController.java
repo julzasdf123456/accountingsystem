@@ -1,41 +1,49 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
+import com.boheco1.dev.integratedaccountingsystem.JournalEntriesController;
+import com.boheco1.dev.integratedaccountingsystem.dao.MirsDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
-import com.boheco1.dev.integratedaccountingsystem.helpers.*;
+import com.boheco1.dev.integratedaccountingsystem.helpers.ContentHandler;
+import com.boheco1.dev.integratedaccountingsystem.helpers.ContextMenuHelper;
+import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
+import com.boheco1.dev.integratedaccountingsystem.helpers.ModalBuilder;
+import com.boheco1.dev.integratedaccountingsystem.helpers.NodeLocator;
+import com.boheco1.dev.integratedaccountingsystem.helpers.SubMenuHelper;
 import com.jfoenix.controls.JFXButton;
-import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
-
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.StackPane;
+
 public class WarehouseDashboardController extends MenuControllerHandler implements Initializable, SubMenuHelper {
-
-    /**
-     * Initialize Sub Menus
-     */
     public List<JFXButton> subMenus;
-    public JFXButton options, reports;
-
+    public JFXButton options = new JFXButton("Options");
+    public JFXButton reports = new JFXButton("Reports");
     @FXML
-    private Label critical_lbl;
+    private StackPane stackPane;
+    @FXML
+    private Label pendingApprovals_lbl, pendingReleases_lbl, critical_lbl;
 
-    /**
-     * Initialize Sub Menu Context Menu Items
-     */
-    ContextMenuHelper contextMenuHelper;
-    // FOR OPTIONS
+    ContextMenuHelper contextMenuHelper = new ContextMenuHelper();
+    MenuItem createInventory = new MenuItem("Create Inventory");
     MenuItem viewAllStocks = new MenuItem("View All Stocks");
     MenuItem trash = new MenuItem("Trash");
-
-    // FOR REPORTS
     MenuItem inventoryReport = new MenuItem("Inventory Report");
     MenuItem liquidationReport = new MenuItem("Liquidation Report");
     MenuItem stockeEntryReport = new MenuItem("Stock Entry Report");
@@ -57,24 +65,40 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
         });
     }
 
-    @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.initializeCriticalStocks();
+        try {
+            pendingApprovals_lbl.setText(""+MirsDAO.countPending());
+            pendingReleases_lbl.setText(""+MirsDAO.countPendingReleases());
+        } catch (Exception var4) {
+            var4.printStackTrace();
+        }
+
     }
 
-    @Override
+    @FXML
+    private void mirsPendingApproval(MouseEvent event) {
+        ModalBuilder.showModalFromXML(this.getClass(), "../warehouse_pending_mirs.fxml", this.stackPane);
+    }
+
+    @FXML
+    private void mirsPendingReleases(MouseEvent event) {
+        ModalBuilder.showModalFromXML(this.getClass(), "../warehouse_pending_mirs.fxml", this.stackPane);
+    }
+
     public void setSubMenus(FlowPane flowPane) {
-        subMenus = new ArrayList<>();
-        subMenus.add(options);
-        subMenus.add(reports);
-
-        flowPane.getChildren().removeAll();
-        flowPane.getChildren().setAll(subMenus);
+        this.subMenus = new ArrayList();
+        this.subMenus.add(this.options);
+        this.subMenus.add(this.reports);
+        flowPane.getChildren().removeAll(new Node[0]);
+        flowPane.getChildren().setAll(this.subMenus);
     }
 
-    @Override
     public void handleContentReplacements(AnchorPane container, Label titleHolder) {
-
+        this.createInventory.setOnAction((actionEvent) -> {
+            titleHolder.setText("Create Inventory");
+            container.getChildren().setAll(ContentHandler.getNodeFromFxml(StockController.class, "../warehouse_create_inventory_controller.fxml"));
+        });
         viewAllStocks.setOnAction(actionEvent -> {
             titleHolder.setText("View All Stocks");
             container.getChildren().setAll(ContentHandler.getNodeFromFxml(StockController.class, "../warehouse_stock.fxml"));
