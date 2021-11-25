@@ -11,21 +11,28 @@ import java.util.List;
 public class EmployeeDAO {
 
     public static void addEmployee(EmployeeInfo employee, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{? = call Add_employee (?,?,?,?,?,?,?)}");
-        cs.registerOutParameter(1, Types.INTEGER);
-        cs.setString(2, employee.getEmployeeFirstName());
-        cs.setString(3, employee.getEmployeeMidName());
-        cs.setString(4, employee.getEmployeeLastName());
-        cs.setString(6, employee.getEmployeeAddress());
-        cs.setString(5, employee.getPhone());
+//        CallableStatement cs = conn.prepareCall("{? = call Add_employee (?,?,?,?,?,?,?)}");
+        PreparedStatement cs = conn.prepareStatement(
+                "INSERT INTO EmployeeInfo (EmployeeFirstName, EmployeeMidName, EmployeeLastName, EmployeeSuffix, Address, Phone, Designation, DepartmentID) " +
+                        "VALUES (?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+
+        cs.setString(1, employee.getEmployeeFirstName());
+        cs.setString(2, employee.getEmployeeMidName());
+        cs.setString(3, employee.getEmployeeLastName());
+        cs.setString(4, employee.getEmployeeSuffix());
+        cs.setString(5, employee.getEmployeeAddress());
+        cs.setString(6, employee.getPhone());
         cs.setString(7, employee.getDesignation());
         cs.setInt(8, employee.getDepartmentID());
 
         cs.executeUpdate();
 
-        int id = cs.getInt(1);
+        ResultSet rs = cs.getGeneratedKeys();
 
-        employee.setId(id);
+        if(rs.next()) employee.setId(rs.getInt(1));
+
+        rs.close();
+        cs.close();
     }
 
     public static EmployeeInfo getOne(int id, Connection conn) throws Exception {
@@ -40,6 +47,7 @@ public class EmployeeDAO {
                     rs.getString("EmployeeFirstName"),
                     rs.getString("EmployeeMidName"),
                     rs.getString("EmployeeLastName"),
+                    rs.getString("EmployeeSuffix"),
                     rs.getString("Address"),
                     rs.getString("Phone"),
                     rs.getString("Designation"),
@@ -65,6 +73,7 @@ public class EmployeeDAO {
                     rs.getString("EmployeeFirstName"),
                     rs.getString("EmployeeMidName"),
                     rs.getString("EmployeeLastName"),
+                    rs.getString("EmployeeSuffix"),
                     rs.getString("Address"),
                     rs.getString("Phone"),
                     rs.getString("Designation"),
@@ -81,17 +90,18 @@ public class EmployeeDAO {
     public static void update(EmployeeInfo employeeInfo) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE EmployeeInfo SET " +
-                        "EmployeeFirstName=?, EmployeeMidName=?, EmployeeLastName=?, " +
+                        "EmployeeFirstName=?, EmployeeMidName=?, EmployeeLastName=?, EmployeeSuffix" +
                         "Address=?, Designation=?, DepartmentId=?, Phone=? " +
                         "WHERE EmployeeID=?");
         ps.setString(1, employeeInfo.getEmployeeFirstName());
         ps.setString(2, employeeInfo.getEmployeeMidName());
         ps.setString(3, employeeInfo.getEmployeeLastName());
-        ps.setString(4, employeeInfo.getEmployeeAddress());
-        ps.setString(5, employeeInfo.getDesignation());
-        ps.setInt(6, employeeInfo.getDepartmentID());
-        ps.setString(7, employeeInfo.getPhone());
-        ps.setInt(8, employeeInfo.getId());
+        ps.setString(5, employeeInfo.getEmployeeAddress());
+        ps.setString(6, employeeInfo.getEmployeeSuffix());
+        ps.setString(6, employeeInfo.getDesignation());
+        ps.setInt(7, employeeInfo.getDepartmentID());
+        ps.setString(8, employeeInfo.getPhone());
+        ps.setInt(9, employeeInfo.getId());
 
         ps.executeUpdate();
 

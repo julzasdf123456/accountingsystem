@@ -7,6 +7,7 @@ public class EmployeeInfo {
     private String employeeFirstName;
     private String employeeMidName;
     private String employeeLastName;
+    private String employeeSuffix;
     private String employeeAddress;
     private String phone;
     private String designation;
@@ -17,19 +18,34 @@ public class EmployeeInfo {
 
     public EmployeeInfo(){}
 
-    public EmployeeInfo(int id, String employeeFirstName, String employeeMidName, String employeeLastName, String employeeAddress, String phone, String designation, int departmentID) throws Exception {
+    public EmployeeInfo(int id, String employeeFirstName, String employeeMidName, String employeeLastName,String employeeSuffix, String employeeAddress, String phone, String designation, int departmentID) throws Exception {
         this.id = id;
         this.employeeFirstName = employeeFirstName;
         this.employeeMidName = employeeMidName;
         this.employeeLastName = employeeLastName;
+        this.employeeSuffix = employeeSuffix;
         this.designation = designation;
         this.employeeAddress = employeeAddress;
         this.phone = phone;
         this.departmentID = departmentID;
     }
 
+    public String getEmployeeSuffix() {
+        return employeeSuffix;
+    }
+
+    public void setEmployeeSuffix(String employeeSuffix) {
+        this.employeeSuffix = employeeSuffix;
+    }
+
     public String getFullName() {
-        return employeeLastName + ", " + employeeFirstName + " " + employeeMidName.substring(0,1)  + ".";
+        String fullName = employeeLastName;
+        if(!employeeSuffix.isEmpty()) {
+            fullName += ", " + employeeSuffix;
+        }
+        fullName += ", " + employeeLastName + ", " + employeeFirstName + " " + employeeMidName.charAt(0)  + ".";
+
+        return fullName;
     }
 
     public String getDepartmentName() throws Exception {
