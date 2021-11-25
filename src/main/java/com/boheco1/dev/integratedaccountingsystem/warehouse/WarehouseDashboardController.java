@@ -140,7 +140,7 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
                             btn.setOnAction(event -> {
                                 MIRS mirs = getTableView().getItems().get(getIndex());
                                 try {
-                                    ModalBuilder.showModalFromXML(WarehouseDashboardController.class, "../warehouse_pending_mirs.fxml",stackPane);
+                                    ModalBuilder.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_pending_approval.fxml",stackPane);
                                     activeMIRS = mirs;
                                 } catch (Exception e) {
                                     e.printStackTrace();
