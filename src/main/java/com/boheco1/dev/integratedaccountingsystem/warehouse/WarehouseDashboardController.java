@@ -53,6 +53,9 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
     @FXML
     private Label pendingApprovals_lbl, pendingReleases_lbl, critical_lbl, display_lbl;
 
+    //used by pending MIRS TableView selected item
+    public static MIRS activeMIRS;
+
     ContextMenuHelper contextMenuHelper = new ContextMenuHelper();
     MenuItem createInventory = new MenuItem("Create Inventory");
     MenuItem viewAllStocks = new MenuItem("View All Stocks");
@@ -90,25 +93,27 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
         TableColumn<MIRS, String> column1 = new TableColumn<>("Date Filed");
         column1.setCellValueFactory(new PropertyValueFactory<>("DateFiled"));
         column1.setMinWidth(150);
+        column1.setStyle("-fx-alignment: center;");
 
         TableColumn<MIRS, String> column2 = new TableColumn<>("Requisitioner");
-        //column2.setCellValueFactory(new PropertyValueFactory<>("Requisitioner.FullName"));
-        /*column2.setCellValueFactory(cellData -> {
+        column2.setCellValueFactory(cellData -> {
             try {
                 return new SimpleStringProperty(cellData.getValue().getRequisitioner().getFullName());
             } catch (Exception e) {
                 e.printStackTrace();
             }
             return null;
-        });*/
+        });
         column2.setMinWidth(200);
+        column2.setStyle("-fx-alignment: center-left;");
 
         TableColumn<MIRS, String> column3 = new TableColumn<>("Purpose");
         column3.setCellValueFactory(new PropertyValueFactory<>("Purpose"));
         column3.setMinWidth(250);
+        column3.setStyle("-fx-alignment: center-left;");
 
         TableColumn<MIRS, String> column4 = new TableColumn<>("Action");
-        column4.setStyle("-fx-alignment: CENTER;");
+        column4.setStyle("-fx-alignment: center;");
 
         Callback<TableColumn<MIRS, String>, TableCell<MIRS, String>> viewBtn
         = //
@@ -120,14 +125,13 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
                     Button btn = new Button("view");
                     FontIcon icon = new FontIcon("mdi2e-eye");
 
-
                     @Override
                     public void updateItem(String item, boolean empty) {
                         super.updateItem(item, empty);
                         icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
                         btn.setStyle("-fx-background-color: #2196f3");
                         btn.setGraphic(icon);
-                        btn.setGraphicTextGap(15);
+                        btn.setGraphicTextGap(5);
                         btn.setTextFill(Paint.valueOf(ColorPalette.WHITE));
                         if (empty) {
                             setGraphic(null);
@@ -136,8 +140,8 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
                             btn.setOnAction(event -> {
                                 MIRS mirs = getTableView().getItems().get(getIndex());
                                 try {
-                                    System.out.println(mirs.getId()
-                                            + "   " + mirs.getPurpose());
+                                    ModalBuilder.showModalFromXML(WarehouseDashboardController.class, "../warehouse_pending_mirs.fxml",stackPane);
+                                    activeMIRS = mirs;
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -152,7 +156,7 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
         };
         column4.setCellFactory(viewBtn);
 
-
+        tableView.setFixedCellSize(40);
         tableView.setPlaceholder(new Label("No rows to display"));
         tableView.getColumns().add(column1);
         tableView.getColumns().add(column2);
