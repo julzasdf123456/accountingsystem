@@ -88,6 +88,7 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
                         firstNameField.getText(),
                         middleNameField.getText(),
                         lastNameField.getText(),
+                        "",
                         addressField.getText(),
                         phoneField.getText(),
                         designationField.getText(),
