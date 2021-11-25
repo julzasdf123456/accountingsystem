@@ -49,7 +49,7 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
     private VBox displayBox;
 
     @FXML
-    private TableView<MIRS> tableView;
+    private TableView tableView;
     @FXML
     private Label pendingApprovals_lbl, pendingReleases_lbl, critical_lbl, display_lbl;
 
@@ -90,8 +90,13 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
     private void mirsPendingApproval(MouseEvent event) {
         display_lbl.setText("Pending Approval");
         tableView.getColumns().clear();
-        TableColumn<MIRS, String> column1 = new TableColumn<>("Date Filed");
-        column1.setCellValueFactory(new PropertyValueFactory<>("DateFiled"));
+        TableColumn<MIRS, String> column0 = new TableColumn<>("Date Filed");
+        column0.setCellValueFactory(new PropertyValueFactory<>("DateFiled"));
+        column0.setMinWidth(150);
+        column0.setStyle("-fx-alignment: center;");
+
+        TableColumn<MIRS, String> column1 = new TableColumn<>("MIRS Number");
+        column1.setCellValueFactory(new PropertyValueFactory<>("Id"));
         column1.setMinWidth(150);
         column1.setStyle("-fx-alignment: center;");
 
@@ -140,8 +145,8 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
                             btn.setOnAction(event -> {
                                 MIRS mirs = getTableView().getItems().get(getIndex());
                                 try {
-                                    ModalBuilder.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_pending_approval.fxml",stackPane);
                                     activeMIRS = mirs;
+                                    ModalBuilder.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_pending_approval.fxml",stackPane);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -158,6 +163,7 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
 
         tableView.setFixedCellSize(40);
         tableView.setPlaceholder(new Label("No rows to display"));
+        tableView.getColumns().add(column0);
         tableView.getColumns().add(column1);
         tableView.getColumns().add(column2);
         tableView.getColumns().add(column3);
@@ -174,6 +180,11 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
     @FXML
     private void mirsPendingReleases(MouseEvent event) {
         display_lbl.setText("Pending Releases");
+        tableView.getColumns().clear();
+        TableColumn<MIRS, String> column0 = new TableColumn<>("Date Filed");
+        column0.setCellValueFactory(new PropertyValueFactory<>("DateFiled"));
+        column0.setMinWidth(150);
+        column0.setStyle("-fx-alignment: center;");
     }
 
     @FXML
