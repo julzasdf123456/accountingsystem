@@ -29,9 +29,8 @@ public class EmployeeDAO {
     }
 
     public static EmployeeInfo getOne(int id, Connection conn) throws Exception {
-//        CallableStatement cs = conn.prepareCall("{call Get_employee (?)}");
         PreparedStatement cs = conn.prepareStatement(
-                "SELECT * FROM EmployeeInfo ORDER BY EmployeeLastName, EmployeeFirstName");
+                "SELECT * FROM EmployeeInfo WHERE EmployeeID=?");
         cs.setInt(1, id);
         ResultSet rs = cs.executeQuery();
 
