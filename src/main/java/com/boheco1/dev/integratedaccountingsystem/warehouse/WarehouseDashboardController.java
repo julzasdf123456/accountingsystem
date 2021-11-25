@@ -62,7 +62,7 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
     MenuItem trash = new MenuItem("Trash");
     MenuItem inventoryReport = new MenuItem("Inventory Report");
     MenuItem liquidationReport = new MenuItem("Liquidation Report");
-    MenuItem stockeEntryReport = new MenuItem("Stock Entry Report");
+    MenuItem stockEntryReport = new MenuItem("Stock Entry Report");
 
     public WarehouseDashboardController() {
         options = new JFXButton("Options");
@@ -76,7 +76,7 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
         });
 
         reports.setOnAction(actionEvent -> {
-            contextMenuHelper.initializePopupContextMenu(reports, inventoryReport, liquidationReport, stockeEntryReport)
+            contextMenuHelper.initializePopupContextMenu(reports, inventoryReport, liquidationReport, stockEntryReport)
                     .show(reports, NodeLocator.getNodeX(reports), NodeLocator.getNodeY(reports));
         });
     }
@@ -221,6 +221,16 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
         inventoryReport.setOnAction(actionEvent -> {
             titleHolder.setText("Inventory Report");
             container.getChildren().setAll(ContentHandler.getNodeFromFxml(InventoryReportController.class, "../warehouse_inventory_report.fxml"));
+        });
+
+        stockEntryReport.setOnAction(actionEvent -> {
+            titleHolder.setText("Stock Entry Report");
+            container.getChildren().setAll(ContentHandler.getNodeFromFxml(StockEntryReportController.class, "../warehouse_stock_entry_report.fxml"));
+        });
+
+        liquidationReport.setOnAction(actionEvent -> {
+            titleHolder.setText("Stock Liquidation Report");
+            container.getChildren().setAll(ContentHandler.getNodeFromFxml(StockEntryReportController.class, "../warehouse_stock_liquidation_report.fxml"));
         });
     }
 
