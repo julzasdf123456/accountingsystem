@@ -774,7 +774,7 @@ public class StockDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT Stocks.* FROM Stocks LEFT JOIN StockEntryLogs " +
                         "ON StockEntryLogs.StockID=Stocks.id " +
-                        "WHERE StockEntryLogs.UpdatedAt BETWEEN ? AND ? " +
+                        "WHERE IsTrashed=0 AND StockEntryLogs.UpdatedAt BETWEEN ? AND ? " +
                         "ORDER BY StockEntryLogs.UpdatedAt " +
                         "OFFSET ? ROWS " +
                         "FETCH NEXT ? ROWS ONLY");
@@ -823,11 +823,280 @@ public class StockDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT Stocks.* FROM Stocks LEFT JOIN StockEntryLogs " +
                         "ON StockEntryLogs.StockID=Stocks.id " +
-                        "WHERE StockEntryLogs.UpdatedAt BETWEEN ? AND ? " +
+                        "WHERE IsTrashed=0 AND StockEntryLogs.UpdatedAt BETWEEN ? AND ? " +
                         "ORDER BY StockEntryLogs.UpdatedAt");
 
         ps.setDate(1, Date.valueOf(from));
         ps.setDate(2, Date.valueOf(to));
+
+        ResultSet rs = ps.executeQuery();
+        ArrayList<Stock> stocks = new ArrayList<>();
+
+        while(rs.next()) {
+            stocks.add(new Stock(
+                    rs.getInt("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Description"),
+                    rs.getString("SerialNumber"),
+                    rs.getString("Brand"),
+                    rs.getString("Model"),
+                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
+                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
+                    rs.getInt("TypeID"),
+                    rs.getString("Unit"),
+                    rs.getInt("Quantity"),
+                    rs.getInt("Critical"),
+                    rs.getDouble("Price"),
+                    rs.getString("NEACode"),
+                    rs.getBoolean("IsTrashed"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
+                    rs.getInt("UserIDCreated"),
+                    rs.getInt("UserIDUpdated"),
+                    rs.getInt("UserIDTrashed")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+        return stocks;
+    }
+
+    /**
+     * Get the stock entries of a given period. Used in StockEntryReport.
+     * @param from start date
+     * @param to end date
+     * @return The list of stocks for this particular period
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<Stock> getStockEntries(LocalDate from, LocalDate to) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT Stocks.*, StockEntryLogs.Price as entryPrice, StockEntryLogs.Quantity as entryQuantity, StockEntryLogs.Source as entrySource, StockEntryLogs.CreatedAt as entryCreatedAt, StockEntryLogs.UpdatedAt as entryUpdatedAt " +
+                        "FROM Stocks LEFT JOIN StockEntryLogs " +
+                        "ON StockEntryLogs.StockID=Stocks.id " +
+                        "WHERE IsTrashed=0 AND StockEntryLogs.CreatedAt BETWEEN ? AND ? " +
+                        "ORDER BY StockEntryLogs.CreatedAt ASC, Stocks.StockName ASC");
+
+        ps.setDate(1, Date.valueOf(from));
+        ps.setDate(2, Date.valueOf(to));
+
+        ResultSet rs = ps.executeQuery();
+        ArrayList<Stock> stocks = new ArrayList<>();
+
+        while(rs.next()) {
+            Stock stock = new Stock(
+                    rs.getInt("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Description"),
+                    rs.getString("SerialNumber"),
+                    rs.getString("Brand"),
+                    rs.getString("Model"),
+                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
+                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
+                    rs.getInt("TypeID"),
+                    rs.getString("Unit"),
+                    rs.getInt("entryQuantity"),
+                    rs.getInt("Critical"),
+                    rs.getDouble("entryPrice"),
+                    rs.getString("NEACode"),
+                    rs.getBoolean("IsTrashed"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("entryCreatedAt")!=null ? rs.getTimestamp("entryCreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("entryUpdatedAt")!=null ? rs.getTimestamp("entryUpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
+                    rs.getInt("UserIDCreated"),
+                    rs.getInt("UserIDUpdated"),
+                    rs.getInt("UserIDTrashed")
+            );
+            stock.setSource(rs.getString("entrySource"));
+            stocks.add(stock);
+        }
+
+        rs.close();
+        ps.close();
+        return stocks;
+    }
+    /**
+     * Get the stock entries of a given period per page. Used in StockEntryReport pagination.
+     * @param from start date
+     * @param to end date
+     * @param limit limit of rows per page
+     * @param offset page number in the result set
+     * @return The list of stocks for this particular period
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<Stock> getStockEntries(LocalDate from, LocalDate to, int limit, int offset) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT Stocks.*, StockEntryLogs.Price as entryPrice, StockEntryLogs.Quantity as entryQuantity, StockEntryLogs.Source as entrySource, StockEntryLogs.CreatedAt as entryCreatedAt, StockEntryLogs.UpdatedAt as entryUpdatedAt " +
+                        "FROM Stocks LEFT JOIN StockEntryLogs " +
+                        "ON StockEntryLogs.StockID=Stocks.id " +
+                        "WHERE IsTrashed=0 AND StockEntryLogs.CreatedAt BETWEEN ? AND ? " +
+                        "ORDER BY StockEntryLogs.CreatedAt ASC, Stocks.StockName ASC "+
+                        "OFFSET ? ROWS " +
+                        "FETCH NEXT ? ROWS ONLY");
+
+        ps.setDate(1, Date.valueOf(from));
+        ps.setDate(2, Date.valueOf(to));
+        ps.setInt(3, offset);
+        ps.setInt(4, limit);
+
+        ResultSet rs = ps.executeQuery();
+        ArrayList<Stock> stocks = new ArrayList<>();
+
+        while(rs.next()) {
+            Stock stock = new Stock(
+                    rs.getInt("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Description"),
+                    rs.getString("SerialNumber"),
+                    rs.getString("Brand"),
+                    rs.getString("Model"),
+                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
+                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
+                    rs.getInt("TypeID"),
+                    rs.getString("Unit"),
+                    rs.getInt("entryQuantity"),
+                    rs.getInt("Critical"),
+                    rs.getDouble("entryPrice"),
+                    rs.getString("NEACode"),
+                    rs.getBoolean("IsTrashed"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("entryCreatedAt")!=null ? rs.getTimestamp("entryCreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("entryUpdatedAt")!=null ? rs.getTimestamp("entryUpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
+                    rs.getInt("UserIDCreated"),
+                    rs.getInt("UserIDUpdated"),
+                    rs.getInt("UserIDTrashed")
+            );
+            stock.setSource(rs.getString("entrySource"));
+            stocks.add(stock);
+        }
+
+        rs.close();
+        ps.close();
+        return stocks;
+    }
+
+    /**
+     * Get the released stocks of a given period. Used in StockLiquidationReport.
+     * @param from start date
+     * @param to end date
+     * @return The list of released stocks for this particular period
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<Stock> getReleasedStocks(LocalDate from, LocalDate to) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT Stocks.*, Releasing.Price as releasedPrice, Releasing.Quantity as releasedQuantity, Releasing.CreatedAt as releasedCreatedAt, Releasing.UpdatedAt as releasedUpdatedAt " +
+                        "FROM Stocks LEFT JOIN Releasing " +
+                        "ON Releasing.StockID=Stocks.id " +
+                        "WHERE IsTrashed=0 AND Releasing.UpdatedAt BETWEEN ? AND ? AND Releasing.Status='Approved' " +
+                        "ORDER BY Releasing.UpdatedAt ASC, Stocks.StockName ASC");
+
+        ps.setDate(1, Date.valueOf(from));
+        ps.setDate(2, Date.valueOf(to));
+
+        ResultSet rs = ps.executeQuery();
+        ArrayList<Stock> stocks = new ArrayList<>();
+
+        while(rs.next()) {
+            Stock stock = new Stock(
+                    rs.getInt("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Description"),
+                    rs.getString("SerialNumber"),
+                    rs.getString("Brand"),
+                    rs.getString("Model"),
+                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
+                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
+                    rs.getInt("TypeID"),
+                    rs.getString("Unit"),
+                    rs.getInt("releasedQuantity"),
+                    rs.getInt("Critical"),
+                    rs.getDouble("releasedPrice"),
+                    rs.getString("NEACode"),
+                    rs.getBoolean("IsTrashed"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("releasedCreatedAt")!=null ? rs.getTimestamp("releasedCreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("releasedUpdatedAt")!=null ? rs.getTimestamp("releasedUpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
+                    rs.getInt("UserIDCreated"),
+                    rs.getInt("UserIDUpdated"),
+                    rs.getInt("UserIDTrashed")
+            );
+            stocks.add(stock);
+        }
+
+        rs.close();
+        ps.close();
+        return stocks;
+    }
+    /**
+     * Get the released stocks of a given period. Used in StockLiquidationReport pagination.
+     * @param from start date
+     * @param to end date
+     * @param limit limit of rows per page
+     * @param offset page number in the result set
+     * @return The list of released stocks for this particular period
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<Stock> getReleasedStocks(LocalDate from, LocalDate to, int limit, int offset) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT Stocks.*, Releasing.Price as releasedPrice, Releasing.Quantity as releasedQuantity, Releasing.CreatedAt as releasedCreatedAt, Releasing.UpdatedAt as releasedUpdatedAt " +
+                        "FROM Stocks LEFT JOIN Releasing " +
+                        "ON Releasing.StockID=Stocks.id " +
+                        "WHERE IsTrashed=0 AND Releasing.UpdatedAt BETWEEN ? AND ? AND Releasing.Status='Approved' " +
+                        "ORDER BY Releasing.UpdatedAt ASC, Stocks.StockName ASC "+
+                        "OFFSET ? ROWS " +
+                        "FETCH NEXT ? ROWS ONLY");
+
+        ps.setDate(1, Date.valueOf(from));
+        ps.setDate(2, Date.valueOf(to));
+        ps.setInt(3, offset);
+        ps.setInt(4, limit);
+
+        ResultSet rs = ps.executeQuery();
+        ArrayList<Stock> stocks = new ArrayList<>();
+
+        while(rs.next()) {
+            Stock stock = new Stock(
+                    rs.getInt("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Description"),
+                    rs.getString("SerialNumber"),
+                    rs.getString("Brand"),
+                    rs.getString("Model"),
+                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
+                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
+                    rs.getInt("TypeID"),
+                    rs.getString("Unit"),
+                    rs.getInt("releasedQuantity"),
+                    rs.getInt("Critical"),
+                    rs.getDouble("releasedPrice"),
+                    rs.getString("NEACode"),
+                    rs.getBoolean("IsTrashed"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("releasedCreatedAt")!=null ? rs.getTimestamp("releasedCreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("releasedUpdatedAt")!=null ? rs.getTimestamp("releasedUpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
+                    rs.getInt("UserIDCreated"),
+                    rs.getInt("UserIDUpdated"),
+                    rs.getInt("UserIDTrashed")
+            );
+            stocks.add(stock);
+        }
+
+        rs.close();
+        ps.close();
+        return stocks;
+    }
+
+    public static List<Stock> getInventory() throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM Stocks " +
+                        "WHERE IsTrashed=0 "+
+                        "ORDER BY UpdatedAt, StockName, Quantity DESC");
 
         ResultSet rs = ps.executeQuery();
         ArrayList<Stock> stocks = new ArrayList<>();
