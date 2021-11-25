@@ -32,12 +32,6 @@ public class MirsDAO {
         ps.setInt(7, mirs.getId());
 
         ps.executeUpdate();
-
-        ResultSet rs = ps.getGeneratedKeys();
-
-        if(rs.next()) mirs.setId(rs.getInt(1));
-
-        rs.close();
         ps.close();
 
     }
@@ -240,5 +234,66 @@ public class MirsDAO {
         ps.close();
 
         return items;
+    }
+
+    public static List<MIRS> getAllPending() throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MIRS WHERE Status='Pending' ORDER BY CreatedAt");
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<MIRS> pending = new ArrayList<>();
+
+        while(rs.next()) {
+            pending.add(new MIRS(
+                    rs.getInt("id"),
+                    rs.getDate("DateFiled").toLocalDate(),
+                    rs.getString("Purpose"),
+                    rs.getString("Details"),
+                    rs.getString("Status"),
+                    rs.getInt("RequisitionerID"),
+                    rs.getInt("UserID"),
+                    rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return pending;
+    }
+
+    public static int countPending() throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT COUNT(id) AS 'count' FROM MIRS WHERE Status='Pending'");
+        ResultSet rs = ps.executeQuery();
+
+        int count = 0;
+
+        if(rs.next()) {
+            count = rs.getInt("count");
+        }
+
+        rs.close();
+        ps.close();
+
+        return count;
+    }
+
+    public static int countPendingReleases() throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT COUNT(id) AS 'count' FROM Releasing WHERE Status='Pending'");
+
+        ResultSet rs = ps.executeQuery();
+        int count = 0;
+
+        if(rs.next()) {
+            count = rs.getInt("count");
+        }
+
+        rs.close();
+        ps.close();
+
+        return count;
     }
 }

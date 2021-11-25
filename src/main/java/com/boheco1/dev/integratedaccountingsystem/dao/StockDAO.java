@@ -4,6 +4,8 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +25,8 @@ public class StockDAO {
                         "ValidityDate, TypeID, Unit, " +
                         "Quantity, Price, NEACode, " +
                         "IsTrashed, Comments, CreatedAt, " +
-                        "UserIDCreated) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?)", Statement.RETURN_GENERATED_KEYS);
+                        "UserIDCreated, Critical) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?,?)", Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
         ps.setString(3, stock.getSerialNumber());
@@ -44,6 +46,8 @@ public class StockDAO {
         ps.setBoolean(13, stock.isTrashed());
         ps.setString(14, stock.getComments());
         ps.setInt(15, stock.getUserIDCreated());
+
+        ps.setInt(16, stock.getCritical());
 
         ps.executeUpdate();
 
@@ -113,7 +117,7 @@ public class StockDAO {
                         "Brand=?, Model=?, ManufacturingDate=?, " +
                         "ValidityDate=?, TypeID=?, Unit=?," +
                         "Quantity=?, Price=?, NEACode=?," +
-                        "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=? " +
+                        "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=?, Critical=? " +
                         "WHERE id=?");
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
@@ -121,9 +125,19 @@ public class StockDAO {
 
         ps.setString(4, stock.getBrand());
         ps.setString(5, stock.getModel());
-        ps.setDate(6, Date.valueOf(stock.getManufacturingDate()));
 
-        ps.setDate(7, Date.valueOf(stock.getValidityDate()));
+        try {
+            ps.setDate(6, Date.valueOf(stock.getManufacturingDate()));
+        }catch(Exception e){
+            ps.setDate(6, null);
+        }
+
+        try {
+            ps.setDate(7, Date.valueOf(stock.getValidityDate()));
+        }catch(Exception e){
+            ps.setDate(7, null);
+        }
+
         ps.setInt(8,stock.getTypeID());
         ps.setString(9, stock.getUnit());
 
@@ -133,7 +147,8 @@ public class StockDAO {
 
         ps.setString(13, stock.getComments());
         ps.setInt(14, ActiveUser.getUser().getId());
-        ps.setInt(15, stock.getId());
+        ps.setInt(15, stock.getCritical());
+        ps.setInt(16, stock.getId());
 
         ps.executeUpdate();
 
@@ -461,7 +476,7 @@ public class StockDAO {
             stockTypes.add(new StockType(
                     rs.getInt("id"),
                     rs.getString("StockType"),
-                    rs.getString("Unit")));
+                    rs.getString("Units")));
         }
 
         rs.close();
@@ -485,7 +500,7 @@ public class StockDAO {
             StockType stock = new StockType(
                     rs.getInt("id"),
                     rs.getString("StockType"),
-                    rs.getString("Unit")
+                    rs.getString("Units")
             );
 
             rs.close();
@@ -511,7 +526,7 @@ public class StockDAO {
             StockType stock = new StockType(
                     rs.getInt("id"),
                     rs.getString("StockType"),
-                    rs.getString("Unit")
+                    rs.getString("Units")
             );
 
             rs.close();
@@ -646,6 +661,59 @@ public class StockDAO {
     }
 
     /**
+     * Get the list of Critical Stocks with pagination
+     * @param limit row per page
+     * @param offset page
+     * @return The List of stocks that are in at critical level
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<Stock> getCritical(int limit, int offset) throws Exception {
+
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM Stocks WHERE Quantity <= Critical " +
+                        "AND IsTrashed=0 ORDER BY Quantity "+
+                        "OFFSET ? ROWS " +
+                        "FETCH NEXT ? ROWS ONLY");
+        ps.setInt(1, offset);
+        ps.setInt(2, limit);
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<Stock> criticalStocks = new ArrayList<>();
+
+        while(rs.next()) {
+            criticalStocks.add(new Stock(
+                    rs.getInt("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Description"),
+                    rs.getString("SerialNumber"),
+                    rs.getString("Brand"),
+                    rs.getString("Model"),
+                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
+                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
+                    rs.getInt("TypeID"),
+                    rs.getString("Unit"),
+                    rs.getInt("Quantity"),
+                    rs.getInt("Critical"),
+                    rs.getDouble("Price"),
+                    rs.getString("NEACode"),
+                    rs.getBoolean("IsTrashed"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
+                    rs.getInt("UserIDCreated"),
+                    rs.getInt("UserIDUpdated"),
+                    rs.getInt("UserIDTrashed")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return criticalStocks;
+    }
+
+    /**
      * Count the number of Stocks which are at critical level
      * @return The number of Stocks in critical level.
      * @throws Exception obligatory from DB.getConnection()
@@ -653,7 +721,6 @@ public class StockDAO {
     public static int countCritical() throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT COUNT(ID) AS 'count' FROM Stocks WHERE IsTrashed=0 AND Quantity<=Critical;");
-        ps.setInt(1, CRITICAL);
         ResultSet rs = ps.executeQuery();
 
         int count = 0;
@@ -703,4 +770,124 @@ public class StockDAO {
         return entryLogs;
     }
 
+    public static List<Stock> getInventory(LocalDate from, LocalDate to, int limit, int offset) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT Stocks.* FROM Stocks LEFT JOIN StockEntryLogs " +
+                        "ON StockEntryLogs.StockID=Stocks.id " +
+                        "WHERE StockEntryLogs.UpdatedAt BETWEEN ? AND ? " +
+                        "ORDER BY StockEntryLogs.UpdatedAt " +
+                        "OFFSET ? ROWS " +
+                        "FETCH NEXT ? ROWS ONLY");
+
+        ps.setDate(1, Date.valueOf(from));
+        ps.setDate(2, Date.valueOf(to));
+        ps.setInt(3, offset);
+        ps.setInt(4, limit);
+
+        ResultSet rs = ps.executeQuery();
+        ArrayList<Stock> stocks = new ArrayList<>();
+
+        while(rs.next()) {
+            stocks.add(new Stock(
+                    rs.getInt("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Description"),
+                    rs.getString("SerialNumber"),
+                    rs.getString("Brand"),
+                    rs.getString("Model"),
+                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
+                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
+                    rs.getInt("TypeID"),
+                    rs.getString("Unit"),
+                    rs.getInt("Quantity"),
+                    rs.getInt("Critical"),
+                    rs.getDouble("Price"),
+                    rs.getString("NEACode"),
+                    rs.getBoolean("IsTrashed"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
+                    rs.getInt("UserIDCreated"),
+                    rs.getInt("UserIDUpdated"),
+                    rs.getInt("UserIDTrashed")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+        return stocks;
+    }
+
+    public static List<Stock> getInventory(LocalDate from, LocalDate to) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT Stocks.* FROM Stocks LEFT JOIN StockEntryLogs " +
+                        "ON StockEntryLogs.StockID=Stocks.id " +
+                        "WHERE StockEntryLogs.UpdatedAt BETWEEN ? AND ? " +
+                        "ORDER BY StockEntryLogs.UpdatedAt");
+
+        ps.setDate(1, Date.valueOf(from));
+        ps.setDate(2, Date.valueOf(to));
+
+        ResultSet rs = ps.executeQuery();
+        ArrayList<Stock> stocks = new ArrayList<>();
+
+        while(rs.next()) {
+            stocks.add(new Stock(
+                    rs.getInt("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Description"),
+                    rs.getString("SerialNumber"),
+                    rs.getString("Brand"),
+                    rs.getString("Model"),
+                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
+                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
+                    rs.getInt("TypeID"),
+                    rs.getString("Unit"),
+                    rs.getInt("Quantity"),
+                    rs.getInt("Critical"),
+                    rs.getDouble("Price"),
+                    rs.getString("NEACode"),
+                    rs.getBoolean("IsTrashed"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
+                    rs.getInt("UserIDCreated"),
+                    rs.getInt("UserIDUpdated"),
+                    rs.getInt("UserIDTrashed")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+        return stocks;
+    }
+
+    /**
+     * Return the pending quantity of a MIRSItem
+     * @param stock
+     * @return
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static int countPendingRequest(Stock stock) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT SUM(Quantity) AS 'pending' FROM MIRSItems mi LEFT JOIN MIRS m ON m.id = mi.MIRSID WHERE m.Status = 'Pending' AND mi.StockID = ?; ");
+        ps.setInt(1, stock.getId());
+        ResultSet rs = ps.executeQuery();
+
+        int count = 0;
+
+        if(rs.next()) {
+            count = rs.getInt("pending");
+        }
+
+        return count;
+    }
+
+    public static int countAvailable(Stock stock) throws Exception {
+        int pending = countPendingRequest(stock);
+
+        return stock.getQuantity()-pending;
+    }
 }

@@ -13,8 +13,8 @@ import java.util.List;
 public class MIRSSignatoryDAO {
     public static void add(MIRSSignatory msig) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO MIRSignatories " +
-                        "(MIRSID, userID, Status, Comments, CreatedAt, UpdatedAt) " +
+                "INSERT INTO MIRSSignatories " +
+                        "(MIRSID, user_id, Status, Comments, CreatedAt, UpdatedAt) " +
                         "VALUES " +
                         "(?,?,?,?,GETDATE(),GETDATE())", Statement.RETURN_GENERATED_KEYS);
         ps.setInt(1, msig.getMirsID());
@@ -35,7 +35,7 @@ public class MIRSSignatoryDAO {
     public static void update(MIRSSignatory msig) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE MIRSSignatories SET " +
-                        "MIRSID=?, userID=?, Status=?, Comments=?, UpdatedAt=GETDATE() " +
+                        "MIRSID=?, user_id=?, Status=?, Comments=?, UpdatedAt=GETDATE() " +
                         "WHERE id=?");
         ps.setInt(1, msig.getMirsID());
         ps.setInt(2, msig.getUserID());
@@ -61,7 +61,7 @@ public class MIRSSignatoryDAO {
             msig = new MIRSSignatory(
                     rs.getInt("id"),
                     rs.getInt("MIRSID"),
-                    rs.getInt("userID"),
+                    rs.getInt("user_id"),
                     rs.getString("Status"),
                     rs.getString("Comments"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
@@ -88,7 +88,7 @@ public class MIRSSignatoryDAO {
             mirsSignatories.add(new MIRSSignatory(
                     rs.getInt("id"),
                     rs.getInt("MIRSID"),
-                    rs.getInt("userID"),
+                    rs.getInt("user_id"),
                     rs.getString("Status"),
                     rs.getString("Comments"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
