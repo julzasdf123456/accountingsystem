@@ -39,13 +39,14 @@ public class EmployeeInfo {
     }
 
     public String getFullName() {
-        String fullName = employeeLastName;
-        if(!employeeSuffix.isEmpty()) {
-            fullName += ", " + employeeSuffix;
-        }
-        fullName += ", " + employeeLastName + ", " + employeeFirstName + " " + employeeMidName.charAt(0)  + ".";
+        StringBuffer fullName = new StringBuffer();
 
-        return fullName;
+        if(employeeLastName!=null) fullName.append(employeeLastName).append(", ");
+        if(employeeSuffix!=null) fullName.append(" ").append(employeeSuffix).append(", ");
+        if(employeeFirstName!=null) fullName.append(employeeFirstName);
+        if(employeeMidName!=null) fullName.append(" ").append(employeeMidName.charAt(0));
+
+        return fullName.toString();
     }
 
     public String getDepartmentName() throws Exception {

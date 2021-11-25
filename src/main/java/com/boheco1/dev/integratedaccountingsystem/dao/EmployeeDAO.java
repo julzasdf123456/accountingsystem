@@ -90,14 +90,14 @@ public class EmployeeDAO {
     public static void update(EmployeeInfo employeeInfo) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE EmployeeInfo SET " +
-                        "EmployeeFirstName=?, EmployeeMidName=?, EmployeeLastName=?, EmployeeSuffix" +
+                        "EmployeeFirstName=?, EmployeeMidName=?, EmployeeLastName=?, EmployeeSuffix=?, " +
                         "Address=?, Designation=?, DepartmentId=?, Phone=? " +
                         "WHERE EmployeeID=?");
         ps.setString(1, employeeInfo.getEmployeeFirstName());
         ps.setString(2, employeeInfo.getEmployeeMidName());
         ps.setString(3, employeeInfo.getEmployeeLastName());
+        ps.setString(4, employeeInfo.getEmployeeSuffix());
         ps.setString(5, employeeInfo.getEmployeeAddress());
-        ps.setString(6, employeeInfo.getEmployeeSuffix());
         ps.setString(6, employeeInfo.getDesignation());
         ps.setInt(7, employeeInfo.getDepartmentID());
         ps.setString(8, employeeInfo.getPhone());

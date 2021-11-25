@@ -13,14 +13,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane prefHeight="546.0" prefWidth="904.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.ManageEmployeesController">
+<AnchorPane prefHeight="634.0" prefWidth="904.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.ManageEmployeesController">
    <children>
       <StackPane fx:id="employeeStackPane" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <ScrollPane prefHeight="535.0" prefWidth="903.0">
               <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="543.0" prefWidth="903.0">
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="603.0" prefWidth="903.0">
                      <children>
                         <Label layoutX="47.0" layoutY="14.0" text="Employee Form">
                            <font>
@@ -44,6 +43,11 @@
                                     <Font size="14.0" />
                                  </font>
                               </JFXTextField>
+                              <JFXTextField fx:id="suffixField" labelFloat="true" layoutX="10.0" layoutY="116.0" promptText="Suffix">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </JFXTextField>
                               <JFXTextArea fx:id="addressField" labelFloat="true" prefHeight="57.0" prefWidth="274.0" promptText="Address" styleClass="jfx-textarea-field" wrapText="true">
                                  <font>
                                     <Font size="14.0" />
@@ -62,12 +66,12 @@
                               <JFXComboBox fx:id="departmentField" labelFloat="true" prefHeight="25.0" prefWidth="371.0" promptText="Department" styleClass="jfx-textarea-field" stylesheets="@style.css" />
                            </children>
                         </VBox>
-                        <JFXButton buttonType="RAISED" graphicTextGap="6.0" layoutX="154.0" layoutY="454.0" onAction="#onSaveEmployee" prefHeight="37.0" prefWidth="129.0" styleClass="btn-info" stylesheets="@style.css" text="Save Changes">
+                        <JFXButton buttonType="RAISED" graphicTextGap="6.0" layoutX="154.0" layoutY="494.0" onAction="#onSaveEmployee" prefHeight="37.0" prefWidth="129.0" styleClass="btn-info" stylesheets="@style.css" text="Save Changes">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </JFXButton>
-                        <JFXButton buttonType="RAISED" graphicTextGap="6.0" layoutX="47.0" layoutY="454.0" onAction="#onNewEmployee" prefHeight="37.0" prefWidth="79.0" styleClass="btn-sucess" stylesheets="@style.css" text="New">
+                        <JFXButton buttonType="RAISED" graphicTextGap="6.0" layoutX="47.0" layoutY="494.0" onAction="#onNewEmployee" prefHeight="37.0" prefWidth="79.0" styleClass="btn-sucess" stylesheets="@style.css" text="New">
                            <font>
                               <Font size="14.0" />
                            </font>

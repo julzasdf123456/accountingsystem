@@ -34,8 +34,8 @@
                                  <children>
                                     <VBox alignment="CENTER" layoutX="179.0" layoutY="126.0" prefHeight="463.0" prefWidth="254.0" spacing="15.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="60.0">
                                        <children>
-                                          <JFXTextField fx:id="username" focusColor="#00ad8e" labelFloat="true" promptText="Username" style="-fx-background-color: #f5f5f5;" text="lentrix" unFocusColor="#b5b5b5" />
-                                          <JFXPasswordField fx:id="password" focusColor="#00ad8e" labelFloat="true" promptText="Password" style="-fx-background-color: #f5f5f5;" text="password" unFocusColor="#b5b5b5" />
+                                          <JFXTextField fx:id="username" focusColor="#00ad8e" labelFloat="true" promptText="Username" style="-fx-background-color: #f5f5f5;" text="admin" unFocusColor="#b5b5b5" />
+                                          <JFXPasswordField fx:id="password" focusColor="#00ad8e" labelFloat="true" promptText="Password" style="-fx-background-color: #f5f5f5;" text="password123" unFocusColor="#b5b5b5" />
                                           <JFXButton buttonType="RAISED" defaultButton="true" onAction="#loginEvent" prefHeight="25.0" prefWidth="83.0" style="-fx-background-color: #00AD8E;" text="Login" textFill="WHITE" />
                                        </children>
                                     </VBox>

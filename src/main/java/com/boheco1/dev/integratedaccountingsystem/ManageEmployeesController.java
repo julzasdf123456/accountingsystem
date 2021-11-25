@@ -32,7 +32,7 @@ import java.util.ResourceBundle;
 public class ManageEmployeesController extends MenuControllerHandler implements Initializable {
 
     @FXML
-    JFXTextField firstNameField, middleNameField, lastNameField, designationField, phoneField;
+    JFXTextField firstNameField, middleNameField, lastNameField, suffixField, designationField, phoneField;
 
     @FXML
     JFXTextArea addressField;
@@ -60,10 +60,7 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
     private ObservableList<EmployeeInfo> listOfEmployees;
 
     public ManageEmployeesController()
-    {
-
-
-    }
+    {}
 
     public void onNewEmployee()
     {
@@ -71,6 +68,7 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
         middleNameField.setText(null);
         lastNameField.setText(null);
         addressField.setText(null);
+        suffixField.setText(null);
         phoneField.setText(null);
         designationField.setText(null);
         departmentField.getSelectionModel().clearSelection();
@@ -88,7 +86,7 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
                         firstNameField.getText(),
                         middleNameField.getText(),
                         lastNameField.getText(),
-                        "",
+                        suffixField.getText(),
                         addressField.getText(),
                         phoneField.getText(),
                         designationField.getText(),
@@ -105,6 +103,7 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
                 currentEmployee.setEmployeeMidName(middleNameField.getText());
                 currentEmployee.setEmployeeLastName(lastNameField.getText());
                 currentEmployee.setEmployeeAddress(addressField.getText());
+                currentEmployee.setEmployeeSuffix(suffixField.getText());
                 currentEmployee.setPhone(phoneField.getText());
                 currentEmployee.setDesignation(designationField.getText());
                 currentEmployee.setDepartmentID(departmentField.getSelectionModel().getSelectedItem().getDepartmentID());
@@ -175,6 +174,7 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
             firstNameField.setText(currentEmployee.getEmployeeFirstName());
             middleNameField.setText(currentEmployee.getEmployeeMidName());
             lastNameField.setText(currentEmployee.getEmployeeLastName());
+            suffixField.setText(currentEmployee.getEmployeeSuffix());
             addressField.setText(currentEmployee.getEmployeeAddress());
             phoneField.setText(currentEmployee.getPhone());
             designationField.setText(currentEmployee.getDesignation());

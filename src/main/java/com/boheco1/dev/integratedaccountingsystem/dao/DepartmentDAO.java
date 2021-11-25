@@ -9,7 +9,9 @@ import java.util.List;
 
 public class DepartmentDAO {
     public static List<Department> getAll(Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall(("{call Get_all_departments}"));
+//        CallableStatement cs = conn.prepareCall(("{call Get_all_departments}"));
+        PreparedStatement cs = conn.prepareStatement("SELECT * FROM Departments ORDER BY DepartmentName");
+
         ResultSet rs = cs.executeQuery();
         ArrayList<Department> departments = new ArrayList();
 
