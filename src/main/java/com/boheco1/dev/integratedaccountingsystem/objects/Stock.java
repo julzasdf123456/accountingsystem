@@ -28,6 +28,8 @@ public class Stock {
     private int userIDUpdated;
     private int userIDTrashed;
 
+    private String source;
+
     public Stock() {}
 
     public Stock(int id, String stockName, String model, String brand) {
@@ -238,5 +240,13 @@ public class Stock {
 
     public void setUserIDTrashed(int userIDTrashed) {
         this.userIDTrashed = userIDTrashed;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 }
