@@ -1,10 +1,10 @@
 package com.boheco1.dev.integratedaccountingsystem.helpers;
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.RegionUtil;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Locale;
@@ -32,11 +32,18 @@ public class ExcelBuilder {
         this.wide = wide;
     }
 
+    public void setMargin(double top, double right, double bottom, double left){
+        sheet.setMargin(Sheet.RightMargin, right);
+        sheet.setMargin(Sheet.LeftMargin, left);
+        sheet.setMargin(Sheet.TopMargin, top);
+        sheet.setMargin(Sheet.BottomMargin, bottom);
+    }
+
     public void createHeader(){
         Row header = sheet.createRow(0);
         Cell header_cell = header.createCell(0);
         header_cell.setCellValue(this.header);
-        sheet.addMergedRegion(new CellRangeAddress(0,0,0, (this.wide * 2) - 1));
+        sheet.addMergedRegion(new CellRangeAddress(0,0,0, this.wide - 1));
         Font header_font = wb.createFont();
         header_font.setFontHeightInPoints((short)12);
         header_font.setFontName("Arial");
@@ -87,35 +94,80 @@ public class ExcelBuilder {
         }
     }
 
+    public void styleLeftBorder(Cell cell, Font font, HorizontalAlignment alignment){
+        CellStyle style = wb.createCellStyle();
+        style.setFont(font);
+        style.setAlignment(alignment);
+        /*style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        style.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        style.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBottomBorderColor(IndexedColors.BLACK.getIndex());*/
+        cell.setCellStyle(style);
+    }
+
+    public void styleMergedCells(CellRangeAddress address){
+        RegionUtil.setBorderTop(BorderStyle.THIN, address, sheet);
+        RegionUtil.setBorderLeft(BorderStyle.THIN, address, sheet);
+        RegionUtil.setBorderRight(BorderStyle.THIN, address, sheet);
+        RegionUtil.setBorderBottom(BorderStyle.THIN, address, sheet);
+    }
+
+    public void styleBorder(Cell cell, int fontSize, HorizontalAlignment alignment, boolean wrap){
+        CellStyle style = wb.createCellStyle();
+        Font font = wb.createFont();
+        font.setFontHeightInPoints((short)fontSize);
+        font.setFontName("Arial");
+        style.setFont(font);
+        style.setAlignment(alignment);
+        style.setWrapText(wrap);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        style.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        style.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        cell.setCellStyle(style);
+    }
+
+    public void styleRightBorder(Cell cell, Font font, HorizontalAlignment alignment){
+        XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
+        style.setFont(font);
+        style.setAlignment(alignment);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        cell.setCellStyle(style);
+    }
+
     public void createSignatorees(int row, String names[], String designations[]){
+
         int width = (this.wide/2);
+
+        Font font_11 = wb.createFont();
+        font_11.setFontHeightInPoints((short)11);
+        font_11.setFontName("Arial");
+
+        Font font_12 = wb.createFont();
+        font_12.setFontHeightInPoints((short)12);
+        font_12.setBold(true);
+        font_12.setFontName("Arial");
+
         //Prepared and Recommended
         Row row1 = sheet.createRow(row);
         Cell cell1 = row1.createCell(0);
         cell1.setCellValue("Prepared by:");
         sheet.addMergedRegion(new CellRangeAddress(row, row,0, width - 1));
-        Font font = wb.createFont();
-        font.setFontHeightInPoints((short)11);
-        font.setFontName("Arial");
-        CellStyle style_left = wb.createCellStyle();
-        style_left.setFont(font);
-        style_left.setAlignment(HorizontalAlignment.CENTER);
-        style_left.setBorderLeft(BorderStyle.THIN);
-        style_left.setLeftBorderColor(IndexedColors.BLUE.getIndex());
-        cell1.setCellStyle(style_left);
+        this.styleLeftBorder(cell1, font_11, HorizontalAlignment.CENTER);
 
         Cell cell2 = row1.createCell(width);
         cell2.setCellValue("Recommended by:");
         sheet.addMergedRegion(new CellRangeAddress(row, row, width,this.wide - 1));
-        Font font2 = wb.createFont();
-        font2.setFontHeightInPoints((short)11);
-        font2.setFontName("Arial");
-        CellStyle style_right = wb.createCellStyle();
-        style_right.setFont(font);
-        style_right.setAlignment(HorizontalAlignment.CENTER);
-        style_right.setBorderRight(BorderStyle.THIN);
-        style_right.setRightBorderColor(IndexedColors.BLUE.getIndex());
-        cell2.setCellStyle(style_right);
+        this.styleRightBorder(cell2, font_11, HorizontalAlignment.CENTER);
 
         //Signatorees
         int second_row = row+2;
@@ -123,30 +175,13 @@ public class ExcelBuilder {
         Cell cell3 = row2.createCell(0);
         cell3.setCellValue(names[0].toUpperCase(Locale.ROOT));
         sheet.addMergedRegion(new CellRangeAddress(second_row, second_row,0, width - 1));
-        Font font3 = wb.createFont();
-        font3.setBold(true);
-        font3.setFontHeightInPoints((short)12);
-        font3.setFontName("Arial");
-        CellStyle style_left1 = wb.createCellStyle();
-        style_left1.setFont(font3);
-        style_left1.setAlignment(HorizontalAlignment.CENTER);
-        style_left1.setBorderLeft(BorderStyle.THIN);
-        style_left1.setLeftBorderColor(IndexedColors.BLACK.getIndex());
-        cell3.setCellStyle(style_left1);
+        this.styleRightBorder(cell3, font_12, HorizontalAlignment.CENTER);
+
 
         Cell cell4 = row2.createCell(width);
         cell4.setCellValue(names[1].toUpperCase(Locale.ROOT));
         sheet.addMergedRegion(new CellRangeAddress(second_row, second_row, width,this.wide - 1));
-        Font font4 = wb.createFont();
-        font4.setBold(true);
-        font4.setFontHeightInPoints((short)12);
-        font4.setFontName("Arial");
-        CellStyle style_right1 = wb.createCellStyle();
-        style_right1.setFont(font4);
-        style_right1.setAlignment(HorizontalAlignment.CENTER);
-        style_right1.setBorderRight(BorderStyle.THIN);
-        style_right1.setRightBorderColor(IndexedColors.BLACK.getIndex());
-        cell4.setCellStyle(style_right1);
+        this.styleRightBorder(cell4, font_12, HorizontalAlignment.CENTER);
 
         //Designation of signatorees
         int third_row = row+3;
@@ -154,65 +189,36 @@ public class ExcelBuilder {
         Cell cell5 = row3.createCell(0);
         cell5.setCellValue(designations[0]);
         sheet.addMergedRegion(new CellRangeAddress(third_row, third_row,0, width - 1));
-        Font font5 = wb.createFont();
-        font5.setFontHeightInPoints((short)11);
-        font5.setFontName("Arial");
-        CellStyle style_left2 = wb.createCellStyle();
-        style_left2.setFont(font5);
-        style_left2.setAlignment(HorizontalAlignment.CENTER);
-        style_left2.setBorderLeft(BorderStyle.THIN);
-        style_left2.setLeftBorderColor(IndexedColors.BLACK.getIndex());
-        cell5.setCellStyle(style_left2);
+        this.styleLeftBorder(cell5, font_11, HorizontalAlignment.CENTER);
 
         Cell cell6 = row3.createCell(width);
         cell6.setCellValue(designations[1]);
         sheet.addMergedRegion(new CellRangeAddress(third_row, third_row, width,this.wide - 1));
-        Font font6 = wb.createFont();
-        font6.setFontHeightInPoints((short)11);
-        font6.setFontName("Arial");
-        CellStyle style_right2 = wb.createCellStyle();
-        style_right2.setFont(font6);
-        style_right2.setAlignment(HorizontalAlignment.CENTER);
-        style_right2.setBorderRight(BorderStyle.THIN);
-        style_right2.setRightBorderColor(IndexedColors.BLACK.getIndex());
-        cell6.setCellStyle(style_right2);
+        this.styleLeftBorder(cell6, font_11, HorizontalAlignment.CENTER);
 
-        //Last signatoree
+        //Approved
         int fourth_row = row + 6;
         Row row4 = sheet.createRow(fourth_row);
         Cell cell7 = row4.createCell(0);
-        cell7.setCellValue(names[2]);
+        cell7.setCellValue("Approved:");
         sheet.addMergedRegion(new CellRangeAddress(fourth_row, fourth_row,0, this.wide - 1));
-        Font font7 = wb.createFont();
-        font7.setBold(true);
-        font7.setFontHeightInPoints((short)12);
-        font7.setFontName("Arial");
-        CellStyle style_both = wb.createCellStyle();
-        style_both.setFont(font7);
-        style_both.setAlignment(HorizontalAlignment.CENTER);
-        style_both.setBorderRight(BorderStyle.THIN);
-        style_both.setRightBorderColor(IndexedColors.BLACK.getIndex());
-        style_both.setBorderLeft(BorderStyle.THIN);
-        style_both.setLeftBorderColor(IndexedColors.BLACK.getIndex());
-        cell7.setCellStyle(style_both);
+        this.styleRightBorder(cell7, font_11, HorizontalAlignment.CENTER);
 
-        //Last signatoree
-        int fifth_row = row + 7;
+
+        //Last signatoree name
+        int fifth_row = row + 8;
         Row row5 = sheet.createRow(fifth_row);
         Cell cell8 = row5.createCell(0);
-        cell8.setCellValue(designations[2]);
+        cell8.setCellValue(names[2]);
         sheet.addMergedRegion(new CellRangeAddress(fifth_row, fifth_row,0, this.wide - 1));
-        Font font8 = wb.createFont();
-        font8.setFontHeightInPoints((short)11);
-        font8.setFontName("Arial");
-        CellStyle style_both1 = wb.createCellStyle();
-        style_both1.setFont(font8);
-        style_both1.setAlignment(HorizontalAlignment.CENTER);
-        style_both1.setBorderRight(BorderStyle.THIN);
-        style_both1.setRightBorderColor(IndexedColors.BLACK.getIndex());
-        style_both1.setBorderLeft(BorderStyle.THIN);
-        style_both1.setLeftBorderColor(IndexedColors.BLACK.getIndex());
-        cell8.setCellStyle(style_both1);
+        this.styleRightBorder(cell8, font_12, HorizontalAlignment.CENTER);
+
+        int sixth_row = row + 9;
+        Row row6 = sheet.createRow(sixth_row);
+        Cell cell9 = row6.createCell(0);
+        cell9.setCellValue(designations[2]);
+        sheet.addMergedRegion(new CellRangeAddress(sixth_row, sixth_row,0, this.wide - 1));
+        this.styleRightBorder(cell9, font_11, HorizontalAlignment.CENTER);
     }
 
     public void save(OutputStream file) throws IOException {
