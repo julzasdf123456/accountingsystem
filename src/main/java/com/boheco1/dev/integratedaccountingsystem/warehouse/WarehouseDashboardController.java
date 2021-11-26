@@ -53,9 +53,6 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
     @FXML
     private Label pendingApprovals_lbl, pendingReleases_lbl, critical_lbl, display_lbl;
 
-    //used by pending MIRS TableView selected item
-    public static MIRS activeMIRS;
-
     ContextMenuHelper contextMenuHelper = new ContextMenuHelper();
     MenuItem createInventory = new MenuItem("Create Inventory");
     MenuItem viewAllStocks = new MenuItem("View All Stocks");
@@ -89,6 +86,35 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
     @FXML
     private void mirsPendingApproval(MouseEvent event) {
         display_lbl.setText("Pending Approval");
+        initializedTable();
+        try {
+            ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getMIRSByStatus("Pending"));
+            tableView.getItems().setAll(observableList);
+        } catch (Exception e) {
+            AlertDialogBuilder.messgeDialog("System Error", this.getClass().getName() +": "+ e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }
+    }
+
+    @FXML
+    private void mirsPendingReleases(MouseEvent event) {
+        display_lbl.setText("Pending Releases");
+        initializedTable();
+        try {
+            ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getMIRSByStatus("Releasing"));
+            tableView.getItems().setAll(observableList);
+        } catch (Exception e) {
+            AlertDialogBuilder.messgeDialog("System Error", this.getClass().getName() +": "+ e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }
+    }
+
+    @FXML
+    void viewCriticalItems(MouseEvent event) {
+        System.out.println("Clicked critical");
+        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(CriticalStockController.class, "../warehouse_critical_stock.fxml"));
+    }
+
+    private void initializedTable(){
+        tableView.getItems().clear();
         tableView.getColumns().clear();
         TableColumn<MIRS, String> column0 = new TableColumn<>("Date Filed");
         column0.setCellValueFactory(new PropertyValueFactory<>("DateFiled"));
@@ -121,78 +147,54 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
         column4.setStyle("-fx-alignment: center;");
 
         Callback<TableColumn<MIRS, String>, TableCell<MIRS, String>> viewBtn
-        = //
-        new Callback<TableColumn<MIRS, String>, TableCell<MIRS, String>>() {
-            @Override
-            public TableCell call(final TableColumn<MIRS, String> param) {
-                final TableCell<MIRS, String> cell = new TableCell<MIRS, String>() {
-
-                    Button btn = new Button("view");
-                    FontIcon icon = new FontIcon("mdi2e-eye");
-
+                = //
+                new Callback<TableColumn<MIRS, String>, TableCell<MIRS, String>>() {
                     @Override
-                    public void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
-                        btn.setStyle("-fx-background-color: #2196f3");
-                        btn.setGraphic(icon);
-                        btn.setGraphicTextGap(5);
-                        btn.setTextFill(Paint.valueOf(ColorPalette.WHITE));
-                        if (empty) {
-                            setGraphic(null);
-                            setText(null);
-                        } else {
-                            btn.setOnAction(event -> {
-                                MIRS mirs = getTableView().getItems().get(getIndex());
-                                try {
-                                    activeMIRS = mirs;
-                                    ModalBuilder.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_pending_approval.fxml",stackPane);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
+                    public TableCell call(final TableColumn<MIRS, String> param) {
+                        final TableCell<MIRS, String> cell = new TableCell<MIRS, String>() {
+
+                            Button btn = new Button("view");
+                            FontIcon icon = new FontIcon("mdi2e-eye");
+
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
+                                btn.setStyle("-fx-background-color: #2196f3");
+                                btn.setGraphic(icon);
+                                btn.setGraphicTextGap(5);
+                                btn.setTextFill(Paint.valueOf(ColorPalette.WHITE));
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    btn.setOnAction(event -> {
+                                        MIRS mirs = getTableView().getItems().get(getIndex());
+                                        try {
+                                            Utility.setActiveMIRS(mirs);
+                                            ModalBuilder.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_approval_form.fxml",stackPane);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    });
+                                    setGraphic(btn);
+                                    setText(null);
                                 }
-                            });
-                            setGraphic(btn);
-                            setText(null);
-                        }
+                            }
+                        };
+                        return cell;
                     }
                 };
-                return cell;
-            }
-        };
         column4.setCellFactory(viewBtn);
 
-        tableView.setFixedCellSize(40);
+        tableView.setFixedCellSize(35);
         tableView.setPlaceholder(new Label("No rows to display"));
         tableView.getColumns().add(column0);
         tableView.getColumns().add(column1);
         tableView.getColumns().add(column2);
         tableView.getColumns().add(column3);
         tableView.getColumns().add(column4);
-
-        try {
-            ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getAllPending());
-            tableView.getItems().setAll(observableList);
-        } catch (Exception e) {
-            AlertDialogBuilder.messgeDialog("System Error", this.getClass().getName() +": "+ e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }
     }
-
-    @FXML
-    private void mirsPendingReleases(MouseEvent event) {
-        display_lbl.setText("Pending Releases");
-        tableView.getColumns().clear();
-        TableColumn<MIRS, String> column0 = new TableColumn<>("Date Filed");
-        column0.setCellValueFactory(new PropertyValueFactory<>("DateFiled"));
-        column0.setMinWidth(150);
-        column0.setStyle("-fx-alignment: center;");
-    }
-
-    @FXML
-    void viewCriticalItems(MouseEvent event) {
-        System.out.println("Clicked critical");
-        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(CriticalStockController.class, "../warehouse_critical_stock.fxml"));
-    }
-
 
 
     public void setSubMenus(FlowPane flowPane) {
@@ -238,7 +240,7 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
         Platform.runLater(() -> {
             try {
                 critical_lbl.setText(""+ StockDAO.countCritical());
-                pendingApprovals_lbl.setText(""+MirsDAO.countPending());
+                pendingApprovals_lbl.setText(""+MirsDAO.countMIRSByStatus("Pending"));
                 pendingReleases_lbl.setText(""+MirsDAO.countMIRSByStatus("Releasing"));
             } catch (Exception e) {
                 e.printStackTrace();
