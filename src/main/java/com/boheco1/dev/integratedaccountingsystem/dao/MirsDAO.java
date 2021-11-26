@@ -280,9 +280,10 @@ public class MirsDAO {
         return count;
     }
 
-    public static int countPendingReleases() throws Exception {
+    public static int countMIRSByStatus(String status) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT COUNT(id) AS 'count' FROM Releasing WHERE Status='Pending'");
+                "SELECT COUNT(id) AS 'count' FROM Releasing WHERE Status=?");
+        ps.setString(1, status);
 
         ResultSet rs = ps.executeQuery();
         int count = 0;
@@ -297,9 +298,10 @@ public class MirsDAO {
         return count;
     }
 
-    public static List<MIRS> getApproved() throws Exception {
+    public static List<MIRS> getMIRSByStatus(String status) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM MIRS WHERE status='Approved' ORDER BY CreatedAt");
+                "SELECT * FROM MIRS WHERE status=? ORDER BY CreatedAt");
+        ps.setString(1, status);
         ResultSet rs = ps.executeQuery();
 
         ArrayList<MIRS> approved = new ArrayList<>();
