@@ -296,4 +296,31 @@ public class MirsDAO {
 
         return count;
     }
+
+    public static List<MIRS> getApproved() throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MIRS WHERE status='Approved' ORDER BY CreatedAt");
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<MIRS> approved = new ArrayList<>();
+
+        while(rs.next()) {
+            approved.add(new MIRS(
+                    rs.getInt("id"),
+                    rs.getDate("DateFiled").toLocalDate(),
+                    rs.getString("Purpose"),
+                    rs.getString("Details"),
+                    rs.getString("Status"),
+                    rs.getInt("RequisitionerID"),
+                    rs.getInt("UserID"),
+                    rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return approved;
+    }
 }
