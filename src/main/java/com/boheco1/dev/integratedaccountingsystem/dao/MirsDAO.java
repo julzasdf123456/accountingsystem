@@ -282,7 +282,7 @@ public class MirsDAO {
 
     public static int countMIRSByStatus(String status) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT COUNT(id) AS 'count' FROM Releasing WHERE Status=?");
+                "SELECT COUNT(id) AS 'count' FROM MIRS WHERE Status=?");
         ps.setString(1, status);
 
         ResultSet rs = ps.executeQuery();
