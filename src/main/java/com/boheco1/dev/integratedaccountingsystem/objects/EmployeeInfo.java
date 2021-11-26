@@ -11,6 +11,7 @@ public class EmployeeInfo {
     private String employeeAddress;
     private String phone;
     private String designation;
+    private String signatoryLevel;
     private int departmentID;
 
     private String fullName;
@@ -18,7 +19,7 @@ public class EmployeeInfo {
 
     public EmployeeInfo(){}
 
-    public EmployeeInfo(int id, String employeeFirstName, String employeeMidName, String employeeLastName,String employeeSuffix, String employeeAddress, String phone, String designation, int departmentID) throws Exception {
+    public EmployeeInfo(int id, String employeeFirstName, String employeeMidName, String employeeLastName,String employeeSuffix, String employeeAddress, String phone, String designation, String signatoryLevel, int departmentID) throws Exception {
         this.id = id;
         this.employeeFirstName = employeeFirstName;
         this.employeeMidName = employeeMidName;
@@ -27,7 +28,16 @@ public class EmployeeInfo {
         this.designation = designation;
         this.employeeAddress = employeeAddress;
         this.phone = phone;
+        this.signatoryLevel = signatoryLevel;
         this.departmentID = departmentID;
+    }
+
+    public String getSignatoryLevel() {
+        return signatoryLevel;
+    }
+
+    public void setSignatoryLevel(String signatoryLevel) {
+        this.signatoryLevel = signatoryLevel;
     }
 
     public String getEmployeeSuffix() {

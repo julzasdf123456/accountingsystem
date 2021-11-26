@@ -149,7 +149,7 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
                     return;
                 }
 
-                currentEmployee = new EmployeeInfo(-1,firstNameField.getText(),middleNameField.getText(),lastNameField.getText(),"",addressField.getText(),phoneNumberField.getText(),designationField.getText(),dept.getDepartmentID());
+                currentEmployee = new EmployeeInfo(-1,firstNameField.getText(),middleNameField.getText(),lastNameField.getText(),"",addressField.getText(),phoneNumberField.getText(),designationField.getText(),null, dept.getDepartmentID());
                 String fullName = currentEmployee.getEmployeeFirstName() + " " + currentEmployee.getEmployeeLastName();
                 EmployeeDAO.addEmployee(currentEmployee, conn);
 

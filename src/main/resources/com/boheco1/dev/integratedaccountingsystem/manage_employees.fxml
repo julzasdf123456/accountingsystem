@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="634.0" prefWidth="904.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.ManageEmployeesController">
+<AnchorPane prefHeight="664.0" prefWidth="931.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.ManageEmployeesController">
    <children>
       <StackPane fx:id="employeeStackPane" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -64,14 +64,15 @@
                                  </font>
                               </JFXTextField>
                               <JFXComboBox fx:id="departmentField" labelFloat="true" prefHeight="25.0" prefWidth="371.0" promptText="Department" styleClass="jfx-textarea-field" stylesheets="@style.css" />
+                              <JFXComboBox fx:id="signatoryLevelField" labelFloat="true" layoutX="10.0" layoutY="395.0" prefHeight="25.0" prefWidth="371.0" promptText="Signatory Level" styleClass="jfx-textarea-field" stylesheets="@style.css" />
                            </children>
                         </VBox>
-                        <JFXButton buttonType="RAISED" graphicTextGap="6.0" layoutX="154.0" layoutY="494.0" onAction="#onSaveEmployee" prefHeight="37.0" prefWidth="129.0" styleClass="btn-info" stylesheets="@style.css" text="Save Changes">
+                        <JFXButton buttonType="RAISED" graphicTextGap="6.0" layoutX="154.0" layoutY="537.0" onAction="#onSaveEmployee" prefHeight="37.0" prefWidth="129.0" styleClass="btn-info" stylesheets="@style.css" text="Save Changes">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </JFXButton>
-                        <JFXButton buttonType="RAISED" graphicTextGap="6.0" layoutX="47.0" layoutY="494.0" onAction="#onNewEmployee" prefHeight="37.0" prefWidth="79.0" styleClass="btn-sucess" stylesheets="@style.css" text="New">
+                        <JFXButton buttonType="RAISED" graphicTextGap="6.0" layoutX="47.0" layoutY="537.0" onAction="#onNewEmployee" prefHeight="37.0" prefWidth="79.0" styleClass="btn-sucess" stylesheets="@style.css" text="New">
                            <font>
                               <Font size="14.0" />
                            </font>

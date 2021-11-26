@@ -239,7 +239,7 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
             try {
                 critical_lbl.setText(""+ StockDAO.countCritical());
                 pendingApprovals_lbl.setText(""+MirsDAO.countPending());
-                pendingReleases_lbl.setText(""+MirsDAO.countPendingReleases());
+                pendingReleases_lbl.setText(""+MirsDAO.countMIRSByStatus("Releasing"));
             } catch (Exception e) {
                 e.printStackTrace();
             }

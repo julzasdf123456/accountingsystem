@@ -13,8 +13,8 @@ public class EmployeeDAO {
     public static void addEmployee(EmployeeInfo employee, Connection conn) throws SQLException {
 //        CallableStatement cs = conn.prepareCall("{? = call Add_employee (?,?,?,?,?,?,?)}");
         PreparedStatement cs = conn.prepareStatement(
-                "INSERT INTO EmployeeInfo (EmployeeFirstName, EmployeeMidName, EmployeeLastName, EmployeeSuffix, Address, Phone, Designation, DepartmentID) " +
-                        "VALUES (?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+                "INSERT INTO EmployeeInfo (EmployeeFirstName, EmployeeMidName, EmployeeLastName, EmployeeSuffix, Address, Phone, Designation, DepartmentID, SignatoryLevel) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
 
         cs.setString(1, employee.getEmployeeFirstName());
         cs.setString(2, employee.getEmployeeMidName());
@@ -24,6 +24,7 @@ public class EmployeeDAO {
         cs.setString(6, employee.getPhone());
         cs.setString(7, employee.getDesignation());
         cs.setInt(8, employee.getDepartmentID());
+        cs.setString(9, employee.getSignatoryLevel());
 
         cs.executeUpdate();
 
@@ -51,6 +52,7 @@ public class EmployeeDAO {
                     rs.getString("Address"),
                     rs.getString("Phone"),
                     rs.getString("Designation"),
+                    rs.getString("SignatoryLevel"),
                     rs.getInt("DepartmentID")
             );
         }else {
@@ -77,6 +79,7 @@ public class EmployeeDAO {
                     rs.getString("Address"),
                     rs.getString("Phone"),
                     rs.getString("Designation"),
+                    rs.getString("SignatoryLevel"),
                     rs.getInt("DepartmentID")
             ));
         }
@@ -91,7 +94,7 @@ public class EmployeeDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE EmployeeInfo SET " +
                         "EmployeeFirstName=?, EmployeeMidName=?, EmployeeLastName=?, EmployeeSuffix=?, " +
-                        "Address=?, Designation=?, DepartmentId=?, Phone=? " +
+                        "Address=?, Designation=?, DepartmentId=?, Phone=?, SignatoryLevel=? " +
                         "WHERE EmployeeID=?");
         ps.setString(1, employeeInfo.getEmployeeFirstName());
         ps.setString(2, employeeInfo.getEmployeeMidName());
@@ -101,7 +104,8 @@ public class EmployeeDAO {
         ps.setString(6, employeeInfo.getDesignation());
         ps.setInt(7, employeeInfo.getDepartmentID());
         ps.setString(8, employeeInfo.getPhone());
-        ps.setInt(9, employeeInfo.getId());
+        ps.setString(9,employeeInfo.getSignatoryLevel());
+        ps.setInt(10, employeeInfo.getId());
 
         ps.executeUpdate();
 

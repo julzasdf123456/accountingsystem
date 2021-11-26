@@ -40,6 +40,8 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
     @FXML
     JFXComboBox<Department> departmentField;
 
+    @FXML JFXComboBox<String> signatoryLevelField;
+
     @FXML
     private TableView<EmployeeInfo> employeesTable;
 
@@ -90,7 +92,8 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
                         addressField.getText(),
                         phoneField.getText(),
                         designationField.getText(),
-                        ((Department)departmentField.getSelectionModel().getSelectedItem()).getDepartmentID()
+                        signatoryLevelField.getSelectionModel().getSelectedItem(),
+                        departmentField.getSelectionModel().getSelectedItem().getDepartmentID()
                 );
 
                 EmployeeDAO.addEmployee(currentEmployee, DB.getConnection());
@@ -106,6 +109,7 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
                 currentEmployee.setEmployeeSuffix(suffixField.getText());
                 currentEmployee.setPhone(phoneField.getText());
                 currentEmployee.setDesignation(designationField.getText());
+                currentEmployee.setSignatoryLevel(signatoryLevelField.getSelectionModel().getSelectedItem());
                 currentEmployee.setDepartmentID(departmentField.getSelectionModel().getSelectedItem().getDepartmentID());
 
                 EmployeeDAO.update(currentEmployee);
@@ -139,6 +143,13 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
 
             listOfEmployees = FXCollections.observableArrayList(EmployeeDAO.getAll(DB.getConnection()));
             employeesTable.setItems(listOfEmployees);
+
+            ArrayList<String> signatoryLevels = new ArrayList<>();
+            signatoryLevels.add("General Manager");
+            signatoryLevels.add("Department Manager");
+            signatoryLevels.add("Supervisor");
+            signatoryLevels.add("Section Head");
+            signatoryLevelField.setItems(FXCollections.observableArrayList(signatoryLevels));
 
             employeesTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<EmployeeInfo>() {
                 @Override
@@ -178,6 +189,7 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
             addressField.setText(currentEmployee.getEmployeeAddress());
             phoneField.setText(currentEmployee.getPhone());
             designationField.setText(currentEmployee.getDesignation());
+            signatoryLevelField.getSelectionModel().select(currentEmployee.getSignatoryLevel());
             departmentField.getSelectionModel().select(currentEmployee.getDepartment());
         }catch(Exception ex) {
             AlertDialogBuilder.messgeDialog("Exception!", ex.getMessage(), employeeStackPane, AlertDialogBuilder.DANGER_DIALOG);
