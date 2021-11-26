@@ -156,7 +156,7 @@
                                     <children>
                                         <VBox alignment="CENTER" prefHeight="47.0" prefWidth="200.0">
                                             <children>
-                                                <JFXTextField fx:id="dm" alignment="CENTER" editable="false" prefHeight="25.0" prefWidth="174.0" styleClass="jfx-text-field">
+                                                <JFXTextField fx:id="dm" alignment="CENTER" prefHeight="25.0" prefWidth="174.0" styleClass="jfx-text-field">
                                                     <font>
                                                         <Font size="18.0" />
                                                     </font>
@@ -203,7 +203,7 @@
                         </VBox>
                     </bottom>
                     <top>
-                        <VBox alignment="TOP_RIGHT" prefHeight="218.0" prefWidth="971.0" style="-fx-background-color: #ffff;" BorderPane.alignment="CENTER">
+                        <VBox alignment="CENTER_LEFT" prefHeight="218.0" prefWidth="971.0" style="-fx-background-color: #ffff;" BorderPane.alignment="CENTER">
                             <children>
                                 <Label maxWidth="1.7976931348623157E308" text="MIRS Form">
                                     <font>
@@ -232,14 +232,29 @@
                                         <Insets top="25.0" />
                                     </VBox.margin>
                                 </JFXTextField>
-                                <JFXTextArea fx:id="purpose" labelFloat="true" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="45.0" prefWidth="261.0" promptText="Purpose" style="-fx-background-color: #f5f5f5;" styleClass="jfx-textarea-field">
-                                    <font>
-                                        <Font size="14.0" />
-                                    </font>
-                                    <VBox.margin>
-                                        <Insets top="25.0" />
-                                    </VBox.margin>
-                                </JFXTextArea>
+                        <HBox>
+                           <children>
+                                      <JFXTextArea fx:id="purpose" labelFloat="true" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="41.0" prefWidth="262.0" promptText="Purpose" style="-fx-background-color: #f5f5f5;" styleClass="jfx-textarea-field">
+                                          <font>
+                                              <Font size="14.0" />
+                                          </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                                      </JFXTextArea>
+                              <JFXTextArea fx:id="details" labelFloat="true" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="41.0" prefWidth="415.0" promptText="Details" style="-fx-background-color: #f5f5f5;" styleClass="jfx-textarea-field">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextArea>
+                           </children>
+                           <VBox.margin>
+                              <Insets top="25.0" />
+                           </VBox.margin>
+                        </HBox>
                             </children>
                             <padding>
                                 <Insets left="16.0" right="16.0" />
