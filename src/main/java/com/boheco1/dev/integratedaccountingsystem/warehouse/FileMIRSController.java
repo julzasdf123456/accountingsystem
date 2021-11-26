@@ -1,10 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.*;
-import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
-import com.boheco1.dev.integratedaccountingsystem.helpers.InputValidation;
-import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
-import com.boheco1.dev.integratedaccountingsystem.helpers.SubMenuHelper;
+import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
@@ -52,7 +49,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     private JFXComboBox<Integer> quantity;
 
     @FXML
-    private JFXTextArea purpose;
+    private JFXTextArea purpose, details;
 
     @FXML
     private Label available, inStock, pending;
@@ -71,6 +68,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
     private Stock stock = null;
     private EmployeeInfo requisitionerEmployee = null;
+    private User userSignatory = null;
     private List<Signatory> signatories = null;
     private ObservableList<MIRSItem> requestItem = null;
 
@@ -79,6 +77,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         date.setValue(LocalDate.now());
         bindParticularsAutocomplete(particulars);
         bindRequisitionerAutocomplete(requisitioner);
+        bindDMAutocomplete(dm);
         InputValidation.restrictNumbersOnly(mirsNum);
         setSignatories();
         initializeItemTable();
@@ -91,6 +90,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         mirsNum.setText("");
         requisitioner.setText("");
         purpose.setText("");
+        details.setText("");
         particulars.setText("");
         quantity.getItems().clear();
         remarks.setText("");
@@ -172,7 +172,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             List<MIRSItem> mirsItemList = requestItem; //from ObservableList to List
             MIRS mirs = new MIRS();
             mirs.setId(Integer.parseInt(mirsNum.getText())); //id mean MIRS number from user input
-            mirs.setDetails(null);
+            mirs.setDetails(details.getText());
             mirs.setStatus("Pending");
             mirs.setDateFiled(date.getValue());
             mirs.setPurpose(purpose.getText());
@@ -340,8 +340,52 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             requisitionerEmployee = event.getCompletion();
             tablePane.setDisable(false);
             signaturePane.setDisable(false);
-            requisitioner.setText(requisitionerEmployee.getEmployeeFirstName() + " " + requisitionerEmployee.getEmployeeLastName());
+            requisitioner.setText(requisitionerEmployee.getFullName());
             purpose.requestFocus();
+        });
+    }
+
+    private void bindDMAutocomplete(JFXTextField textField){
+        AutoCompletionBinding<User> employeeSuggest = TextFields.bindAutoCompletion(textField,
+                param -> {
+                    //Value typed in the textfield
+                    String query = param.getUserText();
+
+                    //Initialize list of stocks
+                    List<User> list = new ArrayList<>();
+
+                    //Perform DB query when length of search string is 4 or above
+                    if (query.length() > 3){
+                        try {
+                            list = UserDAO.search(query);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    if (list.size() == 0) {
+                        userSignatory = null;
+                    }
+
+                    return list;
+                }, new StringConverter<>() {
+                    //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
+                    @Override
+                    public String toString(User object) {
+                        return object.getFullName();
+                    }
+
+                    @Override
+                    public User fromString(String string) {
+                        throw new UnsupportedOperationException();
+                    }
+                });
+
+        //This will set the actions once the user clicks an item from the popupmenu.
+        employeeSuggest.setOnAutoCompleted(event -> {
+            userSignatory = event.getCompletion();
+            signatories.get(0).setUserID(userSignatory.getId());
+            dm.setText(userSignatory.getFullName());
         });
     }
 }
