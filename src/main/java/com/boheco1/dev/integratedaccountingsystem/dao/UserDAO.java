@@ -152,6 +152,24 @@ public class UserDAO {
         return users;
     }
 
+    public static List<User> search(String key) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM users WHERE fullname LIKE ? ORDER BY fullname");
+        ps.setString(1, "%" + key + "%");
+        ResultSet rs = ps.executeQuery();
+        ArrayList<User> users = new ArrayList();
+        while(rs.next()) {
+            users.add(new User(
+                    rs.getInt("id"),
+                    rs.getInt("EmployeeID"),
+                    rs.getString("username"),
+                    rs.getString("fullname")
+            ));
+        }
+        rs.close();
+        ps.close();
+        return users;
+    }
+
     public static void addUser(User user, Connection conn) throws Exception {
         String passwordHash = Hash.hash(user.getPassword());
         PreparedStatement cs = conn.prepareStatement("INSERT INTO users (username, fullname, passsword, EmployeeID) " +
