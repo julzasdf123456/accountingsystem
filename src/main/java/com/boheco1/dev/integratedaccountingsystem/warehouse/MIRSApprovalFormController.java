@@ -26,6 +26,7 @@ import javafx.scene.layout.StackPane;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class MIRSApprovalFormController implements Initializable {
@@ -71,14 +72,21 @@ public class MIRSApprovalFormController implements Initializable {
 
             particularsCol.setCellValueFactory(cellData -> {
                 try {
-                    return new SimpleStringProperty(StockDAO.get(cellData.getValue().getStockID()).getStockName());
+                    return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getStockName());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 return null;
             });
 
-            unitCol.setCellValueFactory(new PropertyValueFactory<>("Unit"));
+            unitCol.setCellValueFactory(cellData -> {
+                try {
+                    return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getUnit());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            });
             quantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
             remarksCol.setCellValueFactory(new PropertyValueFactory<>("Remarks"));
             tableView.getItems().setAll(observableList);
