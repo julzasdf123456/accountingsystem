@@ -86,7 +86,7 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
     @FXML
     private void mirsPendingApproval(MouseEvent event) {
         display_lbl.setText("Pending Approval");
-        initializedTable();
+        initializedTable("Pending");
         try {
             ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getMIRSByStatus("Pending"));
             tableView.getItems().setAll(observableList);
@@ -98,7 +98,7 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
     @FXML
     private void mirsPendingReleases(MouseEvent event) {
         display_lbl.setText("Pending Releases");
-        initializedTable();
+        initializedTable("Releasing");
         try {
             ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getMIRSByStatus("Releasing"));
             tableView.getItems().setAll(observableList);
@@ -113,7 +113,7 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
         Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(CriticalStockController.class, "../warehouse_critical_stock.fxml"));
     }
 
-    private void initializedTable(){
+    private void initializedTable(String s){
         tableView.getItems().clear();
         tableView.getColumns().clear();
         TableColumn<MIRS, String> column0 = new TableColumn<>("Date Filed");
@@ -172,7 +172,11 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
                                         MIRS mirs = getTableView().getItems().get(getIndex());
                                         try {
                                             Utility.setActiveMIRS(mirs);
-                                            ModalBuilder.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_approval_form.fxml",stackPane);
+                                            if(s.equals("Pending")){
+                                                ModalBuilder.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_approval_form.fxml",stackPane);
+                                            }else if (s.equals("Releasing")){
+                                                ModalBuilder.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_releasing_form.fxml",stackPane);
+                                            }
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
