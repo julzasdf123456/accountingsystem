@@ -7,6 +7,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.ExcelBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.SubMenuHelper;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
+import com.boheco1.dev.integratedaccountingsystem.objects.StockEntryLog;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import javafx.application.Platform;
@@ -116,12 +117,11 @@ public class StockEntryReportController extends MenuControllerHandler implements
             File selectedFile = fileChooser.showSaveDialog(stage);
             if (selectedFile != null) {
                 try (OutputStream fileOut = new FileOutputStream(selectedFile)) {
+
                     //Create the ExcelBuilder
-                    ExcelBuilder doc = new ExcelBuilder(
-                            "BOHOL I ELECTRIC COOPERATIVE, INC.",
-                            "Cabulijan, Tubigon, Bohol",
-                            "Stock Entry Report",
-                            10);
+                    ExcelBuilder doc = new ExcelBuilder(10);
+
+                    doc.setTitle("Stock Entry Report");
 
                     //Set the margin
                     doc.setMargin(1, 0.5, 1, 0.5);
@@ -193,11 +193,13 @@ public class StockEntryReportController extends MenuControllerHandler implements
 
                     //For every stock, set the stock data in the appropriate cells per row
                     for (Stock stock : stocks) {
+                        StockEntryLog log = stock.getEntryLog();
+
                         row += 1;
                         row_header = sheet.createRow(row);
 
                         current_entry = row_header.createCell(0);
-                        current_entry.setCellValue(stock.getCreatedAt().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+                        current_entry.setCellValue(log.getCreatedAt().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")));
                         doc.styleBorder(current_entry, 10, HorizontalAlignment.CENTER, false);
 
                         current_stock = row_header.createCell(1);
@@ -219,17 +221,15 @@ public class StockEntryReportController extends MenuControllerHandler implements
                         doc.styleBorder(current_unit, 10, HorizontalAlignment.CENTER, false);
 
                         current_price = row_header.createCell(8);
-                        current_price.setCellValue(stock.getPrice());
+                        current_price.setCellValue(log.getPrice());
                         doc.styleBorder(current_price, 10, HorizontalAlignment.LEFT, false);
 
                         current_qty = row_header.createCell(9);
-                        current_qty.setCellValue(stock.getQuantity());
+                        current_qty.setCellValue(log.getQuantity());
                         doc.styleBorder(current_qty, 10, HorizontalAlignment.LEFT, false);
                     }
                     //Create the signatorees
-                    String names[] = {"RYAN REYNOLDS", "DWAYNE JOHNSON", "GAL GADOT"};
-                    String designations[] = {"Warehouse Warden", "Department Manager", "General Manager"};
-                    doc.createSignatorees(stocks.size() + 13, names, designations);
+                    doc.createSignatorees(stocks.size() + 13);
 
                     //Save the excel file
                     doc.save(fileOut);
@@ -264,13 +264,13 @@ public class StockEntryReportController extends MenuControllerHandler implements
 
         TableColumn<Stock, String> column6 = new TableColumn<>("Quantity");
         column6.setMinWidth(75);
-        column6.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        column6.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getEntryLog().getQuantity()+""));
 
         TableColumn<Stock, String> column7 = new TableColumn<>("Price");
-        column7.setCellValueFactory(new PropertyValueFactory<>("price"));
+        column7.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getEntryLog().getPrice()+""));
 
         TableColumn<Stock, String> column8 = new TableColumn<>("Entry Date");
-        column8.setCellValueFactory(stockStringCellDataFeatures -> new SimpleStringProperty(stockStringCellDataFeatures.getValue().getCreatedAt().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))));
+        column8.setCellValueFactory(stockStringCellDataFeatures -> new SimpleStringProperty(stockStringCellDataFeatures.getValue().getEntryLog().getCreatedAt().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))));
 
         this.stocksTable.getColumns().removeAll();
         this.stocksTable.getColumns().add(column8);

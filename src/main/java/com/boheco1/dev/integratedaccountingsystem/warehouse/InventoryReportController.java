@@ -112,18 +112,14 @@ public class InventoryReportController extends MenuControllerHandler implements 
             File selectedFile = fileChooser.showSaveDialog(stage);
             if (selectedFile != null) {
                 try (OutputStream fileOut = new FileOutputStream(selectedFile)) {
-                    ExcelBuilder doc = new ExcelBuilder(
-                            "BOHOL I ELECTRIC COOPERATIVE, INC.",
-                            "Cabulijan, Tubigon, Bohol",
-                            "Inventory Report",
-                            10);
+                    ExcelBuilder doc = new ExcelBuilder(10);
+
+                    doc.setTitle("Inventory Report");
 
                     doc.setMargin(1, 0.5, 1, 0.5);
 
                     doc.createHeader();
                     doc.createTitle(5, "Period of " + from.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")) + " - " + to.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")));
-                    String names[] = {"RYAN REYNOLDS", "DWAYNE JOHNSON", "GAL GADOT"};
-                    String designations[] = {"Warehouse Warden", "Department Manager", "General Manager"};
 
                     Sheet sheet = doc.getSheet();
 
@@ -189,7 +185,11 @@ public class InventoryReportController extends MenuControllerHandler implements 
                         current_qty.setCellValue(stock.getQuantity());
                         doc.styleBorder(current_qty, 10, HorizontalAlignment.LEFT, false);
                     }
-                    doc.createSignatorees(stocks.size() + 13, names, designations);
+
+                    //Create signatorees
+                    doc.createSignatorees(stocks.size() + 13);
+
+                    //Save file
                     doc.save(fileOut);
                 } catch (Exception e) {
                     AlertDialogBuilder.messgeDialog("System Warning", "Process failed due to: " + e.getMessage(),
