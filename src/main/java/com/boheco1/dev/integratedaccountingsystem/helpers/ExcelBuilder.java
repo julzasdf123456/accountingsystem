@@ -11,18 +11,41 @@ import java.util.Locale;
 
 public class ExcelBuilder {
 
-    private String header;
-    private String address;
-    private String title;
+    private String header = "BOHOL I ELECTRIC COOPERATIVE, INC.";
+    private String address = "Cabulijan, Tubigon, Bohol";
+    private String title = "Stock Entry Report";
 
     private Workbook wb;
     private Sheet sheet;
+
+    private String names[] = new String[]{"RYAN REYNOLDS", "DWAYNE JOHNSON", "GAL GADOT"};
+    private String[] designations = new String[]{"Warehouse Warden", "Department Manager", "General Manager"};
 
     private int wide;
 
     public static final int DOC_SHORT = 25;
     public static final int LONG_SHORT = 35;
 
+    /**
+     * Default Constructor for the ExcelBuilder
+     * @param wide the number of cells (width)
+     **/
+    public ExcelBuilder(int wide){
+        this.wb = new XSSFWorkbook();
+        this.sheet = this.wb.createSheet("Sheet");
+        this.header = header;
+        this.address = address;
+        this.title = title;
+        this.wide = wide;
+    }
+
+    /**
+     * Default Constructor for the ExcelBuilder
+     * @param header string for the header
+     * @param address string for the address
+     * @param title string for title
+     * @param wide the number of cells (width)
+     **/
     public ExcelBuilder(String header, String address, String title, int wide){
         this.wb = new XSSFWorkbook();
         this.sheet = this.wb.createSheet("Sheet");
@@ -32,6 +55,13 @@ public class ExcelBuilder {
         this.wide = wide;
     }
 
+    /**
+     * Sets the margin of the document
+     * @param top the top margin
+     * @param right the right margin
+     * @param bottom the bottom margin
+     * @param left the left margin
+     **/
     public void setMargin(double top, double right, double bottom, double left){
         sheet.setMargin(Sheet.RightMargin, right);
         sheet.setMargin(Sheet.LeftMargin, left);
@@ -39,6 +69,9 @@ public class ExcelBuilder {
         sheet.setMargin(Sheet.BottomMargin, bottom);
     }
 
+    /**
+     * Creates the header
+     **/
     public void createHeader(){
         Row header = sheet.createRow(0);
         Cell header_cell = header.createCell(0);
@@ -65,6 +98,9 @@ public class ExcelBuilder {
         address_cell.setCellStyle(address_style);
     }
 
+    /**
+     * Creates the title
+     **/
     public void createTitle(int row, String subtitle){
         Row title = sheet.createRow(row);
         Cell title_cell = title.createCell(0);
@@ -109,6 +145,10 @@ public class ExcelBuilder {
         cell.setCellStyle(style);
     }
 
+    /**
+     * Puts borders to the region of merged cells
+     * @param address the region to set the border
+     **/
     public void styleMergedCells(CellRangeAddress address){
         RegionUtil.setBorderTop(BorderStyle.THIN, address, sheet);
         RegionUtil.setBorderLeft(BorderStyle.THIN, address, sheet);
@@ -116,6 +156,13 @@ public class ExcelBuilder {
         RegionUtil.setBorderBottom(BorderStyle.THIN, address, sheet);
     }
 
+    /**
+     * Puts borders to the cell
+     * @param cell the cell to set the border
+     * @param fontSize the font size of the content
+     * @param alignment the cell alignment
+     * @param wrap wraps contents
+     **/
     public void styleBorder(Cell cell, int fontSize, HorizontalAlignment alignment, boolean wrap){
         CellStyle style = wb.createCellStyle();
         Font font = wb.createFont();
@@ -135,6 +182,12 @@ public class ExcelBuilder {
         cell.setCellStyle(style);
     }
 
+    /**
+     * Puts borders to the region of merged cells
+     * @param cell the cell to set the border
+     * @param font the font size of the content
+     * @param alignment the cell alignment
+     **/
     public void styleRightBorder(Cell cell, Font font, HorizontalAlignment alignment){
         XSSFCellStyle style = (XSSFCellStyle) wb.createCellStyle();
         style.setFont(font);
@@ -144,7 +197,10 @@ public class ExcelBuilder {
         cell.setCellStyle(style);
     }
 
-    public void createSignatorees(int row, String names[], String designations[]){
+    /**
+     * Creates signatorees
+     **/
+    public void createSignatorees(int row){
 
         int width = (this.wide/2);
 
@@ -221,6 +277,9 @@ public class ExcelBuilder {
         this.styleRightBorder(cell9, font_11, HorizontalAlignment.CENTER);
     }
 
+    /**
+     * Saves the Excel file
+     **/
     public void save(OutputStream file) throws IOException {
         this.wb.write(file);
     }
@@ -271,5 +330,13 @@ public class ExcelBuilder {
 
     public void setWide(int wide) {
         this.wide = wide;
+    }
+
+    public String[] getDesignations() {
+        return designations;
+    }
+
+    public void setDesignations(String[] designations) {
+        this.designations = designations;
     }
 }
