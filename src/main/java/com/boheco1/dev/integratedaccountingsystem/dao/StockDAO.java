@@ -772,10 +772,9 @@ public class StockDAO {
 
     public static List<Stock> getInventory(LocalDate from, LocalDate to, int limit, int offset) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT Stocks.* FROM Stocks LEFT JOIN StockEntryLogs " +
-                        "ON StockEntryLogs.StockID=Stocks.id " +
-                        "WHERE IsTrashed=0 AND StockEntryLogs.UpdatedAt BETWEEN ? AND ? " +
-                        "ORDER BY StockEntryLogs.UpdatedAt " +
+                "SELECT * FROM Stocks "+
+                        "WHERE IsTrashed=0 AND UpdatedAt BETWEEN ? AND ? " +
+                        "ORDER BY UpdatedAt ASC, StockName ASC " +
                         "OFFSET ? ROWS " +
                         "FETCH NEXT ? ROWS ONLY");
 
@@ -821,10 +820,9 @@ public class StockDAO {
 
     public static List<Stock> getInventory(LocalDate from, LocalDate to) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT Stocks.* FROM Stocks LEFT JOIN StockEntryLogs " +
-                        "ON StockEntryLogs.StockID=Stocks.id " +
-                        "WHERE IsTrashed=0 AND StockEntryLogs.UpdatedAt BETWEEN ? AND ? " +
-                        "ORDER BY StockEntryLogs.UpdatedAt");
+                "SELECT * FROM Stocks "+
+                        "WHERE IsTrashed=0 AND UpdatedAt BETWEEN ? AND ? " +
+                        "ORDER BY UpdatedAt ASC, StockName ASC");
 
         ps.setDate(1, Date.valueOf(from));
         ps.setDate(2, Date.valueOf(to));
@@ -873,7 +871,8 @@ public class StockDAO {
      */
     public static List<Stock> getStockEntries(LocalDate from, LocalDate to) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT Stocks.*, StockEntryLogs.Price as entryPrice, StockEntryLogs.Quantity as entryQuantity, StockEntryLogs.Source as entrySource, StockEntryLogs.CreatedAt as entryCreatedAt, StockEntryLogs.UpdatedAt as entryUpdatedAt " +
+                "SELECT Stocks.*, StockEntryLogs.id as entryID, StockEntryLogs.Price as entryPrice, StockEntryLogs.Quantity as entryQuantity, StockEntryLogs.Source as entrySource, " +
+                        "StockEntryLogs.CreatedAt as entryCreatedAt, StockEntryLogs.UpdatedAt as entryUpdatedAt, StockEntryLogs.UserID as entryUserID " +
                         "FROM Stocks LEFT JOIN StockEntryLogs " +
                         "ON StockEntryLogs.StockID=Stocks.id " +
                         "WHERE IsTrashed=0 AND StockEntryLogs.CreatedAt BETWEEN ? AND ? " +
@@ -897,20 +896,29 @@ public class StockDAO {
                     rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
                     rs.getInt("TypeID"),
                     rs.getString("Unit"),
-                    rs.getInt("entryQuantity"),
+                    rs.getInt("Quantity"),
                     rs.getInt("Critical"),
-                    rs.getDouble("entryPrice"),
+                    rs.getDouble("Price"),
                     rs.getString("NEACode"),
                     rs.getBoolean("IsTrashed"),
                     rs.getString("Comments"),
-                    rs.getTimestamp("entryCreatedAt")!=null ? rs.getTimestamp("entryCreatedAt").toLocalDateTime() : null,
-                    rs.getTimestamp("entryUpdatedAt")!=null ? rs.getTimestamp("entryUpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
                     rs.getInt("UserIDCreated"),
                     rs.getInt("UserIDUpdated"),
                     rs.getInt("UserIDTrashed")
             );
-            stock.setSource(rs.getString("entrySource"));
+            StockEntryLog log = new StockEntryLog();
+            log.setId(rs.getInt("entryID"));
+            log.setStockID(rs.getInt("id"));
+            log.setSource(rs.getString("entrySource"));
+            log.setPrice(rs.getDouble("entryPrice"));
+            log.setQuantity(rs.getInt("entryQuantity"));
+            log.setUserID(rs.getInt("entryUserID"));
+            log.setCreatedAt(rs.getTimestamp("entryCreatedAt")!=null ? rs.getTimestamp("entryCreatedAt").toLocalDateTime() : null);
+            log.setUpdatedAt(rs.getTimestamp("entryUpdatedAt")!=null ? rs.getTimestamp("entryUpdatedAt").toLocalDateTime() : null);
+            stock.setEntryLog(log);
             stocks.add(stock);
         }
 
@@ -929,7 +937,8 @@ public class StockDAO {
      */
     public static List<Stock> getStockEntries(LocalDate from, LocalDate to, int limit, int offset) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT Stocks.*, StockEntryLogs.Price as entryPrice, StockEntryLogs.Quantity as entryQuantity, StockEntryLogs.Source as entrySource, StockEntryLogs.CreatedAt as entryCreatedAt, StockEntryLogs.UpdatedAt as entryUpdatedAt " +
+                "SELECT Stocks.*, StockEntryLogs.id as entryID, StockEntryLogs.Price as entryPrice, StockEntryLogs.Quantity as entryQuantity, StockEntryLogs.Source as entrySource, " +
+                        "StockEntryLogs.CreatedAt as entryCreatedAt, StockEntryLogs.UpdatedAt as entryUpdatedAt, StockEntryLogs.UserID as entryUserID " +
                         "FROM Stocks LEFT JOIN StockEntryLogs " +
                         "ON StockEntryLogs.StockID=Stocks.id " +
                         "WHERE IsTrashed=0 AND StockEntryLogs.CreatedAt BETWEEN ? AND ? " +
@@ -957,20 +966,29 @@ public class StockDAO {
                     rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
                     rs.getInt("TypeID"),
                     rs.getString("Unit"),
-                    rs.getInt("entryQuantity"),
+                    rs.getInt("Quantity"),
                     rs.getInt("Critical"),
-                    rs.getDouble("entryPrice"),
+                    rs.getDouble("Price"),
                     rs.getString("NEACode"),
                     rs.getBoolean("IsTrashed"),
                     rs.getString("Comments"),
-                    rs.getTimestamp("entryCreatedAt")!=null ? rs.getTimestamp("entryCreatedAt").toLocalDateTime() : null,
-                    rs.getTimestamp("entryUpdatedAt")!=null ? rs.getTimestamp("entryUpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
                     rs.getInt("UserIDCreated"),
                     rs.getInt("UserIDUpdated"),
                     rs.getInt("UserIDTrashed")
             );
-            stock.setSource(rs.getString("entrySource"));
+            StockEntryLog log = new StockEntryLog();
+            log.setId(rs.getInt("entryID"));
+            log.setStockID(rs.getInt("id"));
+            log.setSource(rs.getString("entrySource"));
+            log.setPrice(rs.getDouble("entryPrice"));
+            log.setQuantity(rs.getInt("entryQuantity"));
+            log.setUserID(rs.getInt("entryUserID"));
+            log.setCreatedAt(rs.getTimestamp("entryCreatedAt")!=null ? rs.getTimestamp("entryCreatedAt").toLocalDateTime() : null);
+            log.setUpdatedAt(rs.getTimestamp("entryUpdatedAt")!=null ? rs.getTimestamp("entryUpdatedAt").toLocalDateTime() : null);
+            stock.setEntryLog(log);
             stocks.add(stock);
         }
 
@@ -988,10 +1006,12 @@ public class StockDAO {
      */
     public static List<Stock> getReleasedStocks(LocalDate from, LocalDate to) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT Stocks.*, Releasing.Price as releasedPrice, Releasing.Quantity as releasedQuantity, Releasing.CreatedAt as releasedCreatedAt, Releasing.UpdatedAt as releasedUpdatedAt " +
+                "SELECT Stocks.*, Releasing.id as releasedID, Releasing.MIRSID as releasedMIRSID, Releasing.Quantity as releasedQuantity, " +
+                        "Releasing.Price as releasedPrice, Releasing.UserID as releasedUserID, Releasing.Status as releasedStatus, " +
+                        "Releasing.CreatedAt as releasedCreatedAt, Releasing.UpdatedAt as releasedUpdatedAt " +
                         "FROM Stocks LEFT JOIN Releasing " +
                         "ON Releasing.StockID=Stocks.id " +
-                        "WHERE IsTrashed=0 AND Releasing.UpdatedAt BETWEEN ? AND ? AND Releasing.Status='Approved' " +
+                        "WHERE IsTrashed=0 AND Releasing.CreatedAt BETWEEN ? AND ? AND Releasing.Status='Approved' " +
                         "ORDER BY Releasing.UpdatedAt ASC, Stocks.StockName ASC");
 
         ps.setDate(1, Date.valueOf(from));
@@ -1012,19 +1032,30 @@ public class StockDAO {
                     rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
                     rs.getInt("TypeID"),
                     rs.getString("Unit"),
-                    rs.getInt("releasedQuantity"),
+                    rs.getInt("Quantity"),
                     rs.getInt("Critical"),
-                    rs.getDouble("releasedPrice"),
+                    rs.getDouble("Price"),
                     rs.getString("NEACode"),
                     rs.getBoolean("IsTrashed"),
                     rs.getString("Comments"),
-                    rs.getTimestamp("releasedCreatedAt")!=null ? rs.getTimestamp("releasedCreatedAt").toLocalDateTime() : null,
-                    rs.getTimestamp("releasedUpdatedAt")!=null ? rs.getTimestamp("releasedUpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
                     rs.getInt("UserIDCreated"),
                     rs.getInt("UserIDUpdated"),
                     rs.getInt("UserIDTrashed")
             );
+            Releasing log = new Releasing();
+            log.setId(rs.getInt("releasedID"));
+            log.setStockID(rs.getInt("id"));
+            log.setMirsID(rs.getInt("releasedMIRSID"));
+            log.setStatus(rs.getString("releasedStatus"));
+            log.setPrice(rs.getDouble("releasedPrice"));
+            log.setQuantity(rs.getInt("releasedQuantity"));
+            log.setUserID(rs.getInt("releasedUserID"));
+            log.setCreatedAt(rs.getTimestamp("releasedCreatedAt")!=null ? rs.getTimestamp("releasedCreatedAt").toLocalDateTime() : null);
+            log.setUpdatedAt(rs.getTimestamp("releasedUpdatedAt")!=null ? rs.getTimestamp("releasedUpdatedAt").toLocalDateTime() : null);
+            stock.setReleasing(log);
             stocks.add(stock);
         }
 
@@ -1043,7 +1074,9 @@ public class StockDAO {
      */
     public static List<Stock> getReleasedStocks(LocalDate from, LocalDate to, int limit, int offset) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT Stocks.*, Releasing.Price as releasedPrice, Releasing.Quantity as releasedQuantity, Releasing.CreatedAt as releasedCreatedAt, Releasing.UpdatedAt as releasedUpdatedAt " +
+                "SELECT Stocks.*, Releasing.id as releasedID, Releasing.MIRSID as releasedMIRSID, Releasing.Quantity as releasedQuantity, " +
+                        "Releasing.Price as releasedPrice, Releasing.UserID as releasedUserID, Releasing.Status as releasedStatus, " +
+                        "Releasing.CreatedAt as releasedCreatedAt, Releasing.UpdatedAt as releasedUpdatedAt " +
                         "FROM Stocks LEFT JOIN Releasing " +
                         "ON Releasing.StockID=Stocks.id " +
                         "WHERE IsTrashed=0 AND Releasing.UpdatedAt BETWEEN ? AND ? AND Releasing.Status='Approved' " +
