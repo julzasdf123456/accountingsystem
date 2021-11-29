@@ -28,7 +28,8 @@ public class Stock {
     private int userIDUpdated;
     private int userIDTrashed;
 
-    private String source;
+    private StockEntryLog entryLog;
+    private Releasing releasing;
 
     public Stock() {}
 
@@ -242,11 +243,19 @@ public class Stock {
         this.userIDTrashed = userIDTrashed;
     }
 
-    public String getSource() {
-        return source;
+    public StockEntryLog getEntryLog() {
+        return entryLog;
     }
 
-    public void setSource(String source) {
-        this.source = source;
+    public void setEntryLog(StockEntryLog entryLog) {
+        this.entryLog = entryLog;
+    }
+
+    public Releasing getReleasing() {
+        return releasing;
+    }
+
+    public void setReleasing(Releasing releasing) {
+        this.releasing = releasing;
     }
 }
