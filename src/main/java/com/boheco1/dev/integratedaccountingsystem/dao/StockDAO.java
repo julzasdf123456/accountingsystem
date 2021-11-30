@@ -770,18 +770,23 @@ public class StockDAO {
         return entryLogs;
     }
 
-    public static List<Stock> getInventory(LocalDate from, LocalDate to, int limit, int offset) throws Exception {
+    /**
+     * Get the current stock inventories. Used in InventoryReport.
+     * @param limit limit of rows per page
+     * @param offset page number in the result set
+     * @return The list of current stocks for this particular date
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<Stock> getInventory(int limit, int offset) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM Stocks "+
-                        "WHERE IsTrashed=0 AND UpdatedAt BETWEEN ? AND ? " +
-                        "ORDER BY UpdatedAt ASC, StockName ASC " +
+                        "WHERE IsTrashed=0 " +
+                        "ORDER BY StockName ASC, Quantity DESC "+
                         "OFFSET ? ROWS " +
                         "FETCH NEXT ? ROWS ONLY");
 
-        ps.setDate(1, Date.valueOf(from));
-        ps.setDate(2, Date.valueOf(to));
-        ps.setInt(3, offset);
-        ps.setInt(4, limit);
+        ps.setInt(1, offset);
+        ps.setInt(2, limit);
 
         ResultSet rs = ps.executeQuery();
         ArrayList<Stock> stocks = new ArrayList<>();
@@ -818,14 +823,16 @@ public class StockDAO {
         return stocks;
     }
 
-    public static List<Stock> getInventory(LocalDate from, LocalDate to) throws Exception {
+    /**
+     * Get the current stock inventories. Used in InventoryReport.
+     * @return The list of current stocks for this particular date
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<Stock> getInventory() throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM Stocks "+
-                        "WHERE IsTrashed=0 AND UpdatedAt BETWEEN ? AND ? " +
-                        "ORDER BY UpdatedAt ASC, StockName ASC");
-
-        ps.setDate(1, Date.valueOf(from));
-        ps.setDate(2, Date.valueOf(to));
+                "SELECT * FROM Stocks " +
+                        "WHERE IsTrashed=0 "+
+                        "ORDER BY StockName ASC, Quantity DESC");
 
         ResultSet rs = ps.executeQuery();
         ArrayList<Stock> stocks = new ArrayList<>();
@@ -1118,47 +1125,6 @@ public class StockDAO {
                     rs.getInt("UserIDTrashed")
             );
             stocks.add(stock);
-        }
-
-        rs.close();
-        ps.close();
-        return stocks;
-    }
-
-    public static List<Stock> getInventory() throws Exception {
-        PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM Stocks " +
-                        "WHERE IsTrashed=0 "+
-                        "ORDER BY UpdatedAt, StockName, Quantity DESC");
-
-        ResultSet rs = ps.executeQuery();
-        ArrayList<Stock> stocks = new ArrayList<>();
-
-        while(rs.next()) {
-            stocks.add(new Stock(
-                    rs.getInt("id"),
-                    rs.getString("StockName"),
-                    rs.getString("Description"),
-                    rs.getString("SerialNumber"),
-                    rs.getString("Brand"),
-                    rs.getString("Model"),
-                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
-                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
-                    rs.getInt("TypeID"),
-                    rs.getString("Unit"),
-                    rs.getInt("Quantity"),
-                    rs.getInt("Critical"),
-                    rs.getDouble("Price"),
-                    rs.getString("NEACode"),
-                    rs.getBoolean("IsTrashed"),
-                    rs.getString("Comments"),
-                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
-                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
-                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
-                    rs.getInt("UserIDCreated"),
-                    rs.getInt("UserIDUpdated"),
-                    rs.getInt("UserIDTrashed")
-            ));
         }
 
         rs.close();
