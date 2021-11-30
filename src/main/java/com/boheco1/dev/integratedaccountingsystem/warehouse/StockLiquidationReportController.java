@@ -8,13 +8,13 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.SubMenuHelper;
 import com.boheco1.dev.integratedaccountingsystem.objects.Releasing;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
-import com.boheco1.dev.integratedaccountingsystem.objects.StockEntryLog;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.DatePicker;
@@ -117,127 +117,140 @@ public class StockLiquidationReportController extends MenuControllerHandler impl
             fileChooser.setInitialFileName("stock_liquidation_report_"+LocalDate.now()+".xlsx");
             File selectedFile = fileChooser.showSaveDialog(stage);
             if (selectedFile != null) {
-                try (OutputStream fileOut = new FileOutputStream(selectedFile)) {
-                    //Create the ExcelBuilder
-                    ExcelBuilder doc = new ExcelBuilder(10);
+                // Create a background Task
+                Task<Void> task = new Task<>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        try (OutputStream fileOut = new FileOutputStream(selectedFile)) {
+                            //Create the ExcelBuilder
+                            ExcelBuilder doc = new ExcelBuilder(10);
 
-                    doc.setTitle("Stock Liquidation Report");
+                            doc.setTitle("Stock Liquidation Report");
 
-                    //Set the margin
-                    doc.setMargin(1, 0.5, 1, 0.5);
+                            //Set the margin
+                            doc.setMargin(1, 0.5, 1, 0.5);
 
-                    //Create the header
-                    doc.createHeader();
+                            //Create the header
+                            doc.createHeader();
 
-                    //Create the title
-                    doc.createTitle(5, "Period of " + from.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")) + " - " + to.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+                            //Create the title
+                            doc.createTitle(5, "Period of " + from.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")) + " - " + to.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")));
 
-                    Sheet sheet = doc.getSheet();
+                            Sheet sheet = doc.getSheet();
 
-                    //Create the table header
-                    int row = 9;
-                    Font font = doc.getWb().createFont();
-                    font.setFontHeightInPoints((short)11);
-                    font.setFontName("Arial");
-                    CellStyle style = doc.getWb().createCellStyle();
-                    style.setAlignment(HorizontalAlignment.CENTER);
-                    style.setFont(font);
+                            //Create the table header
+                            int row = 9;
+                            Font font = doc.getWb().createFont();
+                            font.setFontHeightInPoints((short) 11);
+                            font.setFontName("Arial");
+                            CellStyle style = doc.getWb().createCellStyle();
+                            style.setAlignment(HorizontalAlignment.CENTER);
+                            style.setFont(font);
 
-                    Row table_header = sheet.createRow(row);
+                            Row table_header = sheet.createRow(row);
 
-                    Cell entry_cell = table_header.createCell(0);
-                    entry_cell.setCellValue("DATE");
-                    doc.styleBorder(entry_cell, 11, HorizontalAlignment.CENTER, false);
+                            Cell entry_cell = table_header.createCell(0);
+                            entry_cell.setCellValue("DATE");
+                            doc.styleBorder(entry_cell, 11, HorizontalAlignment.CENTER, false);
 
-                    Cell stock_cell = table_header.createCell(1);
-                    stock_cell.setCellValue("STOCK NAME");
-                    CellRangeAddress stock_cell_addr = new CellRangeAddress(row, row, 1, 2);
-                    stock_cell.setCellStyle(style);
-                    sheet.addMergedRegion(stock_cell_addr);
-                    doc.styleMergedCells(stock_cell_addr);
+                            Cell stock_cell = table_header.createCell(1);
+                            stock_cell.setCellValue("STOCK NAME");
+                            CellRangeAddress stock_cell_addr = new CellRangeAddress(row, row, 1, 2);
+                            stock_cell.setCellStyle(style);
+                            sheet.addMergedRegion(stock_cell_addr);
+                            doc.styleMergedCells(stock_cell_addr);
 
-                    Cell desc_cell = table_header.createCell(3);
-                    desc_cell.setCellValue("DESCRIPTION");
-                    CellRangeAddress desc_cell_addr = new CellRangeAddress(row, row, 3, 6);
-                    desc_cell.setCellStyle(style);
-                    sheet.addMergedRegion(desc_cell_addr);
-                    doc.styleMergedCells(desc_cell_addr);
+                            Cell desc_cell = table_header.createCell(3);
+                            desc_cell.setCellValue("DESCRIPTION");
+                            CellRangeAddress desc_cell_addr = new CellRangeAddress(row, row, 3, 6);
+                            desc_cell.setCellStyle(style);
+                            sheet.addMergedRegion(desc_cell_addr);
+                            doc.styleMergedCells(desc_cell_addr);
 
-                    Cell unit_cell = table_header.createCell(7);
-                    unit_cell.setCellValue("UNIT");
-                    doc.styleBorder(unit_cell, 11, HorizontalAlignment.CENTER, false);
+                            Cell unit_cell = table_header.createCell(7);
+                            unit_cell.setCellValue("UNIT");
+                            doc.styleBorder(unit_cell, 11, HorizontalAlignment.CENTER, false);
 
-                    Cell price_cell = table_header.createCell(8);
-                    price_cell.setCellValue("PRICE");
-                    doc.styleBorder(price_cell, 11, HorizontalAlignment.CENTER, false);
+                            Cell price_cell = table_header.createCell(8);
+                            price_cell.setCellValue("PRICE");
+                            doc.styleBorder(price_cell, 11, HorizontalAlignment.CENTER, false);
 
-                    Cell qty_cell = table_header.createCell(9);
-                    qty_cell.setCellValue("QTY");
-                    doc.styleBorder(qty_cell, 11, HorizontalAlignment.CENTER, false);
+                            Cell qty_cell = table_header.createCell(9);
+                            qty_cell.setCellValue("QTY");
+                            doc.styleBorder(qty_cell, 11, HorizontalAlignment.CENTER, false);
 
-                    //Get stock entries from database
-                    List<Stock> stocks = StockDAO.getReleasedStocks(from, to);
+                            //Get stock entries from database
+                            List<Stock> stocks = StockDAO.getReleasedStocks(from, to);
 
-                    int stocks_row = row + 1;
+                            int stocks_row = row + 1;
 
-                    Font font2 = doc.getWb().createFont();
-                    font2.setFontHeightInPoints((short)10);
-                    font2.setFontName("Arial");
-                    CellStyle style2 = doc.getWb().createCellStyle();
-                    style2.setAlignment(HorizontalAlignment.LEFT);
-                    style2.setFont(font2);
+                            Font font2 = doc.getWb().createFont();
+                            font2.setFontHeightInPoints((short) 10);
+                            font2.setFontName("Arial");
+                            CellStyle style2 = doc.getWb().createCellStyle();
+                            style2.setAlignment(HorizontalAlignment.LEFT);
+                            style2.setFont(font2);
 
-                    Row row_header = sheet.createRow(stocks_row);
-                    Cell current_entry, current_stock, current_desc, current_unit, current_price, current_qty;
-                    CellRangeAddress sname_addr, sdec_addr;
+                            Row row_header = sheet.createRow(stocks_row);
+                            Cell current_entry, current_stock, current_desc, current_unit, current_price, current_qty;
+                            CellRangeAddress sname_addr, sdec_addr;
 
-                    //For every stock, set the stock data in the appropriate cells per row
-                    for (Stock stock : stocks) {
+                            //For every stock, set the stock data in the appropriate cells per row
+                            for (Stock stock : stocks) {
 
-                        Releasing item = stock.getReleasing();
-                        row += 1;
-                        row_header = sheet.createRow(row);
+                                Releasing item = stock.getReleasing();
+                                row += 1;
+                                row_header = sheet.createRow(row);
 
-                        current_entry = row_header.createCell(0);
-                        current_entry.setCellValue(item.getCreatedAt().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")));
-                        doc.styleBorder(current_entry, 10, HorizontalAlignment.CENTER, false);
+                                current_entry = row_header.createCell(0);
+                                current_entry.setCellValue(item.getCreatedAt().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+                                doc.styleBorder(current_entry, 10, HorizontalAlignment.CENTER, false);
 
-                        current_stock = row_header.createCell(1);
-                        current_stock.setCellValue(stock.getStockName());
-                        sname_addr = new CellRangeAddress(row, row, 1, 2);
-                        current_stock.setCellStyle(style2);
-                        sheet.addMergedRegion(sname_addr);
-                        doc.styleMergedCells(sname_addr);
+                                current_stock = row_header.createCell(1);
+                                current_stock.setCellValue(stock.getStockName());
+                                sname_addr = new CellRangeAddress(row, row, 1, 2);
+                                current_stock.setCellStyle(style2);
+                                sheet.addMergedRegion(sname_addr);
+                                doc.styleMergedCells(sname_addr);
 
-                        current_desc = row_header.createCell(3);
-                        current_desc.setCellValue(stock.getDescription());
-                        sdec_addr = new CellRangeAddress(row, row, 3, 6);
-                        current_desc.setCellStyle(style2);
-                        sheet.addMergedRegion(sdec_addr);
-                        doc.styleMergedCells(sdec_addr);
+                                current_desc = row_header.createCell(3);
+                                current_desc.setCellValue(stock.getDescription());
+                                sdec_addr = new CellRangeAddress(row, row, 3, 6);
+                                current_desc.setCellStyle(style2);
+                                sheet.addMergedRegion(sdec_addr);
+                                doc.styleMergedCells(sdec_addr);
 
-                        current_unit = row_header.createCell(7);
-                        current_unit.setCellValue(stock.getUnit());
-                        doc.styleBorder(current_unit, 10, HorizontalAlignment.CENTER, false);
+                                current_unit = row_header.createCell(7);
+                                current_unit.setCellValue(stock.getUnit());
+                                doc.styleBorder(current_unit, 10, HorizontalAlignment.CENTER, false);
 
-                        current_price = row_header.createCell(8);
-                        current_price.setCellValue(item.getPrice());
-                        doc.styleBorder(current_price, 10, HorizontalAlignment.LEFT, false);
+                                current_price = row_header.createCell(8);
+                                current_price.setCellValue(item.getPrice());
+                                doc.styleBorder(current_price, 10, HorizontalAlignment.LEFT, false);
 
-                        current_qty = row_header.createCell(9);
-                        current_qty.setCellValue(item.getQuantity());
-                        doc.styleBorder(current_qty, 10, HorizontalAlignment.LEFT, false);
+                                current_qty = row_header.createCell(9);
+                                current_qty.setCellValue(item.getQuantity());
+                                doc.styleBorder(current_qty, 10, HorizontalAlignment.LEFT, false);
+                            }
+
+                            //Create the signatorees
+                            doc.createSignatorees(stocks.size() + 13);
+
+                            //Save the excel file
+                            doc.save(fileOut);
+                        } catch (Exception e) {
+                            AlertDialogBuilder.messgeDialog("System Warning", "Process failed due to: " + e.getMessage(),
+                                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                        }
+                        return null;
                     }
+                };
 
-                    //Create the signatorees
-                    doc.createSignatorees(stocks.size() + 13);
+                task.setOnSucceeded(wse -> {
+                    this.showProgressBar(false);
+                });
 
-                    //Save the excel file
-                    doc.save(fileOut);
-                } catch (Exception e) {
-                    AlertDialogBuilder.messgeDialog("System Warning", "Process failed due to: " + e.getMessage(),
-                            stackPane, AlertDialogBuilder.DANGER_DIALOG);
-                }
+                new Thread(task).start();
             }
         }
     }
@@ -315,7 +328,7 @@ public class StockLiquidationReportController extends MenuControllerHandler impl
     }
 
     public void showProgressBar(boolean show){
-        this.downloadReport_btn.setDisable(!show);
+        this.downloadReport_btn.setDisable(show);
         this.progressBar.setVisible(show);
     }
 

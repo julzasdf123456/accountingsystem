@@ -87,14 +87,15 @@
                   </BorderPane>
                </top>
                <bottom>
-                  <Pane prefHeight="16.0" prefWidth="869.0" BorderPane.alignment="CENTER">
-                     <BorderPane.margin>
-                        <Insets />
-                     </BorderPane.margin>
+                  <AnchorPane prefHeight="17.0" prefWidth="869.0" BorderPane.alignment="CENTER">
                      <children>
-                        <ProgressBar fx:id="progressBar" layoutX="652.0" layoutY="4.0" prefHeight="7.0" prefWidth="201.0" />
+                        <ProgressBar fx:id="progressBar" prefHeight="12.0" prefWidth="175.0" AnchorPane.rightAnchor="0.0">
+                           <padding>
+                              <Insets right="16.0" top="2.0" />
+                           </padding>
+                        </ProgressBar>
                      </children>
-                  </Pane>
+                  </AnchorPane>
                </bottom>
             </BorderPane>
          </children>
