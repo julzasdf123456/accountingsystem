@@ -106,7 +106,7 @@
                                     <Insets left="18.0" right="18.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="quantity" prefHeight="30.0" prefWidth="59.0" promptText="Qty" />
+                              <JFXTextField fx:id="quantity" labelFloat="true" prefHeight="30.0" prefWidth="59.0" promptText="Qty" style="-fx-background-color: #f5f5f5;" />
                               <JFXTextField fx:id="remarks" labelFloat="true" maxHeight="38.0" maxWidth="474.0" prefHeight="30.0" prefWidth="339.0" promptText="Remarks" style="-fx-background-color: #f5f5f5;" styleClass="jfx-text-field">
                                  <font>
                                     <Font size="14.0" />

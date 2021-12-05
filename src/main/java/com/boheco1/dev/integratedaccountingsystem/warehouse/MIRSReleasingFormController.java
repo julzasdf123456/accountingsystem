@@ -25,6 +25,7 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import javax.swing.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,9 +57,12 @@ public class MIRSReleasingFormController implements Initializable {
     @FXML
     private TableColumn<MIRSItem, Integer> quantityCol;
     @FXML
+
     private TableView particularsTable;
-    private Stock stock = null;
+    private Stock selectedStock = null;
     private ObservableList<MIRSItem> requestItem = null;
+
+    private boolean isEditingItem = false;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         bindParticularsAutocomplete(particulars);
@@ -131,7 +135,15 @@ public class MIRSReleasingFormController implements Initializable {
                                         btn.setOnAction(event -> {
                                             MIRSItem mirsItem = getTableView().getItems().get(getIndex());
                                             try {
-
+                                                selectedStock = StockDAO.get(mirsItem.getStockID());
+                                                int av = StockDAO.countAvailable(selectedStock);
+                                                particulars.setText(selectedStock.getStockName());
+                                                quantity.setText(""+mirsItem.getQuantity());
+                                                remarks.setText(mirsItem.getRemarks());
+                                                inStock.setText("In Stock: "+ selectedStock.getQuantity());
+                                                pending.setText("Pending: "+ StockDAO.countPendingRequest(selectedStock));
+                                                available.setText("Available: "+ av);
+                                                isEditingItem = true;
                                             } catch (Exception e) {
                                                 e.printStackTrace();
                                             }
@@ -216,7 +228,7 @@ public class MIRSReleasingFormController implements Initializable {
                 ReleasingDAO.add(releasing);
                 Stock temp = new Stock(); //temp stock object for quantity deduction
                 temp.setId(mirsItem.getStockID());
-                temp.setQuantity(stock.getQuantity());
+                temp.setQuantity(selectedStock.getQuantity());
                 StockDAO.deductStockQuantity(temp, mirsItem.getQuantity());
             }
 
@@ -230,34 +242,35 @@ public class MIRSReleasingFormController implements Initializable {
     @FXML
     private void addBtn(ActionEvent event) {
         try{
-            if(stock == null){
+            if(selectedStock == null){
                 AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
                         stackPane, AlertDialogBuilder.DANGER_DIALOG);
                 return;
-            }else if(Integer.parseInt(quantity.getText()) > StockDAO.countAvailable(stock)) {
+            }else if(Integer.parseInt(quantity.getText()) > StockDAO.countAvailable(selectedStock)) {
                 AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid request quantity!",
                         stackPane, AlertDialogBuilder.DANGER_DIALOG);
                 return;
             }
 
-            for(MIRSItem added: requestItem){
-                if(added.getStockID() == stock.getId()){
-                    AlertDialogBuilder.messgeDialog("System Warning", "Item already added, please use edit item option instead.",
-                            stackPane, AlertDialogBuilder.WARNING_DIALOG);
-                    return;
+            if(isEditingItem){
+                for(MIRSItem added: requestItem) {
+                    if (added.getStockID() == selectedStock.getId()) {
+                        requestItem.remove(added);
+                        break;
+                    }
                 }
             }
 
             MIRSItem mirsItem = new MIRSItem();
             mirsItem.setMirsID(Integer.parseInt(mirsNum.getText()));
-            mirsItem.setStockID(stock.getId());
-            mirsItem.setParticulars(stock.getStockName());
-            mirsItem.setUnit(stock.getUnit());
+            mirsItem.setStockID(selectedStock.getId());
+            mirsItem.setParticulars(selectedStock.getStockName());
+            mirsItem.setUnit(selectedStock.getUnit());
             mirsItem.setQuantity(Integer.parseInt(quantity.getText()));
-            mirsItem.setPrice(stock.getPrice());
+            mirsItem.setPrice(selectedStock.getPrice());
             mirsItem.setRemarks(remarks.getText());
 
-            stock = null; //set to null for validation
+            selectedStock = null; //set to null for validation
             requestItem.add(mirsItem);
             particularsTable.setItems(requestItem);
 
@@ -294,7 +307,9 @@ public class MIRSReleasingFormController implements Initializable {
                     }
 
                     if (list.size() == 0) {
-                        stock = null;
+                        selectedStock = null;
+                        quantity.setText("");
+                        remarks.setText("");
                     }
 
                     return list;
@@ -315,10 +330,35 @@ public class MIRSReleasingFormController implements Initializable {
         stockSuggest.setOnAutoCompleted(event -> {
             SlimStock result = event.getCompletion();
             try {
-                stock = StockDAO.get(result.getId());
-                inStock.setText("In Stock: "+stock.getQuantity());
-                pending.setText("Pending: "+ StockDAO.countPendingRequest(stock));
-                int av = StockDAO.countAvailable(stock);
+                selectedStock = StockDAO.get(result.getId());
+                int av = StockDAO.countAvailable(selectedStock);
+                if(av == 0) {
+                    AlertDialogBuilder.messgeDialog("System Warning", "Insufficient stock.",
+                            stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                    particulars.setText("");
+                    quantity.setText("");
+                    particulars.requestFocus();
+                    inStock.setText("In Stock: 0");
+                    pending.setText("Pending: 0");
+                    available.setText("Available: 0");
+                    return;
+                }
+                for(MIRSItem added: requestItem){
+                    if(added.getStockID() == result.getId()){
+                        AlertDialogBuilder.messgeDialog("System Warning", "Item already added, please use edit item option instead.",
+                                stackPane, AlertDialogBuilder.WARNING_DIALOG);
+                        particulars.setText("");
+                        quantity.setText("");
+                        particulars.requestFocus();
+                        inStock.setText("In Stock: 0");
+                        pending.setText("Pending: 0");
+                        available.setText("Available: 0");
+                        return;
+                    }
+                }
+
+                inStock.setText("In Stock: "+ selectedStock.getQuantity());
+                pending.setText("Pending: "+ StockDAO.countPendingRequest(selectedStock));
                 available.setText("Available: "+ av);
             } catch (Exception e) {
                 AlertDialogBuilder.messgeDialog("System Error", "bindParticularsAutocomplete(): "+e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
