@@ -1140,7 +1140,7 @@ public class StockDAO {
      */
     public static int countPendingRequest(Stock stock) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT SUM(Quantity) AS 'pending' FROM MIRSItems mi LEFT JOIN MIRS m ON m.id = mi.MIRSID WHERE m.Status = 'Pending' AND mi.StockID = ?; ");
+                "SELECT SUM(Quantity) AS 'pending' FROM MIRSItems mi LEFT JOIN MIRS m ON m.id = mi.MIRSID WHERE (m.Status = 'Pending' OR m.Status = 'Releasing') AND mi.StockID = ?; ");
         ps.setInt(1, stock.getId());
         ResultSet rs = ps.executeQuery();
 
