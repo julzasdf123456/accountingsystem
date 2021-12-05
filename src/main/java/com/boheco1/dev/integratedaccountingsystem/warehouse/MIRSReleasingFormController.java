@@ -1,16 +1,13 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
-import com.boheco1.dev.integratedaccountingsystem.dao.MIRSSignatoryDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.MirsDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ColorPalette;
-import com.boheco1.dev.integratedaccountingsystem.helpers.ModalBuilder;
+import com.boheco1.dev.integratedaccountingsystem.helpers.InputValidation;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
-import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
-import com.boheco1.dev.integratedaccountingsystem.objects.MIRSItem;
-import com.boheco1.dev.integratedaccountingsystem.objects.MIRSSignatory;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
+import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXTextField;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,9 +20,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.TextFields;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -41,7 +42,13 @@ public class MIRSReleasingFormController implements Initializable {
     private TextArea details, purpose;
 
     @FXML
-    private Label mirsNumber, date, requisitioner, dm, gm;
+    private JFXTextField particulars, remarks, quantity;
+
+    @FXML
+    private Label available, inStock, pending;
+
+    @FXML
+    private Label mirsNum, date, requisitioner, dm, gm;
 
     @FXML
     private TableColumn<MIRSItem, String> codeCol, unitCol, particularsCol, remarksCol, editCol, deleteCol;
@@ -49,17 +56,19 @@ public class MIRSReleasingFormController implements Initializable {
     @FXML
     private TableColumn<MIRSItem, Integer> quantityCol;
     @FXML
-    private TableView tableView;
-    private ObservableList<MIRSItem> observableList = null;
-
+    private TableView particularsTable;
+    private Stock stock = null;
+    private ObservableList<MIRSItem> requestItem = null;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        bindParticularsAutocomplete(particulars);
+        InputValidation.restrictNumbersOnly(quantity);
         try {
             MIRS mirs = MirsDAO.getMIRS(Utility.getActiveMIRS().getId());
             List<MIRSItem> mirsItemList = MirsDAO.getItems(mirs);
             List<MIRSSignatory> mirsSignatoryList = MIRSSignatoryDAO.get(mirs);
 
-            mirsNumber.setText(""+mirs.getId());
+            mirsNum.setText(""+mirs.getId());
             date.setText(""+mirs.getDateFiled());
             purpose.setText(mirs.getPurpose());
             details.setText(mirs.getDetails());
@@ -67,9 +76,10 @@ public class MIRSReleasingFormController implements Initializable {
             dm.setText(""+ UserDAO.get(mirsSignatoryList.get(0).getUserID()).getFullName());
             gm.setText(""+ UserDAO.get(mirsSignatoryList.get(1).getUserID()).getFullName());
 
-            observableList = FXCollections.observableArrayList(mirsItemList);
+            requestItem = FXCollections.observableArrayList(mirsItemList);
 
             codeCol.setCellValueFactory(new PropertyValueFactory<>("StockID"));
+            codeCol.setStyle("-fx-alignment: center-left;");
 
             particularsCol.setCellValueFactory(cellData -> {
                 try {
@@ -79,6 +89,7 @@ public class MIRSReleasingFormController implements Initializable {
                 }
                 return null;
             });
+            particularsCol.setStyle("-fx-alignment: center-left;");
 
             unitCol.setCellValueFactory(cellData -> {
                 try {
@@ -88,8 +99,11 @@ public class MIRSReleasingFormController implements Initializable {
                 }
                 return null;
             });
+            unitCol.setStyle("-fx-alignment: center;");
             quantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
+            quantityCol.setStyle("-fx-alignment: center-left;");
             remarksCol.setCellValueFactory(new PropertyValueFactory<>("Remarks"));
+            remarksCol.setStyle("-fx-alignment: center-left;");
 
             editCol.setStyle("-fx-alignment: center;");
             Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> editBtn
@@ -158,8 +172,8 @@ public class MIRSReleasingFormController implements Initializable {
                                         btn.setOnAction(event -> {
                                             MIRSItem mirsItem = getTableView().getItems().get(getIndex());
                                             try {
-                                                observableList.remove(mirsItem);
-                                                tableView.setItems(observableList);
+                                                requestItem.remove(mirsItem);
+                                                particularsTable.setItems(requestItem);
                                             } catch (Exception e) {
                                                 e.printStackTrace();
                                             }
@@ -176,9 +190,9 @@ public class MIRSReleasingFormController implements Initializable {
 
 
 
-            tableView.setFixedCellSize(35);
-            tableView.setPlaceholder(new Label("No rows to display"));
-            tableView.getItems().setAll(observableList);
+            particularsTable.setFixedCellSize(35);
+            particularsTable.setPlaceholder(new Label("No rows to display"));
+            particularsTable.getItems().setAll(requestItem);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -188,9 +202,25 @@ public class MIRSReleasingFormController implements Initializable {
     @FXML
     private void acceptBtn(ActionEvent event) {
         try {
-            Utility.getActiveMIRS().setStatus("Releasing");
+            Utility.getActiveMIRS().setStatus("Closed");
             MirsDAO.update(Utility.getActiveMIRS());
-            AlertDialogBuilder.messgeDialog("System Message", "MIRS application approved and ready for releasing.", stackPane, AlertDialogBuilder.INFO_DIALOG);
+
+            for (MIRSItem mirsItem : requestItem){
+                Releasing releasing = new Releasing();
+                releasing.setStockID(mirsItem.getStockID());
+                releasing.setMirsID(mirsItem.getMirsID());
+                releasing.setQuantity(mirsItem.getQuantity());
+                releasing.setPrice(mirsItem.getPrice());
+                releasing.setUserID(ActiveUser.getUser().getId());
+                releasing.setStatus("Released");
+                ReleasingDAO.add(releasing);
+                Stock temp = new Stock(); //temp stock object for quantity deduction
+                temp.setId(mirsItem.getStockID());
+                temp.setQuantity(stock.getQuantity());
+                StockDAO.deductStockQuantity(temp, mirsItem.getQuantity());
+            }
+
+            AlertDialogBuilder.messgeDialog("System Message", "MIRS items released.", stackPane, AlertDialogBuilder.INFO_DIALOG);
             btnHolder.setDisable(true);
         } catch (Exception e) {
             e.printStackTrace();
@@ -199,6 +229,100 @@ public class MIRSReleasingFormController implements Initializable {
 
     @FXML
     private void addBtn(ActionEvent event) {
+        try{
+            if(stock == null){
+                AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
+                        stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                return;
+            }else if(Integer.parseInt(quantity.getText()) > StockDAO.countAvailable(stock)) {
+                AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid request quantity!",
+                        stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                return;
+            }
 
+            for(MIRSItem added: requestItem){
+                if(added.getStockID() == stock.getId()){
+                    AlertDialogBuilder.messgeDialog("System Warning", "Item already added, please use edit item option instead.",
+                            stackPane, AlertDialogBuilder.WARNING_DIALOG);
+                    return;
+                }
+            }
+
+            MIRSItem mirsItem = new MIRSItem();
+            mirsItem.setMirsID(Integer.parseInt(mirsNum.getText()));
+            mirsItem.setStockID(stock.getId());
+            mirsItem.setParticulars(stock.getStockName());
+            mirsItem.setUnit(stock.getUnit());
+            mirsItem.setQuantity(Integer.parseInt(quantity.getText()));
+            mirsItem.setPrice(stock.getPrice());
+            mirsItem.setRemarks(remarks.getText());
+
+            stock = null; //set to null for validation
+            requestItem.add(mirsItem);
+            particularsTable.setItems(requestItem);
+
+            particulars.setText("");
+            quantity.setText("");
+            particulars.requestFocus();
+            inStock.setText("In Stock: 0");
+            pending.setText("Pending: 0");
+            available.setText("Available: 0");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertDialogBuilder.messgeDialog("System Error", e.getMessage(),
+                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }
+    }
+
+    private void bindParticularsAutocomplete(JFXTextField textField){
+        AutoCompletionBinding<SlimStock> stockSuggest = TextFields.bindAutoCompletion(textField,
+                param -> {
+                    //Value typed in the textfield
+                    String query = param.getUserText();
+
+                    //Initialize list of stocks
+                    List<SlimStock> list = new ArrayList<>();
+
+                    //Perform DB query when length of search string is 4 or above
+                    if (query.length() > 3){
+                        try {
+                            list = StockDAO.search(query, 0);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    if (list.size() == 0) {
+                        stock = null;
+                    }
+
+                    return list;
+                }, new StringConverter<>() {
+                    //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
+                    @Override
+                    public String toString(SlimStock object) {
+                        return object.getStockName();
+                    }
+
+                    @Override
+                    public SlimStock fromString(String string) {
+                        throw new UnsupportedOperationException();
+                    }
+                });
+
+        //This will set the actions once the user clicks an item from the popupmenu.
+        stockSuggest.setOnAutoCompleted(event -> {
+            SlimStock result = event.getCompletion();
+            try {
+                stock = StockDAO.get(result.getId());
+                inStock.setText("In Stock: "+stock.getQuantity());
+                pending.setText("Pending: "+ StockDAO.countPendingRequest(stock));
+                int av = StockDAO.countAvailable(stock);
+                available.setText("Available: "+ av);
+            } catch (Exception e) {
+                AlertDialogBuilder.messgeDialog("System Error", "bindParticularsAutocomplete(): "+e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+            }
+        });
     }
 }
