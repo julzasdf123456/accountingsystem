@@ -156,7 +156,6 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
 
         TableColumn<MIRS, String> column4 = new TableColumn<>("Action");
         column4.setStyle("-fx-alignment: center;");
-
         Callback<TableColumn<MIRS, String>, TableCell<MIRS, String>> viewBtn
                 = //
                 new Callback<TableColumn<MIRS, String>, TableCell<MIRS, String>>() {
@@ -202,6 +201,33 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
                 };
         column4.setCellFactory(viewBtn);
 
+        TableColumn<MIRS, String> column5 = new TableColumn<>("Status");
+        column5.setStyle("-fx-alignment: center;");
+        Callback<TableColumn<MIRS, String>, TableCell<MIRS, String>> statusIcon
+                = //
+                new Callback<TableColumn<MIRS, String>, TableCell<MIRS, String>>() {
+                    @Override
+                    public TableCell call(final TableColumn<MIRS, String> param) {
+                        final TableCell<MIRS, String> cell = new TableCell<MIRS, String>() {
+                            Label status = new Label("     ");
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                status.setStyle("-fx-background-color: #f44336; -fx-background-radius: 12");
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    setGraphic(status);
+                                    setText(null);
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+        column5.setCellFactory(statusIcon);
+
         tableView.setFixedCellSize(35);
         tableView.setPlaceholder(new Label("No rows to display"));
         tableView.getColumns().add(column0);
@@ -209,6 +235,10 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
         tableView.getColumns().add(column2);
         tableView.getColumns().add(column3);
         tableView.getColumns().add(column4);
+
+        //display status column only if displaying Pending Approval MIRS
+        if(s.equals("Pending"))
+            tableView.getColumns().add(column5);
     }
 
     public void createTableForCriticalItem(){
