@@ -199,9 +199,6 @@ public class MIRSReleasingFormController implements Initializable {
                         }
                     };
             deleteCol.setCellFactory(removeBtn);
-
-
-
             particularsTable.setFixedCellSize(35);
             particularsTable.setPlaceholder(new Label("No rows to display"));
             particularsTable.getItems().setAll(requestItem);
@@ -226,9 +223,7 @@ public class MIRSReleasingFormController implements Initializable {
                 releasing.setUserID(ActiveUser.getUser().getId());
                 releasing.setStatus("Released");
                 ReleasingDAO.add(releasing);
-                Stock temp = new Stock(); //temp stock object for quantity deduction
-                temp.setId(mirsItem.getStockID());
-                temp.setQuantity(selectedStock.getQuantity());
+                Stock temp = StockDAO.get(mirsItem.getStockID()); //temp stock object for quantity deduction
                 StockDAO.deductStockQuantity(temp, mirsItem.getQuantity());
             }
 
