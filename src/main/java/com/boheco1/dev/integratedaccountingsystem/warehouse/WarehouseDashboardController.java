@@ -5,18 +5,21 @@
 
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
+import com.boheco1.dev.integratedaccountingsystem.HomeController;
 import com.boheco1.dev.integratedaccountingsystem.JournalEntriesController;
 import com.boheco1.dev.integratedaccountingsystem.dao.MirsDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
+import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 import com.jfoenix.controls.JFXButton;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTreeTableView;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -52,6 +55,12 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
     private TableView tableView;
     @FXML
     private Label pendingApprovals_lbl, pendingReleases_lbl, critical_lbl, display_lbl;
+
+    @FXML
+    private JFXComboBox<Integer> page_cb;
+
+    private int LIMIT = HomeController.ROW_PER_PAGE;
+    private int COUNT = 0;
 
     ContextMenuHelper contextMenuHelper = new ContextMenuHelper();
     MenuItem createInventory = new MenuItem("Create Inventory");
@@ -109,8 +118,10 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
 
     @FXML
     void viewCriticalItems(MouseEvent event) {
-        System.out.println("Clicked critical");
-        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(CriticalStockController.class, "../warehouse_critical_stock.fxml"));
+        this.bindPages();
+        this.setCriticalCount();
+        this.initializeCriticalStocks();
+       // Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(CriticalStockController.class, "../warehouse_critical_stock.fxml"));
     }
 
     private void initializedTable(String s){
@@ -200,6 +211,101 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
         tableView.getColumns().add(column4);
     }
 
+    public void createTableForCriticalItem(){
+        tableView.getItems().clear();
+        tableView.getColumns().clear();
+
+        TableColumn<Stock, String> column1 = new TableColumn<>("Stock Name");
+        column1.setMinWidth(150);
+        column1.setCellValueFactory(new PropertyValueFactory<>("stockName"));
+
+        TableColumn<Stock, String> column2 = new TableColumn<>("Description");
+        column2.setMinWidth(300);
+        column2.setCellValueFactory(new PropertyValueFactory<>("description"));
+
+        TableColumn<Stock, String> column3 = new TableColumn<>("Brand");
+        column3.setMinWidth(100);
+        column3.setCellValueFactory(new PropertyValueFactory<>("brand"));
+
+        TableColumn<Stock, String> column4 = new TableColumn<>("Model");
+        column4.setMinWidth(100);
+        column4.setCellValueFactory(new PropertyValueFactory<>("model"));
+
+        TableColumn<Stock, String> column5 = new TableColumn<>("Unit");
+        column5.setCellValueFactory(new PropertyValueFactory<>("unit"));
+
+        TableColumn<Stock, String> column6 = new TableColumn<>("Quantity");
+        column6.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+
+        TableColumn<Stock, String> column7 = new TableColumn<>("Price");
+        column7.setCellValueFactory(new PropertyValueFactory<>("price"));
+        this.tableView.getColumns().removeAll();
+        this.tableView.getColumns().add(column1);
+        this.tableView.getColumns().add(column2);
+        this.tableView.getColumns().add(column3);
+        this.tableView.getColumns().add(column4);
+        this.tableView.getColumns().add(column5);
+        this.tableView.getColumns().add(column7);
+        this.tableView.getColumns().add(column6);
+    }
+
+    public void initializeCriticalStocks(){
+        Platform.runLater(() -> {
+            try {
+                this.createTableForCriticalItem();
+                ObservableList<Stock> stocks = FXCollections.observableList(StockDAO.getCritical(LIMIT, 0));
+                this.tableView.getItems().setAll(stocks);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void bindPages(){
+        Platform.runLater(() -> {
+            try {
+                COUNT = StockDAO.countCritical();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            double div = COUNT / LIMIT;
+            double pages = Math.ceil(div);
+
+            if (COUNT % LIMIT > 0)
+                pages++;
+
+            this.page_cb.getItems().clear();
+            for (int i = 1; i <= pages; i++) {
+                this.page_cb.getItems().add(i);
+            }
+
+            this.page_cb.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+                Platform.runLater(() -> {
+                    try {
+                        if (!page_cb.getSelectionModel().isEmpty()) {
+                            int offset = (page_cb.getSelectionModel().getSelectedItem() - 1) * LIMIT;
+                            ObservableList<Stock> stocks = FXCollections.observableList(StockDAO.getCritical(LIMIT, offset));
+                            this.tableView.getItems().setAll(stocks);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+            });
+        });
+    }
+
+    private void setCriticalCount() {
+        Platform.runLater(() -> {
+            try {
+                COUNT = StockDAO.countCritical();
+                this.display_lbl.setText(COUNT +" Critical Items");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
     public void setSubMenus(FlowPane flowPane) {
         this.subMenus = new ArrayList();
