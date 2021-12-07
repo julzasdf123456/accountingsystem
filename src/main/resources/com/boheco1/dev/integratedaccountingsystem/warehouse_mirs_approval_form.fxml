@@ -87,7 +87,7 @@
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <TextArea fx:id="details" editable="false" prefHeight="62.0" prefWidth="249.0" wrapText="true" />
+                        <TextArea fx:id="details" prefHeight="62.0" prefWidth="249.0" wrapText="true" />
                      </children>
                      <VBox.margin>
                         <Insets bottom="16.0" />
