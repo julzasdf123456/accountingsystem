@@ -9,15 +9,15 @@ import java.util.List;
 
 public class TestRun {
     public static void main(String[] args) {
-        try {
-            List<Stock> inventory1 = StockDAO.getInventory(LocalDate.of(2021,11,20), LocalDate.of(2021,11,22));
-            List<Stock> inventory2 = StockDAO.getInventory(LocalDate.of(2021,11,20), LocalDate.of(2021,11,22),1,50);
-
-            System.out.println(inventory1.size());
-            System.out.println(inventory2.size());
-        }catch(Exception ex) {
-            ex.printStackTrace();
-        }
+//        try {
+//            List<Stock> inventory1 = StockDAO.getInventory(LocalDate.of(2021,11,20), LocalDate.of(2021,11,22));
+//            List<Stock> inventory2 = StockDAO.getInventory(LocalDate.of(2021,11,20), LocalDate.of(2021,11,22),1,50);
+//
+//            System.out.println(inventory1.size());
+//            System.out.println(inventory2.size());
+//        }catch(Exception ex) {
+//            ex.printStackTrace();
+//        }
     }
 
     private static void testInventory() {

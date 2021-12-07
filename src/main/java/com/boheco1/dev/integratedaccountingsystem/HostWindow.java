@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
@@ -24,6 +25,10 @@ public class HostWindow extends Application {
         stage.setTitle("Integrated Accounting System");
         stage.setScene(scene);
         stage.show();
+        stage.setOnCloseRequest(windowEvent -> {
+            Platform.exit();
+            System.exit(0);
+        });
     }
 
     private static Parent loadFXML(String fxml) throws IOException {

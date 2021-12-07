@@ -11,10 +11,10 @@ public class DB {
     public static Connection getConnection() throws SQLException, ClassNotFoundException {
         if(connection==null) {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            String conString = "jdbc:sqlserver://localhost;" +
+            String conString = "jdbc:sqlserver://juliolopez;" +
                     "Database=Accounting;" +
-                    "user=app_user;" +
-                    "password=Boheco_2021;" +
+                    "user=accounting;" +
+                    "password=accounting;" +
                     "encrypt=false;" +
                     "trustServerCertificate=false;" +
                     "loginTimeout=60";

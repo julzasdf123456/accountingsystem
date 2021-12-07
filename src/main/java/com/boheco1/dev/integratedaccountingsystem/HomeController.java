@@ -1,10 +1,9 @@
 package com.boheco1.dev.integratedaccountingsystem;
 
-import com.boheco1.dev.integratedaccountingsystem.helpers.ColorPalette;
-import com.boheco1.dev.integratedaccountingsystem.helpers.ContentHandler;
-import com.boheco1.dev.integratedaccountingsystem.helpers.DrawerMenuHelper;
+import com.boheco1.dev.integratedaccountingsystem.dao.NotificationsDAO;
+import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 
-import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.objects.Notifications;
 import com.boheco1.dev.integratedaccountingsystem.usermgt.UserMgtController;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.FileMIRSController;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.StockEntryController;
@@ -14,26 +13,32 @@ import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 
 import com.jfoenix.controls.JFXButton;
 import javafx.animation.*;
+import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Popup;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class HomeController implements Initializable {
+
+    /**
+     * ICONS ARE IN https://kordamp.org/ikonli/cheat-sheet-materialdesign2.html
+     */
 
     @FXML StackPane homeStackPane;
 
@@ -49,6 +54,11 @@ public class HomeController implements Initializable {
 
     @FXML Label title;
 
+    // NOTIFICATION AND OTHER MENUS
+    public JFXButton notificationButton;
+    public Popup notificationPopup;
+    public FontIcon notificationIcon;
+
     // DRAWER MENU ARRAYS
     public List<JFXButton> drawerMenus;
     public List<Label> labelList;
@@ -62,7 +72,7 @@ public class HomeController implements Initializable {
     public FontIcon hamburgerIcon;
 
     @FXML
-    public FlowPane subToolbar;
+    public FlowPane subToolbar, notificationBin;
     public List<JFXButton> submenuList;
 
     @Override
@@ -81,6 +91,12 @@ public class HomeController implements Initializable {
         DrawerMenuHelper.setMenuLabels(telleringLabel, new FontIcon("mdi2c-contactless-payment-circle"), labelList);
         DrawerMenuHelper.setMenuLabels(warehouseLabel, new FontIcon("mdi2s-sitemap"), labelList);
 
+        //Create notifications
+//        try {
+//            NotificationsDAO.create(new Notifications("This is an MIRS notification is for user 2", NotificationsDAO.MIRS_APROVAL, null, "2", "06-2021"));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         // INITIALIZE MENU ICONS
         drawerMenus = new ArrayList<>();
@@ -98,6 +114,52 @@ public class HomeController implements Initializable {
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(warehouseDashboardBtn, new FontIcon("mdi2v-view-dashboard"), drawerMenus, "Warehouse Dashboard", contentPane, "warehouse_dashboard_controller.fxml", subToolbar, new WarehouseDashboardController(), title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(mirsBtn, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "File MIRS", contentPane, "warehouse_file_mirs.fxml", subToolbar, new FileMIRSController(), title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(stockBtn, new FontIcon("mdi2w-warehouse"), drawerMenus, "Stock", contentPane, "warehouse_stock_entry.fxml", subToolbar, new StockEntryController(), title);
+
+        // INITIALIZE NOTIFICATION BUTTON
+        notificationIcon = new FontIcon("mdi2b-bell");
+        notificationIcon.setIconColor(Paint.valueOf(ColorPalette.GREY_DARK));
+        notificationIcon.setIconSize(15);
+        notificationButton = new JFXButton("", notificationIcon);
+        notificationButton.setFont(Font.font(notificationButton.getFont().getFamily(), 10));
+        notificationBin.getChildren().add(notificationButton);
+
+        notificationButton.setOnAction(actionEvent -> {
+            showNotification();
+        });
+
+        notifyUser();
+    }
+
+    public void notifyUser() {
+        try {
+            Timer timer = new java.util.Timer();
+
+            timer.schedule(new TimerTask() {
+                public void run() {
+                    Platform.runLater(new Runnable() {
+                        public void run() {
+                            try {
+                                int count = NotificationsDAO.getNotifCount(ActiveUser.getUser().getId()+"");
+                                if (count > 0) {
+                                    notificationButton.setTextFill(Paint.valueOf(ColorPalette.DANGER));
+                                    notificationIcon.setIconColor(Paint.valueOf(ColorPalette.DANGER));
+                                    notificationButton.setFont(Font.font(notificationButton.getFont().getFamily(), FontWeight.BOLD, 10));
+                                } else {
+                                    notificationButton.setTextFill(Paint.valueOf(ColorPalette.GREY_DARK));
+                                    notificationIcon.setIconColor(Paint.valueOf(ColorPalette.GREY_DARK));
+                                    notificationButton.setFont(Font.font(notificationButton.getFont().getFamily(), 10));
+                                }
+                                notificationButton.setText("(" + count + ")");
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            }, 0, 1000); // 1 second
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -166,4 +228,66 @@ public class HomeController implements Initializable {
         this.replaceContent("view_my_account.fxml");
     }
 
+    /**
+     * NOTIFICATION CUSTOMIZATION
+     */
+    public void showNotification() {
+        try {
+            notificationPopup = new Popup();
+            VBox vBox = new VBox();
+            vBox.setPrefWidth(240);
+            vBox.setFillWidth(true);
+
+            List<Notifications> notificationsList = NotificationsDAO.getNotificationsForUser(ActiveUser.getUser().getId()+"");
+            Label notifTitle = new Label("Your Notifications");
+            notifTitle.setPadding(new Insets(10, 0, 10, 10));
+            notifTitle.setFont(Font.font(notifTitle.getFont().getFamily(), FontWeight.BOLD, 14));
+
+            vBox.getChildren().add(notifTitle);
+            for(Notifications notifications : notificationsList) {
+                FontIcon icon = new FontIcon(notifications.getIcon()!=null ? notifications.getIcon() : NotificationsDAO.INFORMATION_ICON);
+                JFXButton item = new JFXButton(notifications.getNotificationDetails(), icon);
+                item.setGraphicTextGap(10);
+                item.setPadding(new Insets(10, 10, 10, 10));
+
+                if (notifications.getStatus().equals("UNREAD")) {
+                    item.setFont(Font.font(item.getFont().getFamily(), FontWeight.BOLD, 13));
+                } else {
+                    item.setFont(Font.font(item.getFont().getFamily(), 13));
+                }
+
+                item.setOnAction(actionEvent -> {
+                    // Mark status as "READ" when clicked
+                    if (notifications.getStatus().equals("UNREAD")) {
+                        notifications.setStatus("READ");
+                        try {
+                            NotificationsDAO.update(notifications);
+                            item.setFont(Font.font(item.getFont().getFamily(), 13));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    // PERFORM EVENT HERE
+                    if (notifications.getNotificationType().equals(NotificationsDAO.INFORMATION)) {
+                        AlertDialogBuilder.messgeDialog("Notification", notifications.getNotificationDetails(), homeStackPane, AlertDialogBuilder.INFO_DIALOG);
+                    } else if (notifications.getNotificationType().equals(NotificationsDAO.MIRS_APROVAL)) {
+                        // forward to viewing of mirs
+                    }
+                });
+                vBox.getChildren().add(item);
+            }
+
+            ScrollPane scrollPane = new ScrollPane(vBox);
+            scrollPane.getStyleClass().add("popup-holder");
+            scrollPane.setMaxHeight(notificationButton.getScene().getWindow().getHeight()-110);//Adjust max height of the popup here
+            scrollPane.setMaxWidth(350);//Adjust max width of the popup here
+            notificationPopup.getContent().add(scrollPane);
+
+            notificationPopup.setAutoHide(true);
+            notificationPopup.show(notificationButton.getScene().getWindow(), NodeLocator.getNodeX(notificationButton)-20, NodeLocator.getNodeY(notificationButton)+30);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
