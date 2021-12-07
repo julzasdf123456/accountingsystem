@@ -27,6 +27,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -40,9 +41,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.util.Callback;
+import jdk.jfr.EventType;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-public class WarehouseDashboardController extends MenuControllerHandler implements Initializable, SubMenuHelper {
+public class  WarehouseDashboardController extends MenuControllerHandler implements Initializable, SubMenuHelper {
     public List<JFXButton> subMenus;
     public JFXButton options = new JFXButton("Options");
     public JFXButton reports = new JFXButton("Reports");
@@ -54,7 +56,7 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
     @FXML
     private TableView tableView;
     @FXML
-    private Label pendingApprovals_lbl, pendingReleases_lbl, critical_lbl, display_lbl;
+    public  Label pendingApprovals_lbl, pendingReleases_lbl, critical_lbl, display_lbl;
 
     @FXML
     private JFXComboBox<Integer> page_cb;
@@ -85,11 +87,11 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
             contextMenuHelper.initializePopupContextMenu(reports, inventoryReport, liquidationReport, stockEntryReport)
                     .show(reports, NodeLocator.getNodeX(reports), NodeLocator.getNodeY(reports));
         });
-    }
-
+    };
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.initializeCounts();
+        initializeCounts();
         display_lbl.setText(" ");
+        mirsPendingApproval(null);
     }
 
     @FXML
@@ -183,9 +185,9 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
                                         try {
                                             Utility.setActiveMIRS(mirs);
                                             if(s.equals("Pending")){
-                                                ModalBuilder.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_approval_form.fxml",stackPane);
+                                                ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_approval_form.fxml",stackPane);
                                             }else if (s.equals("Releasing")){
-                                                ModalBuilder.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_releasing_form.fxml",stackPane);
+                                                ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_releasing_form.fxml",stackPane);
                                             }
                                         } catch (Exception e) {
                                             e.printStackTrace();
@@ -377,14 +379,12 @@ public class WarehouseDashboardController extends MenuControllerHandler implemen
     }
 
     public void initializeCounts(){
-        Platform.runLater(() -> {
-            try {
-                critical_lbl.setText(""+ StockDAO.countCritical());
-                pendingApprovals_lbl.setText(""+MirsDAO.countMIRSByStatus("Pending"));
-                pendingReleases_lbl.setText(""+MirsDAO.countMIRSByStatus("Releasing"));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        try {
+            this.critical_lbl.setText(""+ StockDAO.countCritical());
+            this.pendingApprovals_lbl.setText(""+MirsDAO.countMIRSByStatus("Pending"));
+            this.pendingReleases_lbl.setText(""+MirsDAO.countMIRSByStatus("Releasing"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
