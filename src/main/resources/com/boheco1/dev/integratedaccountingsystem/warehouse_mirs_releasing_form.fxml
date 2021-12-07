@@ -81,14 +81,14 @@
                         <Insets bottom="16.0" />
                      </VBox.margin>
                   </HBox>
-                  <HBox alignment="TOP_RIGHT" prefHeight="54.0" prefWidth="853.0">
+                  <HBox alignment="TOP_RIGHT" prefHeight="81.0" prefWidth="898.0">
                      <children>
                         <Label alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="339.0" text="Other Details: ">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <TextArea fx:id="details" editable="false" prefHeight="62.0" prefWidth="249.0" wrapText="true" />
+                        <TextArea fx:id="details" prefHeight="62.0" prefWidth="249.0" wrapText="true" />
                      </children>
                      <VBox.margin>
                         <Insets bottom="16.0" />

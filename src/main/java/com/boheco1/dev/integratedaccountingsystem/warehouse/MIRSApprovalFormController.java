@@ -100,6 +100,7 @@ public class MIRSApprovalFormController implements Initializable {
     private void acceptBtn(ActionEvent event) {
         try {
             Utility.getActiveMIRS().setStatus("Releasing");
+            Utility.getActiveMIRS().setDetails(details.getText());
             MirsDAO.update(Utility.getActiveMIRS());
             AlertDialogBuilder.messgeDialog("System Message", "MIRS application approved and ready for releasing.", stackPane, AlertDialogBuilder.INFO_DIALOG);
             btnHolder.setDisable(true);
@@ -112,6 +113,7 @@ public class MIRSApprovalFormController implements Initializable {
     private void rejectBtn(ActionEvent event) {
         try {
             Utility.getActiveMIRS().setStatus("Rejected");
+            Utility.getActiveMIRS().setDetails(details.getText());
             MirsDAO.update(Utility.getActiveMIRS());
             AlertDialogBuilder.messgeDialog("System Message", "MIRS application rejected.", stackPane, AlertDialogBuilder.WARNING_DIALOG);
             btnHolder.setDisable(true);

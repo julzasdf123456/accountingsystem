@@ -212,6 +212,7 @@ public class MIRSReleasingFormController implements Initializable {
     private void acceptBtn(ActionEvent event) {
         try {
             Utility.getActiveMIRS().setStatus("Closed");
+            Utility.getActiveMIRS().setDetails(details.getText());
             MirsDAO.update(Utility.getActiveMIRS());
 
             for (MIRSItem mirsItem : requestItem){
