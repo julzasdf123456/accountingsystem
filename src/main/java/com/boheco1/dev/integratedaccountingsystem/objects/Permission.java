@@ -1,11 +1,11 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 public class Permission {
-    private int id;
+    private String id;
     private String permission;
     private String remarks;
 
-    public Permission(int id, String permission, String remarks) {
+    public Permission(String id, String permission, String remarks) {
         this.id = id;
         this.permission = permission;
         this.remarks = remarks;
@@ -27,11 +27,11 @@ public class Permission {
         this.remarks = remarks;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

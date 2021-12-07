@@ -3,9 +3,9 @@ package com.boheco1.dev.integratedaccountingsystem.objects;
 import java.time.LocalDateTime;
 
 public class MIRSItem {
-    private int id;
-    private int mirsID;
-    private int stockID;
+    private String id;
+    private String mirsID;
+    private String stockID;
     private int quantity;
     private double price;
     private String remarks;
@@ -16,7 +16,7 @@ public class MIRSItem {
 
     public MIRSItem(){}
 
-    public MIRSItem(int id, int mirsID, int stockID, int quantity, double price, String remarks, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public MIRSItem(String id, String mirsID, String stockID, int quantity, double price, String remarks, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.mirsID = mirsID;
         this.stockID = stockID;
@@ -27,27 +27,27 @@ public class MIRSItem {
         this.updatedAt = updatedAt;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public int getMirsID() {
+    public String getMirsID() {
         return mirsID;
     }
 
-    public void setMirsID(int mirsID) {
+    public void setMirsID(String mirsID) {
         this.mirsID = mirsID;
     }
 
-    public int getStockID() {
+    public String getStockID() {
         return stockID;
     }
 
-    public void setStockID(int stockID) {
+    public void setStockID(String stockID) {
         this.stockID = stockID;
     }
 

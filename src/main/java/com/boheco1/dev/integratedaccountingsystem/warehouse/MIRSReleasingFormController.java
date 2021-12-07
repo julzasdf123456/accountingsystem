@@ -258,7 +258,7 @@ public class MIRSReleasingFormController implements Initializable {
             }
 
             MIRSItem mirsItem = new MIRSItem();
-            mirsItem.setMirsID(Integer.parseInt(mirsNum.getText()));
+            mirsItem.setMirsID(mirsNum.getText());
             mirsItem.setStockID(selectedStock.getId());
             mirsItem.setParticulars(selectedStock.getStockName());
             mirsItem.setUnit(selectedStock.getUnit());

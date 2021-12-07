@@ -1,13 +1,13 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 public class StockType {
-    private int id;
+    private String id;
     private String stockType;
     private String unit;
 
     public StockType() {}
 
-    public StockType(int id, String stockType, String unit) {
+    public StockType(String id, String stockType, String unit) {
         this.id = id;
         this.stockType = stockType;
         this.unit = unit;
@@ -21,11 +21,11 @@ public class StockType {
         this.unit = unit;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

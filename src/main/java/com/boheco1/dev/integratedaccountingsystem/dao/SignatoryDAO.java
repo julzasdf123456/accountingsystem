@@ -18,7 +18,7 @@ public class SignatoryDAO {
                         "VALUES " +
                         "(?,?,?,?,now(), now())", Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, sig.getType());
-        ps.setInt(2, sig.getUserID());
+        ps.setString(2, sig.getUserID());
         ps.setInt(3, sig.getRank());
         ps.setString(4, sig.getComments());
 
@@ -26,7 +26,7 @@ public class SignatoryDAO {
 
         ResultSet rs = ps.getGeneratedKeys();
 
-        if(rs.next()) sig.setId(rs.getInt(1));
+        if(rs.next()) sig.setId(rs.getString(1));
 
         rs.close();
         ps.close();
@@ -39,10 +39,10 @@ public class SignatoryDAO {
                         "WHERE id=?");
 
         ps.setString(1, sig.getType());
-        ps.setInt(2, sig.getUserID());
+        ps.setString(2, sig.getUserID());
         ps.setInt(3, sig.getRank());
         ps.setString(4, sig.getComments());
-        ps.setInt(5, sig.getId());
+        ps.setString(5, sig.getId());
 
         ps.executeUpdate();
 
@@ -60,9 +60,9 @@ public class SignatoryDAO {
 
         if(rs.next()) {
             sig = new Signatory(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("Type"),
-                    rs.getInt("UserID"),
+                    rs.getString("UserID"),
                     rs.getInt("Rank"),
                     rs.getString("Comments"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
@@ -92,9 +92,9 @@ public class SignatoryDAO {
         ArrayList<Signatory> signatories = new ArrayList<>();
         while(rs.next()) {
             signatories.add(new Signatory(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("Type"),
-                    rs.getInt("UserID"),
+                    rs.getString("UserID"),
                     rs.getInt("Rank"),
                     rs.getString("Comments"),
                     rs.getDate("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,

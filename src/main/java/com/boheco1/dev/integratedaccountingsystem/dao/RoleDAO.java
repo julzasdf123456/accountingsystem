@@ -16,7 +16,7 @@ public class RoleDAO {
 
         while(rs.next()) {
             roles.add(new Role(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("role"),
                     rs.getString("description")
             ));
@@ -30,13 +30,13 @@ public class RoleDAO {
 
     public static List<Permission> getPermissions(Role role, Connection cxn) throws SQLException {
         PreparedStatement cs = cxn.prepareStatement("SELECT * FROM permissions WHERE id IN (SELECT permission_id FROM role_permissions WHERE role_id=?)");
-        cs.setInt(1, role.getId());
+        cs.setString(1, role.getId());
         ResultSet rs = cs.executeQuery();
 
         ArrayList<Permission> permissions = new ArrayList();
         while(rs.next()) {
             permissions.add(new Permission(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("permission"),
                     rs.getString("remarks")
             ));
@@ -56,7 +56,7 @@ public class RoleDAO {
         ResultSet rs = cs.getGeneratedKeys();
 
         if(rs.next()) {
-            int id = rs.getInt(1);
+            String id = rs.getString(1);
             role.setId(id);
         }
 
@@ -66,13 +66,13 @@ public class RoleDAO {
 
     public static List<Role> rolesOfUser(User user, Connection conn) throws SQLException {
         PreparedStatement cs = conn.prepareStatement("SELECT * FROM roles WHERE id IN (SELECT role_id FROM user_roles WHERE user_id=?)");
-        cs.setInt(1, user.getId());
+        cs.setString(1, user.getId());
         ResultSet rs = cs.executeQuery();
         ArrayList<Role> userRoles = new ArrayList();
 
         while(rs.next()) {
             userRoles.add(new Role(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("role"),
                     rs.getString("description")
             ));
@@ -86,12 +86,12 @@ public class RoleDAO {
 
     public static List<Role> userAvailableRoles(User user, Connection conn) throws SQLException {
         PreparedStatement cs = conn.prepareStatement("SELECT * FROM roles WHERE id NOT IN (SELECT role_id FROM user_roles WHERE user_id=?)");
-        cs.setInt(1, user.getId());
+        cs.setString(1, user.getId());
         ResultSet rs = cs.executeQuery();
         ArrayList<Role> availableRoles = new ArrayList();
         while(rs.next()) {
             availableRoles.add(new Role(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("role"),
                     rs.getString("description")
             ));
@@ -105,7 +105,7 @@ public class RoleDAO {
 
     public static void deleteRole(Role role, Connection conn) throws SQLException {
         PreparedStatement cs = conn.prepareStatement("DELETE FROM roles WHERE id=?");
-        cs.setInt(1, role.getId());
+        cs.setString(1, role.getId());
         cs.executeUpdate();
 
         cs.close();
@@ -113,12 +113,12 @@ public class RoleDAO {
 
     public static List<Permission> availablePermissions(Role role, Connection conn) throws SQLException {
         PreparedStatement cs = conn.prepareStatement("SELECT * FROM permissions WHERE id NOT IN (SELECT permission_id FROM role_permissions WHERE role_id=?)");
-        cs.setInt(1, role.getId());
+        cs.setString(1, role.getId());
         ResultSet rs = cs.executeQuery();
         ArrayList<Permission> availablePermissions = new ArrayList();
         while(rs.next()) {
             availablePermissions.add(new Permission(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("permission"),
                     rs.getString("remarks")
             ));
@@ -132,7 +132,7 @@ public class RoleDAO {
 
     public static void updateRole(Role role, Connection conn) throws SQLException {
         PreparedStatement cs = conn.prepareStatement("UPDATE roles SET role=?, description=? WHERE id=?");
-        cs.setInt(3, role.getId());
+        cs.setString(3, role.getId());
         cs.setString(1, role.getRole());
         cs.setString(2, role.getDescription());
         cs.executeUpdate();

@@ -109,7 +109,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             }
 
             MIRSItem mirsItem = new MIRSItem();
-            mirsItem.setMirsID(Integer.parseInt(mirsNum.getText()));
+            mirsItem.setMirsID(mirsNum.getText());
             mirsItem.setStockID(selectedStock.getId());
             mirsItem.setParticulars(selectedStock.getStockName());
             mirsItem.setUnit(selectedStock.getUnit());
@@ -169,7 +169,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         try {
             List<MIRSItem> mirsItemList = requestItem; //from ObservableList to List
             MIRS mirs = new MIRS();
-            mirs.setId(Integer.parseInt(mirsNum.getText())); //id mean MIRS number from user input
+            mirs.setId(mirsNum.getText()); //id mean MIRS number from user input
             mirs.setDetails(details.getText());
             mirs.setStatus("Pending");
             mirs.setDateFiled(date.getValue());

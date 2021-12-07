@@ -1,21 +1,21 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 public class Role {
-    private int id;
+    private String id;
     private String role;
     private String description;
 
-    public Role(int id, String role, String description) {
+    public Role(String id, String role, String description) {
         this.id = id;
         this.role = role;
         this.description = description;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

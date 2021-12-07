@@ -17,7 +17,7 @@ public class PermissionDAO {
         ArrayList<Permission> permissions = new ArrayList();
         while(rs.next()) {
             permissions.add(new Permission(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("permission"),
                     rs.getString("remarks")
             ));
@@ -38,7 +38,7 @@ public class PermissionDAO {
         ResultSet rs = cs.getGeneratedKeys();
 
         if(rs.next()) {
-            int id = rs.getInt(1);
+            String id = rs.getString(1);
             permission.setId(id);
         }
 
@@ -48,13 +48,13 @@ public class PermissionDAO {
 
     public static List<Permission> permissionsOfUser(User user, Connection conn) throws SQLException {
         PreparedStatement cs = conn.prepareStatement("SELECT * FROM permissions WHERE id IN (SELECT permission_id FROM user_permissions WHERE user_id=?)");
-        cs.setInt(1, user.getId());
+        cs.setString(1, user.getId());
         ResultSet rs = cs.executeQuery();
 
         ArrayList<Permission> userPermissions = new ArrayList();
         while(rs.next()) {
             userPermissions.add(new Permission(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("permission"),
                     rs.getString("remarks")
             ));
@@ -67,12 +67,12 @@ public class PermissionDAO {
 
     public static List<Permission> userAvailablePermissions(User user, Connection conn) throws SQLException {
         PreparedStatement cs = conn.prepareStatement("SELECT * FROM permissions WHERE id NOT IN (SELECT permission_id from user_permissions WHERE user_id=?)");
-        cs.setInt(1, user.getId());
+        cs.setString(1, user.getId());
         ResultSet rs = cs.executeQuery();
         ArrayList<Permission> availablePermissions = new ArrayList();
         while(rs.next()) {
             availablePermissions.add(new Permission(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("permission"),
                     rs.getString("remarks")
             ));
@@ -83,7 +83,7 @@ public class PermissionDAO {
 
     public static void updatePermission(Permission permission, Connection conn) throws SQLException {
         PreparedStatement cs = conn.prepareStatement("UPDATE permissions SET permission=?, remakrs=? WHERE id=?");
-        cs.setInt(3, permission.getId());
+        cs.setString(3, permission.getId());
         cs.setString(1, permission.getPermission());
         cs.setString(2, permission.getRemarks());
         cs.executeUpdate();
@@ -93,7 +93,7 @@ public class PermissionDAO {
 
     public static void removePermission(Permission permission, Connection conn) throws SQLException {
         PreparedStatement cs = conn.prepareStatement("DELETE FROM permissions WHERE id=?");
-        cs.setInt(1, permission.getId());
+        cs.setString(1, permission.getId());
         cs.executeUpdate();
 
         cs.close();

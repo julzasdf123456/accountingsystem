@@ -13,11 +13,11 @@ public class ReleasingDAO {
                 "INSERT INTO Releasing (StockID, MIRSID, Quantity, Price, UserID, Status, CreatedAt, UpdatedAt) " +
                         "VALUES (?,?,?,?,?,?,GETDATE(),GETDATE())", Statement.RETURN_GENERATED_KEYS);
 
-        ps.setInt(1, releasing.getStockID());
-        ps.setInt(2, releasing.getMirsID());
+        ps.setString(1, releasing.getStockID());
+        ps.setString(2, releasing.getMirsID());
         ps.setInt(3, releasing.getQuantity());
         ps.setDouble(4, releasing.getPrice());
-        ps.setInt(5, releasing.getUserID());
+        ps.setString(5, releasing.getUserID());
         ps.setString(6, releasing.getStatus());
 
         ps.executeUpdate();
@@ -25,7 +25,7 @@ public class ReleasingDAO {
         ResultSet rs = ps.getGeneratedKeys();
 
         if(rs.next()) {
-            releasing.setId(rs.getInt(1));
+            releasing.setId(rs.getString(1));
         }
 
         rs.close();
@@ -43,12 +43,12 @@ public class ReleasingDAO {
 
         if(rs.next()) {
             releasing = new Releasing(
-                    rs.getInt("id"),
-                    rs.getInt("StockID"),
-                    rs.getInt("MIRSID"),
+                    rs.getString("id"),
+                    rs.getString("StockID"),
+                    rs.getString("MIRSID"),
                     rs.getInt("Quantity"),
                     rs.getDouble("Price"),
-                    rs.getInt("UserID"),
+                    rs.getString("UserID"),
                     rs.getString("Status")
             );
             releasing.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());

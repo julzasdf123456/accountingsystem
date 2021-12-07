@@ -17,19 +17,19 @@ public class DepartmentDAO {
 
         while(rs.next()) {
             departments.add(new Department(
-                    rs.getInt("DepartmentID"),
+                    rs.getString("DepartmentID"),
                     rs.getString("DepartmentName"),
-                    rs.getInt("DepartmentHead")
+                    rs.getString("DepartmentHead")
             ));
         }
 
         return departments;
     }
 
-    public static Department get(int id) throws Exception {
+    public static Department get(String id) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM Departments WHERE DepartmentID=?");
-        ps.setInt(1, id);
+        ps.setString(1, id);
 
         ResultSet rs = ps.executeQuery();
 
@@ -37,9 +37,9 @@ public class DepartmentDAO {
 
         if(rs.next()) {
             dept = new Department(
-                    rs.getInt("DepartmentID"),
+                    rs.getString("DepartmentID"),
                     rs.getString("DepartmentName"),
-                    rs.getInt("DepartmentHead")
+                    rs.getString("DepartmentHead")
             );
         }
 

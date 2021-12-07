@@ -1,21 +1,21 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 public class Department {
-    private int departmentID;
+    private String departmentID;
     private String departmentName;
-    private int departmentHeadID;
+    private String departmentHeadID;
 
-    public Department(int departmentID, String departmentName, int departmentHeadID) {
+    public Department(String departmentID, String departmentName, String departmentHeadID) {
         this.departmentID = departmentID;
         this.departmentName = departmentName;
         this.departmentHeadID = departmentHeadID;
     }
 
-    public int getDepartmentID() {
+    public String getDepartmentID() {
         return departmentID;
     }
 
-    public void setDepartmentID(int departmentID) {
+    public void setDepartmentID(String departmentID) {
         this.departmentID = departmentID;
     }
 
@@ -27,11 +27,11 @@ public class Department {
         this.departmentName = departmentName;
     }
 
-    public int getDepartmentHeadID() {
+    public String getDepartmentHeadID() {
         return departmentHeadID;
     }
 
-    public void setDepartmentHeadID(int departmentHeadID) {
+    public void setDepartmentHeadID(String departmentHeadID) {
         this.departmentHeadID = departmentHeadID;
     }
 

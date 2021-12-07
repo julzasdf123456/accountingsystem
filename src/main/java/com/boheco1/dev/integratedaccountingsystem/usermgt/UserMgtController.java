@@ -130,7 +130,7 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
         selectRoleCombo.setItems(listOfAvailableRoles);
     }
 
-    private Department findDepartment(int departmentID)
+    private Department findDepartment(String departmentID)
     {
         for(Department dept: listOfDepartments) {
             if(dept.getDepartmentID()==departmentID) return dept;
@@ -149,11 +149,11 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
                     return;
                 }
 
-                currentEmployee = new EmployeeInfo(-1,firstNameField.getText(),middleNameField.getText(),lastNameField.getText(),"",addressField.getText(),phoneNumberField.getText(),designationField.getText(),null, dept.getDepartmentID());
+                currentEmployee = new EmployeeInfo("",firstNameField.getText(),middleNameField.getText(),lastNameField.getText(),"",addressField.getText(),phoneNumberField.getText(),designationField.getText(),null, dept.getDepartmentID());
                 String fullName = currentEmployee.getEmployeeFirstName() + " " + currentEmployee.getEmployeeLastName();
                 EmployeeDAO.addEmployee(currentEmployee, conn);
 
-                currentUser = new User(-1, currentEmployee.getId(), userNameField.getText(), fullName);
+                currentUser = new User("", currentEmployee.getId(), userNameField.getText(), fullName);
                 currentUser.setPassword("Boheco1");
                 UserDAO.addUser(currentUser, conn);
 
@@ -236,7 +236,7 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
         try {
             if(currentRole == null)
             {
-                currentRole = new Role(-1, roleNameField.getText(), roleDescriptionField.getText());
+                currentRole = new Role("", roleNameField.getText(), roleDescriptionField.getText());
                 RoleDAO.add(currentRole, conn);
                 listOfRoles.add(currentRole);
             }
@@ -350,7 +350,7 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
         try {
             if(currentPermission==null) {
                 //create new permission
-                currentPermission = new Permission(-1, permissionNameField.getText(), permissionDescriptionField.getText());
+                currentPermission = new Permission("", permissionNameField.getText(), permissionDescriptionField.getText());
                 PermissionDAO.add(currentPermission, conn);
                 listOfPermissions.add(currentPermission);
             }else {

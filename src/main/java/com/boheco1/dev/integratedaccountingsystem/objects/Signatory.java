@@ -5,9 +5,9 @@ import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
 import java.time.LocalDateTime;
 
 public class Signatory {
-    private int id;
+    private String id;
     private String type;
-    private int userID;
+    private String userID;
     private int rank;
     private String comments;
     private LocalDateTime createdAt;
@@ -15,7 +15,7 @@ public class Signatory {
 
     private User user;
 
-    public Signatory(int id, String type, int userID, int rank, String comments, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Signatory(String id, String type, String userID, int rank, String comments, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.type = type;
         this.userID = userID;
@@ -25,11 +25,11 @@ public class Signatory {
         this.updatedAt = updatedAt;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -41,11 +41,11 @@ public class Signatory {
         this.type = type;
     }
 
-    public int getUserID() {
+    public String getUserID() {
         return userID;
     }
 
-    public void setUserID(int userID) {
+    public void setUserID(String userID) {
         this.userID = userID;
     }
 

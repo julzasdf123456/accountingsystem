@@ -36,7 +36,7 @@ public class StockDAO {
         ps.setDate(6, stock.getManufacturingDate()!=null ? Date.valueOf(stock.getManufacturingDate()) : null);
 
         ps.setDate(7, stock.getValidityDate()!=null ? Date.valueOf(stock.getValidityDate()) : null);
-        ps.setInt(8, stock.getTypeID());
+        ps.setString(8, stock.getTypeID());
         ps.setString(9, stock.getUnit());
 
         ps.setInt(10, stock.getQuantity());
@@ -45,7 +45,7 @@ public class StockDAO {
 
         ps.setBoolean(13, stock.isTrashed());
         ps.setString(14, stock.getComments());
-        ps.setInt(15, stock.getUserIDCreated());
+        ps.setString(15, stock.getUserIDCreated());
 
         ps.setInt(16, stock.getCritical());
 
@@ -53,7 +53,7 @@ public class StockDAO {
 
         ResultSet rs = ps.getGeneratedKeys();
         if(rs.next()) {
-            stock.setId(rs.getInt(1));
+            stock.setId(rs.getString(1));
         }
 
         rs.close();
@@ -66,14 +66,14 @@ public class StockDAO {
      * @return Stock object
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static Stock get(int id) throws Exception {
+    public static Stock get(String id) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM Stocks WHERE id=?");
-        ps.setInt(1, id);
+        ps.setString(1, id);
         ResultSet rs = ps.executeQuery();
         if(rs.next()) {
             Stock stock = new Stock(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
                     rs.getString("SerialNumber"),
@@ -81,7 +81,7 @@ public class StockDAO {
                     rs.getString("Model"),
                     rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
                     rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
-                    rs.getInt("TypeID"),
+                    rs.getString("TypeID"),
                     rs.getString("Unit"),
                     rs.getInt("Quantity"),
                     rs.getInt("Critical"),
@@ -92,9 +92,9 @@ public class StockDAO {
                     rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
-                    rs.getInt("UserIDCreated"),
-                    rs.getInt("UserIDUpdated"),
-                    rs.getInt("UserIDTrashed")
+                    rs.getString("UserIDCreated"),
+                    rs.getString("UserIDUpdated"),
+                    rs.getString("UserIDTrashed")
             );
 
             rs.close();
@@ -138,7 +138,7 @@ public class StockDAO {
             ps.setDate(7, null);
         }
 
-        ps.setInt(8,stock.getTypeID());
+        ps.setString(8,stock.getTypeID());
         ps.setString(9, stock.getUnit());
 
         ps.setInt(10, stock.getQuantity());
@@ -146,9 +146,9 @@ public class StockDAO {
         ps.setString(12, stock.getNeaCode());
 
         ps.setString(13, stock.getComments());
-        ps.setInt(14, ActiveUser.getUser().getId());
+        ps.setString(14, ActiveUser.getUser().getId());
         ps.setInt(15, stock.getCritical());
-        ps.setInt(16, stock.getId());
+        ps.setString(16, stock.getId());
 
         ps.executeUpdate();
 
@@ -188,15 +188,15 @@ public class StockDAO {
             ps.setDate(7, null);
         }
 
-        ps.setInt(8,stock.getTypeID());
+        ps.setString(8,stock.getTypeID());
         ps.setString(9, stock.getUnit());
 
         ps.setDouble(10, stock.getPrice());
         ps.setString(11, stock.getNeaCode());
 
         ps.setString(12, stock.getComments());
-        ps.setInt(13, ActiveUser.getUser().getId());
-        ps.setInt(14, stock.getId());
+        ps.setString(13, ActiveUser.getUser().getId());
+        ps.setString(14, stock.getId());
 
         ps.executeUpdate();
 
@@ -225,7 +225,7 @@ public class StockDAO {
         ArrayList<SlimStock> stocks = new ArrayList<>();
         while(rs.next()) {
             SlimStock stock = new SlimStock(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Model"),
                     rs.getString("Brand"));
@@ -267,7 +267,7 @@ public class StockDAO {
 
         while(rs.next()) {
             SlimStock stock = new SlimStock(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Model"),
                     rs.getString("Brand"));
@@ -308,7 +308,7 @@ public class StockDAO {
 
         while(rs.next()) {
             stocks.add(new Stock(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
                     rs.getString("SerialNumber"),
@@ -316,7 +316,7 @@ public class StockDAO {
                     rs.getString("Model"),
                     rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
                     rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
-                    rs.getInt("TypeID"),
+                    rs.getString("TypeID"),
                     rs.getString("Unit"),
                     rs.getInt("Quantity"),
                     rs.getInt("Critical"),
@@ -327,9 +327,9 @@ public class StockDAO {
                     rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
-                    rs.getInt("UserIDCreated"),
-                    rs.getInt("UserIDUpdated"),
-                    rs.getInt("UserIDTrashed")
+                    rs.getString("UserIDCreated"),
+                    rs.getString("UserIDUpdated"),
+                    rs.getString("UserIDTrashed")
             ));
         }
 
@@ -350,8 +350,8 @@ public class StockDAO {
                 "UPDATE Stocks SET quantity=?, UpdatedAt=GETDATE(), UserIDUpdated=? " +
                         "WHERE id = ?");
         ps.setInt(1, quantity);
-        ps.setInt(2, ActiveUser.getUser().getId());
-        ps.setInt(3, stock.getId());
+        ps.setString(2, ActiveUser.getUser().getId());
+        ps.setString(3, stock.getId());
 
         ps.executeUpdate();
 
@@ -388,8 +388,8 @@ public class StockDAO {
     public static void trash(Stock stock) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE Stocks SET IsTrashed=1, TrashedAt=GETDATE(), UserIDTrashed=? WHERE id=?");
-        ps.setInt(1, ActiveUser.getUser().getId());
-        ps.setInt(2, stock.getId());
+        ps.setString(1, ActiveUser.getUser().getId());
+        ps.setString(2, stock.getId());
         ps.executeUpdate();
         ps.close();
     }
@@ -402,8 +402,8 @@ public class StockDAO {
     public static void restore(Stock trash) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE Stocks SET IsTrashed=0, UpdatedAt=GETDATE(), UserIDTrashed=? WHERE id=?");
-        ps.setInt(1, ActiveUser.getUser().getId());
-        ps.setInt(2, trash.getId());
+        ps.setString(1, ActiveUser.getUser().getId());
+        ps.setString(2, trash.getId());
         ps.executeUpdate();
         ps.close();
     }
@@ -420,16 +420,16 @@ public class StockDAO {
                         "(StockID, Quantity, Source, Price, UserID, CreatedAt, UpdatedAt) " +
                         "VALUES " +
                         "(?,?,?,?,?,GETDATE(),GETDATE())", Statement.RETURN_GENERATED_KEYS);
-        ps.setInt(1, stock.getId());
+        ps.setString(1, stock.getId());
         ps.setInt(2, log.getQuantity());
         ps.setString(3, log.getSource());
         ps.setDouble(4, log.getPrice());
-        ps.setInt(5, ActiveUser.getUser().getId());
+        ps.setString(5, ActiveUser.getUser().getId());
         ps.executeUpdate();
 
         ResultSet rs = ps.getGeneratedKeys();
         if(rs.next()) {
-            int id = rs.getInt(1);
+            String id = rs.getString(1);
             log.setId(id);
         }
         rs.close();
@@ -449,12 +449,12 @@ public class StockDAO {
                         "StockID=?, Quantity=?, Source=?, " +
                         "Price=?, UserID=?, UpdatedAt=GETDATE() " +
                         "WHERE id=?");
-        ps.setInt(1, log.getStockID());
+        ps.setString(1, log.getStockID());
         ps.setInt(2, log.getQuantity());
         ps.setString(3, log.getSource());
         ps.setDouble(4, log.getPrice());
-        ps.setInt(5, ActiveUser.getUser().getId());
-        ps.setInt(6, log.getId());
+        ps.setString(5, ActiveUser.getUser().getId());
+        ps.setString(6, log.getId());
 
         ps.executeUpdate();
 
@@ -474,7 +474,7 @@ public class StockDAO {
 
         while(rs.next()) {
             stockTypes.add(new StockType(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("StockType"),
                     rs.getString("Units")));
         }
@@ -498,7 +498,7 @@ public class StockDAO {
         ResultSet rs = ps.executeQuery();
         if(rs.next()) {
             StockType stock = new StockType(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("StockType"),
                     rs.getString("Units")
             );
@@ -524,7 +524,7 @@ public class StockDAO {
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {
             StockType stock = new StockType(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("StockType"),
                     rs.getString("Units")
             );
@@ -581,7 +581,7 @@ public class StockDAO {
 
         while(rs.next()) {
             trashedStocks.add(new Stock(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
                     rs.getString("SerialNumber"),
@@ -589,7 +589,7 @@ public class StockDAO {
                     rs.getString("Model"),
                     rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
                     rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
-                    rs.getInt("TypeID"),
+                    rs.getString("TypeID"),
                     rs.getString("Unit"),
                     rs.getInt("Quantity"),
                     rs.getInt("Critical"),
@@ -600,9 +600,9 @@ public class StockDAO {
                     rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
-                    rs.getInt("UserIDCreated"),
-                    rs.getInt("UserIDUpdated"),
-                    rs.getInt("UserIDTrashed")
+                    rs.getString("UserIDCreated"),
+                    rs.getString("UserIDUpdated"),
+                    rs.getString("UserIDTrashed")
             ));
         }
 
@@ -629,7 +629,7 @@ public class StockDAO {
 
         while(rs.next()) {
             criticalStocks.add(new Stock(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
                     rs.getString("SerialNumber"),
@@ -637,7 +637,7 @@ public class StockDAO {
                     rs.getString("Model"),
                     rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
                     rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
-                    rs.getInt("TypeID"),
+                    rs.getString("TypeID"),
                     rs.getString("Unit"),
                     rs.getInt("Quantity"),
                     rs.getInt("Critical"),
@@ -648,9 +648,9 @@ public class StockDAO {
                     rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
-                    rs.getInt("UserIDCreated"),
-                    rs.getInt("UserIDUpdated"),
-                    rs.getInt("UserIDTrashed")
+                    rs.getString("UserIDCreated"),
+                    rs.getString("UserIDUpdated"),
+                    rs.getString("UserIDTrashed")
             ));
         }
 
@@ -682,7 +682,7 @@ public class StockDAO {
 
         while(rs.next()) {
             criticalStocks.add(new Stock(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
                     rs.getString("SerialNumber"),
@@ -690,7 +690,7 @@ public class StockDAO {
                     rs.getString("Model"),
                     rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
                     rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
-                    rs.getInt("TypeID"),
+                    rs.getString("TypeID"),
                     rs.getString("Unit"),
                     rs.getInt("Quantity"),
                     rs.getInt("Critical"),
@@ -701,9 +701,9 @@ public class StockDAO {
                     rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
-                    rs.getInt("UserIDCreated"),
-                    rs.getInt("UserIDUpdated"),
-                    rs.getInt("UserIDTrashed")
+                    rs.getString("UserIDCreated"),
+                    rs.getString("UserIDUpdated"),
+                    rs.getString("UserIDTrashed")
             ));
         }
 
@@ -743,7 +743,7 @@ public class StockDAO {
     public static List<StockEntryLog> getEntryLogs(Stock stock) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM StockEntryLogs WHERE StockID=?;");
-        ps.setInt(1, stock.getId());
+        ps.setString(1, stock.getId());
 
         ResultSet rs = ps.executeQuery();
 
@@ -752,12 +752,12 @@ public class StockDAO {
         while(rs.next()) {
             entryLogs.add(
                     new StockEntryLog(
-                            rs.getInt("id"),
-                            rs.getInt("StockID"),
+                            rs.getString("id"),
+                            rs.getString("StockID"),
                             rs.getInt("Quantity"),
                             rs.getString("Source"),
                             rs.getDouble("Price"),
-                            rs.getInt("UserID"),
+                            rs.getString("UserID"),
                             rs.getTimestamp("CreatedAt").toLocalDateTime(),
                             rs.getTimestamp("UpdatedAt").toLocalDateTime()
                     )
@@ -793,7 +793,7 @@ public class StockDAO {
 
         while(rs.next()) {
             stocks.add(new Stock(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
                     rs.getString("SerialNumber"),
@@ -801,7 +801,7 @@ public class StockDAO {
                     rs.getString("Model"),
                     rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
                     rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
-                    rs.getInt("TypeID"),
+                    rs.getString("TypeID"),
                     rs.getString("Unit"),
                     rs.getInt("Quantity"),
                     rs.getInt("Critical"),
@@ -812,9 +812,9 @@ public class StockDAO {
                     rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
-                    rs.getInt("UserIDCreated"),
-                    rs.getInt("UserIDUpdated"),
-                    rs.getInt("UserIDTrashed")
+                    rs.getString("UserIDCreated"),
+                    rs.getString("UserIDUpdated"),
+                    rs.getString("UserIDTrashed")
             ));
         }
 
@@ -839,7 +839,7 @@ public class StockDAO {
 
         while(rs.next()) {
             stocks.add(new Stock(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
                     rs.getString("SerialNumber"),
@@ -847,7 +847,7 @@ public class StockDAO {
                     rs.getString("Model"),
                     rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
                     rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
-                    rs.getInt("TypeID"),
+                    rs.getString("TypeID"),
                     rs.getString("Unit"),
                     rs.getInt("Quantity"),
                     rs.getInt("Critical"),
@@ -858,9 +858,9 @@ public class StockDAO {
                     rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
-                    rs.getInt("UserIDCreated"),
-                    rs.getInt("UserIDUpdated"),
-                    rs.getInt("UserIDTrashed")
+                    rs.getString("UserIDCreated"),
+                    rs.getString("UserIDUpdated"),
+                    rs.getString("UserIDTrashed")
             ));
         }
 
@@ -893,7 +893,7 @@ public class StockDAO {
 
         while(rs.next()) {
             Stock stock = new Stock(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
                     rs.getString("SerialNumber"),
@@ -901,7 +901,7 @@ public class StockDAO {
                     rs.getString("Model"),
                     rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
                     rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
-                    rs.getInt("TypeID"),
+                    rs.getString("TypeID"),
                     rs.getString("Unit"),
                     rs.getInt("Quantity"),
                     rs.getInt("Critical"),
@@ -912,17 +912,17 @@ public class StockDAO {
                     rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
-                    rs.getInt("UserIDCreated"),
-                    rs.getInt("UserIDUpdated"),
-                    rs.getInt("UserIDTrashed")
+                    rs.getString("UserIDCreated"),
+                    rs.getString("UserIDUpdated"),
+                    rs.getString("UserIDTrashed")
             );
             StockEntryLog log = new StockEntryLog();
-            log.setId(rs.getInt("entryID"));
-            log.setStockID(rs.getInt("id"));
+            log.setId(rs.getString("entryID"));
+            log.setStockID(rs.getString("id"));
             log.setSource(rs.getString("entrySource"));
             log.setPrice(rs.getDouble("entryPrice"));
             log.setQuantity(rs.getInt("entryQuantity"));
-            log.setUserID(rs.getInt("entryUserID"));
+            log.setUserID(rs.getString("entryUserID"));
             log.setCreatedAt(rs.getTimestamp("entryCreatedAt")!=null ? rs.getTimestamp("entryCreatedAt").toLocalDateTime() : null);
             log.setUpdatedAt(rs.getTimestamp("entryUpdatedAt")!=null ? rs.getTimestamp("entryUpdatedAt").toLocalDateTime() : null);
             stock.setEntryLog(log);
@@ -963,7 +963,7 @@ public class StockDAO {
 
         while(rs.next()) {
             Stock stock = new Stock(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
                     rs.getString("SerialNumber"),
@@ -971,7 +971,7 @@ public class StockDAO {
                     rs.getString("Model"),
                     rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
                     rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
-                    rs.getInt("TypeID"),
+                    rs.getString("TypeID"),
                     rs.getString("Unit"),
                     rs.getInt("Quantity"),
                     rs.getInt("Critical"),
@@ -982,17 +982,17 @@ public class StockDAO {
                     rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
-                    rs.getInt("UserIDCreated"),
-                    rs.getInt("UserIDUpdated"),
-                    rs.getInt("UserIDTrashed")
+                    rs.getString("UserIDCreated"),
+                    rs.getString("UserIDUpdated"),
+                    rs.getString("UserIDTrashed")
             );
             StockEntryLog log = new StockEntryLog();
-            log.setId(rs.getInt("entryID"));
-            log.setStockID(rs.getInt("id"));
+            log.setId(rs.getString("entryID"));
+            log.setStockID(rs.getString("id"));
             log.setSource(rs.getString("entrySource"));
             log.setPrice(rs.getDouble("entryPrice"));
             log.setQuantity(rs.getInt("entryQuantity"));
-            log.setUserID(rs.getInt("entryUserID"));
+            log.setUserID(rs.getString("entryUserID"));
             log.setCreatedAt(rs.getTimestamp("entryCreatedAt")!=null ? rs.getTimestamp("entryCreatedAt").toLocalDateTime() : null);
             log.setUpdatedAt(rs.getTimestamp("entryUpdatedAt")!=null ? rs.getTimestamp("entryUpdatedAt").toLocalDateTime() : null);
             stock.setEntryLog(log);
@@ -1029,7 +1029,7 @@ public class StockDAO {
 
         while(rs.next()) {
             Stock stock = new Stock(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
                     rs.getString("SerialNumber"),
@@ -1037,7 +1037,7 @@ public class StockDAO {
                     rs.getString("Model"),
                     rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
                     rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
-                    rs.getInt("TypeID"),
+                    rs.getString("TypeID"),
                     rs.getString("Unit"),
                     rs.getInt("Quantity"),
                     rs.getInt("Critical"),
@@ -1048,18 +1048,18 @@ public class StockDAO {
                     rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
-                    rs.getInt("UserIDCreated"),
-                    rs.getInt("UserIDUpdated"),
-                    rs.getInt("UserIDTrashed")
+                    rs.getString("UserIDCreated"),
+                    rs.getString("UserIDUpdated"),
+                    rs.getString("UserIDTrashed")
             );
             Releasing log = new Releasing();
-            log.setId(rs.getInt("releasedID"));
-            log.setStockID(rs.getInt("id"));
-            log.setMirsID(rs.getInt("releasedMIRSID"));
+            log.setId(rs.getString("releasedID"));
+            log.setStockID(rs.getString("id"));
+            log.setMirsID(rs.getString("releasedMIRSID"));
             log.setStatus(rs.getString("releasedStatus"));
             log.setPrice(rs.getDouble("releasedPrice"));
             log.setQuantity(rs.getInt("releasedQuantity"));
-            log.setUserID(rs.getInt("releasedUserID"));
+            log.setUserID(rs.getString("releasedUserID"));
             log.setCreatedAt(rs.getTimestamp("releasedCreatedAt")!=null ? rs.getTimestamp("releasedCreatedAt").toLocalDateTime() : null);
             log.setUpdatedAt(rs.getTimestamp("releasedUpdatedAt")!=null ? rs.getTimestamp("releasedUpdatedAt").toLocalDateTime() : null);
             stock.setReleasing(log);
@@ -1101,7 +1101,7 @@ public class StockDAO {
 
         while(rs.next()) {
             Stock stock = new Stock(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
                     rs.getString("SerialNumber"),
@@ -1109,7 +1109,7 @@ public class StockDAO {
                     rs.getString("Model"),
                     rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
                     rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
-                    rs.getInt("TypeID"),
+                    rs.getString("TypeID"),
                     rs.getString("Unit"),
                     rs.getInt("releasedQuantity"),
                     rs.getInt("Critical"),
@@ -1120,9 +1120,9 @@ public class StockDAO {
                     rs.getTimestamp("releasedCreatedAt")!=null ? rs.getTimestamp("releasedCreatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("releasedUpdatedAt")!=null ? rs.getTimestamp("releasedUpdatedAt").toLocalDateTime() : null,
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
-                    rs.getInt("UserIDCreated"),
-                    rs.getInt("UserIDUpdated"),
-                    rs.getInt("UserIDTrashed")
+                    rs.getString("UserIDCreated"),
+                    rs.getString("UserIDUpdated"),
+                    rs.getString("UserIDTrashed")
             );
             stocks.add(stock);
         }
@@ -1141,7 +1141,7 @@ public class StockDAO {
     public static int countPendingRequest(Stock stock) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT SUM(Quantity) AS 'pending' FROM MIRSItems mi LEFT JOIN MIRS m ON m.id = mi.MIRSID WHERE (m.Status = 'Pending' OR m.Status = 'Releasing') AND mi.StockID = ?; ");
-        ps.setInt(1, stock.getId());
+        ps.setString(1, stock.getId());
         ResultSet rs = ps.executeQuery();
 
         int count = 0;

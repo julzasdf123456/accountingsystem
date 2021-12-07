@@ -3,7 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.objects;
 import com.boheco1.dev.integratedaccountingsystem.dao.DepartmentDAO;
 
 public class EmployeeInfo {
-    private int id;
+    private String id;
     private String employeeFirstName;
     private String employeeMidName;
     private String employeeLastName;
@@ -12,14 +12,14 @@ public class EmployeeInfo {
     private String phone;
     private String designation;
     private String signatoryLevel;
-    private int departmentID;
+    private String departmentID;
 
     private String fullName;
     private String departmentName;
 
     public EmployeeInfo(){}
 
-    public EmployeeInfo(int id, String employeeFirstName, String employeeMidName, String employeeLastName,String employeeSuffix, String employeeAddress, String phone, String designation, String signatoryLevel, int departmentID) throws Exception {
+    public EmployeeInfo(String id, String employeeFirstName, String employeeMidName, String employeeLastName,String employeeSuffix, String employeeAddress, String phone, String designation, String signatoryLevel, String departmentID) throws Exception {
         this.id = id;
         this.employeeFirstName = employeeFirstName;
         this.employeeMidName = employeeMidName;
@@ -79,19 +79,19 @@ public class EmployeeInfo {
         this.employeeAddress = employeeAddress;
     }
 
-    public int getDepartmentID() {
+    public String getDepartmentID() {
         return departmentID;
     }
 
-    public void setDepartmentID(int departmentID) {
+    public void setDepartmentID(String departmentID) {
         this.departmentID = departmentID;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

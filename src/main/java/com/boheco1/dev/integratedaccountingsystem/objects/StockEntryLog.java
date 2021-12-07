@@ -7,12 +7,12 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import java.time.LocalDateTime;
 
 public class StockEntryLog {
-    private int id;
-    private int stockID;
+    private String id;
+    private String stockID;
     private int quantity;
     private String source;
     private double Price;
-    private int userID;
+    private String userID;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -21,7 +21,7 @@ public class StockEntryLog {
 
     public StockEntryLog() {}
 
-    public StockEntryLog(int id, int stockID, int quantity, String source, double price, int userID, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public StockEntryLog(String id, String stockID, int quantity, String source, double price, String userID, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.stockID = stockID;
         this.quantity = quantity;
@@ -32,19 +32,19 @@ public class StockEntryLog {
         this.updatedAt = updatedAt;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public int getStockID() {
+    public String getStockID() {
         return stockID;
     }
 
-    public void setStockID(int stockID) {
+    public void setStockID(String stockID) {
         this.stockID = stockID;
     }
 
@@ -72,11 +72,11 @@ public class StockEntryLog {
         Price = price;
     }
 
-    public int getUserID() {
+    public String getUserID() {
         return userID;
     }
 
-    public void setUserID(int userID) {
+    public void setUserID(String userID) {
         this.userID = userID;
     }
 

@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class SlimStock {
 
-    private int id;
+    private String id;
     private String StockName;
     private String Model;
     private String Brand;
@@ -13,18 +13,18 @@ public class SlimStock {
     private String Unit;
     private double Price;
 
-    public SlimStock(int id, String stockName, String model, String brand) {
+    public SlimStock(String id, String stockName, String model, String brand) {
         this.id = id;
         StockName = stockName;
         Model = model;
         Brand = brand;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Stock {
-    private int id;
+    private String id;
     private String stockName;
     private String description;
     private String serialNumber;
@@ -13,7 +13,7 @@ public class Stock {
     private String model;
     private LocalDate manufacturingDate;
     private LocalDate validityDate;
-    private int typeID;
+    private String typeID;
     private String unit;
     private int quantity;
     private int critical;
@@ -24,23 +24,23 @@ public class Stock {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime trashedAt;
-    private int userIDCreated;
-    private int userIDUpdated;
-    private int userIDTrashed;
+    private String userIDCreated;
+    private String userIDUpdated;
+    private String userIDTrashed;
 
     private StockEntryLog entryLog;
     private Releasing releasing;
 
     public Stock() {}
 
-    public Stock(int id, String stockName, String model, String brand) {
+    public Stock(String id, String stockName, String model, String brand) {
         this.id = id;
         this.stockName = stockName;
         this.model = model;
         this.brand = brand;
     }
     /** Constructor with critical **/
-    public Stock(int id, String stockName, String description, String serialNumber, String brand, String model, LocalDate manufacturingDate, LocalDate validityDate, int typeID, String unit, int quantity, int critical, double price, String neaCode, boolean isTrashed, String comments, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime trashedAt, int userIDCreated, int userIDUpdated, int userIDTrashed) {
+    public Stock(String id, String stockName, String description, String serialNumber, String brand, String model, LocalDate manufacturingDate, LocalDate validityDate, String typeID, String unit, int quantity, int critical, double price, String neaCode, boolean isTrashed, String comments, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime trashedAt, String userIDCreated, String userIDUpdated, String userIDTrashed) {
         this.id = id;
         this.stockName = stockName;
         this.description = description;
@@ -75,11 +75,11 @@ public class Stock {
         this.critical = critical;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -139,11 +139,11 @@ public class Stock {
         this.validityDate = validityDate;
     }
 
-    public int getTypeID() {
+    public String getTypeID() {
         return typeID;
     }
 
-    public void setTypeID(int typeID) {
+    public void setTypeID(String typeID) {
         this.typeID = typeID;
     }
 
@@ -219,27 +219,27 @@ public class Stock {
         this.trashedAt = trashedAt;
     }
 
-    public int getUserIDCreated() {
+    public String getUserIDCreated() {
         return userIDCreated;
     }
 
-    public void setUserIDCreated(int userIDCreated) {
+    public void setUserIDCreated(String userIDCreated) {
         this.userIDCreated = userIDCreated;
     }
 
-    public int getUserIDUpdated() {
+    public String getUserIDUpdated() {
         return userIDUpdated;
     }
 
-    public void setUserIDUpdated(int userIDUpdated) {
+    public void setUserIDUpdated(String userIDUpdated) {
         this.userIDUpdated = userIDUpdated;
     }
 
-    public int getUserIDTrashed() {
+    public String getUserIDTrashed() {
         return userIDTrashed;
     }
 
-    public void setUserIDTrashed(int userIDTrashed) {
+    public void setUserIDTrashed(String userIDTrashed) {
         this.userIDTrashed = userIDTrashed;
     }
 

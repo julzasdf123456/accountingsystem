@@ -23,28 +23,28 @@ public class EmployeeDAO {
         cs.setString(5, employee.getEmployeeAddress());
         cs.setString(6, employee.getPhone());
         cs.setString(7, employee.getDesignation());
-        cs.setInt(8, employee.getDepartmentID());
+        cs.setString(8, employee.getDepartmentID());
         cs.setString(9, employee.getSignatoryLevel());
 
         cs.executeUpdate();
 
         ResultSet rs = cs.getGeneratedKeys();
 
-        if(rs.next()) employee.setId(rs.getInt(1));
+        if(rs.next()) employee.setId(rs.getString(1));
 
         rs.close();
         cs.close();
     }
 
-    public static EmployeeInfo getOne(int id, Connection conn) throws Exception {
+    public static EmployeeInfo getOne(String id, Connection conn) throws Exception {
         PreparedStatement cs = conn.prepareStatement(
                 "SELECT * FROM EmployeeInfo WHERE EmployeeID=?");
-        cs.setInt(1, id);
+        cs.setString(1, id);
         ResultSet rs = cs.executeQuery();
 
         if(rs.next()) {
             return new EmployeeInfo(
-                    rs.getInt("EmployeeID"),
+                    rs.getString("EmployeeID"),
                     rs.getString("EmployeeFirstName"),
                     rs.getString("EmployeeMidName"),
                     rs.getString("EmployeeLastName"),
@@ -53,7 +53,7 @@ public class EmployeeDAO {
                     rs.getString("Phone"),
                     rs.getString("Designation"),
                     rs.getString("SignatoryLevel"),
-                    rs.getInt("DepartmentID")
+                    rs.getString("DepartmentID")
             );
         }else {
             return null;
@@ -71,7 +71,7 @@ public class EmployeeDAO {
 
         while(rs.next()) {
             employeeInfos.add(new EmployeeInfo(
-                    rs.getInt("EmployeeID"),
+                    rs.getString("EmployeeID"),
                     rs.getString("EmployeeFirstName"),
                     rs.getString("EmployeeMidName"),
                     rs.getString("EmployeeLastName"),
@@ -80,7 +80,7 @@ public class EmployeeDAO {
                     rs.getString("Phone"),
                     rs.getString("Designation"),
                     rs.getString("SignatoryLevel"),
-                    rs.getInt("DepartmentID")
+                    rs.getString("DepartmentID")
             ));
         }
 
@@ -102,10 +102,10 @@ public class EmployeeDAO {
         ps.setString(4, employeeInfo.getEmployeeSuffix());
         ps.setString(5, employeeInfo.getEmployeeAddress());
         ps.setString(6, employeeInfo.getDesignation());
-        ps.setInt(7, employeeInfo.getDepartmentID());
+        ps.setString(7, employeeInfo.getDepartmentID());
         ps.setString(8, employeeInfo.getPhone());
-        ps.setString(9,employeeInfo.getSignatoryLevel());
-        ps.setInt(10, employeeInfo.getId());
+        ps.setString(9, employeeInfo.getSignatoryLevel());
+        ps.setString(10, employeeInfo.getId());
 
         ps.executeUpdate();
 
@@ -132,7 +132,7 @@ public class EmployeeDAO {
         ArrayList<EmployeeInfo> list = new ArrayList<>();
         while(rs.next()) {
             EmployeeInfo employeeInfo = new EmployeeInfo();
-            employeeInfo.setId(rs.getInt("EmployeeID"));
+            employeeInfo.setId(rs.getString("EmployeeID"));
             employeeInfo.setEmployeeFirstName(rs.getString("EmployeeFirstName"));
             employeeInfo.setEmployeeMidName(rs.getString("EmployeeMidName"));
             employeeInfo.setEmployeeLastName(rs.getString("EmployeeLastName"));

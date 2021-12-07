@@ -27,9 +27,9 @@ public class MirsDAO {
         ps.setString(2, mirs.getPurpose());
         ps.setString(3, mirs.getDetails());
         ps.setString(4, mirs.getStatus());
-        ps.setInt(5, mirs.getRequisitionerID());
-        ps.setInt(6, mirs.getUserID());
-        ps.setInt(7, mirs.getId());
+        ps.setString(5, mirs.getRequisitionerID());
+        ps.setString(6, mirs.getUserID());
+        ps.setString(7, mirs.getId());
 
         ps.executeUpdate();
         ps.close();
@@ -50,8 +50,8 @@ public class MirsDAO {
         ps.setString(2, mirs.getPurpose());
         ps.setString(3, mirs.getDetails());
         ps.setString(4, mirs.getStatus());
-        ps.setInt(5, mirs.getRequisitionerID());
-        ps.setInt(6, mirs.getId());
+        ps.setString(5, mirs.getRequisitionerID());
+        ps.setString(6, mirs.getId());
 
         ps.executeUpdate();
 
@@ -69,8 +69,8 @@ public class MirsDAO {
                 "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt) " +
                         "VALUES " +
                         "(?,?,?,?,?,GETDATE(),GETDATE())", Statement.RETURN_GENERATED_KEYS);
-        ps.setInt(1, mirs.getId());
-        ps.setInt(2, item.getStockID());
+        ps.setString(1, mirs.getId());
+        ps.setString(2, item.getStockID());
         ps.setInt(3, item.getQuantity());
         ps.setDouble(4, item.getPrice());
         ps.setString(5, item.getRemarks());
@@ -78,7 +78,7 @@ public class MirsDAO {
         ps.executeUpdate();
 
         ResultSet rs = ps.getGeneratedKeys();
-        if(rs.next()) item.setId(rs.getInt(1));
+        if(rs.next()) item.setId(rs.getString(1));
 
         rs.close();
         ps.close();
@@ -97,8 +97,8 @@ public class MirsDAO {
                         "(?,?,?,?,?,GETDATE(),GETDATE())");
 
         for(MIRSItem item: items) {
-            ps.setInt(1, mirs.getId());
-            ps.setInt(2, item.getStockID());
+            ps.setString(1, mirs.getId());
+            ps.setString(2, item.getStockID());
             ps.setInt(3, item.getQuantity());
             ps.setDouble(4, item.getPrice());
             ps.setString(5, item.getRemarks());
@@ -120,7 +120,7 @@ public class MirsDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE MIRSItems SET StockID=?, Quantity=?, Price=?, Comments=?, UpdatedAt=GETDATE() " +
                         "WHERE id=?");
-        ps.setInt(1, item.getStockID());
+        ps.setString(1, item.getStockID());
         ps.setInt(2, item.getQuantity());
         ps.setDouble(3, item.getPrice());
         ps.setString(4, item.getRemarks());
@@ -138,7 +138,7 @@ public class MirsDAO {
     public static void removeItem(MIRSItem item) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "DELETE FROM MIRSItems WHERE id=?");
-        ps.setInt(1, item.getId());
+        ps.setString(1, item.getId());
 
         ps.executeUpdate();
 
@@ -155,7 +155,7 @@ public class MirsDAO {
                 "DELETE FROM MIRSItems WHERE id=?");
 
         for(MIRSItem item: items) {
-            ps.setInt(1, item.getId());
+            ps.setString(1, item.getId());
             ps.addBatch();
         }
 
@@ -179,13 +179,13 @@ public class MirsDAO {
 
         if(rs.next()) {
             MIRS mirs = new MIRS(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getDate("DateFiled").toLocalDate(),
                     rs.getString("Purpose"),
                     rs.getString("Details"),
                     rs.getString("Status"),
-                    rs.getInt("RequisitionerID"),
-                    rs.getInt("UserID"),
+                    rs.getString("RequisitionerID"),
+                    rs.getString("UserID"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
                     rs.getTimestamp("UpdatedAt").toLocalDateTime()
             );
@@ -211,7 +211,7 @@ public class MirsDAO {
     public static List<MIRSItem> getItems(MIRS mirs) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM MIRSItems WHERE MIRSID=?");
-        ps.setInt(1, mirs.getId());
+        ps.setString(1, mirs.getId());
 
         ResultSet rs = ps.executeQuery();
 
@@ -219,9 +219,9 @@ public class MirsDAO {
 
         while(rs.next()) {
             items.add(new MIRSItem(
-                    rs.getInt("id"),
-                    rs.getInt("MIRSID"),
-                    rs.getInt("StockID"),
+                    rs.getString("id"),
+                    rs.getString("MIRSID"),
+                    rs.getString("StockID"),
                     rs.getInt("Quantity"),
                     rs.getDouble("Price"),
                     rs.getString("Comments"),
@@ -245,13 +245,13 @@ public class MirsDAO {
 
         while(rs.next()) {
             pending.add(new MIRS(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getDate("DateFiled").toLocalDate(),
                     rs.getString("Purpose"),
                     rs.getString("Details"),
                     rs.getString("Status"),
-                    rs.getInt("RequisitionerID"),
-                    rs.getInt("UserID"),
+                    rs.getString("RequisitionerID"),
+                    rs.getString("UserID"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
                     rs.getTimestamp("UpdatedAt").toLocalDateTime()
             ));
@@ -308,13 +308,13 @@ public class MirsDAO {
 
         while(rs.next()) {
             approved.add(new MIRS(
-                    rs.getInt("id"),
+                    rs.getString("id"),
                     rs.getDate("DateFiled").toLocalDate(),
                     rs.getString("Purpose"),
                     rs.getString("Details"),
                     rs.getString("Status"),
-                    rs.getInt("RequisitionerID"),
-                    rs.getInt("UserID"),
+                    rs.getString("RequisitionerID"),
+                    rs.getString("UserID"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
                     rs.getTimestamp("UpdatedAt").toLocalDateTime()
             ));

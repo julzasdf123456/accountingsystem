@@ -8,13 +8,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class MIRS {
-    private int id;
+    private String id;
     private LocalDate dateFiled;
     private String purpose;
     private String details;
     private String status;
-    private int requisitionerID;
-    private int userID;
+    private String requisitionerID;
+    private String userID;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -23,7 +23,7 @@ public class MIRS {
 
     public MIRS(){}
 
-    public MIRS(int id, LocalDate dateFiled, String purpose, String details, String status, int requisitionerID, int userID, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public MIRS(String id, LocalDate dateFiled, String purpose, String details, String status, String requisitionerID, String userID, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.dateFiled = dateFiled;
         this.purpose = purpose;
@@ -35,11 +35,11 @@ public class MIRS {
         this.updatedAt = updatedAt;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -75,19 +75,19 @@ public class MIRS {
         this.status = status;
     }
 
-    public int getRequisitionerID() {
+    public String getRequisitionerID() {
         return requisitionerID;
     }
 
-    public void setRequisitionerID(int requisitionerID) {
+    public void setRequisitionerID(String requisitionerID) {
         this.requisitionerID = requisitionerID;
     }
 
-    public int getUserID() {
+    public String getUserID() {
         return userID;
     }
 
-    public void setUserID(int userID) {
+    public void setUserID(String userID) {
         this.userID = userID;
     }
 

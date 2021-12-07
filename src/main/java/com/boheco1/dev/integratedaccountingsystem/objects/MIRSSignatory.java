@@ -3,9 +3,9 @@ package com.boheco1.dev.integratedaccountingsystem.objects;
 import java.time.LocalDateTime;
 
 public class MIRSSignatory {
-    private int id;
-    private int mirsID;
-    private int userID;
+    private String id;
+    private String mirsID;
+    private String userID;
     private String status;
     private String comments;
     private LocalDateTime createdAt;
@@ -13,7 +13,7 @@ public class MIRSSignatory {
 
     public MIRSSignatory(){}
 
-    public MIRSSignatory(int id, int mirsID, int userID, String status, String comments, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public MIRSSignatory(String id, String mirsID, String userID, String status, String comments, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.mirsID = mirsID;
         this.userID = userID;
@@ -23,27 +23,27 @@ public class MIRSSignatory {
         this.updatedAt = updatedAt;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public int getMirsID() {
+    public String getMirsID() {
         return mirsID;
     }
 
-    public void setMirsID(int mirsID) {
+    public void setMirsID(String mirsID) {
         this.mirsID = mirsID;
     }
 
-    public int getUserID() {
+    public String getUserID() {
         return userID;
     }
 
-    public void setUserID(int userID) {
+    public void setUserID(String userID) {
         this.userID = userID;
     }
 

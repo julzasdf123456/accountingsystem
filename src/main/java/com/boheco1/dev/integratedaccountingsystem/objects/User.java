@@ -6,30 +6,30 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import java.util.List;
 
 public class User {
-    private int id;
+    private String id;
     private String userName;
     private String fullName;
     private String passwordHash;
     private String password;
-    private int employeeID;
+    private String employeeID;
     private List<Permission> permissions;
     private static final String KEY = "ubhc1@securityxc";
 
     private EmployeeInfo employeeInfo;
 
-    public User(int id, int employeeID, String userName, String fullName) {
+    public User(String id, String employeeID, String userName, String fullName) {
         this.id = id;
         this.employeeID = employeeID;
         this.userName = userName;
         this.fullName = fullName;
     }
 
-    public User(int id, int employeeID, String userName, String fullName, String passwordHash) {
+    public User(String id, String employeeID, String userName, String fullName, String passwordHash) {
         this(id, employeeID, userName, fullName);
         this.passwordHash = passwordHash;
     }
 
-    public int getEmployeeID() {
+    public String getEmployeeID() {
         return employeeID;
     }
 
@@ -57,11 +57,11 @@ public class User {
         this.fullName = fullName;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

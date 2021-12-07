@@ -3,17 +3,17 @@ package com.boheco1.dev.integratedaccountingsystem.objects;
 import java.time.LocalDateTime;
 
 public class Releasing {
-    private int id;
-    private int stockID;
-    private int mirsID;
+    private String id;
+    private String stockID;
+    private String mirsID;
     private int quantity;
     private double price;
-    private int userID;
+    private String userID;
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Releasing(int id, int stockID, int mirsID, int quantity, double price, int userID, String status) {
+    public Releasing(String id, String stockID, String mirsID, int quantity, double price, String userID, String status) {
         this.id = id;
         this.stockID = stockID;
         this.mirsID = mirsID;
@@ -26,27 +26,27 @@ public class Releasing {
     public Releasing() {
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public int getStockID() {
+    public String getStockID() {
         return stockID;
     }
 
-    public void setStockID(int stockID) {
+    public void setStockID(String stockID) {
         this.stockID = stockID;
     }
 
-    public int getMirsID() {
+    public String getMirsID() {
         return mirsID;
     }
 
-    public void setMirsID(int mirsID) {
+    public void setMirsID(String mirsID) {
         this.mirsID = mirsID;
     }
 
@@ -66,11 +66,11 @@ public class Releasing {
         this.price = price;
     }
 
-    public int getUserID() {
+    public String getUserID() {
         return userID;
     }
 
-    public void setUserID(int userID) {
+    public void setUserID(String userID) {
         this.userID = userID;
     }
 
