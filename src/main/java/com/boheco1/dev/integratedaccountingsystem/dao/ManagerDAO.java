@@ -6,6 +6,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.User;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -32,30 +33,40 @@ public class ManagerDAO {
     }
 
     public static void addPermissionToUser(User user, Permission permission, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call Add_permission_to_user (?,?)}");
+//        CallableStatement cs = conn.prepareCall("{call Add_permission_to_user (?,?)}");
+        PreparedStatement cs = conn.prepareStatement("INSERT INTO user_permissions (user_id, permission_id) " +
+                "VALUES (?,?)");
+
         cs.setString(1, user.getId());
         cs.setString(2, permission.getId());
         cs.executeUpdate();
+
+        cs.close();
     }
 
     public static void removeRolePermission(Role role, Permission permission, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call Remove_role_permission (?,?)}");
+        PreparedStatement cs = conn.prepareStatement("DELETE FROM role_permissions WHERE role_id=? AND permission_id=?");
+
         cs.setString(1, role.getId());
         cs.setString(2, permission.getId());
         cs.executeUpdate();
+
+        cs.close();
     }
 
     public static void removeUserPermission(User user, Permission permission, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call Remove_user_permission (?,?)}");
+        PreparedStatement cs = conn.prepareStatement("DELETE FROM user_permissions WHERE user_id=? AND permission_id=?");
         cs.setString(1, user.getId());
         cs.setString(2, permission.getId());
         cs.executeUpdate();
+        cs.close();
     }
 
     public static void removeUserRole(User user, Role role, Connection conn) throws SQLException {
-        CallableStatement cs = conn.prepareCall("{call Remove_user_role (?,?)}");
+        PreparedStatement cs = conn.prepareStatement("DELETE FROM user_roles WHERE user_id=? AND role_id=?");
         cs.setString(1, user.getId());
         cs.setString(2, role.getId());
         cs.executeUpdate();
+        cs.close();
     }
 }
