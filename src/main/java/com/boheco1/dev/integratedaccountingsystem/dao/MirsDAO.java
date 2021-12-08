@@ -172,10 +172,10 @@ public class MirsDAO {
      * @return MIRS object
      * @throws Exception
      */
-    public static MIRS getMIRS(int id) throws Exception {
+    public static MIRS getMIRS(String id) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM MIRS WHERE id=?");
-        ps.setInt(1, id);
+        ps.setString(1, id);
 
         ResultSet rs = ps.executeQuery();
 

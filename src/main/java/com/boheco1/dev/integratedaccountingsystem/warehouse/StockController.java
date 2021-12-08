@@ -49,7 +49,7 @@ public class StockController extends MenuControllerHandler implements Initializa
     @FXML
     private JFXComboBox<Integer> page_cb;
 
-    private HashMap<Integer, SlimStock> selected = new HashMap<>();
+    private HashMap<String, SlimStock> selected = new HashMap<>();
 
     private JFXDialog dialog;
 

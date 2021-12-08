@@ -107,7 +107,7 @@ public class ViewStockController implements Initializable {
 
         }
 
-        int id = this.stock.getId();
+        String id = this.stock.getId();
         this.stock = new Stock();
 
         //Mandatory fields

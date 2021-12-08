@@ -45,7 +45,7 @@ public class TrashStockController extends MenuControllerHandler implements Initi
     @FXML
     private JFXComboBox<Integer> page_cb;
 
-    private HashMap<Integer, SlimStock> selected = new HashMap<>();
+    private HashMap<String, SlimStock> selected = new HashMap<>();
 
     private JFXDialog dialog;
 

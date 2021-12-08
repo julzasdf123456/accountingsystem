@@ -84,7 +84,7 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
             if(currentEmployee==null) {
                 //create new
                 currentEmployee = new EmployeeInfo(
-                        -1,
+                        "",
                         firstNameField.getText(),
                         middleNameField.getText(),
                         lastNameField.getText(),
