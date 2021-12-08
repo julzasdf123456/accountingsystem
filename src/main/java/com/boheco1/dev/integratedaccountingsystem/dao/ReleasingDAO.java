@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.Releasing;
 
 import java.sql.PreparedStatement;
@@ -10,8 +11,10 @@ import java.sql.Statement;
 public class ReleasingDAO {
     public static void add(Releasing releasing) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO Releasing (StockID, MIRSID, Quantity, Price, UserID, Status, CreatedAt, UpdatedAt) " +
-                        "VALUES (?,?,?,?,?,?,GETDATE(),GETDATE())", Statement.RETURN_GENERATED_KEYS);
+                "INSERT INTO Releasing (StockID, MIRSID, Quantity, Price, UserID, Status, CreatedAt, UpdatedAt, id) " +
+                        "VALUES (?,?,?,?,?,?,GETDATE(),GETDATE(),?)");
+
+        releasing.setId(Utility.generateRandomId());
 
         ps.setString(1, releasing.getStockID());
         ps.setString(2, releasing.getMirsID());
@@ -19,16 +22,10 @@ public class ReleasingDAO {
         ps.setDouble(4, releasing.getPrice());
         ps.setString(5, releasing.getUserID());
         ps.setString(6, releasing.getStatus());
+        ps.setString(7, releasing.getId());
 
         ps.executeUpdate();
 
-        ResultSet rs = ps.getGeneratedKeys();
-
-        if(rs.next()) {
-            releasing.setId(rs.getString(1));
-        }
-
-        rs.close();
         ps.close();
     }
 

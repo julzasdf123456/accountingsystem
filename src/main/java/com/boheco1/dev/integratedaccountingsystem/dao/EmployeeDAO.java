@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
 
 import java.sql.*;
@@ -13,9 +14,10 @@ public class EmployeeDAO {
     public static void addEmployee(EmployeeInfo employee, Connection conn) throws SQLException {
 //        CallableStatement cs = conn.prepareCall("{? = call Add_employee (?,?,?,?,?,?,?)}");
         PreparedStatement cs = conn.prepareStatement(
-                "INSERT INTO EmployeeInfo (EmployeeFirstName, EmployeeMidName, EmployeeLastName, EmployeeSuffix, Address, Phone, Designation, DepartmentID, SignatoryLevel) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+                "INSERT INTO EmployeeInfo (EmployeeFirstName, EmployeeMidName, EmployeeLastName, EmployeeSuffix, Address, Phone, Designation, DepartmentID, SignatoryLevel, EmployeeID) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?)");
 
+        employee.setId(Utility.generateRandomId());
         cs.setString(1, employee.getEmployeeFirstName());
         cs.setString(2, employee.getEmployeeMidName());
         cs.setString(3, employee.getEmployeeLastName());
@@ -25,14 +27,10 @@ public class EmployeeDAO {
         cs.setString(7, employee.getDesignation());
         cs.setString(8, employee.getDepartmentID());
         cs.setString(9, employee.getSignatoryLevel());
+        cs.setString(10, employee.getId() );
 
         cs.executeUpdate();
 
-        ResultSet rs = cs.getGeneratedKeys();
-
-        if(rs.next()) employee.setId(rs.getString(1));
-
-        rs.close();
         cs.close();
     }
 

@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRSSignatory;
 
@@ -14,21 +15,18 @@ public class MIRSSignatoryDAO {
     public static void add(MIRSSignatory msig) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "INSERT INTO MIRSSignatories " +
-                        "(MIRSID, user_id, Status, Comments, CreatedAt, UpdatedAt) " +
+                        "(MIRSID, user_id, Status, Comments, CreatedAt, UpdatedAt,id) " +
                         "VALUES " +
-                        "(?,?,?,?,GETDATE(),GETDATE())", Statement.RETURN_GENERATED_KEYS);
+                        "(?,?,?,?,GETDATE(),GETDATE(),?)");
+        msig.setId(Utility.generateRandomId());
         ps.setString(1, msig.getMirsID());
         ps.setString(2, msig.getUserID());
         ps.setString(3, msig.getStatus());
         ps.setString(4, msig.getComments());
+        ps.setString(5, msig.getId());
 
         ps.executeUpdate();
 
-        ResultSet rs = ps.getGeneratedKeys();
-
-        if(rs.next()) msig.setId(rs.getString(1));
-
-        rs.close();
         ps.close();
     }
 

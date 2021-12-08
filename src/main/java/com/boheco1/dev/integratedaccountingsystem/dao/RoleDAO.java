@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.Permission;
 import com.boheco1.dev.integratedaccountingsystem.objects.Role;
 import com.boheco1.dev.integratedaccountingsystem.objects.User;
@@ -46,21 +47,17 @@ public class RoleDAO {
     }
 
     public static void add(Role role, Connection cxn) throws SQLException {
-        PreparedStatement cs = cxn.prepareStatement("INSERT INTO roles (role, description) VALUES (?,?)", Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement cs = cxn.prepareStatement(
+                "INSERT INTO roles (role, description, id) VALUES (?,?,?)");
+
+        role.setId(Utility.generateRandomId());
 
         cs.setString(1, role.getRole());
         cs.setString(2, role.getDescription());
+        cs.setString(3, role.getId());
 
         cs.executeUpdate();
 
-        ResultSet rs = cs.getGeneratedKeys();
-
-        if(rs.next()) {
-            String id = rs.getString(1);
-            role.setId(id);
-        }
-
-        rs.close();
         cs.close();
     }
 

@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRSItem;
 
@@ -20,9 +21,10 @@ public class MirsDAO {
      */
     public static void create(MIRS mirs) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO MIRS (DateFiled, Purpose, Details, Status, RequisitionerID, UserID, id, CreatedAt, UpdatedAt) " +
+                "INSERT INTO MIRS (DateFiled, Purpose, Details, Status, RequisitionerID, UserID, id, CreatedAt, UpdatedAt, id) " +
                         "VALUES " +
-                        "(?,?,?,?,?,?,?,GETDATE(), GETDATE())", Statement.RETURN_GENERATED_KEYS);
+                        "(?,?,?,?,?,?,?,GETDATE(), GETDATE(),?)");
+        mirs.setId(Utility.generateRandomId());
         ps.setDate(1, Date.valueOf(mirs.getDateFiled()));
         ps.setString(2, mirs.getPurpose());
         ps.setString(3, mirs.getDetails());
@@ -30,6 +32,7 @@ public class MirsDAO {
         ps.setString(5, mirs.getRequisitionerID());
         ps.setString(6, mirs.getUserID());
         ps.setString(7, mirs.getId());
+        ps.setString(8, mirs.getId());
 
         ps.executeUpdate();
         ps.close();
@@ -66,21 +69,19 @@ public class MirsDAO {
      */
     public static void addMIRSItem(MIRS mirs, MIRSItem item) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt) " +
+                "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id) " +
                         "VALUES " +
-                        "(?,?,?,?,?,GETDATE(),GETDATE())", Statement.RETURN_GENERATED_KEYS);
+                        "(?,?,?,?,?,GETDATE(),GETDATE(), ?)");
+        mirs.setId(Utility.generateRandomId());
         ps.setString(1, mirs.getId());
         ps.setString(2, item.getStockID());
         ps.setInt(3, item.getQuantity());
         ps.setDouble(4, item.getPrice());
         ps.setString(5, item.getRemarks());
+        ps.setString(6, mirs.getId());
 
         ps.executeUpdate();
 
-        ResultSet rs = ps.getGeneratedKeys();
-        if(rs.next()) item.setId(rs.getString(1));
-
-        rs.close();
         ps.close();
     }
 
@@ -92,9 +93,9 @@ public class MirsDAO {
      */
     public static void addMIRSItems(MIRS mirs, List<MIRSItem> items) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt) " +
+                "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id) " +
                         "VALUES " +
-                        "(?,?,?,?,?,GETDATE(),GETDATE())");
+                        "(?,?,?,?,?,GETDATE(),GETDATE(), ?)");
 
         for(MIRSItem item: items) {
             ps.setString(1, mirs.getId());
@@ -102,6 +103,7 @@ public class MirsDAO {
             ps.setInt(3, item.getQuantity());
             ps.setDouble(4, item.getPrice());
             ps.setString(5, item.getRemarks());
+            ps.setString(6, Utility.generateRandomId());
 
             ps.addBatch();
         }

@@ -1,7 +1,9 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
+import jdk.jshell.execution.Util;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -25,8 +27,11 @@ public class StockDAO {
                         "ValidityDate, TypeID, Unit, " +
                         "Quantity, Price, NEACode, " +
                         "IsTrashed, Comments, CreatedAt, " +
-                        "UserIDCreated, Critical) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?,?)", Statement.RETURN_GENERATED_KEYS);
+                        "UserIDCreated, Critical, id) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?,?,?)", Statement.RETURN_GENERATED_KEYS);
+
+        stock.setId(Utility.generateRandomId());
+
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
         ps.setString(3, stock.getSerialNumber());
@@ -49,14 +54,10 @@ public class StockDAO {
 
         ps.setInt(16, stock.getCritical());
 
+        ps.setString(17, stock.getId());
+
         ps.executeUpdate();
 
-        ResultSet rs = ps.getGeneratedKeys();
-        if(rs.next()) {
-            stock.setId(rs.getString(1));
-        }
-
-        rs.close();
         ps.close();
     }
 
@@ -417,22 +418,20 @@ public class StockDAO {
     public static void stockEntry(Stock stock, StockEntryLog log) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "INSERT INTO StockEntryLogs " +
-                        "(StockID, Quantity, Source, Price, UserID, CreatedAt, UpdatedAt) " +
+                        "(StockID, Quantity, Source, Price, UserID, CreatedAt, UpdatedAt, id) " +
                         "VALUES " +
-                        "(?,?,?,?,?,GETDATE(),GETDATE())", Statement.RETURN_GENERATED_KEYS);
+                        "(?,?,?,?,?,GETDATE(),GETDATE(), ?)");
+
+        stock.setId(Utility.generateRandomId());
+
         ps.setString(1, stock.getId());
         ps.setInt(2, log.getQuantity());
         ps.setString(3, log.getSource());
         ps.setDouble(4, log.getPrice());
         ps.setString(5, ActiveUser.getUser().getId());
+        ps.setString(6, stock.getId());
         ps.executeUpdate();
 
-        ResultSet rs = ps.getGeneratedKeys();
-        if(rs.next()) {
-            String id = rs.getString(1);
-            log.setId(id);
-        }
-        rs.close();
         ps.close();
 
         addStockQuantity(stock, log.getQuantity());

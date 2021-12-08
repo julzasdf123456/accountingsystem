@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.Permission;
 import com.boheco1.dev.integratedaccountingsystem.objects.Role;
 import com.boheco1.dev.integratedaccountingsystem.objects.User;
@@ -29,20 +30,16 @@ public class PermissionDAO {
     }
 
     public static void add(Permission permission, Connection conn) throws SQLException {
-        PreparedStatement cs = conn.prepareStatement("INSERT INTO permissions (permission, remarks) VALUES (?,?)", Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement cs = conn.prepareStatement(
+                "INSERT INTO permissions (permission, remarks, id) VALUES (?,?,?)");
+
+        permission.setId(Utility.generateRandomId());
 
         cs.setString(1, permission.getPermission());
         cs.setString(2, permission.getRemarks());
+        cs.setString(3, permission.getId());
         cs.executeUpdate();
 
-        ResultSet rs = cs.getGeneratedKeys();
-
-        if(rs.next()) {
-            String id = rs.getString(1);
-            permission.setId(id);
-        }
-
-        rs.close();
         cs.close();
     }
 

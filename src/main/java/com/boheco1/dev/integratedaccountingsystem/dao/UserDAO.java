@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 import com.boheco1.dev.integratedaccountingsystem.objects.Permission;
 import com.boheco1.dev.integratedaccountingsystem.objects.Role;
@@ -172,24 +173,20 @@ public class UserDAO {
 
     public static void addUser(User user, Connection conn) throws Exception {
         String passwordHash = Hash.hash(user.getPassword());
-        PreparedStatement cs = conn.prepareStatement("INSERT INTO users (username, fullname, passsword, EmployeeID) " +
-                "VALUES (?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement cs = conn.prepareStatement(
+                "INSERT INTO users (username, fullname, passsword, EmployeeID, id) " +
+                "VALUES (?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+
+        user.setId(Utility.generateRandomId());
 
         cs.setString(1, user.getUserName());
         cs.setString(2, user.getFullName());
         cs.setString(3, passwordHash);
         cs.setString(4, user.getEmployeeID());
+        cs.setString(5, user.getId());
 
         cs.executeUpdate();
 
-        ResultSet rs = cs.getGeneratedKeys();
-
-        if(rs.next()) {
-            String id = rs.getString(1);
-            user.setId(id);
-        }
-
-        rs.close();
         cs.close();
     }
 

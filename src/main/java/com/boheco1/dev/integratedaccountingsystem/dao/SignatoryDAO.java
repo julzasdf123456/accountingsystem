@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.Signatory;
 
 import java.sql.PreparedStatement;
@@ -14,21 +15,20 @@ public class SignatoryDAO {
     public static void add(Signatory sig) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "INSERT INTO Signatories " +
-                        "(Type, UserID, Rank, Comments, CreatedAt, UpdatedAt) " +
+                        "(Type, UserID, Rank, Comments, CreatedAt, UpdatedAt, id) " +
                         "VALUES " +
-                        "(?,?,?,?,now(), now())", Statement.RETURN_GENERATED_KEYS);
+                        "(?,?,?,?,now(), now(), ?)");
+
+        sig.setId(Utility.generateRandomId());
+
         ps.setString(1, sig.getType());
         ps.setString(2, sig.getUserID());
         ps.setInt(3, sig.getRank());
         ps.setString(4, sig.getComments());
+        ps.setString(5, sig.getId());
 
         ps.executeUpdate();
 
-        ResultSet rs = ps.getGeneratedKeys();
-
-        if(rs.next()) sig.setId(rs.getString(1));
-
-        rs.close();
         ps.close();
     }
 
