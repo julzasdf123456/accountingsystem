@@ -167,6 +167,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                     AlertDialogBuilder.messgeDialog("Stock Entry", "New stock was successfully added!", stockStackPane, AlertDialogBuilder.SUCCESS_DIALOG);
                 }catch (Exception e){
                     AlertDialogBuilder.messgeDialog("System Error", "New stock was not successfully added due to:"+e.getMessage()+".", stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+                    e.printStackTrace();
                 }
                 this.reset();
             }else{

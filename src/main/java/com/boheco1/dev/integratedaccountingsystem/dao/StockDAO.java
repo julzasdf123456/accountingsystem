@@ -422,14 +422,14 @@ public class StockDAO {
                         "VALUES " +
                         "(?,?,?,?,?,GETDATE(),GETDATE(), ?)");
 
-        stock.setId(Utility.generateRandomId());
+        log.setId(Utility.generateRandomId());
 
         ps.setString(1, stock.getId());
         ps.setInt(2, log.getQuantity());
         ps.setString(3, log.getSource());
         ps.setDouble(4, log.getPrice());
         ps.setString(5, ActiveUser.getUser().getId());
-        ps.setString(6, stock.getId());
+        ps.setString(6, log.getId());
         ps.executeUpdate();
 
         ps.close();
