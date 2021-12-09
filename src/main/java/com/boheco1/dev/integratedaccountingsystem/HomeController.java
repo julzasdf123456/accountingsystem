@@ -132,7 +132,8 @@ public class HomeController implements Initializable {
         if(ActiveUser.getUser().can("manage-warehouse"))
             NavMenuHelper.addMenu(navMenuBox, stocks, homeStackPane);
         NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Administrator"), new FontIcon("mdi2s-security"), homeStackPane);
-        NavMenuHelper.addMenu(navMenuBox, employees, homeStackPane);
+        if(ActiveUser.getUser().can("manage-employees"))
+            NavMenuHelper.addMenu(navMenuBox, employees, homeStackPane);
         NavMenuHelper.addMenu(navMenuBox, users, homeStackPane);
         NavMenuHelper.addMenu(navMenuBox, signatoriesButton, homeStackPane);
         NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("User"), new FontIcon("mdi2a-account-circle"), homeStackPane);
