@@ -30,6 +30,7 @@ public class EmployeeInfo {
         this.phone = phone;
         this.signatoryLevel = signatoryLevel;
         this.departmentID = departmentID;
+        this.fullName = getFullName();
     }
 
     public String getSignatoryLevel() {
@@ -51,16 +52,17 @@ public class EmployeeInfo {
     public String getFullName() {
         StringBuffer fullName = new StringBuffer();
 
-        if(employeeLastName!=null) fullName.append(employeeLastName).append(", ");
-        if(employeeSuffix!=null) fullName.append(" ").append(employeeSuffix).append(", ");
-        if(employeeFirstName!=null) fullName.append(employeeFirstName);
-        if(employeeMidName!=null) fullName.append(" ").append(employeeMidName.charAt(0));
+        if(employeeLastName!=null && !employeeLastName.isEmpty()) fullName.append(employeeLastName).append(", ");
+        if(employeeSuffix!=null && !employeeSuffix.isEmpty()) fullName.append(" ").append(employeeSuffix).append(", ");
+        if(employeeFirstName!=null && !employeeFirstName.isEmpty()) fullName.append(employeeFirstName);
+        if(employeeMidName!=null && !employeeMidName.isEmpty()) fullName.append(" ").append(employeeMidName.charAt(0));
 
         return fullName.toString();
     }
 
     public String getDepartmentName() throws Exception {
-        return DepartmentDAO.get(departmentID).getDepartmentName();
+        Department dept = DepartmentDAO.get(departmentID);
+        return dept!=null ? dept.getDepartmentName() : "-";
     }
 
     public String getPhone() {
