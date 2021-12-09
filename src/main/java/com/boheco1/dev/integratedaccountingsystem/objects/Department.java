@@ -42,6 +42,6 @@ public class Department {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof Department && ((Department)obj).getDepartmentID()==departmentID);
+        return (obj instanceof Department && ((Department)obj).getDepartmentID().equals(departmentID));
     }
 }
