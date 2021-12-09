@@ -4,6 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.dao.NotificationsDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 
 import com.boheco1.dev.integratedaccountingsystem.objects.Notifications;
+import com.boheco1.dev.integratedaccountingsystem.usermgt.AllUsersController;
 import com.boheco1.dev.integratedaccountingsystem.usermgt.UserMgtController;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.FileMIRSController;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.StockEntryController;
@@ -94,6 +95,7 @@ public class HomeController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Utility.setContentPane(contentPane);
+        Utility.setStackPane(homeStackPane);
         submenuList = new ArrayList<>();
         // INITIALIZE HAMBURGER
         hamburgerIcon = new FontIcon("mdi2a-arrow-left");
@@ -154,8 +156,10 @@ public class HomeController implements Initializable {
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(fileMirs, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "File MIRS", contentPane, "warehouse_file_mirs.fxml", subToolbar, new FileMIRSController(), title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(stocks, new FontIcon("mdi2w-warehouse"), drawerMenus, "Stock", contentPane, "warehouse_stock_entry.fxml", subToolbar, new StockEntryController(), title);
 
+        // USERS
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(employees,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, employees.getText(), contentPane, "manage_employees.fxml", subToolbar, new ManageEmployeesController(), "manage-users", homeStackPane, title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(users,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, users.getText(), contentPane, "user_mgt.fxml", subToolbar, new UserMgtController(), "manage-users", homeStackPane, title);
+//        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(users,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, users.getText(), contentPane, "user_mgt.fxml", subToolbar, new UserMgtController(), "manage-users", homeStackPane, title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(users,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, users.getText(), contentPane, "all_users_controller.fxml", subToolbar, new AllUsersController(), "manage-users", homeStackPane, title);
         DrawerMenuHelper.setMenuButton(signatoriesButton,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, signatoriesButton.getText());
 
         DrawerMenuHelper.setMenuButton(myAccount,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "My Account");

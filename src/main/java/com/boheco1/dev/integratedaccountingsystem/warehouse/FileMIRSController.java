@@ -11,15 +11,16 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Paint;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -33,40 +34,52 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     private AnchorPane contentPane;
 
     @FXML
-    private VBox tablePane, signaturePane;
-
-    @FXML
     private StackPane stackPane;
 
     @FXML
     private DatePicker date;
 
     @FXML
-    private JFXTextField mirsNum, requisitioner, dm, gm, particulars, remarks, quantity;
+    private JFXTextField mirsNum, requisitioner, dm, gm, particulars, quantity;
 
     @FXML
-    private JFXTextArea purpose, details;
+    private Label mirsNum1, date1, requisitioner1;
+
+    @FXML
+    private JFXTextArea purpose, details, remark;
+
+    @FXML
+    private TextArea purpose1, details1;
 
     @FXML
     private Label available, inStock, pending;
 
     @FXML
-    private TableView<MIRSItem> particularsTable;
+    private TableView<MIRSItem> particularsTable, requestedItemsTable;
 
     @FXML
-    private TableColumn<MIRSItem, String> codeCol, particularsCol, unitCol, remarksCol;
+    private TableColumn<MIRSItem, String> particularsCol, unitCol, remarksCol, actionCol;
+
+    @FXML
+    private TableColumn<MIRSItem, String> codeCol, particularsCol1, unitCol1, remarksCol1;
 
     @FXML
     private TableColumn<MIRSItem, Integer> quantityCol;
 
     @FXML
+    private TableColumn<MIRSItem, Integer> quantityCol1;
+
+    @FXML
     private JFXButton addBtn, requestBtn, removeBtn;
+
+    @FXML
+    private TabPane tabPane;
 
     private Stock selectedStock = null;
     private EmployeeInfo requisitionerEmployee = null;
     private User userSignatory = null;
     private List<Signatory> signatories = null;
-    private ObservableList<MIRSItem> requestItem = null;
+    private ObservableList<MIRSItem> selectedItem = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -76,13 +89,15 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         bindDMAutocomplete(dm);
         InputValidation.restrictNumbersOnly(mirsNum);
         InputValidation.restrictNumbersOnly(quantity);
-        setSignatories();
         initializeItemTable();
     }
 
     private void resetInputFields() {
         selectedStock = null;
         requisitionerEmployee = null;
+        selectedItem.clear();
+        particularsTable.getItems().clear();
+        requestedItemsTable.getItems().clear();
         particularsTable.getItems().clear();
         mirsNum.setText("");
         requisitioner.setText("");
@@ -90,9 +105,8 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         details.setText("");
         particulars.setText("");
         quantity.setText("");
-        remarks.setText("");
-        tablePane.setDisable(true);
-        signaturePane.setDisable(true);
+        remark.setText("");
+        tabPane.getSelectionModel().select(0);
     }
 
     @FXML
@@ -115,11 +129,11 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             mirsItem.setUnit(selectedStock.getUnit());
             mirsItem.setQuantity(Integer.parseInt(quantity.getText()));
             mirsItem.setPrice(selectedStock.getPrice());
-            mirsItem.setRemarks(remarks.getText());
+            mirsItem.setRemarks(remark.getText());
 
             selectedStock = null; //set to null for validation
-            requestItem.add(mirsItem);
-            particularsTable.setItems(requestItem);
+            selectedItem.add(mirsItem);
+            particularsTable.setItems(selectedItem);
 
             particulars.setText("");
             quantity.setText("");
@@ -135,15 +149,33 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     }
 
     @FXML
-    private void removeBtn(ActionEvent event) {
-        MIRSItem selected = particularsTable.getSelectionModel().getSelectedItem();
-        for (MIRSItem m: requestItem) {
-            if(m.equals(selected)){
-                requestItem.remove(m);
-                break;
+    private void selectedTab(MouseEvent event) {
+        try{
+            if(tabPane.getSelectionModel().getSelectedIndex() == 2){
+                mirsNum1.setText(mirsNum.getText());
+                date1.setText(""+date.getValue());
+                purpose1.setText(purpose.getText());
+                details1.setText(details.getText());
+
+                codeCol.setCellValueFactory(new PropertyValueFactory<>("StockID"));
+                particularsCol1.setCellValueFactory(new PropertyValueFactory<>("Particulars"));
+                unitCol1.setCellValueFactory(new PropertyValueFactory<>("Unit"));
+                unitCol1.setStyle("-fx-alignment: center;");
+                quantityCol1.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
+                quantityCol1.setStyle("-fx-alignment: center;");
+                remarksCol1.setCellValueFactory(new PropertyValueFactory<>("Remarks"));
+                requestedItemsTable.setItems(selectedItem);
+
+                requisitioner1.setText(requisitioner.getText());
+
+                setSignatories();
             }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertDialogBuilder.messgeDialog("System Error", e.getMessage(),
+                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }
-        particularsTable.setItems(requestItem);
     }
 
     @FXML
@@ -160,14 +192,14 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid Purpose!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
             return;
-        }else if(requestItem.isEmpty()){
+        }else if(selectedItem.isEmpty()){
             AlertDialogBuilder.messgeDialog("Invalid Input", "No request item found.",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
             return;
         }
 
         try {
-            List<MIRSItem> mirsItemList = requestItem; //from ObservableList to List
+            List<MIRSItem> mirsItemList = selectedItem; //from ObservableList to List
             MIRS mirs = new MIRS();
             mirs.setId(mirsNum.getText()); //id mean MIRS number from user input
             mirs.setDetails(details.getText());
@@ -190,8 +222,8 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 MIRSSignatory mirsSignatory = new MIRSSignatory();
                 mirsSignatory.setMirsID(mirs.getId());
                 mirsSignatory.setUserID(s.getUserID());
-                mirsSignatory.setStatus(null);
-                mirsSignatory.setComments(null);
+                mirsSignatory.setStatus("pending");
+                mirsSignatory.setComments("");
                 MIRSSignatoryDAO.add(mirsSignatory); //saving signatories for the MIRS request
             }
             AlertDialogBuilder.messgeDialog("System Message", "MIRS request successfully filed, please wait for the approval, thank you!",
@@ -211,15 +243,59 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     }
 
     private void initializeItemTable() {
-        codeCol.setCellValueFactory(new PropertyValueFactory<>("StockID"));
         particularsCol.setCellValueFactory(new PropertyValueFactory<>("Particulars"));
         unitCol.setCellValueFactory(new PropertyValueFactory<>("Unit"));
+        unitCol.setStyle("-fx-alignment: center;");
         quantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
+        quantityCol.setStyle("-fx-alignment: center;");
         remarksCol.setCellValueFactory(new PropertyValueFactory<>("Remarks"));
 
-        requestItem =  FXCollections.observableArrayList();
+        actionCol.setStyle("-fx-alignment: center;");
+        Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> removeBtn
+                = //
+                new Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>>() {
+                    @Override
+                    public TableCell call(final TableColumn<MIRSItem, String> param) {
+                        final TableCell<MIRSItem, String> cell = new TableCell<MIRSItem, String>() {
+
+                            Button btn = new Button("");
+                            FontIcon icon = new FontIcon("mdi2d-delete");
+
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
+                                btn.setStyle("-fx-background-color: #f44336");
+                                btn.setGraphic(icon);
+                                btn.setGraphicTextGap(5);
+                                btn.setTextFill(Paint.valueOf(ColorPalette.WHITE));
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    btn.setOnAction(event -> {
+                                        MIRSItem mirsItem = getTableView().getItems().get(getIndex());
+                                        try {
+                                            selectedItem.remove(mirsItem);
+                                            particularsTable.setItems(selectedItem);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    });
+                                    setGraphic(btn);
+                                    setText(null);
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+        actionCol.setCellFactory(removeBtn);
+
+        selectedItem =  FXCollections.observableArrayList();
         particularsTable.setPlaceholder(new Label("No item Added"));
     }
+
 
     private void setSignatories(){
         try {
@@ -283,7 +359,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                             stackPane, AlertDialogBuilder.DANGER_DIALOG);
                     return;
                 }
-                for(MIRSItem added: requestItem){
+                for(MIRSItem added: selectedItem){
                     if(added.getStockID() == result.getId()){
                         AlertDialogBuilder.messgeDialog("System Warning", "Item already added, please remove item then add again if you have changes.",
                                 stackPane, AlertDialogBuilder.WARNING_DIALOG);
@@ -324,11 +400,6 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                         }
                     }
 
-                    if(query.length() == 0){
-                        tablePane.setDisable(true);
-                        signaturePane.setDisable(true);
-                    }
-
                     if (list.size() == 0) {
                         requisitionerEmployee = null;
                     }
@@ -350,8 +421,6 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         //This will set the actions once the user clicks an item from the popupmenu.
         employeeSuggest.setOnAutoCompleted(event -> {
             requisitionerEmployee = event.getCompletion();
-            tablePane.setDisable(false);
-            signaturePane.setDisable(false);
             requisitioner.setText(requisitionerEmployee.getFullName());
             purpose.requestFocus();
         });

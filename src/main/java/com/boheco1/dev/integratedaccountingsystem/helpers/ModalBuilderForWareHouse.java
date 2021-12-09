@@ -20,6 +20,19 @@ public class ModalBuilderForWareHouse {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    public static void showModalFromXMLWithExitPath(Class parentClass, String xml, StackPane stackPane, String fxml) {
+        try {
+            Parent parent = FXMLLoader.load(parentClass.getResource(xml));
+            JFXDialogLayout dialogLayout = new JFXDialogLayout();
+            dialogLayout.setBody(parent);
+            JFXDialog dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+            dialog.setOnDialogClosed(e ->
+                    Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(CriticalStockController.class, fxml)));
+            dialog.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

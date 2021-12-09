@@ -50,11 +50,11 @@ public class MIRSApprovalFormController implements Initializable {
     @FXML
     private TableView<MIRSItem> tableView;
 
-
+    private MIRS mirs;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
-            MIRS mirs = MirsDAO.getMIRS(Utility.getActiveMIRS().getId());
+            mirs = MirsDAO.getMIRS(Utility.getActiveMIRS().getId());
             List<MIRSItem> mirsItemList = MirsDAO.getItems(mirs);
             List<MIRSSignatory> mirsSignatoryList = MIRSSignatoryDAO.get(mirs);
 
@@ -63,6 +63,7 @@ public class MIRSApprovalFormController implements Initializable {
             purpose.setText(mirs.getPurpose());
             details.setText(mirs.getDetails());
             requisitioner.setText(mirs.getRequisitioner().getFullName());
+
             dm.setText(""+ UserDAO.get(mirsSignatoryList.get(0).getUserID()).getFullName());
             gm.setText(""+ UserDAO.get(mirsSignatoryList.get(1).getUserID()).getFullName());
 
@@ -91,6 +92,7 @@ public class MIRSApprovalFormController implements Initializable {
             remarksCol.setCellValueFactory(new PropertyValueFactory<>("Remarks"));
             tableView.getItems().setAll(observableList);
 
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -99,6 +101,10 @@ public class MIRSApprovalFormController implements Initializable {
     @FXML
     private void acceptBtn(ActionEvent event) {
         try {
+            if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) > 0){
+                AlertDialogBuilder.messgeDialog("System Message", "Sorry but approval of both DM and GM are required.", stackPane, AlertDialogBuilder.WARNING_DIALOG);
+                return;
+            }
             Utility.getActiveMIRS().setStatus("Releasing");
             Utility.getActiveMIRS().setDetails(details.getText());
             MirsDAO.update(Utility.getActiveMIRS());

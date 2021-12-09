@@ -67,6 +67,8 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
     ContextMenuHelper contextMenuHelper = new ContextMenuHelper();
     MenuItem createInventory = new MenuItem("Create Inventory");
     MenuItem viewAllStocks = new MenuItem("View All Stocks");
+    MenuItem viewAllMirs = new MenuItem("View All MIRS");
+    MenuItem viewMRItems = new MenuItem("View MRs");
     MenuItem trash = new MenuItem("Trash");
     MenuItem inventoryReport = new MenuItem("Inventory Report");
     MenuItem liquidationReport = new MenuItem("Liquidation Report");
@@ -79,7 +81,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         contextMenuHelper = new ContextMenuHelper();
 
         options.setOnAction(actionEvent -> {
-            contextMenuHelper.initializePopupContextMenu(options, viewAllStocks, trash)
+            contextMenuHelper.initializePopupContextMenu(options, viewAllStocks, viewAllMirs, viewMRItems, trash)
                     .show(options, NodeLocator.getNodeX(options), NodeLocator.getNodeY(options));
         });
 
@@ -228,14 +230,17 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
                                             Platform.runLater(new Runnable() {
                                                 public void run() {
                                                     try {
-                                                        MIRS mirs = getTableView().getItems().get(getIndex());
-                                                        System.out.println(mirs.getId());
-                                                        if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 2){
-                                                            status.setStyle("-fx-background-color: #f44336; -fx-background-radius: 12");
-                                                        }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 1){
-                                                            status.setStyle("-fx-background-color: #ff9800; -fx-background-radius: 12");
-                                                        }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 0){
-                                                            status.setStyle("-fx-background-color: #388e3c; -fx-background-radius: 12");
+                                                        int index = getIndex();
+                                                        if(index >= 0){
+                                                            MIRS mirs = getTableView().getItems().get(index);
+                                                            //System.out.println(mirs.getId());
+                                                            if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 2){
+                                                                status.setStyle("-fx-background-color: "+ColorPalette.DANGER+"; -fx-background-radius: 12");
+                                                            }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 1){
+                                                                status.setStyle("-fx-background-color: "+ColorPalette.WARNING+"; -fx-background-radius: 12");
+                                                            }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 0){
+                                                                status.setStyle("-fx-background-color: "+ColorPalette.SUCCESS+"; -fx-background-radius: 12");
+                                                            }
                                                         }
                                                     } catch (Exception e) {
                                                         e.printStackTrace();
@@ -384,6 +389,16 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         viewAllStocks.setOnAction(actionEvent -> {
             titleHolder.setText("View All Stocks");
             container.getChildren().setAll(ContentHandler.getNodeFromFxml(StockController.class, "../warehouse_stock.fxml"));
+        });
+
+        viewAllMirs.setOnAction(actionEvent -> {
+            titleHolder.setText("MIRS Repository");
+            container.getChildren().setAll(ContentHandler.getNodeFromFxml(ViewAllMIRSController.class, "../view_all_mirs_controller.fxml"));
+        });
+
+        viewMRItems.setOnAction(actionEvent -> {
+            titleHolder.setText("All MRs");
+            container.getChildren().setAll(ContentHandler.getNodeFromFxml(ViewMRsController.class, "../view_mrs_controller.fxml"));
         });
 
         trash.setOnAction(actionEvent -> {
