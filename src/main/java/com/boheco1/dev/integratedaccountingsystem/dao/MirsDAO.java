@@ -21,11 +21,9 @@ public class MirsDAO {
      */
     public static void create(MIRS mirs) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO MIRS (DateFiled, Purpose, Details, Status, RequisitionerID, UserID, id, CreatedAt, UpdatedAt, id) " +
+                "INSERT INTO MIRS (DateFiled, Purpose, Details, Status, RequisitionerID, UserID, id, CreatedAt, UpdatedAt) " +
                         "VALUES " +
-                        "(?,?,?,?,?,?,?,GETDATE(), GETDATE(),?)");
-
-        mirs.setId(Utility.generateRandomId());
+                        "(?,?,?,?,?,?,?,GETDATE(), GETDATE())");
 
         ps.setDate(1, Date.valueOf(mirs.getDateFiled()));
         ps.setString(2, mirs.getPurpose());
@@ -34,7 +32,6 @@ public class MirsDAO {
         ps.setString(5, mirs.getRequisitionerID());
         ps.setString(6, mirs.getUserID());
         ps.setString(7, mirs.getId());
-        ps.setString(8, mirs.getId());
 
         ps.executeUpdate();
         ps.close();
