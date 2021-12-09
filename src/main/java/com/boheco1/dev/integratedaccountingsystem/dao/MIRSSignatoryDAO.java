@@ -73,6 +73,25 @@ public class MIRSSignatoryDAO {
         return msig;
     }
 
+    public static int getSignatoryCount(String  id) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT COUNT(id) as TotalCount FROM MIRSSignatories WHERE MIRSID=? AND Status='pending'");
+        ps.setString(1, id);
+
+        ResultSet rs = ps.executeQuery();
+
+        String count = "";
+
+        while(rs.next()) {
+            count = rs.getString("TotalCount");
+        }
+
+        rs.close();
+        ps.close();
+
+        return Integer.parseInt(count);
+    }
+
     public static List<MIRSSignatory> get(MIRS mirs) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM MIRSSignatories WHERE MIRSID=?");
