@@ -7,17 +7,17 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
 import com.boheco1.dev.integratedaccountingsystem.HomeController;
 import com.boheco1.dev.integratedaccountingsystem.JournalEntriesController;
+import com.boheco1.dev.integratedaccountingsystem.dao.MIRSSignatoryDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.MirsDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
+import com.boheco1.dev.integratedaccountingsystem.objects.MIRSSignatory;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 import com.jfoenix.controls.JFXButton;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTreeTableView;
@@ -215,11 +215,38 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
                             @Override
                             public void updateItem(String item, boolean empty) {
                                 super.updateItem(item, empty);
-                                status.setStyle("-fx-background-color: #f44336; -fx-background-radius: 12");
+
                                 if (empty) {
                                     setGraphic(null);
                                     setText(null);
                                 } else {
+                                    try {
+                                    Timer timer = new java.util.Timer();
+
+                                        timer.schedule(new TimerTask() {
+                                        public void run() {
+                                            Platform.runLater(new Runnable() {
+                                                public void run() {
+                                                    try {
+                                                        MIRS mirs = getTableView().getItems().get(getIndex());
+                                                        System.out.println(mirs.getId());
+                                                        if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 2){
+                                                            status.setStyle("-fx-background-color: #f44336; -fx-background-radius: 12");
+                                                        }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 1){
+                                                            status.setStyle("-fx-background-color: #ff9800; -fx-background-radius: 12");
+                                                        }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 0){
+                                                            status.setStyle("-fx-background-color: #388e3c; -fx-background-radius: 12");
+                                                        }
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                            });
+                                       }
+                                        }, 0, 1000); // 1 second
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
                                     setGraphic(status);
                                     setText(null);
                                 }
@@ -241,6 +268,8 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         //display status column only if displaying Pending Approval MIRS
         if(s.equals("Pending"))
             tableView.getColumns().add(column5);
+
+        tableView.refresh();
     }
 
     public void createTableForCriticalItem(){
