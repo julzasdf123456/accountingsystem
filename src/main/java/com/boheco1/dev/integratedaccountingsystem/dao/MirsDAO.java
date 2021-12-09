@@ -24,7 +24,9 @@ public class MirsDAO {
                 "INSERT INTO MIRS (DateFiled, Purpose, Details, Status, RequisitionerID, UserID, id, CreatedAt, UpdatedAt, id) " +
                         "VALUES " +
                         "(?,?,?,?,?,?,?,GETDATE(), GETDATE(),?)");
+
         mirs.setId(Utility.generateRandomId());
+
         ps.setDate(1, Date.valueOf(mirs.getDateFiled()));
         ps.setString(2, mirs.getPurpose());
         ps.setString(3, mirs.getDetails());
@@ -72,13 +74,15 @@ public class MirsDAO {
                 "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id) " +
                         "VALUES " +
                         "(?,?,?,?,?,GETDATE(),GETDATE(), ?)");
-        mirs.setId(Utility.generateRandomId());
+
+        item.setId(Utility.generateRandomId());
+
         ps.setString(1, mirs.getId());
         ps.setString(2, item.getStockID());
         ps.setInt(3, item.getQuantity());
         ps.setDouble(4, item.getPrice());
         ps.setString(5, item.getRemarks());
-        ps.setString(6, mirs.getId());
+        ps.setString(6, item.getId());
 
         ps.executeUpdate();
 
