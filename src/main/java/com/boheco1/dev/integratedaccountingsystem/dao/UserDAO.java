@@ -214,7 +214,7 @@ public class UserDAO {
     }
 
     public static void removePermission(User user, Permission permission, Connection conn) throws SQLException {
-        PreparedStatement cs = conn.prepareStatement("DELETE FROM user_permissions WHERE user_id=?, AND permission_id=?");
+        PreparedStatement cs = conn.prepareStatement("DELETE FROM user_permissions WHERE user_id=? AND permission_id=?");
         cs.setString(1, user.getId());
         cs.setString(2, permission.getId());
         cs.executeUpdate();

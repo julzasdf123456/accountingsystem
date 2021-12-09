@@ -114,6 +114,7 @@ public class DrawerMenuHelper {
     public static void setMenuButtonWithViewAndSubMenu(JFXButton button, FontIcon icon, List<JFXButton> drawerMenuList, String tooltipText, AnchorPane contentPane, String fxml, FlowPane subToolbar, MenuControllerHandler controller, String permission, StackPane stackPane, Label titleHolder) {
         try {
             icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
+            icon.setIconSize(16);
             button.setGraphic(icon);
             button.setGraphicTextGap(15);
             button.setTextFill(Paint.valueOf(ColorPalette.WHITE));

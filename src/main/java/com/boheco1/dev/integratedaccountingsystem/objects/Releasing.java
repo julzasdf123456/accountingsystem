@@ -12,6 +12,7 @@ public class Releasing {
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String MR;
 
     public Releasing(String id, String stockID, String mirsID, int quantity, double price, String userID, String status) {
         this.id = id;
@@ -21,6 +22,17 @@ public class Releasing {
         this.price = price;
         this.userID = userID;
         this.status = status;
+    }
+
+    public Releasing(String id, String stockID, String mirsID, int quantity, double price, String userID, String status, String MR) {
+        this.id = id;
+        this.stockID = stockID;
+        this.mirsID = mirsID;
+        this.quantity = quantity;
+        this.price = price;
+        this.userID = userID;
+        this.status = status;
+        this.MR = MR;
     }
 
     public Releasing() {
@@ -96,5 +108,13 @@ public class Releasing {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getMR() {
+        return MR;
+    }
+
+    public void setMR(String MR) {
+        this.MR = MR;
     }
 }

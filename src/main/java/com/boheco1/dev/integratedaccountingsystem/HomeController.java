@@ -46,12 +46,6 @@ public class HomeController implements Initializable {
 
     @FXML GridPane gridPane;
 
-    @FXML Label accountingLabel, billingLabel, telleringLabel, warehouseLabel, userLabel, adminLabel;
-
-    @FXML JFXButton budget, journalEntries, myAcctBtn, logoutBtn, allAccounts, collection, otherPayments, usersBtn, employeesBtn, stockBtn;
-
-    @FXML JFXButton warehouseDashboardBtn, mirsBtn;
-
     @FXML Label title;
 
     // NOTIFICATION AND OTHER MENUS
@@ -67,9 +61,31 @@ public class HomeController implements Initializable {
 
     // DRAWER
     @FXML JFXButton hamburger;
+    @FXML VBox navMenuBox;
     public boolean isDrawerExpanded = true;
     public Double drawerMinWidth = 70.0;
     public FontIcon hamburgerIcon;
+
+    /**
+     * Nav Menu Items
+     */
+    // FINANCE
+    public JFXButton journalEntries, budget;
+
+    // BILLING
+    public JFXButton allAccounts;
+
+    // TELLER
+    public JFXButton collection;
+
+    // WAREHOUSE
+    public JFXButton warehouseDashboard, fileMirs, stocks;
+
+    // ADMINISTRATIVE
+    public JFXButton employees, users, signatoriesButton;
+
+    // USER
+    public JFXButton myAccount, logout;
 
     @FXML
     public FlowPane subToolbar, notificationBin;
@@ -86,34 +102,75 @@ public class HomeController implements Initializable {
 
         // initialize main menu labels
         labelList = new ArrayList<>();
-        DrawerMenuHelper.setMenuLabels(accountingLabel, new FontIcon("mdi2f-finance"), labelList);
-        DrawerMenuHelper.setMenuLabels(billingLabel, new FontIcon("mdi2r-receipt"), labelList);
-        DrawerMenuHelper.setMenuLabels(telleringLabel, new FontIcon("mdi2c-contactless-payment-circle"), labelList);
-        DrawerMenuHelper.setMenuLabels(warehouseLabel, new FontIcon("mdi2s-sitemap"), labelList);
 
-        //Create notifications
-//        try {
-//            NotificationsDAO.create(new Notifications("This is an MIRS notification is for user 2", NotificationsDAO.MIRS_APROVAL, null, "2", "06-2021"));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        // INITIALIZE CUSTOM MENU
+        journalEntries = new JFXButton("Journal Entries");
+        signatoriesButton = new JFXButton("Signatories");
+        budget = new JFXButton("Budget");
+        allAccounts = new JFXButton("All Accounts");
+        collection = new JFXButton("Collection");
+        warehouseDashboard = new JFXButton("Dashboard");
+        fileMirs = new JFXButton("File MIRS");
+        stocks = new JFXButton("Stocks");
+        employees = new JFXButton("Employees");
+        users = new JFXButton("Users");
+        myAccount = new JFXButton("My Account");
+        logout = new JFXButton("Logout");
 
-        // INITIALIZE MENU ICONS
+        // ADD ALL ITEMS TO NAV SEQUENTIALLY
+        NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Finance"), new FontIcon("mdi2f-finance"), homeStackPane);
+        NavMenuHelper.addMenu(navMenuBox, journalEntries, homeStackPane);
+        NavMenuHelper.addMenu(navMenuBox, budget, homeStackPane);
+        NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Billing"), new FontIcon("mdi2r-receipt"), homeStackPane);
+        NavMenuHelper.addMenu(navMenuBox, allAccounts, homeStackPane);
+        NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Teller"), new FontIcon("mdi2c-contactless-payment-circle"), homeStackPane);
+        NavMenuHelper.addMenu(navMenuBox, collection, homeStackPane);
+        NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Warehouse"), new FontIcon("mdi2s-sitemap"), homeStackPane);
+        NavMenuHelper.addMenu(navMenuBox, warehouseDashboard, homeStackPane);
+        NavMenuHelper.addMenu(navMenuBox, fileMirs, homeStackPane);
+        NavMenuHelper.addMenu(navMenuBox, stocks, homeStackPane);
+        NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Administrator"), new FontIcon("mdi2s-security"), homeStackPane);
+        NavMenuHelper.addMenu(navMenuBox, employees, homeStackPane);
+        NavMenuHelper.addMenu(navMenuBox, users, homeStackPane);
+        NavMenuHelper.addMenu(navMenuBox, signatoriesButton, homeStackPane);
+        NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("User"), new FontIcon("mdi2a-account-circle"), homeStackPane);
+        NavMenuHelper.addMenu(navMenuBox, myAccount, homeStackPane);
+        NavMenuHelper.addMenu(navMenuBox, logout, homeStackPane);
+
+        // INITIALIZE MENU FUNCTIONS
         drawerMenus = new ArrayList<>();
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(budget,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, budget.getText(), contentPane, "budget_layout.fxml", subToolbar, new BudgetController(), "budget", homeStackPane, title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(usersBtn,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, usersBtn.getText(), contentPane, "user_mgt.fxml", subToolbar, new UserMgtController(), "manage-users", homeStackPane, title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(employeesBtn,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, employeesBtn.getText(), contentPane, "manage_employees.fxml", subToolbar, new ManageEmployeesController(), "manage-users", homeStackPane, title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(journalEntries,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, journalEntries.getText(), contentPane, "journal_entries_layout.fxml", subToolbar, new JournalEntriesController(), title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(budget,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, budget.getText(), contentPane, "budget_layout.fxml", subToolbar, new BudgetController(), "budget", homeStackPane, title);
+
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(allAccounts, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, allAccounts.getText(), contentPane, "all_accounts_layout.fxml", subToolbar, new AllAccountsController(), title);
-        DrawerMenuHelper.setMenuButtonWithView(collection, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, collection.getText(), contentPane, "all_accounts_layout.fxml");
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(otherPayments, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, otherPayments.getText(), contentPane, "all_accounts_layout.fxml", subToolbar, null, title);
-        DrawerMenuHelper.setMenuButton(myAcctBtn,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "My Account");
-        DrawerMenuHelper.setMenuButton(logoutBtn,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "Logout");
+
+        DrawerMenuHelper.setMenuButton(collection,  new FontIcon("mdi2c-cash-usd"), drawerMenus, collection.getText());
 
         // WAREHOUSE
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(warehouseDashboardBtn, new FontIcon("mdi2v-view-dashboard"), drawerMenus, "Warehouse Dashboard", contentPane, "warehouse_dashboard_controller.fxml", subToolbar, new WarehouseDashboardController(), title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(mirsBtn, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "File MIRS", contentPane, "warehouse_file_mirs.fxml", subToolbar, new FileMIRSController(), title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(stockBtn, new FontIcon("mdi2w-warehouse"), drawerMenus, "Stock", contentPane, "warehouse_stock_entry.fxml", subToolbar, new StockEntryController(), title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(warehouseDashboard, new FontIcon("mdi2v-view-dashboard"), drawerMenus, "Warehouse Dashboard", contentPane, "warehouse_dashboard_controller.fxml", subToolbar, new WarehouseDashboardController(), title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(fileMirs, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "File MIRS", contentPane, "warehouse_file_mirs.fxml", subToolbar, new FileMIRSController(), title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(stocks, new FontIcon("mdi2w-warehouse"), drawerMenus, "Stock", contentPane, "warehouse_stock_entry.fxml", subToolbar, new StockEntryController(), title);
+
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(employees,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, employees.getText(), contentPane, "manage_employees.fxml", subToolbar, new ManageEmployeesController(), "manage-users", homeStackPane, title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(users,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, users.getText(), contentPane, "user_mgt.fxml", subToolbar, new UserMgtController(), "manage-users", homeStackPane, title);
+        DrawerMenuHelper.setMenuButton(signatoriesButton,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, signatoriesButton.getText());
+
+        DrawerMenuHelper.setMenuButton(myAccount,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "My Account");
+        DrawerMenuHelper.setMenuButton(logout,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "Logout");
+
+        // CUSTOM IN-CONTROLLER EVENTS
+        myAccount.setOnAction(actionEvent -> {
+            this.replaceContent("view_my_account.fxml");
+        });
+
+        logout.setOnAction(actionEvent -> {
+            ActiveUser.setUser(null);
+            try {
+                HostWindow.setRoot("login_controller");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
 
         // INITIALIZE NOTIFICATION BUTTON
         notificationIcon = new FontIcon("mdi2b-bell");
@@ -127,7 +184,14 @@ public class HomeController implements Initializable {
             showNotification();
         });
 
+        //Create notifications
+//        try {
+//            NotificationsDAO.create(new Notifications("This is an MIRS notification is for user 2", NotificationsDAO.MIRS_APROVAL, null, "2", "06-2021"));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         notifyUser();
+
     }
 
     public void notifyUser() {
@@ -208,24 +272,9 @@ public class HomeController implements Initializable {
         });
     }
 
-    @FXML
-    private void newClick() {
-    }
-
     public void replaceContent(String fxml) {
         contentPane.getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, fxml));
         subToolbar = null;
-    }
-
-    @FXML
-    private void logout() throws IOException {
-        ActiveUser.setUser(null);
-        HostWindow.setRoot("login_controller");
-    }
-
-    @FXML
-    private void viewMyAccount() {
-        this.replaceContent("view_my_account.fxml");
     }
 
     /**

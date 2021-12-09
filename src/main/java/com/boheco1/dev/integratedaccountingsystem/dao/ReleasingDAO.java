@@ -11,8 +11,8 @@ import java.sql.Statement;
 public class ReleasingDAO {
     public static void add(Releasing releasing) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO Releasing (StockID, MIRSID, Quantity, Price, UserID, Status, CreatedAt, UpdatedAt, id) " +
-                        "VALUES (?,?,?,?,?,?,GETDATE(),GETDATE(),?)");
+                "INSERT INTO Releasing (StockID, MIRSID, Quantity, Price, UserID, Status, CreatedAt, UpdatedAt, id, MR) " +
+                        "VALUES (?,?,?,?,?,?,GETDATE(),GETDATE(),?, ?)");
 
         releasing.setId(Utility.generateRandomId());
 
@@ -23,6 +23,7 @@ public class ReleasingDAO {
         ps.setString(5, releasing.getUserID());
         ps.setString(6, releasing.getStatus());
         ps.setString(7, releasing.getId());
+        ps.setString(8, releasing.getMR());
 
         ps.executeUpdate();
 
@@ -46,7 +47,8 @@ public class ReleasingDAO {
                     rs.getInt("Quantity"),
                     rs.getDouble("Price"),
                     rs.getString("UserID"),
-                    rs.getString("Status")
+                    rs.getString("Status"),
+                    rs.getString("MR")
             );
             releasing.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
             releasing.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
@@ -57,6 +59,4 @@ public class ReleasingDAO {
 
         return releasing;
     }
-
-    
 }

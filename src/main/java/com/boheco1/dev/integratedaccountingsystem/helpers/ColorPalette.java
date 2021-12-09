@@ -2,8 +2,8 @@ package com.boheco1.dev.integratedaccountingsystem.helpers;
 
 public class ColorPalette {
     public static String MAIN_COLOR_LIGHT = "#26a69a";
-    public static String MAIN_COLOR = "#00AD8E"; // BUTTONS, BACKGROUNDS
-    public static String MAIN_COLOR_DARK = "#006B57"; // BACKGROUND HIGHLIGHTS
+    public static String MAIN_COLOR = "#009688"; // BUTTONS, BACKGROUNDS
+    public static String MAIN_COLOR_DARK = "#00675b"; // BACKGROUND HIGHLIGHTS
     public static String COLOR_ACCENT = "#FA0068"; // LINES, HIGHLIGHTS
     public static String GREY_LIGHT = "#b5b5b5"; // DIVIDERS, CARD BACKGROUNDS
     public static String GREY = "#757575"; // CAPTIONS
