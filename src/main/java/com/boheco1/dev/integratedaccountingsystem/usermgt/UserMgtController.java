@@ -4,6 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.*;
 import javafx.collections.FXCollections;
@@ -24,7 +25,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class UserMgtController extends MenuControllerHandler implements Initializable {
-    @FXML JFXComboBox selectUserCombo, selectRoleCombo, selectPermissionCombo,
+    @FXML JFXComboBox selectRoleCombo, selectPermissionCombo,
             selectPermissionForRoleCombo, departmentCombo;
 
     @FXML JFXTextField userNameField, designationField, phoneNumberField, roleNameField,
@@ -59,11 +60,9 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
     public void initialize(URL url, ResourceBundle resourceBundle)
     {
         try {
-            
+            currentUser = Utility.getSelectedUser();
+
             conn = DB.getConnection();
-            
-            listOfUsers = FXCollections.observableArrayList(UserDAO.getAll(conn));
-            selectUserCombo.setItems(listOfUsers);
 
             listOfDepartments = FXCollections.observableArrayList(DepartmentDAO.getAll(conn));
             departmentCombo.setItems(listOfDepartments);
@@ -81,6 +80,8 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
             selectPermissionCombo.setItems(listOfAvailablePermissions);
             selectRoleCombo.setItems(listOfAvailableRoles);
 
+            renderUser();
+
         }catch(Exception ex) {
             AlertDialogBuilder.messgeDialog("Exception", ex.getMessage(),userMgtStackPane,AlertDialogBuilder.DANGER_DIALOG);
             ex.printStackTrace();
@@ -90,7 +91,7 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
     public void onSelectUser(ActionEvent ev)
     {
         try {
-            this.currentUser = (User)selectUserCombo.getSelectionModel().getSelectedItem();
+//            this.currentUser = (User)selectUserCombo.getSelectionModel().getSelectedItem();
 
             if(currentUser==null) return;
 
@@ -106,6 +107,15 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
 
     private void renderUser() throws Exception
     {
+        try {
+            if(currentUser==null) return;
+
+            this.currentEmployee = EmployeeDAO.getOne(currentUser.getEmployeeID(), conn);
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertDialogBuilder.messgeDialog("Exception", e.getMessage(), userMgtStackPane, AlertDialogBuilder.DANGER_DIALOG);;
+        }
+
         userNameField.setText(currentUser.getUserName());
         designationField.setText(currentEmployee.getDesignation());
         phoneNumberField.setText(currentEmployee.getPhone());
@@ -158,7 +168,7 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
                 UserDAO.addUser(currentUser, conn);
 
                 listOfUsers.add(0, currentUser);
-                selectUserCombo.getSelectionModel().select(0);
+//                selectUserCombo.getSelectionModel().select(0);
             }else {
                 AlertDialogBuilder.messgeDialog("Unavailable","This feature is not available yet.",userMgtStackPane,AlertDialogBuilder.WARNING_DIALOG);;
             }
@@ -178,7 +188,7 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
             currentUser = null;
             currentEmployee = null;
 
-            selectUserCombo.getSelectionModel().clearSelection();
+//            selectUserCombo.getSelectionModel().clearSelection();
 
             userNameField.setText(null);
             firstNameField.setText(null);
