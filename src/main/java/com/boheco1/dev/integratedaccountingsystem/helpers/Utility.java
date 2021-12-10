@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.helpers;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
 import com.boheco1.dev.integratedaccountingsystem.objects.User;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 
 import java.util.Date;
 import java.util.Random;
@@ -11,6 +12,7 @@ public class Utility {
     private static AnchorPane contentPane;
     private static MIRS activeMIRS;
     private static User selectedUser;
+    private static StackPane stackPane;
 
     public static MIRS getActiveMIRS() {
         return activeMIRS;
@@ -50,5 +52,13 @@ public class Utility {
 
     public static void setSelectedUser(User selectedUser) {
         Utility.selectedUser = selectedUser;
+    }
+
+    public static StackPane getStackPane() {
+        return stackPane;
+    }
+
+    public static void setStackPane(StackPane stackPane) {
+        Utility.stackPane = stackPane;
     }
 }

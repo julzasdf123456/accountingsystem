@@ -328,4 +328,36 @@ public class MirsDAO {
 
         return approved;
     }
+
+    /**
+     * Fetch all MIRS
+     * @return
+     * @throws Exception
+     */
+    public static List<MIRS> getAllMIRS() throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MIRS ORDER BY DateFiled DESC");
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<MIRS> mirsList = new ArrayList<>();
+
+        while(rs.next()) {
+            mirsList.add(new MIRS(
+                    rs.getString("id"),
+                    rs.getDate("DateFiled").toLocalDate(),
+                    rs.getString("Purpose"),
+                    rs.getString("Details"),
+                    rs.getString("Status"),
+                    rs.getString("RequisitionerID"),
+                    rs.getString("UserID"),
+                    rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return mirsList;
+    }
 }

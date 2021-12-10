@@ -95,6 +95,7 @@ public class HomeController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Utility.setContentPane(contentPane);
+        Utility.setStackPane(homeStackPane);
         submenuList = new ArrayList<>();
         // INITIALIZE HAMBURGER
         hamburgerIcon = new FontIcon("mdi2a-arrow-left");

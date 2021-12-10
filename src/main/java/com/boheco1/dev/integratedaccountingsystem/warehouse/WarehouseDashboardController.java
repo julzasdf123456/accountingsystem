@@ -67,6 +67,8 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
     ContextMenuHelper contextMenuHelper = new ContextMenuHelper();
     MenuItem createInventory = new MenuItem("Create Inventory");
     MenuItem viewAllStocks = new MenuItem("View All Stocks");
+    MenuItem viewAllMirs = new MenuItem("View All MIRS");
+    MenuItem viewMRItems = new MenuItem("View MRs");
     MenuItem trash = new MenuItem("Trash");
     MenuItem inventoryReport = new MenuItem("Inventory Report");
     MenuItem liquidationReport = new MenuItem("Liquidation Report");
@@ -79,7 +81,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         contextMenuHelper = new ContextMenuHelper();
 
         options.setOnAction(actionEvent -> {
-            contextMenuHelper.initializePopupContextMenu(options, viewAllStocks, trash)
+            contextMenuHelper.initializePopupContextMenu(options, viewAllStocks, viewAllMirs, viewMRItems, trash)
                     .show(options, NodeLocator.getNodeX(options), NodeLocator.getNodeY(options));
         });
 
@@ -387,6 +389,15 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         viewAllStocks.setOnAction(actionEvent -> {
             titleHolder.setText("View All Stocks");
             container.getChildren().setAll(ContentHandler.getNodeFromFxml(StockController.class, "../warehouse_stock.fxml"));
+        });
+
+        viewAllMirs.setOnAction(actionEvent -> {
+            titleHolder.setText("MIRS Repository");
+            container.getChildren().setAll(ContentHandler.getNodeFromFxml(ViewAllMIRSController.class, "../view_all_mirs_controller.fxml"));
+        });
+
+        viewMRItems.setOnAction(actionEvent -> {
+            
         });
 
         trash.setOnAction(actionEvent -> {
