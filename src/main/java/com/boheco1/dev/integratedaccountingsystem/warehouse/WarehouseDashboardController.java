@@ -397,7 +397,8 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         });
 
         viewMRItems.setOnAction(actionEvent -> {
-            
+            titleHolder.setText("All MRs");
+            container.getChildren().setAll(ContentHandler.getNodeFromFxml(ViewMRsController.class, "../view_mrs_controller.fxml"));
         });
 
         trash.setOnAction(actionEvent -> {

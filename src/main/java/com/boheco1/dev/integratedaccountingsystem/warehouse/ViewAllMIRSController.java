@@ -25,7 +25,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class ViewAllMIRSController  extends MenuControllerHandler implements Initializable, SubMenuHelper {
+public class ViewAllMIRSController extends MenuControllerHandler implements Initializable, SubMenuHelper {
 
     @FXML TableView allMirsTable;
 
