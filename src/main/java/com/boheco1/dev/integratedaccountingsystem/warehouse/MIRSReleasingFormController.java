@@ -6,7 +6,6 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.ColorPalette;
 import com.boheco1.dev.integratedaccountingsystem.helpers.InputValidation;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -25,7 +24,6 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import javax.swing.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +61,7 @@ public class MIRSReleasingFormController implements Initializable {
     private ObservableList<MIRSItem> requestItem = null;
 
     private boolean isEditingItem = false;
+    private MIRSItem selectedMirsItem;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         bindParticularsAutocomplete(particulars);
@@ -133,16 +132,17 @@ public class MIRSReleasingFormController implements Initializable {
                                         setText(null);
                                     } else {
                                         btn.setOnAction(event -> {
-                                            MIRSItem mirsItem = getTableView().getItems().get(getIndex());
+                                             selectedMirsItem = getTableView().getItems().get(getIndex());
                                             try {
-                                                selectedStock = StockDAO.get(mirsItem.getStockID());
+                                                selectedStock = StockDAO.get(selectedMirsItem.getStockID());
                                                 int av = StockDAO.countAvailable(selectedStock);
                                                 particulars.setText(selectedStock.getStockName());
-                                                quantity.setText(""+mirsItem.getQuantity());
-                                                remarks.setText(mirsItem.getRemarks());
+                                                quantity.setText(""+ selectedMirsItem.getQuantity());
+                                                remarks.setText(selectedMirsItem.getRemarks());
                                                 inStock.setText("In Stock: "+ selectedStock.getQuantity());
                                                 pending.setText("Pending: "+ StockDAO.countPendingRequest(selectedStock));
                                                 available.setText("Available: "+ av);
+                                                System.err.println(selectedStock.getId());
                                                 isEditingItem = true;
                                             } catch (Exception e) {
                                                 e.printStackTrace();
@@ -250,8 +250,10 @@ public class MIRSReleasingFormController implements Initializable {
 
             if(isEditingItem){
                 for(MIRSItem added: requestItem) {
-                    if (added.getStockID() == selectedStock.getId()) {
-                        requestItem.remove(added);
+                    System.err.println(added.getStockID()+", "+selectedStock.getId());
+                    if (added.getStockID().equals(selectedStock.getId()) ) {
+                        requestItem.remove(selectedMirsItem);
+                        particularsTable.setItems(requestItem);
                         break;
                     }
                 }
