@@ -153,7 +153,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         try{
             if(tabPane.getSelectionModel().getSelectedIndex() == 1){
                 if(workJobNum.getText().isEmpty() || mirsNum.getText().isEmpty()
-                || requisitioner.getText().isEmpty() || purpose.getText().isEmpty() || details.getText().isEmpty()){
+                || requisitionerEmployee == null || purpose.getText().isEmpty() || details.getText().isEmpty()){
                     AlertDialogBuilder.messgeDialog("System Message", "Please complete all the MIRS details on Step 1.",
                             stackPane, AlertDialogBuilder.WARNING_DIALOG);
                     tabPane.getSelectionModel().select(0);
@@ -384,6 +384,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 pending.setText("Pending: "+ StockDAO.countPendingRequest(selectedStock));
                 available.setText("Available: "+ av);
             } catch (Exception e) {
+                e.printStackTrace();
                 AlertDialogBuilder.messgeDialog("System Error", "bindParticularsAutocomplete(): "+e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
             }
         });

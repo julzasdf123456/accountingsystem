@@ -47,7 +47,7 @@
                                           <Font size="14.0" />
                                        </font>
                                        <VBox.margin>
-                                          <Insets bottom="16.0" />
+                                          <Insets bottom="16.0" top="16.0" />
                                        </VBox.margin>
                                     </JFXTextField>
                                               <JFXTextField fx:id="mirsNum" labelFloat="true" prefHeight="25.0" prefWidth="300.0" promptText="MIRS Number" style="-fx-background-color: #f5f5f5;">
@@ -66,7 +66,7 @@
                                                       <Font size="14.0" />
                                                   </font>
                                               </JFXTextField>
-                                              <JFXTextArea fx:id="purpose" labelFloat="true" prefHeight="90.0" prefWidth="285.0" promptText="Purpose" style="-fx-background-color: #f5f5f5;">
+                                              <JFXTextArea fx:id="purpose" focusColor="#00ad8e" labelFloat="true" prefHeight="90.0" prefWidth="285.0" promptText="Purpose" style="-fx-background-color: #f5f5f5;">
                                                   <VBox.margin>
                                                       <Insets bottom="16.0" top="16.0" />
                                                   </VBox.margin>
@@ -74,7 +74,7 @@
                                                       <Font size="14.0" />
                                                   </font>
                                               </JFXTextArea>
-                                              <JFXTextArea fx:id="details" labelFloat="true" prefHeight="90.0" prefWidth="285.0" promptText="Details" style="-fx-background-color: #f5f5f5;">
+                                              <JFXTextArea fx:id="details" focusColor="#00ad8e" labelFloat="true" prefHeight="90.0" prefWidth="285.0" promptText="Details" style="-fx-background-color: #f5f5f5;">
                                                   <VBox.margin>
                                                       <Insets bottom="16.0" top="16.0" />
                                                   </VBox.margin>
@@ -153,7 +153,7 @@
                                                             <Insets bottom="16.0" top="16.0" />
                                                         </VBox.margin>
                                                     </HBox>
-                                                    <JFXTextArea fx:id="remark" prefHeight="62.0" prefWidth="400.0" promptText="Remarks" style="-fx-background-color: #f5f5f5;">
+                                                    <JFXTextArea fx:id="remark" focusColor="#00ad8e" labelFloat="true" prefHeight="62.0" prefWidth="400.0" promptText="Remarks" style="-fx-background-color: #f5f5f5;">
                                                         <VBox.margin>
                                                             <Insets bottom="16.0" top="16.0" />
                                                         </VBox.margin>
