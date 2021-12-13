@@ -31,7 +31,7 @@ import java.util.ResourceBundle;
 public class ViewStockController implements Initializable {
 
     @FXML
-    private JFXTextField stockName, serialNumber, brand, model, quantity, unit, price, neaCode, threshold;
+    private JFXTextField stockName, serialNumber, brand, model, quantity, unit, price, neaCode, threshold, localCode, accountCode;
 
     @FXML
     private JFXTextArea description, comments;
@@ -84,6 +84,8 @@ public class ViewStockController implements Initializable {
         String unit = this.unit.getText();
         StockType stockType = (StockType) this.type.getSelectionModel().getSelectedItem();
         String serialNumber = this.serialNumber.getText();
+        String localCode = this.localCode.getText();
+        String accountCode = this.accountCode.getText();
 
         int threshold = 0;
         int quantity = 0;
@@ -134,6 +136,12 @@ public class ViewStockController implements Initializable {
         if (name.length() == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for stock name!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (accountCode.length() == 0) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for accounting code!",
+                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (localCode.length() == 0) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for local code!",
+                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (brand.length() == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for brand!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
@@ -154,6 +162,8 @@ public class ViewStockController implements Initializable {
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else {
             try {
+                this.stock.setAcctgCode(accountCode);
+                this.stock.setLocalCode(localCode);
                 this.stock.setQuantity(quantity);
                 StockDAO.update(this.stock);
                 AlertDialogBuilder.messgeDialog("Update Stock", "Current stock details was successfully updated!", stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
@@ -196,6 +206,8 @@ public class ViewStockController implements Initializable {
 
     public void initializeInformation(){
         this.stockName.setText(stock.getStockName());
+        this.localCode.setText(stock.getLocalCode());
+        this.accountCode.setText(stock.getAcctgCode());
         this.serialNumber.setText(""+stock.getSerialNumber());
         this.brand.setText(stock.getBrand());
         this.model.setText(stock.getModel());

@@ -27,6 +27,8 @@ public class Stock {
     private String userIDCreated;
     private String userIDUpdated;
     private String userIDTrashed;
+    private String acctgCode;
+    private String localCode;
 
     private StockEntryLog entryLog;
     private Releasing releasing;
@@ -39,8 +41,8 @@ public class Stock {
         this.model = model;
         this.brand = brand;
     }
-    /** Constructor with critical **/
-    public Stock(String id, String stockName, String description, String serialNumber, String brand, String model, LocalDate manufacturingDate, LocalDate validityDate, String typeID, String unit, int quantity, int critical, double price, String neaCode, boolean isTrashed, String comments, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime trashedAt, String userIDCreated, String userIDUpdated, String userIDTrashed) {
+    /** Constructor with critical, accountcode, localcode **/
+    public Stock(String id, String stockName, String description, String serialNumber, String brand, String model, LocalDate manufacturingDate, LocalDate validityDate, String typeID, String unit, int quantity, int critical, double price, String neaCode, boolean isTrashed, String comments, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime trashedAt, String userIDCreated, String userIDUpdated, String userIDTrashed, String acctgCode, String localCode) {
         this.id = id;
         this.stockName = stockName;
         this.description = description;
@@ -63,6 +65,8 @@ public class Stock {
         this.userIDCreated = userIDCreated;
         this.userIDUpdated = userIDUpdated;
         this.userIDTrashed = userIDTrashed;
+        this.acctgCode = acctgCode;
+        this.localCode = localCode;
     }
 
 
@@ -257,5 +261,21 @@ public class Stock {
 
     public void setReleasing(Releasing releasing) {
         this.releasing = releasing;
+    }
+
+    public String getAcctgCode() {
+        return acctgCode;
+    }
+
+    public void setAcctgCode(String acctgCode) {
+        this.acctgCode = acctgCode;
+    }
+
+    public String getLocalCode() {
+        return localCode;
+    }
+
+    public void setLocalCode(String localCode) {
+        this.localCode = localCode;
     }
 }

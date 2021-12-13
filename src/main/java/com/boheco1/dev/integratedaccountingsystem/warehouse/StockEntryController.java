@@ -35,7 +35,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
     private StackPane stockStackPane;
 
     @FXML
-    private JFXTextField stockName, serialNumber, brand, model, quantity, unit, price, neaCode, threshold;
+    private JFXTextField stockName, serialNumber, brand, model, quantity, unit, price, neaCode, threshold, localCode, accountCode;
 
     @FXML
     private JFXTextArea comments, description;
@@ -79,6 +79,8 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         LocalDate valDate = this.valDate.getValue();
         String source = this.source.getSelectionModel().getSelectedItem();
         String serialNumber = this.serialNumber.getText();
+        String localCode = this.localCode.getText();
+        String accountCode = this.accountCode.getText();
 
         int threshold = 0;
         int quantity = 0;
@@ -127,6 +129,12 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         if (name.length() == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for stock name!",
                         stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (accountCode.length() == 0) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for accounting code!",
+                    stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (localCode.length() == 0) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for local code!",
+                    stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (brand.length() == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for brand!",
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
@@ -152,6 +160,10 @@ public class StockEntryController extends MenuControllerHandler implements Initi
             if (isNew) {
                 //If new Stock item, set stock quantity to 0 and insert Stock to database
                 this.stock.setQuantity(0);
+
+                this.stock.setAcctgCode(accountCode);
+                this.stock.setLocalCode(localCode);
+
                 try {
                     StockDAO.add(this.stock);
 
@@ -282,6 +294,8 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                 isNew = false;
                 stock = StockDAO.get(result.getId());
                 stockName.setText(stock.getStockName());
+                accountCode.setText(stock.getAcctgCode());
+                localCode.setText(stock.getLocalCode());
                 //quantity.setText(""+stock.getQuantity());
                 price.setText(""+stock.getPrice());
                 serialNumber.setText(stock.getSerialNumber());
@@ -305,6 +319,8 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                 type.getSelectionModel().select(index);
                 stockName.setDisable(true);
                 serialNumber.setDisable(true);
+                accountCode.setDisable(true);
+                localCode.setDisable(true);
                 brand.setDisable(true);
                 model.setDisable(true);
                 unit.setDisable(true);
@@ -327,6 +343,8 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.isNew = true;
 
         this.stockName.setText("");
+        this.localCode.setText("");
+        this.accountCode.setText("");
         this.brand.setText("");
         this.quantity.setText("");
         this.unit.setText("");
@@ -342,6 +360,8 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.valDate.setValue(null);
         this.threshold.setText("");
         this.stockName.setDisable(false);
+        this.localCode.setDisable(false);
+        this.accountCode.setDisable(false);
         this.serialNumber.setDisable(false);
         this.brand.setDisable(false);
         this.model.setDisable(false);
