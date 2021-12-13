@@ -18,7 +18,7 @@ public class ExcelBuilder {
     private Workbook wb;
     private Sheet sheet;
 
-    private String names[] = new String[]{"RYAN REYNOLDS", "DWAYNE JOHNSON", "GAL GADOT"};
+    private String[] names = new String[]{"RYAN REYNOLDS", "DWAYNE JOHNSON", "GAL GADOT"};
     private String[] designations = new String[]{"Warehouse Warden", "Department Manager", "General Manager"};
 
     private int wide;
@@ -134,14 +134,6 @@ public class ExcelBuilder {
         CellStyle style = wb.createCellStyle();
         style.setFont(font);
         style.setAlignment(alignment);
-        /*style.setBorderLeft(BorderStyle.THIN);
-        style.setBorderRight(BorderStyle.THIN);
-        style.setBorderTop(BorderStyle.THIN);
-        style.setBorderBottom(BorderStyle.THIN);
-        style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
-        style.setRightBorderColor(IndexedColors.BLACK.getIndex());
-        style.setTopBorderColor(IndexedColors.BLACK.getIndex());
-        style.setBottomBorderColor(IndexedColors.BLACK.getIndex());*/
         cell.setCellStyle(style);
     }
 
@@ -338,5 +330,13 @@ public class ExcelBuilder {
 
     public void setDesignations(String[] designations) {
         this.designations = designations;
+    }
+
+    public String[] getNames() {
+        return names;
+    }
+
+    public void setNames(String[] names) {
+        this.names = names;
     }
 }
