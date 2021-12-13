@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 import com.boheco1.dev.integratedaccountingsystem.HomeController;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
+import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
@@ -30,6 +31,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class InventoryReportController extends MenuControllerHandler implements Initializable, SubMenuHelper {
@@ -95,6 +97,12 @@ public class InventoryReportController extends MenuControllerHandler implements 
                         ExcelBuilder doc = new ExcelBuilder(10);
 
                         doc.setTitle("Inventory Report");
+
+                        String names[] = {ActiveUser.getUser().getFullName().toUpperCase(Locale.ROOT), "", ""};
+                        doc.setNames(names);
+
+                        String designations[] = {"Warehouse Personnel", "Head, Warehouse", "General Manager"};
+                        doc.setDesignations(designations);
 
                         doc.setMargin(1, 0.5, 1, 0.5);
 

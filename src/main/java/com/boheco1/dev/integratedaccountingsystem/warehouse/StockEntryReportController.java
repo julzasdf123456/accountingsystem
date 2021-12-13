@@ -6,6 +6,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ExcelBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.SubMenuHelper;
+import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 import com.boheco1.dev.integratedaccountingsystem.objects.StockEntryLog;
 import com.jfoenix.controls.JFXButton;
@@ -36,6 +37,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class StockEntryReportController extends MenuControllerHandler implements Initializable, SubMenuHelper {
@@ -127,6 +129,12 @@ public class StockEntryReportController extends MenuControllerHandler implements
                             ExcelBuilder doc = new ExcelBuilder(10);
 
                             doc.setTitle("Stock Entry Report");
+
+                            String names[] = {ActiveUser.getUser().getFullName().toUpperCase(Locale.ROOT), "", ""};
+                            doc.setNames(names);
+
+                            String designations[] = {"Warehouse Personnel", "Head, Warehouse", "General Manager"};
+                            doc.setDesignations(designations);
 
                             //Set the margin
                             doc.setMargin(1, 0.5, 1, 0.5);
