@@ -15,13 +15,14 @@ public class StockEntryLog {
     private String userID;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String rrNo;
 
     private Stock stock;
     private User user;
 
     public StockEntryLog() {}
 
-    public StockEntryLog(String id, String stockID, int quantity, String source, double price, String userID, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public StockEntryLog(String id, String stockID, int quantity, String source, double price, String userID, LocalDateTime createdAt, LocalDateTime updatedAt, String rrNo) {
         this.id = id;
         this.stockID = stockID;
         this.quantity = quantity;
@@ -30,6 +31,15 @@ public class StockEntryLog {
         this.userID = userID;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.rrNo = rrNo;
+    }
+
+    public String getRrNo() {
+        return rrNo;
+    }
+
+    public void setRrNo(String rrNo) {
+        this.rrNo = rrNo;
     }
 
     public String getId() {

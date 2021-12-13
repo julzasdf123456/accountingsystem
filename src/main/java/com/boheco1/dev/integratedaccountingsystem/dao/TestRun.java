@@ -39,7 +39,7 @@ public class TestRun {
             ActiveUser.setUser(UserDAO.get("1000"));
 
             Stock stock = StockDAO.get("4");
-            StockDAO.stockEntry(stock, new StockEntryLog("",stock.getId(),60,"Purchases",126.70,"",null,null) );
+            StockDAO.stockEntry(stock, new StockEntryLog("",stock.getId(),60,"Purchases",126.70,"",null,null,"") );
 
             List<StockEntryLog> logs = StockDAO.getEntryLogs(stock);
             for(StockEntryLog log: logs) {

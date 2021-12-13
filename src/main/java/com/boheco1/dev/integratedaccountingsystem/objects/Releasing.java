@@ -13,6 +13,7 @@ public class Releasing {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String MR;
+    private String workOrderNo;
 
     public Releasing(String id, String stockID, String mirsID, int quantity, double price, String userID, String status) {
         this.id = id;
@@ -33,6 +34,26 @@ public class Releasing {
         this.userID = userID;
         this.status = status;
         this.MR = MR;
+    }
+
+    public Releasing(String id, String stockID, String mirsID, int quantity, double price, String userID, String status, String MR, String workdOrderNo) {
+        this.id = id;
+        this.stockID = stockID;
+        this.mirsID = mirsID;
+        this.quantity = quantity;
+        this.price = price;
+        this.userID = userID;
+        this.status = status;
+        this.MR = MR;
+        this.workOrderNo=workdOrderNo;
+    }
+
+    public String getWorkOrderNo() {
+        return workOrderNo;
+    }
+
+    public void setWorkOrderNo(String workOrderNo) {
+        this.workOrderNo = workOrderNo;
     }
 
     public Releasing() {

@@ -27,8 +27,8 @@ public class StockDAO {
                         "ValidityDate, TypeID, Unit, " +
                         "Quantity, Price, NEACode, " +
                         "IsTrashed, Comments, CreatedAt, " +
-                        "UserIDCreated, Critical, id) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?,?,?)", Statement.RETURN_GENERATED_KEYS);
+                        "UserIDCreated, Critical, id, LocalCode, AcctgCode) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?,?,?,?,?)");
 
         stock.setId(Utility.generateRandomId());
 
@@ -55,6 +55,9 @@ public class StockDAO {
         ps.setInt(16, stock.getCritical());
 
         ps.setString(17, stock.getId());
+
+        ps.setString(18, stock.getLocalCode());
+        ps.setString(19, stock.getAcctgCode());
 
         ps.executeUpdate();
 
@@ -95,7 +98,9 @@ public class StockDAO {
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
                     rs.getString("UserIDCreated"),
                     rs.getString("UserIDUpdated"),
-                    rs.getString("UserIDTrashed")
+                    rs.getString("UserIDTrashed"),
+                    rs.getString("LocalCode"),
+                    rs.getString("AcctgCode")
             );
 
             rs.close();
@@ -118,7 +123,8 @@ public class StockDAO {
                         "Brand=?, Model=?, ManufacturingDate=?, " +
                         "ValidityDate=?, TypeID=?, Unit=?," +
                         "Quantity=?, Price=?, NEACode=?," +
-                        "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=?, Critical=? " +
+                        "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=?, Critical=?," +
+                        "LocalCode=?, AcctgCode=? " +
                         "WHERE id=?");
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
@@ -149,7 +155,9 @@ public class StockDAO {
         ps.setString(13, stock.getComments());
         ps.setString(14, ActiveUser.getUser().getId());
         ps.setInt(15, stock.getCritical());
-        ps.setString(16, stock.getId());
+        ps.setString(16, stock.getLocalCode());
+        ps.setString(16, stock.getAcctgCode());
+        ps.setString(18, stock.getId());
 
         ps.executeUpdate();
 
@@ -330,7 +338,9 @@ public class StockDAO {
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
                     rs.getString("UserIDCreated"),
                     rs.getString("UserIDUpdated"),
-                    rs.getString("UserIDTrashed")
+                    rs.getString("UserIDTrashed"),
+                    rs.getString("LocalCode"),
+                    rs.getString("AcctgCode")
             ));
         }
 
@@ -418,9 +428,9 @@ public class StockDAO {
     public static void stockEntry(Stock stock, StockEntryLog log) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "INSERT INTO StockEntryLogs " +
-                        "(StockID, Quantity, Source, Price, UserID, CreatedAt, UpdatedAt, id) " +
+                        "(StockID, Quantity, Source, Price, UserID, CreatedAt, UpdatedAt, id, RRNo) " +
                         "VALUES " +
-                        "(?,?,?,?,?,GETDATE(),GETDATE(), ?)");
+                        "(?,?,?,?,?,GETDATE(),GETDATE(), ?, ?)");
 
         log.setId(Utility.generateRandomId());
 
@@ -430,6 +440,7 @@ public class StockDAO {
         ps.setDouble(4, log.getPrice());
         ps.setString(5, ActiveUser.getUser().getId());
         ps.setString(6, log.getId());
+        ps.setString(7, log.getRrNo());
         ps.executeUpdate();
 
         ps.close();
@@ -446,7 +457,7 @@ public class StockDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE StockEntryLogs SET " +
                         "StockID=?, Quantity=?, Source=?, " +
-                        "Price=?, UserID=?, UpdatedAt=GETDATE() " +
+                        "Price=?, UserID=?, RRNo=?, UpdatedAt=GETDATE() " +
                         "WHERE id=?");
         ps.setString(1, log.getStockID());
         ps.setInt(2, log.getQuantity());
@@ -454,6 +465,7 @@ public class StockDAO {
         ps.setDouble(4, log.getPrice());
         ps.setString(5, ActiveUser.getUser().getId());
         ps.setString(6, log.getId());
+        ps.setString(7, log.getRrNo());
 
         ps.executeUpdate();
 
@@ -601,7 +613,9 @@ public class StockDAO {
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
                     rs.getString("UserIDCreated"),
                     rs.getString("UserIDUpdated"),
-                    rs.getString("UserIDTrashed")
+                    rs.getString("UserIDTrashed"),
+                    rs.getString("LocalCode"),
+                    rs.getString("AcctgCode")
             ));
         }
 
@@ -649,7 +663,9 @@ public class StockDAO {
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
                     rs.getString("UserIDCreated"),
                     rs.getString("UserIDUpdated"),
-                    rs.getString("UserIDTrashed")
+                    rs.getString("UserIDTrashed"),
+                    rs.getString("LocalCode"),
+                    rs.getString("AcctgCode")
             ));
         }
 
@@ -702,7 +718,9 @@ public class StockDAO {
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
                     rs.getString("UserIDCreated"),
                     rs.getString("UserIDUpdated"),
-                    rs.getString("UserIDTrashed")
+                    rs.getString("UserIDTrashed"),
+                    rs.getString("LocalCode"),
+                    rs.getString("AcctgCode")
             ));
         }
 
@@ -758,7 +776,8 @@ public class StockDAO {
                             rs.getDouble("Price"),
                             rs.getString("UserID"),
                             rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                            rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                            rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                            rs.getString("RRNo")
                     )
             );
         }
@@ -813,7 +832,9 @@ public class StockDAO {
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
                     rs.getString("UserIDCreated"),
                     rs.getString("UserIDUpdated"),
-                    rs.getString("UserIDTrashed")
+                    rs.getString("UserIDTrashed"),
+                    rs.getString("LocalCode"),
+                    rs.getString("AcctgCode")
             ));
         }
 
@@ -859,7 +880,9 @@ public class StockDAO {
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
                     rs.getString("UserIDCreated"),
                     rs.getString("UserIDUpdated"),
-                    rs.getString("UserIDTrashed")
+                    rs.getString("UserIDTrashed"),
+                    rs.getString("LocalCode"),
+                    rs.getString("AcctgCode")
             ));
         }
 
@@ -913,7 +936,9 @@ public class StockDAO {
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
                     rs.getString("UserIDCreated"),
                     rs.getString("UserIDUpdated"),
-                    rs.getString("UserIDTrashed")
+                    rs.getString("UserIDTrashed"),
+                    rs.getString("LocalCode"),
+                    rs.getString("AcctgCode")
             );
             StockEntryLog log = new StockEntryLog();
             log.setId(rs.getString("entryID"));
@@ -983,7 +1008,9 @@ public class StockDAO {
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
                     rs.getString("UserIDCreated"),
                     rs.getString("UserIDUpdated"),
-                    rs.getString("UserIDTrashed")
+                    rs.getString("UserIDTrashed"),
+                    rs.getString("LocalCode"),
+                    rs.getString("AcctgCode")
             );
             StockEntryLog log = new StockEntryLog();
             log.setId(rs.getString("entryID"));
@@ -1049,7 +1076,9 @@ public class StockDAO {
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
                     rs.getString("UserIDCreated"),
                     rs.getString("UserIDUpdated"),
-                    rs.getString("UserIDTrashed")
+                    rs.getString("UserIDTrashed"),
+                    rs.getString("LocalCode"),
+                    rs.getString("AcctgCode")
             );
             Releasing log = new Releasing();
             log.setId(rs.getString("releasedID"));
@@ -1121,7 +1150,9 @@ public class StockDAO {
                     rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
                     rs.getString("UserIDCreated"),
                     rs.getString("UserIDUpdated"),
-                    rs.getString("UserIDTrashed")
+                    rs.getString("UserIDTrashed"),
+                    rs.getString("LocalCode"),
+                    rs.getString("AcctgCode")
             );
             stocks.add(stock);
         }
