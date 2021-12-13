@@ -40,10 +40,10 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     private DatePicker date;
 
     @FXML
-    private JFXTextField mirsNum, requisitioner, dm, gm, particulars, quantity;
+    private JFXTextField workJobNum, mirsNum, requisitioner, dm, gm, particulars, quantity;
 
     @FXML
-    private Label mirsNum1, date1, requisitioner1;
+    private Label workJobNum1, mirsNum1, date1, requisitioner1;
 
     @FXML
     private JFXTextArea purpose, details, remark;
@@ -151,7 +151,15 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     @FXML
     private void selectedTab(MouseEvent event) {
         try{
-            if(tabPane.getSelectionModel().getSelectedIndex() == 2){
+            if(tabPane.getSelectionModel().getSelectedIndex() == 1){
+                if(workJobNum.getText().isEmpty() || mirsNum.getText().isEmpty()
+                || requisitioner.getText().isEmpty() || purpose.getText().isEmpty() || details.getText().isEmpty()){
+                    AlertDialogBuilder.messgeDialog("System Message", "Please complete all the MIRS details on Step 1.",
+                            stackPane, AlertDialogBuilder.WARNING_DIALOG);
+                    tabPane.getSelectionModel().select(0);
+                }
+            }else if(tabPane.getSelectionModel().getSelectedIndex() == 2){
+                workJobNum1.setText(workJobNum.getText());
                 mirsNum1.setText(mirsNum.getText());
                 date1.setText(""+date.getValue());
                 purpose1.setText(purpose.getText());
@@ -295,7 +303,6 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         selectedItem =  FXCollections.observableArrayList();
         particularsTable.setPlaceholder(new Label("No item Added"));
     }
-
 
     private void setSignatories(){
         try {
