@@ -2,6 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.Receiving;
+import com.boheco1.dev.integratedaccountingsystem.objects.ReceivingItem;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -63,8 +64,33 @@ public class ReceivingDAO {
         return receiving;
     }
 
+    public static void update(Receiving receiving) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE Receiving " +
+                "SET Date=?, RVNo=?, BLWBNo=?, Carrier=?, DRNo=?, PONo=?, SupplierID=?, " +
+                "InvoiceNo=?, ReceivedBy=?, ReceivedOrigBy=?, VerifiedBy=? " +
+                "WHERE RRNo=?");
+
+        ps.setDate(1, Date.valueOf(receiving.getDate()));
+        ps.setString(2, receiving.getRvNo());
+        ps.setString(3, receiving.getBlwbNo());
+        ps.setString(4, receiving.getCarrier());
+        ps.setString(5, receiving.getDrNo());
+        ps.setString(6, receiving.getPoNo());
+        ps.setString(7, receiving.getSupplierId());
+        ps.setString(8, receiving.getInvoiceNo());
+        ps.setString(9, receiving.getReceivedBy());
+        ps.setString(10, receiving.getReceivedOrigBy());
+        ps.setString(11, receiving.getVerifiedBy());
+        ps.setString(12, receiving.getRrNo());
+
+        ps.executeUpdate();
+
+        ps.close();
+    }
+
     public static List<Receiving> getByDateRange(LocalDate from, LocalDate to) throws Exception {
-        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM Receiving " +
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM Receiving " +
                 "WHERE Date BETWEEN ? AND ? ORDER BY Date ASC");
         ps.setDate(1, Date.valueOf(from));
         ps.setDate(2, Date.valueOf(to));
@@ -93,6 +119,27 @@ public class ReceivingDAO {
         rs.close();
 
         return receivings;
+    }
+
+    public static void addItems(String RRNo, List<ReceivingItem> items) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "INSERT INTO ReceivingItem " +
+                        "(RRNo, StockID, QtyDelivered, QtyAccepted, UnitCost) " +
+                        "VALUES (?,?,?,?,?)");
+
+        ps.setString(1, RRNo);
+        for(ReceivingItem item: items) {
+            ps.setString(2, item.getStockId());
+            ps.setInt(3, item.getQtyDelivered());
+            ps.setInt(4, item.getQtyAccepted());
+            ps.setDouble(5, item.getUnitCost());
+
+            ps.addBatch();
+        }
+
+        ps.executeBatch();
+
+        ps.close();
     }
 
     private static String generateRRNo() throws Exception {
