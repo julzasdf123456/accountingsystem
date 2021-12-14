@@ -97,7 +97,7 @@ public class MirsDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id, WorkOrderNo) " +
                         "VALUES " +
-                        "(?,?,?,?,?,GETDATE(),GETDATE(), ?)");
+                        "(?,?,?,?,?,GETDATE(),GETDATE(), ?, ?)");
 
         for(MIRSItem item: items) {
             ps.setString(1, mirs.getId());
