@@ -40,10 +40,10 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     private DatePicker date;
 
     @FXML
-    private JFXTextField workJobNum, mirsNum, requisitioner, dm, gm, particulars, quantity;
+    private JFXTextField workOrderNum, mirsNum, requisitioner, dm, gm, particulars, quantity;
 
     @FXML
-    private Label workJobNum1, mirsNum1, date1, requisitioner1;
+    private Label workOrderNum1, mirsNum1, date1, requisitioner1;
 
     @FXML
     private JFXTextArea purpose, details, remark;
@@ -88,6 +88,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         bindRequisitionerAutocomplete(requisitioner);
         bindDMAutocomplete(dm);
         InputValidation.restrictNumbersOnly(mirsNum);
+        InputValidation.restrictNumbersOnly(workOrderNum);
         InputValidation.restrictNumbersOnly(quantity);
         initializeItemTable();
     }
@@ -130,6 +131,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             mirsItem.setQuantity(Integer.parseInt(quantity.getText()));
             mirsItem.setPrice(selectedStock.getPrice());
             mirsItem.setRemarks(remark.getText());
+            mirsItem.setWorkOrderNo(workOrderNum.getText());
 
             selectedStock = null; //set to null for validation
             selectedItem.add(mirsItem);
@@ -152,14 +154,14 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     private void selectedTab(MouseEvent event) {
         try{
             if(tabPane.getSelectionModel().getSelectedIndex() == 1){
-                if(workJobNum.getText().isEmpty() || mirsNum.getText().isEmpty()
+                if(workOrderNum.getText().isEmpty() || mirsNum.getText().isEmpty()
                 || requisitionerEmployee == null || purpose.getText().isEmpty() || details.getText().isEmpty()){
                     AlertDialogBuilder.messgeDialog("System Message", "Please complete all the MIRS details on Step 1.",
                             stackPane, AlertDialogBuilder.WARNING_DIALOG);
                     tabPane.getSelectionModel().select(0);
                 }
             }else if(tabPane.getSelectionModel().getSelectedIndex() == 2){
-                workJobNum1.setText(workJobNum.getText());
+                workOrderNum1.setText(workOrderNum.getText());
                 mirsNum1.setText(mirsNum.getText());
                 date1.setText(""+date.getValue());
                 purpose1.setText(purpose.getText());
@@ -221,11 +223,6 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
             MirsDAO.addMIRSItems(mirs, mirsItemList); //add the items request from the MIRS filled
 
-            for(MIRSItem mirsItem : mirsItemList){
-                Stock request = StockDAO.get(mirsItem.getStockID());
-                //StockDAO.deductStockQuantity(request, mirsItem.getQuantity());
-            }
-
             for(Signatory s : signatories){
                 MIRSSignatory mirsSignatory = new MIRSSignatory();
                 mirsSignatory.setMirsID(mirs.getId());
@@ -257,7 +254,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         quantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
         quantityCol.setStyle("-fx-alignment: center;");
         remarksCol.setCellValueFactory(new PropertyValueFactory<>("Remarks"));
-
+        remarksCol.setStyle("-fx-alignment: center-left;");
         actionCol.setStyle("-fx-alignment: center;");
         Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> removeBtn
                 = //

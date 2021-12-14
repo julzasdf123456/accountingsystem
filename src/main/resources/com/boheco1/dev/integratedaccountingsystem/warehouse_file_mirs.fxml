@@ -42,7 +42,7 @@
                                                       <Insets bottom="16.0" top="16.0" />
                                                   </VBox.margin>
                                               </DatePicker>
-                                    <JFXTextField fx:id="workJobNum" labelFloat="true" prefHeight="25.0" prefWidth="300.0" promptText="Work job number" style="-fx-background-color: #f5f5f5;">
+                                    <JFXTextField fx:id="workOrderNum" labelFloat="true" prefHeight="25.0" prefWidth="300.0" promptText="Work Order number" style="-fx-background-color: #f5f5f5;">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -229,9 +229,9 @@
                                                             <Font size="14.0" />
                                                          </font>
                                                       </Label>
-                                                      <Label fx:id="workJobNum1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="129.0" text="-">
+                                                      <Label fx:id="workOrderNum1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="129.0" text="-">
                                                          <font>
-                                                            <Font size="14.0" />
+                                                            <Font name="System Bold" size="14.0" />
                                                          </font>
                                                       </Label>
                                                    </children>
@@ -245,7 +245,7 @@
                                                       </Label>
                                                       <Label fx:id="mirsNum1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="129.0" text="-">
                                                          <font>
-                                                            <Font size="14.0" />
+                                                            <Font name="System Bold" size="14.0" />
                                                          </font>
                                                       </Label>
                                                    </children>
@@ -259,7 +259,7 @@
                                                       </Label>
                                                       <Label fx:id="date1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="129.0" text="-">
                                                          <font>
-                                                            <Font size="14.0" />
+                                                            <Font name="System Bold" size="14.0" />
                                                          </font>
                                                       </Label>
                                                    </children>
