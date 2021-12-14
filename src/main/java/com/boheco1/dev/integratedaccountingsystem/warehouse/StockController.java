@@ -199,6 +199,7 @@ public class StockController extends MenuControllerHandler implements Initializa
             });
             return new SimpleObjectProperty<>(checkBox);
         });
+        select.setStyle("-fx-alignment: center;");
 
         TableColumn<SlimStock, String> column1 = new TableColumn<>("Stock Name");
         column1.setMinWidth(150);
@@ -209,22 +210,29 @@ public class StockController extends MenuControllerHandler implements Initializa
         column2.setCellValueFactory(new PropertyValueFactory<>("description"));
 
         TableColumn<SlimStock, String> column3 = new TableColumn<>("Brand");
-        column3.setMinWidth(100);
+        column3.setMinWidth(175);
         column3.setCellValueFactory(new PropertyValueFactory<>("brand"));
 
         TableColumn<SlimStock, String> column4 = new TableColumn<>("Model");
-        column4.setMinWidth(100);
+        column4.setMinWidth(175);
         column4.setCellValueFactory(new PropertyValueFactory<>("model"));
 
         TableColumn<SlimStock, String> column5 = new TableColumn<>("Unit");
         column5.setCellValueFactory(new PropertyValueFactory<>("unit"));
+        column5.setMinWidth(75);
+        column5.setStyle("-fx-alignment: center;");
 
         TableColumn<SlimStock, String> column6 = new TableColumn<>("Quantity");
         column6.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        column6.setMinWidth(75);
+        column6.setStyle("-fx-alignment: center;");
 
         TableColumn<SlimStock, String> column7 = new TableColumn<>("Price");
         column7.setCellValueFactory(new PropertyValueFactory<>("price"));
+        column7.setMinWidth(75);
+
         stocksTable.getColumns().removeAll();
+
         stocksTable.getColumns().add(select);
         stocksTable.getColumns().add(column1);
         stocksTable.getColumns().add(column2);

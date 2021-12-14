@@ -9,6 +9,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.StockEntryLog;
 import com.boheco1.dev.integratedaccountingsystem.objects.StockType;
 import com.jfoenix.controls.*;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -25,6 +26,7 @@ import javafx.util.StringConverter;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -179,6 +181,7 @@ public class ViewStockController implements Initializable {
         TableColumn<StockEntryLog, String> column1 = new TableColumn<>("Quantity");
         column1.setMinWidth(110);
         column1.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
+        column1.setStyle("-fx-alignment: center;");
 
         TableColumn<StockEntryLog, String> column2 = new TableColumn<>("Price");
         column2.setMinWidth(110);
@@ -190,12 +193,14 @@ public class ViewStockController implements Initializable {
 
         TableColumn<StockEntryLog, String> column4 = new TableColumn<>("Date");
         column4.setMinWidth(70);
-        column4.setCellValueFactory(new PropertyValueFactory<>("updatedAt"));
+        column4.setCellValueFactory(stockEntryLog -> new SimpleStringProperty(stockEntryLog.getValue().getUpdatedAt().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))));
+        column4.setStyle("-fx-alignment: center;");
 
+        stockEntries.getColumns().add(column4);
         stockEntries.getColumns().add(column1);
         stockEntries.getColumns().add(column2);
         stockEntries.getColumns().add(column3);
-        stockEntries.getColumns().add(column4);
+
     }
 
     public void initializeInformation(){

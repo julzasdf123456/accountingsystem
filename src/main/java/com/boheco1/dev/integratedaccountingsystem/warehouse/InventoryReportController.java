@@ -8,11 +8,13 @@ import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -207,22 +209,29 @@ public class InventoryReportController extends MenuControllerHandler implements 
         column2.setCellValueFactory(new PropertyValueFactory<>("description"));
 
         TableColumn<Stock, String> column3 = new TableColumn<>("Brand");
-        column3.setMinWidth(100);
+        column3.setMinWidth(175);
         column3.setCellValueFactory(new PropertyValueFactory<>("brand"));
 
         TableColumn<Stock, String> column4 = new TableColumn<>("Model");
-        column4.setMinWidth(100);
+        column4.setMinWidth(175);
         column4.setCellValueFactory(new PropertyValueFactory<>("model"));
 
         TableColumn<Stock, String> column5 = new TableColumn<>("Unit");
+        column5.setMinWidth(75);
         column5.setCellValueFactory(new PropertyValueFactory<>("unit"));
+        column5.setStyle("-fx-alignment: center;");
 
         TableColumn<Stock, String> column6 = new TableColumn<>("Quantity");
+        column6.setMinWidth(75);
         column6.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        column6.setStyle("-fx-alignment: center;");
 
         TableColumn<Stock, String> column7 = new TableColumn<>("Price");
+        column7.setMinWidth(75);
         column7.setCellValueFactory(new PropertyValueFactory<>("price"));
+
         this.stocksTable.getColumns().removeAll();
+
         this.stocksTable.getColumns().add(column1);
         this.stocksTable.getColumns().add(column2);
         this.stocksTable.getColumns().add(column3);
@@ -230,6 +239,8 @@ public class InventoryReportController extends MenuControllerHandler implements 
         this.stocksTable.getColumns().add(column5);
         this.stocksTable.getColumns().add(column7);
         this.stocksTable.getColumns().add(column6);
+
+        this.stocksTable.setPlaceholder(new Label("No period selected!"));
     }
 
     public void bindPages(int count){

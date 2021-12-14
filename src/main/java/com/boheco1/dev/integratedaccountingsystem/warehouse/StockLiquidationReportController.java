@@ -18,16 +18,14 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.io.File;
@@ -269,32 +267,37 @@ public class StockLiquidationReportController extends MenuControllerHandler impl
         column1.setCellValueFactory(new PropertyValueFactory<>("stockName"));
 
         TableColumn<Stock, String> column2 = new TableColumn<>("Description");
-        column2.setMinWidth(260);
+        column2.setMinWidth(300);
         column2.setCellValueFactory(new PropertyValueFactory<>("description"));
 
         TableColumn<Stock, String> column3 = new TableColumn<>("Brand");
-        column3.setMinWidth(100);
+        column3.setMinWidth(175);
         column3.setCellValueFactory(new PropertyValueFactory<>("brand"));
 
         TableColumn<Stock, String> column4 = new TableColumn<>("Model");
-        column4.setMinWidth(100);
+        column4.setMinWidth(175);
         column4.setCellValueFactory(new PropertyValueFactory<>("model"));
 
         TableColumn<Stock, String> column5 = new TableColumn<>("Unit");
         column5.setMinWidth(75);
         column5.setCellValueFactory(new PropertyValueFactory<>("unit"));
+        column5.setStyle("-fx-alignment: center;");
 
         TableColumn<Stock, String> column6 = new TableColumn<>("Quantity");
         column6.setMinWidth(75);
         column6.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getReleasing().getQuantity()+""));
+        column6.setStyle("-fx-alignment: center;");
 
         TableColumn<Stock, String> column7 = new TableColumn<>("Price");
         column7.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getReleasing().getPrice()+""));
+        column7.setMinWidth(75);
 
         TableColumn<Stock, String> column8 = new TableColumn<>("Released Date");
         column8.setCellValueFactory(stockStringCellDataFeatures -> new SimpleStringProperty(stockStringCellDataFeatures.getValue().getReleasing().getCreatedAt().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))));
+        column8.setStyle("-fx-alignment: center;");
 
         this.stocksTable.getColumns().removeAll();
+
         this.stocksTable.getColumns().add(column8);
         this.stocksTable.getColumns().add(column1);
         this.stocksTable.getColumns().add(column2);
@@ -303,6 +306,7 @@ public class StockLiquidationReportController extends MenuControllerHandler impl
         this.stocksTable.getColumns().add(column5);
         this.stocksTable.getColumns().add(column7);
         this.stocksTable.getColumns().add(column6);
+        this.stocksTable.setPlaceholder(new Label("No period selected!"));
     }
 
     public void bindPages(int count){
