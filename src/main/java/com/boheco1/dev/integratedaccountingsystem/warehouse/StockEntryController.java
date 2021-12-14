@@ -129,12 +129,6 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         if (name.length() == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for stock name!",
                         stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (accountCode.length() == 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for accounting code!",
-                    stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (localCode.length() == 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for local code!",
-                    stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (brand.length() == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for brand!",
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);

@@ -156,7 +156,7 @@ public class StockDAO {
         ps.setString(14, ActiveUser.getUser().getId());
         ps.setInt(15, stock.getCritical());
         ps.setString(16, stock.getLocalCode());
-        ps.setString(16, stock.getAcctgCode());
+        ps.setString(17, stock.getAcctgCode());
         ps.setString(18, stock.getId());
 
         ps.executeUpdate();
@@ -176,7 +176,8 @@ public class StockDAO {
                         "Brand=?, Model=?, ManufacturingDate=?, " +
                         "ValidityDate=?, TypeID=?, Unit=?," +
                         "Price=?, NEACode=?," +
-                        "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=? " +
+                        "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=?, " +
+                        "LocalCode=?, AcctgCode=? " +
                         "WHERE id=?");
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
@@ -205,7 +206,9 @@ public class StockDAO {
 
         ps.setString(12, stock.getComments());
         ps.setString(13, ActiveUser.getUser().getId());
-        ps.setString(14, stock.getId());
+        ps.setString(14, stock.getLocalCode());
+        ps.setString(15, stock.getAcctgCode());
+        ps.setString(16, stock.getId());
 
         ps.executeUpdate();
 

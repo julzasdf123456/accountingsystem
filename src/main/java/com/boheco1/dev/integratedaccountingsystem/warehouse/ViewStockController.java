@@ -136,12 +136,6 @@ public class ViewStockController implements Initializable {
         if (name.length() == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for stock name!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (accountCode.length() == 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for accounting code!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (localCode.length() == 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for local code!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (brand.length() == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for brand!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
