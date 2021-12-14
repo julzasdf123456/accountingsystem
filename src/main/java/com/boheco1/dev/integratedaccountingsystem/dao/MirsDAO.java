@@ -242,6 +242,44 @@ public class MirsDAO {
         return items;
     }
 
+    /**
+     * Retrieves a group of MIRSItems that belong to a single MIRS record which are not yet released
+     * @param mirs the MIRS File from which the the MIRSItems belong
+     * @return List of MIRSItem
+     * @throws Exception
+     */
+    public static List<MIRSItem> getUnreleasedItems(MIRS mirs) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MIRSItems m WHERE m.MIRSID=? AND m.StockID NOT IN " +
+                        "(SELECT StockID FROM Releasing r WHERE r.MIRSID=?);");
+
+        ps.setString(1, mirs.getId());
+        ps.setString(2, mirs.getId());
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<MIRSItem> items = new ArrayList();
+
+        while(rs.next()) {
+            items.add(new MIRSItem(
+                    rs.getString("id"),
+                    rs.getString("MIRSID"),
+                    rs.getString("StockID"),
+                    rs.getInt("Quantity"),
+                    rs.getDouble("Price"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                    rs.getString("WorkOrderNo")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return items;
+    }
+
     public static List<MIRS> getAllPending() throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM MIRS WHERE Status='Pending' ORDER BY CreatedAt");
