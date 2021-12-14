@@ -13,8 +13,8 @@ import java.util.List;
 public class ReceivingDAO {
     public static void add(Receiving receiving) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement("INSERT INTO Receiving " +
-                "(RRNo, Date, RVNo, BLWBNo, Carrier, DRNo, PONo, SupplierID, InvoiceNo) " +
-                "VALUES (?,?,?,?,?,?,?,?,?)");
+                "(RRNo, Date, RVNo, BLWBNo, Carrier, DRNo, PONo, SupplierID, InvoiceNo, ReceivedBy, ReceivedOrigBy, VerifiedBy) " +
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
 
         ps.setString(1, generateRRNo());
         ps.setDate(2, Date.valueOf(receiving.getDate()));
@@ -25,6 +25,9 @@ public class ReceivingDAO {
         ps.setString(7, receiving.getPoNo());
         ps.setString(8, receiving.getSupplierId());
         ps.setString(9, receiving.getInvoiceNo());
+        ps.setString(10, receiving.getReceivedBy());
+        ps.setString(11, receiving.getReceivedOrigBy());
+        ps.setString(12, receiving.getVerifiedBy());
 
         ps.executeUpdate();
 
@@ -48,7 +51,10 @@ public class ReceivingDAO {
                     rs.getString("DRNo"),
                     rs.getString("PONo"),
                     rs.getString("SupplierID"),
-                    rs.getString("InvoiceNo")
+                    rs.getString("InvoiceNo"),
+                    rs.getString("ReceivedBy"),
+                    rs.getString("ReceivedOrigBy"),
+                    rs.getString("VerifiedBy")
             );
         }
 
@@ -77,7 +83,10 @@ public class ReceivingDAO {
                     rs.getString("DRNo"),
                     rs.getString("PONo"),
                     rs.getString("SupplierID"),
-                    rs.getString("InvoiceNo")
+                    rs.getString("InvoiceNo"),
+                    rs.getString("ReceivedBy"),
+                    rs.getString("ReceivedOrigBy"),
+                    rs.getString("VerifiedBy")
             ));
         }
 

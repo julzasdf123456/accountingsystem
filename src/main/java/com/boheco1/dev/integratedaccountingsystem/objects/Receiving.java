@@ -12,10 +12,13 @@ public class Receiving {
     private String poNo;
     private String supplierId;
     private String invoiceNo;
+    private String receivedBy;
+    private String receivedOrigBy;
+    private String verifiedBy;
 
     public Receiving() {}
 
-    public Receiving(String rrNo, LocalDate date, String rvNo, String blwbNo, String carrier, String drNo, String poNo, String supplierId, String invoiceNo) {
+    public Receiving(String rrNo, LocalDate date, String rvNo, String blwbNo, String carrier, String drNo, String poNo, String supplierId, String invoiceNo, String receivedBy, String receivedOrigBy, String verifiedBy) {
         this.rrNo = rrNo;
         this.date = date;
         this.rvNo = rvNo;
@@ -25,6 +28,33 @@ public class Receiving {
         this.poNo = poNo;
         this.supplierId = supplierId;
         this.invoiceNo = invoiceNo;
+        this.receivedBy = receivedBy;
+        this.receivedOrigBy = receivedOrigBy;
+        this.verifiedBy = verifiedBy;
+    }
+
+    public String getReceivedBy() {
+        return receivedBy;
+    }
+
+    public void setReceivedBy(String receivedBy) {
+        this.receivedBy = receivedBy;
+    }
+
+    public String getReceivedOrigBy() {
+        return receivedOrigBy;
+    }
+
+    public void setReceivedOrigBy(String receivedOrigBy) {
+        this.receivedOrigBy = receivedOrigBy;
+    }
+
+    public String getVerifiedBy() {
+        return verifiedBy;
+    }
+
+    public void setVerifiedBy(String verifiedBy) {
+        this.verifiedBy = verifiedBy;
     }
 
     public LocalDate getDate() {
