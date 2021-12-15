@@ -110,11 +110,11 @@ public class SupplierDAO {
     public static List<SupplierInfo> search(String key) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM SupplierInfo si " +
-                        "WHERE si.CompanyName LIKE '%?%' " +
+                        "WHERE si.CompanyName LIKE ? " +
                         "ORDER BY CompanyName OFFSET 0 ROWS " +
                         "FETCH NEXT 10 ROWS ONLY");
 
-        ps.setString(1, key);
+        ps.setString(1, "%" + key + "%");
 
         ResultSet rs = ps.executeQuery();
 
