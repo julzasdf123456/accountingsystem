@@ -7,6 +7,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.Notifications;
 import com.boheco1.dev.integratedaccountingsystem.usermgt.AllUsersController;
 import com.boheco1.dev.integratedaccountingsystem.usermgt.UserMgtController;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.FileMIRSController;
+import com.boheco1.dev.integratedaccountingsystem.warehouse.ReceivingEntryController;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.StockEntryController;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.WarehouseDashboardController;
 
@@ -80,7 +81,7 @@ public class HomeController implements Initializable {
     public JFXButton collection;
 
     // WAREHOUSE
-    public JFXButton warehouseDashboard, fileMirs, stocks;
+    public JFXButton warehouseDashboard, fileMirs, stocks, receiving;
 
     // ADMINISTRATIVE
     public JFXButton employees, users, signatoriesButton;
@@ -113,11 +114,12 @@ public class HomeController implements Initializable {
         collection = new JFXButton("Collection");
         warehouseDashboard = new JFXButton("Dashboard");
         fileMirs = new JFXButton("File MIRS");
-        stocks = new JFXButton("Stocks");
+        stocks = new JFXButton("Stock Entry");
         employees = new JFXButton("Employees");
         users = new JFXButton("Users");
         myAccount = new JFXButton("My Account");
         logout = new JFXButton("Logout");
+        receiving = new JFXButton("Receiving Entry");
 
         // ADD ALL ITEMS TO NAV SEQUENTIALLY
         NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Finance"), new FontIcon("mdi2f-finance"), homeStackPane);
@@ -131,6 +133,8 @@ public class HomeController implements Initializable {
         if(ActiveUser.getUser().can("manage-warehouse"))
             NavMenuHelper.addMenu(navMenuBox, warehouseDashboard, homeStackPane);
         NavMenuHelper.addMenu(navMenuBox, fileMirs, homeStackPane);
+        if(ActiveUser.getUser().can("manage-warehouse"))
+            NavMenuHelper.addMenu(navMenuBox, receiving, homeStackPane);
         if(ActiveUser.getUser().can("manage-warehouse"))
             NavMenuHelper.addMenu(navMenuBox, stocks, homeStackPane);
         NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Administrator"), new FontIcon("mdi2s-security"), homeStackPane);
@@ -154,7 +158,8 @@ public class HomeController implements Initializable {
         // WAREHOUSE
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(warehouseDashboard, new FontIcon("mdi2v-view-dashboard"), drawerMenus, "Warehouse Dashboard", contentPane, "warehouse_dashboard_controller.fxml", subToolbar, new WarehouseDashboardController(), title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(fileMirs, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "File MIRS", contentPane, "warehouse_file_mirs.fxml", subToolbar, new FileMIRSController(), title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(stocks, new FontIcon("mdi2w-warehouse"), drawerMenus, "Stock", contentPane, "warehouse_stock_entry.fxml", subToolbar, new StockEntryController(), title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(stocks, new FontIcon("mdi2w-warehouse"), drawerMenus, "Stock Entry", contentPane, "warehouse_stock_entry.fxml", subToolbar, new StockEntryController(), title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(receiving, new FontIcon("mdi2w-warehouse"), drawerMenus, "Receiving Entry", contentPane, "warehouse_receiving_entry.fxml", subToolbar, new ReceivingEntryController(), title);
 
         // USERS
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(employees,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, employees.getText(), contentPane, "manage_employees.fxml", subToolbar, new ManageEmployeesController(), "manage-users", homeStackPane, title);

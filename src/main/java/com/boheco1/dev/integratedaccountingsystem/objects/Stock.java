@@ -32,6 +32,7 @@ public class Stock {
 
     private StockEntryLog entryLog;
     private Releasing releasing;
+    private ReceivingItem receivingItem;
 
     public Stock() {}
 
@@ -275,5 +276,13 @@ public class Stock {
 
     public void setReleasing(Releasing releasing) {
         this.releasing = releasing;
+    }
+
+    public ReceivingItem getReceivingItem() {
+        return receivingItem;
+    }
+
+    public void setReceivingItem(ReceivingItem receivingItem) {
+        this.receivingItem = receivingItem;
     }
 }
