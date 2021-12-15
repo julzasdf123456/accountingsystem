@@ -101,7 +101,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         display_lbl.setText("Pending Approval");
         initializedTable("Pending");
         try {
-            ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getMIRSByStatus("Pending"));
+            ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getMIRSByStatus("pending"));
             tableView.getItems().setAll(observableList);
         } catch (Exception e) {
             AlertDialogBuilder.messgeDialog("System Error", this.getClass().getName() +": "+ e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
@@ -113,7 +113,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         display_lbl.setText("Pending Releases");
         initializedTable("Releasing");
         try {
-            ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getMIRSByStatus("Releasing"));
+            ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getMIRSByStatus("releasing"));
             tableView.getItems().setAll(observableList);
         } catch (Exception e) {
             AlertDialogBuilder.messgeDialog("System Error", this.getClass().getName() +": "+ e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
@@ -425,8 +425,8 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
     public void initializeCounts(){
         try {
             this.critical_lbl.setText(""+ StockDAO.countCritical());
-            this.pendingApprovals_lbl.setText(""+MirsDAO.countMIRSByStatus("Pending"));
-            this.pendingReleases_lbl.setText(""+MirsDAO.countMIRSByStatus("Releasing"));
+            this.pendingApprovals_lbl.setText(""+MirsDAO.countMIRSByStatus("pending"));
+            this.pendingReleases_lbl.setText(""+MirsDAO.countMIRSByStatus("releasing"));
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -213,7 +213,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             MIRS mirs = new MIRS();
             mirs.setId(mirsNum.getText()); //id mean MIRS number from user input
             mirs.setDetails(details.getText());
-            mirs.setStatus("Pending");
+            mirs.setStatus("pending");
             mirs.setDateFiled(date.getValue());
             mirs.setPurpose(purpose.getText());
             mirs.setRequisitionerID(requisitionerEmployee.getId());

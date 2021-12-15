@@ -282,7 +282,7 @@ public class MirsDAO {
 
     public static List<MIRS> getAllPending() throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM MIRS WHERE Status='Pending' ORDER BY CreatedAt");
+                "SELECT * FROM MIRS WHERE Status='pending' ORDER BY CreatedAt");
         ResultSet rs = ps.executeQuery();
 
         ArrayList<MIRS> pending = new ArrayList<>();
@@ -309,7 +309,7 @@ public class MirsDAO {
 
     public static int countPending() throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT COUNT(id) AS 'count' FROM MIRS WHERE Status='Pending'");
+                "SELECT COUNT(id) AS 'count' FROM MIRS WHERE Status='pending'");
         ResultSet rs = ps.executeQuery();
 
         int count = 0;
