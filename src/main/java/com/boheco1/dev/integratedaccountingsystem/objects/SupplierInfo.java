@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 public class SupplierInfo {
+    private String supplierID;
     private String accountID;
     private String companyName;
     private String companyAddress;
@@ -11,9 +12,28 @@ public class SupplierInfo {
     private String mobileNo;
     private String emailAddress;
     private String faxNo;
-    private String taxType;
+    private String taxType;//VAT, Non-VAT
+    private String supplierNature; //1. Manufacturing 2. Utilities(Electricity, Water, Gas, Etc.) 3. Construction 4. Transportation & Storage 5. Accommodation & Food Services Activities 6. Wholesale/Retail Trade 7. IT & Communication 8. Consultancy/Professional/Management Services 9. Education 10. Rental 11.Other Service Activities
+    private String notes;
+    private String status;
 
-    public SupplierInfo(String accountID, String companyName, String companyAddress, String TINNo, String contactPerson, String zipCode, String phoneNo, String mobileNo, String emailAddress, String faxNo, String taxType) {
+    public SupplierInfo(
+            String supplierID,
+            String accountID,
+            String companyName,
+            String companyAddress,
+            String TINNo,
+            String contactPerson,
+            String zipCode,
+            String phoneNo,
+            String mobileNo,
+            String emailAddress,
+            String faxNo,
+            String taxType,
+            String supplierNature,
+            String notes,
+            String status) {
+        this.supplierID=supplierID;
         this.accountID = accountID;
         this.companyName = companyName;
         this.companyAddress = companyAddress;
@@ -25,6 +45,33 @@ public class SupplierInfo {
         this.emailAddress = emailAddress;
         this.faxNo = faxNo;
         this.taxType = taxType;
+        this.supplierNature=supplierNature;
+        this.notes=notes;
+        this.status=status;
+    }
+
+    public String getSupplierNature() {
+        return supplierNature;
+    }
+
+    public void setSupplierNature(String supplierNature) {
+        this.supplierNature = supplierNature;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getAccountID() {
@@ -113,5 +160,13 @@ public class SupplierInfo {
 
     public void setTaxType(String taxType) {
         this.taxType = taxType;
+    }
+
+    public String getSupplierID() {
+        return supplierID;
+    }
+
+    public void setSupplierID(String supplierID) {
+        this.supplierID = supplierID;
     }
 }

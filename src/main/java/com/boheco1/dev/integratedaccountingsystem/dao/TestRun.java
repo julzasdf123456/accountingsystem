@@ -1,8 +1,10 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
+import java.sql.PreparedStatement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -11,13 +13,26 @@ import java.util.List;
 public class TestRun {
     public static void main(String[] args) {
         try {
-            List<User> users = UserDAO.getAll(DB.getConnection());
-            for(User user: users) {
-                UserDAO.updatePassword(user, "password123", DB.getConnection());
-            }
+
         }catch(Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private static void generateSupplierIDs() throws Exception {
+        List<SupplierInfo> suppliers = SupplierDAO.getAll();
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE SupplierInfo SET SupplierID=? WHERE AccountID=?");
+
+        for(SupplierInfo supplier: suppliers) {
+            String id = Utility.generateRandomId();
+            ps.setString(1, id);
+            ps.setString(2, supplier.getAccountID());
+            ps.addBatch();
+            System.out.println("Generated " + id + " for " + supplier.getAccountID());
+        }
+
+        ps.executeBatch();
     }
 
     private static void testInventory() {
