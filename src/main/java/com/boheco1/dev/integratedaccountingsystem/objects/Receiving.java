@@ -15,6 +15,7 @@ public class Receiving {
     private String receivedBy;
     private String receivedOrigBy;
     private String verifiedBy;
+    private String postedBinCardBy;
 
     public Receiving() {}
 
@@ -127,5 +128,13 @@ public class Receiving {
 
     public void setInvoiceNo(String invoiceNo) {
         this.invoiceNo = invoiceNo;
+    }
+
+    public String getPostedBinCardBy() {
+        return postedBinCardBy;
+    }
+
+    public void setPostedBinCardBy(String postedBinCardBy) {
+        this.postedBinCardBy = postedBinCardBy;
     }
 }

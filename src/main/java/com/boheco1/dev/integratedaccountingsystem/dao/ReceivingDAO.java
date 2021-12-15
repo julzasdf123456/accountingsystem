@@ -16,8 +16,8 @@ public class ReceivingDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement("INSERT INTO Receiving " +
                 "(RRNo, Date, RVNo, BLWBNo, Carrier, DRNo, PONo, SupplierID, InvoiceNo, ReceivedBy, ReceivedOrigBy, VerifiedBy) " +
                 "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
-
-        ps.setString(1, generateRRNo());
+        String rrno = generateRRNo();
+        ps.setString(1, rrno);
         ps.setDate(2, Date.valueOf(receiving.getDate()));
         ps.setString(3, receiving.getRvNo());
         ps.setString(4, receiving.getBlwbNo());
@@ -31,6 +31,8 @@ public class ReceivingDAO {
         ps.setString(12, receiving.getVerifiedBy());
 
         ps.executeUpdate();
+
+        receiving.setRrNo(rrno);
 
         ps.close();
     }
@@ -148,22 +150,31 @@ public class ReceivingDAO {
         String newRRNo = null;
 
          PreparedStatement ps = DB.getConnection().prepareStatement("SELECT RRNo FROM Receiving " +
-                 "WHERE RRNo LIKE '?%' ORDER BY RRNo DESC");
-         ps.setInt(1, year);
+                 "WHERE RRNo LIKE ? ORDER BY RRNo DESC");
+         ps.setString(1, year + "%");
          ResultSet rs = ps.executeQuery();
          if(rs.next()) {
              String rrNo = rs.getString("RRNo");
-             String parsed = rrNo.substring(rrNo.indexOf('-'));
+             String parsed = rrNo.split("-")[1];
              try {
-                 int serial = Integer.parseInt(parsed);
-                 return year + "-" + ++serial;
+                 int serial = Integer.parseInt(parsed) + 1;
+                 System.out.println(serial);
+                 String no = serial+"";
+                 if (no.length() == 1){
+                     no = "000"+serial;
+                 }else if (no.length() == 2) {
+                     no = "00"+serial;
+                 }else if (no.length() == 3) {
+                     no = "0"+serial;
+                 }
+                 return year + "-" + no;
              }catch(NumberFormatException ex) {
-                 return year + "0001";
+                 return year + "-" + "0001";
              }
          }
 
          rs.close();
 
-         return year + "0001";
+         return year + "-" + "0001";
     }
 }
