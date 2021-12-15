@@ -106,4 +106,42 @@ public class SupplierDAO {
 
         return supplierInfos;
     }
+
+    public static List<SupplierInfo> search(String key) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM SupplierInfo si " +
+                        "WHERE si.CompanyName LIKE '%?%' " +
+                        "ORDER BY CompanyName OFFSET 0 ROWS " +
+                        "FETCH NEXT 10 ROWS ONLY");
+
+        ps.setString(1, key);
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<SupplierInfo> supplierInfos = new ArrayList<>();
+
+        while(rs.next()) {
+            supplierInfos.add(new SupplierInfo(
+                    rs.getString("SupplierID"),
+                    rs.getString("AccountID"),
+                    rs.getString("CompanyName"),
+                    rs.getString("CompanyAddress"),
+                    rs.getString("TINNo"),
+                    rs.getString("ContactPerson"),
+                    rs.getString("ZipCode"),
+                    rs.getString("PhoneNo"),
+                    rs.getString("MobileNo"),
+                    rs.getString("EmailAddress"),
+                    rs.getString("FaxNo"),
+                    rs.getString("TaxType"),
+                    rs.getString("SupplierNature"),
+                    rs.getString("Notes"),
+                    rs.getString("Status")
+            ));
+        }
+        rs.close();
+        ps.close();
+
+        return supplierInfos;
+    }
 }
