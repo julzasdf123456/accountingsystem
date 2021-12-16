@@ -109,7 +109,7 @@ public class InventoryReportController extends MenuControllerHandler implements 
                         doc.setMargin(1, 0.5, 1, 0.5);
 
                         doc.createHeader();
-                        doc.createTitle(5, "As of " + LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+                        doc.createTitle(5, "As of " + LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")), false);
 
                         Sheet sheet = doc.getSheet();
 

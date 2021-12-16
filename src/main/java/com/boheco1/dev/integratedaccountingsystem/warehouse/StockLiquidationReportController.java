@@ -140,7 +140,7 @@ public class StockLiquidationReportController extends MenuControllerHandler impl
                             doc.createHeader();
 
                             //Create the title
-                            doc.createTitle(5, "Period of " + from.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")) + " - " + to.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+                            doc.createTitle(5, "Period of " + from.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")) + " - " + to.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")), false);
 
                             Sheet sheet = doc.getSheet();
 
