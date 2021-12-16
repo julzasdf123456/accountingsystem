@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.Receiving;
 import com.boheco1.dev.integratedaccountingsystem.objects.ReceivingItem;
+import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -158,7 +159,6 @@ public class ReceivingDAO {
              String parsed = rrNo.split("-")[1];
              try {
                  int serial = Integer.parseInt(parsed) + 1;
-                 System.out.println(serial);
                  String no = serial+"";
                  if (no.length() == 1){
                      no = "000"+serial;
@@ -176,5 +176,43 @@ public class ReceivingDAO {
          rs.close();
 
          return year + "-" + "0001";
+    }
+
+    public static List<Stock> getReceivingItems(String rrno) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT Stocks.id, Stocks.StockName, Stocks.Description, Stocks.Unit, Stocks.LocalCode, Stocks.AcctgCode, " +
+                        "ReceivingItem.QtyDelivered, ReceivingItem.QtyAccepted, ReceivingItem.UnitCost " +
+                        "FROM Stocks LEFT JOIN ReceivingItem " +
+                        "ON ReceivingItem.StockID=Stocks.id " +
+                        "WHERE RRNo = ? ORDER BY Stocks.StockName ASC");
+        ps.setString(1, rrno);
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<Stock> stocks = new ArrayList<>();
+
+        while(rs.next()) {
+            Stock stock = new Stock();
+            stock.setId(rs.getString("id"));
+            stock.setStockName(rs.getString("StockName"));
+            stock.setDescription(rs.getString("Description"));
+            stock.setUnit(rs.getString("Unit"));
+            stock.setLocalCode(rs.getString("LocalCode"));
+            stock.setAcctgCode(rs.getString("AcctgCode"));
+
+            ReceivingItem item = new ReceivingItem();
+            item.setRrNo(rrno);
+            item.setStockId(rs.getString("id"));
+            item.setUnitCost(rs.getDouble("UnitCost"));
+            item.setQtyDelivered(rs.getInt("QtyDelivered"));
+            item.setQtyAccepted(rs.getInt("QtyAccepted"));
+
+            stock.setReceivingItem(item);
+            stocks.add(stock);
+        }
+
+        rs.close();
+
+        return stocks;
     }
 }
