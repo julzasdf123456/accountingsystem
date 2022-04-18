@@ -2,11 +2,15 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
+import com.boheco1.dev.integratedaccountingsystem.objects.MIRSItem;
 import com.boheco1.dev.integratedaccountingsystem.objects.Releasing;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReleasingDAO {
     public static void add(Releasing releasing) throws Exception {
@@ -60,5 +64,37 @@ public class ReleasingDAO {
         ps.close();
 
         return releasing;
+    }
+
+    public static List<Releasing> get(MIRS mirs) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM Releasing WHERE MIRSID=?");
+        ps.setString(1, mirs.getId());
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<Releasing> items = new ArrayList();
+        while(rs.next()) {
+            Releasing  releasing = new Releasing(
+                    rs.getString("id"),
+                    rs.getString("StockID"),
+                    rs.getString("MIRSID"),
+                    rs.getInt("Quantity"),
+                    rs.getDouble("Price"),
+                    rs.getString("UserID"),
+                    rs.getString("Status"),
+                    rs.getString("MR"),
+                    rs.getString("WorkOrderNo")
+            );
+            releasing.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
+            releasing.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
+
+            items.add(releasing);
+        }
+
+        rs.close();
+        ps.close();
+
+        return items;
     }
 }

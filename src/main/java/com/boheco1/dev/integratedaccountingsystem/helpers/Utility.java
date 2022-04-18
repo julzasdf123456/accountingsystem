@@ -9,6 +9,14 @@ import java.util.Date;
 import java.util.Random;
 
 public class Utility {
+
+    public static String RELEASING = "releasing";
+    public static String REJECTED = "rejected";
+    public static String RELEASED = "released";
+    public static String CLOSED = "closed";
+    public static String PENDING = "pending";
+    public static String APPROVED = "approved";
+
     private static AnchorPane contentPane;
     private static MIRS activeMIRS;
     private static User selectedUser;

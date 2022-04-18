@@ -68,6 +68,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
     MenuItem createInventory = new MenuItem("Create Inventory");
     MenuItem viewAllStocks = new MenuItem("View All Stocks");
     MenuItem viewAllMirs = new MenuItem("View All MIRS");
+    MenuItem viewAllReleasedItems = new MenuItem("View All Released Items");
     MenuItem viewMRItems = new MenuItem("View MRs");
     MenuItem trash = new MenuItem("Trash");
     MenuItem inventoryReport = new MenuItem("Inventory Report");
@@ -81,7 +82,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         contextMenuHelper = new ContextMenuHelper();
 
         options.setOnAction(actionEvent -> {
-            contextMenuHelper.initializePopupContextMenu(options, viewAllStocks, viewAllMirs, viewMRItems, trash)
+            contextMenuHelper.initializePopupContextMenu(options, viewAllStocks, viewAllMirs, viewAllReleasedItems, viewMRItems, trash)
                     .show(options, NodeLocator.getNodeX(options), NodeLocator.getNodeY(options));
         });
 
@@ -99,9 +100,9 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
     @FXML
     private void mirsPendingApproval(MouseEvent event) {
         display_lbl.setText("Pending Approval");
-        initializedTable("Pending");
+        initializedTable(Utility.PENDING);
         try {
-            ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getMIRSByStatus("pending"));
+            ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getMIRSByStatus(Utility.PENDING));
             tableView.getItems().setAll(observableList);
         } catch (Exception e) {
             AlertDialogBuilder.messgeDialog("System Error", this.getClass().getName() +": "+ e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
@@ -111,9 +112,9 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
     @FXML
     private void mirsPendingReleases(MouseEvent event) {
         display_lbl.setText("Pending Releases");
-        initializedTable("Releasing");
+        initializedTable(Utility.RELEASING);
         try {
-            ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getMIRSByStatus("releasing"));
+            ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getMIRSByStatus(Utility.RELEASING));
             tableView.getItems().setAll(observableList);
         } catch (Exception e) {
             AlertDialogBuilder.messgeDialog("System Error", this.getClass().getName() +": "+ e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
@@ -186,9 +187,9 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
                                         MIRS mirs = getTableView().getItems().get(getIndex());
                                         try {
                                             Utility.setActiveMIRS(mirs);
-                                            if(s.equals("Pending")){
+                                            if(s.equals("pending")){
                                                 ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_approval_form.fxml",stackPane);
-                                            }else if (s.equals("Releasing")){
+                                            }else if (s.equals("releasing")){
                                                 ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_releasing_form.fxml",stackPane);
                                             }
                                         } catch (Exception e) {
@@ -396,6 +397,11 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
             container.getChildren().setAll(ContentHandler.getNodeFromFxml(ViewAllMIRSController.class, "../view_all_mirs_controller.fxml"));
         });
 
+        viewAllReleasedItems.setOnAction(actionEvent -> {
+            titleHolder.setText("Released Item Repository");
+            container.getChildren().setAll(ContentHandler.getNodeFromFxml(ViewAllMIRSController.class, "../view_all_released_item_controller.fxml"));
+        });
+
         viewMRItems.setOnAction(actionEvent -> {
             titleHolder.setText("All MRs");
             container.getChildren().setAll(ContentHandler.getNodeFromFxml(ViewMRsController.class, "../view_mrs_controller.fxml"));
@@ -425,8 +431,8 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
     public void initializeCounts(){
         try {
             this.critical_lbl.setText(""+ StockDAO.countCritical());
-            this.pendingApprovals_lbl.setText(""+MirsDAO.countMIRSByStatus("pending"));
-            this.pendingReleases_lbl.setText(""+MirsDAO.countMIRSByStatus("releasing"));
+            this.pendingApprovals_lbl.setText(""+MirsDAO.countMIRSByStatus(Utility.PENDING));
+            this.pendingReleases_lbl.setText(""+MirsDAO.countMIRSByStatus(Utility.RELEASING));
         } catch (Exception e) {
             e.printStackTrace();
         }

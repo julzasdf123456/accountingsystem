@@ -50,6 +50,8 @@ public class MIRSApprovalFormController implements Initializable {
     @FXML
     private TableView<MIRSItem> tableView;
 
+
+
     private MIRS mirs;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -105,7 +107,7 @@ public class MIRSApprovalFormController implements Initializable {
                 AlertDialogBuilder.messgeDialog("System Message", "Sorry but approval of both DM and GM are required.", stackPane, AlertDialogBuilder.WARNING_DIALOG);
                 return;
             }
-            Utility.getActiveMIRS().setStatus("releasing");
+            Utility.getActiveMIRS().setStatus(Utility.RELEASING);
             Utility.getActiveMIRS().setDetails(details.getText());
             MirsDAO.update(Utility.getActiveMIRS());
             AlertDialogBuilder.messgeDialog("System Message", "MIRS application approved and ready for releasing.", stackPane, AlertDialogBuilder.INFO_DIALOG);
@@ -118,7 +120,7 @@ public class MIRSApprovalFormController implements Initializable {
     @FXML
     private void rejectBtn(ActionEvent event) {
         try {
-            Utility.getActiveMIRS().setStatus("rejected");
+            Utility.getActiveMIRS().setStatus(Utility.REJECTED);
             Utility.getActiveMIRS().setDetails(details.getText());
             MirsDAO.update(Utility.getActiveMIRS());
             AlertDialogBuilder.messgeDialog("System Message", "MIRS application rejected.", stackPane, AlertDialogBuilder.WARNING_DIALOG);

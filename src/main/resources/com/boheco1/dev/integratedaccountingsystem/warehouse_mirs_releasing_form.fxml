@@ -1,22 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXTextField?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import com.jfoenix.controls.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<StackPane fx:id="stackPane" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.MIRSReleasingFormController">
+<StackPane fx:id="stackPane" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.MIRSReleasingFormController">
    <children>
-      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="797.0" prefWidth="898.0" style="-fx-background-color: #ffff;" stylesheets="@style.css">
+      <AnchorPane fx:id="anchorpane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="829.0" prefWidth="953.0" style="-fx-background-color: #ffff;" stylesheets="@style.css">
          <children>
             <VBox alignment="TOP_CENTER" prefWidth="898.0" AnchorPane.bottomAnchor="39.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
@@ -37,28 +29,28 @@
                      <children>
                         <HBox alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="217.0">
                            <children>
-                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="132.0" text="MIRS Number: ">
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="175.0" text="MIRS Number: ">
                                  <font>
-                                    <Font size="14.0" />
+                                    <Font size="22.0" />
                                  </font>
                               </Label>
                               <Label fx:id="mirsNum" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="161.0" text="-">
                                  <font>
-                                    <Font size="14.0" />
+                                    <Font size="22.0" />
                                  </font>
                               </Label>
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_RIGHT" prefHeight="27.0" prefWidth="217.0">
                            <children>
-                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="132.0" text="Date:">
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="175.0" text="Date:">
                                  <font>
-                                    <Font size="14.0" />
+                                    <Font size="22.0" />
                                  </font>
                               </Label>
                               <Label fx:id="date" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="161.0" text="-">
                                  <font>
-                                    <Font size="14.0" />
+                                    <Font size="22.0" />
                                  </font>
                               </Label>
                            </children>
@@ -68,7 +60,7 @@
                         <Insets bottom="16.0" />
                      </VBox.margin>
                   </VBox>
-                  <HBox alignment="TOP_RIGHT" prefHeight="54.0" prefWidth="583.0">
+                  <HBox alignment="TOP_RIGHT" prefHeight="66.0" prefWidth="953.0">
                      <children>
                         <Label alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="339.0" text="Please furnish the following materials for: ">
                            <font>
@@ -81,7 +73,7 @@
                         <Insets bottom="16.0" />
                      </VBox.margin>
                   </HBox>
-                  <HBox alignment="TOP_RIGHT" prefHeight="81.0" prefWidth="898.0">
+                  <HBox alignment="TOP_RIGHT" prefHeight="66.0" prefWidth="898.0">
                      <children>
                         <Label alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="339.0" text="Other Details: ">
                            <font>
@@ -128,7 +120,7 @@
                               <Insets bottom="10.0" top="24.0" />
                            </VBox.margin>
                         </HBox>
-                        <HBox prefHeight="7.0" prefWidth="848.0">
+                        <HBox fx:id="addItemPanel" prefHeight="7.0" prefWidth="848.0">
                            <VBox.margin>
                               <Insets left="18.0" />
                            </VBox.margin>
@@ -180,7 +172,7 @@
                         <TableColumn fx:id="unitCol" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" text="Unit" />
                         <TableColumn fx:id="quantityCol" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" text="Qty" />
                         <TableColumn fx:id="remarksCol" maxWidth="203.0" minWidth="150.0" prefWidth="203.0" text="Remarks" />
-                        <TableColumn fx:id="editCol" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="Edit" />
+                        <TableColumn fx:id="releaseCol" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="Release" />
                         <TableColumn fx:id="deleteCol" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="Remove" />
                     </columns>
                      <columnResizePolicy>
