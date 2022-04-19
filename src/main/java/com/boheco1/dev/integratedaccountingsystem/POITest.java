@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
+import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
 import com.boheco1.dev.integratedaccountingsystem.objects.MR;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -9,10 +10,21 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileOutputStream;
 import java.time.LocalDate;
+import java.util.List;
 
 public class POITest {
     public static void main(String[] args) {
-        testMR();
+        try {
+            List<EmployeeInfo> emps = MrDAO.getEmployeesWithMR();
+            System.out.println(emps.size());
+
+            System.out.println("First Employee: " + emps.get(0).getFullName());
+            List<MR> mrs = MrDAO.getMRsOfEmployee(emps.get(0));
+
+            System.out.println("Item: " + mrs.get(0).getExtItem());
+        }catch(Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private static void testMR() {
