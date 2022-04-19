@@ -1,14 +1,48 @@
 package com.boheco1.dev.integratedaccountingsystem;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
+import com.boheco1.dev.integratedaccountingsystem.objects.MR;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileOutputStream;
+import java.time.LocalDate;
 
 public class POITest {
     public static void main(String[] args) {
+        testMR();
+    }
+
+    private static void testMR() {
+        MR mr = new MR("1639087755070-3I2VEZOH4MWTMP8",
+                "3000",
+                "Rubber Knife",
+                5,
+                212.50f,
+                LocalDate.of(2020,4,22));
+
+        MR mr2 = new MR("1639087755070-3I2VEZOH4MWTMP8",
+                "2000",
+                "1cct8DZOMpP3TSjTQh97XSIIUtPGRp",
+                2,
+                LocalDate.of(2020,4,21));
+
+        try {
+            MrDAO.add(mr);
+            System.out.println("First MR created.");
+            MrDAO.add(mr2);
+            System.out.println("Second MR created.");
+            MR mr3 = MrDAO.get(mr2.getId());
+
+            System.out.println("ID: " + mr3.getId() + " Item: " + mr3.getExtItem());
+        }catch(Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void executePOITest() {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("Sample Sheet");
         Object[][] data = {
