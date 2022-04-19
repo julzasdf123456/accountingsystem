@@ -1,11 +1,8 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
-import com.boheco1.dev.integratedaccountingsystem.JournalEntriesController;
 import com.boheco1.dev.integratedaccountingsystem.dao.MirsDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
-import com.boheco1.dev.integratedaccountingsystem.objects.User;
 import com.itextpdf.text.DocumentException;
 import com.jfoenix.controls.JFXButton;
 import javafx.application.Platform;
@@ -19,18 +16,16 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import javax.swing.*;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class ViewAllMIRSController extends MenuControllerHandler implements Initializable, SubMenuHelper {
+public class ViewAllReleasedItemController extends MenuControllerHandler implements Initializable, SubMenuHelper {
 
-    @FXML TableView allMirsTable;
+    @FXML TableView allReleasedItemTable;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -53,13 +48,11 @@ public class ViewAllMIRSController extends MenuControllerHandler implements Init
             purposeCol.setMinWidth(150);
             purposeCol.setCellValueFactory(new PropertyValueFactory<>("purpose"));
 
-            TableColumn<MIRS, MIRS> actionCol = new TableColumn<>("Action");
-            actionCol.setStyle("-fx-alignment: center;");
+            TableColumn<MIRS, MIRS> printCol = new TableColumn<>("Print");
+            printCol.setStyle("-fx-alignment: center;");
             // ADD ACTION BUTTONS
-            actionCol.setCellValueFactory(mirsmirsCellDataFeatures -> new ReadOnlyObjectWrapper<>(mirsmirsCellDataFeatures.getValue()));
-            actionCol.setCellFactory(mirsmirsTableColumn -> new TableCell<>(){
-                FontIcon viewIcon =  new FontIcon("mdi2e-eye");
-                private final JFXButton viewButton = new JFXButton("", viewIcon);
+            printCol.setCellValueFactory(mirsmirsCellDataFeatures -> new ReadOnlyObjectWrapper<>(mirsmirsCellDataFeatures.getValue()));
+            printCol.setCellFactory(mirsmirsTableColumn -> new TableCell<>(){
 
                 FontIcon printIcon =  new FontIcon("mdi2p-printer");
                 private final JFXButton printButton = new JFXButton("", printIcon);
@@ -69,26 +62,14 @@ public class ViewAllMIRSController extends MenuControllerHandler implements Init
                     super.updateItem(mirs, b);
 
                     if (mirs != null) {
-                        viewButton.setStyle("-fx-background-color: #2196f3;");
-                        viewIcon.setIconSize(13);
-                        viewIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
 
                         printButton.setStyle("-fx-background-color: #ff9800;");
                         printIcon.setIconSize(13);
                         printIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
 
-                        viewButton.setOnAction(actionEvent -> {
-                            try {
-                                Utility.setActiveMIRS(mirs);
-                                ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_mirs_preview.fxml", Utility.getStackPane(), "../view_all_mirs_controller.fxml");
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        });
-
                         printButton.setOnAction(actionEvent -> {
                             try {
-                                new PrintMIRS(mirs);
+                                new PrintReleasedItems(mirs);
                             } catch (FileNotFoundException e) {
                                 e.printStackTrace();
                             } catch (DocumentException e) {
@@ -101,7 +82,6 @@ public class ViewAllMIRSController extends MenuControllerHandler implements Init
 
                         HBox hBox = new HBox();
                         hBox.setSpacing(2);
-                        hBox.getChildren().add(viewButton);
                         hBox.getChildren().add(printButton);
 
                         setGraphic(hBox);
@@ -111,11 +91,11 @@ public class ViewAllMIRSController extends MenuControllerHandler implements Init
                     }
                 }
             });
-            allMirsTable.getColumns().removeAll();
-            allMirsTable.getColumns().add(mirsIdCol);
-            allMirsTable.getColumns().add(mirsDateFiled);
-            allMirsTable.getColumns().add(purposeCol);
-            allMirsTable.getColumns().add(actionCol);
+            allReleasedItemTable.getColumns().removeAll();
+            allReleasedItemTable.getColumns().add(mirsIdCol);
+            allReleasedItemTable.getColumns().add(mirsDateFiled);
+            allReleasedItemTable.getColumns().add(purposeCol);
+            allReleasedItemTable.getColumns().add(printCol);
         } catch (Exception e) {
             e.printStackTrace();
             AlertDialogBuilder.messgeDialog("Error", "Error initializing table: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
@@ -127,7 +107,7 @@ public class ViewAllMIRSController extends MenuControllerHandler implements Init
             Platform.runLater(() -> {
                 try {
                     ObservableList<MIRS> mirs = FXCollections.observableList(MirsDAO.getAllMIRS());
-                    allMirsTable.getItems().setAll(mirs);
+                    allReleasedItemTable.getItems().setAll(mirs);
                 } catch (Exception e) {
                     e.printStackTrace();
                     AlertDialogBuilder.messgeDialog("Error", "Error populating table: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);

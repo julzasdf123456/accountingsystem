@@ -87,8 +87,8 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         bindParticularsAutocomplete(particulars);
         bindRequisitionerAutocomplete(requisitioner);
         bindDMAutocomplete(dm);
-        InputValidation.restrictNumbersOnly(mirsNum);
-        InputValidation.restrictNumbersOnly(workOrderNum);
+        //InputValidation.restrictNumbersOnly(mirsNum);
+        //InputValidation.restrictNumbersOnly(workOrderNum);
         InputValidation.restrictNumbersOnly(quantity);
         initializeItemTable();
     }
@@ -155,7 +155,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         try{
             if(tabPane.getSelectionModel().getSelectedIndex() == 1){
                 if(workOrderNum.getText().isEmpty() || mirsNum.getText().isEmpty()
-                || requisitionerEmployee == null || purpose.getText().isEmpty() || details.getText().isEmpty()){
+                || requisitionerEmployee == null || purpose.getText().isEmpty() ){
                     AlertDialogBuilder.messgeDialog("System Message", "Please complete all the MIRS details on Step 1.",
                             stackPane, AlertDialogBuilder.WARNING_DIALOG);
                     tabPane.getSelectionModel().select(0);
@@ -213,7 +213,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             MIRS mirs = new MIRS();
             mirs.setId(mirsNum.getText()); //id mean MIRS number from user input
             mirs.setDetails(details.getText());
-            mirs.setStatus("pending");
+            mirs.setStatus(Utility.PENDING);
             mirs.setDateFiled(date.getValue());
             mirs.setPurpose(purpose.getText());
             mirs.setRequisitionerID(requisitionerEmployee.getId());
@@ -227,7 +227,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 MIRSSignatory mirsSignatory = new MIRSSignatory();
                 mirsSignatory.setMirsID(mirs.getId());
                 mirsSignatory.setUserID(s.getUserID());
-                mirsSignatory.setStatus("pending");
+                mirsSignatory.setStatus(Utility.PENDING);
                 mirsSignatory.setComments("");
                 MIRSSignatoryDAO.add(mirsSignatory); //saving signatories for the MIRS request
             }
