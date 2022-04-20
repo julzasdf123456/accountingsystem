@@ -393,7 +393,7 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
                     //Perform DB query when length of search string is 4 or above
                     if (query.length() > 3){
                         try {
-                            list = StockDAO.search(query, 0);
+                            list = StockDAO.search_available(query);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

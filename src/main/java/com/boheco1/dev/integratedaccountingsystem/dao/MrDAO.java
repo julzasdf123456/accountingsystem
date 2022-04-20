@@ -96,6 +96,40 @@ public class MrDAO {
         return employees;
     }
 
+    public static List<EmployeeInfo> getEmployeesWithMR(String key) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM EmployeeInfo WHERE EmployeeID IN (SELECT DISTINCT employeeId FROM MR) " +
+                        "AND (EmployeeFirstName LIKE ? OR EmployeeMidName LIKE ? OR EmployeeLastName LIKE ? ) " +
+                        "ORDER BY EmployeeLastName");
+
+        ps.setString(1, '%'+ key+'%');
+        ps.setString(2, '%'+ key+'%');
+        ps.setString(3, '%'+ key+'%');
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<EmployeeInfo> employees = new ArrayList();
+
+        while(rs.next()) {
+            employees.add(new EmployeeInfo(
+                    rs.getString("EmployeeID"),
+                    rs.getString("EmployeeFirstName"),
+                    rs.getString("EmployeeMidName"),
+                    rs.getString("EmployeeLastName"),
+                    rs.getString("EmployeeSuffix"),
+                    rs.getString("Address"),
+                    rs.getString("Phone"),
+                    rs.getString("Designation"),
+                    rs.getString("SignatoryLevel"),
+                    rs.getString("DepartmentID")
+            ));
+        }
+
+        rs.close();
+
+        return employees;
+    }
+
     public static List<MR> getMRsOfEmployee(EmployeeInfo employeeInfo) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM MR WHERE employeeId=?");
         ps.setString(1, employeeInfo.getId());

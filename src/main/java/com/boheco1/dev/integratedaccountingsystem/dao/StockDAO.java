@@ -3,11 +3,9 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import jdk.jshell.execution.Util;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -231,6 +229,43 @@ public class StockDAO {
         ps.setString(2, "%" + key + "%");
         ps.setString(3, "%" + key + "%");
         ps.setInt(4, trashed);
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<SlimStock> stocks = new ArrayList<>();
+        while(rs.next()) {
+            SlimStock stock = new SlimStock(
+                    rs.getString("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Model"),
+                    rs.getString("Brand"));
+            stock.setDescription(rs.getString("Description"));
+            stock.setPrice(rs.getDouble("Price"));
+            stock.setUnit(rs.getString("Unit"));
+            stock.setQuantity(rs.getInt("Quantity"));
+            stocks.add(stock);
+        }
+
+        rs.close();
+        ps.close();
+
+        return stocks;
+    }
+
+    /**
+     * Retrieves a list of available SlimStocks as a search result based on a search Key
+     * @param key The search key
+     * @return A list of SlimStock that qualifies with the search key
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<SlimStock> search_available(String key) throws Exception  {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "Select TOP 50 id, StockName, Brand, Model, Description, Price, Unit, Quantity FROM Stocks " +
+                        "WHERE (StockName LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
+                        "AND IsTrashed=0 AND Quantity > 0 ORDER BY StockName");
+        ps.setString(1, "%" + key + "%");
+        ps.setString(2, "%" + key + "%");
+        ps.setString(3, "%" + key + "%");
 
         ResultSet rs = ps.executeQuery();
 
