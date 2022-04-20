@@ -15,13 +15,11 @@ import java.util.List;
 public class POITest {
     public static void main(String[] args) {
         try {
-            List<EmployeeInfo> emps = MrDAO.getEmployeesWithMR();
-            System.out.println(emps.size());
+           MR mr = MrDAO.get("1650370438700-KOE5CTKOQQ55VSL");
+           MrDAO.returnMR(mr);
 
-            System.out.println("First Employee: " + emps.get(0).getFullName());
-            List<MR> mrs = MrDAO.getMRsOfEmployee(emps.get(0));
-
-            System.out.println("Item: " + mrs.get(0).getExtItem());
+            System.out.println("Active MRs: " + MrDAO.countMRs("active"));
+            System.out.println("Returned MRs: " + MrDAO.countMRs("returned"));
         }catch(Exception ex) {
             ex.printStackTrace();
         }

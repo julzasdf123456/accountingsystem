@@ -8,6 +8,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,5 +124,29 @@ public class MrDAO {
         ps.close();
 
         return mrs;
+    }
+
+    public static void returnMR(MR mr) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE MR SET status=?, dateOfReturn=? WHERE id=?");
+        ps.setString(1,"returned");
+        ps.setDate(2, java.sql.Date.valueOf(LocalDate.now()));
+        ps.setString(3, mr.getId());
+
+        ps.executeUpdate();
+
+        ps.close();
+    }
+
+    public static int countMRs(String status) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT COUNT(id) AS 'count' FROM MR WHERE status=?");
+        ps.setString(1, status);
+        ResultSet rs = ps.executeQuery();
+
+        if(rs.next()) {
+            return rs.getInt("count");
+        }
+
+        return 0;
     }
 }
