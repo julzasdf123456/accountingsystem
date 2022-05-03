@@ -28,7 +28,7 @@ public class StockDAO {
                         "UserIDCreated, Critical, id, LocalCode, AcctgCode) " +
                         "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?,?,?,?,?)");
 
-        stock.setId(Utility.generateRandomId());
+        if(stock.getId()==null) stock.setId(Utility.generateRandomId());
 
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
