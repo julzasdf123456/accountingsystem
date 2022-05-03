@@ -124,6 +124,9 @@ public class StockDAO {
                         "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=?, Critical=?," +
                         "LocalCode=?, AcctgCode=? " +
                         "WHERE id=?");
+
+        Stock oldStock = StockDAO.get(stock.getId());
+
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
         ps.setString(3, stock.getSerialNumber());
@@ -158,6 +161,19 @@ public class StockDAO {
         ps.setString(18, stock.getId());
 
         ps.executeUpdate();
+
+        //create a Stock History if price was updated.
+        if(oldStock.getPrice()!=stock.getPrice()) {
+            StockHistoryDAO.create(
+                    new StockHistory(
+                            Utility.generateRandomId(),
+                            stock.getId(),
+                            LocalDate.now().minusDays(1),
+                            oldStock.getPrice(),
+                            ActiveUser.getUser().getId()
+                    )
+            );
+        }
 
         ps.close();
     }
