@@ -42,6 +42,13 @@ public class Stock {
         this.model = model;
         this.brand = brand;
     }
+
+    public Stock(String id, String description, double price) {
+        this.id=id;
+        this.description=description;
+        this.price=price;
+    }
+
     /** Constructor with critical **/
     public Stock(String id, String stockName, String description, String serialNumber, String brand, String model, LocalDate manufacturingDate, LocalDate validityDate, String typeID, String unit, int quantity, int critical, double price, String neaCode, boolean isTrashed, String comments, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime trashedAt, String userIDCreated, String userIDUpdated, String userIDTrashed, String localCode, String acctgCode) {
         this.id = id;
