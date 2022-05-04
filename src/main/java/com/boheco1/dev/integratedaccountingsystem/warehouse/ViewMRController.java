@@ -76,8 +76,8 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
         column1.setCellValueFactory(new PropertyValueFactory<>("extItem"));
         column1.setStyle("-fx-alignment: center-left;");
 
-        TableColumn<MR, String> column2 = new TableColumn<>("Quantity");
-        column2.setMinWidth(100);
+        TableColumn<MR, String> column2 = new TableColumn<>("Qty");
+        column2.setMinWidth(50);
         column2.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         column2.setStyle("-fx-alignment: center;");
 
@@ -90,7 +90,7 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
         column4.setMinWidth(100);
         column4.setCellValueFactory(new PropertyValueFactory<>("dateOfMR"));
         column4.setStyle("-fx-alignment: center;");
-
+        /*
         TableColumn<MR, String> column5 = new TableColumn<>("Action");
         Callback<TableColumn<MR, String>, TableCell<MR, String>> removeBtn
                 = //
@@ -133,7 +133,17 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
                     }
                 };
         column5.setCellFactory(removeBtn);
-        column5.setStyle("-fx-alignment: center;");
+        column5.setStyle("-fx-alignment: center;");*/
+
+        TableColumn<MR, String> column6 = new TableColumn<>("Date Returned");
+        column6.setMinWidth(130);
+        column6.setCellValueFactory(new PropertyValueFactory<>("dateOfReturn"));
+        column6.setStyle("-fx-alignment: center;");
+
+        TableColumn<MR, String> column7 = new TableColumn<>("Status");
+        column7.setMinWidth(100);
+        column7.setCellValueFactory(new PropertyValueFactory<>("status"));
+        column7.setStyle("-fx-alignment: center;");
 
         this.mrItems =  FXCollections.observableArrayList();
         this.mr_items_table.setPlaceholder(new Label("No item added"));
@@ -142,7 +152,9 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
         this.mr_items_table.getColumns().add(column2);
         this.mr_items_table.getColumns().add(column3);
         this.mr_items_table.getColumns().add(column4);
-        this.mr_items_table.getColumns().add(column5);
+        //this.mr_items_table.getColumns().add(column5);
+        this.mr_items_table.getColumns().add(column6);
+        this.mr_items_table.getColumns().add(column7);
     }
 
     public void setMR(EmployeeInfo emp){

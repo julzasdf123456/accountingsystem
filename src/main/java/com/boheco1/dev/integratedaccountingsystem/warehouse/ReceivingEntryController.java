@@ -212,6 +212,10 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
                     //Create stock
                     Stock stock = StockDAO.get(item.getStockId());
 
+                    //Update the Stock table's price to latest received item unit cost
+                    stock.setPrice(item.getUnitCost());
+                    StockDAO.updateDetails(stock);
+
                     //Create StockEntryLog object
                     StockEntryLog stockEntryLog = new StockEntryLog();
                     stockEntryLog.setQuantity(item.getQtyAccepted());
@@ -221,7 +225,7 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
                     //set the Entry Log RRNo
                     stockEntryLog.setRrNo(receiving.getRrNo());
 
-                    //Insert StockEntryLog to database
+                    //Insert StockEntryLog to database and update the Stock's quantity
                     StockDAO.stockEntry(stock, stockEntryLog);
                 }
 
@@ -390,10 +394,10 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
                     //Initialize list of stocks
                     List<SlimStock> list = new ArrayList<>();
 
-                    //Perform DB query when length of search string is 4 or above
-                    if (query.length() > 3){
+                    //Perform DB query when length of search string is 3 or above
+                    if (query.length() > 2){
                         try {
-                            list = StockDAO.search_available(query);
+                            list = StockDAO.search(query, 0);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -408,7 +412,7 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
                     //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
                     @Override
                     public String toString(SlimStock object) {
-                        return object.getStockName();
+                        return object.getDescription();
                     }
 
                     @Override
@@ -422,7 +426,7 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
             SlimStock result = event.getCompletion();
             try {
                 currentStock = StockDAO.get(result.getId());
-                this.stock_tf.setText(currentStock.getStockName());
+                this.stock_tf.setText(currentStock.getDescription());
                 this.cost_tf.setText(currentStock.getPrice()+"");
                 this.addBtn.setDisable(false);
             } catch (Exception e) {
@@ -440,8 +444,8 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
                     //Initialize list of stocks
                     List<SupplierInfo> list = new ArrayList<>();
 
-                    //Perform DB query when length of search string is 4 or above
-                    if (query.length() > 3){
+                    //Perform DB query when length of search string is 3 or above
+                    if (query.length() > 2){
                         try {
                             list = SupplierDAO.search(query);
                         } catch (Exception e) {
@@ -485,8 +489,8 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
                     //Initialize list of stocks
                     List<User> list = new ArrayList<>();
 
-                    //Perform DB query when length of search string is 4 or above
-                    if (query.length() > 3){
+                    //Perform DB query when length of search string is 2 or above
+                    if (query.length() > 1){
                         try {
                             list = UserDAO.search(query);
                         } catch (Exception e) {

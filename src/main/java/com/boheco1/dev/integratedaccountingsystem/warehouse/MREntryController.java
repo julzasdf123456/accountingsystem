@@ -112,6 +112,10 @@ public class MREntryController extends MenuControllerHandler implements Initiali
     @FXML
     private void addItem()  {
         String item_name = this.item_name_tf.getText();
+        int max = 0;
+        if (from_warehouse_chb.isSelected() && this.currentItem != null){
+            max = this.currentItem.getQuantity();
+        }
         int qty = 0;
         double price = 0;
         try {
@@ -128,6 +132,9 @@ public class MREntryController extends MenuControllerHandler implements Initiali
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (qty <= 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for quantity!",
+                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (from_warehouse_chb.isSelected() && this.currentItem != null && qty > max) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "MR quantity cannot exceed maximum stock quantity!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (price <= 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for the item price!",
@@ -146,7 +153,7 @@ public class MREntryController extends MenuControllerHandler implements Initiali
             if (from_warehouse_chb.isSelected()){
                 if (currentItem != null) {
                     mr_item.setStockId(this.currentItem.getId());
-                    mr_item.setExtItem(this.currentItem.getStockName());
+                    mr_item.setExtItem(this.currentItem.getDescription());
                     mr_item.setPrice(this.currentItem.getPrice());
                     mr_item.setQuantity(qty);
                     mr_item.setDateOfMR(LocalDate.now());
@@ -194,7 +201,7 @@ public class MREntryController extends MenuControllerHandler implements Initiali
                     List<EmployeeInfo> list = new ArrayList<>();
 
                     //Perform DB query when length of search string is 4 or above
-                    if (query.length() > 3){
+                    if (query.length() > 1){
                         try {
                             list = EmployeeDAO.getEmployeeInfo(query);
                         } catch (Exception e) {
@@ -263,7 +270,7 @@ public class MREntryController extends MenuControllerHandler implements Initiali
                     //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
                     @Override
                     public String toString(SlimStock object) {
-                        return object.getStockName();
+                        return object.getStockName()!= null ? object.getStockName()+" "+object.getDescription() : object.getDescription();
                     }
 
                     @Override
@@ -277,7 +284,7 @@ public class MREntryController extends MenuControllerHandler implements Initiali
             SlimStock result = event.getCompletion();
             try {
                 currentItem = StockDAO.get(result.getId());
-                this.item_name_tf.setText(currentItem.getStockName());
+                this.item_name_tf.setText(currentItem.getStockName()!= null ? currentItem.getStockName() + " "+currentItem.getDescription() : currentItem.getDescription());
                 this.cost_tf.setText(currentItem.getPrice()+"");
             } catch (Exception e) {
                 AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), this.stackPane, AlertDialogBuilder.DANGER_DIALOG);

@@ -239,12 +239,13 @@ public class StockDAO {
     public static List<SlimStock> search(String key, int trashed) throws Exception  {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "Select TOP 50 id, StockName, Brand, Model, Description, Price, Unit, Quantity FROM Stocks " +
-                        "WHERE (StockName LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
+                        "WHERE (StockName LIKE ? OR Description LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
                         "AND IsTrashed=? ORDER BY StockName");
         ps.setString(1, "%" + key + "%");
         ps.setString(2, "%" + key + "%");
         ps.setString(3, "%" + key + "%");
-        ps.setInt(4, trashed);
+        ps.setString(4, "%" + key + "%");
+        ps.setInt(5, trashed);
 
         ResultSet rs = ps.executeQuery();
 
@@ -277,11 +278,12 @@ public class StockDAO {
     public static List<SlimStock> search_available(String key) throws Exception  {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "Select TOP 50 id, StockName, Brand, Model, Description, Price, Unit, Quantity FROM Stocks " +
-                        "WHERE (StockName LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
+                        "WHERE (StockName LIKE ? OR Description LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
                         "AND IsTrashed=0 AND Quantity > 0 ORDER BY StockName");
         ps.setString(1, "%" + key + "%");
         ps.setString(2, "%" + key + "%");
         ps.setString(3, "%" + key + "%");
+        ps.setString(4, "%" + key + "%");
 
         ResultSet rs = ps.executeQuery();
 
