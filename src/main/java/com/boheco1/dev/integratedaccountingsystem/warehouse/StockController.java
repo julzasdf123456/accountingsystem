@@ -10,8 +10,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -19,6 +17,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
@@ -26,10 +25,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
-import javafx.util.StringConverter;
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.*;
 
 public class StockController extends MenuControllerHandler implements Initializable, SubMenuHelper {
@@ -94,6 +91,31 @@ public class StockController extends MenuControllerHandler implements Initializa
                 }
             });
         }
+    }
+
+    @FXML
+    public void updatePrices(){
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../warehouse_update_prices.fxml"));
+        Parent parent = null;
+        try {
+            parent = loader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        Label label = new Label("Bulk Update Prices");
+        label.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, 18));
+        label.setWrapText(true);
+        label.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
+        dialogLayout.setHeading(label);
+        dialogLayout.setBody(new AnchorPane(parent));
+        JFXButton cancel = new JFXButton("Close");
+        cancel.setDefaultButton(true);
+        cancel.setMinWidth(75);
+        cancel.setOnAction(ev -> dialog.close());
+        dialogLayout.setActions(cancel);
+        dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.CENTER);
+        dialog.show();
     }
 
     @FXML

@@ -63,6 +63,33 @@ public class StockDAO {
     }
 
     /**
+     * Updates the product prices
+     * @param stocks the list of stocks to update
+     * @return void
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void batchUpdatePrices(List<Stock> stocks) throws Exception{
+        String sql = "";
+        for (Stock stock : stocks) {
+            sql += "UPDATE Stocks SET Price = '" + stock.getPrice() + "' WHERE id= '" + stock.getId() + "'; ";
+            sql += "INSERT INTO StockHistory (id, StockID, date, price, updatedBy) " +
+                    "VALUES ('" + Utility.generateRandomId() + "', '" + stock.getId() + "','" + LocalDate.now().minusDays(1) + "','" + stock.getOldPrice() + "','" + ActiveUser.getUser().getId() + "'); ";
+        }
+        Connection conn = DB.getConnection();
+
+        try {
+            conn.setAutoCommit(false);
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.executeUpdate();
+            conn.commit();
+            ps.close();
+        } catch (SQLException e) {
+            conn.rollback();
+            conn.close();
+        }
+    }
+
+    /**
      * Retrieves a single Stock record
      * @param id the identifier of the Stock record to be retrieved
      * @return Stock object
@@ -193,6 +220,8 @@ public class StockDAO {
                         "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=?, " +
                         "LocalCode=?, AcctgCode=? " +
                         "WHERE id=?");
+        Stock oldStock = StockDAO.get(stock.getId());
+
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
         ps.setString(3, stock.getSerialNumber());
@@ -226,6 +255,18 @@ public class StockDAO {
 
         ps.executeUpdate();
 
+        //create a Stock History if price was updated.
+        if(oldStock.getPrice()!=stock.getPrice()) {
+            StockHistoryDAO.create(
+                    new StockHistory(
+                            Utility.generateRandomId(),
+                            stock.getId(),
+                            LocalDate.now().minusDays(1),
+                            oldStock.getPrice(),
+                            ActiveUser.getUser().getId()
+                    )
+            );
+        }
         ps.close();
     }
 

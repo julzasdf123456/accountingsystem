@@ -49,18 +49,14 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.initializeTable();
+        this.populateTable(null);
         this.query_tf.setOnAction(actionEvent -> searchEmployee());
     }
 
     @FXML
     public void searchEmployee(){
         String key = this.query_tf.getText();
-
-        if (key.length() == 0) {
-            AlertDialogBuilder.messgeDialog("System Information", "Please enter the employee's last name before proceeding.", stackPane, AlertDialogBuilder.INFO_DIALOG);
-        }else{
-            this.populateTable(key);
-        }
+        this.populateTable(key);
     }
 
 
@@ -157,7 +153,13 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
         try {
             Platform.runLater(() -> {
                 try {
-                    ObservableList<EmployeeInfo> list = FXCollections.observableList(MrDAO.getEmployeesWithMR(key));
+                    ObservableList<EmployeeInfo> list;
+                    if (key != null) {
+                        list = FXCollections.observableList(MrDAO.getEmployeesWithMR(key));
+
+                    }else{
+                        list = FXCollections.observableList(MrDAO.getEmployeesWithMR());
+                    }
                     this.employeesTable.getItems().setAll(list);
                 } catch (Exception e) {
                     e.printStackTrace();

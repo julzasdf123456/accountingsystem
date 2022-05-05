@@ -29,7 +29,7 @@ public class Stock {
     private String userIDTrashed;
     private String localCode;
     private String acctgCode;
-
+    private Double oldPrice;
     private StockEntryLog entryLog;
     private Releasing releasing;
     private ReceivingItem receivingItem;
@@ -291,5 +291,13 @@ public class Stock {
 
     public void setReceivingItem(ReceivingItem receivingItem) {
         this.receivingItem = receivingItem;
+    }
+
+    public Double getOldPrice() {
+        return oldPrice;
+    }
+
+    public void setOldPrice(Double oldPrice) {
+        this.oldPrice = oldPrice;
     }
 }
