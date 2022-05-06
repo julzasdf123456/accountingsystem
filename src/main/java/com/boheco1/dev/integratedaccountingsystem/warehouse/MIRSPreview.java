@@ -87,7 +87,7 @@ public class MIRSPreview implements Initializable {
         ObservableList<MIRSItem> observableList = FXCollections.observableArrayList(mirsItemList);
         req_particularsCol.setCellValueFactory(cellData -> {
             try {
-                return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getStockName());
+                return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getDescription());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -130,7 +130,7 @@ public class MIRSPreview implements Initializable {
         ObservableList<Releasing> observableList = FXCollections.observableArrayList(releasedIitems);
         rel_particularsCol.setCellValueFactory(cellData -> {
             try {
-                return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getStockName());
+                return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getDescription());
             } catch (Exception e) {
                 e.printStackTrace();
             }
