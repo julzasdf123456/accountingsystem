@@ -28,7 +28,7 @@ public class StockDAO {
                         "UserIDCreated, Critical, id, LocalCode, AcctgCode) " +
                         "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?,?,?,?,?)");
 
-        stock.setId(Utility.generateRandomId());
+        if(stock.getId()==null) stock.setId(Utility.generateRandomId());
 
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
@@ -60,6 +60,33 @@ public class StockDAO {
         ps.executeUpdate();
 
         ps.close();
+    }
+
+    /**
+     * Updates the product prices
+     * @param stocks the list of stocks to update
+     * @return void
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void batchUpdatePrices(List<Stock> stocks) throws Exception{
+        String sql = "";
+        for (Stock stock : stocks) {
+            sql += "UPDATE Stocks SET Price = '" + stock.getPrice() + "' WHERE id= '" + stock.getId() + "'; ";
+            sql += "INSERT INTO StockHistory (id, StockID, date, price, updatedBy) " +
+                    "VALUES ('" + Utility.generateRandomId() + "', '" + stock.getId() + "','" + LocalDate.now().minusDays(1) + "','" + stock.getOldPrice() + "','" + ActiveUser.getUser().getId() + "'); ";
+        }
+        Connection conn = DB.getConnection();
+
+        try {
+            conn.setAutoCommit(false);
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.executeUpdate();
+            conn.commit();
+            ps.close();
+        } catch (SQLException e) {
+            conn.rollback();
+            conn.close();
+        }
     }
 
     /**
@@ -124,6 +151,9 @@ public class StockDAO {
                         "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=?, Critical=?," +
                         "LocalCode=?, AcctgCode=? " +
                         "WHERE id=?");
+
+        Stock oldStock = StockDAO.get(stock.getId());
+
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
         ps.setString(3, stock.getSerialNumber());
@@ -159,6 +189,19 @@ public class StockDAO {
 
         ps.executeUpdate();
 
+        //create a Stock History if price was updated.
+        if(oldStock.getPrice()!=stock.getPrice()) {
+            StockHistoryDAO.create(
+                    new StockHistory(
+                            Utility.generateRandomId(),
+                            stock.getId(),
+                            LocalDate.now().minusDays(1),
+                            oldStock.getPrice(),
+                            ActiveUser.getUser().getId()
+                    )
+            );
+        }
+
         ps.close();
     }
 
@@ -177,6 +220,8 @@ public class StockDAO {
                         "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=?, " +
                         "LocalCode=?, AcctgCode=? " +
                         "WHERE id=?");
+        Stock oldStock = StockDAO.get(stock.getId());
+
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
         ps.setString(3, stock.getSerialNumber());
@@ -210,6 +255,18 @@ public class StockDAO {
 
         ps.executeUpdate();
 
+        //create a Stock History if price was updated.
+        if(oldStock.getPrice()!=stock.getPrice()) {
+            StockHistoryDAO.create(
+                    new StockHistory(
+                            Utility.generateRandomId(),
+                            stock.getId(),
+                            LocalDate.now().minusDays(1),
+                            oldStock.getPrice(),
+                            ActiveUser.getUser().getId()
+                    )
+            );
+        }
         ps.close();
     }
 
@@ -223,12 +280,13 @@ public class StockDAO {
     public static List<SlimStock> search(String key, int trashed) throws Exception  {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "Select TOP 50 id, StockName, Brand, Model, Description, Price, Unit, Quantity FROM Stocks " +
-                        "WHERE (StockName LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
+                        "WHERE (StockName LIKE ? OR Description LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
                         "AND IsTrashed=? ORDER BY StockName");
         ps.setString(1, "%" + key + "%");
         ps.setString(2, "%" + key + "%");
         ps.setString(3, "%" + key + "%");
-        ps.setInt(4, trashed);
+        ps.setString(4, "%" + key + "%");
+        ps.setInt(5, trashed);
 
         ResultSet rs = ps.executeQuery();
 
@@ -261,11 +319,12 @@ public class StockDAO {
     public static List<SlimStock> search_available(String key) throws Exception  {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "Select TOP 50 id, StockName, Brand, Model, Description, Price, Unit, Quantity FROM Stocks " +
-                        "WHERE (StockName LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
+                        "WHERE (StockName LIKE ? OR Description LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
                         "AND IsTrashed=0 AND Quantity > 0 ORDER BY StockName");
         ps.setString(1, "%" + key + "%");
         ps.setString(2, "%" + key + "%");
         ps.setString(3, "%" + key + "%");
+        ps.setString(4, "%" + key + "%");
 
         ResultSet rs = ps.executeQuery();
 

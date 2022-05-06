@@ -1,7 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.helpers;
 
-import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
-import com.boheco1.dev.integratedaccountingsystem.objects.User;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 
@@ -20,7 +19,14 @@ public class Utility {
     private static AnchorPane contentPane;
     private static MIRS activeMIRS;
     private static User selectedUser;
+
+    private static EmployeeInfo selectedEmployee;
+
     private static StackPane stackPane;
+
+    private static Stock selectedStock;
+
+    private static Receiving selectedReceiving;
 
     public static MIRS getActiveMIRS() {
         return activeMIRS;
@@ -28,6 +34,30 @@ public class Utility {
 
     public static void setActiveMIRS(MIRS activeMIRS) {
         Utility.activeMIRS = activeMIRS;
+    }
+
+    public static Stock getSelectedStock() {
+        return selectedStock;
+    }
+
+    public static void setSelectedStock(Stock stock) {
+        Utility.selectedStock = stock;
+    }
+
+    public static EmployeeInfo getSelectedEmployee() {
+        return selectedEmployee;
+    }
+
+    public static void setSelectedEmployee(EmployeeInfo employee) {
+        Utility.selectedEmployee = employee;
+    }
+
+    public static Receiving getSelectedReceiving() {
+        return selectedReceiving;
+    }
+
+    public static void setSelectedReceiving(Receiving receiving) {
+        Utility.selectedReceiving = receiving;
     }
 
     public static AnchorPane getContentPane() {

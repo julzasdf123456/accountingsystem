@@ -10,13 +10,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.FlowPane;
@@ -26,10 +22,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
-import javafx.util.StringConverter;
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.*;
 
 public class StockController extends MenuControllerHandler implements Initializable, SubMenuHelper {
@@ -97,6 +91,11 @@ public class StockController extends MenuControllerHandler implements Initializa
     }
 
     @FXML
+    public void updatePrices(){
+        ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_update_prices.fxml", Utility.getStackPane(),  "../warehouse_stock.fxml");
+    }
+
+    @FXML
     public void trashStock(){
         if (selected.size() == 0) {
             AlertDialogBuilder.messgeDialog("System Information", "Select item(s) before proceeding!", stackPane, AlertDialogBuilder.INFO_DIALOG);
@@ -157,25 +156,8 @@ public class StockController extends MenuControllerHandler implements Initializa
                 Object selected_items[] = sel.toArray();
                 SlimStock slim_stock = (SlimStock) selected_items[0];
                 Stock stock = StockDAO.get(slim_stock.getId());
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("../warehouse_stock_update.fxml"));
-                Parent parent = loader.load();
-                ViewStockController controller = loader.<ViewStockController>getController();
-                controller.setStock(stock);
-                controller.setStackPane(this.stackPane);
-                JFXDialogLayout dialogLayout = new JFXDialogLayout();
-                Label label = new Label("View Stock");
-                label.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, 18));
-                label.setWrapText(true);
-                label.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
-                dialogLayout.setHeading(label);
-                dialogLayout.setBody(parent);
-                JFXButton cancel = new JFXButton("Close");
-                cancel.setDefaultButton(true);
-                cancel.setMinWidth(75);
-                cancel.setOnAction(event -> dialog.close());
-                dialogLayout.setActions(cancel);
-                dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.CENTER);
-                dialog.show();
+                Utility.setSelectedStock(stock);
+                ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_stock_update.fxml", Utility.getStackPane(),  "../warehouse_stock.fxml");
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (Exception e) {
@@ -242,8 +224,6 @@ public class StockController extends MenuControllerHandler implements Initializa
         stocksTable.getColumns().add(column6);
         stocksTable.getColumns().add(column7);
     }
-
-
 
     public void initializeStocks(){
         Platform.runLater(() -> {

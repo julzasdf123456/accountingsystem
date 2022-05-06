@@ -91,6 +91,39 @@ public class ReceivingDAO {
         ps.close();
     }
 
+    public static List<Receiving> getByReportNo(String rrno) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM Receiving " +
+                        "WHERE RRNo LIKE ? ORDER BY Date ASC");
+        ps.setString(1, "%"+rrno+"%");
+
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<Receiving> receivings = new ArrayList<>();
+
+        while(rs.next()) {
+            receivings.add(new Receiving(
+                    rs.getString("RRNo"),
+                    rs.getDate("Date").toLocalDate(),
+                    rs.getString("RVNo"),
+                    rs.getString("BLWBNo"),
+                    rs.getString("Carrier"),
+                    rs.getString("DRNo"),
+                    rs.getString("PONo"),
+                    rs.getString("SupplierID"),
+                    rs.getString("InvoiceNo"),
+                    rs.getString("ReceivedBy"),
+                    rs.getString("ReceivedOrigBy"),
+                    rs.getString("VerifiedBy")
+            ));
+        }
+
+        rs.close();
+
+        return receivings;
+    }
+
     public static List<Receiving> getByDateRange(LocalDate from, LocalDate to) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM Receiving " +

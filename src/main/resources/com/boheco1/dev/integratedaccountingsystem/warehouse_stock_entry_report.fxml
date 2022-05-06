@@ -5,6 +5,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -15,7 +16,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<?import javafx.scene.control.ProgressBar?>
 <AnchorPane fx:id="anchorPane" prefHeight="584.0" prefWidth="869.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.StockEntryReportController">
    <children>
       <StackPane fx:id="stackPane" style="-fx-background-color: #FFFFFF;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -82,6 +82,9 @@
                                  </children>
                               </HBox>
                            </children>
+                           <BorderPane.margin>
+                              <Insets left="4.0" />
+                           </BorderPane.margin>
                         </Pane>
                      </left>
                   </BorderPane>

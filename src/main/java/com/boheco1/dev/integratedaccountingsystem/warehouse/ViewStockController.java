@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 import com.boheco1.dev.integratedaccountingsystem.objects.StockEntryLog;
@@ -62,7 +63,9 @@ public class ViewStockController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        this.stackPane = Utility.getStackPane();
         Platform.runLater(() -> {
+            this.stock = Utility.getSelectedStock();
             this.bindNumbers();
             this.bindStockTypes();
             this.createStockEntriesTable();
@@ -144,9 +147,6 @@ public class ViewStockController implements Initializable {
         }else if (price == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for price!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (quantity == 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for quantity!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (unit.length() == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for unit!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
@@ -166,14 +166,6 @@ public class ViewStockController implements Initializable {
             } catch (Exception e) {
                 AlertDialogBuilder.messgeDialog("System Error", "New stock was not successfully added due to:"+e.getMessage()+".", stackPane, AlertDialogBuilder.DANGER_DIALOG);
             }
-        }
-    }
-
-    public void setStock(Stock stock){
-        try {
-            this.stock = StockDAO.get(stock.getId());
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

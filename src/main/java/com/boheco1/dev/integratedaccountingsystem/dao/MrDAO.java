@@ -24,7 +24,7 @@ public class MrDAO {
         if(mr.getStockId()!=null) {
             Stock stock = StockDAO.get(mr.getStockId());
             mr.setPrice(stock!=null ? stock.getPrice() : null);
-            mr.setExtItem(stock.getStockName());
+            mr.setExtItem(stock.getDescription());
         }
 
         ps.setString(1, mr.getId());

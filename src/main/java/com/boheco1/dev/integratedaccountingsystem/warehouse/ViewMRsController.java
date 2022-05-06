@@ -4,27 +4,19 @@ import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -42,25 +34,19 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
     @FXML
     private JFXTextField query_tf;
 
-    private JFXDialog dialog;
-
     private ObservableList<EmployeeInfo> employees = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.initializeTable();
+        this.populateTable(null);
         this.query_tf.setOnAction(actionEvent -> searchEmployee());
     }
 
     @FXML
     public void searchEmployee(){
         String key = this.query_tf.getText();
-
-        if (key.length() == 0) {
-            AlertDialogBuilder.messgeDialog("System Information", "Please enter the employee's last name before proceeding.", stackPane, AlertDialogBuilder.INFO_DIALOG);
-        }else{
-            this.populateTable(key);
-        }
+        this.populateTable(key);
     }
 
 
@@ -107,31 +93,9 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
                     viewIcon.setIconSize(13);
                     viewIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
 
-
                     viewButton.setOnAction(actionEvent -> {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("../warehouse_view_mr.fxml"));
-                        Parent parent = null;
-                        try {
-                            parent = loader.load();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        ViewMRController view_mr = loader.getController();
-                        view_mr.setMR(employee);
-                        JFXDialogLayout dialogLayout = new JFXDialogLayout();
-                        Label label = new Label("View Employee MR");
-                        label.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, 18));
-                        label.setWrapText(true);
-                        label.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
-                        dialogLayout.setHeading(label);
-                        dialogLayout.setBody(new AnchorPane(parent));
-                        JFXButton cancel = new JFXButton("Close");
-                        cancel.setDefaultButton(true);
-                        cancel.setMinWidth(75);
-                        cancel.setOnAction(ev -> dialog.close());
-                        dialogLayout.setActions(cancel);
-                        dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.CENTER);
-                        dialog.show();
+                        Utility.setSelectedEmployee(employee);
+                        ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_view_mr.fxml", Utility.getStackPane(),  "../view_mrs_controller.fxml");
                     });
                     setGraphic(viewButton);
                 } else {
@@ -157,7 +121,13 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
         try {
             Platform.runLater(() -> {
                 try {
-                    ObservableList<EmployeeInfo> list = FXCollections.observableList(MrDAO.getEmployeesWithMR(key));
+                    ObservableList<EmployeeInfo> list;
+                    if (key != null) {
+                        list = FXCollections.observableList(MrDAO.getEmployeesWithMR(key));
+
+                    }else{
+                        list = FXCollections.observableList(MrDAO.getEmployeesWithMR());
+                    }
                     this.employeesTable.getItems().setAll(list);
                 } catch (Exception e) {
                     e.printStackTrace();

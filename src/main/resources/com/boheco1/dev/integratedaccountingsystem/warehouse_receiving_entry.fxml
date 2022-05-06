@@ -284,19 +284,15 @@
                                     <Font size="14.0" />
                                  </font>
                                  <HBox.margin>
-                                    <Insets left="16.0" />
+                                    <Insets left="16.0" right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                           </children>
-                        </HBox>
-                        <HBox prefHeight="100.0" prefWidth="200.0">
-                           <children>
                               <JFXTextField fx:id="verified_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="246.0" promptText="Verified by" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                                  <HBox.margin>
-                                    <Insets right="16.0" />
+                                    <Insets left="16.0" right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
                               <JFXTextField fx:id="posted_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="246.0" promptText="Posted to Bin Card by" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
@@ -338,6 +334,7 @@
                               </JFXButton>
                            </children>
                         </HBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0" />
                      </children>
                      <BorderPane.margin>
                         <Insets />

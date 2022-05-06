@@ -10,19 +10,21 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="contentPane" prefHeight="550.0" prefWidth="802.0" style="-fx-background-color: white;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController">
+
+<StackPane prefHeight="550.0" prefWidth="802.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController">
    <children>
-      <StackPane fx:id="stackPane" prefHeight="550.0" prefWidth="832.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="16.0">
+      <AnchorPane fx:id="contentPane" prefHeight="550.0" prefWidth="802.0" style="-fx-background-color: white;" stylesheets="@style.css">
          <children>
-            <BorderPane prefHeight="605.0" prefWidth="964.0">
+            <BorderPane prefHeight="550.0" prefWidth="802.0">
                <center>
-                  <TableView fx:id="mr_items_table" prefHeight="190.0" prefWidth="849.0" BorderPane.alignment="CENTER">
+                  <TableView fx:id="mr_items_table" prefHeight="190.0" prefWidth="802.0" BorderPane.alignment="CENTER">
                      <BorderPane.margin>
                         <Insets bottom="16.0" />
-                     </BorderPane.margin></TableView>
+                     </BorderPane.margin>
+                  </TableView>
                </center>
                <top>
-                  <VBox prefHeight="106.0" prefWidth="832.0" BorderPane.alignment="CENTER">
+                  <VBox prefHeight="106.0" prefWidth="802.0" BorderPane.alignment="CENTER">
                      <children>
                         <HBox prefHeight="52.0" prefWidth="1165.0">
                            <children>
@@ -88,6 +90,6 @@
                </top>
             </BorderPane>
          </children>
-      </StackPane>
+      </AnchorPane>
    </children>
-</AnchorPane>
+</StackPane>

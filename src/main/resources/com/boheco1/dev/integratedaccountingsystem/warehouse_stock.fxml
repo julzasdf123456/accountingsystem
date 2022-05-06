@@ -14,7 +14,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane prefHeight="554.0" prefWidth="726.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.StockController">
+<AnchorPane prefHeight="554.0" prefWidth="952.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.StockController">
    <children>
       <StackPane fx:id="stackPane" style="-fx-background-color: #FFFFFF;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -36,7 +36,7 @@
                         </JFXComboBox>
                      </right>
                      <left>
-                        <Pane prefHeight="66.0" prefWidth="653.0" BorderPane.alignment="CENTER">
+                        <Pane prefHeight="66.0" prefWidth="820.0" BorderPane.alignment="CENTER">
                            <children>
                               <JFXButton layoutX="363.0" layoutY="18.0" onAction="#newStock" prefHeight="30.0" prefWidth="75.0" styleClass="btn-theme" stylesheets="@style.css" text="New" textFill="WHITE">
                                  <graphic>
@@ -72,6 +72,11 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
+                              <JFXButton layoutX="711.0" layoutY="18.0" onAction="#updatePrices" prefHeight="30.0" prefWidth="95.0" styleClass="btn-warning" stylesheets="@style.css" text="Update Prices" textFill="WHITE">
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </JFXButton>
                            </children>
                         </Pane>
                      </left>

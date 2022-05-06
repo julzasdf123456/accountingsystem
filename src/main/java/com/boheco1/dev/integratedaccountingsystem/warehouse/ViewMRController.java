@@ -2,8 +2,8 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
-import com.boheco1.dev.integratedaccountingsystem.helpers.ColorPalette;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
@@ -17,9 +17,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Paint;
-import javafx.util.Callback;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -44,12 +41,12 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
 
     private EmployeeInfo employee = null;
 
-    private MR currentItem = null;
-
     private ObservableList<MR> mrItems = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        employee = Utility.getSelectedEmployee();
+        this.setMR(employee);
     }
 
     @FXML
@@ -76,8 +73,8 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
         column1.setCellValueFactory(new PropertyValueFactory<>("extItem"));
         column1.setStyle("-fx-alignment: center-left;");
 
-        TableColumn<MR, String> column2 = new TableColumn<>("Quantity");
-        column2.setMinWidth(100);
+        TableColumn<MR, String> column2 = new TableColumn<>("Qty");
+        column2.setMinWidth(50);
         column2.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         column2.setStyle("-fx-alignment: center;");
 
@@ -90,7 +87,7 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
         column4.setMinWidth(100);
         column4.setCellValueFactory(new PropertyValueFactory<>("dateOfMR"));
         column4.setStyle("-fx-alignment: center;");
-
+        /*
         TableColumn<MR, String> column5 = new TableColumn<>("Action");
         Callback<TableColumn<MR, String>, TableCell<MR, String>> removeBtn
                 = //
@@ -133,7 +130,17 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
                     }
                 };
         column5.setCellFactory(removeBtn);
-        column5.setStyle("-fx-alignment: center;");
+        column5.setStyle("-fx-alignment: center;");*/
+
+        TableColumn<MR, String> column6 = new TableColumn<>("Date Returned");
+        column6.setMinWidth(130);
+        column6.setCellValueFactory(new PropertyValueFactory<>("dateOfReturn"));
+        column6.setStyle("-fx-alignment: center;");
+
+        TableColumn<MR, String> column7 = new TableColumn<>("Status");
+        column7.setMinWidth(100);
+        column7.setCellValueFactory(new PropertyValueFactory<>("status"));
+        column7.setStyle("-fx-alignment: center;");
 
         this.mrItems =  FXCollections.observableArrayList();
         this.mr_items_table.setPlaceholder(new Label("No item added"));
@@ -142,7 +149,9 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
         this.mr_items_table.getColumns().add(column2);
         this.mr_items_table.getColumns().add(column3);
         this.mr_items_table.getColumns().add(column4);
-        this.mr_items_table.getColumns().add(column5);
+        //this.mr_items_table.getColumns().add(column5);
+        this.mr_items_table.getColumns().add(column6);
+        this.mr_items_table.getColumns().add(column7);
     }
 
     public void setMR(EmployeeInfo emp){
@@ -167,12 +176,12 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
                     this.mr_items_table.getItems().setAll(mrItems);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while populating table due to: " + e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while populating table due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
-            AlertDialogBuilder.messgeDialog("System Error", "An error occurred while populating table due to: " + e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+            AlertDialogBuilder.messgeDialog("System Error", "An error occurred while populating table due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }
     }
 }
