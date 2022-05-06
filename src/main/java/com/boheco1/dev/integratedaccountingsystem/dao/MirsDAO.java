@@ -308,6 +308,34 @@ public class MirsDAO {
         return pending;
     }
 
+    public static List<MIRS> getByMonthYear(String my) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MIRS WHERE CONCAT(YEAR(DateFiled),'-',MONTH(DateFiled)) = ? ORDER BY CreatedAt");
+        ps.setString(1,my);
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<MIRS> result = new ArrayList<>();
+
+        while(rs.next()) {
+            result.add(new MIRS(
+                    rs.getString("id"),
+                    rs.getDate("DateFiled").toLocalDate(),
+                    rs.getString("Purpose"),
+                    rs.getString("Details"),
+                    rs.getString("Status"),
+                    rs.getString("RequisitionerID"),
+                    rs.getString("UserID"),
+                    rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return result;
+    }
+
     public static int countPending() throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT COUNT(id) AS 'count' FROM MIRS WHERE Status='pending'");
