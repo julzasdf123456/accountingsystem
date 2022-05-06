@@ -15,15 +15,16 @@ import java.time.LocalDate;
 public class StockHistoryDAO {
     public static void create(StockHistory stockHistory) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO StockHistory (id, date, price, updatedBy) " +
-                        "VALUES (?,?,?,?)");
+                "INSERT INTO StockHistory (id, StockID, date, price, updatedBy) " +
+                        "VALUES (?,?,?,?,?)");
 
         if(stockHistory.getId()==null) stockHistory.setId(Utility.generateRandomId());
 
-        ps.setString(1, stockHistory.getStockID());
-        ps.setDate(2, java.sql.Date.valueOf(stockHistory.getDate()));
-        ps.setDouble(3, stockHistory.getPrice());
-        ps.setString(4, stockHistory.getUpdatedBy());
+        ps.setString(1, stockHistory.getId());
+        ps.setString(2, stockHistory.getStockID());
+        ps.setDate(3, java.sql.Date.valueOf(stockHistory.getDate()));
+        ps.setDouble(4, stockHistory.getPrice());
+        ps.setString(5, stockHistory.getUpdatedBy());
 
         ps.executeUpdate();
 
