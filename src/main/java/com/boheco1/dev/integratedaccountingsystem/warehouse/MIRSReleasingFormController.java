@@ -204,6 +204,7 @@ public class MIRSReleasingFormController implements Initializable {
                                                             StockDAO.deductStockQuantity(temp, selectedMirsItem.getQuantity());
 
                                                             requestItem.remove(selectedMirsItem);
+                                                            particularsTable.setItems(requestItem);
                                                             Utility.getActiveMIRS().setDetails(details.getText());
                                                             MirsDAO.update(Utility.getActiveMIRS());
 

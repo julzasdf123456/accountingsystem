@@ -17,7 +17,7 @@ import java.util.Locale;
 
 public class PrintReleasedItems {
 
-    float[] column = {3f,2f,2f,2f,2f,2f,2f};
+    float[] column = {4f,1f,1f};
     PdfPTable table = new PdfPTable(column);
     PdfPCell cell;
     Document document;
@@ -32,6 +32,7 @@ public class PrintReleasedItems {
         header();
         tableHeader();
         content();
+        footer();
 
         document = new Document(PageSize.LETTER,30f,30f,30f,30f);
         Paragraph preface = new Paragraph();
@@ -82,41 +83,38 @@ public class PrintReleasedItems {
         createCell("Cabulijan, Tubigon, Bohol", column.length,11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
 
         createCell(2,column.length);
-        createCell("RELEASED ITEM LIST", column.length,12, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+        createCell("MIRS - RELEASED ITEM LIST", column.length,12, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
 
         createCell(2,column.length);
-        createCell("MIRS Date Filed: ", 6,11, Font.NORMAL, Element.ALIGN_RIGHT, Rectangle.NO_BORDER);
-        createCell(""+mirs.getDateFiled(), 1,11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
-
-        createCell("Please furnish the following for:", 3,11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
-        createCell("Other Details: ", 4,11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
-        createCell(mirs.getPurpose(), 3,11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
-        createCell(mirs.getDetails(), 4,11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
+        createCell("Date Released: "+mirs.getDateFiled(), column.length,11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
+        createCell("ID: "+mirs.getId(), column.length,11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
+        createCell("Work Order #: "+releasedIitems.get(0).getWorkOrderNo(), column.length,11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
 
     }
 
     private void tableHeader(){
-        createCell(2,column.length);
+        createCell(1,column.length);
         createCell("PARTICULARS", 1,11, Font.BOLD, Element.ALIGN_CENTER);
-        createCell("MIRS ID", 1,11, Font.BOLD, Element.ALIGN_CENTER);
-        createCell("W.O.N", 1,11, Font.BOLD, Element.ALIGN_CENTER);
         createCell("QUANTITY", 1,11, Font.BOLD, Element.ALIGN_CENTER);
         createCell("PRICE", 1,11, Font.BOLD, Element.ALIGN_CENTER);
-        createCell("DATE", 1,11, Font.BOLD, Element.ALIGN_CENTER);
-        createCell("Released By", 1,11, Font.BOLD, Element.ALIGN_CENTER);
+
     }
 
     private  void content() throws Exception {
         for(int x=0;x<releasedIitems.size();x++){
             createCell(StockDAO.get(releasedIitems.get(x).getStockID()).getStockName(), 1,11, Font.NORMAL, Element.ALIGN_LEFT);
-            createCell(releasedIitems.get(x).getMirsID(), 1,11, Font.NORMAL, Element.ALIGN_CENTER);
-            createCell(releasedIitems.get(x).getWorkOrderNo(), 1,11, Font.NORMAL, Element.ALIGN_CENTER);
             createCell(""+releasedIitems.get(x).getQuantity(), 1,11, Font.NORMAL, Element.ALIGN_CENTER);
             createCell(""+releasedIitems.get(x).getPrice(), 1,11, Font.NORMAL, Element.ALIGN_RIGHT);
-            createCell(""+releasedIitems.get(x).getCreatedAt(), 1,11, Font.NORMAL, Element.ALIGN_LEFT);
-            createCell(""+releasedIitems.get(x).getUserID(), 1,11, Font.NORMAL, Element.ALIGN_CENTER);
         }
 
+    }
+
+    private  void footer() throws Exception {
+        createCell("Please furnish the following for: \n"+mirs.getPurpose(), 1,11, Font.NORMAL, Element.ALIGN_LEFT);
+        createCell("Other Details: "+mirs.getDetails(), 2,11, Font.NORMAL, Element.ALIGN_LEFT);
+
+        createCell("Requested By: "+mirs.getRequisitioner().getFullName(), column.length,8, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
+        createCell("Released By: "+UserDAO.get(releasedIitems.get(0).getUserID()).getFullName(), column.length,8, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
     }
 
     private void createCell(int loop, int span){
