@@ -41,7 +41,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.time.LocalDate;
@@ -239,27 +238,7 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
 
     @FXML
     public void addStock(){
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../warehouse_stock_entry.fxml"));
-        Parent parent = null;
-        try {
-            parent = loader.load();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        JFXDialogLayout dialogLayout = new JFXDialogLayout();
-        Label label = new Label("Add New Stock");
-        label.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, 18));
-        label.setWrapText(true);
-        label.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
-        dialogLayout.setHeading(label);
-        dialogLayout.setBody(new AnchorPane(parent));
-        JFXButton cancel = new JFXButton("Close");
-        cancel.setDefaultButton(true);
-        cancel.setMinWidth(75);
-        cancel.setOnAction(event -> dialog.close());
-        dialogLayout.setActions(cancel);
-        dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.CENTER);
-        dialog.show();
+        ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_stock_entry.fxml", Utility.getStackPane(),  "../warehouse_receiving_entry.fxml");
     }
 
     public void createTable(){

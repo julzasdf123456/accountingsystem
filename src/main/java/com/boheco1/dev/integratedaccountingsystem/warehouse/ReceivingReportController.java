@@ -7,8 +7,6 @@ import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -17,16 +15,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.poi.ss.usermodel.Cell;
@@ -36,7 +31,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.time.LocalDate;
@@ -68,8 +62,6 @@ public class ReceivingReportController extends MenuControllerHandler implements 
 
     private int LIMIT = HomeController.ROW_PER_PAGE;
     private int COUNT = 0;
-
-    private JFXDialog dialog;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -172,29 +164,8 @@ public class ReceivingReportController extends MenuControllerHandler implements 
                         setText(null);
                     } else {
                         viewButton.setOnAction(actionEvent -> {
-                            FXMLLoader loader = new FXMLLoader(getClass().getResource("../warehouse_view_receiving_report.fxml"));
-                            Parent parent = null;
-                            try {
-                                parent = loader.load();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            ViewReceivingReportController view_report = loader.getController();
-                            view_report.setReceiving(item);
-                            JFXDialogLayout dialogLayout = new JFXDialogLayout();
-                            Label label = new Label("View Receiving Report");
-                            label.setFont(javafx.scene.text.Font.font(javafx.scene.text.Font.getDefault().getFamily(), FontWeight.BOLD, 18));
-                            label.setWrapText(true);
-                            label.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
-                            dialogLayout.setHeading(label);
-                            dialogLayout.setBody(new AnchorPane(parent));
-                            JFXButton cancel = new JFXButton("Close");
-                            cancel.setDefaultButton(true);
-                            cancel.setMinWidth(75);
-                            cancel.setOnAction(ev -> dialog.close());
-                            dialogLayout.setActions(cancel);
-                            dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.CENTER);
-                            dialog.show();
+                            Utility.setSelectedReceiving(item);
+                            ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_view_receiving_report.fxml", Utility.getStackPane(),  "../warehouse_receiving_report.fxml");
                         });
 
                         printButton.setOnAction(actionEvent -> {

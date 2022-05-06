@@ -2,8 +2,8 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
-import com.boheco1.dev.integratedaccountingsystem.helpers.ColorPalette;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
@@ -17,9 +17,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Paint;
-import javafx.util.Callback;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -44,12 +41,12 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
 
     private EmployeeInfo employee = null;
 
-    private MR currentItem = null;
-
     private ObservableList<MR> mrItems = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        employee = Utility.getSelectedEmployee();
+        this.setMR(employee);
     }
 
     @FXML
@@ -179,12 +176,12 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
                     this.mr_items_table.getItems().setAll(mrItems);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while populating table due to: " + e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while populating table due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
-            AlertDialogBuilder.messgeDialog("System Error", "An error occurred while populating table due to: " + e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+            AlertDialogBuilder.messgeDialog("System Error", "An error occurred while populating table due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }
     }
 }

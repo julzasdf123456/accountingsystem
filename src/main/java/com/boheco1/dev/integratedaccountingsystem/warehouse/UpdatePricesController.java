@@ -122,7 +122,11 @@ public class UpdatePricesController extends MenuControllerHandler implements Ini
         );
 
         selectedFile = fileChooser.showOpenDialog(stage);
-        this.file_tf.setText(selectedFile.getAbsolutePath());
+        try{
+            this.file_tf.setText(selectedFile.getAbsolutePath());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void showProgressBar(boolean show){

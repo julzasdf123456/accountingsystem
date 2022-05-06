@@ -1,49 +1,32 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.ReceivingDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.SupplierDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTextField;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Paint;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Callback;
-import javafx.util.StringConverter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.controlsfx.control.textfield.AutoCompletionBinding;
-import org.controlsfx.control.textfield.TextFields;
-import org.kordamp.ikonli.javafx.FontIcon;
-
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -66,33 +49,27 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
     @FXML
     private TableView items_table;
 
-    private JFXDialog dialog;
-
-    private Stock currentStock = null;
     private ObservableList<Stock> receivedItems = null;
-
-    private SupplierInfo supplier = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.createTable();
+        Receiving receiving = Utility.getSelectedReceiving();
+        this.setReceiving(receiving);
     }
 
     public void createTable(){
         TableColumn<Stock, String> column1 = new TableColumn<>("Code");
         column1.setMinWidth(100);
         column1.setCellValueFactory(new PropertyValueFactory<>("localCode"));
-        column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Stock, String> column2 = new TableColumn<>("Stock");
         column2.setMinWidth(110);
         column2.setCellValueFactory(new PropertyValueFactory<>("stockName"));
-        column2.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Stock, String> column3 = new TableColumn<>("Description");
         column3.setMinWidth(275);
         column3.setCellValueFactory(new PropertyValueFactory<>("description"));
-        column3.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Stock, String> column4 = new TableColumn<>("Unit");
         column4.setMinWidth(50);
@@ -112,12 +89,10 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
         TableColumn<Stock, String> column7 = new TableColumn<>("Price");
         column7.setMinWidth(100);
         column7.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getReceivingItem().getUnitCost()+""));
-        column7.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Stock, String> column8 = new TableColumn<>("Amount");
         column8.setMinWidth(100);
         column8.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getReceivingItem().getQtyAccepted() * stocks.getValue().getReceivingItem().getUnitCost() +""));
-        column8.setStyle("-fx-alignment: center-left;");
 
         this.receivedItems =  FXCollections.observableArrayList();
         this.items_table.setPlaceholder(new Label("No item added"));

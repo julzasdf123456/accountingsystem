@@ -18,10 +18,18 @@
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane fx:id="contentPane" prefHeight="550.0" prefWidth="960.0" style="-fx-background-color: white;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.ViewStockController">
+<AnchorPane fx:id="contentPane" prefHeight="665.0" prefWidth="960.0" style="-fx-background-color: white;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.ViewStockController">
    <children>
-      <VBox prefHeight="650.0" prefWidth="964.0">
+      <VBox prefHeight="665.0" prefWidth="964.0">
          <children>
+            <Label text="View Stock Information">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="8.0" />
+               </VBox.margin>
+            </Label>
             <Separator prefWidth="200.0" />
             <Pane prefHeight="650.0" prefWidth="960.0">
                <children>
