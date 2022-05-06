@@ -9,6 +9,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -400,5 +401,60 @@ public class MirsDAO {
         ps.close();
 
         return mirsList;
+    }
+
+    public static List<MIRS> getByDateFiled(LocalDate date) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MIRS WHERE DateFiled = ? ORDER BY CreatedAt");
+        ps.setDate(1, java.sql.Date.valueOf(date));
+
+        ResultSet rs = ps.executeQuery();
+
+        List<MIRS> mirs = new ArrayList();
+
+        while(rs.next()) {
+            mirs.add(
+                new MIRS(
+                        rs.getString("id"),
+                        rs.getDate("DateFiled").toLocalDate(),
+                        rs.getString("Purpose"),
+                        rs.getString("Details"),
+                        rs.getString("Status"),
+                        rs.getString("RequisitionerID"),
+                        rs.getString("UserID"),
+                        rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                        rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                )
+            );
+        }
+        return mirs;
+    }
+
+    public static List<MIRS> getByDateFiledBetween(LocalDate from, LocalDate to) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MIRS WHERE DateFiled BETWEEN ? AND ? ORDER BY CreatedAt");
+        ps.setDate(1, java.sql.Date.valueOf(from));
+        ps.setDate(2, java.sql.Date.valueOf(to));
+
+        ResultSet rs = ps.executeQuery();
+
+        List<MIRS> mirs = new ArrayList();
+
+        while(rs.next()) {
+            mirs.add(
+                    new MIRS(
+                            rs.getString("id"),
+                            rs.getDate("DateFiled").toLocalDate(),
+                            rs.getString("Purpose"),
+                            rs.getString("Details"),
+                            rs.getString("Status"),
+                            rs.getString("RequisitionerID"),
+                            rs.getString("UserID"),
+                            rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                            rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                    )
+            );
+        }
+        return mirs;
     }
 }
