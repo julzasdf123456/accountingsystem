@@ -9,6 +9,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.SlimStock;
 import com.boheco1.dev.integratedaccountingsystem.objects.User;
 import com.itextpdf.text.DocumentException;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -33,6 +34,8 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import javax.swing.*;
 import java.io.FileNotFoundException;
 import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
@@ -40,33 +43,41 @@ public class ViewAllMIRSController extends MenuControllerHandler implements Init
 
     @FXML TableView allMirsTable;
     @FXML private JFXTextField search_box;
-
+    @FXML private JFXComboBox<Integer> month;
+    @FXML private JFXTextField year;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initializeMirsTable();
         populateMirsTable("");
+
+        Calendar cal = Calendar.getInstance();
+        year.setText(""+cal.get(Calendar.YEAR));
+
+        for(int i = 1; i <=12;i++){
+            month.getItems().add(i);
+        }
     }
 
     private void initializeMirsTable() {
         try {
 
             TableColumn<MIRS, String> mirsIdCol = new TableColumn<>("MIRS Number");
-            mirsIdCol.setPrefWidth(150);
-            mirsIdCol.setMaxWidth(150);
-            mirsIdCol.setMinWidth(150);
+            mirsIdCol.setPrefWidth(100);
+            mirsIdCol.setMaxWidth(100);
+            mirsIdCol.setMinWidth(100);
             mirsIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 
             TableColumn<MIRS, String> mirsDateFiled = new TableColumn<>("Date Filed");
-            mirsDateFiled.setPrefWidth(150);
-            mirsDateFiled.setMaxWidth(150);
-            mirsDateFiled.setMinWidth(150);
+            mirsDateFiled.setPrefWidth(100);
+            mirsDateFiled.setMaxWidth(100);
+            mirsDateFiled.setMinWidth(100);
             mirsDateFiled.setCellValueFactory(new PropertyValueFactory<>("dateFiled"));
 
             TableColumn<MIRS, String> mirsStatus = new TableColumn<>("Status");
-            mirsStatus.setPrefWidth(150);
-            mirsStatus.setMaxWidth(150);
-            mirsStatus.setMinWidth(150);
+            mirsStatus.setPrefWidth(100);
+            mirsStatus.setMaxWidth(100);
+            mirsStatus.setMinWidth(100);
             mirsStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
             TableColumn<MIRS, String> purposeCol = new TableColumn<>("Purpose");
@@ -165,21 +176,34 @@ public class ViewAllMIRSController extends MenuControllerHandler implements Init
         }
     }
 
+    @FXML
+    private void monthly_summary_btn(ActionEvent event) {
+        try {
+            ObservableList<MIRS> mirs = FXCollections.observableList(MirsDAO.getByMonthYear(year.getText() +"-"+ month.getSelectionModel().getSelectedItem()));
+           // allMirsTable.getItems().clear();
+            //allMirsTable.getItems().setAll(mirs);
+            if (mirs.size() == 0) {
+                AlertDialogBuilder.messgeDialog("System Information", "No record on selected month and year.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+                return;
+            }
+            new PrintMIRSMonthlyChargeSummary(mirs);
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertDialogBuilder.messgeDialog("Error", "Error populating table: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }
+    }
+
     private void populateMirsTable(String q) {
         try {
-            try {
-                if(q.equals("")) {
-                    ObservableList<MIRS> mirs = FXCollections.observableList(MirsDAO.getAllMIRS());
-                    allMirsTable.getItems().setAll(mirs);
-                }else {
-                    allMirsTable.getItems().clear();
-                    allMirsTable.getItems().add(MirsDAO.getMIRS(q));
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                AlertDialogBuilder.messgeDialog("Error", "Error populating table: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            if(q.equals("")) {
+                ObservableList<MIRS> mirs = FXCollections.observableList(MirsDAO.getAllMIRS());
+                allMirsTable.getItems().clear();
+                allMirsTable.getItems().setAll(mirs);
+            }else {
+                allMirsTable.getItems().clear();
+                allMirsTable.getItems().add(MirsDAO.getMIRS(q));
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             AlertDialogBuilder.messgeDialog("Error", "Error populating table: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);

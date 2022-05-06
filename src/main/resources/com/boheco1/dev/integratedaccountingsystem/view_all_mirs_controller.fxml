@@ -1,31 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane fx:id="anchorPane" prefHeight="652.0" prefWidth="904.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.ViewAllMIRSController">
+<AnchorPane fx:id="anchorPane" prefHeight="694.0" prefWidth="967.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.ViewAllMIRSController">
    <children>
-      <HBox layoutX="14.0" layoutY="27.0" prefHeight="31.0" prefWidth="567.0" AnchorPane.bottomAnchor="594.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="323.0" AnchorPane.topAnchor="27.0">
+      <HBox layoutX="14.0" layoutY="27.0" prefHeight="31.0" prefWidth="427.0" AnchorPane.bottomAnchor="594.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="463.0" AnchorPane.topAnchor="27.0">
          <children>
             <JFXTextField fx:id="search_box" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="236.0" promptText="MIRS Number">
                <font>
                   <Font size="14.0" />
                </font>
             </JFXTextField>
-            <JFXButton fx:id="search_btn" onAction="#searchMIRS" prefHeight="31.0" prefWidth="78.0" styleClass="btn-theme" stylesheets="@style.css" text="Search" textFill="WHITE">
+            <JFXButton fx:id="search_btn" buttonType="RAISED" contentDisplay="CENTER" onAction="#searchMIRS" prefHeight="31.0" prefWidth="35.0" styleClass="btn-theme" stylesheets="@style.css" textFill="WHITE">
                <HBox.margin>
                   <Insets left="30.0" />
                </HBox.margin>
+               <graphic>
+                  <FontIcon iconColor="WHITE" iconLiteral="mdi2f-file-find-outline" iconSize="20" />
+               </graphic>
             </JFXButton>
-            <JFXButton fx:id="search_btn1" onAction="#viewMIRS" prefHeight="31.0" prefWidth="78.0" styleClass="btn-info" stylesheets="@style.css" text="Preview" textFill="WHITE">
+            <JFXButton fx:id="search_btn1" alignment="CENTER" buttonType="RAISED" contentDisplay="CENTER" onAction="#viewMIRS" prefHeight="31.0" prefWidth="35.0" styleClass="btn-info" stylesheets="@style.css" text=" " textFill="WHITE">
                <HBox.margin>
-                  <Insets left="70.0" />
+                  <Insets left="30.0" />
                </HBox.margin>
+               <graphic>
+                  <FontIcon iconColor="WHITE" iconLiteral="mdi2f-file-eye" iconSize="20" />
+               </graphic>
             </JFXButton>
          </children>
       </HBox>
@@ -33,5 +41,27 @@
          <columnResizePolicy>
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
          </columnResizePolicy></TableView>
+      <HBox layoutX="653.0" layoutY="27.0" prefHeight="31.0" prefWidth="211.0" AnchorPane.bottomAnchor="594.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="27.0">
+         <children>
+            <JFXComboBox fx:id="month" focusColor="#00ad8e" prefHeight="25.0" prefWidth="59.0" promptText="Month" visibleRowCount="12">
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
+            </JFXComboBox>
+            <JFXTextField fx:id="year" focusColor="#00ad8e" labelFloat="true" prefHeight="25.0" prefWidth="47.0" promptText="Year">
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
+            </JFXTextField>
+            <JFXButton fx:id="monthly_summary_btn" alignment="CENTER" buttonType="RAISED" contentDisplay="CENTER" onAction="#monthly_summary_btn" prefHeight="31.0" prefWidth="35.0" styleClass="btn-info" stylesheets="@style.css" text=" " textFill="WHITE">
+               <graphic>
+                  <FontIcon iconColor="WHITE" iconLiteral="mdi2f-file-eye" iconSize="20" />
+               </graphic>
+               <HBox.margin>
+                  <Insets left="30.0" />
+               </HBox.margin>
+            </JFXButton>
+         </children>
+      </HBox>
    </children>
 </AnchorPane>
