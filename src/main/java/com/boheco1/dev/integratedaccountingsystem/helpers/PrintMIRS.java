@@ -19,7 +19,7 @@ import java.util.Locale;
 
 public class PrintMIRS {
 
-    float[] column = {2f,2f,2f,2f,2f,2f};
+    float[] column = {2f,2f,2f,1f,1f,2f};
     PdfPTable table = new PdfPTable(column);
     PdfPCell cell;
     Document document;
@@ -107,14 +107,14 @@ public class PrintMIRS {
         createCell("CODE", 1,11, Font.BOLD, Element.ALIGN_CENTER);
         createCell("PARTICULARS", 2,11, Font.BOLD, Element.ALIGN_CENTER);
         createCell("UNIT", 1,11, Font.BOLD, Element.ALIGN_CENTER);
-        createCell("QUANTITY", 1,11, Font.BOLD, Element.ALIGN_CENTER);
+        createCell("QTY", 1,11, Font.BOLD, Element.ALIGN_CENTER);
         createCell("REMARKS", 1,11, Font.BOLD, Element.ALIGN_CENTER);
     }
 
     private  void content() throws Exception {
         for(int x=0;x<mirsItemList.size();x++){
-            createCell(mirsItemList.get(x).getStockID().substring(0, 10)+"...", 1,11, Font.NORMAL, Element.ALIGN_LEFT);
-            createCell(StockDAO.get(mirsItemList.get(x).getStockID()).getStockName(), 2,11, Font.NORMAL, Element.ALIGN_LEFT);
+            createCell(mirsItemList.get(x).getStockID(), 1,11, Font.NORMAL, Element.ALIGN_LEFT);
+            createCell(StockDAO.get(mirsItemList.get(x).getStockID()).getDescription(), 2,11, Font.NORMAL, Element.ALIGN_LEFT);
             createCell(StockDAO.get(mirsItemList.get(x).getStockID()).getUnit(), 1,11, Font.NORMAL, Element.ALIGN_CENTER);
             createCell(""+mirsItemList.get(x).getQuantity(), 1,11, Font.NORMAL, Element.ALIGN_CENTER);
             createCell(mirsItemList.get(x).getRemarks(), 1,11, Font.NORMAL, Element.ALIGN_LEFT);

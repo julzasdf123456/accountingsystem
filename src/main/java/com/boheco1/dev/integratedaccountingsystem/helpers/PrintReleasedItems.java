@@ -17,7 +17,7 @@ import java.util.Locale;
 
 public class PrintReleasedItems {
 
-    float[] column = {4f,1f,1f};
+    float[] column = {1f,3f,1f,1f};
     PdfPTable table = new PdfPTable(column);
     PdfPCell cell;
     Document document;
@@ -94,24 +94,26 @@ public class PrintReleasedItems {
 
     private void tableHeader(){
         createCell(1,column.length);
+        createCell("CODE", 1,11, Font.BOLD, Element.ALIGN_CENTER);
         createCell("PARTICULARS", 1,11, Font.BOLD, Element.ALIGN_CENTER);
-        createCell("QUANTITY", 1,11, Font.BOLD, Element.ALIGN_CENTER);
-        createCell("PRICE", 1,11, Font.BOLD, Element.ALIGN_CENTER);
+        createCell("UNIT", 1,11, Font.BOLD, Element.ALIGN_CENTER);
+        createCell("QTY", 1,11, Font.BOLD, Element.ALIGN_CENTER);
 
     }
 
     private  void content() throws Exception {
         for(int x=0;x<releasedIitems.size();x++){
-            createCell(StockDAO.get(releasedIitems.get(x).getStockID()).getStockName(), 1,11, Font.NORMAL, Element.ALIGN_LEFT);
+            createCell(""+releasedIitems.get(x).getStockID(), 1,11, Font.NORMAL, Element.ALIGN_CENTER);
+            createCell(StockDAO.get(releasedIitems.get(x).getStockID()).getDescription(), 1,11, Font.NORMAL, Element.ALIGN_LEFT);
+            createCell(StockDAO.get(releasedIitems.get(x).getStockID()).getUnit(), 1,11, Font.NORMAL, Element.ALIGN_CENTER);
             createCell(""+releasedIitems.get(x).getQuantity(), 1,11, Font.NORMAL, Element.ALIGN_CENTER);
-            createCell(""+releasedIitems.get(x).getPrice(), 1,11, Font.NORMAL, Element.ALIGN_RIGHT);
         }
 
     }
 
     private  void footer() throws Exception {
-        createCell("Please furnish the following for: \n"+mirs.getPurpose(), 1,11, Font.NORMAL, Element.ALIGN_LEFT);
-        createCell("Other Details: "+mirs.getDetails(), 2,11, Font.NORMAL, Element.ALIGN_LEFT);
+        createCell("Please furnish the following for: \n"+mirs.getPurpose(), 2,11, Font.NORMAL, Element.ALIGN_LEFT);
+        createCell("Other Details: \n"+mirs.getDetails(), 2,11, Font.NORMAL, Element.ALIGN_LEFT);
 
         createCell("Requested By: "+mirs.getRequisitioner().getFullName(), column.length,8, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
         createCell("Released By: "+UserDAO.get(releasedIitems.get(0).getUserID()).getFullName(), column.length,8, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);

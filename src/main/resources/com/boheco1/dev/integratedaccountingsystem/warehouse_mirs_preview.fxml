@@ -4,7 +4,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -110,12 +109,6 @@
                            </children>
                         </HBox>
                         <TableView fx:id="requestedTable" focusTraversable="false" prefHeight="339.0" prefWidth="543.0" VBox.vgrow="ALWAYS">
-                          <columns>
-                            <TableColumn fx:id="req_particularsCol" prefWidth="75.0" text="Particulars" />
-                              <TableColumn fx:id="req_unitCol" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" text="Unit" />
-                              <TableColumn fx:id="req_quantityCol" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" text="Qty" />
-                              <TableColumn fx:id="req_remarksCol" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="Remarks" />
-                          </columns>
                            <columnResizePolicy>
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
@@ -158,11 +151,6 @@
                            </children>
                         </HBox>
                         <TableView fx:id="releasedTable" focusTraversable="false" prefHeight="231.0" prefWidth="503.0" VBox.vgrow="ALWAYS">
-                           <columns>
-                              <TableColumn fx:id="rel_particularsCol" prefWidth="75.0" text="Particulars" />
-                              <TableColumn fx:id="rel_quantityCol" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" text="Qty" />
-                              <TableColumn fx:id="rel_price" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="Total" />
-                           </columns>
                            <columnResizePolicy>
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>

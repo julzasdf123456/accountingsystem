@@ -49,16 +49,19 @@ public class MIRSPreview implements Initializable {
     private TableView requestedTable;
 
     @FXML
-    private TableColumn<MIRSItem, String> req_particularsCol, req_unitCol, req_remarksCol;
+    private TableColumn<MIRSItem, String> req_particularsCol, req_unitCol;
 
     @FXML
     private TableColumn<MIRSItem, Integer> req_quantityCol;
 
     @FXML
+    private TableColumn<MIRSItem, Double> req_price;
+
+    @FXML
     private TableView releasedTable;
 
     @FXML
-    private TableColumn<Releasing, String> rel_particularsCol;
+    private TableColumn<Releasing, String> rel_particularsCol, rel_unitCol;
 
     @FXML
     private TableColumn<Releasing, Integer> rel_quantityCol;
@@ -85,6 +88,8 @@ public class MIRSPreview implements Initializable {
         }
 
         ObservableList<MIRSItem> observableList = FXCollections.observableArrayList(mirsItemList);
+        req_particularsCol = new TableColumn<>("Paticulars");
+        req_particularsCol.setMinWidth(200);
         req_particularsCol.setCellValueFactory(cellData -> {
             try {
                 return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getDescription());
@@ -94,6 +99,9 @@ public class MIRSPreview implements Initializable {
             return null;
         });
 
+        req_unitCol = new TableColumn<>("Unit");
+        req_unitCol.setMinWidth(50);
+        req_unitCol.setStyle("-fx-alignment: center;");
         req_unitCol.setCellValueFactory(cellData -> {
             try {
                 return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getUnit());
@@ -102,8 +110,22 @@ public class MIRSPreview implements Initializable {
             }
             return null;
         });
+
+        req_quantityCol = new TableColumn<>("Qty");
+        req_quantityCol.setMinWidth(50);
+        req_quantityCol.setStyle("-fx-alignment: center;");
         req_quantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
-        req_remarksCol.setCellValueFactory(new PropertyValueFactory<>("Remarks"));
+
+        req_price = new TableColumn<>("Price");
+        req_price.setMinWidth(100);
+        req_price.setStyle("-fx-alignment: center-right;");
+        req_price.setCellValueFactory(new PropertyValueFactory<>("Price"));
+
+        requestedTable.getColumns().removeAll();
+        requestedTable.getColumns().add(req_particularsCol);
+        requestedTable.getColumns().add(req_unitCol);
+        requestedTable.getColumns().add(req_quantityCol);
+        requestedTable.getColumns().add(req_price);
         requestedTable.getItems().setAll(observableList);
 
         try {
@@ -128,6 +150,8 @@ public class MIRSPreview implements Initializable {
             return;
 
         ObservableList<Releasing> observableList = FXCollections.observableArrayList(releasedIitems);
+        rel_particularsCol = new TableColumn<>("Paticulars");
+        rel_particularsCol.setMinWidth(200);
         rel_particularsCol.setCellValueFactory(cellData -> {
             try {
                 return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getDescription());
@@ -137,8 +161,33 @@ public class MIRSPreview implements Initializable {
             return null;
         });
 
+        rel_unitCol = new TableColumn<>("Unit");
+        rel_unitCol.setMinWidth(50);
+        rel_unitCol.setStyle("-fx-alignment: center;");
+        rel_unitCol.setCellValueFactory(cellData -> {
+            try {
+                return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getUnit());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        });
+
+        rel_quantityCol = new TableColumn<>("Qty");
+        rel_quantityCol.setMinWidth(50);
+        rel_quantityCol.setStyle("-fx-alignment: center;");
         rel_quantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
+
+        rel_price = new TableColumn<>("Price");
+        rel_price.setMinWidth(100);
+        rel_price.setStyle("-fx-alignment: center-right;");
         rel_price.setCellValueFactory(new PropertyValueFactory<>("Price"));
+
+        releasedTable.getColumns().removeAll();
+        releasedTable.getColumns().add(rel_particularsCol);
+        releasedTable.getColumns().add(rel_unitCol);
+        releasedTable.getColumns().add(rel_quantityCol);
+        releasedTable.getColumns().add(rel_price);
         releasedTable.getItems().setAll(observableList);
 
         date_released.setText("Released on: " + releasedIitems.get(0).getCreatedAt().toLocalDate());
