@@ -6,6 +6,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -26,6 +27,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class FileMIRSController extends MenuControllerHandler implements Initializable, SubMenuHelper {
@@ -248,7 +250,14 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     }
 
     private void initializeItemTable() {
-        particularsCol.setCellValueFactory(new PropertyValueFactory<>("Particulars"));
+        particularsCol.setCellValueFactory(cellData -> {
+            try {
+                return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getDescription());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        });
         unitCol.setCellValueFactory(new PropertyValueFactory<>("Unit"));
         unitCol.setStyle("-fx-alignment: center;");
         quantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
@@ -343,7 +352,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                     //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
                     @Override
                     public String toString(SlimStock object) {
-                        return object.getStockName();
+                        return object.getDescription();
                     }
 
                     @Override
