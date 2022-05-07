@@ -18,7 +18,7 @@ import java.util.Locale;
 
 public class PrintMIRSMonthlyChargeSummary {
 
-    float[] column = {4f,1f,2f,2f,2f,2f,2f};
+    float[] column = {3f,1f,1f,1.5f,1.5f,1.5f,1.5f};
     PdfPTable table = new PdfPTable(column);
     PdfPCell cell;
     Document document;
@@ -34,7 +34,8 @@ public class PrintMIRSMonthlyChargeSummary {
         tableHeader();
         content();
 
-        document = new Document(PageSize.LETTER,30f,30f,30f,30f);
+        document = new Document(PageSize.LETTER.rotate(),30f,30f,30f,30f);
+
         Paragraph preface = new Paragraph();
         PdfWriter.getInstance(document, new FileOutputStream("c:/prints/MIRS.pdf"));
         document.open();
@@ -86,7 +87,7 @@ public class PrintMIRSMonthlyChargeSummary {
         createCell("Cabulijan, Tubigon, Bohol", column.length,11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
 
         createCell(2,column.length);
-        createCell("MATERIAL ISSUANCE REQUISITION SLIP", column.length,12, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+        createCell("MIRS: Released Items", column.length,12, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
         createCell("Monthly Charges Summary for the month of " + ld.getMonth() +" "+ ld.getYear(), column.length,11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
     }
 
