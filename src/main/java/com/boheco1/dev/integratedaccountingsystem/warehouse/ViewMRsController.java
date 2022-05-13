@@ -1,37 +1,23 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
-import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Rectangle;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.io.File;
 import java.net.URL;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class ViewMRsController extends MenuControllerHandler implements Initializable  {
@@ -96,31 +82,13 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
         column6.setCellFactory(mrtable -> new TableCell<>(){
 
             FontIcon viewIcon =  new FontIcon("mdi2e-eye");
-            FontIcon printIcon = new FontIcon("mdi2p-printer");
 
             private final JFXButton viewButton = new JFXButton("", viewIcon);
-            private final JFXButton printButton = new JFXButton("", printIcon);
 
             @Override
             protected void updateItem(EmployeeInfo employee, boolean b) {
                 super.updateItem(employee, b);
                 if (employee != null) {
-                    Stage stage = (Stage) Utility.getContentPane().getScene().getWindow();
-                    printButton.setStyle("-fx-background-color: #00AD8E;");
-                    printIcon.setIconSize(13);
-                    printIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
-                    printButton.setOnAction(actionEvent1 -> {
-                        Platform.runLater(() -> {
-                            try {
-                                printMR(employee, stage);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                AlertDialogBuilder.messgeDialog("System Warning", "Process failed due to: " + e.getMessage(),
-                                        stackPane, AlertDialogBuilder.DANGER_DIALOG);
-                            }
-                        });
-                    });
-
                     viewButton.setStyle("-fx-background-color: #2196f3;");
                     viewIcon.setIconSize(13);
                     viewIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
@@ -129,11 +97,7 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
                         Utility.setSelectedEmployee(employee);
                         ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_view_mr.fxml", Utility.getStackPane(),  "../view_mrs_controller.fxml");
                     });
-                    HBox hBox = new HBox();
-                    hBox.setSpacing(2);
-                    hBox.getChildren().add(viewButton);
-                    hBox.getChildren().add(printButton);
-                    setGraphic(hBox);
+                    setGraphic(viewButton);
                 } else {
                     setGraphic(null);
                     return;
@@ -176,51 +140,5 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
         }
     }
 
-    public void printMR(EmployeeInfo employeeInfo, Stage stage) throws Exception{
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
-        );
-        fileChooser.setInitialFileName("MR_report_"+employeeInfo.getEmployeeLastName()+"_"+employeeInfo.getEmployeeFirstName()+".pdf");
-        File selectedFile = fileChooser.showSaveDialog(stage);
-        if (selectedFile != null) {
-            PrintPDF mr_pdf = new PrintPDF(selectedFile);
-            //Create Header
-            mr_pdf.header(LocalDate.now(), "Memorandum Receipt".toUpperCase());
-
-            //Create Header details
-            String[] employee_details = {"Employee:", employeeInfo.getFullName(), "Designation:", employeeInfo.getDesignation()};
-            int[] emp_span = {1,2,1,2};
-            int[] emp_aligns = {Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_LEFT};
-            int[] emp_borders = {Rectangle.NO_BORDER,Rectangle.NO_BORDER,Rectangle.NO_BORDER,Rectangle.NO_BORDER};
-            int[] emp_fonts = {Font.NORMAL, Font.BOLD, Font.NORMAL, Font.BOLD};
-            mr_pdf.other_details(employee_details, emp_span, emp_fonts, emp_aligns,emp_borders,true);
-
-            //Create Table Header
-            String[] headers = {"Item", "Qty", "Unit Price", "Date of MR", "Status"};
-            int[] header_spans = {2,1,1,1,1};
-            mr_pdf.tableHeader(headers, header_spans);
-
-            //Create Table Content
-            List<MR> mrs  = MrDAO.getMRsOfEmployee(employeeInfo);
-            ArrayList<String[]> rows = new ArrayList<>();
-            for(MR mr : mrs){
-                String[] data = {mr.getExtItem(), mr.getQuantity()+"", mr.getPrice()+"", mr.getDateOfMR().toString(), mr.getStatus()};
-                rows.add(data);
-            }
-            int[] rows_aligns = {Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_CENTER};
-            mr_pdf.tableContent(rows, header_spans, rows_aligns);
-
-            //Create Footer
-            int[] footer_spans = {2, 4};
-            EmployeeInfo user = ActiveUser.getUser().getEmployeeInfo();
-            String[] prepared = {"Prepared by", ""};
-            String[] designations = {user.getDesignation(), ""};
-            String[] names = {user.getEmployeeFirstName()+" "+user.getEmployeeLastName(), ""};
-            mr_pdf.footer(prepared, designations, names, footer_spans, true);
-            mr_pdf.generate();
-        }
-    }
 
 }
