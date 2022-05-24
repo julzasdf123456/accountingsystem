@@ -4,6 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRSItem;
+import com.boheco1.dev.integratedaccountingsystem.objects.ReleasedItemDetails;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -484,5 +485,41 @@ public class MirsDAO {
             );
         }
         return mirs;
+    }
+
+    public List<ReleasedItemDetails> getReleasedMIRSItems(MIRS mirs) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT Stocks.Description, MIRSItems.*, Releasing.Status " +
+                        "FROM MIRSItems " +
+                        "LEFT JOIN Stocks ON Stocks.id = MIRSItems.StockID " +
+                        "LEFT JOIN Releasing ON (Releasing.MIRSID=MIRSItems.MIRSID AND Releasing.StockID=MIRSItems.StockID) " +
+                        "WHERE MIRSItems.MIRSID=?;");
+
+        ps.setString(1, mirs.getId());
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<ReleasedItemDetails> releasedItemDetails = new ArrayList();
+
+        while(rs.next()) {
+            releasedItemDetails.add(new ReleasedItemDetails(
+                    rs.getString("Description"),
+                    rs.getString("id"),
+                    rs.getString("MIRSID"),
+                    rs.getString("StockID"),
+                    rs.getInt("Quantity"),
+                    rs.getDouble("Price"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                    rs.getString("WorkOrderNo")
+            ));
+        }
+
+        rs.close();
+
+        ps.close();
+
+        return releasedItemDetails;
     }
 }
