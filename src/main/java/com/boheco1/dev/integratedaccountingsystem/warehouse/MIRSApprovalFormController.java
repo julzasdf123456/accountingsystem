@@ -75,7 +75,7 @@ public class MIRSApprovalFormController implements Initializable {
 
             particularsCol.setCellValueFactory(cellData -> {
                 try {
-                    return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getStockName());
+                    return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getDescription());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

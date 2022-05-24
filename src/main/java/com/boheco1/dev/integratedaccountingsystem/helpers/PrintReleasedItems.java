@@ -87,8 +87,8 @@ public class PrintReleasedItems {
 
         createCell(2,column.length);
         createCell("Date Released: "+mirs.getDateFiled(), column.length,11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
-        createCell("ID: "+mirs.getId(), column.length,11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
-        createCell("Work Order #: "+releasedIitems.get(0).getWorkOrderNo(), column.length,11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
+        createCell("MIRS#: "+mirs.getId(), column.length,11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
+        //createCell("Work Order #: "+releasedIitems.get(0).getWorkOrderNo(), column.length,11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
 
     }
 

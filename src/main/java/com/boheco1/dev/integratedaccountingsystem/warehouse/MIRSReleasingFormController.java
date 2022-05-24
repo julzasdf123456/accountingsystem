@@ -101,7 +101,7 @@ public class MIRSReleasingFormController implements Initializable {
 
             particularsCol.setCellValueFactory(cellData -> {
                 try {
-                    return new SimpleStringProperty(StockDAO.get(cellData.getValue().getStockID()).getStockName());
+                    return new SimpleStringProperty(StockDAO.get(cellData.getValue().getStockID()).getDescription());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -477,7 +477,7 @@ public class MIRSReleasingFormController implements Initializable {
                     //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
                     @Override
                     public String toString(SlimStock object) {
-                        return object.getStockName();
+                        return object.getDescription();
                     }
 
                     @Override

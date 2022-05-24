@@ -98,7 +98,7 @@ public class PrintMIRSMonthlyChargeSummary {
         createCell("Price", 1,11, Font.BOLD, Element.ALIGN_CENTER);
         createCell("Charges", 1,11, Font.BOLD, Element.ALIGN_CENTER);
         createCell("NEA Code", 1,11, Font.BOLD, Element.ALIGN_CENTER);
-        createCell("Acctg Code", 1,11, Font.BOLD, Element.ALIGN_CENTER);
+        createCell("Acct Code", 1,11, Font.BOLD, Element.ALIGN_CENTER);
         createCell("Local Code", 1,11, Font.BOLD, Element.ALIGN_CENTER);
     }
 

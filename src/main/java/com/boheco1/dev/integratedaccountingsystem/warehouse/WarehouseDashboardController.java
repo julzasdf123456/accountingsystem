@@ -271,8 +271,9 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         tableView.getColumns().add(column3);
         tableView.getColumns().add(column4);
 
+
         //display status column only if displaying Pending Approval MIRS
-        if(s.equals("Pending"))
+        if(s.equals(Utility.PENDING))
             tableView.getColumns().add(column5);
 
         tableView.refresh();
