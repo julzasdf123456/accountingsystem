@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.helpers;
 
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
+import com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 
@@ -15,6 +16,11 @@ public class Utility {
     public static String CLOSED = "closed";
     public static String PENDING = "pending";
     public static String APPROVED = "approved";
+    public static String MR_RETURNED_SERVICEABLE = "serviceable";
+    public static String MR_RETURNED_UNSERVICEABLE = "unserviceable";
+    public static String MR_RETURNED = "returned";
+    public static String MR_ACTIVE = "active";
+    public static String MR_LOST = "lost";
 
     private static AnchorPane contentPane;
     private static MIRS activeMIRS;
@@ -26,7 +32,11 @@ public class Utility {
 
     private static Stock selectedStock;
 
+    private static MR selectedMR;
+
     private static Receiving selectedReceiving;
+
+    private static ViewMRController mrController;
 
     public static MIRS getActiveMIRS() {
         return activeMIRS;
@@ -99,4 +109,16 @@ public class Utility {
     public static void setStackPane(StackPane stackPane) {
         Utility.stackPane = stackPane;
     }
+
+    public static MR getSelectedMR() {
+        return selectedMR;
+    }
+
+    public static void setSelectedMR(MR selectedMR) {
+        Utility.selectedMR = selectedMR;
+    }
+
+    public static ViewMRController getMrController() { return mrController; }
+
+    public static void setMrController(ViewMRController mrController) { Utility.mrController = mrController; }
 }

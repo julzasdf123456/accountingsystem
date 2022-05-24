@@ -5,6 +5,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
 import com.boheco1.dev.integratedaccountingsystem.objects.MR;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
+import com.boheco1.dev.integratedaccountingsystem.objects.StockEntryLog;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -160,13 +161,31 @@ public class MrDAO {
         return mrs;
     }
 
-    public static void returnMR(MR mr) throws Exception {
+    public static void returnMR(MR mr, String remarks) throws Exception {
+        Stock stock = StockDAO.get(mr.getStockId());
+        if (stock == null){
+            stock = new Stock();
+            stock.setId(mr.getStockId());
+            stock.setQuantity(0);
+            stock.setStockName(mr.getExtItem());
+            stock.setDescription(mr.getExtItem());
+            stock.setPrice(mr.getPrice());
+
+            StockDAO.add(stock);
+        }
+        StockEntryLog entry = new StockEntryLog();
+        entry.setSource("Returned");
+        entry.setQuantity(mr.getQuantity());
+        entry.setPrice(mr.getPrice());
+
+        StockDAO.stockEntry(stock, entry);
+
+
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "UPDATE MR SET status=?, dateOfReturn=? WHERE id=?");
-        ps.setString(1,"returned");
+                "UPDATE MR SET status='returned', remarks=?, dateOfReturn=? WHERE id=?");
+        ps.setString(1, remarks);
         ps.setDate(2, java.sql.Date.valueOf(LocalDate.now()));
         ps.setString(3, mr.getId());
-
         ps.executeUpdate();
 
         ps.close();

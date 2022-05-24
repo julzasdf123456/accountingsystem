@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXRadioButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<AnchorPane fx:id="contentPane" prefHeight="282.0" prefWidth="527.0" style="-fx-background-color: white;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.MRReturnController">
+   <children>
+      <VBox prefHeight="272.0" prefWidth="527.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label fx:id="status_lbl" alignment="TOP_CENTER" prefHeight="37.0" prefWidth="531.0" textAlignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <HBox prefHeight="60.0" prefWidth="527.0">
+               <children>
+                  <JFXTextField fx:id="stock_id_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="527.0" promptText="Stock ID" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </JFXTextField>
+               </children>
+            </HBox>
+            <HBox prefHeight="60.0" prefWidth="527.0">
+               <children>
+                  <JFXTextField fx:id="description_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="527.0" promptText="Description" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </JFXTextField>
+               </children>
+            </HBox>
+            <HBox prefHeight="52.0" prefWidth="527.0">
+               <children>
+                  <JFXTextField fx:id="qty_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="165.0" promptText="Quantity" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets right="16.0" />
+                     </HBox.margin>
+                  </JFXTextField>
+                  <JFXTextField fx:id="unit_price_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="165.0" promptText="Unit Price" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets right="16.0" />
+                     </HBox.margin>
+                  </JFXTextField>
+                  <JFXTextField fx:id="date_mr_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="165.0" promptText="Date of MR" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </JFXTextField>
+               </children>
+            </HBox>
+            <Label text="Remarks">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <HBox prefHeight="22.0" prefWidth="527.0">
+               <children>
+
+                  <JFXRadioButton fx:id="return_serviceable_rb" prefHeight="19.0" prefWidth="165.0" text="Serviceable">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets right="16.0" />
+                     </HBox.margin>
+                     <toggleGroup>
+                        <ToggleGroup fx:id="toggleGroup" />
+                     </toggleGroup>
+                  </JFXRadioButton>
+                  <JFXRadioButton fx:id="return_unserviceable_rb" layoutX="10.0" layoutY="10.0" prefHeight="19.0" prefWidth="165.0" text="Unserviceable" toggleGroup="$toggleGroup">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </JFXRadioButton>
+               </children>
+            </HBox>
+            <HBox prefHeight="30.0" prefWidth="527.0">
+               <children>
+                  <JFXButton fx:id="returnBtn" onAction="#returnMR" prefHeight="27.0" prefWidth="165.0" styleClass="btn-theme" stylesheets="@style.css" text="Return" textFill="WHITE">
+                     <graphic>
+                        <FontIcon iconColor="WHITE" iconLiteral="mdi2f-file-document-outline" iconSize="14" />
+                     </graphic>
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                  </JFXButton>
+               </children>
+               <VBox.margin>
+                  <Insets top="16.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

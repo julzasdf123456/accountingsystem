@@ -10,12 +10,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<StackPane prefHeight="550.0" prefWidth="802.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController">
+<StackPane prefHeight="550.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController">
    <children>
-      <AnchorPane fx:id="contentPane" prefHeight="550.0" prefWidth="802.0" style="-fx-background-color: white;" stylesheets="@style.css">
+      <AnchorPane fx:id="contentPane" prefHeight="550.0" prefWidth="1024.0" style="-fx-background-color: white;" stylesheets="@style.css">
          <children>
-            <BorderPane prefHeight="550.0" prefWidth="802.0">
+            <BorderPane prefHeight="550.0" prefWidth="1024.0">
                <center>
                   <TableView fx:id="mr_items_table" prefHeight="190.0" prefWidth="802.0" BorderPane.alignment="CENTER">
                      <BorderPane.margin>

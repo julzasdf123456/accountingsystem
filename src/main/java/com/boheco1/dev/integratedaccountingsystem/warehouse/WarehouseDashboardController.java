@@ -68,7 +68,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
     MenuItem createInventory = new MenuItem("Create Inventory");
     MenuItem viewAllStocks = new MenuItem("View All Stocks");
     MenuItem viewAllMirs = new MenuItem("View All MIRS");
-    MenuItem viewMRItems = new MenuItem("View MRs");
+    MenuItem viewMRItems = new MenuItem("View All MRs");
     MenuItem trash = new MenuItem("Trash");
     MenuItem inventoryReport = new MenuItem("Inventory Report");
     MenuItem liquidationReport = new MenuItem("Liquidation Report");
