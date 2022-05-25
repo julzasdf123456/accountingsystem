@@ -1267,7 +1267,8 @@ public class StockDAO {
      */
     public static int countPendingRequest(Stock stock) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT SUM(Quantity) AS 'pending' FROM MIRSItems mi LEFT JOIN MIRS m ON m.id = mi.MIRSID WHERE (m.Status = 'Pending' OR m.Status = 'Releasing') AND mi.StockID = ?; ");
+                "SELECT SUM(Quantity) AS 'pending' FROM MIRSItems mi " +
+                        "LEFT JOIN MIRS m ON m.id = mi.MIRSID WHERE (m.Status = 'Pending' OR m.Status = 'Releasing') AND mi.StockID = ?; ");
         ps.setString(1, stock.getId());
         ResultSet rs = ps.executeQuery();
 
@@ -1275,6 +1276,26 @@ public class StockDAO {
 
         if(rs.next()) {
             count = rs.getInt("pending");
+        }
+
+        int unavailable = StockDAO.countReleasingUnavailable(stock);
+
+        return count-unavailable;
+    }
+
+    public static int countReleasingUnavailable(Stock stock) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT SUM(r.Quantity) AS 'unavailable' FROM Releasing r " +
+                "WHERE r.MIRSID IN (SELECT m.id FROM MIRS m WHERE m.Status='releasing') " +
+                "AND r.StockID=?");
+
+        ps.setString(1, stock.getId());
+
+        ResultSet rs = ps.executeQuery();
+
+        int count = 0;
+
+        if(rs.next()) {
+            count = rs.getInt("unavailable");
         }
 
         return count;
