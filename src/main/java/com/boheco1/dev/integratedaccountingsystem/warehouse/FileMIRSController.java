@@ -119,7 +119,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
                         stackPane, AlertDialogBuilder.DANGER_DIALOG);
                 return;
-            }else if(Integer.parseInt(quantity.getText()) > StockDAO.countAvailable(selectedStock)) {
+            }else if(quantity.getText().length() == 0 || Integer.parseInt(quantity.getText()) > StockDAO.countAvailable(selectedStock)) {
                 AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid request quantity!",
                         stackPane, AlertDialogBuilder.DANGER_DIALOG);
                 return;
@@ -147,7 +147,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             available.setText("Available: 0");
         } catch (Exception e) {
             e.printStackTrace();
-            AlertDialogBuilder.messgeDialog("System Error", e.getMessage(),
+            AlertDialogBuilder.messgeDialog("System Error", "Invalid Input",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }
     }
@@ -170,7 +170,14 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 details1.setText(details.getText());
 
                 codeCol.setCellValueFactory(new PropertyValueFactory<>("StockID"));
-                particularsCol1.setCellValueFactory(new PropertyValueFactory<>("Particulars"));
+                particularsCol1.setCellValueFactory(cellData -> {
+                    try {
+                        return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getDescription());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                });
                 unitCol1.setCellValueFactory(new PropertyValueFactory<>("Unit"));
                 unitCol1.setStyle("-fx-alignment: center;");
                 quantityCol1.setCellValueFactory(new PropertyValueFactory<>("Quantity"));

@@ -106,7 +106,7 @@ public class PrintMIRSMonthlyChargeSummary {
         double total = 0;
         for (MIRS m : mirsList) {
             System.out.println(m.getId());
-            List<Releasing> mirsItemList = ReleasingDAO.get(m);
+            List<Releasing> mirsItemList = ReleasingDAO.get(m, Utility.RELEASED);
             for (Releasing rel : mirsItemList) {
                 System.out.println(rel.getStockID());
                 createCell(StockDAO.get(rel.getStockID()).getDescription(), 1,11, Font.NORMAL, Element.ALIGN_LEFT);

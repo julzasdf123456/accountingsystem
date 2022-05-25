@@ -16,6 +16,7 @@ public class Utility {
     public static String CLOSED = "closed";
     public static String PENDING = "pending";
     public static String APPROVED = "approved";
+    public static String UNAVAILABLE = "unavailable";
     public static String MR_RETURNED_SERVICEABLE = "serviceable";
     public static String MR_RETURNED_UNSERVICEABLE = "unserviceable";
     public static String MR_RETURNED = "returned";

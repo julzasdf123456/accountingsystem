@@ -487,7 +487,7 @@ public class MirsDAO {
         return mirs;
     }
 
-    public List<ReleasedItemDetails> getReleasedMIRSItems(MIRS mirs) throws Exception {
+    public static  List<ReleasedItemDetails> getReleasedMIRSItems(MIRS mirs) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT Stocks.Description, MIRSItems.*, Releasing.Status " +
                         "FROM MIRSItems " +
@@ -509,7 +509,7 @@ public class MirsDAO {
                     rs.getString("StockID"),
                     rs.getInt("Quantity"),
                     rs.getDouble("Price"),
-                    rs.getString("Comments"),
+                    rs.getString("Status"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
                     rs.getTimestamp("UpdatedAt").toLocalDateTime(),
                     rs.getString("WorkOrderNo")

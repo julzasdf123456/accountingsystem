@@ -66,10 +66,11 @@ public class ReleasingDAO {
         return releasing;
     }
 
-    public static List<Releasing> get(MIRS mirs) throws Exception {
+    public static List<Releasing> get(MIRS mirs, String status) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM Releasing WHERE MIRSID=?");
+                "SELECT * FROM Releasing WHERE MIRSID=? and status=?");
         ps.setString(1, mirs.getId());
+        ps.setString(2, status);
 
         ResultSet rs = ps.executeQuery();
 
