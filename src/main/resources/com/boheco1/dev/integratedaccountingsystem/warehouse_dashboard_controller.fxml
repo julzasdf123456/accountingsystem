@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="539.0" prefWidth="1083.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.WarehouseDashboardController">
+<AnchorPane prefHeight="560.0" prefWidth="1083.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.WarehouseDashboardController">
    <children>
       <StackPane fx:id="stackPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -25,6 +25,7 @@
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
@@ -98,17 +99,39 @@
                               </VBox>
                            </children>
                         </AnchorPane>
-                        <AnchorPane layoutX="547.0" layoutY="18.0" prefHeight="113.0" prefWidth="200.0" styleClass="card" GridPane.columnIndex="3">
+                        <AnchorPane layoutX="547.0" layoutY="18.0" prefHeight="113.0" prefWidth="200.0" GridPane.columnIndex="3">
                            <children>
-                              <VBox alignment="CENTER" prefHeight="98.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <VBox alignment="CENTER" onMouseClicked="#viewEmployeesWithMR" prefHeight="98.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Label text="Other Monitoring" textFill="#a8a8a8" />
-                                    <Label text="0" textFill="#575757">
+                                    <Label text="MR" textFill="WHITE" />
+                                    <Label fx:id="mr_lbl" text="0" textFill="WHITE">
                                        <font>
                                           <Font name="System Bold" size="25.0" />
                                        </font>
                                     </Label>
-                                    <Label layoutX="96.0" layoutY="46.0" text="Items" textFill="#a8a8a8" />
+                                    <Label layoutX="96.0" layoutY="46.0" text="Employees" textFill="WHITE" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="2.0" top="2.0" />
+                                 </padding>
+                              </VBox>
+                           </children>
+                           <styleClass>
+                              <String fx:value="card-info" />
+                              <String fx:value="card" />
+                           </styleClass>
+                        </AnchorPane>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="4">
+                           <children>
+                              <VBox alignment="CENTER" onMouseClicked="#viewMRItems" prefHeight="98.0" prefWidth="200.0" spacing="5.0" styleClass="card" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <Label text="MR Inventory" />
+                                    <Label fx:id="mr_inventory_lbl" text="0" textFill="#575757">
+                                       <font>
+                                          <Font name="System Bold" size="25.0" />
+                                       </font>
+                                    </Label>
+                                    <Label layoutX="96.0" layoutY="46.0" text="Items" />
                                  </children>
                                  <padding>
                                     <Insets bottom="2.0" top="2.0" />
@@ -146,7 +169,7 @@
                         </JFXComboBox>
                      </children>
                   </HBox>
-                  <TableView fx:id="tableView" prefHeight="284.0" prefWidth="1051.0" VBox.vgrow="ALWAYS">
+                  <TableView fx:id="tableView" prefHeight="302.0" prefWidth="1051.0" VBox.vgrow="ALWAYS">
                      <VBox.margin>
                         <Insets bottom="16.0" left="16.0" right="16.0" />
                      </VBox.margin>

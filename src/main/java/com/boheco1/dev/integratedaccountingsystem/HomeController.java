@@ -117,7 +117,7 @@ public class HomeController implements Initializable {
         myAccount = new JFXButton("My Account");
         logout = new JFXButton("Logout");
         receiving = new JFXButton("Receiving Entry");
-        addMR = new JFXButton("Add MR");
+        addMR = new JFXButton("MR Entry");
 
         // ADD ALL ITEMS TO NAV SEQUENTIALLY
         NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Finance"), new FontIcon("mdi2f-finance"), homeStackPane);

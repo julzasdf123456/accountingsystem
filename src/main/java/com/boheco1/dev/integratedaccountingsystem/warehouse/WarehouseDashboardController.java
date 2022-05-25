@@ -9,6 +9,7 @@ import com.boheco1.dev.integratedaccountingsystem.HomeController;
 import com.boheco1.dev.integratedaccountingsystem.JournalEntriesController;
 import com.boheco1.dev.integratedaccountingsystem.dao.MIRSSignatoryDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.MirsDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
@@ -56,7 +57,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
     @FXML
     private TableView tableView;
     @FXML
-    public  Label pendingApprovals_lbl, pendingReleases_lbl, critical_lbl, display_lbl;
+    public  Label pendingApprovals_lbl, pendingReleases_lbl, critical_lbl, display_lbl, mr_lbl, mr_inventory_lbl;
 
     @FXML
     private JFXComboBox<Integer> page_cb;
@@ -129,6 +130,16 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         this.setCriticalCount();
         this.initializeCriticalStocks();
        // Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(CriticalStockController.class, "../warehouse_critical_stock.fxml"));
+    }
+
+    @FXML
+    void viewMRItems(MouseEvent event) {
+        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(MRInventoryController.class, "../warehouse_mr_inventory.fxml"));
+    }
+
+    @FXML
+    void viewEmployeesWithMR(MouseEvent event) {
+        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(ViewMRsController.class, "../view_mrs_controller.fxml"));
     }
 
     private void initializedTable(String s){
@@ -441,6 +452,8 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
             this.critical_lbl.setText(""+ StockDAO.countCritical());
             this.pendingApprovals_lbl.setText(""+MirsDAO.countMIRSByStatus(Utility.PENDING));
             this.pendingReleases_lbl.setText(""+MirsDAO.countMIRSByStatus(Utility.RELEASING));
+            this.mr_lbl.setText(""+MrDAO.countEmployeesWithMRs());
+            this.mr_inventory_lbl.setText(""+MrDAO.countMRs("active"));
         } catch (Exception e) {
             e.printStackTrace();
         }
