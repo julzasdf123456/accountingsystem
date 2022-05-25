@@ -170,7 +170,14 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 details1.setText(details.getText());
 
                 codeCol.setCellValueFactory(new PropertyValueFactory<>("StockID"));
-                particularsCol1.setCellValueFactory(new PropertyValueFactory<>("Particulars"));
+                particularsCol1.setCellValueFactory(cellData -> {
+                    try {
+                        return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getDescription());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                });
                 unitCol1.setCellValueFactory(new PropertyValueFactory<>("Unit"));
                 unitCol1.setStyle("-fx-alignment: center;");
                 quantityCol1.setCellValueFactory(new PropertyValueFactory<>("Quantity"));

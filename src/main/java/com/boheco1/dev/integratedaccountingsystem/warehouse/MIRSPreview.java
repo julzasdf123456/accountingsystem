@@ -141,7 +141,7 @@ public class MIRSPreview implements Initializable {
 
     private void populateReleasedMIRSInfo() {
         try {
-            releasedIitems = ReleasingDAO.get(mirs);
+            releasedIitems = ReleasingDAO.get(mirs, Utility.RELEASED);
         } catch (Exception e) {
             e.printStackTrace();
         }

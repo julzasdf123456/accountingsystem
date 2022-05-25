@@ -172,8 +172,8 @@
                         <TableColumn fx:id="unitCol" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" text="Unit" />
                         <TableColumn fx:id="quantityCol" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" text="Qty" />
                         <TableColumn fx:id="remarksCol" maxWidth="203.0" minWidth="150.0" prefWidth="203.0" text="Remarks" />
-                        <TableColumn fx:id="releaseCol" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="Release" />
-                        <TableColumn fx:id="deleteCol" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" text="Remove" />
+                        <TableColumn fx:id="releaseCol" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" />
+                        <TableColumn fx:id="cancelCol" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" />
                     </columns>
                      <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

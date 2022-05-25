@@ -27,7 +27,7 @@ public class PrintReleasedItems {
 
     public PrintReleasedItems(MIRS mirs) throws Exception {
         this.mirs = mirs;
-        releasedIitems = ReleasingDAO.get(mirs);
+        releasedIitems = ReleasingDAO.get(mirs, Utility.RELEASED);
         createDirectory();
         header();
         tableHeader();

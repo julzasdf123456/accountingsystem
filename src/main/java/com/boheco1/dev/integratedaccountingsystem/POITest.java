@@ -16,7 +16,7 @@ public class POITest {
     public static void main(String[] args) {
         try {
            MR mr = MrDAO.get("1650370438700-KOE5CTKOQQ55VSL");
-           MrDAO.returnMR(mr);
+           //MrDAO.returnMR(mr);
 
             System.out.println("Active MRs: " + MrDAO.countMRs("active"));
             System.out.println("Returned MRs: " + MrDAO.countMRs("returned"));
