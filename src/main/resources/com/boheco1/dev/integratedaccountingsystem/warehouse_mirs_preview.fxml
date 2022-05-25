@@ -6,20 +6,14 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<StackPane fx:id="stackPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="787.0" prefWidth="1045.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.MIRSPreview">
+<StackPane fx:id="stackPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="726.0" prefWidth="1136.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.MIRSPreview">
    <children>
-      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: #ffff;" stylesheets="@style.css">
-         <StackPane.margin>
-            <Insets />
-         </StackPane.margin>
-      </AnchorPane>
       <VBox prefHeight="776.0" prefWidth="1045.0">
          <children>
             <VBox alignment="CENTER" prefHeight="6.0" prefWidth="784.0">
@@ -54,9 +48,9 @@
                   <Insets bottom="16.0" />
                </VBox.margin>
             </VBox>
-            <HBox alignment="TOP_RIGHT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="138.0" prefWidth="1045.0" VBox.vgrow="NEVER">
+            <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="92.0" prefWidth="1136.0" VBox.vgrow="NEVER">
                <children>
-                  <VBox prefHeight="82.0" prefWidth="76.0" HBox.hgrow="ALWAYS">
+                  <VBox prefHeight="92.0" prefWidth="124.0" HBox.hgrow="ALWAYS">
                      <children>
                         <Label alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Please furnish the following materials for: " VBox.vgrow="ALWAYS">
                            <font>
@@ -87,11 +81,11 @@
                   <Insets bottom="16.0" />
                </VBox.margin>
             </HBox>
-            <HBox prefHeight="494.0" prefWidth="1045.0">
+            <HBox prefHeight="494.0" prefWidth="1045.0" VBox.vgrow="ALWAYS">
                <children>
-                  <VBox prefHeight="456.0" prefWidth="518.0">
+                  <VBox prefHeight="494.0" prefWidth="573.0" HBox.hgrow="ALWAYS">
                      <children>
-                        <HBox>
+                        <HBox prefHeight="30.0" prefWidth="527.0">
                            <children>
                               <Label text="Requested">
                                  <font>
@@ -108,7 +102,7 @@
                               </JFXButton>
                            </children>
                         </HBox>
-                        <TableView fx:id="requestedTable" focusTraversable="false" prefHeight="339.0" prefWidth="543.0" VBox.vgrow="ALWAYS">
+                        <TableView fx:id="requestedTable" focusTraversable="false" prefHeight="424.0" prefWidth="550.0" VBox.vgrow="ALWAYS">
                            <columnResizePolicy>
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
@@ -131,7 +125,7 @@
                         <Insets right="5.0" />
                      </HBox.margin>
                   </VBox>
-                  <VBox prefWidth="518.0">
+                  <VBox prefHeight="494.0" prefWidth="573.0" HBox.hgrow="ALWAYS">
                      <children>
                         <HBox>
                            <children>
@@ -150,7 +144,7 @@
                               </JFXButton>
                            </children>
                         </HBox>
-                        <TableView fx:id="releasedTable" focusTraversable="false" prefHeight="231.0" prefWidth="503.0" VBox.vgrow="ALWAYS">
+                        <TableView fx:id="releasedTable" focusTraversable="false" prefHeight="424.0" prefWidth="550.0" VBox.vgrow="ALWAYS">
                            <columnResizePolicy>
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>

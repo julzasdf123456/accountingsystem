@@ -9,21 +9,21 @@ public class ReleasedItemDetails {
     private String stockID;
     private int quantity;
     private double price;
-    private String remarks;
+    private String status;
     private String particulars;
     private String unit;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String workOrderNo;
 
-    public ReleasedItemDetails(String itemDescription, String mirsItemId, String mirsID, String stockID, int quantity, double price, String remarks, LocalDateTime createdAt, LocalDateTime updatedAt, String workOrderNo) {
+    public ReleasedItemDetails(String itemDescription, String mirsItemId, String mirsID, String stockID, int quantity, double price, String status, LocalDateTime createdAt, LocalDateTime updatedAt, String workOrderNo) {
         this.itemDescription = itemDescription;
         this.mirsItemId = mirsItemId;
         this.mirsID = mirsID;
         this.stockID = stockID;
         this.quantity = quantity;
         this.price = price;
-        this.remarks = remarks;
+        this.status = status;
         this.unit = unit;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -78,12 +78,12 @@ public class ReleasedItemDetails {
         this.price = price;
     }
 
-    public String getRemarks() {
-        return remarks;
+    public String getStatus() {
+        return status;
     }
 
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getUnit() {

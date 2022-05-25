@@ -119,7 +119,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
                         stackPane, AlertDialogBuilder.DANGER_DIALOG);
                 return;
-            }else if(Integer.parseInt(quantity.getText()) > StockDAO.countAvailable(selectedStock)) {
+            }else if(quantity.getText().length() == 0 || Integer.parseInt(quantity.getText()) > StockDAO.countAvailable(selectedStock)) {
                 AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid request quantity!",
                         stackPane, AlertDialogBuilder.DANGER_DIALOG);
                 return;
@@ -147,7 +147,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             available.setText("Available: 0");
         } catch (Exception e) {
             e.printStackTrace();
-            AlertDialogBuilder.messgeDialog("System Error", e.getMessage(),
+            AlertDialogBuilder.messgeDialog("System Error", "Invalid Input",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }
     }

@@ -9,6 +9,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.PrintReleasedItems;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRSItem;
+import com.boheco1.dev.integratedaccountingsystem.objects.ReleasedItemDetails;
 import com.boheco1.dev.integratedaccountingsystem.objects.Releasing;
 import com.itextpdf.text.DocumentException;
 import com.jfoenix.controls.JFXButton;
@@ -49,13 +50,13 @@ public class MIRSPreview implements Initializable {
     private TableView requestedTable;
 
     @FXML
-    private TableColumn<MIRSItem, String> req_particularsCol, req_unitCol;
+    private TableColumn<ReleasedItemDetails, String> req_particularsCol, req_unitCol, req_status;
 
     @FXML
-    private TableColumn<MIRSItem, Integer> req_quantityCol;
+    private TableColumn<ReleasedItemDetails, Integer> req_quantityCol;
 
     @FXML
-    private TableColumn<MIRSItem, Double> req_price;
+    private TableColumn<ReleasedItemDetails, Double> req_price;
 
     @FXML
     private TableView releasedTable;
@@ -71,7 +72,7 @@ public class MIRSPreview implements Initializable {
 
     private MIRS mirs;
     private List<Releasing> releasedIitems = null;
-    private List<MIRSItem> mirsItemList = null;
+    private List<ReleasedItemDetails> mirsItemList = null;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         mirs = Utility.getActiveMIRS();
@@ -82,12 +83,12 @@ public class MIRSPreview implements Initializable {
 
     private void populateRequestedMIRSInfo(){
         try {
-            mirsItemList = MirsDAO.getItems(mirs);
+            mirsItemList = MirsDAO.getReleasedMIRSItems(mirs);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        ObservableList<MIRSItem> observableList = FXCollections.observableArrayList(mirsItemList);
+        ObservableList<ReleasedItemDetails> observableList = FXCollections.observableArrayList(mirsItemList);
         req_particularsCol = new TableColumn<>("Paticulars");
         req_particularsCol.setMinWidth(200);
         req_particularsCol.setCellValueFactory(cellData -> {
@@ -121,11 +122,17 @@ public class MIRSPreview implements Initializable {
         req_price.setStyle("-fx-alignment: center-right;");
         req_price.setCellValueFactory(new PropertyValueFactory<>("Price"));
 
+        req_status = new TableColumn<>("Status");
+        req_status.setMinWidth(50);
+        req_status.setStyle("-fx-alignment: center;");
+        req_status.setCellValueFactory(new PropertyValueFactory<>("Status"));
+
         requestedTable.getColumns().removeAll();
         requestedTable.getColumns().add(req_particularsCol);
         requestedTable.getColumns().add(req_unitCol);
         requestedTable.getColumns().add(req_quantityCol);
         requestedTable.getColumns().add(req_price);
+        requestedTable.getColumns().add(req_status);
         requestedTable.getItems().setAll(observableList);
 
         try {

@@ -326,8 +326,8 @@ public class MIRSReleasingFormController implements Initializable {
                                                                 releasing.setStatus(Utility.UNAVAILABLE);
                                                                 releasing.setWorkOrderNo(selectedMirsItem.getWorkOrderNo());
                                                                 ReleasingDAO.add(releasing);
-                                                                Stock temp = StockDAO.get(selectedMirsItem.getStockID()); //temp stock object for quantity deduction
-                                                                StockDAO.deductStockQuantity(temp, selectedMirsItem.getQuantity());
+                                                                //Stock temp = StockDAO.get(selectedMirsItem.getStockID()); //temp stock object for quantity deduction
+                                                                //StockDAO.deductStockQuantity(temp, selectedMirsItem.getQuantity());
 
                                                                 requestItem.remove(selectedMirsItem);
                                                                 particularsTable.setItems(requestItem);
@@ -416,7 +416,7 @@ public class MIRSReleasingFormController implements Initializable {
             flowPane.setColumnHalignment(HPos.CENTER);
             flowPane.setVgap(6);
 
-            Label context = new Label("Confirm removal of MIRS item: "+StockDAO.get(selectedMirsItem.getStockID()).getDescription());
+            Label context = new Label("Confirm releasing of all MIRS items.");
             context.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 12));
             context.setWrapText(true);
             context.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
