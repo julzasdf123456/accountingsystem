@@ -71,6 +71,8 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
     MenuItem viewMRItems = new MenuItem("View All MRs");
     MenuItem trash = new MenuItem("Trash");
     MenuItem inventoryReport = new MenuItem("Inventory Report");
+
+    MenuItem inventoryMRReport = new MenuItem("MR Inventory Report");
     MenuItem liquidationReport = new MenuItem("Liquidation Report");
     MenuItem stockEntryReport = new MenuItem("Stock Entry Report");
     MenuItem receivingReport = new MenuItem("Receiving Report");
@@ -87,7 +89,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         });
 
         reports.setOnAction(actionEvent -> {
-            contextMenuHelper.initializePopupContextMenu(reports, inventoryReport, liquidationReport, stockEntryReport, receivingReport)
+            contextMenuHelper.initializePopupContextMenu(reports, inventoryReport, inventoryMRReport, liquidationReport, stockEntryReport, receivingReport)
                     .show(reports, NodeLocator.getNodeX(reports), NodeLocator.getNodeY(reports));
         });
     };
@@ -398,8 +400,6 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
             container.getChildren().setAll(ContentHandler.getNodeFromFxml(ViewAllMIRSController.class, "../view_all_mirs_controller.fxml"));
         });
 
-
-
         viewMRItems.setOnAction(actionEvent -> {
             titleHolder.setText("All MRs");
             container.getChildren().setAll(ContentHandler.getNodeFromFxml(ViewMRsController.class, "../view_mrs_controller.fxml"));
@@ -413,6 +413,11 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         inventoryReport.setOnAction(actionEvent -> {
             titleHolder.setText("Inventory Report");
             container.getChildren().setAll(ContentHandler.getNodeFromFxml(InventoryReportController.class, "../warehouse_inventory_report.fxml"));
+        });
+
+        inventoryMRReport.setOnAction(actionEvent -> {
+            titleHolder.setText("MR Inventory Report");
+            container.getChildren().setAll(ContentHandler.getNodeFromFxml(MRInventoryController.class, "../warehouse_mr_inventory.fxml"));
         });
 
         stockEntryReport.setOnAction(actionEvent -> {

@@ -63,6 +63,7 @@ public class MrDAO {
         mr.setPrice(rs.getDouble("price"));
         mr.setDateOfMR(rs.getDate("dateOfMR").toLocalDate());
         mr.setStatus(rs.getString("status"));
+        mr.setRemarks(rs.getString("remarks"));
         mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
 
         rs.close();
@@ -132,7 +133,7 @@ public class MrDAO {
     }
 
     public static List<MR> getMRsOfEmployee(EmployeeInfo employeeInfo) throws Exception {
-        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM MR WHERE employeeId=?");
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM MR WHERE employeeId=? ORDER BY dateOfMR DESC");
         ps.setString(1, employeeInfo.getId());
 
         ResultSet rs = ps.executeQuery();
@@ -150,6 +151,7 @@ public class MrDAO {
             mr.setPrice(rs.getDouble("price"));
             mr.setDateOfMR(rs.getDate("dateOfMR").toLocalDate());
             mr.setStatus(rs.getString("status"));
+            mr.setRemarks(rs.getString("remarks"));
             mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
 
             mrs.add(mr);
@@ -182,10 +184,12 @@ public class MrDAO {
 
 
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "UPDATE MR SET status='returned', remarks=?, dateOfReturn=? WHERE id=?");
-        ps.setString(1, remarks);
-        ps.setDate(2, java.sql.Date.valueOf(LocalDate.now()));
-        ps.setString(3, mr.getId());
+                "UPDATE MR SET status=?, remarks=?, dateOfReturn=?, stockID=? WHERE id=?");
+        ps.setString(1, Utility.MR_RETURNED);
+        ps.setString(2, remarks);
+        ps.setDate(3, java.sql.Date.valueOf(LocalDate.now()));
+        ps.setString(4, stock.getId());
+        ps.setString(5, mr.getId());
         ps.executeUpdate();
 
         ps.close();
@@ -201,5 +205,115 @@ public class MrDAO {
         }
 
         return 0;
+    }
+
+    public static List<MR> getMRs(String status) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM MR INNER JOIN EmployeeInfo ON MR.EmployeeID = EmployeeInfo.EmployeeID " +
+                "WHERE status=? ORDER BY extItem ASC");
+        ps.setString(1, status);
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<MR> mrs = new ArrayList();
+
+        while(rs.next()) {
+            MR mr = new MR();
+            mr.setId(rs.getString("id"));
+            mr.setEmployeeId(rs.getString("employeeId"));
+            mr.setWarehousePersonnelId(rs.getString("warehousePersonnelId"));
+            mr.setExtItem(rs.getString("extItem"));
+            mr.setStockId(rs.getString("stockID"));
+            mr.setQuantity(rs.getInt("quantity"));
+            mr.setPrice(rs.getDouble("price"));
+            mr.setDateOfMR(rs.getDate("dateOfMR").toLocalDate());
+            mr.setStatus(rs.getString("status"));
+            mr.setRemarks(rs.getString("remarks"));
+            mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
+            mr.setEmployeeFirstName(rs.getString("employeeFirstName"));
+            mr.setEmployeeLastName(rs.getString("employeeLastName"));
+            mrs.add(mr);
+        }
+
+        rs.close();
+        ps.close();
+
+        return mrs;
+    }
+
+    public static List<MR> getMRsByDescription(String desc, String stockID) throws Exception {
+        PreparedStatement ps = null;
+        String key = desc;
+        if (stockID == null){
+            ps = DB.getConnection().prepareStatement("SELECT * FROM MR INNER JOIN EmployeeInfo ON MR.EmployeeID = EmployeeInfo.EmployeeID " +
+                    "WHERE extItem=? ORDER BY dateOfMR DESC");
+        }else{
+            ps = DB.getConnection().prepareStatement("SELECT * FROM MR INNER JOIN EmployeeInfo ON MR.EmployeeID = EmployeeInfo.EmployeeID " +
+                    "WHERE stockID=? ORDER BY dateOfMR DESC");
+            key = stockID;
+        }
+        ps.setString(1, key);
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<MR> mrs = new ArrayList();
+
+        while(rs.next()) {
+            MR mr = new MR();
+            mr.setId(rs.getString("id"));
+            mr.setEmployeeId(rs.getString("employeeId"));
+            mr.setWarehousePersonnelId(rs.getString("warehousePersonnelId"));
+            mr.setExtItem(rs.getString("extItem"));
+            mr.setStockId(rs.getString("stockID"));
+            mr.setQuantity(rs.getInt("quantity"));
+            mr.setPrice(rs.getDouble("price"));
+            mr.setDateOfMR(rs.getDate("dateOfMR").toLocalDate());
+            mr.setStatus(rs.getString("status"));
+            mr.setRemarks(rs.getString("remarks"));
+            mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
+            mr.setEmployeeFirstName(rs.getString("employeeFirstName"));
+            mr.setEmployeeLastName(rs.getString("employeeLastName"));
+            mrs.add(mr);
+        }
+
+        rs.close();
+        ps.close();
+
+        return mrs;
+    }
+
+    public static List<MR> searchMRs(String key, String status) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM MR INNER JOIN EmployeeInfo ON MR.EmployeeID = EmployeeInfo.EmployeeID " +
+                "WHERE status=? AND (extItem LIKE ? OR employeeFirstName LIKE ? OR employeeLastName LIKE ? OR stockID LIKE ?) ORDER BY extItem ASC");
+        ps.setString(1, status);
+        ps.setString(2, "%" + key + "%");
+        ps.setString(3, "%" + key + "%");
+        ps.setString(4, "%" + key + "%");
+        ps.setString(5, "%" + key + "%");
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<MR> mrs = new ArrayList();
+
+        while(rs.next()) {
+            MR mr = new MR();
+            mr.setId(rs.getString("id"));
+            mr.setEmployeeId(rs.getString("employeeId"));
+            mr.setWarehousePersonnelId(rs.getString("warehousePersonnelId"));
+            mr.setExtItem(rs.getString("extItem"));
+            mr.setStockId(rs.getString("stockID"));
+            mr.setQuantity(rs.getInt("quantity"));
+            mr.setPrice(rs.getDouble("price"));
+            mr.setDateOfMR(rs.getDate("dateOfMR").toLocalDate());
+            mr.setStatus(rs.getString("status"));
+            mr.setRemarks(rs.getString("remarks"));
+            mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
+            mr.setEmployeeFirstName(rs.getString("employeeFirstName"));
+            mr.setEmployeeLastName(rs.getString("employeeLastName"));
+            mrs.add(mr);
+        }
+
+        rs.close();
+        ps.close();
+
+        return mrs;
     }
 }

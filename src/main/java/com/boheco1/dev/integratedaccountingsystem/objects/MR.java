@@ -5,6 +5,11 @@ import java.time.LocalDate;
 public class MR {
     private String id;
     private String employeeId;
+
+    private String employeeFirstName;
+
+    private String employeeLastName;
+
     private String warehousePersonnelId;
     private String extItem;
     private String stockId;
@@ -14,6 +19,7 @@ public class MR {
     private String status; //active, lost, damaged, returned
     private LocalDate dateOfReturn;
 
+    private String remarks;
     public MR() {
     }
     /**
@@ -118,5 +124,28 @@ public class MR {
 
     public void setDateOfReturn(LocalDate dateOfReturn) {
         this.dateOfReturn = dateOfReturn;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public String getEmployeeFirstName() {
+        return employeeFirstName;
+    }
+
+    public void setEmployeeFirstName(String employeeFirstName) {
+        this.employeeFirstName = employeeFirstName;
+    }
+
+    public String getEmployeeLastName() {
+        return employeeLastName;
+    }
+
+    public void setEmployeeLastName(String employeeLastName) {
+        this.employeeLastName = employeeLastName;
     }
 }

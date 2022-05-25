@@ -59,6 +59,8 @@ public class UpdatePricesController extends MenuControllerHandler implements Ini
 
     @FXML
     public void updatePrices(){
+        status_ta.setStyle("-fx-text-fill: black;");
+        status_ta.setText("");
         if (selectedFile != null) {
             // Create a background Task
             Task<Void> task = new Task<>() {
@@ -71,20 +73,30 @@ public class UpdatePricesController extends MenuControllerHandler implements Ini
                         List<String[]> allRows = reader.readAll();
 
                         List<Stock> stocks = new ArrayList<>();
-
+                        String updated_stocks = "";
                         for(int i = 1; i < allRows.size(); i++){
                             String[] row =  allRows.get(i);
                             String id = row[0];
-                            Double new_price = Double.parseDouble(row[row.length - 1]);
+                            double new_price = Double.parseDouble(row[row.length - 1]);
                             Stock stock = StockDAO.get(id);
                             if (stock == null)
                                 throw new Exception("Stock with the id: "+id+" does not exist.");
-                            stock.setOldPrice(stock.getPrice());
-                            stock.setPrice(new_price);
-                            stocks.add(stock);
+                            double current_price =stock.getPrice();
+
+                            if (new_price != current_price) {
+                                stock.setOldPrice(current_price);
+                                stock.setPrice(new_price);
+                                stocks.add(stock);
+                                updated_stocks += stock.getDescription()+" current price was updated to: P"+new_price+".\n";
+                            }
                         }
-                        StockDAO.batchUpdatePrices(stocks);
-                        status_ta.appendText("Process completed successfully. All selected stocks have their prices successfully updated!");
+                        if (stocks.size() > 0){
+                            StockDAO.batchUpdatePrices(stocks);
+                            status_ta.appendText(updated_stocks);
+                            status_ta.appendText("Process completed successfully. All selected stocks have their prices successfully updated!");
+                        }else{
+                            status_ta.appendText("No stock prices were updated!");
+                        }
                     } catch (Exception e) {
                         status_ta.appendText("Process failed due to: "+e.getMessage());
                     }
@@ -122,10 +134,13 @@ public class UpdatePricesController extends MenuControllerHandler implements Ini
         );
 
         selectedFile = fileChooser.showOpenDialog(stage);
-        try{
-            this.file_tf.setText(selectedFile.getAbsolutePath());
-        }catch (Exception e){
-            e.printStackTrace();
+
+        if (selectedFile != null) {
+            try {
+                this.file_tf.setText(selectedFile.getAbsolutePath());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

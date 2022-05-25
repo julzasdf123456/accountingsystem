@@ -36,7 +36,7 @@
                         </JFXComboBox>
                      </right>
                      <left>
-                        <Pane prefHeight="66.0" prefWidth="820.0" BorderPane.alignment="CENTER">
+                        <Pane prefHeight="66.0" prefWidth="861.0" BorderPane.alignment="CENTER">
                            <children>
                               <JFXButton layoutX="363.0" layoutY="18.0" onAction="#newStock" prefHeight="30.0" prefWidth="75.0" styleClass="btn-theme" stylesheets="@style.css" text="New" textFill="WHITE">
                                  <graphic>
@@ -51,7 +51,7 @@
                                     <Font size="14.0" />
                                  </font>
                               </JFXTextField>
-                              <JFXButton layoutX="583.0" layoutY="18.0" onAction="#trashStock" prefHeight="30.0" prefWidth="50.0" styleClass="btn-danger" stylesheets="@style.css" textFill="WHITE">
+                              <JFXButton layoutX="557.0" layoutY="18.0" onAction="#trashStock" prefHeight="30.0" prefWidth="50.0" styleClass="btn-danger" stylesheets="@style.css" textFill="WHITE">
                                  <graphic>
                                     <FontIcon iconColor="WHITE" iconLiteral="mdi2t-trash-can-outline" iconSize="14" />
                                  </graphic>
@@ -72,7 +72,12 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <JFXButton layoutX="711.0" layoutY="18.0" onAction="#updatePrices" prefHeight="30.0" prefWidth="95.0" styleClass="btn-warning" stylesheets="@style.css" text="Update Prices" textFill="WHITE">
+                              <JFXButton layoutX="660.0" layoutY="18.0" onAction="#updatePrices" prefHeight="30.0" prefWidth="95.0" styleClass="btn-warning" stylesheets="@style.css" text="Update Prices" textFill="WHITE">
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                              </JFXButton>
+                              <JFXButton layoutX="790.0" layoutY="18.0" onAction="#downloadCSV" prefHeight="30.0" prefWidth="57.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" stylesheets="@style.css" text="CSV">
                                  <effect>
                                     <DropShadow />
                                  </effect>

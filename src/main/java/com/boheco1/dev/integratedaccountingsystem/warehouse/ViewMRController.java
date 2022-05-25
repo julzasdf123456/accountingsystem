@@ -112,9 +112,14 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
         column6.setStyle("-fx-alignment: center;");
 
         TableColumn<MR, String> column7 = new TableColumn<>("Status");
-        column7.setMinWidth(200);
+        column7.setMinWidth(100);
         column7.setCellValueFactory(new PropertyValueFactory<>("status"));
         column7.setStyle("-fx-alignment: center;");
+
+        TableColumn<MR, String> column8 = new TableColumn<>("Remarks");
+        column8.setMinWidth(115);
+        column8.setCellValueFactory(new PropertyValueFactory<>("remarks"));
+        column8.setStyle("-fx-alignment: center;");
 
         this.mrItems =  FXCollections.observableArrayList();
         this.mr_items_table.setPlaceholder(new Label("No item added"));
@@ -125,6 +130,7 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
         this.mr_items_table.getColumns().add(column4);
         this.mr_items_table.getColumns().add(column6);
         this.mr_items_table.getColumns().add(column7);
+        this.mr_items_table.getColumns().add(column8);
         this.mr_items_table.getColumns().add(column5);
     }
 

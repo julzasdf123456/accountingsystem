@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane prefHeight="550.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRItemHistoryController">
+   <children>
+      <AnchorPane fx:id="contentPane" prefHeight="550.0" prefWidth="1024.0" style="-fx-background-color: white;" stylesheets="@style.css">
+         <children>
+            <BorderPane prefHeight="550.0" prefWidth="1024.0">
+               <center>
+                  <TableView fx:id="mr_items_table" prefHeight="190.0" prefWidth="1024.0" BorderPane.alignment="CENTER">
+                     <BorderPane.margin>
+                        <Insets />
+                     </BorderPane.margin>
+                  </TableView>
+               </center>
+               <top>
+                  <VBox prefHeight="106.0" prefWidth="802.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <HBox prefHeight="52.0" prefWidth="1165.0">
+                           <children>
+                              <JFXTextField fx:id="desc_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="589.0" promptText="Description" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </JFXTextField>
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="52.0" prefWidth="1165.0">
+                           <children>
+                              <JFXTextField fx:id="stock_id_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="175.0" promptText="Stock ID" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXTextField fx:id="cost_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="175.0" promptText="Cost" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets left="16.0" right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXTextField fx:id="qty_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="175.0" promptText="Quantity" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="8.0" top="8.0" />
+                           </VBox.margin>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </top>
+            </BorderPane>
+         </children>
+      </AnchorPane>
+   </children>
+</StackPane>

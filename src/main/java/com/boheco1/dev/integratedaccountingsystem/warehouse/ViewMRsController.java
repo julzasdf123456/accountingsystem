@@ -1,6 +1,5 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
-import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
@@ -13,9 +12,6 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -185,41 +181,52 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
         fileChooser.setInitialFileName("MR_report_"+employeeInfo.getEmployeeLastName()+"_"+employeeInfo.getEmployeeFirstName()+".pdf");
         File selectedFile = fileChooser.showSaveDialog(stage);
         if (selectedFile != null) {
-            PrintPDF mr_pdf = new PrintPDF(selectedFile);
-            //Create Header
-            mr_pdf.header(LocalDate.now(), "Memorandum Receipt".toUpperCase());
+            Platform.runLater(() -> {
+                try {
+                    PrintPDF mr_pdf = new PrintPDF(selectedFile);
+                    //Create Header
+                    mr_pdf.header(LocalDate.now(), "Memorandum Receipt".toUpperCase());
 
-            //Create Header details
-            String[] employee_details = {"Employee:", employeeInfo.getFullName(), "Designation:", employeeInfo.getDesignation()};
-            int[] emp_span = {1,2,1,2};
-            int[] emp_aligns = {Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_LEFT};
-            int[] emp_borders = {Rectangle.NO_BORDER,Rectangle.NO_BORDER,Rectangle.NO_BORDER,Rectangle.NO_BORDER};
-            int[] emp_fonts = {Font.NORMAL, Font.BOLD, Font.NORMAL, Font.BOLD};
-            mr_pdf.other_details(employee_details, emp_span, emp_fonts, emp_aligns,emp_borders,true);
+                    //Create Header details
+                    String[] employee_details = {"Employee:", employeeInfo.getFullName(), "Designation:", employeeInfo.getDesignation()};
+                    int[] emp_span = {1, 2, 1, 2};
+                    int[] emp_aligns = {Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_LEFT};
+                    int[] emp_borders = {Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER};
+                    int[] emp_fonts = {Font.NORMAL, Font.BOLD, Font.NORMAL, Font.BOLD};
+                    mr_pdf.other_details(employee_details, emp_span, emp_fonts, emp_aligns, emp_borders, true);
 
-            //Create Table Header
-            String[] headers = {"Item", "Qty", "Unit Price", "Date of MR", "Status"};
-            int[] header_spans = {2,1,1,1,1};
-            mr_pdf.tableHeader(headers, header_spans);
+                    //Create Table Header
+                    String[] headers = {"Item", "Qty", "Unit Price", "Date of MR", "Remarks"};
+                    int[] header_spans = {2, 1, 1, 1, 1};
+                    mr_pdf.tableHeader(headers, header_spans);
 
-            //Create Table Content
-            List<MR> mrs  = MrDAO.getMRsOfEmployee(employeeInfo);
-            ArrayList<String[]> rows = new ArrayList<>();
-            for(MR mr : mrs){
-                String[] data = {mr.getExtItem(), mr.getQuantity()+"", mr.getPrice()+"", mr.getDateOfMR().toString(), mr.getStatus()};
-                rows.add(data);
-            }
-            int[] rows_aligns = {Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_CENTER};
-            mr_pdf.tableContent(rows, header_spans, rows_aligns);
+                    //Create Table Content
+                    List<MR> mrs = MrDAO.getMRsOfEmployee(employeeInfo);
+                    ArrayList<String[]> rows = new ArrayList<>();
+                    for (MR mr : mrs) {
+                        String rdate = "";
+                        if (mr.getStatus().equals(Utility.MR_RETURNED)) {
+                            rdate = " on " + mr.getDateOfReturn() + ", " + mr.getRemarks();
+                        }
+                        String[] data = {mr.getExtItem(), mr.getQuantity() + "", mr.getPrice() + "", mr.getDateOfMR().toString(), mr.getStatus() + rdate};
+                        rows.add(data);
+                    }
+                    int[] rows_aligns = {Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_CENTER};
+                    mr_pdf.tableContent(rows, header_spans, rows_aligns);
 
-            //Create Footer
-            int[] footer_spans = {2, 4};
-            EmployeeInfo user = ActiveUser.getUser().getEmployeeInfo();
-            String[] prepared = {"Prepared by", ""};
-            String[] designations = {user.getDesignation(), ""};
-            String[] names = {user.getEmployeeFirstName()+" "+user.getEmployeeLastName(), ""};
-            mr_pdf.footer(prepared, designations, names, footer_spans, true);
-            mr_pdf.generate();
+                    //Create Footer
+                    int[] footer_spans = {2, 4};
+                    EmployeeInfo user = ActiveUser.getUser().getEmployeeInfo();
+                    String[] prepared = {"Prepared by", ""};
+                    String[] designations = {user.getDesignation(), ""};
+                    String[] names = {user.getEmployeeFirstName() + " " + user.getEmployeeLastName(), ""};
+                    mr_pdf.footer(prepared, designations, names, footer_spans, true);
+                    mr_pdf.generate();
+                }catch(Exception e){
+                    e.printStackTrace();
+                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while generating the pdf due to: " + e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                }
+            });
         }
     }
 

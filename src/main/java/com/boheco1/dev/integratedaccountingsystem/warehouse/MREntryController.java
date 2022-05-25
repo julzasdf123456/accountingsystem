@@ -270,7 +270,7 @@ public class MREntryController extends MenuControllerHandler implements Initiali
                     //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
                     @Override
                     public String toString(SlimStock object) {
-                        return object.getStockName()!= null ? object.getStockName()+" "+object.getDescription() : object.getDescription();
+                        return object.getDescription();
                     }
 
                     @Override
@@ -284,7 +284,7 @@ public class MREntryController extends MenuControllerHandler implements Initiali
             SlimStock result = event.getCompletion();
             try {
                 currentItem = StockDAO.get(result.getId());
-                this.item_name_tf.setText(currentItem.getStockName()!= null ? currentItem.getStockName() + " "+currentItem.getDescription() : currentItem.getDescription());
+                this.item_name_tf.setText(currentItem.getDescription());
                 this.cost_tf.setText(currentItem.getPrice()+"");
             } catch (Exception e) {
                 AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), this.stackPane, AlertDialogBuilder.DANGER_DIALOG);

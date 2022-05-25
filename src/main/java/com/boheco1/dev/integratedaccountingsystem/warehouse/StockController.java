@@ -5,6 +5,7 @@ import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.*;
+import com.opencsv.CSVWriter;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
@@ -21,7 +22,12 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Callback;
+
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -93,6 +99,41 @@ public class StockController extends MenuControllerHandler implements Initializa
     @FXML
     public void updatePrices(){
         ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_update_prices.fxml", Utility.getStackPane(),  "../warehouse_stock.fxml");
+    }
+
+    @FXML
+    public void downloadCSV(){
+        Stage stage = (Stage) Utility.getContentPane().getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("CSV Files", "*.csv")
+        );
+        fileChooser.setInitialFileName("StockPricesTemplate.csv");
+        File selectedFile = fileChooser.showSaveDialog(stage);
+        if (selectedFile != null) {
+            Platform.runLater(() -> {
+                try {
+                    CSVWriter writer = new CSVWriter(new FileWriter(selectedFile));
+                    String[] header = "id,StockName,Description,Current Price,Updated Price".split(",");
+                    writer.writeNext(header);
+                    List<Stock> stocks = StockDAO.getInventory();
+                    for (Stock stock : stocks) {
+                        writer.writeNext(new String[]{stock.getId(), stock.getStockName(), stock.getDescription(), stock.getPrice() + "", stock.getPrice() + ""});
+                    }
+                    writer.close();
+                    if (selectedFile.exists()) {
+                        String path = selectedFile.getAbsolutePath();
+                        Process p = Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + path);
+                        p.waitFor();
+                    } else {
+                        AlertDialogBuilder.messgeDialog("System Error", "The CSV file does not exists!", stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while generating the CSV due to: " + e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                }
+            });
+        }
     }
 
     @FXML
