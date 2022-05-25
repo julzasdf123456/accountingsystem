@@ -20,6 +20,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
@@ -120,7 +121,7 @@ public class ReceivingReportController extends MenuControllerHandler implements 
 
         TableColumn<Receiving, String> column2 = new TableColumn<>("Date");
         column2.setMinWidth(150);
-        column2.setCellValueFactory(stockStringCellDataFeatures -> new SimpleStringProperty(stockStringCellDataFeatures.getValue().getDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))));
+        column2.setCellValueFactory(new PropertyValueFactory<>("date"));
         column2.setStyle("-fx-alignment: center;");
 
         TableColumn<Receiving, String> column3 = new TableColumn<>("RV Number");
@@ -139,7 +140,7 @@ public class ReceivingReportController extends MenuControllerHandler implements 
         column5.setStyle("-fx-alignment: center;");
 
         TableColumn<Receiving, Receiving> column6 = new TableColumn<>("Action");
-
+        column6.setMinWidth(50);
         column6.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue()));
         column6.setCellFactory(table -> new TableCell<>() {
             FontIcon viewIcon = new FontIcon("mdi2e-eye");
@@ -156,7 +157,7 @@ public class ReceivingReportController extends MenuControllerHandler implements 
                     viewIcon.setIconSize(13);
                     viewIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
 
-                    printButton.setStyle("-fx-background-color: #ff9800;");
+                    printButton.setStyle("-fx-background-color: #00AD8E;");
                     printIcon.setIconSize(13);
                     printIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
                     if (empty) {
@@ -174,8 +175,11 @@ public class ReceivingReportController extends MenuControllerHandler implements 
 
 
                         HBox hBox = new HBox();
-                        hBox.setSpacing(2);
+                        HBox filler = new HBox();
+                        hBox.setHgrow(filler, Priority.ALWAYS);
+                        hBox.setSpacing(5);
                         hBox.getChildren().add(viewButton);
+                        hBox.getChildren().add(filler);
                         hBox.getChildren().add(printButton);
 
                         setGraphic(hBox);
@@ -550,6 +554,14 @@ public class ReceivingReportController extends MenuControllerHandler implements 
                 this.showProgressBar(false);
                 AlertDialogBuilder.messgeDialog("Receiving Report", "Receiving Report was successfully generated and saved on file!",
                         stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
+                try{
+                    String path = selectedFile.getAbsolutePath();
+                    Process p = Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler "+path);
+                    p.waitFor();
+                }catch (Exception e){
+                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request! Please try again!",
+                            stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                }
             });
 
             task.setOnFailed(workerStateEvent -> {

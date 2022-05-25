@@ -68,7 +68,7 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
         column2.setCellValueFactory(new PropertyValueFactory<>("stockName"));
 
         TableColumn<Stock, String> column3 = new TableColumn<>("Description");
-        column3.setMinWidth(275);
+        column3.setMinWidth(300);
         column3.setCellValueFactory(new PropertyValueFactory<>("description"));
 
         TableColumn<Stock, String> column4 = new TableColumn<>("Unit");
@@ -87,11 +87,11 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
         column6.setStyle("-fx-alignment: center;");
 
         TableColumn<Stock, String> column7 = new TableColumn<>("Price");
-        column7.setMinWidth(100);
+        column7.setMinWidth(75);
         column7.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getReceivingItem().getUnitCost()+""));
 
         TableColumn<Stock, String> column8 = new TableColumn<>("Amount");
-        column8.setMinWidth(100);
+        column8.setMinWidth(75);
         column8.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getReceivingItem().getQtyAccepted() * stocks.getValue().getReceivingItem().getUnitCost() +""));
 
         this.receivedItems =  FXCollections.observableArrayList();

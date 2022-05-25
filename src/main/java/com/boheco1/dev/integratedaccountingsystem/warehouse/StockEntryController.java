@@ -71,6 +71,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
     @FXML
     private void saveBtn()  {
         String name = this.stockName.getText();
+        String desc = this.description.getText();
         String brand = this.brand.getText();
         String model = this.model.getText();
         String unit = this.unit.getText();
@@ -126,11 +127,8 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.stock.setNeaCode(this.neaCode.getText());
         this.stock.setCritical(threshold);
 
-        if (name.length() == 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for stock name!",
-                        stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (brand.length() == 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for brand!",
+        if (desc.length() == 0 || desc == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid description!",
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (stockType == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please select a valid stock type!",
@@ -138,7 +136,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         }else if (quantity == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for quantity!",
                         stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (unit.length() == 0) {
+        }else if (unit == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for unit!",
                         stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (price == 0) {
@@ -272,7 +270,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                     //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
                     @Override
                     public String toString(SlimStock object) {
-                        return object.getStockName();
+                        return object.getDescription();
                     }
 
                     @Override

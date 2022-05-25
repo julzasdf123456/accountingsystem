@@ -254,6 +254,22 @@ public class StockEntryReportController extends MenuControllerHandler implements
 
                 task.setOnSucceeded(wse -> {
                     this.showProgressBar(false);
+                    AlertDialogBuilder.messgeDialog("Stock Entry Report", "Stock Entry Report was successfully generated and saved on file!",
+                            stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
+                    try{
+                        String path = selectedFile.getAbsolutePath();
+                        Process p = Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler "+path);
+                        p.waitFor();
+                    }catch (Exception e){
+                        AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request! Please try again!",
+                                stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                    }
+                });
+
+                task.setOnFailed(workerStateEvent -> {
+                    this.showProgressBar(false);
+                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request! Please try again!",
+                            stackPane, AlertDialogBuilder.DANGER_DIALOG);
                 });
 
                 new Thread(task).start();

@@ -84,6 +84,7 @@ public class ViewStockController implements Initializable {
     @FXML
     public void updateStock(){
         String name = this.stockName.getText();
+        String desc = this.description.getText();
         String brand = this.brand.getText();
         String model = this.model.getText();
         String unit = this.unit.getText();
@@ -138,16 +139,13 @@ public class ViewStockController implements Initializable {
         this.stock.setNeaCode(this.neaCode.getText());
         this.stock.setCritical(threshold);
 
-        if (name.length() == 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for stock name!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (brand.length() == 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for brand!",
+        if (desc.length() == 0 || desc == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid description!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (price == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for price!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (unit.length() == 0) {
+        }else if (unit == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for unit!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (stockType == null) {

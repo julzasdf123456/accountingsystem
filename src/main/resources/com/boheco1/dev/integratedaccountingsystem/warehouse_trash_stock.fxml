@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <AnchorPane prefHeight="554.0" prefWidth="726.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.TrashStockController">
    <children>
@@ -38,14 +35,6 @@
                      <left>
                         <Pane prefHeight="66.0" prefWidth="653.0" BorderPane.alignment="CENTER">
                            <children>
-                              <JFXButton layoutX="363.0" layoutY="18.0" onAction="#restoreTrash" prefHeight="30.0" prefWidth="75.0" style="-fx-background-color: #00AD8E;" text="Restore" textFill="WHITE">
-                                 <graphic>
-                                    <FontIcon iconColor="WHITE" iconLiteral="mdi2f-file-document-outline" iconSize="14" />
-                                 </graphic>
-                                 <effect>
-                                    <DropShadow />
-                                 </effect>
-                              </JFXButton>
                               <JFXTextField fx:id="query_tf" focusColor="#00ad8e" labelFloat="true" layoutX="8.0" layoutY="18.0" onAction="#searchStock" prefHeight="30.0" prefWidth="268.0" promptText="Search Trash" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />

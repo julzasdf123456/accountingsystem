@@ -281,7 +281,7 @@ public class StockDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "Select TOP 50 id, StockName, Brand, Model, Description, Price, Unit, Quantity FROM Stocks " +
                         "WHERE (StockName LIKE ? OR Description LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
-                        "AND IsTrashed=? ORDER BY StockName");
+                        "AND IsTrashed=? ORDER BY Description");
         ps.setString(1, "%" + key + "%");
         ps.setString(2, "%" + key + "%");
         ps.setString(3, "%" + key + "%");
@@ -320,7 +320,7 @@ public class StockDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "Select TOP 50 id, StockName, Brand, Model, Description, Price, Unit, Quantity FROM Stocks " +
                         "WHERE (StockName LIKE ? OR Description LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
-                        "AND IsTrashed=0 AND Quantity > 0 ORDER BY StockName");
+                        "AND IsTrashed=0 AND Quantity > 0 ORDER BY Description");
         ps.setString(1, "%" + key + "%");
         ps.setString(2, "%" + key + "%");
         ps.setString(3, "%" + key + "%");
@@ -360,7 +360,7 @@ public class StockDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "Select * FROM Stocks " +
                         "WHERE IsTrashed=? "+
-                        "ORDER BY StockName " +
+                        "ORDER BY Description " +
                         "OFFSET ? ROWS " +
                         "FETCH NEXT ? ROWS ONLY");
         ps.setInt(1, trashed);

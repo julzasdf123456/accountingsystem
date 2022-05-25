@@ -17,6 +17,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
@@ -87,7 +88,7 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
         column5.setStyle("-fx-alignment: center-left;");
 
         TableColumn<EmployeeInfo, EmployeeInfo> column6 = new TableColumn<>("Action");
-
+        column6.setMinWidth(50);
         column6.setCellValueFactory(emp -> new ReadOnlyObjectWrapper<>(emp.getValue()));
         column6.setCellFactory(mrtable -> new TableCell<>(){
 
@@ -126,8 +127,11 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
                         ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_view_mr.fxml", Utility.getStackPane(),  "../view_mrs_controller.fxml");
                     });
                     HBox hBox = new HBox();
-                    hBox.setSpacing(2);
+                    HBox filler = new HBox();
+                    hBox.setHgrow(filler, Priority.ALWAYS);
+                    hBox.setSpacing(5);
                     hBox.getChildren().add(viewButton);
+                    hBox.getChildren().add(filler);
                     hBox.getChildren().add(printButton);
                     setGraphic(hBox);
                 } else {

@@ -7,6 +7,7 @@ import com.itextpdf.text.Element;
 import com.jfoenix.controls.*;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -24,6 +25,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class MRInventoryController extends MenuControllerHandler implements Initializable, SubMenuHelper {
@@ -104,7 +106,7 @@ public class MRInventoryController extends MenuControllerHandler implements Init
                     List<MR> mrs = MrDAO.getMRs(Utility.MR_ACTIVE);
                     ArrayList<String[]> rows = new ArrayList<>();
                     for (MR mr : mrs) {
-                        String[] data = {mr.getExtItem(), mr.getQuantity() + "", mr.getPrice() + "", mr.getDateOfMR().toString(), mr.getEmployeeFirstName() + " " + mr.getEmployeeLastName()};
+                        String[] data = {mr.getExtItem(), mr.getQuantity() + "", mr.getPrice() + "", mr.getDateOfMR().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")), mr.getEmployeeFirstName() + " " + mr.getEmployeeLastName()};
                         rows.add(data);
                     }
                     int[] rows_aligns = {Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_LEFT};
@@ -151,10 +153,12 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         TableColumn<MR, String> column4 = new TableColumn<>("Date of MR");
         column4.setMinWidth(100);
         column4.setCellValueFactory(new PropertyValueFactory<>("dateOfMR"));
+        column4.setCellValueFactory(stockStringCellDataFeatures -> new SimpleStringProperty(stockStringCellDataFeatures.getValue().getDateOfMR().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))));
+
         column4.setStyle("-fx-alignment: center;");
 
         TableColumn<MR, MR> column5 = new TableColumn<>("Action");
-        column4.setMinWidth(50);
+        column5.setMinWidth(50);
         column5.setCellValueFactory(mr -> new ReadOnlyObjectWrapper<>(mr.getValue()));
         column5.setCellFactory(mrtable -> new TableCell<>(){
             FontIcon icon =  new FontIcon("mdi2e-eye");

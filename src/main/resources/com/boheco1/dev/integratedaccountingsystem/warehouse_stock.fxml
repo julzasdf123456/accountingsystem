@@ -51,22 +51,6 @@
                                     <Font size="14.0" />
                                  </font>
                               </JFXTextField>
-                              <JFXButton layoutX="557.0" layoutY="18.0" onAction="#trashStock" prefHeight="30.0" prefWidth="50.0" styleClass="btn-danger" stylesheets="@style.css" textFill="WHITE">
-                                 <graphic>
-                                    <FontIcon iconColor="WHITE" iconLiteral="mdi2t-trash-can-outline" iconSize="14" />
-                                 </graphic>
-                                 <effect>
-                                    <DropShadow />
-                                 </effect>
-                              </JFXButton>
-                              <JFXButton layoutX="458.0" layoutY="18.0" onAction="#viewStock" prefHeight="30.0" prefWidth="50.0" styleClass="btn-info" stylesheets="@style.css" textFill="WHITE">
-                                 <graphic>
-                                    <FontIcon iconColor="WHITE" iconLiteral="mdi2f-file-eye-outline" iconSize="14" />
-                                 </graphic>
-                                 <effect>
-                                    <DropShadow />
-                                 </effect>
-                              </JFXButton>
                               <Label fx:id="num_stocks_lbl" layoutX="282.0" layoutY="23.0" text="Label">
                                  <font>
                                     <Font size="14.0" />
