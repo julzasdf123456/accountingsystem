@@ -20,10 +20,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -45,6 +42,8 @@ public class ViewAllMIRSController extends MenuControllerHandler implements Init
     @FXML private JFXTextField search_box;
     @FXML private JFXComboBox<Integer> month;
     @FXML private JFXTextField year;
+    @FXML private DatePicker dateSummary;
+    @FXML private JFXButton daily_summary_btn;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -184,6 +183,23 @@ public class ViewAllMIRSController extends MenuControllerHandler implements Init
             //allMirsTable.getItems().setAll(mirs);
             if (mirs.size() == 0) {
                 AlertDialogBuilder.messgeDialog("System Information", "No record on selected month and year.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+                return;
+            }
+            new PrintMIRSMonthlyChargeSummary(mirs);
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertDialogBuilder.messgeDialog("Error", "Error populating table: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }
+    }
+
+    @FXML
+    private void daily_summary_btn(ActionEvent event) {
+        try {
+            ObservableList<MIRS> mirs = FXCollections.observableList(MirsDAO.getByDateFiled(dateSummary.getValue()));
+            // allMirsTable.getItems().clear();
+            //allMirsTable.getItems().setAll(mirs);
+            if (mirs.size() == 0) {
+                AlertDialogBuilder.messgeDialog("System Information", "No record on selected date.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
                 return;
             }
             new PrintMIRSMonthlyChargeSummary(mirs);

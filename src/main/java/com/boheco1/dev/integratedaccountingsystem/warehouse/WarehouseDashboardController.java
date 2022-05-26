@@ -246,14 +246,16 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
                                                     try {
                                                         int index = getIndex();
                                                         if(index >= 0){
-                                                            MIRS mirs = getTableView().getItems().get(index);
-                                                            //System.out.println(mirs.getId());
-                                                            if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 2){
-                                                                status.setStyle("-fx-background-color: "+ColorPalette.DANGER+"; -fx-background-radius: 12");
-                                                            }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 1){
-                                                                status.setStyle("-fx-background-color: "+ColorPalette.WARNING+"; -fx-background-radius: 12");
-                                                            }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 0){
-                                                                status.setStyle("-fx-background-color: "+ColorPalette.SUCCESS+"; -fx-background-radius: 12");
+                                                            if(getTableView().getItems().get(index) instanceof  MIRS && getTableView().getItems().get(index) != null){
+                                                                MIRS mirs = getTableView().getItems().get(index);
+                                                                //System.out.println(mirs.getId());
+                                                                if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 2){
+                                                                    status.setStyle("-fx-background-color: "+ColorPalette.DANGER+"; -fx-background-radius: 12");
+                                                                }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 1){
+                                                                    status.setStyle("-fx-background-color: "+ColorPalette.WARNING+"; -fx-background-radius: 12");
+                                                                }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 0){
+                                                                    status.setStyle("-fx-background-color: "+ColorPalette.SUCCESS+"; -fx-background-radius: 12");
+                                                                }
                                                             }
                                                         }
                                                     } catch (Exception e) {
