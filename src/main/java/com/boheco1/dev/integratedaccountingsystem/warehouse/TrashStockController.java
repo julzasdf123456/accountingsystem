@@ -77,13 +77,13 @@ public class TrashStockController extends MenuControllerHandler implements Initi
     }
 
     public void createTable(){
-        TableColumn<SlimStock, String> column1 = new TableColumn<>("Stock Name");
-        column1.setMinWidth(150);
-        column1.setCellValueFactory(new PropertyValueFactory<>("stockName"));
+        TableColumn<SlimStock, String> column1 = new TableColumn<>("Stock ID");
+        column1.setMinWidth(100);
+        column1.setCellValueFactory(new PropertyValueFactory<>("id"));
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<SlimStock, String> column2 = new TableColumn<>("Description");
-        column2.setMinWidth(300);
+        column2.setMinWidth(400);
         column2.setCellValueFactory(new PropertyValueFactory<>("description"));
         column2.setStyle("-fx-alignment: center-left;");
 

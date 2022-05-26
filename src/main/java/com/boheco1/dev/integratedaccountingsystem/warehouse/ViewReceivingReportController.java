@@ -60,15 +60,11 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
 
     public void createTable(){
         TableColumn<Stock, String> column1 = new TableColumn<>("Code");
-        column1.setMinWidth(100);
-        column1.setCellValueFactory(new PropertyValueFactory<>("localCode"));
-
-        TableColumn<Stock, String> column2 = new TableColumn<>("Stock");
-        column2.setMinWidth(110);
-        column2.setCellValueFactory(new PropertyValueFactory<>("stockName"));
+        column1.setMinWidth(110);
+        column1.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         TableColumn<Stock, String> column3 = new TableColumn<>("Description");
-        column3.setMinWidth(300);
+        column3.setMinWidth(400);
         column3.setCellValueFactory(new PropertyValueFactory<>("description"));
 
         TableColumn<Stock, String> column4 = new TableColumn<>("Unit");
@@ -98,7 +94,6 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
         this.items_table.setPlaceholder(new Label("No item added"));
 
         this.items_table.getColumns().add(column1);
-        this.items_table.getColumns().add(column2);
         this.items_table.getColumns().add(column3);
         this.items_table.getColumns().add(column4);
         this.items_table.getColumns().add(column5);
@@ -405,13 +400,12 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
                             row += 1;
                             row_header = sheet.createRow(row);
 
-                            //LocalCode
                             current_stock_code = row_header.createCell(0);
-                            current_stock_code.setCellValue(stock.getLocalCode());
+                            current_stock_code.setCellValue(stock.getId());
                             doc.styleBorder(current_stock_code, 10, HorizontalAlignment.LEFT, false);
 
                             current_desc = row_header.createCell(1);
-                            current_desc.setCellValue(stock.getStockName() + " " + stock.getDescription());
+                            current_desc.setCellValue(stock.getDescription());
                             sdec_addr = new CellRangeAddress(row, row, 1, 4);
                             sheet.addMergedRegion(sdec_addr);
                             current_desc.setCellStyle(style);

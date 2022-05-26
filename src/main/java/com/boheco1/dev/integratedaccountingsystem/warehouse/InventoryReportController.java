@@ -116,13 +116,13 @@ public class InventoryReportController extends MenuControllerHandler implements 
                         Row table_header = sheet.createRow(row);
 
                         Cell stock_cell = table_header.createCell(0);
-                        stock_cell.setCellValue("STOCK NAME");
+                        stock_cell.setCellValue("CODE NO");
                         CellRangeAddress stock_cell_addr = new CellRangeAddress(row, row, 0, 1);
                         sheet.addMergedRegion(stock_cell_addr);
                         doc.styleMergedCells(stock_cell_addr);
 
                         Cell desc_cell = table_header.createCell(2);
-                        desc_cell.setCellValue("DESCRIPTION");
+                        desc_cell.setCellValue("ARTICLE");
                         CellRangeAddress desc_cell_addr = new CellRangeAddress(row, row, 2, 6);
                         sheet.addMergedRegion(desc_cell_addr);
                         doc.styleMergedCells(desc_cell_addr);
@@ -151,7 +151,7 @@ public class InventoryReportController extends MenuControllerHandler implements 
                             row_header = sheet.createRow(row);
 
                             current_stock = row_header.createCell(0);
-                            current_stock.setCellValue(stock.getStockName());
+                            current_stock.setCellValue(stock.getId());
                             sname_addr = new CellRangeAddress(row, row, 0, 1);
                             sheet.addMergedRegion(sname_addr);
                             doc.styleMergedCells(sname_addr);
@@ -215,12 +215,12 @@ public class InventoryReportController extends MenuControllerHandler implements 
     }
 
     public void createTable(){
-        TableColumn<Stock, String> column1 = new TableColumn<>("Stock Name");
-        column1.setMinWidth(150);
-        column1.setCellValueFactory(new PropertyValueFactory<>("stockName"));
+        TableColumn<Stock, String> column1 = new TableColumn<>("Stock ID");
+        column1.setMinWidth(100);
+        column1.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         TableColumn<Stock, String> column2 = new TableColumn<>("Description");
-        column2.setMinWidth(300);
+        column2.setMinWidth(400);
         column2.setCellValueFactory(new PropertyValueFactory<>("description"));
 
         TableColumn<Stock, String> column3 = new TableColumn<>("Brand");

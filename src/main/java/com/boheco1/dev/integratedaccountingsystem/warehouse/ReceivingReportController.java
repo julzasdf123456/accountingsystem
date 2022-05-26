@@ -459,13 +459,12 @@ public class ReceivingReportController extends MenuControllerHandler implements 
                             row += 1;
                             row_header = sheet.createRow(row);
 
-                            //LocalCode
                             current_stock_code = row_header.createCell(0);
-                            current_stock_code.setCellValue(stock.getLocalCode());
+                            current_stock_code.setCellValue(stock.getId());
                             doc.styleBorder(current_stock_code, 10, HorizontalAlignment.LEFT, false);
 
                             current_desc = row_header.createCell(1);
-                            current_desc.setCellValue(stock.getStockName() + " " + stock.getDescription());
+                            current_desc.setCellValue(stock.getDescription());
                             sdec_addr = new CellRangeAddress(row, row, 1, 4);
                             sheet.addMergedRegion(sdec_addr);
                             current_desc.setCellStyle(style);

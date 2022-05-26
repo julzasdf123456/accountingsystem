@@ -111,11 +111,11 @@ public class StockController extends MenuControllerHandler implements Initializa
             Platform.runLater(() -> {
                 try {
                     CSVWriter writer = new CSVWriter(new FileWriter(selectedFile));
-                    String[] header = "id,StockName,Description,Current Price,Updated Price".split(",");
+                    String[] header = "id,Description,Current Price,Updated Price".split(",");
                     writer.writeNext(header);
                     List<Stock> stocks = StockDAO.getInventory();
                     for (Stock stock : stocks) {
-                        writer.writeNext(new String[]{stock.getId(), stock.getStockName(), stock.getDescription(), stock.getPrice() + "", stock.getPrice() + ""});
+                        writer.writeNext(new String[]{stock.getId(), stock.getDescription(), stock.getPrice() + "", stock.getPrice() + ""});
                     }
                     writer.close();
                     if (selectedFile.exists()) {
@@ -134,13 +134,13 @@ public class StockController extends MenuControllerHandler implements Initializa
     }
 
     public void createTable(){
-        TableColumn<SlimStock, String> column1 = new TableColumn<>("Stock Name");
-        column1.setMinWidth(150);
-        column1.setCellValueFactory(new PropertyValueFactory<>("stockName"));
+        TableColumn<SlimStock, String> column1 = new TableColumn<>("Stock ID");
+        column1.setMinWidth(100);
+        column1.setCellValueFactory(new PropertyValueFactory<>("id"));
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<SlimStock, String> column2 = new TableColumn<>("Description");
-        column2.setMinWidth(300);
+        column2.setMinWidth(400);
         column2.setCellValueFactory(new PropertyValueFactory<>("description"));
         column2.setStyle("-fx-alignment: center-left;");
 
