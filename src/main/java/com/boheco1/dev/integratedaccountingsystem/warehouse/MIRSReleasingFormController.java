@@ -397,8 +397,6 @@ public class MIRSReleasingFormController implements Initializable {
     @FXML
     private void acceptBtn(ActionEvent event) {
         try {
-            AlertDialogBuilder.messgeDialog("System Message", "MIRS items released.", stackPane, AlertDialogBuilder.INFO_DIALOG);
-            anchorpane.setDisable(true);
 
             JFXDialogLayout dialogContent = new JFXDialogLayout();
             dialogContent.setStyle("-fx-border-width: 0 0 0 15; -fx-border-color: " + ColorPalette.INFO + ";");
@@ -460,6 +458,7 @@ public class MIRSReleasingFormController implements Initializable {
                         MirsDAO.update(Utility.getActiveMIRS());
 
                         AlertDialogBuilder.messgeDialog("System Message", "MIRS items released.", stackPane, AlertDialogBuilder.INFO_DIALOG);
+                        anchorpane.setDisable(true);
                     }catch (Exception e){
                         AlertDialogBuilder.messgeDialog("System Error", "Item released: " + e.getMessage(), stackPane, AlertDialogBuilder.INFO_DIALOG);
                     }
