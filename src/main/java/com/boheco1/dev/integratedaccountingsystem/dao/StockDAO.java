@@ -1141,7 +1141,7 @@ public class StockDAO {
                         "Releasing.CreatedAt as releasedCreatedAt, Releasing.UpdatedAt as releasedUpdatedAt " +
                         "FROM Stocks LEFT JOIN Releasing " +
                         "ON Releasing.StockID=Stocks.id " +
-                        "WHERE IsTrashed=0 AND Releasing.CreatedAt BETWEEN ? AND ? AND Releasing.Status='Approved' " +
+                        "WHERE IsTrashed=0 AND Releasing.CreatedAt BETWEEN ? AND ? AND Releasing.Status='released' " +
                         "ORDER BY Releasing.UpdatedAt ASC, Stocks.StockName ASC");
 
         ps.setDate(1, Date.valueOf(from));
