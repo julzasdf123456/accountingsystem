@@ -77,7 +77,7 @@
                                     </FlowPane>
                                  </children>
                               </AnchorPane>
-                              <Label fx:id="title" text="" textFill="#757575" AnchorPane.leftAnchor="10" AnchorPane.topAnchor="60">
+                              <Label fx:id="title" styleClass="heading-label" stylesheets="@style.css" text="" textFill="#757575" AnchorPane.leftAnchor="10" AnchorPane.topAnchor="60">
                                  <font>
                                     <Font name="System Bold" size="15.0" />
                                  </font>

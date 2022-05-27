@@ -12,6 +12,16 @@
     -jfx-unfocus-color: #757575;
 }
 
+.jfx-text-field, .jfx-password-field, .jfx-text-area, .text-area, .check-box, .jfx-check-box,
+.label, .jfx-password-field, .jfx-combo-box, .date-picker, .jfx-button{
+    -fx-font-size: 16px;
+}
+
+.heading-label {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
 // CONTEXT MENU
 .context-menu {
   -fx-background-color: WHITE;
@@ -138,6 +148,7 @@
 // TABLE
 .table-view{
    -fx-background-color: transparent;
+   -fx-font-size:  1.5em;
 }
 
 .table-view:focused{
