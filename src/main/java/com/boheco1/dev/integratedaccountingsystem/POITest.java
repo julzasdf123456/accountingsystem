@@ -1,8 +1,9 @@
 package com.boheco1.dev.integratedaccountingsystem;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.MCTDao;
 import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
-import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
-import com.boheco1.dev.integratedaccountingsystem.objects.MR;
+import com.boheco1.dev.integratedaccountingsystem.dao.ReleasingDAO;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -10,18 +11,35 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileOutputStream;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class POITest {
     public static void main(String[] args) {
         try {
-           MR mr = MrDAO.get("1650370438700-KOE5CTKOQQ55VSL");
-           //MrDAO.returnMR(mr);
-
-            System.out.println("Active MRs: " + MrDAO.countMRs("active"));
-            System.out.println("Returned MRs: " + MrDAO.countMRs("returned"));
+           testMCT();
         }catch(Exception ex) {
             ex.printStackTrace();
+        }
+    }
+
+    public static void testMCT() throws Exception{
+        MCT mct = new MCT("2022-89-001","Integral Testing Only", "Clarin, Bohol", "multiple","-", LocalDate.now());
+        List<Releasing> releasings = new ArrayList();
+        releasings.add(ReleasingDAO.get("1653508612559-63HHRS8YH4WKVXU"));
+        releasings.add(ReleasingDAO.get("1653508612559-8jyHRS8YH4WKVXU"));
+        releasings.add(ReleasingDAO.get("1653681369649-SPPXBW6APP2118Z"));
+
+        MCTDao.create(mct, releasings);
+
+        MCT mct1 = MCTDao.getMCT("2022-89-001");
+        System.out.println(mct1.getMctNo() + " " + mct1.getParticulars() + " " + mct1.getAddress());
+
+        MCTReleasings mctReleasings = MCTDao.getMCTReleasing("2022-89-001");
+        System.out.println(mctReleasings.getMct().getMctNo() + " " + mctReleasings.getMct().getParticulars() + " " + mctReleasings.getMct().getAddress());
+        System.out.println("Releasings...");
+        for(Releasing releasing: mctReleasings.getReleasings()) {
+            System.out.println(releasing.getStockID() + " " + releasing.getMctNo() + " " + releasing.getMirsID());
         }
     }
 

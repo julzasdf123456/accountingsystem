@@ -35,10 +35,10 @@ public class ReleasingDAO {
         ps.close();
     }
 
-    public static Releasing get(int id) throws Exception {
+    public static Releasing get(String id) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM Releasing WHERE id=?");
-        ps.setInt(1, id);
+        ps.setString(1, id);
 
         ResultSet rs = ps.executeQuery();
 
@@ -57,8 +57,8 @@ public class ReleasingDAO {
                     rs.getString("WorkOrderNo"),
                     rs.getString("mct_no")
             );
-            releasing.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
-            releasing.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
+            releasing.setCreatedAt(rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime():null);
+            releasing.setUpdatedAt(rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime():null);
         }
 
         rs.close();

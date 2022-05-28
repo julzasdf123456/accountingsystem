@@ -43,6 +43,7 @@ public class MCTDao {
                             + " is already included in MCT# " + releasing.getMctNo());
                 }
                 ps2.setString(1, mct.getMctNo());
+                ps2.setString(2, releasing.getId());
                 ps2.executeUpdate();
             }
 
