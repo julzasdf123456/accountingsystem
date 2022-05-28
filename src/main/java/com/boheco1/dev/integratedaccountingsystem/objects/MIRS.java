@@ -21,6 +21,10 @@ public class MIRS {
     private User user;
     private EmployeeInfo requisitioner;
 
+    private String address;
+
+    private String applicant;
+
     public MIRS(){}
 
     public MIRS(String id, LocalDate dateFiled, String purpose, String details, String status, String requisitionerID, String userID, LocalDateTime createdAt, LocalDateTime updatedAt) {
@@ -33,6 +37,36 @@ public class MIRS {
         this.userID = userID;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public MIRS(String id, LocalDate dateFiled, String purpose, String details, String status, String requisitionerID, String userID, LocalDateTime createdAt, LocalDateTime updatedAt, String address, String applicant) {
+        this.id = id;
+        this.dateFiled = dateFiled;
+        this.purpose = purpose;
+        this.details = details;
+        this.status = status;
+        this.requisitionerID = requisitionerID;
+        this.userID = userID;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.address = address;
+        this.applicant = applicant;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getApplicant() {
+        return applicant;
+    }
+
+    public void setApplicant(String applicant) {
+        this.applicant = applicant;
     }
 
     public String getId() {

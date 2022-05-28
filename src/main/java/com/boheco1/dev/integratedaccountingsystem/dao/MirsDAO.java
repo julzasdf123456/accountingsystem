@@ -23,9 +23,9 @@ public class MirsDAO {
      */
     public static void create(MIRS mirs) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO MIRS (DateFiled, Purpose, Details, Status, RequisitionerID, UserID, id, CreatedAt, UpdatedAt) " +
+                "INSERT INTO MIRS (DateFiled, Purpose, Details, Status, RequisitionerID, UserID, id, CreatedAt, UpdatedAt, address, applicant) " +
                         "VALUES " +
-                        "(?,?,?,?,?,?,?,GETDATE(), GETDATE())");
+                        "(?,?,?,?,?,?,?,GETDATE(), GETDATE(),?,?)");
 
         ps.setDate(1, Date.valueOf(mirs.getDateFiled()));
         ps.setString(2, mirs.getPurpose());
@@ -34,6 +34,8 @@ public class MirsDAO {
         ps.setString(5, mirs.getRequisitionerID());
         ps.setString(6, mirs.getUserID());
         ps.setString(7, mirs.getId());
+        ps.setString(8, mirs.getAddress());
+        ps.setString(9, mirs.getApplicant());
 
         ps.executeUpdate();
         ps.close();
@@ -48,14 +50,16 @@ public class MirsDAO {
     public static void update(MIRS mirs) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE MIRS SET " +
-                        "DateFiled=?, Purpose=?, Details=?, Status=?, RequisitionerID=?, UpdatedAt=GETDATE() " +
+                        "DateFiled=?, Purpose=?, Details=?, Status=?, RequisitionerID=?, UpdatedAt=GETDATE(), address=?, applicant=? " +
                         "WHERE id=?");
         ps.setDate(1, Date.valueOf(mirs.getDateFiled()));
         ps.setString(2, mirs.getPurpose());
         ps.setString(3, mirs.getDetails());
         ps.setString(4, mirs.getStatus());
         ps.setString(5, mirs.getRequisitionerID());
-        ps.setString(6, mirs.getId());
+        ps.setString(6, mirs.getAddress());
+        ps.setString(7, mirs.getApplicant());
+        ps.setString(8, mirs.getId());
 
         ps.executeUpdate();
 
@@ -194,7 +198,9 @@ public class MirsDAO {
                     rs.getString("RequisitionerID"),
                     rs.getString("UserID"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                    rs.getString("address"),
+                    rs.getString("applicant")
             );
 
             rs.close();
