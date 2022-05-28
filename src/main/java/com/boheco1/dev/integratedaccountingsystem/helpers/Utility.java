@@ -5,6 +5,7 @@ import com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
@@ -122,4 +123,9 @@ public class Utility {
     public static ViewMRController getMrController() { return mrController; }
 
     public static void setMrController(ViewMRController mrController) { Utility.mrController = mrController; }
+
+    public static String CURRENT_YEAR(){
+        Calendar cal = Calendar.getInstance();
+        return ""+cal.get(Calendar.YEAR);
+    }
 }
