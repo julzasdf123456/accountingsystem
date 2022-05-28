@@ -124,7 +124,7 @@ public class Utility {
 
     public static void setMrController(ViewMRController mrController) { Utility.mrController = mrController; }
 
-    public static String CURRENT_YEAR(){
+    public static String CURRENT_YEAR() {
         Calendar cal = Calendar.getInstance();
         return ""+cal.get(Calendar.YEAR);
     }
