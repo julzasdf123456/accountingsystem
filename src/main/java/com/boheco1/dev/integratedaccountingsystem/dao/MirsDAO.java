@@ -522,4 +522,22 @@ public class MirsDAO {
 
         return releasedItemDetails;
     }
+
+    public static int getBalance(MIRSItem item) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT SUM(Quantity) FROM Releasing r WHERE r.StockID = ? AND MIRSID = ?;");
+
+        ps.setString(1, item.getStockID());
+        ps.setString(2, item.getMirsID());
+
+        ResultSet rs = ps.executeQuery();
+
+        int releasedCount = 0;
+
+        if(rs.next()) {
+            releasedCount = rs.getInt(1);
+        }
+
+        return item.getQuantity() - releasedCount;
+    }
 }
