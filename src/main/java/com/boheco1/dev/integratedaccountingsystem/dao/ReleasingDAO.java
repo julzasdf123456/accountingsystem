@@ -54,7 +54,8 @@ public class ReleasingDAO {
                     rs.getString("UserID"),
                     rs.getString("Status"),
                     rs.getString("MR"),
-                    rs.getString("WorkOrderNo")
+                    rs.getString("WorkOrderNo"),
+                    rs.getString("mct_no")
             );
             releasing.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
             releasing.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
@@ -85,7 +86,8 @@ public class ReleasingDAO {
                     rs.getString("UserID"),
                     rs.getString("Status"),
                     rs.getString("MR"),
-                    rs.getString("WorkOrderNo")
+                    rs.getString("WorkOrderNo"),
+                    rs.getString("mct_no")
             );
             releasing.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
             releasing.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());

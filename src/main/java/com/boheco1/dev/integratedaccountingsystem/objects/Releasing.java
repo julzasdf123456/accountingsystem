@@ -15,6 +15,7 @@ public class Releasing {
     private String MR;
     private String workOrderNo;
 
+    private String mctNo;
     public Releasing(String id, String stockID, String mirsID, int quantity, double price, String userID, String status) {
         this.id = id;
         this.stockID = stockID;
@@ -36,7 +37,7 @@ public class Releasing {
         this.MR = MR;
     }
 
-    public Releasing(String id, String stockID, String mirsID, int quantity, double price, String userID, String status, String MR, String workdOrderNo) {
+    public Releasing(String id, String stockID, String mirsID, int quantity, double price, String userID, String status, String MR, String workdOrderNo, String mctNo) {
         this.id = id;
         this.stockID = stockID;
         this.mirsID = mirsID;
@@ -46,8 +47,8 @@ public class Releasing {
         this.status = status;
         this.MR = MR;
         this.workOrderNo=workdOrderNo;
+        this.mctNo = mctNo;
     }
-
     public String getWorkOrderNo() {
         return workOrderNo;
     }
@@ -137,5 +138,13 @@ public class Releasing {
 
     public void setMR(String MR) {
         this.MR = MR;
+    }
+
+    public String getMctNo() {
+        return mctNo;
+    }
+
+    public void setMctNo(String mctNo) {
+        this.mctNo = mctNo;
     }
 }
