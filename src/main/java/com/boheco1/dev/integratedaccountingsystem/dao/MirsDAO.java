@@ -2,9 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
-import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
-import com.boheco1.dev.integratedaccountingsystem.objects.MIRSItem;
-import com.boheco1.dev.integratedaccountingsystem.objects.ReleasedItemDetails;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -545,5 +543,60 @@ public class MirsDAO {
         }
 
         return item.getQuantity() - releasedCount;
+    }
+
+    public static List<UnchargedMIRSReleases> getUnchargedMIRSReleases() throws Exception {
+        List<UnchargedMIRSReleases> unchargedMIRSReleases=new ArrayList();
+
+        ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                "SELECT * FROM dbo.MIRS m WHERE m.id IN " +
+                        "(SELECT r.MIRSID FROM Releasing r WHERE r.status='released' AND mct_no IS NULL);");
+
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT r.*, s.Description, s.Price FROM Releasing r " +
+                        "LEFT JOIN Stocks s ON s.id = r.StockID " +
+                        "WHERE r.MIRSID = ? AND r.Status = 'released' AND mct_no IS NULL;");
+
+        while(rs.next()) {
+            MIRS mirs = new MIRS(
+                    rs.getString("id"),
+                    rs.getDate("DateFiled").toLocalDate(),
+                    rs.getString("Purpose"),
+                    rs.getString("Details"),
+                    rs.getString("Status"),
+                    rs.getString("RequisitionerID"),
+                    rs.getString("UserID"),
+                    rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                    rs.getString("address"),
+                    rs.getString("applicant")
+            );
+
+            List<UnchargedItemDetails> items = new ArrayList();
+
+            ps.setString(1, mirs.getId());
+            ResultSet rs2 = ps.executeQuery();
+
+            while(rs2.next()) {
+                items.add(
+                        new UnchargedItemDetails(
+                                rs2.getString("id"),
+                                rs2.getString("Description"),
+                                rs2.getDouble("Price"),
+                                rs2.getInt("Quantity")
+                        )
+                );
+            }
+
+            rs2.close();
+
+            unchargedMIRSReleases.add(new UnchargedMIRSReleases(mirs, items));
+
+        }
+
+        ps.close();
+        rs.close();
+
+        return unchargedMIRSReleases;
     }
 }

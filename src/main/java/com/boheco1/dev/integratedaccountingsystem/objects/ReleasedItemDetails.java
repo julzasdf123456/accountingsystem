@@ -10,7 +10,6 @@ public class ReleasedItemDetails {
     private int quantity;
     private double price;
     private String status;
-    private String particulars;
     private String unit;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

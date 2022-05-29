@@ -13,9 +13,17 @@ import java.util.List;
 public class TestRun {
     public static void main(String[] args) {
         try {
-            List<MIRS> mirs = MirsDAO.getByDateFiledBetween(LocalDate.of(2022,05,05), LocalDate.of(2022,05,10));
-            for(MIRS m: mirs) {
-                System.out.println(m.getId() + " " + m.getUser().getUserName());
+            List<UnchargedMIRSReleases> unchargedReleases = MirsDAO.getUnchargedMIRSReleases();
+
+            for(UnchargedMIRSReleases unchargedRelease: unchargedReleases) {
+                System.out.println("MIRS:" + unchargedRelease.getMirs().getId() + " "
+                        + unchargedRelease.getMirs().getPurpose() + " "
+                        + unchargedRelease.getReleases().size() + " records."
+                );
+                for(UnchargedItemDetails itemDetails: unchargedRelease.getReleases()) {
+                    System.out.println(itemDetails.getDescription() + " " + itemDetails.getQuantity());
+                }
+                System.out.println("");
             }
         }catch(Exception ex) {
             ex.printStackTrace();
