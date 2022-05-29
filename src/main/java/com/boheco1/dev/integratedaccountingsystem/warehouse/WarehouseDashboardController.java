@@ -248,8 +248,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
                                                         if(index >= 0){
                                                             if(getTableView().getItems().get(index) instanceof  MIRS && getTableView().getItems().get(index) != null){
                                                                 MIRS mirs = getTableView().getItems().get(index);
-                                                                //System.out.println(mirs.getId());
-                                                                if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 2){
+                                                                if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) >= 2){
                                                                     status.setStyle("-fx-background-color: "+ColorPalette.DANGER+"; -fx-background-radius: 12");
                                                                 }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 1){
                                                                     status.setStyle("-fx-background-color: "+ColorPalette.WARNING+"; -fx-background-radius: 12");
