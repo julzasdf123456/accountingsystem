@@ -872,8 +872,8 @@ public class StockDAO {
                             rs.getString("Source"),
                             rs.getDouble("Price"),
                             rs.getString("UserID"),
-                            rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                            rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                            rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                            rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
                             rs.getString("RRNo")
                     )
             );
@@ -883,6 +883,45 @@ public class StockDAO {
         ps.close();
 
         return entryLogs;
+    }
+
+    /**
+     * Get the releases of a given Stock
+     * @param stock the stock to get the entries
+     * @return The List of Releasing for this particular Stock
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<Releasing> getReleasedStocks(Stock stock, String status) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM Releasing WHERE StockID=? AND status=?;");
+        ps.setString(1, stock.getId());
+        ps.setString(2, status);
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<Releasing> releasedStocks = new ArrayList<>();
+
+        while(rs.next()) {
+            Releasing  releasing = new Releasing(
+                    rs.getString("id"),
+                    rs.getString("StockID"),
+                    rs.getString("MIRSID"),
+                    rs.getInt("Quantity"),
+                    rs.getDouble("Price"),
+                    rs.getString("UserID"),
+                    rs.getString("Status"),
+                    rs.getString("MR"),
+                    rs.getString("WorkOrderNo"),
+                    rs.getString("mct_no")
+            );
+            releasing.setCreatedAt(rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null);
+            releasing.setUpdatedAt(rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null);
+            releasedStocks.add(releasing);
+        }
+
+        rs.close();
+        ps.close();
+
+        return releasedStocks;
     }
 
     /**

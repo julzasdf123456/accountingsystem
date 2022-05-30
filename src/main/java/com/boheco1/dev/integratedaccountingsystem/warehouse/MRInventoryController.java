@@ -186,7 +186,7 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         column5.setStyle("-fx-alignment: center;");
 
         TableColumn<MR, String> column7 = new TableColumn<>("Status");
-        column7.setMinWidth(100);
+        column7.setMinWidth(90);
         column7.setCellValueFactory(new PropertyValueFactory<>("status"));
         column7.setStyle("-fx-alignment: center;");
 
