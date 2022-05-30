@@ -59,19 +59,19 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
 
     public void initializeTable() {
         TableColumn<MR, String> column1 = new TableColumn<>("Item Name");
-        column1.setMinWidth(350);
+        column1.setMinWidth(400);
         column1.setCellValueFactory(new PropertyValueFactory<>("extItem"));
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<MR, String> column2 = new TableColumn<>("Qty");
-        column2.setMinWidth(50);
+        column2.setMinWidth(75);
         column2.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         column2.setStyle("-fx-alignment: center;");
 
         TableColumn<MR, String> column3 = new TableColumn<>("Unit Price");
         column3.setMinWidth(100);
         column3.setCellValueFactory(new PropertyValueFactory<>("price"));
-        column3.setStyle("-fx-alignment: center;");
+        column3.setStyle("-fx-alignment: center-left;");
 
         TableColumn<MR, String> column4 = new TableColumn<>("Date of MR");
         column4.setMinWidth(100);

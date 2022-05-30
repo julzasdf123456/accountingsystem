@@ -56,7 +56,6 @@ public class HomeController implements Initializable {
     public List<JFXButton> drawerMenus;
     public List<Label> labelList;
 
-    public static int ROW_PER_PAGE = 25;
 
     // DRAWER
     @FXML JFXButton hamburger;
@@ -159,7 +158,7 @@ public class HomeController implements Initializable {
         // WAREHOUSE
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(warehouseDashboard, new FontIcon("mdi2v-view-dashboard"), drawerMenus, "Warehouse Dashboard", contentPane, "warehouse_dashboard_controller.fxml", subToolbar, new WarehouseDashboardController(), title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(fileMirs, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "File MIRS", contentPane, "warehouse_file_mirs.fxml", subToolbar, new FileMIRSController(), title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(addMR, new FontIcon("mdi2w-warehouse"), drawerMenus, "Add MR", contentPane, "warehouse_mr_entry.fxml", subToolbar, new MREntryController(), title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(addMR, new FontIcon("mdi2w-warehouse"), drawerMenus, "MR Entry", contentPane, "warehouse_mr_entry.fxml", subToolbar, new MREntryController(), title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(stocks, new FontIcon("mdi2w-warehouse"), drawerMenus, "Stock Entry", contentPane, "warehouse_stock_entry.fxml", subToolbar, new StockEntryController(), title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(receiving, new FontIcon("mdi2w-warehouse"), drawerMenus, "Receiving Entry", contentPane, "warehouse_receiving_entry.fxml", subToolbar, new ReceivingEntryController(), title);
 

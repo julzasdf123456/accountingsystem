@@ -56,7 +56,7 @@
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <JFXButton layoutX="660.0" layoutY="18.0" onAction="#updatePrices" prefHeight="30.0" prefWidth="95.0" styleClass="btn-warning" stylesheets="@style.css" text="Update Prices" textFill="WHITE">
+                              <JFXButton layoutX="634.0" layoutY="18.0" onAction="#updatePrices" prefHeight="37.0" prefWidth="121.0" styleClass="btn-warning" stylesheets="@style.css" text="Update Prices" textFill="WHITE">
                                  <effect>
                                     <DropShadow />
                                  </effect>

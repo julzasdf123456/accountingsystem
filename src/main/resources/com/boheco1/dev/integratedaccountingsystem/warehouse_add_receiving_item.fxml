@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.AddTableItemController">
+   <children>
+      <AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="450.0" prefWidth="800.0" style="-fx-background-color: white;" stylesheets="@style.css">
+         <children>
+            <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="450.0" prefWidth="800.0">
+               <center>
+                  <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="450.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <JFXTextField fx:id="stock_tf" focusColor="#00ad8e" labelFloat="true" onAction="#search" prefHeight="37.0" prefWidth="824.0" promptText="Description" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXButton buttonType="RAISED" onAction="#search" prefHeight="30.0" prefWidth="246.0" styleClass="btn-theme" text="Search" textFill="WHITE">
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </JFXButton>
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="24.0" />
+                           </VBox.margin>
+                           <padding>
+                              <Insets top="18.0" />
+                           </padding>
+                        </HBox>
+                        <TableView fx:id="stockTable" prefHeight="270.0" prefWidth="800.0">
+                           <VBox.margin>
+                              <Insets bottom="24.0" />
+                           </VBox.margin>
+                        </TableView>
+                        <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="500.0">
+                           <children>
+                              <JFXTextField fx:id="qty_delivered_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="245.0" promptText="Quantity Delivered" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXTextField fx:id="qty_received_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="245.0" promptText="Quantity Accepted" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets left="16.0" right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXTextField fx:id="cost_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="245.0" promptText="Unit Cost" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="24.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox prefHeight="25.0" prefWidth="450.0">
+                           <children>
+                              <JFXButton buttonType="RAISED" onAction="#addReceivingItem" prefHeight="30.0" prefWidth="246.0" styleClass="btn-info" text="Add" textFill="WHITE">
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </JFXButton>
+                              <JFXButton buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#reset" prefHeight="30.0" prefWidth="245.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Reset" textFill="WHITE">
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </JFXButton>
+                              <HBox prefHeight="100.0" prefWidth="246.0">
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </HBox>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </center>
+            </BorderPane>
+         </children>
+      </AnchorPane>
+   </children>
+</StackPane>

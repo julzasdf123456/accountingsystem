@@ -41,8 +41,8 @@
                            <children>
                               <VBox alignment="CENTER" onMouseClicked="#mirsPendingApproval" prefHeight="98.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Label text="MIRS" textFill="WHITE" />
-                                    <Label fx:id="pendingApprovals_lbl" text="3" textFill="WHITE">
+                                    <Label styleClass="heading-label" text="MIRS" textFill="WHITE" />
+                                    <Label fx:id="pendingApprovals_lbl" styleClass="heading-label" text="3" textFill="WHITE">
                                        <font>
                                           <Font name="System Bold" size="25.0" />
                                        </font>
@@ -63,8 +63,8 @@
                            <children>
                               <VBox alignment="CENTER" onMouseClicked="#mirsPendingReleases" prefHeight="98.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Label text="MIRS" textFill="WHITE" />
-                                    <Label fx:id="pendingReleases_lbl" text="10" textFill="WHITE">
+                                    <Label styleClass="heading-label" text="MIRS" textFill="WHITE" />
+                                    <Label fx:id="pendingReleases_lbl" styleClass="heading-label" text="10" textFill="WHITE">
                                        <font>
                                           <Font name="System Bold" size="25.0" />
                                        </font>
@@ -85,8 +85,8 @@
                            <children>
                               <VBox alignment="CENTER" onMouseClicked="#viewCriticalItems" prefHeight="98.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Label text="Critical Stocks" textFill="WHITE" />
-                                    <Label fx:id="critical_lbl" text="17" textFill="WHITE">
+                                    <Label styleClass="heading-label" text="Critical Stocks" textFill="WHITE" />
+                                    <Label fx:id="critical_lbl" styleClass="heading-label" text="17" textFill="WHITE">
                                        <font>
                                           <Font name="System Bold" size="25.0" />
                                        </font>
@@ -103,8 +103,8 @@
                            <children>
                               <VBox alignment="CENTER" onMouseClicked="#viewEmployeesWithMR" prefHeight="98.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Label text="MR" textFill="WHITE" />
-                                    <Label fx:id="mr_lbl" text="0" textFill="WHITE">
+                                    <Label styleClass="heading-label" text="MR" textFill="WHITE" />
+                                    <Label fx:id="mr_lbl" styleClass="heading-label" text="0" textFill="WHITE">
                                        <font>
                                           <Font name="System Bold" size="25.0" />
                                        </font>
@@ -125,8 +125,8 @@
                            <children>
                               <VBox alignment="CENTER" onMouseClicked="#viewMRItems" prefHeight="98.0" prefWidth="200.0" spacing="5.0" styleClass="card" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Label text="MR Inventory" />
-                                    <Label fx:id="mr_inventory_lbl" text="0" textFill="#575757">
+                                    <Label styleClass="heading-label" text="MR Inventory" />
+                                    <Label fx:id="mr_inventory_lbl" styleClass="heading-label" text="0" textFill="#575757">
                                        <font>
                                           <Font name="System Bold" size="25.0" />
                                        </font>

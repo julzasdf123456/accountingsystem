@@ -131,7 +131,7 @@ public class MRInventoryController extends MenuControllerHandler implements Init
     public void createTable() {
 
         TableColumn<MR, String> column0 = new TableColumn<>("Stock ID");
-        column0.setMinWidth(150);
+        column0.setMinWidth(125);
         column0.setCellValueFactory(new PropertyValueFactory<>("stockId"));
         column0.setStyle("-fx-alignment: center-left;");
 
@@ -141,17 +141,17 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<MR, String> column2 = new TableColumn<>("Qty");
-        column2.setMinWidth(50);
+        column2.setMinWidth(75);
         column2.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         column2.setStyle("-fx-alignment: center;");
 
         TableColumn<MR, String> column3 = new TableColumn<>("Unit Price");
         column3.setMinWidth(100);
         column3.setCellValueFactory(new PropertyValueFactory<>("price"));
-        column3.setStyle("-fx-alignment: center;");
+        column3.setStyle("-fx-alignment: center-left;");
 
         TableColumn<MR, String> column4 = new TableColumn<>("Date of MR");
-        column4.setMinWidth(100);
+        column4.setMinWidth(120);
         column4.setCellValueFactory(new PropertyValueFactory<>("dateOfMR"));
         column4.setCellValueFactory(stockStringCellDataFeatures -> new SimpleStringProperty(stockStringCellDataFeatures.getValue().getDateOfMR().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))));
 

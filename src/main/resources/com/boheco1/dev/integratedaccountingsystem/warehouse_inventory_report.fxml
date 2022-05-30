@@ -35,11 +35,11 @@
                         </JFXComboBox>
                      </right>
                      <left>
-                        <Pane prefHeight="66.0" prefWidth="229.0" BorderPane.alignment="CENTER">
+                        <Pane prefHeight="66.0" prefWidth="289.0" BorderPane.alignment="CENTER">
                            <children>
-                              <HBox alignment="CENTER" prefHeight="66.0" prefWidth="199.0">
+                              <HBox alignment="CENTER" prefHeight="66.0" prefWidth="210.0">
                                  <children>
-                                    <JFXButton fx:id="generate_btn" onAction="#generateReport" prefHeight="30.0" prefWidth="75.0" styleClass="btn-theme" stylesheets="@style.css" text="Generate" textFill="WHITE">
+                                    <JFXButton fx:id="generate_btn" onAction="#generateReport" prefHeight="37.0" prefWidth="92.0" styleClass="btn-theme" stylesheets="@style.css" text="Generate" textFill="WHITE">
                                        <effect>
                                           <DropShadow />
                                        </effect>
@@ -47,7 +47,7 @@
                                           <Insets right="48.0" />
                                        </HBox.margin>
                                     </JFXButton>
-                                    <JFXButton fx:id="downloadReport_btn" onAction="#downloadReport" prefHeight="30.0" prefWidth="50.0" styleClass="btn-info" stylesheets="@style.css" textFill="WHITE">
+                                    <JFXButton fx:id="downloadReport_btn" onAction="#downloadReport" prefHeight="37.0" prefWidth="45.0" styleClass="btn-info" stylesheets="@style.css" textFill="WHITE">
                                        <graphic>
                                           <FontIcon iconColor="WHITE" iconLiteral="mdi2f-file-download-outline" iconSize="14" />
                                        </graphic>

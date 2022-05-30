@@ -1,11 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
-import com.boheco1.dev.integratedaccountingsystem.HomeController;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
-import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
-import com.boheco1.dev.integratedaccountingsystem.helpers.ExcelBuilder;
-import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
-import com.boheco1.dev.integratedaccountingsystem.helpers.SubMenuHelper;
+import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 import com.boheco1.dev.integratedaccountingsystem.objects.Releasing;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
@@ -61,7 +57,7 @@ public class StockLiquidationReportController extends MenuControllerHandler impl
     @FXML
     private JFXButton downloadReport_btn;
 
-    private int LIMIT = HomeController.ROW_PER_PAGE;
+    private int LIMIT = Utility.ROW_PER_PAGE;
     private int COUNT = 0;
 
     @Override
@@ -279,7 +275,7 @@ public class StockLiquidationReportController extends MenuControllerHandler impl
 
     public void createTable(){
         TableColumn<Stock, String> column1 = new TableColumn<>("Stock ID");
-        column1.setMinWidth(100);
+        column1.setMinWidth(125);
         column1.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         TableColumn<Stock, String> column2 = new TableColumn<>("Description");
@@ -306,11 +302,13 @@ public class StockLiquidationReportController extends MenuControllerHandler impl
 
         TableColumn<Stock, String> column7 = new TableColumn<>("Price");
         column7.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getReleasing().getPrice()+""));
-        column7.setMinWidth(75);
+        column7.setMinWidth(100);
+        column7.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Stock, String> column8 = new TableColumn<>("Released Date");
         column8.setCellValueFactory(stockStringCellDataFeatures -> new SimpleStringProperty(stockStringCellDataFeatures.getValue().getReleasing().getCreatedAt().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))));
         column8.setStyle("-fx-alignment: center;");
+        column8.setMinWidth(120);
 
         this.stocksTable.getColumns().removeAll();
 

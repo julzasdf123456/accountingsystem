@@ -32,7 +32,7 @@
                      <children>
                         <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
-                              <JFXTextField fx:id="item_name_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="393.0" promptText="Item Name" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="item_name_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="393.0" promptText="Item Description" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -70,7 +70,7 @@
                         </JFXTextField>
                         <HBox prefHeight="25.0" prefWidth="450.0">
                            <children>
-                              <JFXButton fx:id="addBtn" buttonType="RAISED" onAction="#addItem" prefHeight="30.0" prefWidth="246.0" styleClass="btn-info" stylesheets="@style.css" text="Add" textFill="WHITE">
+                              <JFXButton fx:id="addBtn" buttonType="RAISED" onAction="#addItem" prefHeight="37.0" prefWidth="137.0" styleClass="btn-info" stylesheets="@style.css" text="Add" textFill="WHITE">
                                  <effect>
                                     <DropShadow />
                                  </effect>
@@ -93,7 +93,7 @@
                      </BorderPane.margin></VBox>
                </right>
                <top>
-                  <VBox prefHeight="126.0" prefWidth="1165.0" BorderPane.alignment="CENTER">
+                  <VBox prefHeight="157.0" prefWidth="1165.0" BorderPane.alignment="CENTER">
                      <children>
                         <HBox prefHeight="61.0" prefWidth="1165.0">
                            <children>
@@ -135,7 +135,7 @@
                               </JFXTextField>
                            </children>
                         </HBox>
-                        <Label prefHeight="27.0" prefWidth="150.0" text="Assigned Items">
+                        <Label prefHeight="35.0" prefWidth="246.0" styleClass="heading-label" text="Assigned Items">
                            <VBox.margin>
                               <Insets bottom="10.0" />
                            </VBox.margin>

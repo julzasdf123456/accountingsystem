@@ -63,7 +63,7 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
 
     public void initializeTable() {
         TableColumn<EmployeeInfo, String> column1 = new TableColumn<>("Employee ID");
-        column1.setMinWidth(50);
+        column1.setMinWidth(100);
         column1.setCellValueFactory(new PropertyValueFactory<>("id"));
         column1.setStyle("-fx-alignment: center-left;");
 

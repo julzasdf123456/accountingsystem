@@ -1,6 +1,5 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
-import com.boheco1.dev.integratedaccountingsystem.HomeController;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
@@ -53,7 +52,7 @@ public class StockController extends MenuControllerHandler implements Initializa
 
     private JFXDialog dialog;
 
-    private int LIMIT = HomeController.ROW_PER_PAGE;
+    private int LIMIT = Utility.ROW_PER_PAGE;
     private int COUNT = 0;
 
     @Override
@@ -135,7 +134,7 @@ public class StockController extends MenuControllerHandler implements Initializa
 
     public void createTable(){
         TableColumn<SlimStock, String> column1 = new TableColumn<>("Stock ID");
-        column1.setMinWidth(100);
+        column1.setMinWidth(125);
         column1.setCellValueFactory(new PropertyValueFactory<>("id"));
         column1.setStyle("-fx-alignment: center-left;");
 
@@ -166,7 +165,7 @@ public class StockController extends MenuControllerHandler implements Initializa
 
         TableColumn<SlimStock, String> column7 = new TableColumn<>("Price");
         column7.setCellValueFactory(new PropertyValueFactory<>("price"));
-        column7.setMinWidth(75);
+        column7.setMinWidth(100);
         column7.setStyle("-fx-alignment: center-left;");
 
         TableColumn<SlimStock, SlimStock> column8 = new TableColumn<>("Action");
@@ -186,63 +185,69 @@ public class StockController extends MenuControllerHandler implements Initializa
                     viewButton.setStyle("-fx-background-color: #2196f3;");
                     icon.setIconSize(13);
                     icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
-                    try{
-                        Stock stock = StockDAO.get(item.getId());
-                        viewButton.setOnAction(actionEvent -> {
-                            Utility.setSelectedStock(stock);
-                            ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_stock_update.fxml", Utility.getStackPane(),  "../warehouse_stock.fxml");
-                        });
-                    }catch (Exception e){
-
-                    }
 
                     trashButton.setStyle("-fx-background-color: #f44336;");
                     trashIcon.setIconSize(13);
                     trashIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
-                    trashButton.setOnAction(trashEvent ->{
-                        JFXDialogLayout dialogLayout = new JFXDialogLayout();
-                        dialogLayout.setHeading(new Text("Confirm Trash Stock"));
-                        Label label = new Label("Do you want to put the selected stock to recycle bin?");
-                        label.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 12));
-                        label.setWrapText(true);
-                        label.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
-                        dialogLayout.setBody(label);
-                        dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.CENTER);
-                        JFXButton trash = new JFXButton("Trash");
-                        trash.setStyle("-fx-background-color: "+ColorPalette.DANGER);
-                        trash.setTextFill(Paint.valueOf("#FFFFFF"));
-                        trash.setMinWidth(75);
-                        trash.setOnAction(event -> {
-                            try {
-                                stocksTable.getItems().remove(item);
-                                StockDAO.trash(StockDAO.get(item.getId()));
-                                AlertDialogBuilder.messgeDialog("System Information", "Stock item was put to trash!", stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
-                                bindPages();
-                                setStocksCount();
-                                dialog.close();
-                            } catch (Exception e) {
-                                AlertDialogBuilder.messgeDialog("System Error", "Failed to put item to trash due to: "+e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
-                            }
-                        });
-                        JFXButton cancel = new JFXButton("Cancel");
-                        cancel.setDefaultButton(true);
-                        cancel.setMinWidth(75);
-                        cancel.setOnAction(event -> dialog.close());
-                        List<JFXButton> actions = new ArrayList<>();
-                        actions.add(cancel);
-                        actions.add(trash);
-                        dialogLayout.setActions(actions);
-                        dialog.show();
-                    });
+                    if (empty) {
+                        setGraphic(null);
+                        setText(null);
+                    } else {
+                        try {
+                            Stock stock = StockDAO.get(item.getId());
+                            viewButton.setOnAction(actionEvent -> {
+                                Utility.setSelectedStock(stock);
+                                ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_stock_update.fxml", Utility.getStackPane(), "../warehouse_stock.fxml");
+                            });
+                        } catch (Exception e) {
 
-                    HBox hBox = new HBox();
-                    HBox filler = new HBox();
-                    hBox.setHgrow(filler, Priority.ALWAYS);
-                    hBox.setSpacing(5);
-                    hBox.getChildren().add(viewButton);
-                    hBox.getChildren().add(filler);
-                    hBox.getChildren().add(trashButton);
-                    setGraphic(hBox);
+                        }
+                        trashButton.setOnAction(trashEvent -> {
+                            JFXDialogLayout dialogLayout = new JFXDialogLayout();
+                            dialogLayout.setHeading(new Text("Confirm Trash Stock"));
+                            Label label = new Label("Do you want to put the selected stock to recycle bin?");
+                            label.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 12));
+                            label.setWrapText(true);
+                            label.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
+                            dialogLayout.setBody(label);
+                            dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.CENTER);
+                            JFXButton trash = new JFXButton("Trash");
+                            trash.setStyle("-fx-background-color: " + ColorPalette.DANGER);
+                            trash.setTextFill(Paint.valueOf("#FFFFFF"));
+                            trash.setMinWidth(75);
+                            trash.setOnAction(event -> {
+                                try {
+                                    stocksTable.getItems().remove(item);
+                                    StockDAO.trash(StockDAO.get(item.getId()));
+                                    AlertDialogBuilder.messgeDialog("System Information", "Stock item was put to trash!", stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
+                                    bindPages();
+                                    setStocksCount();
+                                    dialog.close();
+                                } catch (Exception e) {
+                                    AlertDialogBuilder.messgeDialog("System Error", "Failed to put item to trash due to: " + e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                                }
+                            });
+                            JFXButton cancel = new JFXButton("Cancel");
+                            cancel.setDefaultButton(true);
+                            cancel.setMinWidth(75);
+                            cancel.setOnAction(event -> dialog.close());
+                            List<JFXButton> actions = new ArrayList<>();
+                            actions.add(cancel);
+                            actions.add(trash);
+                            dialogLayout.setActions(actions);
+                            dialog.show();
+                        });
+
+                        HBox hBox = new HBox();
+                        HBox filler = new HBox();
+                        hBox.setHgrow(filler, Priority.ALWAYS);
+                        hBox.setSpacing(5);
+                        hBox.getChildren().add(viewButton);
+                        hBox.getChildren().add(filler);
+                        hBox.getChildren().add(trashButton);
+
+                        setGraphic(hBox);
+                    }
                 } else {
                     setGraphic(null);
                     return;
@@ -262,6 +267,7 @@ public class StockController extends MenuControllerHandler implements Initializa
         stocksTable.getColumns().add(column6);
         stocksTable.getColumns().add(column7);
         stocksTable.getColumns().add(column8);
+        this.stocksTable.setPlaceholder(new Label("No queries selected!"));
     }
 
     public void initializeStocks(){

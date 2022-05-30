@@ -10,11 +10,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane prefHeight="550.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController">
+<StackPane prefHeight="650.0" prefWidth="1250.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController">
    <children>
-      <AnchorPane fx:id="contentPane" prefHeight="550.0" prefWidth="1024.0" style="-fx-background-color: white;" stylesheets="@style.css">
+      <AnchorPane fx:id="contentPane" prefHeight="650.0" prefWidth="1250.0" style="-fx-background-color: white;" stylesheets="@style.css">
          <children>
-            <BorderPane prefHeight="550.0" prefWidth="1024.0">
+            <BorderPane prefHeight="650.0" prefWidth="1250.0">
                <center>
                   <TableView fx:id="mr_items_table" prefHeight="190.0" prefWidth="802.0" BorderPane.alignment="CENTER">
                      <BorderPane.margin>
@@ -55,7 +55,7 @@
                         </HBox>
                         <HBox prefHeight="52.0" prefWidth="1165.0">
                            <children>
-                              <JFXTextField fx:id="address_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="246.0" promptText="Address" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="address_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="246.0" promptText="Address" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -63,7 +63,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="phone_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="246.0" promptText="Phone" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="phone_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="246.0" promptText="Phone" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -71,7 +71,7 @@
                                     <Insets left="16.0" right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="designation_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="246.0" promptText="Designation" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="designation_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="246.0" promptText="Designation" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>

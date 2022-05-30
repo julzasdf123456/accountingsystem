@@ -39,7 +39,7 @@
                                           <JFXButton buttonType="RAISED" defaultButton="true" onAction="#loginEvent" prefHeight="25.0" prefWidth="83.0" style="-fx-background-color: #009688;" text="Login" textFill="WHITE" />
                                        </children>
                                     </VBox>
-                                    <Label layoutX="50.0" layoutY="36.0" text="Integrated&#10;Accounting" textFill="#212121" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="80.0">
+                                    <Label layoutX="50.0" layoutY="36.0" styleClass="system-title" stylesheets="@style.css" text="Integrated&#10;Accounting" textFill="#212121" AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="80.0">
                                        <font>
                                           <Font name="System Bold" size="37.0" />
                                        </font>

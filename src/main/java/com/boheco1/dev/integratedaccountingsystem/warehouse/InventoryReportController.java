@@ -1,6 +1,5 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
-import com.boheco1.dev.integratedaccountingsystem.HomeController;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
@@ -55,7 +54,7 @@ public class InventoryReportController extends MenuControllerHandler implements 
     @FXML
     private JFXButton downloadReport_btn;
 
-    private int LIMIT = HomeController.ROW_PER_PAGE;
+    private int LIMIT = Utility.ROW_PER_PAGE;
     private int COUNT = 0;
 
     @Override
@@ -108,7 +107,7 @@ public class InventoryReportController extends MenuControllerHandler implements 
                         doc.setMargin(1, 0.5, 1, 0.5);
 
                         doc.createHeader();
-                        doc.createTitle(5, "As of " + LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")), false);
+                        doc.createTitle(5, "As of " + LocalDate.now().format(DateTimeFormatter.ofPattern("MMM dd, yyyy")), false);
 
                         Sheet sheet = doc.getSheet();
 
@@ -216,7 +215,7 @@ public class InventoryReportController extends MenuControllerHandler implements 
 
     public void createTable(){
         TableColumn<Stock, String> column1 = new TableColumn<>("Stock ID");
-        column1.setMinWidth(100);
+        column1.setMinWidth(125);
         column1.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         TableColumn<Stock, String> column2 = new TableColumn<>("Description");
@@ -242,7 +241,7 @@ public class InventoryReportController extends MenuControllerHandler implements 
         column6.setStyle("-fx-alignment: center;");
 
         TableColumn<Stock, String> column7 = new TableColumn<>("Price");
-        column7.setMinWidth(75);
+        column7.setMinWidth(100);
         column7.setCellValueFactory(new PropertyValueFactory<>("price"));
 
         this.stocksTable.getColumns().removeAll();
@@ -255,7 +254,7 @@ public class InventoryReportController extends MenuControllerHandler implements 
         this.stocksTable.getColumns().add(column7);
         this.stocksTable.getColumns().add(column6);
 
-        this.stocksTable.setPlaceholder(new Label("No period selected!"));
+        this.stocksTable.setPlaceholder(new Label("Click button to generate report!"));
     }
 
     public void bindPages(int count){

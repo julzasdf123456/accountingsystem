@@ -12,13 +12,22 @@
     -jfx-unfocus-color: #757575;
 }
 
-.jfx-text-field, .jfx-password-field, .jfx-text-area, .text-area, .check-box, .jfx-check-box,
+.jfx-text-field, .jfx-password-field, .jfx-text-area, .text-area, .check-box, .jfx-check-box, .text-field,
 .label, .jfx-password-field, .jfx-combo-box, .date-picker, .jfx-button{
     -fx-font-size: 16px;
 }
 
+.system-title {
+    -fx-font-size: 37px;
+    -fx-font-weight: bold;
+}
+
 .heading-label {
     -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.bold {
     -fx-font-weight: bold;
 }
 
