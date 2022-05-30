@@ -1,5 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
+
 import java.time.LocalDateTime;
 
 public class MIRSItem {
@@ -115,5 +117,15 @@ public class MIRSItem {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String toString(){
+        String display = "";
+        try {
+            display = this.quantity +" : "+ StockDAO.get(stockID).getDescription();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return display;
     }
 }
