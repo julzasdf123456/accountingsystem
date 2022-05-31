@@ -1,5 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.MirsDAO;
+
 import java.time.LocalDateTime;
 
 public class ReleasedItemDetails {
@@ -14,6 +16,7 @@ public class ReleasedItemDetails {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String workOrderNo;
+    private int remaining;
 
     public ReleasedItemDetails(String itemDescription, String mirsItemId, String mirsID, String stockID, int quantity, double price, String status, LocalDateTime createdAt, LocalDateTime updatedAt, String workOrderNo) {
         this.itemDescription = itemDescription;
@@ -115,5 +118,14 @@ public class ReleasedItemDetails {
 
     public void setWorkOrderNo(String workOrderNo) {
         this.workOrderNo = workOrderNo;
+    }
+
+    public int getRemaining() throws Exception {
+        MIRSItem mirsItem = new MIRSItem();
+        mirsItem.setMirsID(mirsID);
+        mirsItem.setStockID(stockID);
+        mirsItem.setQuantity(quantity);
+
+        return MirsDAO.getBalance(mirsItem);
     }
 }
