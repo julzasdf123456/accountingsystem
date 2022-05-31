@@ -3,9 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXTextArea;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -13,13 +11,20 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.HPos;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
@@ -34,12 +39,6 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class FileMIRSController extends MenuControllerHandler implements Initializable, SubMenuHelper {
-
-    @FXML
-    private AnchorPane contentPane;
-
-    @FXML
-    private StackPane stackPane;
 
     @FXML
     private DatePicker date;
@@ -85,6 +84,9 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         purpose.setText("");
         particulars.setText("");
         quantity.setText("");
+        applicant.setText("");
+        address.setText("");
+        mirsNum.setText(Utility.CURRENT_YEAR()+"-");
     }
 
 
@@ -99,7 +101,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 approvedByEmployee == null ||
                 selectedItem.isEmpty()){
             AlertDialogBuilder.messgeDialog("Input validation", "Please provide all required information, and try again.",
-                    stackPane, AlertDialogBuilder.WARNING_DIALOG);
+                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
             return;
         }
 
@@ -111,11 +113,12 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             mirs.setAddress(address.getText());
             mirs.setPurpose(purpose.getText());
             mirs.setId(mirsNum.getText()); //id mean MIRS number from user input
+            mirs.setStatus(Utility.PENDING);
             mirs.setRequisitionerID(requisitionerEmployee.getId());
             mirs.setUserID(ActiveUser.getUser().getId());
             MirsDAO.create(mirs); //add a new MIRS to the database
             MirsDAO.addMIRSItems(mirs, mirsItemList); //add the items request from the MIRS filled
-            mirs.setStatus(Utility.PENDING);
+
 
             EmployeeInfo[] signatories = {checkedByEmployee, approvedByEmployee};
             for(EmployeeInfo s : signatories){
@@ -127,12 +130,12 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 MIRSSignatoryDAO.add(mirsSignatory); //saving signatories for the MIRS request
             }
             AlertDialogBuilder.messgeDialog("System Message", "MIRS request successfully filed, please wait for the approval, thank you!",
-                    stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
+                    Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
             resetInputFields();
         } catch (Exception e) {
             e.printStackTrace();
             AlertDialogBuilder.messgeDialog("System Error", e.getMessage(),
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }
     }
 
@@ -143,7 +146,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         for(MIRSItem added: selectedItem){
             if(added.getStockID().equals(selectedStock.getId())){
                 AlertDialogBuilder.messgeDialog("System Warning", "Item already added, please remove item, then add again if you have changes.",
-                        stackPane, AlertDialogBuilder.WARNING_DIALOG);
+                        Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
                 particulars.setText("");
                 quantity.setText("");
                 selectedStock = null;
@@ -158,11 +161,11 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
         if(selectedStock == null){
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
         }else if(quantity.getText().length() == 0 || Integer.parseInt(quantity.getText()) > StockDAO.countAvailable(selectedStock)) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid request quantity!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
         }
 
@@ -188,13 +191,66 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     }
 
     @FXML
-    private void removeBtn(ActionEvent event) {
+    private void removeBtn(ActionEvent event) throws Exception {
         MIRSItem selected = mirsItemTable.getSelectionModel().getSelectedItem();
+
         if (selected == null) {
             AlertDialogBuilder.messgeDialog("System Information", "Please select an item from the table!", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
         }else{
-            selectedItem.remove(selected);
-            mirsItemTable.setItems(selectedItem);
+            JFXDialogLayout dialogContent = new JFXDialogLayout();
+            dialogContent.setStyle("-fx-border-width: 0 0 0 15; -fx-border-color: " + ColorPalette.INFO + ";");
+            dialogContent.setPrefHeight(200);
+
+            Label head = new Label("Confirm Iitem Removal");
+            head.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 15));
+            head.setTextFill(Paint.valueOf(ColorPalette.INFO));
+            dialogContent.setHeading(head);
+
+            FlowPane flowPane = new FlowPane();
+            flowPane.setOrientation(Orientation.VERTICAL);
+            flowPane.setAlignment(Pos.CENTER);
+            flowPane.setRowValignment(VPos.CENTER);
+            flowPane.setColumnHalignment(HPos.CENTER);
+            flowPane.setVgap(6);
+
+            Label context = new Label("Confirm cancellation of MIRS item: "+StockDAO.get(selected.getStockID()).getDescription());
+            context.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 12));
+            context.setWrapText(true);
+            context.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
+
+            flowPane.getChildren().add(context);
+            dialogContent.setBody(flowPane);
+
+            JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogContent, JFXDialog.DialogTransition.CENTER);
+            dialog.setOverlayClose(false);
+
+            JFXButton accept = new JFXButton("Accept");
+            accept.setDefaultButton(true);
+            accept.getStyleClass().add("JFXButton");
+
+            JFXButton cancel = new JFXButton("Cancel");
+            cancel.setDefaultButton(true);
+            cancel.getStyleClass().add("JFXButton");
+            dialogContent.setActions(cancel,accept);
+
+            accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+            accept.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent __) {
+                    selectedItem.remove(selected);
+                    mirsItemTable.setItems(selectedItem);
+                    dialog.close();
+                }
+            });
+
+            cancel.setTextFill(Paint.valueOf(ColorPalette.GREY));
+            cancel.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent __) {
+                    dialog.close();
+                }
+            });
+            dialog.show();
         }
     }
 
@@ -288,9 +344,10 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 int av = StockDAO.countAvailable(selectedStock);
                 if(av == 0) {
                     AlertDialogBuilder.messgeDialog("System Warning", "Insufficient stock.",
-                            stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                     particulars.setText("");
                 }else{
+
                     quantity.requestFocus();
 
                     inStock.setText("In Stock: "+ selectedStock.getQuantity());
@@ -299,7 +356,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                AlertDialogBuilder.messgeDialog("System Error", "bindParticularsAutocomplete(): "+e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                AlertDialogBuilder.messgeDialog("System Error", "bindParticularsAutocomplete(): "+e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }
         });
     }
@@ -352,10 +409,10 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 requisitioner.setText(requisitionerEmployee.getFullName());
             }else if(textField == this.checkedBy) {
                 checkedByEmployee= event.getCompletion();
-                checkedBy.setText(requisitionerEmployee.getFullName());
+                checkedBy.setText(checkedByEmployee.getFullName());
             }else if(textField == this.approvedBy){
                 approvedByEmployee = event.getCompletion();
-                approvedBy.setText(requisitionerEmployee.getFullName());
+                approvedBy.setText(approvedByEmployee.getFullName());
             }
         });
     }
