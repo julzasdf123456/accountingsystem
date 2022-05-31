@@ -257,7 +257,7 @@ public class MirsDAO {
     public static List<MIRSItem> getUnreleasedItems(MIRS mirs) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM MIRSItems m WHERE m.MIRSID=? AND m.StockID NOT IN " +
-                        "(SELECT StockID FROM Releasing r WHERE r.MIRSID=?);");
+                        "(SELECT StockID FROM Releasing r WHERE r.MIRSID=? AND r.status='"+Utility.RELEASED+"');");
 
         ps.setString(1, mirs.getId());
         ps.setString(2, mirs.getId());
