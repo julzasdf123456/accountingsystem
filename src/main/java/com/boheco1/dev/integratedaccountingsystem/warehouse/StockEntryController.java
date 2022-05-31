@@ -4,6 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
@@ -62,6 +63,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         }
         this.bindStockTypes();
         this.bindNumbers();
+        this.localCode.setText(Utility.CURRENT_YEAR());
     }
 
     @FXML
@@ -77,7 +79,8 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         String serialNumber = this.serialNumber.getText();
         String localCode = this.localCode.getText();
         String accountCode = this.accountCode.getText();
-
+        String neaCode = this.neaCode.getText();
+        String comments = this.comments.getText();
         int threshold = 0;
         int quantity = 0;
         double price = 0;
@@ -111,18 +114,21 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.stock.setTrashed(false);
         this.stock.setUserIDCreated(ActiveUser.getUser().getId());
         if (stockType != null) this.stock.setTypeID(stockType.getId());
-        this.stock.setUnit(this.unit.getText());
+        this.stock.setUnit(unit);
 
         //Optional Fields
-        this.stock.setDescription(this.description.getText());
-        this.stock.setComments(comments.getText());
+        this.stock.setDescription(desc);
+        this.stock.setComments(comments);
         this.stock.setSerialNumber(serialNumber);
         if (manDate != null) this.stock.setManufacturingDate(manDate);
         if (valDate != null) this.stock.setValidityDate(valDate);
-        this.stock.setNeaCode(this.neaCode.getText());
+        this.stock.setNeaCode(neaCode);
         this.stock.setCritical(threshold);
 
-        if (desc.length() == 0 || desc == null) {
+        if (localCode.length() < 10 || localCode == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid local code!",
+                    stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (desc.length() == 0 || desc == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid description!",
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (stockType == null) {
@@ -142,11 +148,11 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else{
             if (isNew) {
+                this.stock.setId(localCode);
                 //If new Stock item, set stock quantity to 0 and insert Stock to database
                 this.stock.setQuantity(0);
 
                 this.stock.setAcctgCode(accountCode);
-                this.stock.setLocalCode(localCode);
 
                 try {
                     StockDAO.add(this.stock);
@@ -271,7 +277,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                 stock = StockDAO.get(result.getId());
                 stockName.setText(stock.getStockName());
                 accountCode.setText(stock.getAcctgCode());
-                localCode.setText(stock.getLocalCode());
+                localCode.setText(stock.getId());
                 //quantity.setText(""+stock.getQuantity());
                 price.setText(""+stock.getPrice());
                 serialNumber.setText(stock.getSerialNumber());
@@ -318,7 +324,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.isNew = true;
 
         this.stockName.setText("");
-        this.localCode.setText("");
+        this.localCode.setText(Utility.CURRENT_YEAR());
         this.accountCode.setText("");
         this.brand.setText("");
         this.quantity.setText("");

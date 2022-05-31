@@ -20,7 +20,7 @@ public class MrDAO {
                 "INSERT INTO MR (id, employeeId, warehousePersonnelId, extItem, stockID, quantity, price, dateOfMR, status) " +
                         "VALUES (?,?,?,?,?,?,?,?,?)");
 
-        mr.setId(Utility.generateRandomId());
+        if(mr.getId()==null) mr.setId(Utility.generateRandomId());
 
         if(mr.getStockId()!=null) {
             Stock stock = StockDAO.get(mr.getStockId());
