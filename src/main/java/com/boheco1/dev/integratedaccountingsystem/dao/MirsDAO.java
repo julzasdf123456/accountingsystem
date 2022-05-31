@@ -257,7 +257,7 @@ public class MirsDAO {
     public static List<MIRSItem> getUnreleasedItems(MIRS mirs) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM MIRSItems m WHERE m.MIRSID=? AND m.StockID NOT IN " +
-                        "(SELECT StockID FROM Releasing r WHERE r.MIRSID=?);");
+                        "(SELECT StockID FROM Releasing r WHERE r.MIRSID=? AND r.status='"+Utility.RELEASED+"');");
 
         ps.setString(1, mirs.getId());
         ps.setString(2, mirs.getId());
@@ -436,6 +436,72 @@ public class MirsDAO {
         return mirsList;
     }
 
+    public static List<MIRS> searchMIRS(String key, String status) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MIRS WHERE (id LIKE ? OR Purpose LIKE ? OR Address LIKE ? OR Applicant LIKE ?) AND Status = ? ORDER BY DateFiled DESC");
+        ps.setString(1, "%" + key + "%");
+        ps.setString(2, "%" + key + "%");
+        ps.setString(3, "%" + key + "%");
+        ps.setString(4, "%" + key + "%");
+        ps.setString(5, status);
+
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<MIRS> mirsList = new ArrayList<>();
+
+        while(rs.next()) {
+            mirsList.add(new MIRS(
+                    rs.getString("id"),
+                    rs.getDate("DateFiled").toLocalDate(),
+                    rs.getString("Purpose"),
+                    rs.getString("Details"),
+                    rs.getString("Status"),
+                    rs.getString("RequisitionerID"),
+                    rs.getString("UserID"),
+                    rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return mirsList;
+    }
+
+    public static List<MIRS> searchMIRS(String key) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MIRS WHERE (id LIKE ? OR Purpose LIKE ? OR Address LIKE ? OR Applicant LIKE ?) ORDER BY DateFiled DESC");
+        ps.setString(1, "%" + key + "%");
+        ps.setString(2, "%" + key + "%");
+        ps.setString(3, "%" + key + "%");
+        ps.setString(4, "%" + key + "%");
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<MIRS> mirsList = new ArrayList<>();
+
+        while(rs.next()) {
+            mirsList.add(new MIRS(
+                    rs.getString("id"),
+                    rs.getDate("DateFiled").toLocalDate(),
+                    rs.getString("Purpose"),
+                    rs.getString("Details"),
+                    rs.getString("Status"),
+                    rs.getString("RequisitionerID"),
+                    rs.getString("UserID"),
+                    rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return mirsList;
+    }
+
     public static List<MIRS> getByDateFiled(LocalDate date) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM MIRS WHERE DateFiled = ? ORDER BY CreatedAt");
@@ -493,7 +559,7 @@ public class MirsDAO {
 
     public static  List<ReleasedItemDetails> getReleasedMIRSItems(MIRS mirs) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT Stocks.Description, MIRSItems.*, Releasing.Status " +
+                "SELECT DISTINCT Stocks.Description, MIRSItems.*, Releasing.Status " +
                         "FROM MIRSItems " +
                         "LEFT JOIN Stocks ON Stocks.id = MIRSItems.StockID " +
                         "LEFT JOIN Releasing ON (Releasing.MIRSID=MIRSItems.MIRSID AND Releasing.StockID=MIRSItems.StockID) " +

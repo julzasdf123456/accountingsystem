@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.*;
 
 import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXTreeTableView;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -29,6 +30,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -49,10 +51,12 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
     public List<JFXButton> subMenus;
     public JFXButton options = new JFXButton("Options");
     public JFXButton reports = new JFXButton("Reports");
-    @FXML
-    private StackPane stackPane;
+
     @FXML
     private VBox displayBox;
+
+    @FXML
+    private JFXTextField searchMIRS;
 
     @FXML
     private TableView tableView;
@@ -64,6 +68,12 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
 
     private int LIMIT = Utility.ROW_PER_PAGE;
     private int COUNT = 0;
+
+
+
+    private static String APPROVAL = "Pending Approval";
+    private static String RELEASES = "Pending Releases";
+
 
     ContextMenuHelper contextMenuHelper = new ContextMenuHelper();
     MenuItem createInventory = new MenuItem("Create Inventory");
@@ -102,30 +112,30 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
 
     @FXML
     private void mirsPendingApproval(MouseEvent event) {
-        display_lbl.setText("Pending Approval");
+        display_lbl.setText(APPROVAL);
         initializedTable(Utility.PENDING);
         try {
             ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getMIRSByStatus(Utility.PENDING));
             tableView.getItems().setAll(observableList);
         } catch (Exception e) {
-            AlertDialogBuilder.messgeDialog("System Error", this.getClass().getName() +": "+ e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+            AlertDialogBuilder.messgeDialog("System Error", this.getClass().getName() +": "+ e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }
     }
 
     @FXML
     private void mirsPendingReleases(MouseEvent event) {
-        display_lbl.setText("Pending Releases");
+        display_lbl.setText(RELEASES);
         initializedTable(Utility.RELEASING);
         try {
             ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getMIRSByStatus(Utility.RELEASING));
             tableView.getItems().setAll(observableList);
         } catch (Exception e) {
-            AlertDialogBuilder.messgeDialog("System Error", this.getClass().getName() +": "+ e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+            AlertDialogBuilder.messgeDialog("System Error", this.getClass().getName() +": "+ e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }
     }
 
     @FXML
-    void viewCriticalItems(MouseEvent event) {
+    private void viewCriticalItems(MouseEvent event) {
         this.bindPages();
         this.setCriticalCount();
         this.initializeCriticalStocks();
@@ -133,13 +143,30 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
     }
 
     @FXML
-    void viewMRItems(MouseEvent event) {
+    private void viewMRItems(MouseEvent event) {
         Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(MRInventoryController.class, "../warehouse_mr_inventory.fxml"));
     }
 
     @FXML
-    void viewEmployeesWithMR(MouseEvent event) {
+    private void viewEmployeesWithMR(MouseEvent event) {
         Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(ViewMRsController.class, "../view_mrs_controller.fxml"));
+    }
+
+    @FXML
+    private void searchMIRS(ActionEvent event) {
+        ObservableList<MIRS> observableList = null;
+        try {
+            if(display_lbl.getText().equals(APPROVAL)){
+                initializedTable(Utility.PENDING);
+                observableList = FXCollections.observableList(MirsDAO.searchMIRS(searchMIRS.getText(), Utility.PENDING));
+            }else if(display_lbl.getText().equals(RELEASES)){
+                initializedTable(Utility.RELEASING);
+                observableList = FXCollections.observableList(MirsDAO.searchMIRS(searchMIRS.getText(), Utility.RELEASING));
+            }
+            tableView.getItems().setAll(observableList);
+        } catch (Exception e) {
+            AlertDialogBuilder.messgeDialog("System Error", this.getClass().getName() +": "+ e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }
     }
 
     private void initializedTable(String s){
@@ -147,11 +174,15 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         tableView.getColumns().clear();
         TableColumn<MIRS, String> column0 = new TableColumn<>("Date Filed");
         column0.setCellValueFactory(new PropertyValueFactory<>("DateFiled"));
-        column0.setMinWidth(150);
+        column0.setPrefWidth(100);
+        column0.setMaxWidth(100);
+        column0.setMinWidth(100);
         column0.setStyle("-fx-alignment: center;");
 
         TableColumn<MIRS, String> column1 = new TableColumn<>("MIRS Number");
         column1.setCellValueFactory(new PropertyValueFactory<>("Id"));
+        column1.setPrefWidth(150);
+        column1.setMaxWidth(150);
         column1.setMinWidth(150);
         column1.setStyle("-fx-alignment: center;");
 
@@ -164,16 +195,20 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
             }
             return null;
         });
+        column2.setPrefWidth(200);
+        column2.setMaxWidth(200);
         column2.setMinWidth(200);
         column2.setStyle("-fx-alignment: center-left;");
 
         TableColumn<MIRS, String> column3 = new TableColumn<>("Purpose");
         column3.setCellValueFactory(new PropertyValueFactory<>("Purpose"));
-        column3.setMinWidth(250);
         column3.setStyle("-fx-alignment: center-left;");
 
         TableColumn<MIRS, String> column4 = new TableColumn<>("Action");
         column4.setStyle("-fx-alignment: center;");
+        column4.setPrefWidth(80);
+        column4.setMaxWidth(80);
+        column4.setMinWidth(80);
         Callback<TableColumn<MIRS, String>, TableCell<MIRS, String>> viewBtn
                 = //
                 new Callback<TableColumn<MIRS, String>, TableCell<MIRS, String>>() {
@@ -181,14 +216,15 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
                     public TableCell call(final TableColumn<MIRS, String> param) {
                         final TableCell<MIRS, String> cell = new TableCell<MIRS, String>() {
 
-                            Button btn = new Button("view");
-                            FontIcon icon = new FontIcon("mdi2e-eye");
+                            final Button btn = new Button("");
+                            final FontIcon icon = new FontIcon("mdi2e-eye");
 
                             @Override
                             public void updateItem(String item, boolean empty) {
                                 super.updateItem(item, empty);
                                 icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
-                                btn.setStyle("-fx-background-color: #2196f3");
+                                btn.setStyle("-fx-background-color:"+ColorPalette.WARNING+";");
+                                btn.setPadding(new Insets(0, 7, 0, 7));
                                 btn.setGraphic(icon);
                                 btn.setGraphicTextGap(5);
                                 btn.setTextFill(Paint.valueOf(ColorPalette.WHITE));
@@ -201,9 +237,9 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
                                         try {
                                             Utility.setActiveMIRS(mirs);
                                             if(s.equals("pending")){
-                                                ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_approval_form.fxml",stackPane);
+                                                ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_approval_form.fxml",Utility.getStackPane());
                                             }else if (s.equals("releasing")){
-                                                ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_releasing_form.fxml",stackPane);
+                                                ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_releasing_form.fxml",Utility.getStackPane());
                                             }
                                         } catch (Exception e) {
                                             e.printStackTrace();
@@ -221,6 +257,9 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
 
         TableColumn<MIRS, String> column5 = new TableColumn<>("Status");
         column5.setStyle("-fx-alignment: center;");
+        column5.setPrefWidth(80);
+        column5.setMaxWidth(80);
+        column5.setMinWidth(80);
         Callback<TableColumn<MIRS, String>, TableCell<MIRS, String>> statusIcon
                 = //
                 new Callback<TableColumn<MIRS, String>, TableCell<MIRS, String>>() {
@@ -237,23 +276,24 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
                                     setText(null);
                                 } else {
                                     try {
-                                    Timer timer = new java.util.Timer();
-
+                                        Timer timer = new java.util.Timer();
                                         timer.schedule(new TimerTask() {
                                         public void run() {
                                             Platform.runLater(new Runnable() {
                                                 public void run() {
                                                     try {
-                                                        int index = getIndex();
-                                                        if(index >= 0){
-                                                            if(getTableView().getItems().get(index) instanceof  MIRS && getTableView().getItems().get(index) != null){
-                                                                MIRS mirs = getTableView().getItems().get(index);
-                                                                if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) >= 2){
-                                                                    status.setStyle("-fx-background-color: "+ColorPalette.DANGER+"; -fx-background-radius: 12");
-                                                                }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 1){
-                                                                    status.setStyle("-fx-background-color: "+ColorPalette.WARNING+"; -fx-background-radius: 12");
-                                                                }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 0){
-                                                                    status.setStyle("-fx-background-color: "+ColorPalette.SUCCESS+"; -fx-background-radius: 12");
+                                                        if(display_lbl.getText().equals(APPROVAL)){
+                                                            int index = getIndex();
+                                                            if(index >= 0){
+                                                                if(getTableView().getItems().get(index) instanceof  MIRS && getTableView().getItems().get(index) != null){
+                                                                    MIRS mirs = getTableView().getItems().get(index);
+                                                                    if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) >= 2){
+                                                                        status.setStyle("-fx-background-color: "+ColorPalette.DANGER+"; -fx-background-radius: 12; -fx-font-size: 14");
+                                                                    }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 1){
+                                                                        status.setStyle("-fx-background-color: "+ColorPalette.WARNING+"; -fx-background-radius: 12; -fx-font-size: 14");
+                                                                    }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 0){
+                                                                        status.setStyle("-fx-background-color: "+ColorPalette.SUCCESS+"; -fx-background-radius: 12; -fx-font-size: 14");
+                                                                    }
                                                                 }
                                                             }
                                                         }
