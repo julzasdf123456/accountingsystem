@@ -14,6 +14,7 @@ public class Utility {
     public static String RELEASING = "releasing";
     public static String REJECTED = "rejected";
     public static String RELEASED = "released";
+    public static String PARTIAL_RELEASED = "partial";
     public static String CLOSED = "closed";
     public static String PENDING = "pending";
     public static String APPROVED = "approved";
