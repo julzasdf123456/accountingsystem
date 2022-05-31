@@ -101,6 +101,39 @@ public class ReleasingDAO {
         return items;
     }
 
+    public static List<Releasing> getAllReleasedAndPartial(MIRS mirs) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM Releasing WHERE MIRSID=? and (status='"+Utility.RELEASED+"' OR status='"+Utility.PARTIAL_RELEASED+"') ");
+        ps.setString(1, mirs.getId());
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<Releasing> items = new ArrayList();
+        while(rs.next()) {
+            Releasing  releasing = new Releasing(
+                    rs.getString("id"),
+                    rs.getString("StockID"),
+                    rs.getString("MIRSID"),
+                    rs.getInt("Quantity"),
+                    rs.getDouble("Price"),
+                    rs.getString("UserID"),
+                    rs.getString("Status"),
+                    rs.getString("MR"),
+                    rs.getString("WorkOrderNo"),
+                    rs.getString("mct_no")
+            );
+            releasing.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
+            releasing.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
+
+            items.add(releasing);
+        }
+
+        rs.close();
+        ps.close();
+
+        return items;
+    }
+
     public static void updateReleasedItem(Releasing item) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE Releasing SET Status=?, UpdatedAt=GETDATE() " +
