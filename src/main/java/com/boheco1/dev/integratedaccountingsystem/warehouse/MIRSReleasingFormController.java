@@ -97,6 +97,11 @@ public class MIRSReleasingFormController implements Initializable {
     @FXML
     private void acceptBtn(ActionEvent event) {
         try {
+            if(releasingList.getItems().size() == 0) {
+                AlertDialogBuilder.messgeDialog("System Message", "No available item(s) listed for releasing.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                return;
+            }
+
             JFXDialogLayout dialogContent = new JFXDialogLayout();
             dialogContent.setStyle("-fx-border-width: 0 0 0 15; -fx-border-color: " + ColorPalette.INFO + ";");
             dialogContent.setPrefHeight(200);
@@ -113,7 +118,7 @@ public class MIRSReleasingFormController implements Initializable {
             flowPane.setColumnHalignment(HPos.CENTER);
             flowPane.setVgap(6);
 
-            Label context = new Label("Are sure you want to release selected items?");
+            Label context = new Label("Are sure you want to release listed item(s)?");
             context.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 12));
             context.setWrapText(true);
             context.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
@@ -200,6 +205,7 @@ public class MIRSReleasingFormController implements Initializable {
 
     @FXML
     private void addNewMIRSItem(ActionEvent event) throws Exception {
+
         if(selectedStock == null){
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
@@ -209,6 +215,8 @@ public class MIRSReleasingFormController implements Initializable {
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
         }
+
+
 
         MIRSItem mirsItem = new MIRSItem();
         mirsItem.setMirsID(mirsNumber.getText());
@@ -261,10 +269,10 @@ public class MIRSReleasingFormController implements Initializable {
             if(selectedItems.size() == 0){
                 AlertDialogBuilder.messgeDialog("System Message", "No item(s) selected, please try again.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
             }else{
-
                 if(btn == addAllQtyBtn) {
                     ObservableList<MIRSItem> toBeReleased = FXCollections.observableArrayList(releasingList.getItems());
                     for (MIRSItem selected : selectedItems) {
+
                         boolean found = false;
                         for (MIRSItem listed : toBeReleased) {
                             if (listed.getId().equals(selected.getId())) {
@@ -284,6 +292,12 @@ public class MIRSReleasingFormController implements Initializable {
                 }else if(btn == removeItemBtn){
                     ObservableList<MIRSItem> requested = FXCollections.observableArrayList(requestedList.getItems());
                     for (MIRSItem selected : selectedItems) {
+
+                        if(selected.getId() == null){
+                            releasingList.getItems().remove(selected);
+                            break;
+                        }
+
                         boolean found = false;
                         for (MIRSItem listed : requested) {
                             if (listed.getId().equals(selected.getId())) {
@@ -462,6 +476,18 @@ public class MIRSReleasingFormController implements Initializable {
                     particulars.setText("");
                     selectedStock = null;
                 }else{
+
+                    List<MIRSItem> requests = requestedList.getItems();
+                    for(MIRSItem r : requests){
+                        if(selectedStock.getId().equals(r.getStockID())){
+                            AlertDialogBuilder.messgeDialog("System Message", "Can not add addition "+selectedStock.getDescription()+" ,since item can still be listed as item for releasing.",
+                                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                            selectedStock = null;
+                            particulars.setText("");
+                            quantity.setText("");
+                            return;
+                        }
+                    }
                     quantity.requestFocus();
                     inStock.setText("In Stock: "+ selectedStock.getQuantity());
                     pending.setText("Pending: "+ (StockDAO.countPendingRequest(selectedStock)));
