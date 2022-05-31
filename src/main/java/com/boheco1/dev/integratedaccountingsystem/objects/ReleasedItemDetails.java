@@ -17,6 +17,7 @@ public class ReleasedItemDetails {
     private LocalDateTime updatedAt;
     private String workOrderNo;
     private int remaining;
+    private int actualReleased;
 
     public ReleasedItemDetails(String itemDescription, String mirsItemId, String mirsID, String stockID, int quantity, double price, String status, LocalDateTime createdAt, LocalDateTime updatedAt, String workOrderNo) {
         this.itemDescription = itemDescription;
@@ -125,7 +126,16 @@ public class ReleasedItemDetails {
         mirsItem.setMirsID(mirsID);
         mirsItem.setStockID(stockID);
         mirsItem.setQuantity(quantity);
+        return Math.max(MirsDAO.getBalance(mirsItem), 0);
+    }
 
-        return MirsDAO.getBalance(mirsItem);
+    public int getActualReleased() throws Exception {
+        MIRSItem mirsItem = new MIRSItem();
+        mirsItem.setMirsID(mirsID);
+        mirsItem.setStockID(stockID);
+        mirsItem.setQuantity(quantity);
+
+        return Math.abs(MirsDAO.getBalance(mirsItem)-quantity);
+
     }
 }
