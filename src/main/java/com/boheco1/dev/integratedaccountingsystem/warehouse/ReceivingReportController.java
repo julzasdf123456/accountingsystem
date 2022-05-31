@@ -1,6 +1,5 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
-import com.boheco1.dev.integratedaccountingsystem.HomeController;
 import com.boheco1.dev.integratedaccountingsystem.dao.ReceivingDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.SupplierDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
@@ -61,7 +60,7 @@ public class ReceivingReportController extends MenuControllerHandler implements 
 
     private ObservableList<Receiving> rreports;
 
-    private int LIMIT = HomeController.ROW_PER_PAGE;
+    private int LIMIT = Utility.ROW_PER_PAGE;
     private int COUNT = 0;
 
     @Override
@@ -120,8 +119,8 @@ public class ReceivingReportController extends MenuControllerHandler implements 
         column1.setCellValueFactory(new PropertyValueFactory<>("rrNo"));
 
         TableColumn<Receiving, String> column2 = new TableColumn<>("Date");
-        column2.setMinWidth(150);
-        column2.setCellValueFactory(new PropertyValueFactory<>("date"));
+        column2.setMinWidth(120);
+        column2.setCellValueFactory(stockStringCellDataFeatures -> new SimpleStringProperty(stockStringCellDataFeatures.getValue().getDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))));
         column2.setStyle("-fx-alignment: center;");
 
         TableColumn<Receiving, String> column3 = new TableColumn<>("RV Number");
@@ -172,7 +171,6 @@ public class ReceivingReportController extends MenuControllerHandler implements 
                         printButton.setOnAction(actionEvent -> {
                             saveReport(item.getRrNo());
                         });
-
 
                         HBox hBox = new HBox();
                         HBox filler = new HBox();
@@ -282,7 +280,7 @@ public class ReceivingReportController extends MenuControllerHandler implements 
                         date_lbl_cell.setCellStyle(style);
 
                         org.apache.poi.ss.usermodel.Cell date_cell = date_row.createCell(8);
-                        date_cell.setCellValue(receiving.getDate().format(DateTimeFormatter.ofPattern("MMM. dd, yyyy")));
+                        date_cell.setCellValue(receiving.getDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy")));
                         CellRangeAddress date_cell_addr = new CellRangeAddress(date_head_row, date_head_row, 8, 9);
                         sheet.addMergedRegion(date_cell_addr);
                         date_cell.setCellStyle(style);

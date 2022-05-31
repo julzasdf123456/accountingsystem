@@ -47,9 +47,6 @@ public class StockEntryController extends MenuControllerHandler implements Initi
     private JFXComboBox<StockType> type;
 
     @FXML
-    private JFXComboBox<String> source;
-
-    @FXML
     private JFXButton saveBtn;
 
     private Stock stock = null;
@@ -63,7 +60,6 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         } catch (Exception e) {
             e.printStackTrace();
         }
-        this.bindSources();
         this.bindStockTypes();
         this.bindNumbers();
     }
@@ -78,7 +74,6 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         StockType stockType = this.type.getSelectionModel().getSelectedItem();
         LocalDate manDate = this.manuDate.getValue();
         LocalDate valDate = this.valDate.getValue();
-        String source = this.source.getSelectionModel().getSelectedItem();
         String serialNumber = this.serialNumber.getText();
         String localCode = this.localCode.getText();
         String accountCode = this.accountCode.getText();
@@ -142,9 +137,6 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         }else if (price == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for price!",
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (source == null){
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please select a valid source type!",
-                    stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (threshold == 0){
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please select enter a valid threshold remaining limit for the stock!",
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
@@ -162,9 +154,8 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                     //Create StockEntryLog object
                     StockEntryLog stockEntryLog = new StockEntryLog();
                     stockEntryLog.setQuantity(quantity);
-                    if (source != null)
-                        stockEntryLog.setSource(source);
                     stockEntryLog.setPrice(this.stock.getPrice());
+                    stockEntryLog.setSource("Purchased");
 
                     //Insert StockEntryLog to database
                     StockDAO.stockEntry(this.stock, stockEntryLog);
@@ -182,9 +173,8 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                     //Create StockEntryLog object
                     StockEntryLog stockEntryLog = new StockEntryLog();
                     stockEntryLog.setQuantity(quantity);
-                    if (source != null)
-                        stockEntryLog.setSource(source);
                     stockEntryLog.setPrice(this.stock.getPrice());
+                    stockEntryLog.setSource("Purchased");
 
                     //Insert StockEntryLog to database
                     StockDAO.stockEntry(this.stock, stockEntryLog);
@@ -234,12 +224,6 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public void bindSources(){
-        source.getItems().add("Purchased");
-        source.getSelectionModel().select(0);
-        source.getItems().add("Returned");
     }
 
     public void bindAutocomplete(JFXTextField textField){
@@ -323,7 +307,6 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                 valDate.setDisable(true);
                 threshold.setDisable(true);
                 type.setDisable(true);
-                source.getSelectionModel().select(0);
             } catch (Exception e) {
                 AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), this.stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
             }
@@ -341,7 +324,6 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.quantity.setText("");
         this.unit.setText("");
         this.price.setText("");
-        this.source.getSelectionModel().select(null);
         this.type.getSelectionModel().select(null);
         this.description.setText("");
         this.model.setText("");
@@ -365,8 +347,6 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.valDate.setDisable(false);
         this.threshold.setDisable(false);
         this.type.setDisable(false);
-
-        source.getSelectionModel().select(0);
     }
 
     @Override

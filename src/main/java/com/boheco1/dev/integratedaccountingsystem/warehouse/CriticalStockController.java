@@ -1,6 +1,5 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
-import com.boheco1.dev.integratedaccountingsystem.HomeController;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
@@ -30,7 +29,7 @@ public class CriticalStockController extends MenuControllerHandler implements In
     @FXML
     private JFXComboBox<Integer> page_cb;
 
-    private int LIMIT = HomeController.ROW_PER_PAGE;
+    private int LIMIT = Utility.ROW_PER_PAGE;
     private int COUNT = 0;
 
     @Override
@@ -47,10 +46,6 @@ public class CriticalStockController extends MenuControllerHandler implements In
     }
 
     public void createTable(){
-        TableColumn<Stock, String> column1 = new TableColumn<>("Stock Name");
-        column1.setMinWidth(150);
-        column1.setCellValueFactory(new PropertyValueFactory<>("stockName"));
-
         TableColumn<Stock, String> column2 = new TableColumn<>("Description");
         column2.setMinWidth(300);
         column2.setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -72,7 +67,6 @@ public class CriticalStockController extends MenuControllerHandler implements In
         TableColumn<Stock, String> column7 = new TableColumn<>("Price");
         column7.setCellValueFactory(new PropertyValueFactory<>("price"));
         this.stocksTable.getColumns().removeAll();
-        this.stocksTable.getColumns().add(column1);
         this.stocksTable.getColumns().add(column2);
         this.stocksTable.getColumns().add(column3);
         this.stocksTable.getColumns().add(column4);

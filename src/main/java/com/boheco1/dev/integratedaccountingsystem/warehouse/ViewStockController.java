@@ -4,10 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
-import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
-import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
-import com.boheco1.dev.integratedaccountingsystem.objects.StockEntryLog;
-import com.boheco1.dev.integratedaccountingsystem.objects.StockType;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.*;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -15,10 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
@@ -46,7 +40,9 @@ public class ViewStockController implements Initializable {
     private JFXComboBox type;
 
     @FXML
-    private TableView stockEntries;
+    private TabPane tabPane;
+
+    private TableView stockEntries = new TableView(), stockReleases = new TableView();
 
     @FXML
     private JFXToggleButton editMode;
@@ -68,8 +64,23 @@ public class ViewStockController implements Initializable {
             this.stock = Utility.getSelectedStock();
             this.bindNumbers();
             this.bindStockTypes();
+
+            Tab stocks_tab = new Tab();
+            stocks_tab.setText("Stock Entries");
+            stocks_tab.setContent(this.stockEntries);
+            tabPane.getTabs().add(stocks_tab);
+
             this.createStockEntriesTable();
             this.initializeStockEntries();
+
+            Tab releases_tab = new Tab();
+            releases_tab.setText("Stock Releases");
+            releases_tab.setContent(this.stockReleases);
+            tabPane.getTabs().add(releases_tab);
+
+            this.createStockReleasesTable();
+            this.initializeStockReleases();
+
             this.initializeInformation();
             this.setLabels();
             this.toggle();
@@ -169,7 +180,7 @@ public class ViewStockController implements Initializable {
 
     public void createStockEntriesTable(){
         TableColumn<StockEntryLog, String> column1 = new TableColumn<>("Quantity");
-        column1.setMinWidth(110);
+        column1.setMinWidth(90);
         column1.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
         column1.setStyle("-fx-alignment: center;");
 
@@ -186,11 +197,55 @@ public class ViewStockController implements Initializable {
         column4.setCellValueFactory(stockEntryLog -> new SimpleStringProperty(stockEntryLog.getValue().getUpdatedAt().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))));
         column4.setStyle("-fx-alignment: center;");
 
+        TableColumn<StockEntryLog, String> column5 = new TableColumn<>("Receiving Report");
+        column5.setMinWidth(135);
+        column5.setStyle("-fx-alignment: center;");
+        column5.setCellValueFactory(new PropertyValueFactory<>("rrNo"));
+
         stockEntries.getColumns().add(column4);
+        stockEntries.getColumns().add(column5);
         stockEntries.getColumns().add(column1);
         stockEntries.getColumns().add(column2);
         stockEntries.getColumns().add(column3);
 
+    }
+
+    public void createStockReleasesTable(){
+        TableColumn<Releasing, String> column1 = new TableColumn<>("Quantity");
+        column1.setMinWidth(90);
+        column1.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
+        column1.setStyle("-fx-alignment: center;");
+
+        TableColumn<Releasing, String> column2 = new TableColumn<>("Price");
+        column2.setMinWidth(110);
+        column2.setCellValueFactory(new PropertyValueFactory<>("Price"));
+
+        TableColumn<Releasing, String> column3 = new TableColumn<>("Work Order");
+        column3.setMinWidth(135);
+        column3.setCellValueFactory(new PropertyValueFactory<>("workOrderNo"));
+        column3.setStyle("-fx-alignment: center;");
+
+        TableColumn<Releasing, String> column4 = new TableColumn<>("Date");
+        column4.setMinWidth(70);
+        column4.setCellValueFactory(releasedStock -> new SimpleStringProperty(releasedStock.getValue().getUpdatedAt().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))));
+        column4.setStyle("-fx-alignment: center;");
+
+        TableColumn<StockEntryLog, String> column5 = new TableColumn<>("MCT No");
+        column5.setMinWidth(135);
+        column5.setStyle("-fx-alignment: center;");
+        column5.setCellValueFactory(new PropertyValueFactory<>("mctNo"));
+
+        TableColumn<StockEntryLog, String> column6 = new TableColumn<>("MIRS ID");
+        column6.setMinWidth(135);
+        column6.setStyle("-fx-alignment: center;");
+        column6.setCellValueFactory(new PropertyValueFactory<>("mirsID"));
+
+        stockReleases.getColumns().add(column4);
+        stockReleases.getColumns().add(column5);
+        stockReleases.getColumns().add(column1);
+        stockReleases.getColumns().add(column2);
+        stockReleases.getColumns().add(column3);
+        stockReleases.getColumns().add(column6);
     }
 
     public void initializeInformation(){
@@ -227,6 +282,15 @@ public class ViewStockController implements Initializable {
         try {
             ObservableList<StockEntryLog> stocks = FXCollections.observableList(StockDAO.getEntryLogs(stock));
             stockEntries.getItems().setAll(stocks);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void initializeStockReleases(){
+        try {
+            ObservableList<Releasing> stocks = FXCollections.observableList(StockDAO.getReleasedStocks(stock, Utility.RELEASED));
+            stockReleases.getItems().setAll(stocks);
         } catch (Exception e) {
             e.printStackTrace();
         }

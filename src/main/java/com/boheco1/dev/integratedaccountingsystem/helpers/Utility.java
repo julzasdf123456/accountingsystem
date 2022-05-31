@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.helpers;
 
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
+import com.boheco1.dev.integratedaccountingsystem.warehouse.ReceivingEntryController;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
@@ -10,7 +11,7 @@ import java.util.Date;
 import java.util.Random;
 
 public class Utility {
-
+    public static int ROW_PER_PAGE = 20;
     public static String RELEASING = "releasing";
     public static String REJECTED = "rejected";
     public static String RELEASED = "released";
@@ -40,6 +41,8 @@ public class Utility {
     private static Receiving selectedReceiving;
 
     private static ViewMRController mrController;
+
+    private static ObjectTransaction parentController;
 
     public static MIRS getActiveMIRS() {
         return activeMIRS;
@@ -128,5 +131,13 @@ public class Utility {
     public static String CURRENT_YEAR() {
         Calendar cal = Calendar.getInstance();
         return ""+cal.get(Calendar.YEAR);
+    }
+
+    public static ObjectTransaction getParentController() {
+        return parentController;
+    }
+
+    public static void setParentController(ObjectTransaction parentController) {
+        Utility.parentController = parentController;
     }
 }

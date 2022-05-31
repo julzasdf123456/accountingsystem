@@ -38,7 +38,7 @@
                         </JFXComboBox>
                      </right>
                      <left>
-                        <Pane prefHeight="66.0" prefWidth="653.0" BorderPane.alignment="CENTER">
+                        <Pane prefHeight="66.0" prefWidth="681.0" BorderPane.alignment="CENTER">
                            <children>
                               <HBox alignment="CENTER" prefHeight="66.0" prefWidth="656.0">
                                  <children>
@@ -60,12 +60,12 @@
                                           <DatePicker fx:id="to_dp" prefHeight="31.0" prefWidth="211.0" promptText="Select Date" />
                                        </children>
                                     </VBox>
-                                    <JFXButton fx:id="generate_btn" onAction="#generateReport" prefHeight="30.0" prefWidth="75.0" styleClass="btn-theme" stylesheets="@style.css" text="Generate" textFill="WHITE">
+                                    <JFXButton fx:id="generate_btn" onAction="#generateReport" prefHeight="37.0" prefWidth="92.0" styleClass="btn-theme" stylesheets="@style.css" text="Generate" textFill="WHITE">
                                        <effect>
                                           <DropShadow />
                                        </effect>
                                        <HBox.margin>
-                                          <Insets right="48.0" />
+                                          <Insets right="48.0" top="20.0" />
                                        </HBox.margin>
                                     </JFXButton>
                                     <JFXButton fx:id="downloadReport_btn" onAction="#downloadReport" prefHeight="30.0" prefWidth="50.0" styleClass="btn-info" stylesheets="@style.css" textFill="WHITE">
@@ -76,10 +76,13 @@
                                           <DropShadow />
                                        </effect>
                                        <HBox.margin>
-                                          <Insets right="8.0" />
+                                          <Insets right="8.0" top="20.0" />
                                        </HBox.margin>
                                     </JFXButton>
                                  </children>
+                                 <padding>
+                                    <Insets left="5.0" />
+                                 </padding>
                               </HBox>
                            </children>
                            <BorderPane.margin>

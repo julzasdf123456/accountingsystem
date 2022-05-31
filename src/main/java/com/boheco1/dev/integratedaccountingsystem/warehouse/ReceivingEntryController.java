@@ -6,25 +6,18 @@ import com.boheco1.dev.integratedaccountingsystem.dao.SupplierDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTextField;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -49,7 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class ReceivingEntryController extends MenuControllerHandler implements Initializable {
+public class ReceivingEntryController extends MenuControllerHandler implements Initializable, ObjectTransaction {
 
     @FXML
     private StackPane stackPane;
@@ -59,8 +52,7 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
 
 
     @FXML
-    private JFXTextField supplier_tf, bno_tf, addr_tf, carrier_tf, invoice_tf, dr_tf, rv_tf, po_tf, stock_tf, qty_delivered_tf, qty_received_tf, cost_tf,
-            received_tf, received_original_tf, verified_tf, posted_tf;
+    private JFXTextField supplier_tf, bno_tf, addr_tf, carrier_tf, invoice_tf, dr_tf, rv_tf, po_tf, received_tf, received_original_tf, verified_tf, posted_tf;
 
     @FXML
     private TextField net_sales_tf, vat_tf, total_tf;
@@ -68,12 +60,6 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
     @FXML
     private TableView new_stocks_table;
 
-    @FXML
-    private JFXButton addBtn;
-
-    private JFXDialog dialog;
-
-    private Stock currentStock = null;
     private ObservableList<Stock> receivedItems = null;
 
     private User received = null, received_original = null, verified = null, posted = null;
@@ -82,61 +68,22 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.createTable();
-        this.addBtn.setDisable(true);
         this.bindSupplierAutocomplete(this.supplier_tf);
-        this.bindStockAutocomplete(this.stock_tf);
         this.bindUserAutocomplete(this.received_tf);
         this.bindUserAutocomplete(this.received_original_tf);
         this.bindUserAutocomplete(this.verified_tf);
         this.bindUserAutocomplete(this.posted_tf);
-        this.bindNumbers();
         this.reset();
+        Utility.setParentController(this);
     }
 
     @FXML
     public void addReceivingItem(){
-        int qty_delivered = 0, qty_accepted = 0;
-        double price = 0;
-
-        try {
-            qty_delivered = Integer.parseInt(this.qty_delivered_tf.getText());
-            qty_accepted = Integer.parseInt(this.qty_received_tf.getText());
-            price = Double.parseDouble(this.cost_tf.getText());
-        }catch (Exception e){
-
-        }
-
-        if (qty_delivered <= 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for delivered quantity!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (qty_accepted <= 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for accepted quantity!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (qty_accepted > qty_delivered) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Accepted quantity should not exceed delivered quantity!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (price <= 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Unit Cost should not be less than or equal to 0!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (this.currentStock == null) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please select a stock first before proceeding to add!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (this.supplier == null){
+        if (this.supplier == null){
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please set a supplier first before proceeding to add item!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else{
-            ReceivingItem receivingItem = new ReceivingItem();
-            receivingItem.setRrNo(null);
-            receivingItem.setStockId(currentStock.getId());
-            receivingItem.setQtyDelivered(qty_delivered);
-            receivingItem.setQtyAccepted(qty_accepted);
-            receivingItem.setUnitCost(price);
-            Stock stock = currentStock;
-            stock.setReceivingItem(receivingItem);
-            this.receivedItems.add(stock);
-            this.new_stocks_table.setItems(this.receivedItems);
-            this.credit(12, receivingItem.getQtyAccepted()*receivingItem.getUnitCost());
-            this.resetAdd();
+            ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_add_receiving_item.fxml", Utility.getStackPane());
         }
     }
 
@@ -243,12 +190,14 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
 
     public void createTable(){
         TableColumn<Stock, String> column1 = new TableColumn<>("Code");
-        column1.setMinWidth(110);
+        column1.setMinWidth(100);
+        column1.setPrefWidth(120);
         column1.setCellValueFactory(new PropertyValueFactory<>("id"));
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Stock, String> column3 = new TableColumn<>("Description");
-        column3.setMinWidth(400);
+        column3.setMinWidth(350);
+        column3.setPrefWidth(436);
         column3.setCellValueFactory(new PropertyValueFactory<>("description"));
         column3.setStyle("-fx-alignment: center-left;");
 
@@ -258,24 +207,26 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
         column4.setStyle("-fx-alignment: center;");
 
         TableColumn<Stock, String> column5 = new TableColumn<>("Delivered");
-        column5.setMinWidth(50);
+        column5.setMinWidth(80);
         column5.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getReceivingItem().getQtyDelivered()+""));
         column5.setStyle("-fx-alignment: center;");
 
         TableColumn<Stock, String> column6 = new TableColumn<>("Accepted");
-        column6.setMinWidth(50);
+        column6.setMinWidth(80);
         column6.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getReceivingItem().getQtyAccepted()+""));
         column6.setStyle("-fx-alignment: center;");
 
         TableColumn<Stock, String> column7 = new TableColumn<>("Price");
-        column7.setMinWidth(50);
+        column7.setMinWidth(75);
+        column7.setPrefWidth(103);
         column7.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getReceivingItem().getUnitCost()+""));
         column7.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Stock, String> column8 = new TableColumn<>("Amount");
-        column8.setMinWidth(50);
+        column8.setMinWidth(100);
+        column8.setPrefWidth(268);
         column8.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getReceivingItem().getQtyAccepted() * stocks.getValue().getReceivingItem().getUnitCost() +""));
-        column8.setStyle("-fx-alignment: center-left;");
+        column8.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Stock, String> column9 = new TableColumn<>("Action");
         Callback<TableColumn<Stock, String>, TableCell<Stock, String>> removeBtn
@@ -350,62 +301,6 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
         this.net_sales_tf.setText(net_sales+"");
         this.vat_tf.setText(vat+"");
         this.total_tf.setText(total+"");
-    }
-
-    public void bindNumbers(){
-        InputHelper.restrictNumbersOnly(this.qty_delivered_tf);
-        InputHelper.restrictNumbersOnly(this.qty_received_tf);
-        InputHelper.restrictNumbersOnly(this.cost_tf);
-    }
-
-    public void bindStockAutocomplete(JFXTextField textField){
-        AutoCompletionBinding<SlimStock> stockSuggest = TextFields.bindAutoCompletion(textField,
-                param -> {
-                    //Value typed in the textfield
-                    String query = param.getUserText();
-
-                    //Initialize list of stocks
-                    List<SlimStock> list = new ArrayList<>();
-
-                    //Perform DB query when length of search string is 3 or above
-                    if (query.length() > 2){
-                        try {
-                            list = StockDAO.search(query, 0);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    if (list.size() == 0) {
-                        currentStock = null;
-                    }
-
-                    return list;
-                }, new StringConverter<>() {
-                    //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
-                    @Override
-                    public String toString(SlimStock object) {
-                        return object.getDescription();
-                    }
-
-                    @Override
-                    public SlimStock fromString(String string) {
-                        throw new UnsupportedOperationException();
-                    }
-                });
-
-        //This will set the actions once the user clicks an item from the popupmenu.
-        stockSuggest.setOnAutoCompleted(event -> {
-            SlimStock result = event.getCompletion();
-            try {
-                currentStock = StockDAO.get(result.getId());
-                this.stock_tf.setText(currentStock.getDescription());
-                this.cost_tf.setText(currentStock.getPrice()+"");
-                this.addBtn.setDisable(false);
-            } catch (Exception e) {
-                AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), this.stackPane, AlertDialogBuilder.DANGER_DIALOG);
-            }
-        });
     }
 
     public void bindSupplierAutocomplete(JFXTextField textField){
@@ -513,15 +408,6 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
         });
     }
 
-    public void resetAdd(){
-        this.addBtn.setDisable(true);
-        this.stock_tf.setText("");
-        this.cost_tf.setText("");
-        this.qty_delivered_tf.setText("");
-        this.qty_received_tf.setText("");
-        this.currentStock = null;
-    }
-
     public void clear(){
         this.receivedItems =  FXCollections.observableArrayList();
         this.new_stocks_table.setItems(this.receivedItems);
@@ -539,8 +425,6 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
         this.received_original_tf.setText("");
         this.verified_tf.setText("");
         this.posted_tf.setText("");
-
-        this.resetAdd();
 
         this.total_tf.setText("0");
         this.vat_tf.setText("0");
@@ -631,7 +515,7 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
                         date_lbl_cell.setCellStyle(style);
 
                         org.apache.poi.ss.usermodel.Cell date_cell = date_row.createCell(8);
-                        date_cell.setCellValue(receiving.getDate().format(DateTimeFormatter.ofPattern("MMM. dd, yyyy")));
+                        date_cell.setCellValue(receiving.getDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy")));
                         CellRangeAddress date_cell_addr = new CellRangeAddress(date_head_row, date_head_row, 8, 9);
                         sheet.addMergedRegion(date_cell_addr);
                         date_cell.setCellStyle(style);
@@ -924,5 +808,16 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
     @FXML
     public void reset(){
         clear();
+    }
+
+    @Override
+    public void receive(Object o) {
+        if (o instanceof Stock){
+            Stock stock = (Stock) o;
+            ReceivingItem receivingItem = stock.getReceivingItem();
+            this.receivedItems.add(stock);
+            this.new_stocks_table.setItems(this.receivedItems);
+            this.credit(12, receivingItem.getQtyAccepted()*receivingItem.getUnitCost());
+        }
     }
 }

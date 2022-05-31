@@ -10,7 +10,6 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -319,22 +318,22 @@ public class MREntryController extends MenuControllerHandler implements Initiali
 
     public void initializeTable() {
         TableColumn<MR, String> column1 = new TableColumn<>("Stock ID");
-        column1.setMinWidth(100);
+        column1.setMinWidth(120);
         column1.setCellValueFactory(new PropertyValueFactory<>("stockId"));
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<MR, String> column2 = new TableColumn<>("Item Name");
-        column2.setMinWidth(500);
+        column2.setMinWidth(400);
         column2.setCellValueFactory(new PropertyValueFactory<>("extItem"));
         column2.setStyle("-fx-alignment: center-left;");
 
         TableColumn<MR, String> column3 = new TableColumn<>("Quantity");
-        column3.setMinWidth(125);
+        column3.setMinWidth(75);
         column3.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         column3.setStyle("-fx-alignment: center;");
 
         TableColumn<MR, String> column4 = new TableColumn<>("Unit Price");
-        column4.setMinWidth(125);
+        column4.setMinWidth(100);
         column4.setCellValueFactory(new PropertyValueFactory<>("price"));
         column4.setStyle("-fx-alignment: center;");
 

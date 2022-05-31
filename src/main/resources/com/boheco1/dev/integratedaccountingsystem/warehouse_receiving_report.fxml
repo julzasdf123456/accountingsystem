@@ -43,9 +43,9 @@
                                           <Insets right="16.0" />
                                        </HBox.margin>
                                     </VBox>
-                                    <Label prefHeight="17.0" prefWidth="38.0" text="Or">
+                                    <Label alignment="CENTER" prefHeight="17.0" prefWidth="49.0" text="Or" textAlignment="CENTER">
                                        <HBox.margin>
-                                          <Insets right="16.0" />
+                                          <Insets right="16.0" top="20.0" />
                                        </HBox.margin>
                                     </Label>
                                     <VBox>
@@ -71,13 +71,16 @@
                                           <DropShadow />
                                        </effect>
                                        <HBox.margin>
-                                          <Insets right="48.0" />
+                                          <Insets right="48.0" top="20.0" />
                                        </HBox.margin>
                                     </JFXButton>
                                     <JFXButton onAction="#reset" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" stylesheets="@style.css" text="Reset">
                                        <effect>
                                           <DropShadow />
                                        </effect>
+                                       <HBox.margin>
+                                          <Insets top="20.0" />
+                                       </HBox.margin>
                                     </JFXButton>
                                  </children>
                                  <padding>

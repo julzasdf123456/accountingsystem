@@ -62,7 +62,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
     @FXML
     private JFXComboBox<Integer> page_cb;
 
-    private int LIMIT = HomeController.ROW_PER_PAGE;
+    private int LIMIT = Utility.ROW_PER_PAGE;
     private int COUNT = 0;
 
     ContextMenuHelper contextMenuHelper = new ContextMenuHelper();
@@ -297,30 +297,36 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         tableView.getItems().clear();
         tableView.getColumns().clear();
 
-        TableColumn<Stock, String> column1 = new TableColumn<>("Stock Name");
-        column1.setMinWidth(150);
-        column1.setCellValueFactory(new PropertyValueFactory<>("stockName"));
+        TableColumn<Stock, String> column1 = new TableColumn<>("Stock ID");
+        column1.setMinWidth(125);
+        column1.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         TableColumn<Stock, String> column2 = new TableColumn<>("Description");
-        column2.setMinWidth(300);
+        column2.setMinWidth(400);
         column2.setCellValueFactory(new PropertyValueFactory<>("description"));
 
         TableColumn<Stock, String> column3 = new TableColumn<>("Brand");
-        column3.setMinWidth(100);
+        column3.setMinWidth(175);
         column3.setCellValueFactory(new PropertyValueFactory<>("brand"));
 
         TableColumn<Stock, String> column4 = new TableColumn<>("Model");
-        column4.setMinWidth(100);
+        column4.setMinWidth(175);
         column4.setCellValueFactory(new PropertyValueFactory<>("model"));
 
         TableColumn<Stock, String> column5 = new TableColumn<>("Unit");
+        column5.setMinWidth(75);
         column5.setCellValueFactory(new PropertyValueFactory<>("unit"));
+        column5.setStyle("-fx-alignment: center;");
 
         TableColumn<Stock, String> column6 = new TableColumn<>("Quantity");
+        column6.setMinWidth(75);
         column6.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        column6.setStyle("-fx-alignment: center;");
 
         TableColumn<Stock, String> column7 = new TableColumn<>("Price");
+        column7.setMinWidth(100);
         column7.setCellValueFactory(new PropertyValueFactory<>("price"));
+        column7.setStyle("-fx-alignment: center-left;");
         this.tableView.getColumns().removeAll();
         this.tableView.getColumns().add(column1);
         this.tableView.getColumns().add(column2);
@@ -413,7 +419,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         });
 
         viewMRItems.setOnAction(actionEvent -> {
-            titleHolder.setText("All MRs");
+            titleHolder.setText("View All MRs");
             container.getChildren().setAll(ContentHandler.getNodeFromFxml(ViewMRsController.class, "../view_mrs_controller.fxml"));
         });
 

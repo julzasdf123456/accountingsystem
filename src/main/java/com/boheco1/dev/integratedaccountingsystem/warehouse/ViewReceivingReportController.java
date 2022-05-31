@@ -60,11 +60,11 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
 
     public void createTable(){
         TableColumn<Stock, String> column1 = new TableColumn<>("Code");
-        column1.setMinWidth(110);
+        column1.setMinWidth(120);
         column1.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         TableColumn<Stock, String> column3 = new TableColumn<>("Description");
-        column3.setMinWidth(400);
+        column3.setMinWidth(450);
         column3.setCellValueFactory(new PropertyValueFactory<>("description"));
 
         TableColumn<Stock, String> column4 = new TableColumn<>("Unit");
@@ -83,11 +83,12 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
         column6.setStyle("-fx-alignment: center;");
 
         TableColumn<Stock, String> column7 = new TableColumn<>("Price");
-        column7.setMinWidth(75);
+        column7.setMinWidth(103);
         column7.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getReceivingItem().getUnitCost()+""));
 
         TableColumn<Stock, String> column8 = new TableColumn<>("Amount");
-        column8.setMinWidth(75);
+        column8.setMinWidth(268);
+        column8.setStyle("-fx-alignment: center-right;");
         column8.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getReceivingItem().getQtyAccepted() * stocks.getValue().getReceivingItem().getUnitCost() +""));
 
         this.receivedItems =  FXCollections.observableArrayList();

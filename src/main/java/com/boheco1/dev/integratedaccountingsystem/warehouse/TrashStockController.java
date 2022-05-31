@@ -1,6 +1,5 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
-import com.boheco1.dev.integratedaccountingsystem.HomeController;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.SlimStock;
@@ -45,7 +44,7 @@ public class TrashStockController extends MenuControllerHandler implements Initi
 
     private JFXDialog dialog;
 
-    private int LIMIT = HomeController.ROW_PER_PAGE;
+    private int LIMIT = Utility.ROW_PER_PAGE;
     private int COUNT = 0;
 
     @Override
@@ -78,7 +77,7 @@ public class TrashStockController extends MenuControllerHandler implements Initi
 
     public void createTable(){
         TableColumn<SlimStock, String> column1 = new TableColumn<>("Stock ID");
-        column1.setMinWidth(100);
+        column1.setMinWidth(125);
         column1.setCellValueFactory(new PropertyValueFactory<>("id"));
         column1.setStyle("-fx-alignment: center-left;");
 
@@ -109,7 +108,7 @@ public class TrashStockController extends MenuControllerHandler implements Initi
 
         TableColumn<SlimStock, String> column7 = new TableColumn<>("Price");
         column7.setCellValueFactory(new PropertyValueFactory<>("price"));
-        column7.setMinWidth(75);
+        column7.setMinWidth(100);
         column7.setStyle("-fx-alignment: center-left;");
 
         TableColumn<SlimStock, SlimStock> column8 = new TableColumn<>("Action");
