@@ -559,7 +559,7 @@ public class MirsDAO {
 
     public static  List<ReleasedItemDetails> getReleasedMIRSItems(MIRS mirs) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT Stocks.Description, MIRSItems.*, Releasing.Status " +
+                "SELECT DISTINCT Stocks.Description, MIRSItems.*, Releasing.Status " +
                         "FROM MIRSItems " +
                         "LEFT JOIN Stocks ON Stocks.id = MIRSItems.StockID " +
                         "LEFT JOIN Releasing ON (Releasing.MIRSID=MIRSItems.MIRSID AND Releasing.StockID=MIRSItems.StockID) " +
