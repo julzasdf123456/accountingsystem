@@ -100,4 +100,17 @@ public class ReleasingDAO {
 
         return items;
     }
+
+    public static void updateReleasedItem(Releasing item) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE Releasing SET Status=?, UpdatedAt=GETDATE() " +
+                        "WHERE StockId=?");
+        ps.setString(1, item.getStatus());
+        ps.setString(2, item.getStockID());
+
+        ps.executeUpdate();
+
+        ps.close();
+    }
+
 }
