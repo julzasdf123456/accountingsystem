@@ -15,7 +15,6 @@
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-
 <StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.MRReturnController">
    <children>
       <AnchorPane fx:id="contentPane" prefHeight="350.0" prefWidth="527.0" style="-fx-background-color: white;" stylesheets="@style.css">
@@ -31,12 +30,20 @@
                         </Label>
                         <HBox prefHeight="60.0" prefWidth="527.0">
                            <children>
-                              <JFXTextField fx:id="stock_id_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="527.0" promptText="Stock ID" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="mr_no_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="248.0" promptText="MR Number" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                                  <HBox.margin>
-                                    <Insets />
+                                    <Insets right="15.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXTextField fx:id="stock_id_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="248.0" promptText="Stock ID" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
                            </children>

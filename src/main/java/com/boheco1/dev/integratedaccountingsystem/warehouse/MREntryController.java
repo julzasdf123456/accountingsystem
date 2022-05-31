@@ -3,10 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
-import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
-import com.boheco1.dev.integratedaccountingsystem.helpers.ColorPalette;
-import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
-import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
+import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
@@ -41,7 +38,7 @@ public class MREntryController extends MenuControllerHandler implements Initiali
     private StackPane stackPane;
 
     @FXML
-    private JFXTextField employee_search_tf, fname_tf, mname_tf, lname_tf, item_name_tf, qty_tf, cost_tf;
+    private JFXTextField employee_search_tf, fname_tf, mname_tf, lname_tf, item_name_tf, qty_tf, cost_tf, mr_no_tf;
 
     @FXML
     private TableView mr_items_table;
@@ -68,6 +65,7 @@ public class MREntryController extends MenuControllerHandler implements Initiali
             e.printStackTrace();
         }
         this.bindNumbers();
+        this.mr_no_tf.setText(Utility.CURRENT_YEAR()+"-");
     }
 
     @FXML
@@ -111,6 +109,8 @@ public class MREntryController extends MenuControllerHandler implements Initiali
     @FXML
     private void addItem()  {
         String item_name = this.item_name_tf.getText();
+        String mr_no = this.mr_no_tf.getText();
+
         int max = 0;
         if (from_warehouse_chb.isSelected() && this.currentItem != null){
             max = this.currentItem.getQuantity();
@@ -125,6 +125,9 @@ public class MREntryController extends MenuControllerHandler implements Initiali
         }
         if (employee == null){
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please set the employee by selecting from the dropdown list!",
+                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (mr_no.length() <= 5 || mr_no == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please set the MR Number!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (item_name.length() == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter item name or selecting from the dropdown list!",
@@ -293,7 +296,7 @@ public class MREntryController extends MenuControllerHandler implements Initiali
 
     public void reset(){
         this.employee = null;
-
+        this.mr_no_tf.setText(Utility.CURRENT_YEAR()+"-");
         this.resetItemData();
         this.employee_search_tf.setText("");
         this.fname_tf.setText("");
@@ -317,7 +320,7 @@ public class MREntryController extends MenuControllerHandler implements Initiali
     }
 
     public void initializeTable() {
-        TableColumn<MR, String> column1 = new TableColumn<>("Stock ID");
+        TableColumn<MR, String> column1 = new TableColumn<>("Code");
         column1.setMinWidth(120);
         column1.setCellValueFactory(new PropertyValueFactory<>("stockId"));
         column1.setStyle("-fx-alignment: center-left;");

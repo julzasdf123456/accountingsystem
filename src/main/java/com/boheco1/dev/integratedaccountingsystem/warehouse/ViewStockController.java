@@ -131,6 +131,7 @@ public class ViewStockController implements Initializable {
 
         //Mandatory fields
         this.stock.setId(id);
+        this.stock.setLocalCode(localCode);
         this.stock.setStockName(name);
         this.stock.setBrand(brand);
         this.stock.setModel(model);
@@ -150,7 +151,10 @@ public class ViewStockController implements Initializable {
         this.stock.setNeaCode(this.neaCode.getText());
         this.stock.setCritical(threshold);
 
-        if (desc.length() == 0 || desc == null) {
+        if (localCode.length() == 0 || localCode == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid local code!",
+                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (desc.length() == 0 || desc == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid description!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (price == 0) {
@@ -250,8 +254,9 @@ public class ViewStockController implements Initializable {
 
     public void initializeInformation(){
         this.stockName.setText(stock.getStockName());
-        this.localCode.setText(stock.getLocalCode());
+        this.localCode.setText(stock.getId());
         this.accountCode.setText(stock.getAcctgCode());
+        this.neaCode.setText(stock.getNeaCode());
         this.serialNumber.setText(""+stock.getSerialNumber());
         this.brand.setText(stock.getBrand());
         this.model.setText(stock.getModel());
@@ -266,7 +271,6 @@ public class ViewStockController implements Initializable {
         this.unit.setText(stock.getUnit());
         this.price.setText(""+stock.getPrice());
         this.threshold.setText(""+stock.getCritical());
-        this.neaCode.setText(stock.getNeaCode());
         this.comments.setText(stock.getComments());
         ObservableList<StockType> stocktypes = this.type.getItems();
         int index = 0;
