@@ -470,6 +470,38 @@ public class MirsDAO {
         return mirsList;
     }
 
+    public static List<MIRS> searchMIRS(String key) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MIRS WHERE (id LIKE ? OR Purpose LIKE ? OR Address LIKE ? OR Applicant LIKE ?) ORDER BY DateFiled DESC");
+        ps.setString(1, "%" + key + "%");
+        ps.setString(2, "%" + key + "%");
+        ps.setString(3, "%" + key + "%");
+        ps.setString(4, "%" + key + "%");
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<MIRS> mirsList = new ArrayList<>();
+
+        while(rs.next()) {
+            mirsList.add(new MIRS(
+                    rs.getString("id"),
+                    rs.getDate("DateFiled").toLocalDate(),
+                    rs.getString("Purpose"),
+                    rs.getString("Details"),
+                    rs.getString("Status"),
+                    rs.getString("RequisitionerID"),
+                    rs.getString("UserID"),
+                    rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return mirsList;
+    }
+
     public static List<MIRS> getByDateFiled(LocalDate date) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM MIRS WHERE DateFiled = ? ORDER BY CreatedAt");
