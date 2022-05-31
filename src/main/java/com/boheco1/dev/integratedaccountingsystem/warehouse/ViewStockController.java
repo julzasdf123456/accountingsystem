@@ -271,7 +271,7 @@ public class ViewStockController implements Initializable {
         ObservableList<StockType> stocktypes = this.type.getItems();
         int index = 0;
         for (int i=0;  i < stocktypes.size(); i++){
-            if (stocktypes.get(i).getId() == this.stock.getTypeID()) {
+            if (stocktypes.get(i).getId().equals(this.stock.getTypeID())) {
                 index = i;
                 break;
             }
