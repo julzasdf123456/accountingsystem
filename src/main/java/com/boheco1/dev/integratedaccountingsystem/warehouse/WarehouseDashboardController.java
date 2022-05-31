@@ -49,8 +49,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
     public List<JFXButton> subMenus;
     public JFXButton options = new JFXButton("Options");
     public JFXButton reports = new JFXButton("Reports");
-    @FXML
-    private StackPane stackPane;
+
     @FXML
     private VBox displayBox;
 
@@ -108,7 +107,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
             ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getMIRSByStatus(Utility.PENDING));
             tableView.getItems().setAll(observableList);
         } catch (Exception e) {
-            AlertDialogBuilder.messgeDialog("System Error", this.getClass().getName() +": "+ e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+            AlertDialogBuilder.messgeDialog("System Error", this.getClass().getName() +": "+ e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }
     }
 
@@ -120,7 +119,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
             ObservableList<MIRS> observableList = FXCollections.observableList(MirsDAO.getMIRSByStatus(Utility.RELEASING));
             tableView.getItems().setAll(observableList);
         } catch (Exception e) {
-            AlertDialogBuilder.messgeDialog("System Error", this.getClass().getName() +": "+ e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+            AlertDialogBuilder.messgeDialog("System Error", this.getClass().getName() +": "+ e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }
     }
 
@@ -181,14 +180,15 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
                     public TableCell call(final TableColumn<MIRS, String> param) {
                         final TableCell<MIRS, String> cell = new TableCell<MIRS, String>() {
 
-                            Button btn = new Button("view");
-                            FontIcon icon = new FontIcon("mdi2e-eye");
+                            final Button btn = new Button("");
+                            final FontIcon icon = new FontIcon("mdi2e-eye");
 
                             @Override
                             public void updateItem(String item, boolean empty) {
                                 super.updateItem(item, empty);
                                 icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
-                                btn.setStyle("-fx-background-color: #2196f3");
+                                btn.setStyle("-fx-background-color:"+ColorPalette.WARNING+";");
+                                btn.setPadding(new Insets(0, 7, 0, 7));
                                 btn.setGraphic(icon);
                                 btn.setGraphicTextGap(5);
                                 btn.setTextFill(Paint.valueOf(ColorPalette.WHITE));
@@ -201,9 +201,9 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
                                         try {
                                             Utility.setActiveMIRS(mirs);
                                             if(s.equals("pending")){
-                                                ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_approval_form.fxml",stackPane);
+                                                ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_approval_form.fxml",Utility.getStackPane());
                                             }else if (s.equals("releasing")){
-                                                ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_releasing_form.fxml",stackPane);
+                                                ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_releasing_form.fxml",Utility.getStackPane());
                                             }
                                         } catch (Exception e) {
                                             e.printStackTrace();
@@ -249,11 +249,11 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
                                                             if(getTableView().getItems().get(index) instanceof  MIRS && getTableView().getItems().get(index) != null){
                                                                 MIRS mirs = getTableView().getItems().get(index);
                                                                 if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) >= 2){
-                                                                    status.setStyle("-fx-background-color: "+ColorPalette.DANGER+"; -fx-background-radius: 12");
+                                                                    status.setStyle("-fx-background-color: "+ColorPalette.DANGER+"; -fx-background-radius: 12; -fx-font-size: 14");
                                                                 }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 1){
-                                                                    status.setStyle("-fx-background-color: "+ColorPalette.WARNING+"; -fx-background-radius: 12");
+                                                                    status.setStyle("-fx-background-color: "+ColorPalette.WARNING+"; -fx-background-radius: 12; -fx-font-size: 14");
                                                                 }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 0){
-                                                                    status.setStyle("-fx-background-color: "+ColorPalette.SUCCESS+"; -fx-background-radius: 12");
+                                                                    status.setStyle("-fx-background-color: "+ColorPalette.SUCCESS+"; -fx-background-radius: 12; -fx-font-size: 14");
                                                                 }
                                                             }
                                                         }
