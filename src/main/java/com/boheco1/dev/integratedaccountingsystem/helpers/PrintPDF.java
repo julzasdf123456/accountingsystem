@@ -17,13 +17,20 @@ import java.util.ArrayList;
 public class PrintPDF {
 
     private float[] column = {1f, 1f, 1f, 1f, 1f, 1f};
-    private PdfPTable table = new PdfPTable(column);
+    private PdfPTable table;
     private PdfPCell cell;
     private Document document;
     private File pdf;
 
     public PrintPDF(File pdf){
         this.pdf = pdf;
+        this.table = new PdfPTable(column);
+    }
+
+    public PrintPDF(File pdf, float[] column){
+        this.pdf = pdf;
+        this.column = column;
+        this.table = new PdfPTable(this.column);
     }
 
     public void generate() throws Exception{
@@ -51,8 +58,23 @@ public class PrintPDF {
 
         createCell(2,column.length);
         createCell(title, column.length,12, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
-        createCell("As of: "+date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")), column.length,11, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
-        createCell(1,column.length);
+        if (date != null){
+            createCell("As of: "+date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")), column.length,11, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+            createCell(1,column.length);
+        }
+    }
+
+    public void header(LocalDate date, String title, String subtitle){
+        createCell("BOHOL 1 ELECTRIC COOPERATIVE, INC.", column.length,12, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+        createCell("Cabulijan, Tubigon, Bohol", column.length,11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+
+        createCell(2,column.length);
+        createCell(title, column.length,12, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+        createCell(subtitle, column.length,12, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+        if (date != null){
+            createCell("As of: "+date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")), column.length,11, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+            createCell(1,column.length);
+        }
     }
 
     public void tableHeader(String[] headings, int[] spans){
@@ -93,6 +115,23 @@ public class PrintPDF {
 
         for (int i = 0; i < designation.length; i++){
             createCell(designation[i], spans[i],11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
+        }
+    }
+
+    public  void footer(String[] prepared, String[] designation, String[] signatures, int[] spans, boolean add_space, int des_align, int name_align) {
+        if (add_space)
+            createCell(2,column.length);
+
+        for (int i = 0; i < prepared.length; i++){
+            createCell(prepared[i], spans[i],11, Font.NORMAL, des_align, Rectangle.NO_BORDER);
+        }
+        createCell(2,column.length);
+        for (int i = 0; i < signatures.length; i++){
+            createCell(signatures[i].toUpperCase(), spans[i],10, Font.BOLD, name_align, Rectangle.NO_BORDER);
+        }
+
+        for (int i = 0; i < designation.length; i++){
+            createCell(designation[i], spans[i],11, Font.NORMAL, name_align, Rectangle.NO_BORDER);
         }
     }
 
