@@ -1,32 +1,33 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.*;
-import com.boheco1.dev.integratedaccountingsystem.helpers.*;
+import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
+import com.boheco1.dev.integratedaccountingsystem.helpers.DialogBuilder;
+import com.boheco1.dev.integratedaccountingsystem.helpers.InputValidation;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.jfoenix.controls.*;
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXListView;
+import com.jfoenix.controls.JFXTextField;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.HPos;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
-import javafx.geometry.VPos;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.paint.Paint;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 
-
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 
 public class MIRSReleasingFormController implements Initializable {
 
@@ -59,7 +60,6 @@ public class MIRSReleasingFormController implements Initializable {
         requestedList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         releasingList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         bindParticularsAutocomplete(particulars);
-        InputValidation.restrictNumbersOnly(quantity);
         try {
             mirs = MirsDAO.getMIRS(Utility.getActiveMIRS().getId());
             List<MIRSItem> mirsItemList = MirsDAO.getUnreleasedItems(mirs);
@@ -101,44 +101,8 @@ public class MIRSReleasingFormController implements Initializable {
                 AlertDialogBuilder.messgeDialog("System Message", "No available item(s) listed for releasing.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
                 return;
             }
-
-            JFXDialogLayout dialogContent = new JFXDialogLayout();
-            dialogContent.setStyle("-fx-border-width: 0 0 0 15; -fx-border-color: " + ColorPalette.INFO + ";");
-            dialogContent.setPrefHeight(200);
-
-            Label head = new Label("Confirm Action");
-            head.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 15));
-            head.setTextFill(Paint.valueOf(ColorPalette.INFO));
-            dialogContent.setHeading(head);
-
-            FlowPane flowPane = new FlowPane();
-            flowPane.setOrientation(Orientation.VERTICAL);
-            flowPane.setAlignment(Pos.CENTER);
-            flowPane.setRowValignment(VPos.CENTER);
-            flowPane.setColumnHalignment(HPos.CENTER);
-            flowPane.setVgap(6);
-
-            Label context = new Label("Are sure you want to release listed item(s)?");
-            context.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 12));
-            context.setWrapText(true);
-            context.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
-
-            flowPane.getChildren().add(context);
-            dialogContent.setBody(flowPane);
-
-            JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogContent, JFXDialog.DialogTransition.CENTER);
-            dialog.setOverlayClose(false);
-
             JFXButton accept = new JFXButton("Accept");
-            accept.setDefaultButton(true);
-            accept.getStyleClass().add("JFXButton");
-
-            JFXButton cancel = new JFXButton("Cancel");
-            cancel.setDefaultButton(true);
-            cancel.getStyleClass().add("JFXButton");
-            dialogContent.setActions(cancel,accept);
-
-            accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+            JFXDialog dialog = DialogBuilder.showConfirmDialog("Releasing","Are sure you want to release listed item(s)?", accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
             accept.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent __) {
@@ -179,9 +143,8 @@ public class MIRSReleasingFormController implements Initializable {
 
                         mirs.setDetails(details.getText());
                         MirsDAO.update(mirs);
-
+                        releasingList.getItems().clear();
                         AlertDialogBuilder.messgeDialog("System Message", "MIRS items released.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
-                        anchorpane.setDisable(true);
                     }catch (Exception e){
                         AlertDialogBuilder.messgeDialog("System Error", "Item released: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
                     }
@@ -189,15 +152,6 @@ public class MIRSReleasingFormController implements Initializable {
                 }
             });
 
-            cancel.setTextFill(Paint.valueOf(ColorPalette.GREY));
-            cancel.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent __) {
-                    dialog.close();
-                }
-            });
-
-            dialog.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -215,8 +169,6 @@ public class MIRSReleasingFormController implements Initializable {
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
         }
-
-
 
         MIRSItem mirsItem = new MIRSItem();
         mirsItem.setMirsID(mirsNumber.getText());
@@ -318,51 +270,9 @@ public class MIRSReleasingFormController implements Initializable {
                     if(selectedItems.size() > 1){
                         AlertDialogBuilder.messgeDialog("System Message", "Can not perform multiple selection on partial release of item, please try again.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
                     }else{
-                        JFXDialogLayout dialogContent = new JFXDialogLayout();
-                        dialogContent.setStyle("-fx-border-width: 0 0 0 15; -fx-border-color: " + ColorPalette.INFO + ";");
-                        dialogContent.setPrefHeight(200);
-
-                        Label head = new Label("Partial item release");
-                        head.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 15));
-                        head.setTextFill(Paint.valueOf(ColorPalette.INFO));
-                        dialogContent.setHeading(head);
-
-                        FlowPane flowPane = new FlowPane();
-                        flowPane.setOrientation(Orientation.VERTICAL);
-                        flowPane.setAlignment(Pos.CENTER);
-                        flowPane.setRowValignment(VPos.CENTER);
-                        flowPane.setColumnHalignment(HPos.CENTER);
-                        flowPane.setVgap(6);
-
-                        Label context = new Label("Enter desired quantity:  ");
-                        context.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 12));
-                        context.setWrapText(true);
-                        context.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
-
-                        JFXTextField input = new JFXTextField();
-                        input.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 18));
-                        input.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
-                        input.setPromptText("Requested quantity: "+ selectedItems.get(0).getQuantity());
-                        input.setLabelFloat(true);
-                        InputValidation.restrictNumbersOnly(input);
-
-                        flowPane.getChildren().add(context);
-                        flowPane.getChildren().add(input);
-                        dialogContent.setBody(flowPane);
-
-                        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogContent, JFXDialog.DialogTransition.CENTER);
-                        dialog.setOverlayClose(false);
-
                         JFXButton accept = new JFXButton("Accept");
-                        accept.setDefaultButton(true);
-                        accept.getStyleClass().add("JFXButton");
-
-                        JFXButton cancel = new JFXButton("Cancel");
-                        cancel.setDefaultButton(true);
-                        cancel.getStyleClass().add("JFXButton");
-                        dialogContent.setActions(cancel,accept);
-
-                        accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+                        JFXTextField input = new JFXTextField();
+                        JFXDialog dialog = DialogBuilder.showInputDialog("Partial Quantity","Enter desired quantity:  ", "Requested quantity: "+ selectedItems.get(0).getQuantity(), input, accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
                         accept.setOnAction(new EventHandler<ActionEvent>() {
                             @Override
                             public void handle(ActionEvent __) {
@@ -410,14 +320,6 @@ public class MIRSReleasingFormController implements Initializable {
                                 dialog.close();
                             }
                         });
-                        cancel.setTextFill(Paint.valueOf(ColorPalette.GREY));
-                        cancel.setOnAction(new EventHandler<ActionEvent>() {
-                            @Override
-                            public void handle(ActionEvent __) {
-                                dialog.close();
-                            }
-                        });
-                        dialog.show();
                     }
                 }
 
