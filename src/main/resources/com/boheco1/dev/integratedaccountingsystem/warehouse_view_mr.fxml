@@ -2,6 +2,7 @@
 
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -25,37 +26,49 @@
                <top>
                   <VBox prefHeight="106.0" prefWidth="802.0" BorderPane.alignment="CENTER">
                      <children>
-                        <HBox prefHeight="52.0" prefWidth="1165.0">
+                        <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
-                              <JFXTextField fx:id="fname_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="246.0" promptText="First Name" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
+                              <Label prefWidth="802.0" text="MR Number">
                                  <HBox.margin>
-                                    <Insets right="16.0" />
+                                    <Insets right="32.0" />
                                  </HBox.margin>
-                              </JFXTextField>
-                              <JFXTextField fx:id="mname_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="246.0" promptText="Middle Name" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                                 <HBox.margin>
-                                    <Insets left="16.0" right="16.0" />
-                                 </HBox.margin>
-                              </JFXTextField>
-                              <JFXTextField fx:id="lname_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="246.0" promptText="Last Name" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                                 <HBox.margin>
-                                    <Insets left="16.0" />
-                                 </HBox.margin>
-                              </JFXTextField>
+                              </Label>
+                              <Label prefWidth="246.0" text="Date of MR" />
                            </children>
                         </HBox>
-                        <HBox prefHeight="52.0" prefWidth="1165.0">
+                        <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
-                              <JFXTextField fx:id="address_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="246.0" promptText="Address" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="mr_no_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="246.0" promptText="MR Number" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="588.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXTextField fx:id="mr_date_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="246.0" promptText="Date" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </JFXTextField>
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="16.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label prefWidth="802.0" text="Employee">
+                                 <HBox.margin>
+                                    <Insets right="32.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <Label text="Designation" />
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="30.0" prefWidth="1165.0">
+                           <children>
+                              <JFXTextField fx:id="fname_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="246.0" promptText="First Name" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -63,7 +76,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="phone_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="246.0" promptText="Phone" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="mname_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="246.0" promptText="Middle Name" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -71,7 +84,15 @@
                                     <Insets left="16.0" right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="designation_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="246.0" promptText="Designation" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="lname_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="246.0" promptText="Last Name" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets left="16.0" right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXTextField fx:id="designation_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="246.0" promptText="Designation" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -81,7 +102,31 @@
                               </JFXTextField>
                            </children>
                            <VBox.margin>
-                              <Insets bottom="8.0" top="8.0" />
+                              <Insets bottom="8.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <Label text="Contact" />
+                        <HBox prefHeight="30.0" prefWidth="1165.0">
+                           <children>
+                              <JFXTextField fx:id="address_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="802.0" promptText="Address" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXTextField fx:id="phone_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="246.0" promptText="Phone" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets left="16.0" right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="16.0" />
                            </VBox.margin>
                         </HBox>
                      </children>

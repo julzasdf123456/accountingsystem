@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXListView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="anchorpane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="712.0" prefWidth="1136.0" style="-fx-background-color: #ffff;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.MRTFormController">
+   <children>
+      <VBox alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <VBox alignment="CENTER" prefHeight="6.0" prefWidth="784.0">
+               <children>
+                  <HBox alignment="CENTER">
+                     <children>
+                        <Label style="-fx-font-size: 24;" text="MRT Approval: ">
+                           <font>
+                              <Font size="24.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="itemCounter" style="-fx-font-size: 24; -fx-font-weight: bold;" text="0 items found">
+                           <font>
+                              <Font size="24.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <Separator prefWidth="200.0" />
+               </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+               <padding>
+                  <Insets bottom="16.0" />
+               </padding>
+            </VBox>
+            <HBox VBox.vgrow="ALWAYS">
+               <children>
+                  <VBox alignment="TOP_CENTER" prefHeight="658.0" prefWidth="309.0" HBox.hgrow="NEVER">
+                     <children>
+                        <HBox>
+                           <children>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="115.0" text="Date:">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="date" maxWidth="1.7976931348623157E308" style="-fx-background-color: #e7e7e7; -fx-font-weight: bold;" text="-" wrapText="true" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </padding>
+                              </Label>
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox>
+                           <children>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="115.0" text="MIRS Number: ">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="mirsNumber" maxWidth="1.7976931348623157E308" style="-fx-background-color: #e7e7e7; -fx-font-weight: bold;" text="-" wrapText="true" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </padding>
+                              </Label>
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox>
+                           <children>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="115.0" text="Applicant:">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="applicant" maxWidth="1.7976931348623157E308" style="-fx-background-color: #e7e7e7; -fx-font-weight: bold;" text="-" wrapText="true" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </padding>
+                              </Label>
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox>
+                           <children>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="115.0" text="Address:">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="address" maxWidth="1.7976931348623157E308" style="-fx-background-color: #e7e7e7; -fx-font-weight: bold;" text="-" wrapText="true" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </padding>
+                              </Label>
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox layoutX="10.0" layoutY="37.0">
+                           <children>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="115.0" text="Prepared by:">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="requisitioner" maxWidth="1.7976931348623157E308" style="-fx-background-color: #e7e7e7; -fx-font-weight: bold;" text="-" wrapText="true" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </padding>
+                              </Label>
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox>
+                           <children>
+                              <Label maxWidth="-Infinity" minWidth="-Infinity" prefWidth="115.0" text="Signatories: " />
+                              <Label fx:id="signatories" maxWidth="1.7976931348623157E308" style="-fx-background-color: #e7e7e7; -fx-font-weight: bold;" text="-" wrapText="true" HBox.hgrow="ALWAYS">
+                                 <padding>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </padding>
+                              </Label>
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <VBox minHeight="-Infinity" prefHeight="219.0" prefWidth="351.0" VBox.vgrow="ALWAYS">
+                           <children>
+                              <VBox>
+                                 <children>
+                                    <HBox>
+                                       <children>
+                                          <Label contentDisplay="RIGHT" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="115.0" text="Description:">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="purpose" maxWidth="1.7976931348623157E308" style="-fx-background-color: #e7e7e7; -fx-font-weight: bold;" text="-" textAlignment="JUSTIFY" wrapText="true" HBox.hgrow="ALWAYS">
+                                             <padding>
+                                                <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                             </padding>
+                                          </Label>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <VBox prefHeight="106.0" prefWidth="351.0">
+                                 <children>
+                                    <Label alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Remarks">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <TextArea fx:id="details" prefHeight="62.0" prefWidth="249.0" wrapText="true" VBox.vgrow="ALWAYS" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="16.0" />
+                                 </VBox.margin>
+                              </VBox>
+                           </children>
+                        </VBox>
+                     </children>
+                     <HBox.margin>
+                        <Insets right="16.0" />
+                     </HBox.margin>
+                  </VBox>
+                  <VBox fx:id="vboxItems" style="-fx-background-color: #ffff;" HBox.hgrow="ALWAYS">
+                     <children>
+                        <HBox alignment="TOP_CENTER" VBox.vgrow="ALWAYS">
+                           <children>
+                              <VBox HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label text="Released Item(s)" />
+                                    <JFXListView fx:id="requestedList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="300.0" style="-fx-font-size: 1.5em;" VBox.vgrow="ALWAYS" />
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <JFXButton fx:id="addAllQtyBtn" buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#addAllQty" styleClass="btn-info" text="All" VBox.vgrow="ALWAYS">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </JFXButton>
+                                    <JFXButton fx:id="addPartialQtyBtn" buttonType="RAISED" layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308" onAction="#addPartialQty" styleClass="btn-warning" text="Partial" textFill="WHITE" VBox.vgrow="ALWAYS">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </JFXButton>
+                                    <JFXButton fx:id="removeItemBtn" buttonType="RAISED" layoutX="10.0" layoutY="47.0" maxWidth="1.7976931348623157E308" onAction="#removeItem" styleClass="btn-danger" text="Remove" textFill="WHITE" VBox.vgrow="ALWAYS">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </JFXButton>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label text="For Return Item(s)" />
+                                    <JFXListView fx:id="releasingList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="300.0" style="-fx-font-size: 1.5em;" VBox.vgrow="ALWAYS" />
+                                 </children>
+                              </VBox>
+                           </children>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox fx:id="btnHolder" alignment="CENTER" prefHeight="27.0" prefWidth="583.0">
+                           <children>
+                              <JFXButton fx:id="returnBtn" buttonType="RAISED" onAction="#returnItems" prefHeight="45.0" prefWidth="275.0" styleClass="btn-sucess" text="Return" textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="18.0" />
+                                 </font>
+                              </JFXButton>
+                           </children>
+                           <VBox.margin>
+                              <Insets top="16.0" />
+                           </VBox.margin>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

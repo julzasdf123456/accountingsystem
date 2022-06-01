@@ -65,7 +65,7 @@ public class MREntryController extends MenuControllerHandler implements Initiali
             e.printStackTrace();
         }
         this.bindNumbers();
-        this.mr_no_tf.setText(Utility.CURRENT_YEAR()+"-");
+        this.mr_no_tf.setText(NumberGenerator.mrNumber());
     }
 
     @FXML
@@ -296,7 +296,7 @@ public class MREntryController extends MenuControllerHandler implements Initiali
 
     public void reset(){
         this.employee = null;
-        this.mr_no_tf.setText(Utility.CURRENT_YEAR()+"-");
+        this.mr_no_tf.setText(NumberGenerator.mrNumber());
         this.resetItemData();
         this.employee_search_tf.setText("");
         this.fname_tf.setText("");

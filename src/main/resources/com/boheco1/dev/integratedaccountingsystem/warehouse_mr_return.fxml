@@ -17,9 +17,9 @@
 
 <StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.MRReturnController">
    <children>
-      <AnchorPane fx:id="contentPane" prefHeight="350.0" prefWidth="527.0" style="-fx-background-color: white;" stylesheets="@style.css">
+      <AnchorPane fx:id="contentPane" prefHeight="360.0" prefWidth="527.0" style="-fx-background-color: white;" stylesheets="@style.css">
          <children>
-            <BorderPane prefHeight="350.0" prefWidth="527.0">
+            <BorderPane prefHeight="360.0" prefWidth="527.0">
                <center>
                   <VBox prefHeight="282.0" prefWidth="527.0" BorderPane.alignment="CENTER">
                      <children>
@@ -28,9 +28,29 @@
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <HBox prefHeight="60.0" prefWidth="527.0">
+                        <HBox fillHeight="false" prefHeight="16.0" prefWidth="200.0">
                            <children>
-                              <JFXTextField fx:id="mr_no_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="248.0" promptText="MR Number" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <Label prefWidth="248.0" text="MR Number">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="32.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <Label prefWidth="165.0" text="Stock ID">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </Label>
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="40.0" prefWidth="527.0">
+                           <children>
+                              <JFXTextField fx:id="mr_no_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="248.0" promptText="MR Number" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -38,7 +58,7 @@
                                     <Insets right="15.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="stock_id_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="248.0" promptText="Stock ID" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="stock_id_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="248.0" promptText="Stock ID" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -47,10 +67,18 @@
                                  </HBox.margin>
                               </JFXTextField>
                            </children>
+                           <VBox.margin>
+                              <Insets bottom="8.0" />
+                           </VBox.margin>
                         </HBox>
-                        <HBox prefHeight="60.0" prefWidth="527.0">
+                        <Label text="Description">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Label>
+                        <HBox prefHeight="40.0" prefWidth="527.0">
                            <children>
-                              <JFXTextField fx:id="description_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="527.0" promptText="Description" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="description_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="527.0" promptText="Description" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -59,10 +87,38 @@
                                  </HBox.margin>
                               </JFXTextField>
                            </children>
+                           <VBox.margin>
+                              <Insets bottom="8.0" />
+                           </VBox.margin>
                         </HBox>
-                        <HBox prefHeight="52.0" prefWidth="527.0">
+                        <HBox fillHeight="false" prefHeight="16.0" prefWidth="200.0">
                            <children>
-                              <JFXTextField fx:id="qty_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="165.0" promptText="Quantity" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <Label prefWidth="165.0" text="Quantity">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <Label prefWidth="165.0" text="Unit Price">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <Label prefWidth="165.0" text="Date of MR">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="40.0" prefWidth="527.0">
+                           <children>
+                              <JFXTextField fx:id="qty_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="165.0" promptText="Quantity" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -70,7 +126,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="unit_price_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="165.0" promptText="Unit Price" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="unit_price_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="165.0" promptText="Unit Price" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -78,7 +134,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="date_mr_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="165.0" promptText="Date of MR" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="date_mr_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="165.0" promptText="Date of MR" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -87,11 +143,17 @@
                                  </HBox.margin>
                               </JFXTextField>
                            </children>
+                           <VBox.margin>
+                              <Insets bottom="8.0" />
+                           </VBox.margin>
                         </HBox>
                         <Label text="Remarks">
                            <font>
                               <Font name="System Bold" size="14.0" />
                            </font>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
                         </Label>
                         <HBox prefHeight="22.0" prefWidth="527.0">
                            <children>
@@ -126,7 +188,7 @@
                               </JFXButton>
                            </children>
                            <VBox.margin>
-                              <Insets top="16.0" />
+                              <Insets top="25.0" />
                            </VBox.margin>
                         </HBox>
                      </children>
