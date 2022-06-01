@@ -181,7 +181,7 @@
                         <Insets bottom="16.0" left="16.0" right="16.0" top="18.0" />
                      </VBox.margin>
                   </HBox>
-                  <TableView fx:id="tableView" prefHeight="302.0" prefWidth="1051.0" VBox.vgrow="ALWAYS">
+                  <TableView fx:id="tableView" onMouseClicked="#tableViewClicked" prefHeight="302.0" prefWidth="1051.0" VBox.vgrow="ALWAYS">
                      <VBox.margin>
                         <Insets bottom="16.0" left="16.0" right="16.0" />
                      </VBox.margin>

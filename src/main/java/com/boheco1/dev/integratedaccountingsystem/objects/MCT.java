@@ -10,6 +10,8 @@ public class MCT {
     private String workOrderNo;
     private LocalDate createdAt;
 
+    public MCT(){}
+
     public MCT(String mctNo, String particulars, String address, String mirsNo, String workOrderNo, LocalDate createdAt) {
         this.mctNo = mctNo;
         this.particulars = particulars;

@@ -71,8 +71,8 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
 
 
 
-    private static String APPROVAL = "Pending Approval";
-    private static String RELEASES = "Pending Releases";
+    private String APPROVAL = "Pending Approval";
+    private String RELEASES = "Pending Releases";
 
 
     ContextMenuHelper contextMenuHelper = new ContextMenuHelper();
@@ -169,6 +169,24 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         }
     }
 
+
+    @FXML
+    private void tableViewClicked(MouseEvent event) {
+        if(event.getClickCount() == 2){
+            MIRS mirs = (MIRS) tableView.getSelectionModel().getSelectedItem();
+            try {
+                Utility.setActiveMIRS(mirs);
+                if(display_lbl.getText().equals(APPROVAL)){
+                    ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_approval_form.fxml",Utility.getStackPane());
+                }else if(display_lbl.getText().equals(RELEASES)){
+                    ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_releasing_form.fxml",Utility.getStackPane());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void initializedTable(String s){
         tableView.getItems().clear();
         tableView.getColumns().clear();
@@ -204,7 +222,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         column3.setCellValueFactory(new PropertyValueFactory<>("Purpose"));
         column3.setStyle("-fx-alignment: center-left;");
 
-        TableColumn<MIRS, String> column4 = new TableColumn<>("Action");
+        /*TableColumn<MIRS, String> column4 = new TableColumn<>("Action");
         column4.setStyle("-fx-alignment: center;");
         column4.setPrefWidth(80);
         column4.setMaxWidth(80);
@@ -253,7 +271,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
                         return cell;
                     }
                 };
-        column4.setCellFactory(viewBtn);
+        column4.setCellFactory(viewBtn);*/
 
         TableColumn<MIRS, String> column5 = new TableColumn<>("Status");
         column5.setStyle("-fx-alignment: center;");
@@ -323,11 +341,11 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         tableView.getColumns().add(column1);
         tableView.getColumns().add(column2);
         tableView.getColumns().add(column3);
-        tableView.getColumns().add(column4);
+        //tableView.getColumns().add(column4);
 
 
         //display status column only if displaying Pending Approval MIRS
-        if(s.equals(Utility.PENDING))
+        if(display_lbl.getText().equals(APPROVAL))
             tableView.getColumns().add(column5);
 
         tableView.refresh();
