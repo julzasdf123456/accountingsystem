@@ -72,9 +72,9 @@ public class MirsDAO {
      */
     public static void addMIRSItem(MIRS mirs, MIRSItem item) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id, WorkOrderNo) " +
+                "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id) " +
                         "VALUES " +
-                        "(?,?,?,?,?,GETDATE(),GETDATE(), ?, ?)");
+                        "(?,?,?,?,?,GETDATE(),GETDATE(), ?)");
 
         item.setId(Utility.generateRandomId());
 
@@ -84,7 +84,6 @@ public class MirsDAO {
         ps.setDouble(4, item.getPrice());
         ps.setString(5, item.getRemarks());
         ps.setString(6, item.getId());
-        ps.setString(7, item.getWorkOrderNo());
 
         ps.executeUpdate();
 
@@ -99,9 +98,9 @@ public class MirsDAO {
      */
     public static void addMIRSItems(MIRS mirs, List<MIRSItem> items) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id, WorkOrderNo) " +
+                "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id) " +
                         "VALUES " +
-                        "(?,?,?,?,?,GETDATE(),GETDATE(), ?, ?)");
+                        "(?,?,?,?,?,GETDATE(),GETDATE(), ?)");
 
         for(MIRSItem item: items) {
             ps.setString(1, mirs.getId());
@@ -110,7 +109,6 @@ public class MirsDAO {
             ps.setDouble(4, item.getPrice());
             ps.setString(5, item.getRemarks());
             ps.setString(6, Utility.generateRandomId());
-            ps.setString(7, item.getWorkOrderNo());
 
             ps.addBatch();
         }
@@ -198,7 +196,8 @@ public class MirsDAO {
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
                     rs.getTimestamp("UpdatedAt").toLocalDateTime(),
                     rs.getString("address"),
-                    rs.getString("applicant")
+                    rs.getString("applicant"),
+                    rs.getString("WorkOrderNo")
             );
 
             rs.close();
@@ -237,8 +236,7 @@ public class MirsDAO {
                     rs.getDouble("Price"),
                     rs.getString("Comments"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
-                    rs.getString("WorkOrderNo")
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
             ));
         }
 
@@ -275,8 +273,7 @@ public class MirsDAO {
                     rs.getDouble("Price"),
                     rs.getString("Comments"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
-                    rs.getString("WorkOrderNo")
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
             ));
         }
 
@@ -303,7 +300,10 @@ public class MirsDAO {
                     rs.getString("RequisitionerID"),
                     rs.getString("UserID"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                    rs.getString("address"),
+                    rs.getString("applicant"),
+                    rs.getString("WorkOrderNo")
             ));
         }
 
@@ -331,7 +331,10 @@ public class MirsDAO {
                     rs.getString("RequisitionerID"),
                     rs.getString("UserID"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                    rs.getString("address"),
+                    rs.getString("applicant"),
+                    rs.getString("WorkOrderNo")
             ));
         }
 
@@ -394,7 +397,10 @@ public class MirsDAO {
                     rs.getString("RequisitionerID"),
                     rs.getString("UserID"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                    rs.getString("address"),
+                    rs.getString("applicant"),
+                    rs.getString("WorkOrderNo")
             ));
         }
 
@@ -426,7 +432,10 @@ public class MirsDAO {
                     rs.getString("RequisitionerID"),
                     rs.getString("UserID"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                    rs.getString("address"),
+                    rs.getString("applicant"),
+                    rs.getString("WorkOrderNo")
             ));
         }
 
@@ -460,7 +469,10 @@ public class MirsDAO {
                     rs.getString("RequisitionerID"),
                     rs.getString("UserID"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                    rs.getString("address"),
+                    rs.getString("applicant"),
+                    rs.getString("WorkOrderNo")
             ));
         }
 
@@ -492,7 +504,10 @@ public class MirsDAO {
                     rs.getString("RequisitionerID"),
                     rs.getString("UserID"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                    rs.getString("address"),
+                    rs.getString("applicant"),
+                    rs.getString("WorkOrderNo")
             ));
         }
 
@@ -522,7 +537,10 @@ public class MirsDAO {
                         rs.getString("RequisitionerID"),
                         rs.getString("UserID"),
                         rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                        rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                        rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                        rs.getString("address"),
+                        rs.getString("applicant"),
+                        rs.getString("WorkOrderNo")
                 )
             );
         }
@@ -550,7 +568,10 @@ public class MirsDAO {
                             rs.getString("RequisitionerID"),
                             rs.getString("UserID"),
                             rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                            rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                            rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                            rs.getString("address"),
+                            rs.getString("applicant"),
+                            rs.getString("WorkOrderNo")
                     )
             );
         }
@@ -581,8 +602,7 @@ public class MirsDAO {
                     rs.getDouble("Price"),
                     rs.getString("Status"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
-                    rs.getString("WorkOrderNo")
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
             ));
         }
 
@@ -635,7 +655,8 @@ public class MirsDAO {
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
                     rs.getTimestamp("UpdatedAt").toLocalDateTime(),
                     rs.getString("address"),
-                    rs.getString("applicant")
+                    rs.getString("applicant"),
+                    rs.getString("WorkOrderNo")
             );
 
             List<UnchargedItemDetails> items = new ArrayList();

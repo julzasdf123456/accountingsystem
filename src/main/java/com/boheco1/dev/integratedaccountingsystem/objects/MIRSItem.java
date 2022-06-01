@@ -15,11 +15,10 @@ public class MIRSItem {
     private String unit;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String workOrderNo;
 
     public MIRSItem(){}
 
-    public MIRSItem(String id, String mirsID, String stockID, int quantity, double price, String remarks, LocalDateTime createdAt, LocalDateTime updatedAt, String workOrderNo) {
+    public MIRSItem(String id, String mirsID, String stockID, int quantity, double price, String remarks, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.mirsID = mirsID;
         this.stockID = stockID;
@@ -28,15 +27,6 @@ public class MIRSItem {
         this.remarks = remarks;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.workOrderNo=workOrderNo;
-    }
-
-    public String getWorkOrderNo() {
-        return workOrderNo;
-    }
-
-    public void setWorkOrderNo(String workOrderNo) {
-        this.workOrderNo = workOrderNo;
     }
 
     public String getId() {

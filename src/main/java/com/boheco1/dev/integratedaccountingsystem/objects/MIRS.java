@@ -25,7 +25,17 @@ public class MIRS {
 
     private String applicant;
 
+    private String workOrderNo;
+
     public MIRS(){}
+
+    public String getWorkOrderNo() {
+        return workOrderNo;
+    }
+
+    public void setWorkOrderNo(String workOrderNo) {
+        this.workOrderNo = workOrderNo;
+    }
 
     public MIRS(String id, LocalDate dateFiled, String purpose, String details, String status, String requisitionerID, String userID, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
@@ -39,7 +49,7 @@ public class MIRS {
         this.updatedAt = updatedAt;
     }
 
-    public MIRS(String id, LocalDate dateFiled, String purpose, String details, String status, String requisitionerID, String userID, LocalDateTime createdAt, LocalDateTime updatedAt, String address, String applicant) {
+    public MIRS(String id, LocalDate dateFiled, String purpose, String details, String status, String requisitionerID, String userID, LocalDateTime createdAt, LocalDateTime updatedAt, String address, String applicant, String workOrderNo) {
         this.id = id;
         this.dateFiled = dateFiled;
         this.purpose = purpose;
@@ -51,6 +61,7 @@ public class MIRS {
         this.updatedAt = updatedAt;
         this.address = address;
         this.applicant = applicant;
+        this.workOrderNo = workOrderNo;
     }
 
     public String getAddress() {
