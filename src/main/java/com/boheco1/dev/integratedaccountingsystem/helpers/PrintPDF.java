@@ -80,7 +80,7 @@ public class PrintPDF {
     public void tableHeader(String[] headings, int[] spans){
         createCell(2,column.length);
         for (int i = 0; i < headings.length; i++){
-            createCell(headings[i], spans[i],12, Font.BOLD, Element.ALIGN_CENTER);
+            createCell(headings[i], spans[i],11, Font.BOLD, Element.ALIGN_CENTER);
         }
     }
 
@@ -88,7 +88,7 @@ public class PrintPDF {
         for(int x=0;x<items.size();x++){
             String[] data = items.get(x);
             for (int i=0; i < data.length; i++){
-                createCell(data[i], spans[i],11, Font.NORMAL, positions[i]);
+                createCell(data[i], spans[i],10, Font.NORMAL, positions[i]);
             }
         }
     }
@@ -110,7 +110,7 @@ public class PrintPDF {
         }
         createCell(2,column.length);
         for (int i = 0; i < signatures.length; i++){
-            createCell(signatures[i].toUpperCase(), spans[i],10, Font.BOLD, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
+            createCell(signatures[i].toUpperCase(), spans[i],11, Font.BOLD, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
         }
 
         for (int i = 0; i < designation.length; i++){
@@ -127,7 +127,7 @@ public class PrintPDF {
         }
         createCell(2,column.length);
         for (int i = 0; i < signatures.length; i++){
-            createCell(signatures[i].toUpperCase(), spans[i],10, Font.BOLD, name_align, Rectangle.NO_BORDER);
+            createCell(signatures[i].toUpperCase(), spans[i],11, Font.BOLD, name_align, Rectangle.NO_BORDER);
         }
 
         for (int i = 0; i < designation.length; i++){
@@ -140,6 +140,7 @@ public class PrintPDF {
             cell=new PdfPCell(new Paragraph(" ",new Font(Font.FontFamily.TIMES_ROMAN,8,Font.BOLD)));
             cell.setColspan(span);
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
             cell.setBorder(Rectangle.NO_BORDER);
             table.addCell(cell);
         }
@@ -149,6 +150,7 @@ public class PrintPDF {
         cell=new PdfPCell(new Paragraph(text,new Font(Font.FontFamily.TIMES_ROMAN,size,font)));
         cell.setColspan(span);
         cell.setHorizontalAlignment(alignment);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setBorder(border);
         table.addCell(cell);
     }
@@ -157,6 +159,7 @@ public class PrintPDF {
         cell=new PdfPCell(new Paragraph(text,new Font(Font.FontFamily.TIMES_ROMAN,size,font)));
         cell.setColspan(span);
         cell.setHorizontalAlignment(alignment);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         table.addCell(cell);
     }
 
