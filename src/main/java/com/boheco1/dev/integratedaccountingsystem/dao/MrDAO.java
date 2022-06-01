@@ -49,7 +49,8 @@ public class MrDAO {
                 rs.getDate("dateOfMR").toLocalDate(),
                 rs.getString("status"),
                 rs.getString("recommending"),
-                rs.getString("approvedBy")
+                rs.getString("approvedBy"),
+                rs.getString("purpose")
         );
         mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
 
@@ -135,7 +136,8 @@ public class MrDAO {
                     rs.getDate("dateOfMR").toLocalDate(),
                     rs.getString("status"),
                     rs.getString("recommending"),
-                    rs.getString("approvedBy")
+                    rs.getString("approvedBy"),
+                    rs.getString("purpose")
             );
             mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
 
@@ -188,7 +190,8 @@ public class MrDAO {
                     rs.getDate("dateOfMR").toLocalDate(),
                     rs.getString("status"),
                     rs.getString("recommending"),
-                    rs.getString("approvedBy")
+                    rs.getString("approvedBy"),
+                    rs.getString("purpose")
             );
             mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
             mr.setEmployeeInfo(new EmployeeInfo(
@@ -237,7 +240,8 @@ public class MrDAO {
                     rs.getDate("dateOfMR").toLocalDate(),
                     rs.getString("status"),
                     rs.getString("recommending"),
-                    rs.getString("approvedBy")
+                    rs.getString("approvedBy"),
+                    rs.getString("purpose")
             );
             mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
             mr.setEmployeeInfo(new EmployeeInfo(
@@ -281,7 +285,8 @@ public class MrDAO {
                     rs.getDate("dateOfMR").toLocalDate(),
                     rs.getString("status"),
                     rs.getString("recommending"),
-                    rs.getString("approvedBy")
+                    rs.getString("approvedBy"),
+                    rs.getString("purpose")
             );
             mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
             mr.setEmployeeInfo(new EmployeeInfo(

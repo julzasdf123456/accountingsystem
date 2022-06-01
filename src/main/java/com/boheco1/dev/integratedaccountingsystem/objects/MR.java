@@ -16,6 +16,7 @@ public class MR {
     private LocalDate dateOfMR;
     private String status; //active, lost, damaged, returned
     private LocalDate dateOfReturn;
+    private String purpose;
 
     private String recommending;
 
@@ -39,7 +40,7 @@ public class MR {
         this.approvedBy = approvedBy;
     }
 
-    public MR(String id, String employeeId, String warehousePersonnelId, LocalDate dateOfMR, String status, String recommending, String approvedBy) {
+    public MR(String id, String employeeId, String warehousePersonnelId, LocalDate dateOfMR, String status, String recommending, String approvedBy, String purpose) {
         this.id = id;
         this.employeeId = employeeId;
         this.warehousePersonnelId = warehousePersonnelId;
@@ -47,6 +48,7 @@ public class MR {
         this.status = status;
         this.recommending = recommending;
         this.approvedBy = approvedBy;
+        this.purpose = purpose;
     }
 
     public String getId() {
