@@ -26,14 +26,6 @@
                               <Font size="14.0" />
                            </font>
                         </JFXTextField>
-                        <JFXButton fx:id="search_btn1" alignment="CENTER" buttonType="RAISED" contentDisplay="CENTER" onAction="#viewMIRS" styleClass="btn-info" stylesheets="@style.css" text=" " textFill="WHITE">
-                           <HBox.margin>
-                              <Insets left="16.0" />
-                           </HBox.margin>
-                           <graphic>
-                              <FontIcon iconColor="WHITE" iconLiteral="mdi2f-file-eye" iconSize="16" />
-                           </graphic>
-                        </JFXButton>
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_RIGHT" prefHeight="48.0" prefWidth="395.0" HBox.hgrow="ALWAYS">
@@ -73,7 +65,7 @@
                   <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
                </VBox.margin>
             </HBox>
-            <TableView fx:id="mirsTable" prefHeight="576.0" prefWidth="904.0" VBox.vgrow="ALWAYS">
+            <TableView fx:id="mirsTable" onMouseClicked="#mirsTableClicked" prefHeight="576.0" prefWidth="904.0" VBox.vgrow="ALWAYS">
                <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                </columnResizePolicy>

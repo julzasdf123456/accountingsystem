@@ -22,6 +22,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
@@ -89,23 +90,25 @@ public class ViewAllMIRSController extends MenuControllerHandler implements Init
     }
 
     @FXML
-    private void searchMIRS(ActionEvent event) {
-        populateMirsTable(search_box.getText());
+    private void mirsTableClicked(MouseEvent event) {
+        if(event.getClickCount() == 2){
+            MIRS selected = (MIRS) mirsTable.getSelectionModel().getSelectedItem();
+            if (selected == null) {
+                AlertDialogBuilder.messgeDialog("System Information", "Select item(s) before proceeding!", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+                return;
+            }
+            try {
+                Utility.setActiveMIRS(selected);
+                ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_mirs_preview.fxml", Utility.getStackPane(), "../view_all_mirs_controller.fxml");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @FXML
-    private void viewMIRS(ActionEvent event) {
-        MIRS selected = (MIRS) mirsTable.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            AlertDialogBuilder.messgeDialog("System Information", "Select item(s) before proceeding!", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
-            return;
-        }
-            try {
-            Utility.setActiveMIRS(selected);
-            ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_mirs_preview.fxml", Utility.getStackPane(), "../view_all_mirs_controller.fxml");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void searchMIRS(ActionEvent event) {
+        populateMirsTable(search_box.getText());
     }
 
     @FXML
