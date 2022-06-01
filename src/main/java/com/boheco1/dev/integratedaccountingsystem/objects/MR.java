@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 
 import java.time.LocalDate;
@@ -105,5 +106,9 @@ public class MR {
 
     public void setEmployeeInfo(EmployeeInfo employeeInfo) {
         this.employeeInfo = employeeInfo;
+    }
+
+    public void insertItem(MrItem item) throws Exception {
+        MrDAO.createItem(this, item);
     }
 }

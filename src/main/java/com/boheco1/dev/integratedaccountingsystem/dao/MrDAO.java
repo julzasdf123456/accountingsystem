@@ -305,10 +305,10 @@ public class MrDAO {
         return mrs;
     }
 
-    public static void createItem(MrItem item) throws Exception {
+    public static void createItem(MR mr, MrItem item) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO MRItem (id, StockID, Qty, Remarks) " +
-                        "VALUES (?,?,?,?)");
+                "INSERT INTO MRItem (id, StockID, Qty, Remarks, mr_no) " +
+                        "VALUES (?,?,?,?,?)");
 
         if(item.getId()==null) item.setId(Utility.generateRandomId());
 
@@ -316,6 +316,7 @@ public class MrDAO {
         ps.setString(2, item.getStockID());
         ps.setInt(3, item.getQty());
         ps.setString(4, item.getRemarks());
+        ps.setString(5, mr.getId());
 
         ps.executeUpdate();
 
