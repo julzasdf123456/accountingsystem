@@ -5,7 +5,6 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.MrItem;
 import com.boheco1.dev.integratedaccountingsystem.objects.ReceivingItem;
 import com.boheco1.dev.integratedaccountingsystem.objects.SlimStock;
-import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 import com.jfoenix.controls.JFXTextField;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -42,13 +41,21 @@ public class AddMRItemController extends MenuControllerHandler implements Initia
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        //Initializes the stocks table
         this.createTable();
+        //Enables the textfield to accept numbers only
         this.bindNumbers();
+        //Initializes the variables
         this.reset();
+        //Retrieves the parent controller so that the MR Item object can be passed to it
         this.parentController = Utility.getParentController();
+        //Sets the stackpane for the dialogs/modals to display
         this.stackPane = Utility.getStackPane();
     }
-
+    /**
+     * Creates the MR item based on the field values and adds it to the parent controller table
+     * @return void
+     */
     @FXML
     public void addMRItem(){
         String remarks = remarks_tf.getText();
@@ -101,7 +108,10 @@ public class AddMRItemController extends MenuControllerHandler implements Initia
             }
         }
     }
-
+    /**
+     * Initializes the stocks table
+     * @return void
+     */
     public void createTable(){
         TableColumn<SlimStock, String> column0 = new TableColumn<>("RR No");
         column0.setMinWidth(100);
@@ -155,10 +165,17 @@ public class AddMRItemController extends MenuControllerHandler implements Initia
         this.stockTable.getColumns().add(column6);
         this.stockTable.getColumns().add(column7);
     }
-
+    /**
+     * Sets the textfields to accepts number inputs only
+     * @return void
+     */
     public void bindNumbers(){
         InputHelper.restrictNumbersOnly(this.qty_to_mr_tf);
     }
+    /**
+     * Search for stocks based on search string and displays the results in the table
+     * @return void
+     */
     @FXML
     public void search(){
         String key = this.stock_tf.getText();
@@ -169,7 +186,10 @@ public class AddMRItemController extends MenuControllerHandler implements Initia
             throw new RuntimeException(e);
         }
     }
-
+    /**
+     * Resets all the field values
+     * @return void
+     */
     @FXML
     public void reset(){
         this.stockItems =  FXCollections.observableArrayList();

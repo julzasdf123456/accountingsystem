@@ -36,13 +36,21 @@ public class AddTableItemController extends MenuControllerHandler implements Ini
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        //Initializes the stocks table
         this.createTable();
+        //Sets the textfields to accept number inputs only
         this.bindNumbers();
+        //Clears the fields
         this.reset();
+        //Retrieves the parent controller so that the Receiving Item object can be passed to it
         this.parentController = Utility.getParentController();
+        //Sets the stackpane for the dialogs/modals to display
         this.stackPane = Utility.getStackPane();
     }
-
+    /**
+     * Creates the Receiving item based on the field values and adds it to the parent controller table
+     * @return void
+     */
     @FXML
     public void addReceivingItem(){
         int qty_delivered = 0, qty_accepted = 0;
@@ -93,7 +101,10 @@ public class AddTableItemController extends MenuControllerHandler implements Ini
             }
         }
     }
-
+    /**
+     * Initializes the stocks table
+     * @return void
+     */
     public void createTable(){
         TableColumn<SlimStock, String> column1 = new TableColumn<>("Code");
         column1.setMinWidth(100);
@@ -135,12 +146,19 @@ public class AddTableItemController extends MenuControllerHandler implements Ini
         this.stockTable.getColumns().add(column6);
         this.stockTable.getColumns().add(column7);
     }
-
+    /**
+     * Sets the textfields to accepts number inputs only
+     * @return void
+     */
     public void bindNumbers(){
         InputHelper.restrictNumbersOnly(this.qty_delivered_tf);
         InputHelper.restrictNumbersOnly(this.qty_received_tf);
         InputHelper.restrictNumbersOnly(this.cost_tf);
     }
+    /**
+     * Search for stocks based on search string and displays the results in the table
+     * @return void
+     */
     @FXML
     public void search(){
         String key = this.stock_tf.getText();
@@ -151,7 +169,10 @@ public class AddTableItemController extends MenuControllerHandler implements Ini
             throw new RuntimeException(e);
         }
     }
-
+    /**
+     * Resets all the field values
+     * @return void
+     */
     @FXML
     public void reset(){
         this.stockItems =  FXCollections.observableArrayList();

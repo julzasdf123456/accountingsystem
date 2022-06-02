@@ -17,7 +17,7 @@ import javafx.scene.layout.FlowPane;
 
 import java.net.URL;
 import java.util.*;
-
+//For Delete
 public class CriticalStockController extends MenuControllerHandler implements Initializable, SubMenuHelper {
 
     @FXML
