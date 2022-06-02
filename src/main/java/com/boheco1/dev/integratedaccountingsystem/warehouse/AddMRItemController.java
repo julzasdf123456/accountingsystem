@@ -2,6 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
+import com.boheco1.dev.integratedaccountingsystem.objects.MrItem;
 import com.boheco1.dev.integratedaccountingsystem.objects.ReceivingItem;
 import com.boheco1.dev.integratedaccountingsystem.objects.SlimStock;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
@@ -30,7 +31,7 @@ public class AddMRItemController extends MenuControllerHandler implements Initia
     private AnchorPane contentPane;
 
     @FXML
-    private JFXTextField stock_tf, qty_delivered_tf, qty_received_tf, cost_tf, qty_to_mr_tf;
+    private JFXTextField stock_tf, qty_to_mr_tf, remarks_tf;
 
     @FXML
     private TableView stockTable;
@@ -49,74 +50,86 @@ public class AddMRItemController extends MenuControllerHandler implements Initia
     }
 
     @FXML
-    public void addReceivingItem(){
-        int qty_delivered = 0, qty_accepted = 0;
-        double price = 0;
+    public void addMRItem(){
+        String remarks = remarks_tf.getText();
+        int qty_to_add = 0;
 
         try {
-            qty_delivered = Integer.parseInt(this.qty_delivered_tf.getText());
-            qty_accepted = Integer.parseInt(this.qty_received_tf.getText());
-            price = Double.parseDouble(this.cost_tf.getText());
+            qty_to_add = Integer.parseInt(this.qty_to_mr_tf.getText());
         }catch (Exception e){
 
         }
-        ReceivingItem receivingItem = new ReceivingItem();
 
         Object selectedItem = this.stockTable.getSelectionModel().getSelectedItem();
 
         if (!(selectedItem instanceof SlimStock)) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "No item from the table was selected!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (qty_delivered <= 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for delivered quantity!",
+        }else if (qty_to_add <= 0) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for MR quantity!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (qty_accepted <= 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for accepted quantity!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (qty_accepted > qty_delivered) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Accepted quantity should not exceed delivered quantity!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (price <= 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for the item price!",
+
+        }else if (remarks.length() == 0 || remarks == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid remarks!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else {
             SlimStock cstock = (SlimStock) selectedItem;
-            Stock stock = null;
-            try {
-                stock = StockDAO.get(cstock.getId());
-                receivingItem.setRrNo(null);
-                receivingItem.setStockId(stock.getId());
-                receivingItem.setQtyDelivered(qty_delivered);
-                receivingItem.setQtyAccepted(qty_accepted);
-                receivingItem.setUnitCost(price);
-                stock.setReceivingItem(receivingItem);
-                this.parentController.receive(stock);
-                this.reset();
-            } catch (Exception e) {
-                AlertDialogBuilder.messgeDialog("System Error", "A system error occurred due to: "+e.getMessage(),
+
+            if (qty_to_add > cstock.getQuantity()) {
+                AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for MR quantity: "+qty_to_add+" > "+cstock.getQuantity()+"!",
                         stackPane, AlertDialogBuilder.DANGER_DIALOG);
+            }else{
+                try {
+                    MrItem item = new MrItem();
+
+                    ReceivingItem receivingItem = new ReceivingItem();
+                    receivingItem.setStockId(cstock.getId());
+                    receivingItem.setUnitCost(cstock.getPrice());
+                    receivingItem.setQtyAccepted(cstock.getQuantity());
+
+                    item.setRrNo(cstock.getRRNo());
+                    item.setQty(qty_to_add);
+                    item.setStockID(cstock.getId());
+                    item.getStock().setReceivingItem(receivingItem);
+                    item.setRemarks(remarks);
+                    this.parentController.receive(item);
+                    this.reset();
+                } catch (Exception e) {
+                    AlertDialogBuilder.messgeDialog("System Error", "A system error occurred due to: " + e.getMessage(),
+                            stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                }
             }
         }
     }
 
     public void createTable(){
+        TableColumn<SlimStock, String> column0 = new TableColumn<>("RR No");
+        column0.setMinWidth(100);
+        column0.setCellValueFactory(new PropertyValueFactory<>("RRNo"));
+        column0.setStyle("-fx-alignment: center-left;");
+
         TableColumn<SlimStock, String> column1 = new TableColumn<>("Code");
         column1.setMinWidth(100);
         column1.setCellValueFactory(new PropertyValueFactory<>("id"));
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<SlimStock, String> column3 = new TableColumn<>("Description");
-        column3.setMinWidth(350);
+        column3.setMinWidth(345);
         column3.setCellValueFactory(new PropertyValueFactory<>("description"));
         column3.setStyle("-fx-alignment: center-left;");
 
+        TableColumn<SlimStock, String> column8 = new TableColumn<>("Qty");
+        column8.setMinWidth(25);
+        column8.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        column8.setStyle("-fx-alignment: center;");
+
         TableColumn<SlimStock, String> column4 = new TableColumn<>("Brand");
-        column4.setMinWidth(50);
+        column4.setMinWidth(100);
         column4.setCellValueFactory(new PropertyValueFactory<>("brand"));
         column4.setStyle("-fx-alignment: center;");
 
         TableColumn<SlimStock, String> column5 = new TableColumn<>("Model");
-        column5.setMinWidth(50);
+        column5.setMinWidth(100);
         column5.setCellValueFactory(new PropertyValueFactory<>("model"));
         column5.setStyle("-fx-alignment: center;");
 
@@ -126,15 +139,17 @@ public class AddMRItemController extends MenuControllerHandler implements Initia
         column6.setStyle("-fx-alignment: center;");
 
         TableColumn<SlimStock, String> column7 = new TableColumn<>("Price");
-        column7.setMinWidth(75);
+        column7.setMinWidth(120);
         column7.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getPrice()+""));
         column7.setStyle("-fx-alignment: center-left;");
 
         this.stockItems =  FXCollections.observableArrayList();
         this.stockTable.setPlaceholder(new Label("No stock added"));
 
+        this.stockTable.getColumns().add(column0);
         this.stockTable.getColumns().add(column1);
         this.stockTable.getColumns().add(column3);
+        this.stockTable.getColumns().add(column8);
         this.stockTable.getColumns().add(column4);
         this.stockTable.getColumns().add(column5);
         this.stockTable.getColumns().add(column6);
@@ -142,15 +157,13 @@ public class AddMRItemController extends MenuControllerHandler implements Initia
     }
 
     public void bindNumbers(){
-        InputHelper.restrictNumbersOnly(this.qty_delivered_tf);
-        InputHelper.restrictNumbersOnly(this.qty_received_tf);
-        InputHelper.restrictNumbersOnly(this.cost_tf);
+        InputHelper.restrictNumbersOnly(this.qty_to_mr_tf);
     }
     @FXML
     public void search(){
         String key = this.stock_tf.getText();
         try {
-            this.stockItems = FXCollections.observableArrayList(StockDAO.search(key, 0));
+            this.stockItems = FXCollections.observableArrayList(StockDAO.search_available_in_rr(key));
             this.stockTable.setItems(this.stockItems);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -163,8 +176,7 @@ public class AddMRItemController extends MenuControllerHandler implements Initia
         this.stockTable.setItems(this.stockItems);
         this.stockTable.setPlaceholder(new Label("No item added!"));
         this.stock_tf.setText("");
-        this.cost_tf.setText("");
-        this.qty_delivered_tf.setText("");
-        this.qty_received_tf.setText("");
+        this.qty_to_mr_tf.setText("");
+        this.remarks_tf.setText("");
     }
 }

@@ -2,6 +2,8 @@ package com.boheco1.dev.integratedaccountingsystem.objects;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 
+import java.time.LocalDate;
+
 public class MrItem {
     private String id;
     private String stockID;
@@ -10,6 +12,11 @@ public class MrItem {
     private Stock stock;
     private String mrNo;
     private String rrNo;
+
+    private LocalDate dateOfReturned;
+
+    private String Status;
+
     public MrItem() { }
 
     public MrItem(String id, String mrNo, String stockID, int qty, String remarks) {
@@ -76,5 +83,21 @@ public class MrItem {
     }
     public void setRrNo(String rrNo) {
         this.rrNo = rrNo;
+    }
+
+    public LocalDate getDateReturned() {
+        return dateOfReturned;
+    }
+
+    public void setDateReturned(LocalDate dateReturned) {
+        this.dateOfReturned = dateReturned;
+    }
+
+    public String getStatus() {
+        return Status;
+    }
+
+    public void setStatus(String status) {
+        Status = status;
     }
 }

@@ -20,11 +20,14 @@ public class Utility {
     public static String PENDING = "pending";
     public static String APPROVED = "approved";
     public static String UNAVAILABLE = "unavailable";
-    public static String MR_RETURNED_SERVICEABLE = "serviceable";
-    public static String MR_RETURNED_UNSERVICEABLE = "unserviceable";
+
+    public static String MR_FILED = "filed";
+    public static String MR_RECOMMENDING = "recommended";
+    public static String MR_APPROVED = "approved";
+    public static String MR_RELEASED = "released";
     public static String MR_RETURNED = "returned";
     public static String MR_ACTIVE = "active";
-    public static String MR_LOST = "lost";
+
 
     private static AnchorPane contentPane;
     private static MIRS activeMIRS;

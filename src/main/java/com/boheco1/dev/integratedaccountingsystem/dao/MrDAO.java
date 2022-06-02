@@ -14,19 +14,17 @@ public class MrDAO {
 
     public static void add(MR mr) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO MR (id, employeeId, warehousePersonnelid, dateOfMR, status,recommending, approvedBy) " +
-                        "VALUES (?,?,?,?,?,?,?)");
-
-        if(mr.getId()==null) mr.setId(Utility.generateRandomId());
+                "INSERT INTO MR (id, employeeId, dateOfMR, status, warehousePersonnelId, recommending, approvedBy, purpose) " +
+                        "VALUES (?,?,?,?,?,?,?,?)");
 
         ps.setString(1, mr.getId());
         ps.setString(2, mr.getEmployeeId());
-        ps.setString(3, mr.getWarehousePersonnelId());
-        ps.setDate(4, java.sql.Date.valueOf(mr.getDateOfMR()));
-        ps.setString(5, mr.getStatus());
-        ps.setString(6,mr.getRecommending());
+        ps.setDate(3, java.sql.Date.valueOf(mr.getDateOfMR()));
+        ps.setString(4, mr.getStatus());
+        ps.setString(5, mr.getWarehousePersonnelId());
+        ps.setString(6, mr.getRecommending());
         ps.setString(7, mr.getApprovedBy());
-
+        ps.setString(8, mr.getPurpose());
         ps.executeUpdate();
 
         ps.close();
@@ -51,8 +49,10 @@ public class MrDAO {
                 rs.getString("recommending"),
                 rs.getString("approvedBy")
         );
-        mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
-
+        mr.setPurpose(rs.getString("purpose"));
+        mr.setDateApproved(rs.getDate("dateApproved")!=null ? rs.getDate("dateApproved").toLocalDate(): null);
+        mr.setDateRecommended(rs.getDate("dateRecommended")!=null ? rs.getDate("dateRecommended").toLocalDate(): null);
+        mr.setDateReleased(rs.getDate("dateReleased")!=null ? rs.getDate("dateReleased").toLocalDate(): null);
         rs.close();
         ps.close();
 
@@ -137,7 +137,10 @@ public class MrDAO {
                     rs.getString("recommending"),
                     rs.getString("approvedBy")
             );
-            mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
+            mr.setPurpose(rs.getString("purpose"));
+            mr.setDateApproved(rs.getDate("dateApproved")!=null ? rs.getDate("dateApproved").toLocalDate(): null);
+            mr.setDateRecommended(rs.getDate("dateRecommended")!=null ? rs.getDate("dateRecommended").toLocalDate(): null);
+            mr.setDateReleased(rs.getDate("dateReleased")!=null ? rs.getDate("dateReleased").toLocalDate(): null);
 
             mrs.add(mr);
         }
@@ -190,7 +193,10 @@ public class MrDAO {
                     rs.getString("recommending"),
                     rs.getString("approvedBy")
             );
-            mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
+            mr.setPurpose(rs.getString("purpose"));
+            mr.setDateApproved(rs.getDate("dateApproved")!=null ? rs.getDate("dateApproved").toLocalDate(): null);
+            mr.setDateRecommended(rs.getDate("dateRecommended")!=null ? rs.getDate("dateRecommended").toLocalDate(): null);
+            mr.setDateReleased(rs.getDate("dateReleased")!=null ? rs.getDate("dateReleased").toLocalDate(): null);
             mr.setEmployeeInfo(new EmployeeInfo(
                     rs.getString("EmployeeID"),
                     rs.getString("EmployeeFirstName"),
@@ -239,7 +245,10 @@ public class MrDAO {
                     rs.getString("recommending"),
                     rs.getString("approvedBy")
             );
-            mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
+            mr.setPurpose(rs.getString("purpose"));
+            mr.setDateApproved(rs.getDate("dateApproved")!=null ? rs.getDate("dateApproved").toLocalDate(): null);
+            mr.setDateRecommended(rs.getDate("dateRecommended")!=null ? rs.getDate("dateRecommended").toLocalDate(): null);
+            mr.setDateReleased(rs.getDate("dateReleased")!=null ? rs.getDate("dateReleased").toLocalDate(): null);
             mr.setEmployeeInfo(new EmployeeInfo(
                     rs.getString("EmployeeID"),
                     rs.getString("EmployeeFirstName"),
@@ -283,7 +292,10 @@ public class MrDAO {
                     rs.getString("recommending"),
                     rs.getString("approvedBy")
             );
-            mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
+            mr.setPurpose(rs.getString("purpose"));
+            mr.setDateApproved(rs.getDate("dateApproved")!=null ? rs.getDate("dateApproved").toLocalDate(): null);
+            mr.setDateRecommended(rs.getDate("dateRecommended")!=null ? rs.getDate("dateRecommended").toLocalDate(): null);
+            mr.setDateReleased(rs.getDate("dateReleased")!=null ? rs.getDate("dateReleased").toLocalDate(): null);
             mr.setEmployeeInfo(new EmployeeInfo(
                     rs.getString("EmployeeID"),
                     rs.getString("EmployeeFirstName"),
@@ -307,17 +319,18 @@ public class MrDAO {
 
     public static void createItem(MR mr, MrItem item) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO MRItem (id, StockID, Qty, Remarks, mr_no) " +
-                        "VALUES (?,?,?,?,?)");
+                "INSERT INTO MRItem (id, StockID, Qty, Remarks, mr_no, RRNo, Status) " +
+                        "VALUES (?,?,?,?,?,?,?)");
 
         if(item.getId()==null) item.setId(Utility.generateRandomId());
 
-        ps.setString(1, item.getStockID());
+        ps.setString(1, item.getId());
         ps.setString(2, item.getStockID());
         ps.setInt(3, item.getQty());
         ps.setString(4, item.getRemarks());
         ps.setString(5, mr.getId());
-
+        ps.setString(6, item.getRrNo());
+        ps.setString(7, Utility.PENDING);
         ps.executeUpdate();
 
         ps.close();
@@ -331,13 +344,17 @@ public class MrDAO {
         ResultSet rs = ps.executeQuery();
 
         if(rs.next()) {
-            return new MrItem(
+            MrItem item = new MrItem(
                     rs.getString("id"),
                     rs.getString("mr_no"),
                     rs.getString("StockID"),
                     rs.getInt("Qty"),
                     rs.getString("Remarks")
             );
+            item.setRrNo(rs.getString("RRNo"));
+            item.setStatus(rs.getString("Status"));
+            item.setDateReturned(rs.getDate("dateOfReturned")!=null ? rs.getDate("dateOfReturned").toLocalDate(): null);
+            return item;
         }
 
         ps.close();
@@ -356,13 +373,19 @@ public class MrDAO {
         List<MrItem> mrItems = new ArrayList();
 
         while(rs.next()) {
-            mrItems.add(new MrItem(
+            MrItem item = new MrItem(
                     rs.getString("id"),
                     rs.getString("mr_no"),
                     rs.getString("StockID"),
                     rs.getInt("Qty"),
                     rs.getString("Remarks")
-            ));
+            );
+
+            item.setRrNo(rs.getString("RRNo"));
+            item.setRrNo(rs.getString("RRNo"));
+            item.setStatus(rs.getString("Status"));
+            item.setDateReturned(rs.getDate("dateOfReturned")!=null ? rs.getDate("dateOfReturned").toLocalDate(): null);
+            mrItems.add(item);
         }
 
         rs.close();

@@ -14,9 +14,11 @@ public class MR {
 
     private String warehousePersonnelId;
     private LocalDate dateOfMR;
-    private String status; //active, lost, damaged, returned
-    private LocalDate dateOfReturn;
-
+    private String status;
+    private String purpose;
+    private LocalDate dateRecommended;
+    private LocalDate dateApproved;
+    private LocalDate dateReleased;
     private String recommending;
 
     private String approvedBy;
@@ -89,14 +91,6 @@ public class MR {
         this.status = status;
     }
 
-    public LocalDate getDateOfReturn() {
-        return dateOfReturn;
-    }
-
-    public void setDateOfReturn(LocalDate dateOfReturn) {
-        this.dateOfReturn = dateOfReturn;
-    }
-
     public EmployeeInfo getEmployeeInfo() throws Exception{
         if(employeeInfo==null) {
             this.employeeInfo = EmployeeDAO.getOne(employeeId, DB.getConnection());
@@ -110,5 +104,37 @@ public class MR {
 
     public void insertItem(MrItem item) throws Exception {
         MrDAO.createItem(this, item);
+    }
+
+    public LocalDate getDateRecommended() {
+        return dateRecommended;
+    }
+
+    public void setDateRecommended(LocalDate dateRecommended) {
+        this.dateRecommended = dateRecommended;
+    }
+
+    public LocalDate getDateApproved() {
+        return dateApproved;
+    }
+
+    public void setDateApproved(LocalDate dateApproved) {
+        this.dateApproved = dateApproved;
+    }
+
+    public LocalDate getDateReleased() {
+        return dateReleased;
+    }
+
+    public void setDateReleased(LocalDate dateReleased) {
+        this.dateReleased = dateReleased;
+    }
+
+    public String getPurpose() {
+        return purpose;
+    }
+
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
     }
 }
