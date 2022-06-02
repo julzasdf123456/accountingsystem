@@ -12,6 +12,7 @@ public class MrItem {
     private Stock stock;
     private String mrNo;
     private String rrNo;
+    private String status;
 
     private LocalDate dateOfReturned;
 
@@ -25,6 +26,15 @@ public class MrItem {
         this.stockID = stockID;
         this.qty = qty;
         this.remarks = remarks;
+    }
+
+    public MrItem(String id, String mrNo, String stockID, int qty, String remarks, String status) {
+        this.id = id;
+        this.mrNo = mrNo;
+        this.stockID = stockID;
+        this.qty = qty;
+        this.remarks = remarks;
+        this.status = status;
     }
 
     public String getMrNo() {

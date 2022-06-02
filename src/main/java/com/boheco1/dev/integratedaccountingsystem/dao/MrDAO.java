@@ -4,8 +4,10 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -405,5 +407,24 @@ public class MrDAO {
         ps.executeUpdate();
 
         ps.close();
+    }
+
+    public static void returnItem(MrItem item) throws Exception {
+        PreparedStatement ps1 = DB.getConnection().prepareStatement(
+                "UPDATE MrItem SET status=?, dateOfReturned=? WHERE id=?");
+        ps1.setString(1, Utility.MR_RETURNED);
+        ps1.setDate(2, Date.valueOf(LocalDate.now()));
+        ps1.setString(3, item.getId());
+
+        ps1.executeUpdate();
+
+        //If the item returned came from warehouse, replenish warehouse quantity.
+        if(item.getStockID()!=null) {
+            Stock stock = StockDAO.get(item.getStockID());
+            StockDAO.addStockQuantity(stock, item.getQty());
+        }
+
+        ps1.close();
+
     }
 }
