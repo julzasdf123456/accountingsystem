@@ -1,7 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
-import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 
 public class MrItem {
     private String id;
@@ -9,8 +8,9 @@ public class MrItem {
     private int qty;
     private String remarks;
     private Stock stock;
-
     private String mrNo;
+    private String rrNo;
+    public MrItem() { }
 
     public MrItem(String id, String mrNo, String stockID, int qty, String remarks) {
         this.id = id;
@@ -62,12 +62,19 @@ public class MrItem {
 
     public Stock getStock() throws Exception {
         if(stock==null) {
-            stock = StockDAO.get(id);
+            stock = StockDAO.get(this.stockID);
         }
         return stock;
     }
 
     public void setStock(Stock stock) {
         this.stock = stock;
+    }
+
+    public String getRrNo() {
+        return rrNo;
+    }
+    public void setRrNo(String rrNo) {
+        this.rrNo = rrNo;
     }
 }

@@ -349,6 +349,45 @@ public class StockDAO {
     }
 
     /**
+     * Retrieves a list of available SlimStocks as a search result based on a search Key
+     * @param key The search key
+     * @return A list of SlimStock that qualifies with the search key
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<SlimStock> search_available_in_rr(String key) throws Exception  {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "Select TOP 50 Stocks.id, StockName, Brand, Model, Description, StockEntryLogs.Price, Unit, StockEntryLogs.Quantity as Quantity, RRNo FROM Stocks INNER JOIN StockEntryLogs ON Stocks.id = StockEntryLogs.StockID " +
+                        "WHERE (StockName LIKE ? OR Description LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
+                        "AND IsTrashed=0 AND StockEntryLogs.Quantity > 0 ORDER BY RRNo");
+        ps.setString(1, "%" + key + "%");
+        ps.setString(2, "%" + key + "%");
+        ps.setString(3, "%" + key + "%");
+        ps.setString(4, "%" + key + "%");
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<SlimStock> stocks = new ArrayList<>();
+        while(rs.next()) {
+            SlimStock stock = new SlimStock(
+                    rs.getString("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Model"),
+                    rs.getString("Brand"));
+            stock.setDescription(rs.getString("Description"));
+            stock.setPrice(rs.getDouble("Price"));
+            stock.setUnit(rs.getString("Unit"));
+            stock.setQuantity(rs.getInt("Quantity"));
+            stock.setRRNo(rs.getString("RRNo"));
+            stocks.add(stock);
+        }
+
+        rs.close();
+        ps.close();
+
+        return stocks;
+    }
+
+    /**
      * Get a list of Stocks with offset and limit. Used in viewing list stocks.
      * @param limit number of rows to fetch
      * @param offset number of rows to skip
