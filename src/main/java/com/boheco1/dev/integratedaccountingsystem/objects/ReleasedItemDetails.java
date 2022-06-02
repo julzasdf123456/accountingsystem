@@ -15,11 +15,11 @@ public class ReleasedItemDetails {
     private String unit;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String workOrderNo;
+
     private int remaining;
     private int actualReleased;
 
-    public ReleasedItemDetails(String itemDescription, String mirsItemId, String mirsID, String stockID, int quantity, double price, String status, LocalDateTime createdAt, LocalDateTime updatedAt, String workOrderNo) {
+    public ReleasedItemDetails(String itemDescription, String mirsItemId, String mirsID, String stockID, int quantity, double price, String status, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.itemDescription = itemDescription;
         this.mirsItemId = mirsItemId;
         this.mirsID = mirsID;
@@ -30,7 +30,6 @@ public class ReleasedItemDetails {
         this.unit = unit;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.workOrderNo = workOrderNo;
     }
 
     public String getItemDescription() {
@@ -111,14 +110,6 @@ public class ReleasedItemDetails {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public String getWorkOrderNo() {
-        return workOrderNo;
-    }
-
-    public void setWorkOrderNo(String workOrderNo) {
-        this.workOrderNo = workOrderNo;
     }
 
     public int getRemaining() throws Exception {

@@ -2,10 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
-import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
-import com.boheco1.dev.integratedaccountingsystem.objects.MR;
-import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
-import com.boheco1.dev.integratedaccountingsystem.objects.StockEntryLog;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,26 +14,18 @@ public class MrDAO {
 
     public static void add(MR mr) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO MR (id, employeeId, warehousePersonnelId, extItem, stockID, quantity, price, dateOfMR, status) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?)");
+                "INSERT INTO MR (id, employeeId, warehousePersonnelid, dateOfMR, status,recommending, approvedBy) " +
+                        "VALUES (?,?,?,?,?,?,?)");
 
         if(mr.getId()==null) mr.setId(Utility.generateRandomId());
-
-        if(mr.getStockId()!=null) {
-            Stock stock = StockDAO.get(mr.getStockId());
-            mr.setPrice(stock!=null ? stock.getPrice() : null);
-            mr.setExtItem(stock.getDescription());
-        }
 
         ps.setString(1, mr.getId());
         ps.setString(2, mr.getEmployeeId());
         ps.setString(3, mr.getWarehousePersonnelId());
-        ps.setString(4, mr.getExtItem());
-        ps.setString(5, mr.getStockId());
-        ps.setInt(6, mr.getQuantity());
-        ps.setDouble(7, mr.getPrice());
-        ps.setDate(8, java.sql.Date.valueOf(mr.getDateOfMR()));
-        ps.setString(9, "active");
+        ps.setDate(4, java.sql.Date.valueOf(mr.getDateOfMR()));
+        ps.setString(5, mr.getStatus());
+        ps.setString(6,mr.getRecommending());
+        ps.setString(7, mr.getApprovedBy());
 
         ps.executeUpdate();
 
@@ -53,17 +42,15 @@ public class MrDAO {
             return null;
         }
 
-        MR mr = new MR();
-        mr.setId(rs.getString("id"));
-        mr.setEmployeeId(rs.getString("employeeId"));
-        mr.setWarehousePersonnelId(rs.getString("warehousePersonnelId"));
-        mr.setExtItem(rs.getString("extItem"));
-        mr.setStockId(rs.getString("stockID"));
-        mr.setQuantity(rs.getInt("quantity"));
-        mr.setPrice(rs.getDouble("price"));
-        mr.setDateOfMR(rs.getDate("dateOfMR").toLocalDate());
-        mr.setStatus(rs.getString("status"));
-        mr.setRemarks(rs.getString("remarks"));
+        MR mr = new MR(
+                rs.getString("id"),
+                rs.getString("employeeId"),
+                rs.getString("warehousePersonnelId"),
+                rs.getDate("dateOfMR").toLocalDate(),
+                rs.getString("status"),
+                rs.getString("recommending"),
+                rs.getString("approvedBy")
+        );
         mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
 
         rs.close();
@@ -141,17 +128,15 @@ public class MrDAO {
         ArrayList<MR> mrs = new ArrayList();
 
         while(rs.next()) {
-            MR mr = new MR();
-            mr.setId(rs.getString("id"));
-            mr.setEmployeeId(rs.getString("employeeId"));
-            mr.setWarehousePersonnelId(rs.getString("warehousePersonnelId"));
-            mr.setExtItem(rs.getString("extItem"));
-            mr.setStockId(rs.getString("stockID"));
-            mr.setQuantity(rs.getInt("quantity"));
-            mr.setPrice(rs.getDouble("price"));
-            mr.setDateOfMR(rs.getDate("dateOfMR").toLocalDate());
-            mr.setStatus(rs.getString("status"));
-            mr.setRemarks(rs.getString("remarks"));
+            MR mr = new MR(
+                    rs.getString("id"),
+                    rs.getString("employeeId"),
+                    rs.getString("warehousePersonnelId"),
+                    rs.getDate("dateOfMR").toLocalDate(),
+                    rs.getString("status"),
+                    rs.getString("recommending"),
+                    rs.getString("approvedBy")
+            );
             mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
 
             mrs.add(mr);
@@ -161,38 +146,6 @@ public class MrDAO {
         ps.close();
 
         return mrs;
-    }
-
-    public static void returnMR(MR mr, String remarks) throws Exception {
-        Stock stock = StockDAO.get(mr.getStockId());
-        if (stock == null){
-            stock = new Stock();
-            stock.setId(mr.getStockId());
-            stock.setQuantity(0);
-            stock.setStockName(mr.getExtItem());
-            stock.setDescription(mr.getExtItem());
-            stock.setPrice(mr.getPrice());
-
-            StockDAO.add(stock);
-        }
-        StockEntryLog entry = new StockEntryLog();
-        entry.setSource("Returned");
-        entry.setQuantity(mr.getQuantity());
-        entry.setPrice(mr.getPrice());
-
-        StockDAO.stockEntry(stock, entry);
-
-
-        PreparedStatement ps = DB.getConnection().prepareStatement(
-                "UPDATE MR SET status=?, remarks=?, dateOfReturn=?, stockID=? WHERE id=?");
-        ps.setString(1, Utility.MR_RETURNED);
-        ps.setString(2, remarks);
-        ps.setDate(3, java.sql.Date.valueOf(LocalDate.now()));
-        ps.setString(4, stock.getId());
-        ps.setString(5, mr.getId());
-        ps.executeUpdate();
-
-        ps.close();
     }
 
     public static int countMRs(String status) throws Exception {
@@ -228,20 +181,28 @@ public class MrDAO {
         ArrayList<MR> mrs = new ArrayList();
 
         while(rs.next()) {
-            MR mr = new MR();
-            mr.setId(rs.getString("id"));
-            mr.setEmployeeId(rs.getString("employeeId"));
-            mr.setWarehousePersonnelId(rs.getString("warehousePersonnelId"));
-            mr.setExtItem(rs.getString("extItem"));
-            mr.setStockId(rs.getString("stockID"));
-            mr.setQuantity(rs.getInt("quantity"));
-            mr.setPrice(rs.getDouble("price"));
-            mr.setDateOfMR(rs.getDate("dateOfMR").toLocalDate());
-            mr.setStatus(rs.getString("status"));
-            mr.setRemarks(rs.getString("remarks"));
+            MR mr = new MR(
+                    rs.getString("id"),
+                    rs.getString("employeeId"),
+                    rs.getString("warehousePersonnelId"),
+                    rs.getDate("dateOfMR").toLocalDate(),
+                    rs.getString("status"),
+                    rs.getString("recommending"),
+                    rs.getString("approvedBy")
+            );
             mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
-            mr.setEmployeeFirstName(rs.getString("employeeFirstName"));
-            mr.setEmployeeLastName(rs.getString("employeeLastName"));
+            mr.setEmployeeInfo(new EmployeeInfo(
+                    rs.getString("EmployeeID"),
+                    rs.getString("EmployeeFirstName"),
+                    rs.getString("EmployeeMidName"),
+                    rs.getString("EmployeeLastName"),
+                    rs.getString("EmployeeSuffix"),
+                    rs.getString("Address"),
+                    rs.getString("Phone"),
+                    rs.getString("Designation"),
+                    rs.getString("SignatoryLevel"),
+                    rs.getString("DepartmentID")
+            ));
             mrs.add(mr);
         }
 
@@ -269,20 +230,28 @@ public class MrDAO {
         ArrayList<MR> mrs = new ArrayList();
 
         while(rs.next()) {
-            MR mr = new MR();
-            mr.setId(rs.getString("id"));
-            mr.setEmployeeId(rs.getString("employeeId"));
-            mr.setWarehousePersonnelId(rs.getString("warehousePersonnelId"));
-            mr.setExtItem(rs.getString("extItem"));
-            mr.setStockId(rs.getString("stockID"));
-            mr.setQuantity(rs.getInt("quantity"));
-            mr.setPrice(rs.getDouble("price"));
-            mr.setDateOfMR(rs.getDate("dateOfMR").toLocalDate());
-            mr.setStatus(rs.getString("status"));
-            mr.setRemarks(rs.getString("remarks"));
+            MR mr = new MR(
+                    rs.getString("id"),
+                    rs.getString("employeeId"),
+                    rs.getString("warehousePersonnelId"),
+                    rs.getDate("dateOfMR").toLocalDate(),
+                    rs.getString("status"),
+                    rs.getString("recommending"),
+                    rs.getString("approvedBy")
+            );
             mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
-            mr.setEmployeeFirstName(rs.getString("employeeFirstName"));
-            mr.setEmployeeLastName(rs.getString("employeeLastName"));
+            mr.setEmployeeInfo(new EmployeeInfo(
+                    rs.getString("EmployeeID"),
+                    rs.getString("EmployeeFirstName"),
+                    rs.getString("EmployeeMidName"),
+                    rs.getString("EmployeeLastName"),
+                    rs.getString("EmployeeSuffix"),
+                    rs.getString("Address"),
+                    rs.getString("Phone"),
+                    rs.getString("Designation"),
+                    rs.getString("SignatoryLevel"),
+                    rs.getString("DepartmentID")
+            ));
             mrs.add(mr);
         }
 
@@ -305,20 +274,28 @@ public class MrDAO {
         ArrayList<MR> mrs = new ArrayList();
 
         while(rs.next()) {
-            MR mr = new MR();
-            mr.setId(rs.getString("id"));
-            mr.setEmployeeId(rs.getString("employeeId"));
-            mr.setWarehousePersonnelId(rs.getString("warehousePersonnelId"));
-            mr.setExtItem(rs.getString("extItem"));
-            mr.setStockId(rs.getString("stockID"));
-            mr.setQuantity(rs.getInt("quantity"));
-            mr.setPrice(rs.getDouble("price"));
-            mr.setDateOfMR(rs.getDate("dateOfMR").toLocalDate());
-            mr.setStatus(rs.getString("status"));
-            mr.setRemarks(rs.getString("remarks"));
+            MR mr = new MR(
+                    rs.getString("id"),
+                    rs.getString("employeeId"),
+                    rs.getString("warehousePersonnelId"),
+                    rs.getDate("dateOfMR").toLocalDate(),
+                    rs.getString("status"),
+                    rs.getString("recommending"),
+                    rs.getString("approvedBy")
+            );
             mr.setDateOfReturn(rs.getDate("dateOfReturn")!=null ? rs.getDate("dateOfReturn").toLocalDate(): null);
-            mr.setEmployeeFirstName(rs.getString("employeeFirstName"));
-            mr.setEmployeeLastName(rs.getString("employeeLastName"));
+            mr.setEmployeeInfo(new EmployeeInfo(
+                    rs.getString("EmployeeID"),
+                    rs.getString("EmployeeFirstName"),
+                    rs.getString("EmployeeMidName"),
+                    rs.getString("EmployeeLastName"),
+                    rs.getString("EmployeeSuffix"),
+                    rs.getString("Address"),
+                    rs.getString("Phone"),
+                    rs.getString("Designation"),
+                    rs.getString("SignatoryLevel"),
+                    rs.getString("DepartmentID")
+            ));
             mrs.add(mr);
         }
 
@@ -326,5 +303,80 @@ public class MrDAO {
         ps.close();
 
         return mrs;
+    }
+
+    public static void createItem(MR mr, MrItem item) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "INSERT INTO MRItem (id, StockID, Qty, Remarks, mr_no) " +
+                        "VALUES (?,?,?,?,?)");
+
+        if(item.getId()==null) item.setId(Utility.generateRandomId());
+
+        ps.setString(1, item.getStockID());
+        ps.setString(2, item.getStockID());
+        ps.setInt(3, item.getQty());
+        ps.setString(4, item.getRemarks());
+        ps.setString(5, mr.getId());
+
+        ps.executeUpdate();
+
+        ps.close();
+    }
+
+    public static MrItem getItem(String id) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MRItem WHERE id=?");
+        ps.setString(1, id);
+
+        ResultSet rs = ps.executeQuery();
+
+        if(rs.next()) {
+            return new MrItem(
+                    rs.getString("id"),
+                    rs.getString("mr_no"),
+                    rs.getString("StockID"),
+                    rs.getInt("Qty"),
+                    rs.getString("Remarks")
+            );
+        }
+
+        ps.close();
+        rs.close();
+
+        return null;
+    }
+
+    public static List<MrItem> getItems(MR mr) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MRItem WHERE mr_no=?");
+        ps.setString(1, mr.getId());
+
+        ResultSet rs = ps.executeQuery();
+
+        List<MrItem> mrItems = new ArrayList();
+
+        while(rs.next()) {
+            mrItems.add(new MrItem(
+                    rs.getString("id"),
+                    rs.getString("mr_no"),
+                    rs.getString("StockID"),
+                    rs.getInt("Qty"),
+                    rs.getString("Remarks")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return mrItems;
+    }
+    public static void removeItem(MrItem mrItem) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "DELETE FROM MRItem WHERE id=?");
+        ps.setString(1, mrItem.getId());
+
+        ps.executeUpdate();
+
+        ps.close();
     }
 }
