@@ -77,7 +77,7 @@ public class HomeController implements Initializable {
     public JFXButton collection;
 
     // WAREHOUSE
-    public JFXButton warehouseDashboard, fileMirs, stocks, receiving, addMR;
+    public JFXButton warehouseDashboard, fileMirs, generateMct, stocks, receiving, addMR;
 
     // ADMINISTRATIVE
     public JFXButton employees, users, signatoriesButton;
@@ -110,6 +110,7 @@ public class HomeController implements Initializable {
         collection = new JFXButton("Collection");
         warehouseDashboard = new JFXButton("Dashboard");
         fileMirs = new JFXButton("File MIRS");
+        generateMct = new JFXButton("Generate MCT");
         stocks = new JFXButton("Stock Entry");
         employees = new JFXButton("Employees");
         users = new JFXButton("Users");
@@ -133,6 +134,7 @@ public class HomeController implements Initializable {
         NavMenuHelper.addMenu(navMenuBox, fileMirs, homeStackPane);
 
         if(ActiveUser.getUser().can("manage-warehouse")) {
+            NavMenuHelper.addMenu(navMenuBox, generateMct, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, receiving, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, addMR, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, stocks, homeStackPane);
@@ -158,6 +160,7 @@ public class HomeController implements Initializable {
         // WAREHOUSE
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(warehouseDashboard, new FontIcon("mdi2v-view-dashboard"), drawerMenus, "Warehouse Dashboard", contentPane, "warehouse_dashboard_controller.fxml", subToolbar, new WarehouseDashboardController(), title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(fileMirs, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "File MIRS", contentPane, "warehouse_file_mirs.fxml", subToolbar, new FileMIRSController(), title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(generateMct, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Generate MCT", contentPane, "warehouse_generate_mct.fxml", subToolbar, new GenerateMCTController(), title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(addMR, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "MR Entry", contentPane, "warehouse_mr_entry.fxml", subToolbar, new MREntryController(), title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(stocks, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Stock Entry", contentPane, "warehouse_stock_entry.fxml", subToolbar, new StockEntryController(), title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(receiving, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Receiving Entry", contentPane, "warehouse_receiving_entry.fxml", subToolbar, new ReceivingEntryController(), title);
