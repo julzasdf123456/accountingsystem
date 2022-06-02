@@ -67,6 +67,26 @@ public class ReceivingDAO {
         return receiving;
     }
 
+    public static ReceivingItem getItem(String rrno, String stock_id) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM ReceivingItem WHERE RRNo = ? AND StockID = ?");
+        ps.setString(1, rrno);
+        ps.setString(2, stock_id);
+
+        ResultSet rs = ps.executeQuery();
+
+        ReceivingItem item = new ReceivingItem();
+        while(rs.next()) {
+            item.setRrNo(rrno);
+            item.setStockId(rs.getString("StockID"));
+            item.setUnitCost(rs.getDouble("UnitCost"));
+            item.setQtyDelivered(rs.getInt("QtyDelivered"));
+            item.setQtyAccepted(rs.getInt("QtyAccepted"));
+        }
+        rs.close();
+        return item;
+    }
+
     public static void update(Receiving receiving) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE Receiving " +
                 "SET Date=?, RVNo=?, BLWBNo=?, Carrier=?, DRNo=?, PONo=?, SupplierID=?, " +
