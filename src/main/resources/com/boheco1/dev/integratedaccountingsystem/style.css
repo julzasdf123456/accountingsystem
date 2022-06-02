@@ -13,7 +13,7 @@
 }
 
 .jfx-text-field, .jfx-password-field, .jfx-text-area, .text-area, .check-box, .jfx-check-box, .text-field,
-.label, .jfx-password-field, .jfx-combo-box, .date-picker, .jfx-button, .tab{
+.label, .jfx-password-field, .jfx-combo-box, .date-picker, .jfx-button, .tab, .list-view{
     -fx-font-size: 16px;
 }
 

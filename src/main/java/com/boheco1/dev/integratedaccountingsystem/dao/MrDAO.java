@@ -6,7 +6,6 @@ import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 

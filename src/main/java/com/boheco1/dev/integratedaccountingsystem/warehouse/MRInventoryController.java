@@ -106,8 +106,8 @@ public class MRInventoryController extends MenuControllerHandler implements Init
                     List<MR> mrs = MrDAO.getMRs(Utility.MR_ACTIVE);
                     ArrayList<String[]> rows = new ArrayList<>();
                     for (MR mr : mrs) {
-                        String[] data = {mr.getExtItem(), mr.getQuantity() + "", mr.getPrice() + "", mr.getDateOfMR().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")), mr.getEmployeeFirstName() + " " + mr.getEmployeeLastName()};
-                        rows.add(data);
+                        //String[] data = {mr.getExtItem(), mr.getQuantity() + "", mr.getPrice() + "", mr.getDateOfMR().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")), mr.getEmployeeFirstName() + " " + mr.getEmployeeLastName()};
+                        //rows.add(data);
                     }
                     int[] rows_aligns = {Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_LEFT};
                     mr_pdf.tableContent(rows, header_spans, rows_aligns);

@@ -137,4 +137,8 @@ public class MR {
     public void setPurpose(String purpose) {
         this.purpose = purpose;
     }
+
+    public String toString(){
+        return this.id;
+    }
 }
