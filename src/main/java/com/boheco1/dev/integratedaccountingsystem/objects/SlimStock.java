@@ -12,6 +12,7 @@ public class SlimStock {
     private int Quantity;
     private String Unit;
     private double Price;
+    private String RRNo;
 
     public SlimStock(String id, String stockName, String model, String brand) {
         this.id = id;
@@ -95,5 +96,13 @@ public class SlimStock {
     @Override
     public int hashCode() {
         return Objects.hash(id, StockName);
+    }
+
+    public String getRRNo() {
+        return RRNo;
+    }
+
+    public void setRRNo(String RRNo) {
+        this.RRNo = RRNo;
     }
 }

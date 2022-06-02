@@ -130,7 +130,7 @@ public class MRTFormController implements Initializable {
                                 ReleasingDAO.updateReleasedItem(releasing);
                             }
 
-                            releasing.setWorkOrderNo(mirsItem.getWorkOrderNo());
+                            //releasing.setWorkOrderNo(mirsItem.getWorkOrderNo());
                             ReleasingDAO.add(releasing);
                             Stock temp = StockDAO.get(mirsItem.getStockID()); //temp stock object for quantity deduction
                             StockDAO.deductStockQuantity(temp, mirsItem.getQuantity());
@@ -271,7 +271,7 @@ public class MRTFormController implements Initializable {
                                             mirsItem.setRemarks(selectedItems.get(0).getRemarks());
                                             mirsItem.setCreatedAt(selectedItems.get(0).getCreatedAt());
                                             mirsItem.setUpdatedAt(selectedItems.get(0).getUpdatedAt());
-                                            mirsItem.setWorkOrderNo(selectedItems.get(0).getWorkOrderNo());
+                                            //mirsItem.setWorkOrderNo(selectedItems.get(0).getWorkOrderNo());
 
                                             selectedItems.get(0).setQuantity(selectedItems.get(0).getQuantity() - Integer.parseInt(input.getText()));
                                             releasingList.getItems().add(mirsItem);

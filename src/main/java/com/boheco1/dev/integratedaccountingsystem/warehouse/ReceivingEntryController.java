@@ -812,12 +812,21 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
 
     @Override
     public void receive(Object o) {
+        boolean ok = true;
         if (o instanceof Stock){
             Stock stock = (Stock) o;
             ReceivingItem receivingItem = stock.getReceivingItem();
-            this.receivedItems.add(stock);
-            this.new_stocks_table.setItems(this.receivedItems);
-            this.credit(12, receivingItem.getQtyAccepted()*receivingItem.getUnitCost());
+            for (Stock i: this.receivedItems){
+                if (i.getId().equals(receivingItem.getStockId())){
+                    ok = false;
+                    break;
+                }
+            }
+            if (ok) {
+                this.receivedItems.add(stock);
+                this.new_stocks_table.setItems(this.receivedItems);
+                this.credit(12, receivingItem.getQtyAccepted() * receivingItem.getUnitCost());
+            }
         }
     }
 }

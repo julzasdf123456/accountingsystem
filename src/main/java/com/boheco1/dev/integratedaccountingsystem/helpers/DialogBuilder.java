@@ -94,18 +94,16 @@ public class DialogBuilder {
         context.setWrapText(true);
         context.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
 
-
         input.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 18));
         input.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
         input.setPromptText(promptText);
         input.setLabelFloat(true);
-        InputValidation.restrictNumbersOnly(input);
 
         flowPane.getChildren().add(context);
         flowPane.getChildren().add(input);
         dialogContent.setBody(flowPane);
 
-        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogContent, JFXDialog.DialogTransition.CENTER);
+        JFXDialog dialog = new JFXDialog(pane, dialogContent, JFXDialog.DialogTransition.CENTER);
         dialog.setOverlayClose(false);
 
         btn.setDefaultButton(true);
@@ -128,4 +126,49 @@ public class DialogBuilder {
         dialog.show();
         return dialog;
     }
+
+    public static JFXDialog showInputDialog(String title, String message, Orientation orientation, JFXTextField input, JFXButton btn, String style, StackPane pane){
+        JFXDialogLayout dialogContent = new JFXDialogLayout();
+        dialogContent.setStyle("-fx-border-width: 0 0 0 15; -fx-border-color: " + style + ";");
+        dialogContent.setPrefHeight(200);
+
+        Label head = new Label(title);
+        head.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 15));
+        head.setTextFill(Paint.valueOf(style));
+        dialogContent.setHeading(head);
+
+        FlowPane flowPane = new FlowPane();
+        flowPane.setOrientation(orientation);
+        flowPane.setAlignment(Pos.CENTER);
+        flowPane.setRowValignment(VPos.CENTER);
+        flowPane.setColumnHalignment(HPos.CENTER);
+        flowPane.setVgap(6);
+
+        Label context = new Label(message);
+        context.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 12));
+        context.setWrapText(true);
+        context.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
+
+        flowPane.getChildren().add(context);
+        flowPane.getChildren().add(input);
+        dialogContent.setBody(flowPane);
+
+        JFXDialog dialog = new JFXDialog(pane, dialogContent, JFXDialog.DialogTransition.CENTER);
+        dialog.setOverlayClose(false);
+
+        JFXButton cancel = new JFXButton("Cancel");
+        cancel.setDefaultButton(true);
+        cancel.getStyleClass().add("JFXButton");
+        cancel.setTextFill(Paint.valueOf(ColorPalette.GREY_DARK));
+        cancel.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent __) {
+               dialog.close();
+            }
+        });
+        dialogContent.setActions(cancel,btn);
+        dialog.show();
+        return dialog;
+    }
+
 }

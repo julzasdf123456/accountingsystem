@@ -104,39 +104,48 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                     Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
             return;
         }
+        JFXButton accept = new JFXButton("Proceed");
+        JFXDialog dialog = DialogBuilder.showConfirmDialog("File MIRS","Confirm MIRS application", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+        accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+        accept.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent __) {
+                try {
+                    List<MIRSItem> mirsItemList = selectedItem; //from ObservableList to List
+                    MIRS mirs = new MIRS();
+                    mirs.setDateFiled(date.getValue());
+                    mirs.setApplicant(applicant.getText());
+                    mirs.setAddress(address.getText());
+                    mirs.setPurpose(purpose.getText());
+                    mirs.setId(mirsNum.getText()); //id mean MIRS number from user input
+                    mirs.setStatus(Utility.PENDING);
+                    mirs.setRequisitionerID(requisitionerEmployee.getId());
+                    mirs.setUserID(ActiveUser.getUser().getId());
+                    MirsDAO.create(mirs); //add a new MIRS to the database
+                    MirsDAO.addMIRSItems(mirs, mirsItemList); //add the items request from the MIRS filled
 
-        try {
-            List<MIRSItem> mirsItemList = selectedItem; //from ObservableList to List
-            MIRS mirs = new MIRS();
-            mirs.setDateFiled(date.getValue());
-            mirs.setApplicant(applicant.getText());
-            mirs.setAddress(address.getText());
-            mirs.setPurpose(purpose.getText());
-            mirs.setId(mirsNum.getText()); //id mean MIRS number from user input
-            mirs.setStatus(Utility.PENDING);
-            mirs.setRequisitionerID(requisitionerEmployee.getId());
-            mirs.setUserID(ActiveUser.getUser().getId());
-            MirsDAO.create(mirs); //add a new MIRS to the database
-            MirsDAO.addMIRSItems(mirs, mirsItemList); //add the items request from the MIRS filled
 
-
-            EmployeeInfo[] signatories = {checkedByEmployee, approvedByEmployee};
-            for(EmployeeInfo s : signatories){
-                MIRSSignatory mirsSignatory = new MIRSSignatory();
-                mirsSignatory.setMirsID(mirs.getId());
-                mirsSignatory.setUserID(s.getId());
-                mirsSignatory.setStatus(Utility.PENDING);
-                mirsSignatory.setComments("");
-                MIRSSignatoryDAO.add(mirsSignatory); //saving signatories for the MIRS request
+                    EmployeeInfo[] signatories = {checkedByEmployee, approvedByEmployee};
+                    for(EmployeeInfo s : signatories){
+                        MIRSSignatory mirsSignatory = new MIRSSignatory();
+                        mirsSignatory.setMirsID(mirs.getId());
+                        mirsSignatory.setUserID(s.getId());
+                        mirsSignatory.setStatus(Utility.PENDING);
+                        mirsSignatory.setComments("");
+                        MIRSSignatoryDAO.add(mirsSignatory); //saving signatories for the MIRS request
+                    }
+                    AlertDialogBuilder.messgeDialog("System Message", "MIRS request successfully filed, please wait for the approval, thank you!",
+                            Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                    resetInputFields();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    AlertDialogBuilder.messgeDialog("System Error", e.getMessage(),
+                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }
+                dialog.close();
             }
-            AlertDialogBuilder.messgeDialog("System Message", "MIRS request successfully filed, please wait for the approval, thank you!",
-                    Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
-            resetInputFields();
-        } catch (Exception e) {
-            e.printStackTrace();
-            AlertDialogBuilder.messgeDialog("System Error", e.getMessage(),
-                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-        }
+        });
+
     }
 
     @FXML
@@ -197,42 +206,9 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         if (selected == null) {
             AlertDialogBuilder.messgeDialog("System Information", "Please select an item from the table!", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
         }else{
-            JFXDialogLayout dialogContent = new JFXDialogLayout();
-            dialogContent.setStyle("-fx-border-width: 0 0 0 15; -fx-border-color: " + ColorPalette.INFO + ";");
-            dialogContent.setPrefHeight(200);
-
-            Label head = new Label("Confirm Iitem Removal");
-            head.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 15));
-            head.setTextFill(Paint.valueOf(ColorPalette.INFO));
-            dialogContent.setHeading(head);
-
-            FlowPane flowPane = new FlowPane();
-            flowPane.setOrientation(Orientation.VERTICAL);
-            flowPane.setAlignment(Pos.CENTER);
-            flowPane.setRowValignment(VPos.CENTER);
-            flowPane.setColumnHalignment(HPos.CENTER);
-            flowPane.setVgap(6);
-
-            Label context = new Label("Confirm cancellation of MIRS item: "+StockDAO.get(selected.getStockID()).getDescription());
-            context.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 12));
-            context.setWrapText(true);
-            context.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
-
-            flowPane.getChildren().add(context);
-            dialogContent.setBody(flowPane);
-
-            JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogContent, JFXDialog.DialogTransition.CENTER);
-            dialog.setOverlayClose(false);
 
             JFXButton accept = new JFXButton("Accept");
-            accept.setDefaultButton(true);
-            accept.getStyleClass().add("JFXButton");
-
-            JFXButton cancel = new JFXButton("Cancel");
-            cancel.setDefaultButton(true);
-            cancel.getStyleClass().add("JFXButton");
-            dialogContent.setActions(cancel,accept);
-
+            JFXDialog dialog = DialogBuilder.showConfirmDialog("Remove Item","Confirm cancellation of MIRS item: "+StockDAO.get(selected.getStockID()).getDescription(), accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
             accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
             accept.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
@@ -242,15 +218,6 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                     dialog.close();
                 }
             });
-
-            cancel.setTextFill(Paint.valueOf(ColorPalette.GREY));
-            cancel.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent __) {
-                    dialog.close();
-                }
-            });
-            dialog.show();
         }
     }
 

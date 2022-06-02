@@ -30,22 +30,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class MIRSReleasingFormController implements Initializable {
+public class GenerateMCTController extends MenuControllerHandler implements Initializable {
 
     @FXML
     private AnchorPane anchorpane;
 
     @FXML
-    private Label inStock, pending, available, date, itemCounter, mirsNumber, applicant, requisitioner, address, signatories, purpose;
+    private Label date, mirsNumber, applicant, requisitioner, address, signatories, purpose;
 
     @FXML
-    private TextArea details;
+    private JFXTextField searchMirs;
 
     @FXML
-    private JFXTextField particulars, quantity;
-
-    @FXML
-    private JFXButton acceptBtn, addAllQtyBtn, addPartialQtyBtn, removeItemBtn;
+    private JFXButton releaseMCTBtn, addAllQtyBtn, addPartialQtyBtn, removeItemBtn;
 
     @FXML
     private JFXListView<MIRSItem> requestedList, releasingList;
@@ -57,12 +54,15 @@ public class MIRSReleasingFormController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        InputValidation.restrictNumbersOnly(quantity);
-        requestedList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        releasingList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        bindParticularsAutocomplete(particulars);
-        try {
-            mirs = MirsDAO.getMIRS(Utility.getActiveMIRS().getId());
+        //requestedList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        //releasingList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+    }
+
+    @FXML
+    private void searchMirs(ActionEvent event) {
+       /*try {
+            mirs = MirsDAO.(searchMirs.getText());
             List<MIRSItem> mirsItemList = MirsDAO.getUnreleasedItems(mirs);
             List<MIRSSignatory> mirsSignatoryList = MIRSSignatoryDAO.get(mirs);
 
@@ -75,29 +75,27 @@ public class MIRSReleasingFormController implements Initializable {
 
             initializeItemList(mirsItemList);
 
-            itemCounter.setText(mirsItemList.size()+" items found");
             mirsNumber.setText(""+mirs.getId());
             date.setText(""+mirs.getDateFiled());
             purpose.setText(mirs.getPurpose());
-            details.setText(mirs.getDetails());
             address.setText(mirs.getAddress());
             applicant.setText(mirs.getApplicant());
             requisitioner.setText(mirs.getRequisitioner().getFullName());
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     private void initializeItemList(List<MIRSItem> mirsItemList) throws Exception {
-        for (MIRSItem item: mirsItemList) {
+        /*for (MIRSItem item: mirsItemList) {
             item.setQuantity(MirsDAO.getBalance(item));
             requestedList.getItems().add(item);
-        }
+        }*/
     }
 
     @FXML
     private void releaseItem(ActionEvent event) {
-        try {
+        /*try {
             if(releasingList.getItems().size() == 0) {
                 AlertDialogBuilder.messgeDialog("System Message", "No available item(s) listed for releasing.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
                 return;
@@ -115,13 +113,12 @@ public class MIRSReleasingFormController implements Initializable {
 
         } catch (Exception e) {
             e.printStackTrace();
-        }
-
+        }*/
     }
 
     @FXML
     private void releaseMCTItem(ActionEvent event) {
-        try {
+        /*try {
             if(releasingList.getItems().size() == 0) {
                 AlertDialogBuilder.messgeDialog("System Message", "No available item(s) listed for releasing.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
                 return;
@@ -170,11 +167,11 @@ public class MIRSReleasingFormController implements Initializable {
 
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     private void save(String mctNumber) {
-        try{
+        /*try{
             List<MIRSItem> forReleasing = releasingList.getItems();
             List<MIRSItem> remainingRequest = requestedList.getItems();
             List<Releasing> releasedItemWithMCT = new ArrayList<>();
@@ -186,7 +183,7 @@ public class MIRSReleasingFormController implements Initializable {
                 releasing.setQuantity(mirsItem.getQuantity());
                 releasing.setPrice(mirsItem.getPrice());
                 releasing.setUserID(ActiveUser.getUser().getId());
-                //releasing.setWorkOrderNo(mirsItem.getWorkOrderNo());
+                releasing.setWorkOrderNo(mirsItem.getWorkOrderNo());
 
                 for(MIRSItem rem : remainingRequest){
                     if(rem.getId().equals(mirsItem.getId())) {
@@ -213,7 +210,7 @@ public class MIRSReleasingFormController implements Initializable {
                 mct.setParticulars(mirs.getPurpose());
                 mct.setAddress(mirs.getAddress());
                 mct.setMirsNo(mirs.getId());
-                //mct.setWorkOrderNo(forReleasing.get(0).getWorkOrderNo());
+                mct.setWorkOrderNo(forReleasing.get(0).getWorkOrderNo());
                 MCTDao.create(mct, releasedItemWithMCT);
             }
 
@@ -229,12 +226,12 @@ public class MIRSReleasingFormController implements Initializable {
             AlertDialogBuilder.messgeDialog("System Message", "MIRS items released.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
         }catch (Exception e){
             AlertDialogBuilder.messgeDialog("System Error", "Item released: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
-        }
+        }*/
     }
 
     @FXML
     private void addNewMIRSItem(ActionEvent event) throws Exception {
-
+        /*
         if(selectedStock == null){
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
@@ -261,7 +258,7 @@ public class MIRSReleasingFormController implements Initializable {
         particulars.requestFocus();
         inStock.setText("In Stock: 0");
         pending.setText("Pending: 0");
-        available.setText("Available: 0");
+        available.setText("Available: 0");*/
     }
 
     @FXML
@@ -280,7 +277,7 @@ public class MIRSReleasingFormController implements Initializable {
     }
 
     private void addRemoveItem(JFXButton btn){
-        JFXListView<MIRSItem> mirsItemJFXListView = null;
+        /*JFXListView<MIRSItem> mirsItemJFXListView = null;
         if(btn == this.addAllQtyBtn){
             mirsItemJFXListView = requestedList;
         }else if(btn == this.addPartialQtyBtn){
@@ -379,7 +376,7 @@ public class MIRSReleasingFormController implements Initializable {
                                             mirsItem.setRemarks(selectedItems.get(0).getRemarks());
                                             mirsItem.setCreatedAt(selectedItems.get(0).getCreatedAt());
                                             mirsItem.setUpdatedAt(selectedItems.get(0).getUpdatedAt());
-                                            //mirsItem.setWorkOrderNo(selectedItems.get(0).getWorkOrderNo());
+                                            mirsItem.setWorkOrderNo(selectedItems.get(0).getWorkOrderNo());
 
                                             selectedItems.get(0).setQuantity(selectedItems.get(0).getQuantity() - Integer.parseInt(input.getText()));
                                             releasingList.getItems().add(mirsItem);
@@ -402,79 +399,8 @@ public class MIRSReleasingFormController implements Initializable {
             }
         }
         releasingList.getSelectionModel().clearSelection();
-        requestedList.getSelectionModel().clearSelection();
+        requestedList.getSelectionModel().clearSelection();*/
     }
 
-    private void bindParticularsAutocomplete(JFXTextField textField){
-        AutoCompletionBinding<SlimStock> stockSuggest = TextFields.bindAutoCompletion(textField,
-                param -> {
-                    //Value typed in the textfield
-                    String query = param.getUserText();
 
-                    //Initialize list of stocks
-                    List<SlimStock> list = new ArrayList<>();
-
-                    //Perform DB query when length of search string is 4 or above
-                    if (query.length() > 3){
-                        try {
-                            list = StockDAO.search(query, 0);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    if (list.size() == 0) {
-                        selectedStock = null;
-                        quantity.setText("");
-                    }
-
-                    return list;
-                }, new StringConverter<>() {
-                    //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
-                    @Override
-                    public String toString(SlimStock object) {
-                        return object.getDescription();
-                    }
-
-                    @Override
-                    public SlimStock fromString(String string) {
-                        throw new UnsupportedOperationException();
-                    }
-                });
-
-        //This will set the actions once the user clicks an item from the popupmenu.
-        stockSuggest.setOnAutoCompleted(event -> {
-            SlimStock result = event.getCompletion();
-            try {
-                selectedStock = StockDAO.get(result.getId());
-                int av = StockDAO.countAvailable(selectedStock);
-                if(av == 0) {
-                    AlertDialogBuilder.messgeDialog("System Warning", "Insufficient stock.",
-                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-                    particulars.setText("");
-                    selectedStock = null;
-                }else{
-
-                    List<MIRSItem> requests = requestedList.getItems();
-                    for(MIRSItem r : requests){
-                        if(selectedStock.getId().equals(r.getStockID())){
-                            AlertDialogBuilder.messgeDialog("System Message", "Can not add addition "+selectedStock.getDescription()+" ,since item can still be listed as item for releasing.",
-                                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-                            selectedStock = null;
-                            particulars.setText("");
-                            quantity.setText("");
-                            return;
-                        }
-                    }
-                    quantity.requestFocus();
-                    inStock.setText("In Stock: "+ selectedStock.getQuantity());
-                    pending.setText("Pending: "+ (StockDAO.countPendingRequest(selectedStock)));
-                    available.setText("Available: "+ (av));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                AlertDialogBuilder.messgeDialog("System Error", "bindParticularsAutocomplete(): "+e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            }
-        });
-    }
 }

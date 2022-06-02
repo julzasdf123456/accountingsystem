@@ -103,15 +103,16 @@ public class ViewMRItemHistoryController extends MenuControllerHandler implement
     }
 
     public void setMRs(){
-        this.desc_tf.setText(this.mr.getExtItem());
+        /*this.desc_tf.setText(this.mr.getExtItem());
         this.stock_id_tf.setText(this.mr.getStockId());
         this.cost_tf.setText(this.mr.getPrice()+"");
         this.qty_tf.setText(this.mr.getQuantity()+"");
         this.initializeTable();
-        this.populateTable();
+        this.populateTable();*/
     }
 
     public void populateTable() {
+        /*
         try {
             Platform.runLater(() -> {
                 try {
@@ -125,6 +126,6 @@ public class ViewMRItemHistoryController extends MenuControllerHandler implement
         } catch (Exception e) {
             e.printStackTrace();
             AlertDialogBuilder.messgeDialog("System Error", "An error occurred while populating table due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-        }
+        }*/
     }
 }

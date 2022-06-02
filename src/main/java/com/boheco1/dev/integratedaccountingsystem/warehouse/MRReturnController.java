@@ -49,6 +49,7 @@ public class MRReturnController extends MenuControllerHandler implements Initial
 
     @FXML
     public void returnMR()  {
+        /*
         status_lbl.setTextFill(Paint.valueOf(ColorPalette.DANGER));
         status_lbl.setTextAlignment(TextAlignment.CENTER);
         String id = this.stock_id_tf.getText();
@@ -76,14 +77,15 @@ public class MRReturnController extends MenuControllerHandler implements Initial
                 status_lbl.setText("Process failed due to: "+e.getMessage());
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
     public void setMR(MR mr){
+        /*
         if (mr.getStockId() != null) this.stock_id_tf.setText(mr.getStockId());
         this.description_tf.setText(mr.getExtItem());
         this.qty_tf.setText(mr.getQuantity()+"");
         this.unit_price_tf.setText(mr.getPrice()+"");
-        this.date_mr_tf.setText(mr.getDateOfMR().toString());
+        this.date_mr_tf.setText(mr.getDateOfMR().toString());*/
     }
 }

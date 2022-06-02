@@ -12,6 +12,7 @@ import com.itextpdf.text.Rectangle;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -38,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class MREntryController extends MenuControllerHandler implements Initializable {
+public class MREntryController extends MenuControllerHandler implements Initializable, ObjectTransaction {
 
     @FXML
     private AnchorPane contentPane;
@@ -47,22 +48,14 @@ public class MREntryController extends MenuControllerHandler implements Initiali
     private StackPane stackPane;
 
     @FXML
-    private JFXTextField employee_search_tf, fname_tf, mname_tf, lname_tf, item_name_tf, qty_tf, cost_tf, mr_no_tf, recommending_tf, approve_tf, purpose_tf;
+    private JFXTextField employee_search_tf, fname_tf, mname_tf, lname_tf, mr_no_tf, recommending_tf, approve_tf, purpose_tf;
 
     @FXML
     private TableView mr_items_table;
 
-    @FXML
-    private CheckBox from_warehouse_chb;
-
-    @FXML
-    private JFXButton saveBtn, addBtn;
-
     private EmployeeInfo employee = null;
 
-    private Stock currentItem = null;
-
-    private ObservableList<MR> mrItems = null;
+    private ObservableList<MrItem> mrItems = null;
 
     private EmployeeInfo recommending = null, approved = null;
 
@@ -77,136 +70,55 @@ public class MREntryController extends MenuControllerHandler implements Initiali
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        this.bindNumbers();
         this.mr_no_tf.setText(NumberGenerator.mrNumber());
+        Utility.setParentController(this);
+        this.stackPane = Utility.getStackPane();
     }
 
     @FXML
     private void addMR()  {
-        //Set item count
-        int count = 0;
-        List<MR> failed = new ArrayList<>();
-
-        //Iterate the list of MR items
-        for (int i = 0; i < this.mrItems.size(); i++) {
-            MR item = this.mrItems.get(i);
-            try {
-                //Add each MR item to database
-                MrDAO.add(item);
-
-                //If MR item is from warehouse, deduct quantity
-                if (item.getStockId() != null){
-                    Stock item_stock = StockDAO.get(item.getStockId());
-                    StockDAO.deductStockQuantity(item_stock, item.getQuantity());
-                }
-                count++;
-            } catch (Exception e) {
-                failed.add(item);
-                AlertDialogBuilder.messgeDialog("System Error", "MR Entry was not successfully added due to:"+e.getMessage()+" error.", stackPane, AlertDialogBuilder.DANGER_DIALOG);
-            }
-        }
-        //Show notification if successful
-        if (count == this.mrItems.size()) {
-            AlertDialogBuilder.messgeDialog("System Information", "MR Entry was successfully recorded.", stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
-        }else{
-            String names = "";
-            for (MR i : failed){
-                names += i.getExtItem() + ", ";
-            }
-            AlertDialogBuilder.messgeDialog("System Warning", "The following MR Entries were not successfully recorded: "+names+".", stackPane, AlertDialogBuilder.WARNING_DIALOG);
-        }
-        //After adding all MR items, reset all fields
-        this.reset();
-    }
-
-    @FXML
-    private void addItem()  {
-        String item_name = this.item_name_tf.getText();
         String mr_no = this.mr_no_tf.getText();
-
-        int max = 0;
-        if (from_warehouse_chb.isSelected() && this.currentItem != null){
-            max = this.currentItem.getQuantity();
-        }
-        int qty = 0;
-        double price = 0;
-        try {
-            qty = Integer.parseInt(this.qty_tf.getText());
-            price = Double.parseDouble(this.cost_tf.getText());
-        }catch (Exception e){
-
-        }
-        if (employee == null){
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please set the employee by selecting from the dropdown list!",
+        if (mr_no.length() < 9) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please set the MR Number to 9 characters! e.g. 2022-XXXX",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (mr_no.length() <= 5 || mr_no == null) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please set the MR Number!",
+        }else if (this.employee == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please set the employee!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (item_name.length() == 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter item name or selecting from the dropdown list!",
+        }else if (this.mrItems.size()==0) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please add item(s) to MR!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (qty <= 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for quantity!",
+        }else if (this.recommending == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please set the recommending approval!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (from_warehouse_chb.isSelected() && this.currentItem != null && qty > max) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "MR quantity cannot exceed maximum stock quantity!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (price <= 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for the item price!",
+        }else if (this.approved == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please set the approved by!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else{
-            //Create MR Item
-            MR mr_item = new MR();
-
-            //Set the selected employee's ID
-            mr_item.setEmployeeId(employee.getId());
-
-            //Set the current logged user's employee ID
-            mr_item.setWarehousePersonnelId(ActiveUser.getUser().getEmployeeID());
-
-            //Check if the item is from warehouse and set the stock id, item name, and price attributes using current info
-            if (from_warehouse_chb.isSelected()){
-                if (currentItem != null) {
-                    mr_item.setStockId(this.currentItem.getId());
-                    mr_item.setExtItem(this.currentItem.getDescription());
-                    mr_item.setPrice(this.currentItem.getPrice());
-                    mr_item.setQuantity(qty);
-                    mr_item.setDateOfMR(LocalDate.now());
-
-                    this.mrItems.add(mr_item);
-                    this.mr_items_table.setItems(this.mrItems);
-                    this.resetItemData();
-                }else{
-                    AlertDialogBuilder.messgeDialog("Invalid Input", "Please select stock from dropdown list!",
-                            stackPane, AlertDialogBuilder.DANGER_DIALOG);
+            MR mr = new MR(mr_no, employee.getId(), ActiveUser.getUser().getEmployeeID(), LocalDate.now(), Utility.MR_FILED, this.recommending.getId(), this.approved.getId());
+            mr.setPurpose(this.purpose_tf.getText());
+            int count = 0;
+            try {
+                MrDAO.add(mr);
+                for (MrItem i : this.mrItems){
+                    MrDAO.createItem(mr, i);
+                    count++;
                 }
-            //Else set the information from the textfields
-            }else{
-                mr_item.setExtItem(this.item_name_tf.getText());
-                mr_item.setPrice(price);
-                mr_item.setQuantity(qty);
-                mr_item.setDateOfMR(LocalDate.now());
+            } catch (Exception e) {
+                AlertDialogBuilder.messgeDialog("System Error", "Filing of Memorandum Receipt was not successfully added due to:"+e.getMessage()+" error.", stackPane, AlertDialogBuilder.DANGER_DIALOG);
+            }
 
-                this.mrItems.add(mr_item);
-                this.mr_items_table.setItems(this.mrItems);
-                this.resetItemData();
+            if (count == 0) {
+                AlertDialogBuilder.messgeDialog("System Error!", "Process failed! The Memorandum Receipt was not filed!",
+                        stackPane, AlertDialogBuilder.DANGER_DIALOG);
+            }else if (count != this.mrItems.size()){
+                AlertDialogBuilder.messgeDialog("System Error!", "Process failed! Some Memorandum Receipt items was not saved in the database!",
+                        stackPane, AlertDialogBuilder.DANGER_DIALOG);
+            }else{
+                AlertDialogBuilder.messgeDialog("MR Entry", "The Memorandum Receipt was successfully filed!", stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
+                this.reset();
             }
         }
     }
-
-    public void resetItemData(){
-        this.currentItem = null;
-        this.item_name_tf.setText("");
-        this.qty_tf.setText("");
-        this.cost_tf.setText("");
-    }
-
-    public void bindNumbers(){
-        InputHelper.restrictNumbersOnly(this.qty_tf);
-        InputHelper.restrictNumbersOnly(this.cost_tf);
-    }
-
     public void bindSignatoreesAutocomplete(JFXTextField textField){
         AutoCompletionBinding<User> employeeSuggest = TextFields.bindAutoCompletion(textField,
                 param -> {
@@ -312,67 +224,16 @@ public class MREntryController extends MenuControllerHandler implements Initiali
         });
     }
 
-    public void bindItemAutocomplete(JFXTextField textField){
-        AutoCompletionBinding<SlimStock> stockSuggest = TextFields.bindAutoCompletion(textField,
-                param -> {
-                    if (from_warehouse_chb.isSelected() == false){
-                        return null;
-                    }
-                    //Value typed in the textfield
-                    String query = param.getUserText();
-
-                    //Initialize list of stocks
-                    List<SlimStock> list = new ArrayList<>();
-
-                    //Perform DB query when length of search string is 4 or above
-                    if (query.length() > 3){
-                        try {
-                            list = StockDAO.search_available(query);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    if (list.size() == 0) {
-                        currentItem = null;
-                    }
-
-                    return list;
-                }, new StringConverter<>() {
-                    //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
-                    @Override
-                    public String toString(SlimStock object) {
-                        return object.getDescription();
-                    }
-
-                    @Override
-                    public SlimStock fromString(String string) {
-                        throw new UnsupportedOperationException();
-                    }
-                });
-
-        //This will set the actions once the user clicks an item from the popupmenu.
-        stockSuggest.setOnAutoCompleted(event -> {
-            SlimStock result = event.getCompletion();
-            try {
-                currentItem = StockDAO.get(result.getId());
-                this.item_name_tf.setText(currentItem.getDescription());
-                this.cost_tf.setText(currentItem.getPrice()+"");
-            } catch (Exception e) {
-                AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), this.stackPane, AlertDialogBuilder.DANGER_DIALOG);
-            }
-        });
-    }
-
     public void reset(){
         this.employee = null;
+        this.recommending = null;
+        this.approved = null;
         this.mr_no_tf.setText(NumberGenerator.mrNumber());
-        this.resetItemData();
         this.employee_search_tf.setText("");
         this.fname_tf.setText("");
         this.mname_tf.setText("");
         this.lname_tf.setText("");
-
+        this.purpose_tf.setText("");
         this.mrItems =  FXCollections.observableArrayList();
         this.mr_items_table.setItems(this.mrItems);
         this.mr_items_table.setPlaceholder(new Label("No item added!"));
@@ -391,53 +252,79 @@ public class MREntryController extends MenuControllerHandler implements Initiali
 
     public void initializeTable() {
 
-        TableColumn<MR, String> column1 = new TableColumn<>("Quantity");
+        TableColumn<MrItem, String> column1 = new TableColumn<>("Quantity");
         column1.setMinWidth(75);
-        column1.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        column1.setCellValueFactory(new PropertyValueFactory<>("qty"));
         column1.setStyle("-fx-alignment: center;");
 
-        TableColumn<MR, String> column2 = new TableColumn<>("Unit");
+        TableColumn<MrItem, String> column2 = new TableColumn<>("Unit");
         column2.setMinWidth(75);
-        //column3.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        column2.setCellValueFactory(item -> {
+            try {
+                return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getUnit());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         column2.setStyle("-fx-alignment: center;");
 
-        TableColumn<MR, String> column3 = new TableColumn<>("Item Name");
-        column3.setMinWidth(400);
-        column3.setCellValueFactory(new PropertyValueFactory<>("extItem"));
+        TableColumn<MrItem, String> column3 = new TableColumn<>("Description");
+        column3.setMinWidth(375);
+        column3.setCellValueFactory(item -> {
+            try {
+                return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getDescription());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         column3.setStyle("-fx-alignment: center-left;");
 
-        TableColumn<MR, String> column4 = new TableColumn<>("Property No.");
-        column4.setMinWidth(120);
-        column4.setCellValueFactory(new PropertyValueFactory<>("stockId"));
+        TableColumn<MrItem, String> column4 = new TableColumn<>("Property No.");
+        column4.setMinWidth(110);
+        column4.setCellValueFactory(new PropertyValueFactory<>("stockID"));
         column4.setStyle("-fx-alignment: center-left;");
 
-        TableColumn<String, String> column5 = new TableColumn<>("RR No.");
-        column5.setMinWidth(75);
-        //column5.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        TableColumn<MrItem, String> column5 = new TableColumn<>("RR No.");
+        column5.setMinWidth(100);
+        column5.setCellValueFactory(new PropertyValueFactory<>("rrNo"));
         column5.setStyle("-fx-alignment: center;");
 
-        TableColumn<MR, String> column6 = new TableColumn<>("Unit Price");
+        TableColumn<MrItem, Double> column6 = new TableColumn<>("Unit Price");
         column6.setMinWidth(100);
-        column6.setCellValueFactory(new PropertyValueFactory<>("price"));
+        column6.setCellValueFactory(
+                item -> {
+                    try {
+                        return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getReceivingItem().getUnitCost());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        );
         column6.setStyle("-fx-alignment: center;");
 
-        TableColumn<String, String> column7 = new TableColumn<>("Total Value");
+        TableColumn<MrItem, Double> column7 = new TableColumn<>("Total Value");
         column7.setMinWidth(100);
-        //column7.setCellValueFactory(new PropertyValueFactory<>("price"));
+        column7.setCellValueFactory(item -> {
+            try {
+                return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getReceivingItem().getUnitCost() * item.getValue().getQty());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         column7.setStyle("-fx-alignment: center;");
 
-        TableColumn<String, String> column8 = new TableColumn<>("Remarks");
+        TableColumn<MrItem, String> column8 = new TableColumn<>("Remarks");
         column8.setMinWidth(100);
-        //column7.setCellValueFactory(new PropertyValueFactory<>("price"));
+        column8.setCellValueFactory(new PropertyValueFactory<>("remarks"));
         column8.setStyle("-fx-alignment: center;");
 
-        TableColumn<MR, String> column9 = new TableColumn<>("Action");
-        Callback<TableColumn<MR, String>, TableCell<MR, String>> removeBtn
+        TableColumn<MrItem, String> column9 = new TableColumn<>("Action");
+        Callback<TableColumn<MrItem, String>, TableCell<MrItem, String>> removeBtn
                 = //
-                new Callback<TableColumn<MR, String>, TableCell<MR, String>>() {
+                new Callback<TableColumn<MrItem, String>, TableCell<MrItem, String>>() {
                     @Override
-                    public TableCell call(final TableColumn<MR, String> param) {
-                        final TableCell<MR, String> cell = new TableCell<MR, String>() {
+                    public TableCell call(final TableColumn<MrItem, String> param) {
+                        final TableCell<MrItem, String> cell = new TableCell<MrItem, String>() {
 
                             Button btn = new Button("");
                             FontIcon icon = new FontIcon("mdi2d-delete");
@@ -455,8 +342,7 @@ public class MREntryController extends MenuControllerHandler implements Initiali
                                     setText(null);
                                 } else {
                                     btn.setOnAction(event -> {
-                                        MR selected_item = getTableView().getItems().get(getIndex());
-
+                                        MrItem selected_item = getTableView().getItems().get(getIndex());
                                         try {
                                             mrItems.remove(selected_item);
                                             mr_items_table.setItems(mrItems);
@@ -488,7 +374,10 @@ public class MREntryController extends MenuControllerHandler implements Initiali
         this.mr_items_table.getColumns().add(column8);
         this.mr_items_table.getColumns().add(column9);
     }
-
+    @FXML
+    private void addFromStock(){
+        ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_add_mr_item.fxml", Utility.getStackPane());
+    }
     @FXML
     private void print()  {
         Stage stage = (Stage) Utility.getContentPane().getScene().getWindow();
@@ -576,6 +465,24 @@ public class MREntryController extends MenuControllerHandler implements Initiali
                     AlertDialogBuilder.messgeDialog("System Error", "An error occurred while generating the pdf due to: " + e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
                 }
             });
+        }
+    }
+
+    @Override
+    public void receive(Object o) {
+        boolean ok = true;
+        if (o instanceof MrItem){
+            MrItem item = (MrItem) o;
+            for (MrItem i: this.mrItems){
+                if (i.getStockID().equals(item.getStockID())){
+                    ok = false;
+                    break;
+                }
+            }
+            if (ok) {
+                this.mrItems.add(item);
+                this.mr_items_table.setItems(this.mrItems);
+            }
         }
     }
 }

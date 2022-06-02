@@ -207,14 +207,14 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
                     //Create Table Content
                     List<MR> mrs = MrDAO.getMRsOfEmployee(employeeInfo);
                     ArrayList<String[]> rows = new ArrayList<>();
-                    for (MR mr : mrs) {
+                    /*for (MR mr : mrs) {
                         String rdate = "";
                         if (mr.getStatus().equals(Utility.MR_RETURNED)) {
                             rdate = " on " + mr.getDateOfReturn() + ", " + mr.getRemarks();
                         }
                         String[] data = {mr.getExtItem(), mr.getQuantity() + "", mr.getPrice() + "", mr.getDateOfMR().toString(), mr.getStatus() + rdate};
                         rows.add(data);
-                    }
+                    }*/
                     int[] rows_aligns = {Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_CENTER};
                     mr_pdf.tableContent(rows, header_spans, rows_aligns);
 
