@@ -7,6 +7,8 @@ import java.time.LocalDate;
 public class MrItem {
     private String id;
     private String stockID;
+    private String itemName;
+    private String description;
     private int qty;
     private String remarks;
     private Stock stock;
@@ -37,6 +39,40 @@ public class MrItem {
         this.qty = qty;
         this.remarks = remarks;
         this.status = status;
+    }
+
+    public MrItem(String id, String mrNo, String itemName, String description, int qty, String remarks, String status) {
+        this.id = id;
+        this.mrNo = mrNo;
+        this.itemName = itemName;
+        this.description = description;
+        this.qty = qty;
+        this.remarks = remarks;
+        this.status = status;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDate getDateOfReturned() {
+        return dateOfReturned;
+    }
+
+    public void setDateOfReturned(LocalDate dateOfReturned) {
+        this.dateOfReturned = dateOfReturned;
     }
 
     public String getMrNo() {
