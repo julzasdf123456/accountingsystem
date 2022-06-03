@@ -356,9 +356,9 @@ public class StockDAO {
      */
     public static List<SlimStock> search_available_in_rr(String key) throws Exception  {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "Select TOP 50 Stocks.id, StockName, Brand, Model, Description, StockEntryLogs.Price, Unit, StockEntryLogs.Quantity as Quantity, RRNo FROM Stocks INNER JOIN StockEntryLogs ON Stocks.id = StockEntryLogs.StockID " +
+                "Select TOP 50 Stocks.id, StockName, Brand, Model, Description, StockEntryLogs.Price, Unit, Stocks.Quantity as Quantity, RRNo FROM Stocks INNER JOIN StockEntryLogs ON Stocks.id = StockEntryLogs.StockID " +
                         "WHERE (StockName LIKE ? OR Description LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
-                        "AND IsTrashed=0 AND StockEntryLogs.Quantity > 0 ORDER BY RRNo");
+                        "AND IsTrashed=0 AND Stocks.Quantity > 0 ORDER BY RRNo");
         ps.setString(1, "%" + key + "%");
         ps.setString(2, "%" + key + "%");
         ps.setString(3, "%" + key + "%");

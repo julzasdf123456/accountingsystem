@@ -399,6 +399,9 @@ public class MrDAO {
         ps.executeUpdate();
 
         ps.close();
+
+        Stock stock = item.getStock();
+        StockDAO.deductStockQuantity(stock, item.getQty());
     }
 
     public static MrItem getItem(String id) throws Exception {
@@ -480,5 +483,8 @@ public class MrDAO {
         ps.executeUpdate();
 
         ps.close();
+
+        Stock stock = item.getStock();
+        StockDAO.addStockQuantity(stock, item.getQty());
     }
 }
