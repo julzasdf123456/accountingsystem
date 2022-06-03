@@ -317,7 +317,7 @@ public class MrDAO {
     }
 
     public static List<MrItem> searchMRItems(String key, String status) throws Exception {
-        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT MRItem.id, mr_no, MRItem.StockID, Qty, Description, StockName, StockEntryLogs.RRNo, Remarks, dateOfReturned, MRItem.status, StockEntryLogs.Price "+
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT MRItem.id, mr_no, MRItem.StockID, Qty, Description, StockName, StockEntryLogs.RRNo, Remarks, dateOfReturned, MRItem.status, StockEntryLogs.Price, updatedBy "+
                 "FROM MR INNER JOIN MRItem ON MR.id = MRItem.mr_no INNER JOIN Stocks ON MRItem.StockID = Stocks.id INNER JOIN StockEntryLogs ON StockEntryLogs.StockID = Stocks.id "+
                 "WHERE MRItem.status=? AND (Description LIKE ? OR MRItem.StockID LIKE ? OR StockName LIKE ?) ORDER BY Description ASC, mr_no DESC");
         ps.setString(1, status);
@@ -339,6 +339,7 @@ public class MrDAO {
             item.setRrNo(rs.getString("RRNo"));
             item.setStatus(rs.getString("Status"));
             item.getStock().setPrice(rs.getDouble("Price"));
+            item.setUpdatedBy(rs.getString("updatedBy"));
             item.setDateReturned(rs.getDate("dateOfReturned")!=null ? rs.getDate("dateOfReturned").toLocalDate(): null);
             mrItems.add(item);
         }
@@ -369,6 +370,7 @@ public class MrDAO {
             item.setRrNo(rs.getString("RRNo"));
             item.setStatus(rs.getString("Status"));
             item.getStock().setPrice(rs.getDouble("Price"));
+            item.setUpdatedBy(rs.getString("updatedBy"));
             item.setDateReturned(rs.getDate("dateOfReturned")!=null ? rs.getDate("dateOfReturned").toLocalDate(): null);
             mrItems.add(item);
         }
@@ -415,6 +417,7 @@ public class MrDAO {
             );
             item.setRrNo(rs.getString("RRNo"));
             item.setStatus(rs.getString("Status"));
+            item.setUpdatedBy(rs.getString("updatedBy"));
             item.setDateReturned(rs.getDate("dateOfReturned")!=null ? rs.getDate("dateOfReturned").toLocalDate(): null);
             return item;
         }

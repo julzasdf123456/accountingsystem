@@ -88,7 +88,7 @@ public class AllUsersController extends MenuControllerHandler implements Initial
                         deleteIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
 
                         viewButton.setOnAction(actionEvent -> {
-                            Utility.setSelectedUser(users);
+                            Utility.setSelectedObject(users);
 
                             try {
                                 Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(JournalEntriesController.class, "user_mgt.fxml"));

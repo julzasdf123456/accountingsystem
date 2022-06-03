@@ -57,8 +57,11 @@ public class StockController extends MenuControllerHandler implements Initializa
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        //Binds the dropdown box for pagination
         this.bindPages();
+        //Sets the stocks count
         this.setStocksCount();
+        //Initializes the stocks table
         this.initializeStocks();
     }
 
@@ -67,13 +70,19 @@ public class StockController extends MenuControllerHandler implements Initializa
         flowPane.getChildren().removeAll();
         flowPane.getChildren().setAll(new ArrayList<>());
     }
-
+    /**
+     * Opens the Stock Entry form
+     * @return void
+     */
     @FXML
     private void newStock() {
         Node node = ContentHandler.getNodeFromFxml(getClass(),"../warehouse_stock_entry.fxml");
         Utility.getContentPane().getChildren().setAll(node);
     }
-
+    /**
+     * Populates the stocks table based on search query
+     * @return void
+     */
     @FXML
     public void searchStock(){
         selected = new HashMap<>();
@@ -91,12 +100,18 @@ public class StockController extends MenuControllerHandler implements Initializa
                 }
         });
     }
-
+    /**
+     * Displays the View/update Stock form
+     * @return void
+     */
     @FXML
     public void updatePrices(){
         ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_update_prices.fxml", Utility.getStackPane(),  "../warehouse_stock.fxml");
     }
-
+    /**
+     * Generates and saves the CSV of stocks for bulk price update
+     * @return void
+     */
     @FXML
     public void downloadCSV(){
         Stage stage = (Stage) Utility.getContentPane().getScene().getWindow();
@@ -132,6 +147,10 @@ public class StockController extends MenuControllerHandler implements Initializa
         }
     }
 
+    /**
+     * Sets the stocks table
+     * @return void
+     */
     public void createTable(){
         TableColumn<SlimStock, String> column1 = new TableColumn<>("Stock ID");
         column1.setMinWidth(125);
@@ -196,7 +215,7 @@ public class StockController extends MenuControllerHandler implements Initializa
                         try {
                             Stock stock = StockDAO.get(item.getId());
                             viewButton.setOnAction(actionEvent -> {
-                                Utility.setSelectedStock(stock);
+                                Utility.setSelectedObject(stock);
                                 ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_stock_update.fxml", Utility.getStackPane(), "../warehouse_stock.fxml");
                             });
                         } catch (Exception e) {
@@ -269,7 +288,10 @@ public class StockController extends MenuControllerHandler implements Initializa
         stocksTable.getColumns().add(column8);
         this.stocksTable.setPlaceholder(new Label("No queries selected!"));
     }
-
+    /**
+     * Initializes the stocks table
+     * @return void
+     */
     public void initializeStocks(){
         Platform.runLater(() -> {
             try {
@@ -284,7 +306,10 @@ public class StockController extends MenuControllerHandler implements Initializa
             }
         });
     }
-
+    /**
+     * Binds the dropdown box for pagination of results
+     * @return void
+     */
     public void bindPages(){
         Platform.runLater(() -> {
             try {
@@ -319,7 +344,10 @@ public class StockController extends MenuControllerHandler implements Initializa
             });
         });
     }
-
+    /**
+     * Sets the stocks count label
+     * @return void
+     */
     private void setStocksCount() {
         Platform.runLater(() -> {
             try {

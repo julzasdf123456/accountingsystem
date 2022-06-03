@@ -59,9 +59,11 @@ public class ViewStockController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        //Gets the main stackpane and assign to current stackpane
         this.stackPane = Utility.getStackPane();
+        //Displays the stock details
         Platform.runLater(() -> {
-            this.stock = Utility.getSelectedStock();
+            this.stock = (Stock) Utility.getSelectedObject();
             this.bindNumbers();
             this.bindStockTypes();
 
@@ -86,12 +88,18 @@ public class ViewStockController implements Initializable {
             this.toggle();
         });
     }
-
+    /**
+     * Shows/hides the edit button
+     * @return void
+     */
     public void toggle(){
         this.saveBtn.setVisible(false);
         this.editMode.setOnAction(actionEvent -> saveBtn.setVisible(editMode.isSelected()));
     }
-
+    /**
+     * Updates the stock details. Quantity, Stock ID/Local ID, and Price are excluded.
+     * @return void
+     */
     @FXML
     public void updateStock(){
         String name = this.stockName.getText();
@@ -181,7 +189,10 @@ public class ViewStockController implements Initializable {
             }
         }
     }
-
+    /**
+     * Creates the stock entries table
+     * @return void
+     */
     public void createStockEntriesTable(){
         TableColumn<StockEntryLog, String> column1 = new TableColumn<>("Quantity");
         column1.setMinWidth(90);
@@ -213,7 +224,10 @@ public class ViewStockController implements Initializable {
         stockEntries.getColumns().add(column3);
 
     }
-
+    /**
+     * Creates the stock releases table
+     * @return void
+     */
     public void createStockReleasesTable(){
         TableColumn<Releasing, String> column1 = new TableColumn<>("Quantity");
         column1.setMinWidth(90);
@@ -251,7 +265,10 @@ public class ViewStockController implements Initializable {
         stockReleases.getColumns().add(column3);
         stockReleases.getColumns().add(column6);
     }
-
+    /**
+     * Sets the stock details
+     * @return void
+     */
     public void initializeInformation(){
         this.stockName.setText(stock.getStockName());
         this.localCode.setText(stock.getId());
@@ -282,6 +299,10 @@ public class ViewStockController implements Initializable {
         }
         this.type.getSelectionModel().select(index);
     }
+    /**
+     * Initializes the stock entries table
+     * @return void
+     */
     public void initializeStockEntries(){
         try {
             ObservableList<StockEntryLog> stocks = FXCollections.observableList(StockDAO.getEntryLogs(stock));
@@ -290,7 +311,10 @@ public class ViewStockController implements Initializable {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Initializes the stock releases table
+     * @return void
+     */
     public void initializeStockReleases(){
         try {
             ObservableList<Releasing> stocks = FXCollections.observableList(StockDAO.getReleasedStocks(stock, Utility.RELEASED));
@@ -299,13 +323,19 @@ public class ViewStockController implements Initializable {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Binds the textfields to accept numbers only
+     * @return void
+     */
     public void bindNumbers(){
         InputHelper.restrictNumbersOnly(this.quantity);
         InputHelper.restrictNumbersOnly(this.price);
         InputHelper.restrictNumbersOnly(this.threshold);
     }
-
+    /**
+     * Populates the stock types in the dropdown box
+     * @return void
+     */
     public void bindStockTypes(){
         try {
             List<StockType> types = StockDAO.getTypes();
@@ -337,11 +367,17 @@ public class ViewStockController implements Initializable {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Sets the stackpane
+     * @return void
+     */
     public void setStackPane(StackPane stackpane){
         this.stackPane = stackpane;
     }
-
+    /**
+     * Sets the date labels
+     * @return void
+     */
     public void setLabels(){
         this.md_lbl.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 11));
         this.vd_lbl.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 11));

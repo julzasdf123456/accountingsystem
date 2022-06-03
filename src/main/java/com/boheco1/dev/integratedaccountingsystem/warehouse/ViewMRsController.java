@@ -109,7 +109,7 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
                     viewIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
 
                     viewButton.setOnAction(actionEvent -> {
-                        Utility.setSelectedEmployee(employee);
+                        Utility.setSelectedObject(employee);
                         ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_view_mr.fxml", Utility.getStackPane(),  "../view_mrs_controller.fxml");
                     });
                     setGraphic(viewButton);

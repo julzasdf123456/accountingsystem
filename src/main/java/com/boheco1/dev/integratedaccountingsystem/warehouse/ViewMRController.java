@@ -61,7 +61,7 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //Initialize the selected employee
-        employee = Utility.getSelectedEmployee();
+        employee = (EmployeeInfo) Utility.getSelectedObject();
         //Set the employee details, MR list view, MR item table
         this.setMRs();
         //Set this controller so it can be passed to Return MR dialog for processing
@@ -317,7 +317,7 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
                 List<MrItem> items = MrDAO.getItems(mr);
                 ArrayList<String[]> rows = new ArrayList<>();
                 int[] rows_aligns = {Element.ALIGN_CENTER, Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_CENTER,
-                                     Element.ALIGN_CENTER, Element.ALIGN_LEFT,   Element.ALIGN_LEFT, Element.ALIGN_LEFT};
+                                     Element.ALIGN_CENTER, Element.ALIGN_LEFT,   Element.ALIGN_LEFT, Element.ALIGN_CENTER};
                 for (MrItem item : items) {
                     String remarks = item.getRemarks();
                     if (item.getStatus().equals(Utility.MR_RETURNED)) {

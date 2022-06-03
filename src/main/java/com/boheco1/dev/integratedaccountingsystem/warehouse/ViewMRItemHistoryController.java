@@ -1,10 +1,8 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
-import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.MR;
 import com.jfoenix.controls.JFXTextField;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -42,7 +40,9 @@ public class ViewMRItemHistoryController extends MenuControllerHandler implement
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        mr = Utility.getSelectedMR();
+        //Retrieves the selected MR object
+        mr = (MR) Utility.getSelectedObject();
+        //Displays MR item object
         this.setMRs();
     }
 
@@ -51,7 +51,10 @@ public class ViewMRItemHistoryController extends MenuControllerHandler implement
         flowPane.getChildren().removeAll();
         flowPane.getChildren().setAll(new ArrayList<>());
     }
-
+    /**
+     * Initializes the MR item history
+     * @return void
+     */
     public void initializeTable() {
         TableColumn<MR, String> column1 = new TableColumn<>("MR ID");
         column1.setMinWidth(174);
@@ -101,7 +104,10 @@ public class ViewMRItemHistoryController extends MenuControllerHandler implement
         this.mr_items_table.getColumns().add(column6);
         this.mr_items_table.getColumns().add(column7);
     }
-
+    /**
+     * Displays the MR item history
+     * @return void
+     */
     public void setMRs(){
         /*this.desc_tf.setText(this.mr.getExtItem());
         this.stock_id_tf.setText(this.mr.getStockId());
@@ -110,7 +116,10 @@ public class ViewMRItemHistoryController extends MenuControllerHandler implement
         this.initializeTable();
         this.populateTable();*/
     }
-
+    /**
+     * Displays the MR item history in the table
+     * @return void
+     */
     public void populateTable() {
         /*
         try {
