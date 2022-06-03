@@ -447,18 +447,20 @@ public class MrDAO {
 
     public static void createItem(MR mr, MrItem item) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO MRItem (id, StockID, Qty, Remarks, mr_no, RRNo, Status) " +
-                        "VALUES (?,?,?,?,?,?,?)");
+                "INSERT INTO MRItem (id, StockID, ItemName, Description, Qty, Remarks, mr_no, RRNo, Status) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?)");
 
         if(item.getId()==null) item.setId(Utility.generateRandomId());
 
         ps.setString(1, item.getId());
         ps.setString(2, item.getStockID());
-        ps.setInt(3, item.getQty());
-        ps.setString(4, item.getRemarks());
-        ps.setString(5, mr.getId());
-        ps.setString(6, item.getRrNo());
-        ps.setString(7, Utility.MR_ACTIVE);
+        ps.setString(3, item.getItemName());
+        ps.setString(4, item.getDescription());
+        ps.setInt(5, item.getQty());
+        ps.setString(6, item.getRemarks());
+        ps.setString(7, mr.getId());
+        ps.setString(8, item.getRrNo());
+        ps.setString(9, Utility.MR_ACTIVE);
         ps.executeUpdate();
 
         ps.close();
