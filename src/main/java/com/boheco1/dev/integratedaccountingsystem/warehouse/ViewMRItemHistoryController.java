@@ -93,7 +93,7 @@ public class ViewMRItemHistoryController extends MenuControllerHandler implement
             }
         });
         column3.setStyle("-fx-alignment: center-left;");
-        TableColumn<MrItem, Double> column3a = new TableColumn<>("Unit Price");
+        TableColumn<MrItem, Double> column3a = new TableColumn<>("Total");
         column3a.setMinWidth(100);
         column3a.setCellValueFactory(item -> {
             try {
@@ -191,7 +191,7 @@ public class ViewMRItemHistoryController extends MenuControllerHandler implement
         try {
             Platform.runLater(() -> {
                 try {
-                    mrItems = FXCollections.observableList(MrDAO.getMRItems(mr_item.getStockID()));
+                    mrItems = FXCollections.observableList(MrDAO.getMRItems(mr_item.getStockID(), null));
                     this.table.getItems().setAll(mrItems);
                 } catch (Exception e) {
                     e.printStackTrace();

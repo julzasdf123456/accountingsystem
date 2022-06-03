@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
@@ -7,6 +8,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.*;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -42,7 +44,7 @@ public class ViewStockController implements Initializable {
     @FXML
     private TabPane tabPane;
 
-    private TableView stockEntries = new TableView(), stockReleases = new TableView();
+    private TableView stockEntries = new TableView(), stockReleases = new TableView(), mr = new TableView();
 
     @FXML
     private JFXToggleButton editMode;
@@ -74,6 +76,14 @@ public class ViewStockController implements Initializable {
 
             this.createStockEntriesTable();
             this.initializeStockEntries();
+
+            Tab mr_tab = new Tab();
+            mr_tab.setText("MR Items");
+            mr_tab.setContent(this.mr);
+            tabPane.getTabs().add(mr_tab);
+
+            this.createMRItems();
+            this.initializeMRedItems();
 
             Tab releases_tab = new Tab();
             releases_tab.setText("Stock Releases");
@@ -222,7 +232,88 @@ public class ViewStockController implements Initializable {
         stockEntries.getColumns().add(column1);
         stockEntries.getColumns().add(column2);
         stockEntries.getColumns().add(column3);
+    }
+    /**
+     * Creates the MR items table
+     * @return void
+     */
+    public void createMRItems() {
 
+        TableColumn<MrItem, String> column = new TableColumn<>("MR No");
+        column.setMinWidth(100);
+        column.setCellValueFactory(new PropertyValueFactory<>("mrNo"));
+        column.setStyle("-fx-alignment: center;");
+
+        TableColumn<MrItem, String> column2 = new TableColumn<>("Qty");
+        column2.setMinWidth(50);
+        column2.setCellValueFactory(new PropertyValueFactory<>("qty"));
+        column2.setStyle("-fx-alignment: center;");
+
+        TableColumn<MrItem, Double> column3 = new TableColumn<>("Unit Price");
+        column3.setMinWidth(80);
+        column3.setCellValueFactory(item -> {
+            try {
+
+                return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getPrice());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        column3.setStyle("-fx-alignment: center-left;");
+        TableColumn<MrItem, Double> column3a = new TableColumn<>("Total");
+        column3a.setMinWidth(95);
+        column3a.setCellValueFactory(item -> {
+            try {
+
+                return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getPrice()*item.getValue().getQty());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        column3a.setStyle("-fx-alignment: center-left;");
+
+        TableColumn<MrItem, String> column4 = new TableColumn<>("Date of MR");
+        column4.setMinWidth(100);
+        column4.setCellValueFactory(item -> {
+            try {
+                return new ReadOnlyObjectWrapper<>(MrDAO.get(item.getValue().getMrNo()).getDateOfMR().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        column4.setStyle("-fx-alignment: center;");
+
+        TableColumn<MrItem, String> column7 = new TableColumn<>("Remarks");
+        column7.setMinWidth(155);
+        column7.setCellValueFactory(item -> {
+            if (item.getValue().getDateReturned() == null){
+                return new ReadOnlyObjectWrapper<>(item.getValue().getRemarks());
+            }else{
+                String status = item.getValue().getRemarks()+" ("+item.getValue().getStatus()+" on "+item.getValue().getDateReturned()+")";
+                return new ReadOnlyObjectWrapper<>(status);
+            }
+        });
+        column7.setStyle("-fx-alignment: center;");
+
+        TableColumn<MrItem, String> column8 = new TableColumn<>("Employee");
+        column8.setMinWidth(132);
+        column8.setCellValueFactory(item -> {
+            try {
+                MR mr = MrDAO.get(item.getValue().getMrNo());
+                return new ReadOnlyObjectWrapper<>(mr.getEmployeeInfo().getEmployeeFirstName()+" "+mr.getEmployeeInfo().getEmployeeLastName());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        column8.setStyle("-fx-alignment: center-left;");
+
+        this.mr.getColumns().add(column);
+        this.mr.getColumns().add(column4);
+        this.mr.getColumns().add(column2);
+        this.mr.getColumns().add(column3);
+        this.mr.getColumns().add(column3a);
+        this.mr.getColumns().add(column8);
+        this.mr.getColumns().add(column7);
     }
     /**
      * Creates the stock releases table
@@ -319,6 +410,18 @@ public class ViewStockController implements Initializable {
         try {
             ObservableList<Releasing> stocks = FXCollections.observableList(StockDAO.getReleasedStocks(stock, Utility.RELEASED));
             stockReleases.getItems().setAll(stocks);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    /**
+     * Initializes the MR items table
+     * @return void
+     */
+    public void initializeMRedItems(){
+        try {
+            ObservableList<MrItem> mrItems = FXCollections.observableList(MrDAO.getMRItems(stock.getId(), null));
+            this.mr.getItems().setAll(mrItems);
         } catch (Exception e) {
             e.printStackTrace();
         }

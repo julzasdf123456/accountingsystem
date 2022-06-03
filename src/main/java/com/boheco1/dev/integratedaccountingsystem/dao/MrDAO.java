@@ -382,12 +382,24 @@ public class MrDAO {
         return mrItems;
     }
 
-    public static List<MrItem> getMRItems(String stock_id) throws Exception {
-        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT MRItem.id, mr_no, MRItem.StockID, Qty, Description, StockName, StockEntryLogs.RRNo, Remarks, dateOfReturned, MRItem.status, StockEntryLogs.Price, updatedBy "+
-                "FROM MR INNER JOIN MRItem ON MR.id = MRItem.mr_no INNER JOIN Stocks ON MRItem.StockID = Stocks.id INNER JOIN StockEntryLogs ON StockEntryLogs.StockID = Stocks.id "+
-                "WHERE MRItem.status=? AND Stocks.id=? ORDER BY Description ASC, mr_no DESC");
-        ps.setString(1, Utility.MR_ACTIVE);
-        ps.setString(2, stock_id);
+    public static List<MrItem> getMRItems(String stock_id, String status) throws Exception {
+        String sql = "";
+        PreparedStatement ps = null;
+        if (status == null){
+            sql = "SELECT MRItem.id, mr_no, MRItem.StockID, Qty, Description, StockName, StockEntryLogs.RRNo, Remarks, dateOfReturned, MRItem.status, StockEntryLogs.Price, updatedBy "+
+                    "FROM MR INNER JOIN MRItem ON MR.id = MRItem.mr_no INNER JOIN Stocks ON MRItem.StockID = Stocks.id INNER JOIN StockEntryLogs ON StockEntryLogs.StockID = Stocks.id "+
+                    "WHERE Stocks.id=? ORDER BY Description ASC, mr_no DESC";
+            ps = DB.getConnection().prepareStatement(sql);
+            ps.setString(1, stock_id);
+        }else{
+            sql = "SELECT MRItem.id, mr_no, MRItem.StockID, Qty, Description, StockName, StockEntryLogs.RRNo, Remarks, dateOfReturned, MRItem.status, StockEntryLogs.Price, updatedBy "+
+                    "FROM MR INNER JOIN MRItem ON MR.id = MRItem.mr_no INNER JOIN Stocks ON MRItem.StockID = Stocks.id INNER JOIN StockEntryLogs ON StockEntryLogs.StockID = Stocks.id "+
+                    "WHERE MRItem.status=? AND Stocks.id=? ORDER BY Description ASC, mr_no DESC";
+            ps = DB.getConnection().prepareStatement(sql);
+            ps.setString(1, status);
+            ps.setString(2, stock_id);
+        }
+
         ResultSet rs = ps.executeQuery();
 
         List<MrItem> mrItems = new ArrayList();
