@@ -2,24 +2,26 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXListView?>
+<?import com.jfoenix.controls.JFXTextArea?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="anchorpane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="712.0" prefWidth="1136.0" style="-fx-background-color: #ffff;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.GenerateMCTController">
+<AnchorPane fx:id="anchorpane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="712.0" prefWidth="1204.0" style="-fx-background-color: #ffff;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.GenerateMCTController">
    <children>
       <VBox alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <HBox VBox.vgrow="ALWAYS">
                <children>
-                  <VBox alignment="TOP_CENTER" prefHeight="658.0" prefWidth="309.0" HBox.hgrow="NEVER">
+                  <VBox alignment="TOP_CENTER" prefHeight="680.0" prefWidth="428.0" HBox.hgrow="NEVER">
                      <children>
-                        <JFXTextField fx:id="searchMirs" alignment="CENTER" onAction="#searchMirs" promptText="Search MIRS">
+                        <JFXTextField fx:id="searchMirs" alignment="CENTER" onAction="#searchMirs" promptText="Search MIRS" style="-fx-background-color: #f5f5f5;">
                            <VBox.margin>
                               <Insets bottom="30.0" left="16.0" right="16.0" />
                            </VBox.margin>
@@ -27,6 +29,54 @@
                               <Font size="18.0" />
                            </font>
                         </JFXTextField>
+                        <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="77.0">
+                           <children>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="115.0" text="MCT Number:">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <JFXTextField fx:id="mctNumber" onAction="#genMctNum" style="-fx-background-color: #f5f5f5;" HBox.hgrow="ALWAYS" />
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="10.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="77.0">
+                           <children>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="115.0" text="Address:">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <JFXTextField fx:id="newAddress" onAction="#genMctNum" style="-fx-background-color: #f5f5f5;" HBox.hgrow="ALWAYS" />
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="10.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox layoutX="10.0" layoutY="119.0">
+                           <children>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="115.0" text="Particulars:">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <JFXTextArea fx:id="particulars" prefHeight="94.0" prefWidth="313.0" style="-fx-background-color: #f5f5f5;" HBox.hgrow="ALWAYS" />
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="10.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <VBox>
+                           <children>
+                              <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 24;" text="MIRS Details" />
+                              <Separator prefWidth="200.0" />
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="10.0" top="24.0" />
+                           </VBox.margin>
+                        </VBox>
                         <HBox>
                            <children>
                               <Label maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="115.0" text="Date:">
@@ -162,14 +212,14 @@
                         <Insets right="16.0" />
                      </HBox.margin>
                   </VBox>
-                  <VBox fx:id="vboxItems" style="-fx-background-color: #ffff;" HBox.hgrow="ALWAYS">
+                  <VBox style="-fx-background-color: #ffff;" HBox.hgrow="ALWAYS">
                      <children>
                         <HBox alignment="TOP_CENTER" VBox.vgrow="ALWAYS">
                            <children>
                               <VBox HBox.hgrow="ALWAYS">
                                  <children>
-                                    <Label text="Requested MIRS Item(s)" />
-                                    <JFXListView fx:id="requestedList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="300.0" style="-fx-font-size: 1.5em;" VBox.vgrow="ALWAYS" />
+                                    <Label text="Released MIRS Item(s)" />
+                                    <JFXListView fx:id="unchargedItemDetailsListView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="300.0" style="-fx-font-size: 1.5em;" VBox.vgrow="ALWAYS" />
                                  </children>
                               </VBox>
                               <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
@@ -196,8 +246,8 @@
                               </VBox>
                               <VBox HBox.hgrow="ALWAYS">
                                  <children>
-                                    <Label text="For Releasing MIRS Item(s)" />
-                                    <JFXListView fx:id="releasingList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="300.0" style="-fx-font-size: 1.5em;" VBox.vgrow="ALWAYS" />
+                                    <Label text="For MCT Item(s)" />
+                                    <JFXListView fx:id="forMctItemListView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="300.0" style="-fx-font-size: 1.5em;" VBox.vgrow="ALWAYS" />
                                  </children>
                               </VBox>
                            </children>
@@ -205,9 +255,9 @@
                               <Insets />
                            </VBox.margin>
                         </HBox>
-                        <HBox fx:id="btnHolder" alignment="CENTER" prefHeight="27.0" prefWidth="583.0">
+                        <HBox alignment="CENTER" prefHeight="27.0" prefWidth="583.0">
                            <children>
-                              <JFXButton fx:id="releaseMCTBtn" buttonType="RAISED" layoutX="318.0" layoutY="10.0" onAction="#releaseMCTItem" prefHeight="37.0" prefWidth="196.0" text="Release with MCT" textFill="WHITE">
+                              <JFXButton fx:id="generateMCTBtn" buttonType="RAISED" layoutX="318.0" layoutY="10.0" onAction="#saveMCT" prefHeight="37.0" prefWidth="196.0" text="Generate MCT" textFill="WHITE">
                                  <font>
                                     <Font name="System Bold" size="18.0" />
                                  </font>

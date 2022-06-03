@@ -44,4 +44,7 @@ public class UnchargedItemDetails {
         this.price = price;
         this.quantity = quantity;
     }
+    public String toString(){
+        return quantity +" : "+ description;
+    }
 }
