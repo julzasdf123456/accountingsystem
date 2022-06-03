@@ -1,7 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.helpers;
 
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.boheco1.dev.integratedaccountingsystem.warehouse.ReceivingEntryController;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
@@ -31,17 +30,10 @@ public class Utility {
 
     private static AnchorPane contentPane;
     private static MIRS activeMIRS;
-    private static User selectedUser;
-
-    private static EmployeeInfo selectedEmployee;
 
     private static StackPane stackPane;
 
-    private static Stock selectedStock;
-
-    private static MR selectedMR;
-
-    private static Receiving selectedReceiving;
+    private static Object selected;
 
     private static ViewMRController mrController;
 
@@ -55,28 +47,12 @@ public class Utility {
         Utility.activeMIRS = activeMIRS;
     }
 
-    public static Stock getSelectedStock() {
-        return selectedStock;
+    public static Object getSelectedObject() {
+        return selected;
     }
 
-    public static void setSelectedStock(Stock stock) {
-        Utility.selectedStock = stock;
-    }
-
-    public static EmployeeInfo getSelectedEmployee() {
-        return selectedEmployee;
-    }
-
-    public static void setSelectedEmployee(EmployeeInfo employee) {
-        Utility.selectedEmployee = employee;
-    }
-
-    public static Receiving getSelectedReceiving() {
-        return selectedReceiving;
-    }
-
-    public static void setSelectedReceiving(Receiving receiving) {
-        Utility.selectedReceiving = receiving;
+    public static void setSelectedObject(Object obj) {
+        Utility.selected = obj;
     }
 
     public static AnchorPane getContentPane() {
@@ -103,28 +79,12 @@ public class Utility {
         return saltStr;
     }
 
-    public static User getSelectedUser() {
-        return selectedUser;
-    }
-
-    public static void setSelectedUser(User selectedUser) {
-        Utility.selectedUser = selectedUser;
-    }
-
     public static StackPane getStackPane() {
         return stackPane;
     }
 
     public static void setStackPane(StackPane stackPane) {
         Utility.stackPane = stackPane;
-    }
-
-    public static MR getSelectedMR() {
-        return selectedMR;
-    }
-
-    public static void setSelectedMR(MR selectedMR) {
-        Utility.selectedMR = selectedMR;
     }
 
     public static ViewMRController getMrController() { return mrController; }

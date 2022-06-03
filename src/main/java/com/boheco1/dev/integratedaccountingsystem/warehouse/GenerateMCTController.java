@@ -3,10 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXListView;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -16,8 +13,6 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -27,40 +22,52 @@ import org.controlsfx.control.textfield.TextFields;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class GenerateMCTController extends MenuControllerHandler implements Initializable {
 
     @FXML
-    private AnchorPane anchorpane;
+    private JFXTextField newAddress, searchMirs, mctNumber;
 
     @FXML
-    private Label date, mirsNumber, applicant, requisitioner, address, signatories, purpose;
+    private JFXTextArea particulars;
 
     @FXML
-    private JFXTextField searchMirs;
+    private Label purpose, requisitioner, mirsNumber, date, address, applicant, signatories;
 
     @FXML
-    private JFXButton releaseMCTBtn, addAllQtyBtn, addPartialQtyBtn, removeItemBtn;
+    private JFXListView<UnchargedItemDetails> unchargedItemDetailsListView, forMctItemListView;
 
     @FXML
-    private JFXListView<MIRSItem> requestedList, releasingList;
+    private JFXButton addAllQtyBtn, addPartialQtyBtn, removeItemBtn;
 
-    private Stock selectedStock = null;
-    private MIRSItem selectedMirsItem;
-    private MIRS mirs;
-    private String work_order_number;
+    private HashMap<String, List<UnchargedItemDetails>> collectionOfUnchargeReleasedItem;
 
+    private MIRS searchResult;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        //requestedList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        //releasingList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        unchargedItemDetailsListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        forMctItemListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        bindMirsAutocomplete(searchMirs);
+
+        collectionOfUnchargeReleasedItem = new HashMap<>();
+
+        try {
+            List<UnchargedMIRSReleases> unchargedMIRSReleasesList = MirsDAO.getUnchargedMIRSReleases();
+            for(UnchargedMIRSReleases un : unchargedMIRSReleasesList){
+                collectionOfUnchargeReleasedItem.put(un.getMirs().getId(),un.getReleases());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
     @FXML
     private void searchMirs(ActionEvent event) {
+
        /*try {
             mirs = MirsDAO.(searchMirs.getText());
             List<MIRSItem> mirsItemList = MirsDAO.getUnreleasedItems(mirs);
@@ -93,232 +100,130 @@ public class GenerateMCTController extends MenuControllerHandler implements Init
         }*/
     }
 
+    private void save() {
+        try{
+            AlertDialogBuilder.messgeDialog("System Message", "MIRS items released.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+        }catch (Exception e){
+            AlertDialogBuilder.messgeDialog("System Error", "Item released: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+        }
+    }
+
     @FXML
-    private void releaseItem(ActionEvent event) {
-        /*try {
-            if(releasingList.getItems().size() == 0) {
+    private void addAllQty(ActionEvent event) throws Exception {
+        //addRemoveItem(addAllQtyBtn);
+        //public MCT(String mctNo, String particulars, String address, String mirsNo, String workOrderNo, LocalDate createdAt) {
+        ObservableList<UnchargedItemDetails> selectedItems = FXCollections.observableArrayList(unchargedItemDetailsListView.getSelectionModel().getSelectedItems());
+        if(selectedItems.size() == 0){
+            AlertDialogBuilder.messgeDialog("System Message", "No item(s) selected, please try again.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+        }else{
+            for (UnchargedItemDetails selected : selectedItems) {
+                unchargedItemDetailsListView.getItems().remove(selected);
+                forMctItemListView.getItems().add(selected);
+            }
+
+        }
+        unchargedItemDetailsListView.getSelectionModel().clearSelection();
+        forMctItemListView.getSelectionModel().clearSelection();
+        /*MCT mct = new MCT();
+                mct.setMctNo(mctNumber.getText());
+                mct.setParticulars(particulars.getText());
+                mct.setAddress(address.getText());
+                mct.setMirsNo(mirsNumber.getText());
+                mct.setWorkOrderNo(searchResult.getWorkOrderNo());*/
+    }
+
+    @FXML
+    private void removeItem(ActionEvent event) {
+        //addRemoveItem(removeItemBtn);
+        ObservableList<UnchargedItemDetails> selectedItems = FXCollections.observableArrayList(forMctItemListView.getSelectionModel().getSelectedItems());
+        if(selectedItems.size() == 0){
+            AlertDialogBuilder.messgeDialog("System Message", "No item(s) selected, please try again.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+        }else{
+            for (UnchargedItemDetails selected : selectedItems) {
+                unchargedItemDetailsListView.getItems().add(selected);
+                forMctItemListView.getItems().remove(selected);
+            }
+        }
+        unchargedItemDetailsListView.getSelectionModel().clearSelection();
+        forMctItemListView.getSelectionModel().clearSelection();
+    }
+
+    @FXML
+    private void addPartialQty(ActionEvent event) {
+        addRemoveItem(addPartialQtyBtn);
+
+    }
+
+    @FXML
+    private void saveMCT(ActionEvent event) {
+            try {
+            if(forMctItemListView.getItems().size() == 0) {
                 AlertDialogBuilder.messgeDialog("System Message", "No available item(s) listed for releasing.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
                 return;
             }
 
             JFXButton accept = new JFXButton("Accept");
-            JFXDialog dialog = DialogBuilder.showConfirmDialog("Releasing","Are sure you want to release listed item(s)?", accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
+            JFXDialog dialog = DialogBuilder.showConfirmDialog("MCT","Are sure you want to save this MCT?", accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
             accept.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent __) {
-                    save(null);
+                    save();
                     dialog.close();
                 }
             });
 
         } catch (Exception e) {
             e.printStackTrace();
-        }*/
-    }
-
-    @FXML
-    private void releaseMCTItem(ActionEvent event) {
-        /*try {
-            if(releasingList.getItems().size() == 0) {
-                AlertDialogBuilder.messgeDialog("System Message", "No available item(s) listed for releasing.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-                return;
-            }
-
-            JFXButton accept = new JFXButton("Accept");
-            JFXTextField townCode = new JFXTextField();
-            InputValidation.restrictNumbersOnly(townCode);
-            JFXDialog dialogMCTNumber = DialogBuilder.showInputDialog("Release wth MCT","Provide Town Code:  ", "", townCode, accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
-            accept.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent __) {
-                    if(townCode.getText().isEmpty()) {
-                        AlertDialogBuilder.messgeDialog("System Message", "No MCT number provided", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
-                    }else{
-                        JFXButton release = new JFXButton("Accept");
-                        release.setDefaultButton(true);
-                        release.getStyleClass().add("JFXButton");
-                        release.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
-
-                        JFXTextField mctNumber = new JFXTextField();
-                        mctNumber.setStyle("-fx-alignment: center; -fx-text-fill: "+ ColorPalette.BLACK + ";");
-                        mctNumber.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 18));
-                        mctNumber.setLabelFloat(false);
-                        String mctNum = NumberGenerator.mctNumber(townCode.getText());
-                        mctNumber.setText(mctNum);
-                        JFXDialog dialogReleasing = DialogBuilder.showInputDialog("Releasing","Are sure you want to release listed item(s)?", Orientation.HORIZONTAL, mctNumber, release, DialogBuilder.WARNING_DIALOG, Utility.getStackPane());
-
-                        release.setOnAction(new EventHandler<ActionEvent>() {
-                            @Override
-                            public void handle(ActionEvent __) {
-                                if(mctNumber.getText().isEmpty()) {
-                                    dialogReleasing.close();
-                                    AlertDialogBuilder.messgeDialog("System Message", "No MCT number provided", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-                                    return;
-                                }else{
-                                    save(mctNum);
-                                }
-                                dialogReleasing.close();
-                            }
-                        });
-                    }
-                    dialogMCTNumber.close();
-                }
-            });
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-    }
-
-    private void save(String mctNumber) {
-        /*try{
-            List<MIRSItem> forReleasing = releasingList.getItems();
-            List<MIRSItem> remainingRequest = requestedList.getItems();
-            List<Releasing> releasedItemWithMCT = new ArrayList<>();
-            boolean found = false;
-            for (MIRSItem mirsItem : forReleasing){
-                Releasing releasing = new Releasing();
-                releasing.setStockID(mirsItem.getStockID());
-                releasing.setMirsID(mirsItem.getMirsID());
-                releasing.setQuantity(mirsItem.getQuantity());
-                releasing.setPrice(mirsItem.getPrice());
-                releasing.setUserID(ActiveUser.getUser().getId());
-                releasing.setWorkOrderNo(mirsItem.getWorkOrderNo());
-
-                for(MIRSItem rem : remainingRequest){
-                    if(rem.getId().equals(mirsItem.getId())) {
-                        releasing.setStatus(Utility.PARTIAL_RELEASED);
-                        found = true;
-                        break;
-                    }
-                }
-
-                if(!found) {
-                    releasing.setStatus(Utility.RELEASED);
-                    ReleasingDAO.updateReleasedItem(releasing);
-                }
-
-                releasedItemWithMCT.add(releasing);
-                ReleasingDAO.add(releasing);
-                Stock temp = StockDAO.get(mirsItem.getStockID()); //temp stock object for quantity deduction
-                StockDAO.deductStockQuantity(temp, mirsItem.getQuantity());
-            }
-
-            if(mctNumber != null) {
-                MCT mct = new MCT();
-                mct.setMctNo(mctNumber);
-                mct.setParticulars(mirs.getPurpose());
-                mct.setAddress(mirs.getAddress());
-                mct.setMirsNo(mirs.getId());
-                mct.setWorkOrderNo(forReleasing.get(0).getWorkOrderNo());
-                MCTDao.create(mct, releasedItemWithMCT);
-            }
-
-
-            if(requestedList.getItems().size() == 0)
-                mirs.setStatus(Utility.CLOSED);
-            else
-                mirs.setStatus(Utility.RELEASING);
-
-            mirs.setDetails(details.getText());
-            MirsDAO.update(mirs);
-            releasingList.getItems().clear();
-            AlertDialogBuilder.messgeDialog("System Message", "MIRS items released.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
-        }catch (Exception e){
-            AlertDialogBuilder.messgeDialog("System Error", "Item released: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
-        }*/
-    }
-
-    @FXML
-    private void addNewMIRSItem(ActionEvent event) throws Exception {
-        /*
-        if(selectedStock == null){
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
-                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            return;
-        }else if(quantity.getText().length() == 0 || Integer.parseInt(quantity.getText()) > StockDAO.countAvailable(selectedStock)) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid request quantity!",
-                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            return;
         }
-
-        MIRSItem mirsItem = new MIRSItem();
-        mirsItem.setMirsID(mirsNumber.getText());
-        mirsItem.setStockID(selectedStock.getId());
-        mirsItem.setParticulars(selectedStock.getStockName());
-        mirsItem.setUnit(selectedStock.getUnit());
-        mirsItem.setQuantity(Integer.parseInt(quantity.getText()));
-        mirsItem.setPrice(selectedStock.getPrice());
-
-        releasingList.getItems().add(mirsItem);
-
-        selectedStock = null; //set to null for validation
-        particulars.setText("");
-        quantity.setText("");
-        particulars.requestFocus();
-        inStock.setText("In Stock: 0");
-        pending.setText("Pending: 0");
-        available.setText("Available: 0");*/
     }
 
     @FXML
-    private void addAllQty(ActionEvent event) throws Exception {
-        addRemoveItem(addAllQtyBtn);
-    }
-
-    @FXML
-    private void removeItem(ActionEvent event) {
-        addRemoveItem(removeItemBtn);
-    }
-
-    @FXML
-    private void addPartialQty(ActionEvent event) {
-        addRemoveItem(addPartialQtyBtn);
+    void genMctNum(ActionEvent event) {
+        mctNumber.setText(NumberGenerator.mctNumber(mctNumber.getText()));
     }
 
     private void addRemoveItem(JFXButton btn){
-        /*JFXListView<MIRSItem> mirsItemJFXListView = null;
-        if(btn == this.addAllQtyBtn){
-            mirsItemJFXListView = requestedList;
-        }else if(btn == this.addPartialQtyBtn){
-            mirsItemJFXListView = requestedList;
+        /*JFXListView itemListView = null;
+        if(btn == this.addAllQtyBtn || btn == this.addPartialQtyBtn){
+            itemListView = releasedItemListView;
         }else if(btn == this.removeItemBtn){
-            mirsItemJFXListView = releasingList;
+            itemListView = mctItemListView;
         }
 
-        if(mirsItemJFXListView.getItems().isEmpty()) {
+        if(itemListView.getItems().isEmpty()) {
             AlertDialogBuilder.messgeDialog("System Message", "No available item.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
         }else{
-            ObservableList<MIRSItem> selectedItems = FXCollections.observableArrayList(mirsItemJFXListView.getSelectionModel().getSelectedItems());
+            ObservableList<UnchargedItemDetails> selectedItems = FXCollections.observableArrayList(itemListView.getSelectionModel().getSelectedItems());
             if(selectedItems.size() == 0){
                 AlertDialogBuilder.messgeDialog("System Message", "No item(s) selected, please try again.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
             }else{
+            //   ReleasedItemDetails temp = new ReleasedItemDetails();
                 if(btn == addAllQtyBtn) {
-                    ObservableList<MIRSItem> toBeReleased = FXCollections.observableArrayList(releasingList.getItems());
-                    for (MIRSItem selected : selectedItems) {
-
+                    ObservableList<UnchargedItemDetails> toBeReleased = FXCollections.observableArrayList(releasedItemListView.getItems());
+                    for (UnchargedItemDetails selected : selectedItems) {
+                        temp.setMirsID(selected.);
                         boolean found = false;
-                        for (MIRSItem listed : toBeReleased) {
-                            if (listed.getId().equals(selected.getId())) {
-                                listed.setQuantity(listed.getQuantity() + selected.getQuantity());
-                                requestedList.getItems().remove(selected);
+                        for (UnchargedItemDetails listed : toBeReleased) {
+                            if (listed.getId().equals(temp.getStockID())) {
+                                listed.setQuantity(listed.getQuantity() + temp.getQuantity());
+                                releasedItemListView.getItems().remove(temp);
                                 found = true;
                             }
                         }
                         if (!found) {
-                            requestedList.getItems().remove(selected);
-                            releasingList.getItems().add(selected);
+                            releasedItemListView.getItems().remove(temp);
+                            releasedItemListView.getItems().add(temp);
                         }
 
-                        requestedList.refresh();
-                        releasingList.refresh();
+                        releasedItemListView.refresh();
+                        releasedItemListView.refresh();
                     }
                 }else if(btn == removeItemBtn){
-                    ObservableList<MIRSItem> requested = FXCollections.observableArrayList(requestedList.getItems());
+                    ObservableList<MIRSItem> requested = FXCollections.observableArrayList(releasedItemListView.getItems());
                     for (MIRSItem selected : selectedItems) {
 
                         if(selected.getId() == null){
-                            releasingList.getItems().remove(selected);
+                            releasedItemListView.getItems().remove(selected);
                             break;
                         }
 
@@ -326,17 +231,17 @@ public class GenerateMCTController extends MenuControllerHandler implements Init
                         for (MIRSItem listed : requested) {
                             if (listed.getId().equals(selected.getId())) {
                                 listed.setQuantity(listed.getQuantity() + selected.getQuantity());
-                                releasingList.getItems().remove(selected);
+                                releasedItemListView.getItems().remove(selected);
                                 found = true;
                             }
                         }
                         if (!found) {
-                            requestedList.getItems().add(selected);
-                            releasingList.getItems().remove(selected);
+                            releasedItemListView.getItems().add(selected);
+                            releasedItemListView.getItems().remove(selected);
                         }
 
-                        requestedList.refresh();
-                        releasingList.refresh();
+                        releasedItemListView.refresh();
+                        releasedItemListView.refresh();
                     }
                 }else if (btn == addPartialQtyBtn){
                     if(selectedItems.size() > 1){
@@ -355,7 +260,7 @@ public class GenerateMCTController extends MenuControllerHandler implements Init
                                                 Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                                     }else{
 
-                                        ObservableList<MIRSItem> toBeReleased = FXCollections.observableArrayList(releasingList.getItems());
+                                        ObservableList<MIRSItem> toBeReleased = FXCollections.observableArrayList(releasedItemListView.getItems());
                                         boolean found = false;
                                         for (MIRSItem listed : toBeReleased) {
                                             if (listed.getId().equals(selectedItems.get(0).getId())) {
@@ -376,16 +281,15 @@ public class GenerateMCTController extends MenuControllerHandler implements Init
                                             mirsItem.setRemarks(selectedItems.get(0).getRemarks());
                                             mirsItem.setCreatedAt(selectedItems.get(0).getCreatedAt());
                                             mirsItem.setUpdatedAt(selectedItems.get(0).getUpdatedAt());
-                                            mirsItem.setWorkOrderNo(selectedItems.get(0).getWorkOrderNo());
 
                                             selectedItems.get(0).setQuantity(selectedItems.get(0).getQuantity() - Integer.parseInt(input.getText()));
-                                            releasingList.getItems().add(mirsItem);
+                                            releasedItemListView.getItems().add(mirsItem);
 
                                             if(selectedItems.get(0).getQuantity() == 0)
-                                                requestedList.getItems().remove(selectedItems.get(0));
+                                                releasedItemListView.getItems().remove(selectedItems.get(0));
                                         }
-                                        requestedList.refresh();
-                                        releasingList.refresh();
+                                        releasedItemListView.refresh();
+                                        releasedItemListView.refresh();
                                     }
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -394,13 +298,90 @@ public class GenerateMCTController extends MenuControllerHandler implements Init
                             }
                         });
                     }
-                }
+                }*/
 
-            }
-        }
-        releasingList.getSelectionModel().clearSelection();
-        requestedList.getSelectionModel().clearSelection();*/
+         //   }
+        //}
+       // mctItemListView.getSelectionModel().clearSelection();
+       // releasedItemListView.getSelectionModel().clearSelection();
     }
 
+    private void setFieldData(MIRS mirs) throws Exception {
+
+        List<MIRSSignatory> mirsSignatoryList = MIRSSignatoryDAO.get(mirs);
+
+        String signatures = "";
+        for (MIRSSignatory sig:mirsSignatoryList) {
+            signatures+=UserDAO.get(sig.getUserID()).getFullName();
+            signatures+="\n";
+        }
+        signatories.setText(signatures);
+        mirsNumber.setText(""+mirs.getId());
+        date.setText(""+mirs.getDateFiled());
+        purpose.setText(mirs.getPurpose());
+        address.setText(mirs.getAddress());
+        applicant.setText(mirs.getApplicant());
+        requisitioner.setText(mirs.getRequisitioner().getFullName());
+
+        newAddress.setText(mirs.getAddress());
+        particulars.setText(mirs.getPurpose());
+
+        unchargedItemDetailsListView.getItems().clear();
+        List<UnchargedItemDetails> collection = collectionOfUnchargeReleasedItem.get(mirs.getId());
+        if (collection != null){
+            unchargedItemDetailsListView.getItems().addAll(collection);
+        }
+    }
+
+    private void bindMirsAutocomplete(JFXTextField textField){
+        AutoCompletionBinding<MIRS> suggest = TextFields.bindAutoCompletion(textField,
+                param -> {
+                    //Value typed in the textfield
+                    String query = param.getUserText();
+
+                    //Initialize list of stocks
+                    List<MIRS> list = new ArrayList<>();
+
+                    //Perform DB query when length of search string is 4 or above
+                    if (query.length() > 3){
+                        try {
+                            list = MirsDAO.searchMIRS(query);
+                            MIRS dummy = new MIRS();
+                            dummy.setId("dummy");
+                            dummy.setPurpose("--end of result--");//just to add padding between last item and horizontal scrollbar
+                            list.add(dummy);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    return list;
+                }, new StringConverter<>() {
+                    //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
+                    @Override
+                    public String toString(MIRS object) {
+                        return object.getPurpose();
+                    }
+
+                    @Override
+                    public MIRS fromString(String string) {
+                        throw new UnsupportedOperationException();
+                    }
+                });
+
+        suggest.setMinWidth(500);
+        //This will set the actions once the user clicks an item from the popupmenu.
+        suggest.setOnAutoCompleted(event -> {
+            textField.setText("");
+            searchResult = event.getCompletion();
+            if(searchResult.getId().equals("dummy"))
+                return;
+            try {
+                setFieldData(searchResult);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
 }

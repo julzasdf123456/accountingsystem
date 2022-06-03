@@ -634,14 +634,23 @@ public class MirsDAO {
     public static List<UnchargedMIRSReleases> getUnchargedMIRSReleases() throws Exception {
         List<UnchargedMIRSReleases> unchargedMIRSReleases=new ArrayList();
 
-        ResultSet rs = DB.getConnection().createStatement().executeQuery(
+        /*ResultSet rs = DB.getConnection().createStatement().executeQuery(
                 "SELECT * FROM dbo.MIRS m WHERE m.id IN " +
                         "(SELECT r.MIRSID FROM Releasing r WHERE r.status='released' AND mct_no IS NULL);");
 
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT r.*, s.Description, s.Price FROM Releasing r " +
                         "LEFT JOIN Stocks s ON s.id = r.StockID " +
-                        "WHERE r.MIRSID = ? AND r.Status = 'released' AND mct_no IS NULL;");
+                        "WHERE r.MIRSID = ? AND r.Status = 'released' AND mct_no IS NULL;");*/
+
+        ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                "SELECT * FROM dbo.MIRS m WHERE m.id IN " +
+                        "(SELECT r.MIRSID FROM Releasing r WHERE (r.status='"+Utility.RELEASED+"' OR r.status='"+Utility.PARTIAL_RELEASED+"') AND mct_no IS NULL);");
+
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT r.*, s.Description, s.Price FROM Releasing r " +
+                        "LEFT JOIN Stocks s ON s.id = r.StockID " +
+                        "WHERE r.MIRSID = ? AND (r.status='"+Utility.RELEASED+"' OR r.status='"+Utility.PARTIAL_RELEASED+"') AND mct_no IS NULL;");
 
         while(rs.next()) {
             MIRS mirs = new MIRS(

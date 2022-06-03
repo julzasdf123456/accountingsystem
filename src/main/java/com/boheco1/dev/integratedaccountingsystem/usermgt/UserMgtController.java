@@ -60,7 +60,7 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
     public void initialize(URL url, ResourceBundle resourceBundle)
     {
         try {
-            currentUser = Utility.getSelectedUser();
+            currentUser = (User) Utility.getSelectedObject();
 
             conn = DB.getConnection();
 

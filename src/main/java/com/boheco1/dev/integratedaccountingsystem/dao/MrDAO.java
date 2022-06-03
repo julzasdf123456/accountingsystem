@@ -4,7 +4,6 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.LocalDate;
@@ -48,8 +47,7 @@ public class MrDAO {
                 rs.getDate("dateOfMR").toLocalDate(),
                 rs.getString("status"),
                 rs.getString("recommending"),
-                rs.getString("approvedBy"),
-                rs.getString("purpose")
+                rs.getString("approvedBy")
         );
         mr.setPurpose(rs.getString("purpose"));
         mr.setDateApproved(rs.getDate("dateApproved")!=null ? rs.getDate("dateApproved").toLocalDate(): null);
@@ -137,8 +135,7 @@ public class MrDAO {
                     rs.getDate("dateOfMR").toLocalDate(),
                     rs.getString("status"),
                     rs.getString("recommending"),
-                    rs.getString("approvedBy"),
-                    rs.getString("purpose")
+                    rs.getString("approvedBy")
             );
             mr.setPurpose(rs.getString("purpose"));
             mr.setDateApproved(rs.getDate("dateApproved")!=null ? rs.getDate("dateApproved").toLocalDate(): null);
@@ -194,8 +191,7 @@ public class MrDAO {
                     rs.getDate("dateOfMR").toLocalDate(),
                     rs.getString("status"),
                     rs.getString("recommending"),
-                    rs.getString("approvedBy"),
-                    rs.getString("purpose")
+                    rs.getString("approvedBy")
             );
             mr.setPurpose(rs.getString("purpose"));
             mr.setDateApproved(rs.getDate("dateApproved")!=null ? rs.getDate("dateApproved").toLocalDate(): null);
@@ -247,8 +243,7 @@ public class MrDAO {
                     rs.getDate("dateOfMR").toLocalDate(),
                     rs.getString("status"),
                     rs.getString("recommending"),
-                    rs.getString("approvedBy"),
-                    rs.getString("purpose")
+                    rs.getString("approvedBy")
             );
             mr.setPurpose(rs.getString("purpose"));
             mr.setDateApproved(rs.getDate("dateApproved")!=null ? rs.getDate("dateApproved").toLocalDate(): null);
@@ -295,8 +290,7 @@ public class MrDAO {
                     rs.getDate("dateOfMR").toLocalDate(),
                     rs.getString("status"),
                     rs.getString("recommending"),
-                    rs.getString("approvedBy"),
-                    rs.getString("purpose")
+                    rs.getString("approvedBy")
             );
             mr.setPurpose(rs.getString("purpose"));
             mr.setDateApproved(rs.getDate("dateApproved")!=null ? rs.getDate("dateApproved").toLocalDate(): null);
@@ -323,6 +317,115 @@ public class MrDAO {
         return mrs;
     }
 
+    public static List<MrItem> searchMRItems(String key, String status) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT MRItem.id, mr_no, MRItem.StockID, Qty, Description, StockName, StockEntryLogs.RRNo, Remarks, dateOfReturned, MRItem.status, StockEntryLogs.Price, updatedBy "+
+                "FROM MR INNER JOIN MRItem ON MR.id = MRItem.mr_no INNER JOIN Stocks ON MRItem.StockID = Stocks.id INNER JOIN StockEntryLogs ON StockEntryLogs.StockID = Stocks.id "+
+                "WHERE MRItem.status=? AND (Description LIKE ? OR MRItem.StockID LIKE ? OR StockName LIKE ?) ORDER BY Description ASC, mr_no DESC");
+        ps.setString(1, status);
+        ps.setString(2, "%" + key + "%");
+        ps.setString(3, "%" + key + "%");
+        ps.setString(4, "%" + key + "%");
+        ResultSet rs = ps.executeQuery();
+
+        List<MrItem> mrItems = new ArrayList();
+
+        while(rs.next()) {
+            MrItem item = new MrItem(
+                    rs.getString("id"),
+                    rs.getString("mr_no"),
+                    rs.getString("StockID"),
+                    rs.getInt("Qty"),
+                    rs.getString("Remarks")
+            );
+            item.setRrNo(rs.getString("RRNo"));
+            item.setStatus(rs.getString("Status"));
+            item.getStock().setPrice(rs.getDouble("Price"));
+            item.setUpdatedBy(rs.getString("updatedBy"));
+            item.setDateReturned(rs.getDate("dateOfReturned")!=null ? rs.getDate("dateOfReturned").toLocalDate(): null);
+            mrItems.add(item);
+        }
+
+        rs.close();
+        ps.close();
+
+        return mrItems;
+    }
+
+    public static List<MrItem> getMRItems() throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT MRItem.id, mr_no, MRItem.StockID, Qty, Description, StockName, StockEntryLogs.RRNo, Remarks, dateOfReturned, MRItem.status, StockEntryLogs.Price, updatedBy "+
+                "FROM MR INNER JOIN MRItem ON MR.id = MRItem.mr_no INNER JOIN Stocks ON MRItem.StockID = Stocks.id INNER JOIN StockEntryLogs ON StockEntryLogs.StockID = Stocks.id "+
+                "WHERE MRItem.status=? ORDER BY Description ASC, mr_no DESC");
+        ps.setString(1, Utility.MR_ACTIVE);
+        ResultSet rs = ps.executeQuery();
+
+        List<MrItem> mrItems = new ArrayList();
+
+        while(rs.next()) {
+            MrItem item = new MrItem(
+                    rs.getString("id"),
+                    rs.getString("mr_no"),
+                    rs.getString("StockID"),
+                    rs.getInt("Qty"),
+                    rs.getString("Remarks")
+            );
+            item.setRrNo(rs.getString("RRNo"));
+            item.setStatus(rs.getString("Status"));
+            item.getStock().setPrice(rs.getDouble("Price"));
+            item.setUpdatedBy(rs.getString("updatedBy"));
+            item.setDateReturned(rs.getDate("dateOfReturned")!=null ? rs.getDate("dateOfReturned").toLocalDate(): null);
+            mrItems.add(item);
+        }
+
+        rs.close();
+        ps.close();
+
+        return mrItems;
+    }
+
+    public static List<MrItem> getMRItems(String stock_id, String status) throws Exception {
+        String sql = "";
+        PreparedStatement ps = null;
+        if (status == null){
+            sql = "SELECT MRItem.id, mr_no, MRItem.StockID, Qty, Description, StockName, StockEntryLogs.RRNo, Remarks, dateOfReturned, MRItem.status, StockEntryLogs.Price, updatedBy "+
+                    "FROM MR INNER JOIN MRItem ON MR.id = MRItem.mr_no INNER JOIN Stocks ON MRItem.StockID = Stocks.id INNER JOIN StockEntryLogs ON StockEntryLogs.StockID = Stocks.id "+
+                    "WHERE Stocks.id=? ORDER BY Description ASC, mr_no DESC";
+            ps = DB.getConnection().prepareStatement(sql);
+            ps.setString(1, stock_id);
+        }else{
+            sql = "SELECT MRItem.id, mr_no, MRItem.StockID, Qty, Description, StockName, StockEntryLogs.RRNo, Remarks, dateOfReturned, MRItem.status, StockEntryLogs.Price, updatedBy "+
+                    "FROM MR INNER JOIN MRItem ON MR.id = MRItem.mr_no INNER JOIN Stocks ON MRItem.StockID = Stocks.id INNER JOIN StockEntryLogs ON StockEntryLogs.StockID = Stocks.id "+
+                    "WHERE MRItem.status=? AND Stocks.id=? ORDER BY Description ASC, mr_no DESC";
+            ps = DB.getConnection().prepareStatement(sql);
+            ps.setString(1, status);
+            ps.setString(2, stock_id);
+        }
+
+        ResultSet rs = ps.executeQuery();
+
+        List<MrItem> mrItems = new ArrayList();
+
+        while(rs.next()) {
+            MrItem item = new MrItem(
+                    rs.getString("id"),
+                    rs.getString("mr_no"),
+                    rs.getString("StockID"),
+                    rs.getInt("Qty"),
+                    rs.getString("Remarks")
+            );
+            item.setRrNo(rs.getString("RRNo"));
+            item.setStatus(rs.getString("Status"));
+            item.getStock().setPrice(rs.getDouble("Price"));
+            item.setUpdatedBy(rs.getString("updatedBy"));
+            item.setDateReturned(rs.getDate("dateOfReturned")!=null ? rs.getDate("dateOfReturned").toLocalDate(): null);
+            mrItems.add(item);
+        }
+
+        rs.close();
+        ps.close();
+
+        return mrItems;
+    }
+
     public static void createItem(MR mr, MrItem item) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "INSERT INTO MRItem (id, StockID, Qty, Remarks, mr_no, RRNo, Status) " +
@@ -336,10 +439,13 @@ public class MrDAO {
         ps.setString(4, item.getRemarks());
         ps.setString(5, mr.getId());
         ps.setString(6, item.getRrNo());
-        ps.setString(7, Utility.PENDING);
+        ps.setString(7, Utility.MR_ACTIVE);
         ps.executeUpdate();
 
         ps.close();
+
+        Stock stock = item.getStock();
+        StockDAO.deductStockQuantity(stock, item.getQty());
     }
 
     public static MrItem getItem(String id) throws Exception {
@@ -359,6 +465,7 @@ public class MrDAO {
             );
             item.setRrNo(rs.getString("RRNo"));
             item.setStatus(rs.getString("Status"));
+            item.setUpdatedBy(rs.getString("updatedBy"));
             item.setDateReturned(rs.getDate("dateOfReturned")!=null ? rs.getDate("dateOfReturned").toLocalDate(): null);
             return item;
         }
@@ -388,7 +495,6 @@ public class MrDAO {
             );
 
             item.setRrNo(rs.getString("RRNo"));
-            item.setRrNo(rs.getString("RRNo"));
             item.setStatus(rs.getString("Status"));
             item.setDateReturned(rs.getDate("dateOfReturned")!=null ? rs.getDate("dateOfReturned").toLocalDate(): null);
             mrItems.add(item);
@@ -409,22 +515,20 @@ public class MrDAO {
         ps.close();
     }
 
-    public static void returnItem(MrItem item) throws Exception {
-        PreparedStatement ps1 = DB.getConnection().prepareStatement(
-                "UPDATE MrItem SET status=?, dateOfReturned=? WHERE id=?");
-        ps1.setString(1, Utility.MR_RETURNED);
-        ps1.setDate(2, Date.valueOf(LocalDate.now()));
-        ps1.setString(3, item.getId());
+    public static void returnMRItem(MrItem item, String remarks) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE MRItem SET updatedBy=?, Remarks=?, Status=?, dateOfReturned=? " +
+                        "WHERE id=?");
+        ps.setString(1, ActiveUser.getUser().getId());
+        ps.setString(2, remarks);
+        ps.setString(3, Utility.MR_RETURNED);
+        ps.setString(4, LocalDate.now().toString());
+        ps.setString(5, item.getId());
+        ps.executeUpdate();
 
-        ps1.executeUpdate();
+        ps.close();
 
-        //If the item returned came from warehouse, replenish warehouse quantity.
-        if(item.getStockID()!=null) {
-            Stock stock = StockDAO.get(item.getStockID());
-            StockDAO.addStockQuantity(stock, item.getQty());
-        }
-
-        ps1.close();
-
+        Stock stock = item.getStock();
+        StockDAO.addStockQuantity(stock, item.getQty());
     }
 }

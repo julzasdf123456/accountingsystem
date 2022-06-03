@@ -17,76 +17,80 @@
          <children>
             <BorderPane prefHeight="550.0" prefWidth="1024.0">
                <center>
-                  <TableView fx:id="mr_items_table" prefHeight="190.0" prefWidth="1024.0" BorderPane.alignment="CENTER">
+                  <TableView fx:id="table" prefHeight="190.0" prefWidth="1024.0" BorderPane.alignment="CENTER">
                      <BorderPane.margin>
                         <Insets />
                      </BorderPane.margin>
                   </TableView>
                </center>
                <top>
-                  <VBox prefHeight="106.0" prefWidth="802.0" BorderPane.alignment="CENTER">
+                  <VBox prefHeight="89.0" prefWidth="1024.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Label prefHeight="25.0" prefWidth="176.0" text="Description" />
-                        <HBox prefHeight="30.0" prefWidth="1165.0">
+                        <HBox fillHeight="false" prefHeight="16.0" prefWidth="1024.0">
                            <children>
-                              <JFXTextField fx:id="desc_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="589.0" promptText="Description" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <Label prefWidth="175.0" text="Stock ID">
                                  <font>
-                                    <Font size="14.0" />
+                                    <Font name="System Bold" size="14.0" />
                                  </font>
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
-                              </JFXTextField>
-                           </children>
-                           <VBox.margin>
-                              <Insets bottom="8.0" />
-                           </VBox.margin>
-                        </HBox>
-                        <HBox fillHeight="false" prefHeight="16.0" prefWidth="200.0">
-                           <children>
-                              <Label prefHeight="25.0" prefWidth="175.0" text="Local Code">
                                  <HBox.margin>
                                     <Insets right="32.0" />
                                  </HBox.margin>
                               </Label>
-                              <Label prefHeight="25.0" prefWidth="176.0" text="Cost">
+                              <Label prefWidth="403.0" text="Description">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
                                  <HBox.margin>
                                     <Insets right="32.0" />
                                  </HBox.margin>
                               </Label>
-                              <Label prefHeight="25.0" prefWidth="176.0" text="Quantity" />
+                              <Label prefWidth="175.0" text="Brand">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="32.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <Label prefWidth="175.0" text="Model">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
                            </children>
                         </HBox>
-                        <HBox prefHeight="30.0" prefWidth="1165.0">
+                        <HBox prefHeight="40.0" prefWidth="1024.0">
                            <children>
-                              <JFXTextField fx:id="stock_id_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="175.0" promptText="Stock ID" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="stock_id_tf" editable="false" focusColor="#00ad8e" prefHeight="37.0" prefWidth="175.0" promptText="Stock ID" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                                  <HBox.margin>
-                                    <Insets right="16.0" />
+                                    <Insets right="32.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="cost_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="175.0" promptText="Cost" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="description_tf" editable="false" focusColor="#00ad8e" prefHeight="37.0" prefWidth="403.0" promptText="Description" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                                  <HBox.margin>
-                                    <Insets left="16.0" right="16.0" />
+                                    <Insets right="32.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="qty_tf" editable="false" focusColor="#00ad8e" prefHeight="30.0" prefWidth="175.0" promptText="Quantity" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="brand_tf" editable="false" focusColor="#00ad8e" prefHeight="37.0" prefWidth="175.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                                  <HBox.margin>
-                                    <Insets left="16.0" />
+                                    <Insets right="32.0" />
                                  </HBox.margin>
+                              </JFXTextField>
+                              <JFXTextField fx:id="model_tf" editable="false" focusColor="#00ad8e" prefHeight="37.0" prefWidth="175.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
                               </JFXTextField>
                            </children>
-                           <VBox.margin>
-                              <Insets bottom="16.0" />
-                           </VBox.margin>
                         </HBox>
                      </children>
                   </VBox>

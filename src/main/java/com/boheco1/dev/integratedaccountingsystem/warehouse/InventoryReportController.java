@@ -59,11 +59,16 @@ public class InventoryReportController extends MenuControllerHandler implements 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        //Initializes the stocks table
         this.createTable();
+        //Sets the progressbar
         this.progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
         this.progressBar.setVisible(false);
     }
-
+    /**
+     * Generates the inventory report based on button click and display the result in the table
+     * @return void
+     */
     @FXML
     public void generateReport() {
         Platform.runLater(() -> {
@@ -76,7 +81,10 @@ public class InventoryReportController extends MenuControllerHandler implements 
             }
         });
     }
-
+    /**
+     * Generates the inventory report in excel file format based on button click and saves the file in the choosen location
+     * @return void
+     */
     @FXML
     public void downloadReport() {
         Stage stage = (Stage) anchorPane.getScene().getWindow();
@@ -212,7 +220,10 @@ public class InventoryReportController extends MenuControllerHandler implements 
 
         }
     }
-
+    /**
+     * Display the items in the table
+     * @return void
+     */
     public void createTable(){
         TableColumn<Stock, String> column1 = new TableColumn<>("Stock ID");
         column1.setMinWidth(125);
@@ -256,7 +267,11 @@ public class InventoryReportController extends MenuControllerHandler implements 
 
         this.stocksTable.setPlaceholder(new Label("Click button to generate report!"));
     }
-
+    /**
+     * Sets the pagination on the dropdown box and displays the paged results in the table
+     * @param count the total rows
+     * @return void
+     */
     public void bindPages(int count){
 
         double div = count/LIMIT;
@@ -284,7 +299,11 @@ public class InventoryReportController extends MenuControllerHandler implements 
             });
         });
     }
-
+    /**
+     * Shows or hides the progress when there is a process
+     * @param show affects the visibility of the button/progressbar
+     * @return void
+     */
     public void showProgressBar(boolean show){
         this.downloadReport_btn.setDisable(show);
         this.progressBar.setVisible(show);

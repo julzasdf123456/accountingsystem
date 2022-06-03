@@ -4,32 +4,20 @@ import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.*;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.HPos;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -44,7 +32,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     private DatePicker date;
 
     @FXML
-    private JFXTextField applicant, address, mirsNum, requisitioner, checkedBy, approvedBy,particulars, quantity;
+    private JFXTextField applicant, address, mirsNum, requisitioner, signatory1, signatory2, signatory3, particulars, quantity;
 
     @FXML
     private JFXTextArea purpose;
@@ -57,8 +45,9 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
     private Stock selectedStock = null;
     private EmployeeInfo requisitionerEmployee = null;
-    private EmployeeInfo checkedByEmployee = null;
-    private EmployeeInfo approvedByEmployee = null;
+    private EmployeeInfo signatory1Employee = null;
+    private EmployeeInfo signatory2Employee = null;
+    private EmployeeInfo signatory3Employee = null;
     private ObservableList<MIRSItem> selectedItem;
 
     @Override
@@ -67,8 +56,9 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         mirsNum.setText(Utility.CURRENT_YEAR()+"-");
         bindParticularsAutocomplete(particulars);
         bindEmployeeInfoAutocomplete(requisitioner);
-        bindEmployeeInfoAutocomplete(checkedBy);
-        bindEmployeeInfoAutocomplete(approvedBy);
+        bindEmployeeInfoAutocomplete(signatory1);
+        bindEmployeeInfoAutocomplete(signatory2);
+        bindEmployeeInfoAutocomplete(signatory3);
         InputValidation.restrictNumbersOnly(quantity);
         initializeItemTable();
         mirsNum.requestFocus();
@@ -89,7 +79,6 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         mirsNum.setText(Utility.CURRENT_YEAR()+"-");
     }
 
-
     @FXML
     private void requestBtn(ActionEvent event) {
         if(applicant.getText().isEmpty() ||
@@ -97,8 +86,9 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 purpose.getText().isEmpty() ||
                 mirsNum.getText().isEmpty() ||
                 requisitionerEmployee == null ||
-                checkedByEmployee == null ||
-                approvedByEmployee == null ||
+                signatory1Employee == null ||
+                signatory2Employee == null ||
+                signatory3Employee == null ||
                 selectedItem.isEmpty()){
             AlertDialogBuilder.messgeDialog("Input validation", "Please provide all required information, and try again.",
                     Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
@@ -125,7 +115,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                     MirsDAO.addMIRSItems(mirs, mirsItemList); //add the items request from the MIRS filled
 
 
-                    EmployeeInfo[] signatories = {checkedByEmployee, approvedByEmployee};
+                    EmployeeInfo[] signatories = {signatory1Employee, signatory2Employee, signatory3Employee};
                     for(EmployeeInfo s : signatories){
                         MIRSSignatory mirsSignatory = new MIRSSignatory();
                         mirsSignatory.setMirsID(mirs.getId());
@@ -349,10 +339,10 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                     if (list.size() == 0) {
                         if(textField == this.requisitioner)
                             requisitionerEmployee = null;
-                        else if(textField == this.checkedBy)
-                            checkedByEmployee = null;
-                        else if(textField == this.approvedBy)
-                            approvedByEmployee = null;
+                        else if(textField == this.signatory1)
+                            signatory1Employee = null;
+                        else if(textField == this.signatory2)
+                            signatory2Employee = null;
                     }
 
                     return list;
@@ -374,12 +364,15 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             if(textField == this.requisitioner) {
                 requisitionerEmployee = event.getCompletion();
                 requisitioner.setText(requisitionerEmployee.getFullName());
-            }else if(textField == this.checkedBy) {
-                checkedByEmployee= event.getCompletion();
-                checkedBy.setText(checkedByEmployee.getFullName());
-            }else if(textField == this.approvedBy){
-                approvedByEmployee = event.getCompletion();
-                approvedBy.setText(approvedByEmployee.getFullName());
+            }else if(textField == this.signatory1) {
+                signatory1Employee = event.getCompletion();
+                signatory1.setText(signatory1Employee.getFullName());
+            }else if(textField == this.signatory2){
+                signatory2Employee = event.getCompletion();
+                signatory2.setText(signatory2Employee.getFullName());
+            }else if(textField == this.signatory3){
+                signatory3Employee = event.getCompletion();
+                signatory3.setText(signatory3Employee.getFullName());
             }
         });
     }

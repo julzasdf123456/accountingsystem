@@ -18,6 +18,8 @@ public class MrItem {
 
     private String Status;
 
+    private String updatedBy;
+
     public MrItem() { }
 
     public MrItem(String id, String mrNo, String stockID, int qty, String remarks) {
@@ -109,5 +111,13 @@ public class MrItem {
 
     public void setStatus(String status) {
         Status = status;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
     }
 }
