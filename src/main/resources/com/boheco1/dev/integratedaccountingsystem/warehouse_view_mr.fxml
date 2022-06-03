@@ -198,7 +198,7 @@
                                     <Insets right="32.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXButton fx:id="printBtn" buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#printMR" prefHeight="30.0" prefWidth="100.0" styleClass="btn-theme" stylesheets="@style.css" text="Print" textFill="WHITE">
+                              <JFXButton fx:id="printBtn" buttonType="RAISED" maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="100.0" styleClass="btn-theme" stylesheets="@style.css" text="Print" textFill="WHITE">
                                  <graphic>
                                     <FontIcon iconColor="WHITE" iconLiteral="mdi2c-content-save" iconSize="18" />
                                  </graphic>

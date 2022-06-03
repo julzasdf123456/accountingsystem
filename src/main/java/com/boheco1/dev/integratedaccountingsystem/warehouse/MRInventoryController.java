@@ -7,7 +7,6 @@ import com.itextpdf.text.Element;
 import com.jfoenix.controls.*;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -45,14 +44,12 @@ public class MRInventoryController extends MenuControllerHandler implements Init
     @FXML
     private JFXTextField query_tf;
 
-    @FXML
-    private JFXComboBox<String> mr_type;
 
-    private ObservableList<MR> mrItems = null;
+    private ObservableList<MrItem> mrItems = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.bindPages();
+        //Initializes the MRed Items
         this.initializeMRs();
     }
 
@@ -61,13 +58,16 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         flowPane.getChildren().removeAll();
         flowPane.getChildren().setAll(new ArrayList<>());
     }
-
+    /**
+     * Search for stocks based on search string and displays the results in the table
+     * @return void
+     */
     @FXML
     public void searchMR(){
         String key = this.query_tf.getText();
         Platform.runLater(() -> {
             try {
-                List<MR> current_mrs = MrDAO.searchMRs(key, Utility.MR_ACTIVE);
+                List<MrItem> current_mrs = MrDAO.searchMRItems(key, Utility.MR_ACTIVE);
                 this.mrItems = FXCollections.observableList(current_mrs);
                 if (this.table.getItems() != null){
                     this.table.getItems().removeAll();
@@ -78,7 +78,10 @@ public class MRInventoryController extends MenuControllerHandler implements Init
             }
         });
     }
-
+    /**
+     * Generate and saves the current list of items in active MRs in pdf format
+     * @return void
+     */
     @FXML
     public void printReport(){
         Stage stage = (Stage) Utility.getContentPane().getScene().getWindow();
@@ -89,75 +92,60 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         fileChooser.setInitialFileName("MR_Inventory_Report_"+ LocalDate.now()+".pdf");
         File selectedFile = fileChooser.showSaveDialog(stage);
         if (selectedFile != null) {
-            Platform.runLater(() -> {
-                try {
-                    PrintPDF mr_pdf = new PrintPDF(selectedFile);
-
-                    //Create Header
-                    mr_pdf.header(LocalDate.now(), "MR Inventory Report".toUpperCase());
-
-
-                    //Create Table Header
-                    String[] headers = {"Item", "Qty", "Unit Price", "Date of MR", "Employee"};
-                    int[] header_spans = {2, 1, 1, 1, 1};
-                    mr_pdf.tableHeader(headers, header_spans);
-
-                    //Create Table Content
-                    List<MR> mrs = MrDAO.getMRs(Utility.MR_ACTIVE);
-                    ArrayList<String[]> rows = new ArrayList<>();
-                    for (MR mr : mrs) {
-                        //String[] data = {mr.getExtItem(), mr.getQuantity() + "", mr.getPrice() + "", mr.getDateOfMR().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")), mr.getEmployeeFirstName() + " " + mr.getEmployeeLastName()};
-                        //rows.add(data);
-                    }
-                    int[] rows_aligns = {Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_LEFT};
-                    mr_pdf.tableContent(rows, header_spans, rows_aligns);
-
-                    //Create Footer
-                    int[] footer_spans = {2, 4};
-                    EmployeeInfo user = ActiveUser.getUser().getEmployeeInfo();
-                    String[] prepared = {"Prepared by", ""};
-                    String[] designations = {user.getDesignation(), ""};
-                    String[] names = {user.getEmployeeFirstName() + " " + user.getEmployeeLastName(), ""};
-                    mr_pdf.footer(prepared, designations, names, footer_spans, true);
-                    mr_pdf.generate();
-                }catch(Exception e){
-                    e.printStackTrace();
-                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while generating the pdf due to: " + e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
-                }
-            });
+            printActiveMRItems(selectedFile, Utility.getStackPane());
         }
     }
-
+    /**
+     * Creates the MR item table
+     * @return void
+     */
     public void createTable() {
 
-        TableColumn<MR, String> column0 = new TableColumn<>("Stock ID");
+        TableColumn<MrItem, String> column0 = new TableColumn<>("Stock ID");
         column0.setMinWidth(125);
-        column0.setCellValueFactory(new PropertyValueFactory<>("stockId"));
+        column0.setCellValueFactory(new PropertyValueFactory<>("stockID"));
         column0.setStyle("-fx-alignment: center-left;");
 
-        TableColumn<MR, String> column1 = new TableColumn<>("Item Name");
+        TableColumn<MrItem, String> column1 = new TableColumn<>("Description");
         column1.setMinWidth(400);
-        column1.setCellValueFactory(new PropertyValueFactory<>("extItem"));
+        column1.setCellValueFactory(item -> {
+            try {
+                return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getDescription());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         column1.setStyle("-fx-alignment: center-left;");
 
-        TableColumn<MR, String> column2 = new TableColumn<>("Qty");
+        TableColumn<MrItem, String> column2 = new TableColumn<>("Quantity");
         column2.setMinWidth(75);
-        column2.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        column2.setCellValueFactory(new PropertyValueFactory<>("qty"));
         column2.setStyle("-fx-alignment: center;");
 
-        TableColumn<MR, String> column3 = new TableColumn<>("Unit Price");
+        TableColumn<MrItem, Double> column3 = new TableColumn<>("Unit Price");
         column3.setMinWidth(100);
-        column3.setCellValueFactory(new PropertyValueFactory<>("price"));
+        column3.setCellValueFactory(item -> {
+            try {
+
+                return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getPrice());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         column3.setStyle("-fx-alignment: center-left;");
 
-        TableColumn<MR, String> column4 = new TableColumn<>("Date of MR");
+        TableColumn<MrItem, String> column4 = new TableColumn<>("Date of MR");
         column4.setMinWidth(120);
-        column4.setCellValueFactory(new PropertyValueFactory<>("dateOfMR"));
-        column4.setCellValueFactory(stockStringCellDataFeatures -> new SimpleStringProperty(stockStringCellDataFeatures.getValue().getDateOfMR().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))));
-
+        column4.setCellValueFactory(item -> {
+            try {
+                return new ReadOnlyObjectWrapper<>(MrDAO.get(item.getValue().getMrNo()).getDateOfMR().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         column4.setStyle("-fx-alignment: center;");
 
-        TableColumn<MR, MR> column5 = new TableColumn<>("Action");
+        TableColumn<MrItem, MrItem> column5 = new TableColumn<>("Action");
         column5.setMinWidth(50);
         column5.setCellValueFactory(mr -> new ReadOnlyObjectWrapper<>(mr.getValue()));
         column5.setCellFactory(mrtable -> new TableCell<>(){
@@ -165,16 +153,17 @@ public class MRInventoryController extends MenuControllerHandler implements Init
             private final JFXButton viewButton = new JFXButton("", icon);
 
             @Override
-            public void updateItem(MR item, boolean empty) {
+            public void updateItem(MrItem item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item != null) {
                     viewButton.setStyle("-fx-background-color: #2196f3;");
                     icon.setIconSize(13);
                     icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
                     viewButton.setOnAction(actionEvent -> {
-                        Utility.setSelectedMR(item);
+                        //MR mr = MrDAO.get(item.getMrNo());
+                        //Utility.setSelectedMR(mr);
 
-                        ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_view_mr_item_history.fxml", Utility.getStackPane(), "../warehouse_mr_inventory.fxml");
+                        //ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_view_mr_item_history.fxml", Utility.getStackPane(), "../warehouse_mr_inventory.fxml");
                     });
                     setGraphic(viewButton);
                 } else {
@@ -185,19 +174,33 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         });
         column5.setStyle("-fx-alignment: center;");
 
-        TableColumn<MR, String> column7 = new TableColumn<>("Status");
+        TableColumn<MR, String> column7 = new TableColumn<>("Remarks");
         column7.setMinWidth(90);
-        column7.setCellValueFactory(new PropertyValueFactory<>("status"));
+        column7.setCellValueFactory(new PropertyValueFactory<>("remarks"));
         column7.setStyle("-fx-alignment: center;");
 
-        TableColumn<MR, String> column8 = new TableColumn<>("FirstName");
+        TableColumn<MrItem, String> column8 = new TableColumn<>("FirstName");
         column8.setMinWidth(150);
-        column8.setCellValueFactory(new PropertyValueFactory<>("employeeFirstName"));
+        column8.setCellValueFactory(item -> {
+            try {
+                MR mr = MrDAO.get(item.getValue().getMrNo());
+                return new ReadOnlyObjectWrapper<>(mr.getEmployeeInfo().getEmployeeFirstName());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         column8.setStyle("-fx-alignment: center-left;");
 
-        TableColumn<MR, String> column9 = new TableColumn<>("LastName");
+        TableColumn<MrItem, String> column9 = new TableColumn<>("LastName");
         column9.setMinWidth(150);
-        column9.setCellValueFactory(new PropertyValueFactory<>("employeeLastName"));
+        column9.setCellValueFactory(item -> {
+            try {
+                MR mr = MrDAO.get(item.getValue().getMrNo());
+                return new ReadOnlyObjectWrapper<>(mr.getEmployeeInfo().getEmployeeLastName());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         column9.setStyle("-fx-alignment: center-left;");
 
         this.mrItems =  FXCollections.observableArrayList();
@@ -213,12 +216,15 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         this.table.getColumns().add(column9);
         this.table.getColumns().add(column5);
     }
-
+    /**
+     * Initializes the MR items and displays them in the table
+     * @return void
+     */
     public void initializeMRs(){
         Platform.runLater(() -> {
             try {
                 this.createTable();
-                List<MR> current_mrs = MrDAO.getMRs(Utility.MR_ACTIVE);
+                List<MrItem> current_mrs = MrDAO.searchMRItems("", Utility.MR_ACTIVE);
                 this.mrItems = FXCollections.observableList(current_mrs);
                 this.num_mrs_lbl.setText(current_mrs.size()+" rows");
                 if (this.table.getItems() != null){
@@ -230,28 +236,53 @@ public class MRInventoryController extends MenuControllerHandler implements Init
             }
         });
     }
-
-    public void bindPages(){
+    /**
+     * Generates a pdf containing all active MR items
+     * @param selectedFile the pointer to the pdf file using the FileChooser
+     * @param stackPane the stackpane for the dialogs to display
+     * @return void
+     */
+    public static void printActiveMRItems(File selectedFile, StackPane stackPane){
         Platform.runLater(() -> {
-            this.mr_type.getItems().clear();
-            this.mr_type.getItems().add(Utility.MR_ACTIVE);
-            this.mr_type.getItems().add(Utility.MR_RETURNED);
-            this.mr_type.getSelectionModel().select(0);
-            this.mr_type.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
-                Platform.runLater(() -> {
-                    try {
-                        if (!mr_type.getSelectionModel().isEmpty()) {
-                            String type = mr_type.getSelectionModel().getSelectedItem();
-                            List<MR> current_mrs = MrDAO.getMRs(type);
-                            this.mrItems = FXCollections.observableList(current_mrs);
-                            this.num_mrs_lbl.setText(current_mrs.size()+" rows");
-                            this.table.getItems().setAll(this.mrItems);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
-            });
+            try {
+                float[] columns = {.75f, 2f, .5f, .5f, .75f, .75f, .75f, 1.25f};
+                PrintPDF mr_pdf = new PrintPDF(selectedFile, columns);
+
+                //Create Header
+                mr_pdf.header(LocalDate.now(), "MR Inventory Report".toUpperCase());
+
+                //Create Table Header
+                String[] headers = {"RR No.", "Item", "Qty", "Unit", "Unit Price", "MR No.", "Date of MR", "Assigned To"};
+                int[] header_spans = {1, 1, 1, 1, 1, 1, 1, 1};
+                mr_pdf.tableHeader(headers, header_spans);
+
+                //Create Table Content
+                List<MrItem> items = MrDAO.getMRItems();
+                ArrayList<String[]> rows = new ArrayList<>();
+                for (MrItem item : items) {
+                    Stock stock = item.getStock();
+                    MR mr = MrDAO.get(item.getMrNo());
+                    EmployeeInfo employeeInfo = mr.getEmployeeInfo();
+                    String[] data = {item.getRrNo(), stock.getDescription(), item.getQty() + "", stock.getUnit(),
+                            stock.getPrice() + "", item.getMrNo(), mr.getDateOfMR().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")), employeeInfo.getEmployeeFirstName() + " " + employeeInfo.getEmployeeLastName()};
+                    rows.add(data);
+                }
+                int[] rows_aligns = {Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_LEFT,
+                        Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_CENTER, Element.ALIGN_LEFT};
+                mr_pdf.tableContent(rows, header_spans, rows_aligns);
+
+                //Create Footer
+                int[] footer_spans = {4, 4};
+                EmployeeInfo user = ActiveUser.getUser().getEmployeeInfo();
+                String[] prepared = {"Prepared by", ""};
+                String[] designations = {user.getDesignation(), ""};
+                String[] names = {user.getEmployeeFirstName() + " " + user.getEmployeeLastName(), ""};
+                mr_pdf.footer(prepared, designations, names, footer_spans, true);
+                mr_pdf.generate();
+            }catch(Exception e){
+                e.printStackTrace();
+                AlertDialogBuilder.messgeDialog("System Error", "An error occurred while generating the pdf due to: " + e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+            }
         });
     }
 }

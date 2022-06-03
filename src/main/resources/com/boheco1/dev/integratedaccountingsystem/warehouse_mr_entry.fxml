@@ -174,17 +174,6 @@
                                     <Insets left="16.0" />
                                  </HBox.margin>
                               </JFXButton>
-                              <JFXButton buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#print" prefHeight="30.0" prefWidth="246.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Print" textFill="WHITE">
-                                 <effect>
-                                    <DropShadow />
-                                 </effect>
-                                 <font>
-                                    <Font name="System Bold" size="16.0" />
-                                 </font>
-                                 <HBox.margin>
-                                    <Insets left="32.0" />
-                                 </HBox.margin>
-                              </JFXButton>
                            </children>
                         </HBox>
                      </children>
