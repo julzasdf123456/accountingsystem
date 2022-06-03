@@ -6,6 +6,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -462,6 +463,20 @@ public class MrDAO {
                 "DELETE FROM MRItem WHERE id=?");
         ps.setString(1, mrItem.getId());
 
+        ps.executeUpdate();
+
+        ps.close();
+    }
+
+    public static void returnMRItem(MrItem item, String remarks) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE MRItem SET updatedBy=?, Remarks=?, Status=?, dateOfReturned=? " +
+                        "WHERE id=?");
+        ps.setString(1, ActiveUser.getUser().getId());
+        ps.setString(2, remarks);
+        ps.setString(3, Utility.MR_RETURNED);
+        ps.setString(4, LocalDate.now().toString());
+        ps.setString(5, item.getId());
         ps.executeUpdate();
 
         ps.close();

@@ -18,7 +18,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
@@ -151,7 +150,7 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
             if (item.getValue().getDateReturned() == null){
                 return new ReadOnlyObjectWrapper<>(item.getValue().getRemarks());
             }else{
-                String status = item.getValue().getStatus()+" on "+item.getValue().getDateReturned();
+                String status = item.getValue().getRemarks()+" ("+item.getValue().getStatus()+" on "+item.getValue().getDateReturned()+")";
                 return new ReadOnlyObjectWrapper<>(status);
             }
         });
@@ -171,9 +170,8 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
                     icon.setIconSize(13);
                     icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
                     returnBtn.setOnAction(actionEvent -> {
-                        //Utility.setSelectedMR(item);
-
-                        //ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_mr_return.fxml", Utility.getStackPane());
+                        Utility.setSelectedObject(item);
+                        ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_mr_return.fxml", Utility.getStackPane());
                     });
                     setGraphic(returnBtn);
                 } else {
@@ -321,7 +319,7 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
                 for (MrItem item : items) {
                     String remarks = item.getRemarks();
                     if (item.getStatus().equals(Utility.MR_RETURNED)) {
-                        remarks = Utility.MR_RETURNED+ " on " + item.getDateReturned();
+                        remarks = item.getRemarks()+" ("+item.getStatus()+" on "+item.getDateReturned()+")";
                     }
                     String[] data = {item.getQty()+"", item.getStock().getUnit(), item.getStock().getDescription(), item.getStockID(),
                             item.getRrNo(), item.getStock().getPrice()+"", item.getQty()*item.getStock().getPrice()+"", remarks};

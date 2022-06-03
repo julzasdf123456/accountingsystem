@@ -48,19 +48,20 @@ public class MRReturnController extends MenuControllerHandler implements Initial
     public void returnMRItem()  {
         String remarks = this.remarks_tf.getText();
         status_lbl.setTextFill(Paint.valueOf(ColorPalette.DANGER));
+        status_lbl.setStyle("-fx-font-weight: bold;");
         status_lbl.setTextAlignment(TextAlignment.CENTER);
-        String id = this.stock_id_tf.getText();
         if (remarks.length() == 0 || remarks == null) {
-            status_lbl.setText("Please enter a valid remarks!");
+            status_lbl.setText("Please enter a valid MR remarks!");
         } else {
             status_lbl.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR_DARK));
             try {
-                //.returnMR(currentMR, status);
+                MrDAO.returnMRItem(currentMRItem, remarks);
                 status_lbl.setText("MR item was successfully returned!");
                 this.returnBtn.setDisable(true);
                 ViewMRController mrs = Utility.getMrController();
                 MR mr = MrDAO.get(this.currentMRItem.getMrNo());
                 mrs.populateTable(mr);
+                this.returnBtn.setDisable(true);
             } catch (Exception e) {
                 status_lbl.setTextFill(Paint.valueOf(ColorPalette.DANGER));
                 status_lbl.setText("Process failed due to: "+e.getMessage());
