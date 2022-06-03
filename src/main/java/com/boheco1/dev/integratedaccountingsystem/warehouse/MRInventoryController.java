@@ -101,13 +101,18 @@ public class MRInventoryController extends MenuControllerHandler implements Init
      */
     public void createTable() {
 
-        TableColumn<MrItem, String> column0 = new TableColumn<>("Stock ID");
-        column0.setMinWidth(125);
-        column0.setCellValueFactory(new PropertyValueFactory<>("stockID"));
-        column0.setStyle("-fx-alignment: center-left;");
+        TableColumn<MrItem, String> column = new TableColumn<>("Stock ID");
+        column.setMinWidth(100);
+        column.setCellValueFactory(new PropertyValueFactory<>("stockID"));
+        column.setStyle("-fx-alignment: center;");
+
+        TableColumn<MrItem, String> column0 = new TableColumn<>("RR No");
+        column0.setMinWidth(100);
+        column0.setCellValueFactory(new PropertyValueFactory<>("rrNo"));
+        column0.setStyle("-fx-alignment: center;");
 
         TableColumn<MrItem, String> column1 = new TableColumn<>("Description");
-        column1.setMinWidth(400);
+        column1.setMinWidth(350);
         column1.setCellValueFactory(item -> {
             try {
                 return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getDescription());
@@ -123,7 +128,7 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         column2.setStyle("-fx-alignment: center;");
 
         TableColumn<MrItem, Double> column3 = new TableColumn<>("Unit Price");
-        column3.setMinWidth(100);
+        column3.setMinWidth(75);
         column3.setCellValueFactory(item -> {
             try {
 
@@ -133,6 +138,21 @@ public class MRInventoryController extends MenuControllerHandler implements Init
             }
         });
         column3.setStyle("-fx-alignment: center-left;");
+
+        TableColumn<MrItem, Double> column3a = new TableColumn<>("Total");
+        column3a.setMinWidth(95);
+        column3a.setCellValueFactory(item -> {
+            try {
+                return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getPrice()*item.getValue().getQty());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        column3a.setStyle("-fx-alignment: center-left;");
+        TableColumn<MrItem, String> column3b = new TableColumn<>("MR No.");
+        column3b.setMinWidth(75);
+        column3b.setCellValueFactory(new PropertyValueFactory<>("mrNo"));
+        column3b.setStyle("-fx-alignment: center;");
 
         TableColumn<MrItem, String> column4 = new TableColumn<>("Date of MR");
         column4.setMinWidth(120);
@@ -160,10 +180,8 @@ public class MRInventoryController extends MenuControllerHandler implements Init
                     icon.setIconSize(13);
                     icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
                     viewButton.setOnAction(actionEvent -> {
-                        //MR mr = MrDAO.get(item.getMrNo());
-                        //Utility.setSelectedMR(mr);
-
-                        //ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_view_mr_item_history.fxml", Utility.getStackPane(), "../warehouse_mr_inventory.fxml");
+                        Utility.setSelectedObject(item);
+                        ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_view_mr_item_history.fxml", Utility.getStackPane(), "../warehouse_mr_inventory.fxml");
                     });
                     setGraphic(viewButton);
                 } else {
@@ -175,12 +193,12 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         column5.setStyle("-fx-alignment: center;");
 
         TableColumn<MR, String> column7 = new TableColumn<>("Remarks");
-        column7.setMinWidth(90);
+        column7.setMinWidth(125);
         column7.setCellValueFactory(new PropertyValueFactory<>("remarks"));
         column7.setStyle("-fx-alignment: center;");
 
         TableColumn<MrItem, String> column8 = new TableColumn<>("FirstName");
-        column8.setMinWidth(150);
+        column8.setMinWidth(125);
         column8.setCellValueFactory(item -> {
             try {
                 MR mr = MrDAO.get(item.getValue().getMrNo());
@@ -192,7 +210,7 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         column8.setStyle("-fx-alignment: center-left;");
 
         TableColumn<MrItem, String> column9 = new TableColumn<>("LastName");
-        column9.setMinWidth(150);
+        column9.setMinWidth(125);
         column9.setCellValueFactory(item -> {
             try {
                 MR mr = MrDAO.get(item.getValue().getMrNo());
@@ -206,10 +224,13 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         this.mrItems =  FXCollections.observableArrayList();
         this.table.setPlaceholder(new Label("No item added"));
 
+        this.table.getColumns().add(column);
         this.table.getColumns().add(column0);
         this.table.getColumns().add(column1);
         this.table.getColumns().add(column2);
         this.table.getColumns().add(column3);
+        this.table.getColumns().add(column3a);
+        this.table.getColumns().add(column3b);
         this.table.getColumns().add(column4);
         this.table.getColumns().add(column7);
         this.table.getColumns().add(column8);
@@ -245,15 +266,15 @@ public class MRInventoryController extends MenuControllerHandler implements Init
     public static void printActiveMRItems(File selectedFile, StackPane stackPane){
         Platform.runLater(() -> {
             try {
-                float[] columns = {.75f, 2f, .5f, .5f, .75f, .75f, .75f, 1.25f};
+                float[] columns = {.75f, .75f, 2f, .75f, .75f, .75f, .75f, .75f, 1f};
                 PrintPDF mr_pdf = new PrintPDF(selectedFile, columns);
 
                 //Create Header
                 mr_pdf.header(LocalDate.now(), "MR Inventory Report".toUpperCase());
 
                 //Create Table Header
-                String[] headers = {"RR No.", "Item", "Qty", "Unit", "Unit Price", "MR No.", "Date of MR", "Assigned To"};
-                int[] header_spans = {1, 1, 1, 1, 1, 1, 1, 1};
+                String[] headers = {"Stock ID.", "RR No.", "Item", "Qty", "Unit Price", "Total", "MR No.", "Date of MR", "Assigned To"};
+                int[] header_spans = {1, 1, 1, 1, 1, 1, 1, 1, 1};
                 mr_pdf.tableHeader(headers, header_spans);
 
                 //Create Table Content
@@ -263,16 +284,15 @@ public class MRInventoryController extends MenuControllerHandler implements Init
                     Stock stock = item.getStock();
                     MR mr = MrDAO.get(item.getMrNo());
                     EmployeeInfo employeeInfo = mr.getEmployeeInfo();
-                    String[] data = {item.getRrNo(), stock.getDescription(), item.getQty() + "", stock.getUnit(),
-                            stock.getPrice() + "", item.getMrNo(), mr.getDateOfMR().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")), employeeInfo.getEmployeeFirstName() + " " + employeeInfo.getEmployeeLastName()};
+                    String[] data = {item.getStockID(), item.getRrNo(), stock.getDescription(), item.getQty() + " "+stock.getUnit(), stock.getPrice() + "", item.getQty()*stock.getPrice()+"", item.getMrNo(), mr.getDateOfMR().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")), employeeInfo.getEmployeeFirstName() + " " + employeeInfo.getEmployeeLastName()};
                     rows.add(data);
                 }
-                int[] rows_aligns = {Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_LEFT,
+                int[] rows_aligns = {Element.ALIGN_CENTER, Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_LEFT,
                         Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_CENTER, Element.ALIGN_LEFT};
                 mr_pdf.tableContent(rows, header_spans, rows_aligns);
 
                 //Create Footer
-                int[] footer_spans = {4, 4};
+                int[] footer_spans = {5, 4};
                 EmployeeInfo user = ActiveUser.getUser().getEmployeeInfo();
                 String[] prepared = {"Prepared by", ""};
                 String[] designations = {user.getDesignation(), ""};
