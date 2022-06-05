@@ -21,7 +21,7 @@
                <children>
                   <VBox alignment="TOP_CENTER" prefHeight="680.0" prefWidth="428.0" HBox.hgrow="NEVER">
                      <children>
-                        <JFXTextField fx:id="searchMirs" alignment="CENTER" onAction="#searchMirs" promptText="Search MIRS" style="-fx-background-color: #f5f5f5;">
+                        <JFXTextField fx:id="searchMirs" alignment="CENTER" promptText="Search MIRS" style="-fx-background-color: #f5f5f5;">
                            <VBox.margin>
                               <Insets bottom="30.0" left="16.0" right="16.0" />
                            </VBox.margin>
@@ -137,26 +137,6 @@
                               <Insets bottom="5.0" />
                            </VBox.margin>
                         </HBox>
-                        <HBox>
-                           <children>
-                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="115.0" text="Address:">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                              </Label>
-                              <Label fx:id="address" maxWidth="1.7976931348623157E308" style="-fx-background-color: #e7e7e7; -fx-font-weight: bold;" text="-" wrapText="true" HBox.hgrow="ALWAYS">
-                                 <font>
-                                    <Font name="System Bold" size="14.0" />
-                                 </font>
-                                 <padding>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-                                 </padding>
-                              </Label>
-                           </children>
-                           <VBox.margin>
-                              <Insets bottom="5.0" />
-                           </VBox.margin>
-                        </HBox>
                         <HBox layoutX="10.0" layoutY="37.0">
                            <children>
                               <Label maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="115.0" text="Prepared by:">
@@ -190,23 +170,6 @@
                               <Insets bottom="5.0" />
                            </VBox.margin>
                         </HBox>
-                        <HBox>
-                           <children>
-                              <Label contentDisplay="RIGHT" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="115.0" text="Description:">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                              </Label>
-                              <Label fx:id="purpose" maxWidth="1.7976931348623157E308" style="-fx-background-color: #e7e7e7; -fx-font-weight: bold;" text="-" textAlignment="JUSTIFY" wrapText="true" HBox.hgrow="ALWAYS">
-                                 <padding>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
-                                 </padding>
-                              </Label>
-                           </children>
-                           <VBox.margin>
-                              <Insets bottom="5.0" />
-                           </VBox.margin>
-                        </HBox>
                      </children>
                      <HBox.margin>
                         <Insets right="16.0" />
@@ -224,17 +187,12 @@
                               </VBox>
                               <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                                  <children>
-                                    <JFXButton fx:id="addAllQtyBtn" buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#addAllQty" styleClass="btn-info" text="All" VBox.vgrow="ALWAYS">
+                                    <JFXButton fx:id="addItemBtn" buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#addItemToListView" styleClass="btn-info" text="Add" VBox.vgrow="ALWAYS">
                                        <VBox.margin>
                                           <Insets bottom="5.0" top="5.0" />
                                        </VBox.margin>
                                     </JFXButton>
-                                    <JFXButton fx:id="addPartialQtyBtn" buttonType="RAISED" layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308" onAction="#addPartialQty" styleClass="btn-warning" text="Partial" textFill="WHITE" VBox.vgrow="ALWAYS">
-                                       <VBox.margin>
-                                          <Insets bottom="5.0" top="5.0" />
-                                       </VBox.margin>
-                                    </JFXButton>
-                                    <JFXButton fx:id="removeItemBtn" buttonType="RAISED" layoutX="10.0" layoutY="47.0" maxWidth="1.7976931348623157E308" onAction="#removeItem" styleClass="btn-danger" text="Remove" textFill="WHITE" VBox.vgrow="ALWAYS">
+                                    <JFXButton fx:id="removeItemBtn" buttonType="RAISED" layoutX="10.0" layoutY="47.0" maxWidth="1.7976931348623157E308" onAction="#removeItemFromListView" styleClass="btn-danger" text="Remove" textFill="WHITE" VBox.vgrow="ALWAYS">
                                        <VBox.margin>
                                           <Insets bottom="5.0" top="5.0" />
                                        </VBox.margin>
