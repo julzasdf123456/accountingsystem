@@ -93,15 +93,18 @@ public class AddMRItemController extends MenuControllerHandler implements Initia
                     receivingItem.setStockId(cstock.getId());
                     receivingItem.setUnitCost(cstock.getPrice());
                     receivingItem.setQtyAccepted(cstock.getQuantity());
-
+                    item.setPrice(cstock.getPrice());
                     item.setRrNo(cstock.getRRNo());
                     item.setQty(qty_to_add);
                     item.setStockID(cstock.getId());
                     item.getStock().setReceivingItem(receivingItem);
+                    item.setItemName(cstock.getStockName());
+                    item.setDescription(cstock.getDescription());
                     item.setRemarks(remarks);
                     this.parentController.receive(item);
                     this.reset();
                 } catch (Exception e) {
+                    e.printStackTrace();
                     AlertDialogBuilder.messgeDialog("System Error", "A system error occurred due to: " + e.getMessage(),
                             stackPane, AlertDialogBuilder.DANGER_DIALOG);
                 }

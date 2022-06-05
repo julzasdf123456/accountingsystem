@@ -78,7 +78,13 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
         column1.setMinWidth(75);
         column1.setCellValueFactory(item -> {
             try {
-                return new ReadOnlyObjectWrapper<>(item.getValue().getQty()+" "+item.getValue().getStock().getUnit());
+                String output = item.getValue().getQty()+"";
+                if (item.getValue().getStockID() == null){
+                    output += " piece";
+                }else{
+                    item.getValue().getStock().getUnit();
+                }
+                return new ReadOnlyObjectWrapper<>(output);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -89,7 +95,11 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
         column3.setMinWidth(343);
         column3.setCellValueFactory(item -> {
             try {
-                return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getDescription());
+                if (item.getValue().getStockID() == null) {
+                    return new ReadOnlyObjectWrapper<>(item.getValue().getDescription());
+                }else{
+                    return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getDescription());
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -112,11 +122,15 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
                 item -> {
                     try {
                         double cost = 0;
-                        ReceivingItem rc = item.getValue().getStock().getReceivingItem();
-                        if (rc == null){
-                            cost = item.getValue().getStock().getPrice();
+                        if (item.getValue().getStockID() == null) {
+                            cost = item.getValue().getPrice();
                         }else{
-                            cost = rc.getUnitCost();
+                            ReceivingItem rc = item.getValue().getStock().getReceivingItem();
+                            if (rc == null) {
+                                cost = item.getValue().getStock().getPrice();
+                            } else {
+                                cost = rc.getUnitCost();
+                            }
                         }
                         return new ReadOnlyObjectWrapper<>(cost);
                     } catch (Exception e) {
@@ -131,11 +145,15 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
         column7.setCellValueFactory(item -> {
             try {
                 double cost = 0;
-                ReceivingItem rc = item.getValue().getStock().getReceivingItem();
-                if (rc == null){
-                    cost = item.getValue().getStock().getPrice();
-                }else{
-                    cost = rc.getUnitCost();
+                if (item.getValue().getStockID() == null) {
+                    cost = item.getValue().getPrice();
+                }else {
+                    ReceivingItem rc = item.getValue().getStock().getReceivingItem();
+                    if (rc == null) {
+                        cost = item.getValue().getStock().getPrice();
+                    } else {
+                        cost = rc.getUnitCost();
+                    }
                 }
                 return new ReadOnlyObjectWrapper<>(cost*item.getValue().getQty());
             } catch (Exception e) {
@@ -321,8 +339,21 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
                     if (item.getStatus().equals(Utility.MR_RETURNED)) {
                         remarks = item.getRemarks()+" ("+item.getStatus()+" on "+item.getDateReturned()+")";
                     }
-                    String[] data = {item.getQty()+"", item.getStock().getUnit(), item.getStock().getDescription(), item.getStockID(),
-                            item.getRrNo(), item.getStock().getPrice()+"", item.getQty()*item.getStock().getPrice()+"", remarks};
+                    String unit = "piece";
+                    if (item.getStockID() != null)
+                        unit = item.getStock().getUnit();
+
+                    String desc = item.getDescription();
+                    if (item.getStockID() != null)
+                        desc = item.getStock().getDescription();
+
+
+                    double price = item.getPrice();
+                    if (item.getStockID() != null)
+                        price = item.getStock().getPrice();
+
+                    String[] data = {item.getQty()+"", unit, desc, item.getPropertyNo(),
+                            item.getRrNo(), price+"", item.getQty()*price+"", remarks};
                     rows.add(data);
                 }
 

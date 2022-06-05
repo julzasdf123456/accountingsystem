@@ -76,11 +76,17 @@ public class MRReturnController extends MenuControllerHandler implements Initial
     public void setMRItem(MrItem item){
         try {
             Stock stock = item.getStock();
-            if (item.getStockID() != null) this.stock_id_tf.setText(item.getStockID());
-            this.description_tf.setText(stock.getDescription());
+            String desc = item.getDescription();
+            double price = item.getPrice();
+            if (item.getStockID() != null) {
+                this.stock_id_tf.setText(item.getStockID());
+                desc = stock.getDescription();
+                price = stock.getPrice();
+            }
+            this.description_tf.setText(desc);
             this.qty_tf.setText(item.getQty()+"");
-            this.unit_price_tf.setText(stock.getPrice()+"");
-            this.rr_no_tf.setText(item.getMrNo());
+            this.unit_price_tf.setText(price+"");
+            this.rr_no_tf.setText(item.getRrNo());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

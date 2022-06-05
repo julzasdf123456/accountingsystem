@@ -102,7 +102,7 @@
                                     <Font name="System Bold" size="16.0" />
                                  </font>
                               </Label>
-                              <JFXButton fx:id="fromRR" buttonType="RAISED" onAction="#addFromStock" prefHeight="37.0" prefWidth="65.0" styleClass="btn-info" stylesheets="@style.css" text="Add" textFill="WHITE">
+                              <JFXButton fx:id="fromRR" buttonType="RAISED" onAction="#addFromStock" prefHeight="37.0" prefWidth="125.0" styleClass="btn-info" stylesheets="@style.css" text="Warehouse" textFill="WHITE">
                                  <effect>
                                     <DropShadow />
                                  </effect>
@@ -112,6 +112,20 @@
                                  <HBox.margin>
                                     <Insets left="5.0" right="32.0" />
                                  </HBox.margin>
+                                 <graphic>
+                                    <FontIcon iconColor="WHITE" iconLiteral="mdi2f-file-plus" iconSize="18" />
+                                 </graphic>
+                              </JFXButton>
+                              <JFXButton fx:id="fromOthers" buttonType="RAISED" onAction="#addFromOther" prefHeight="37.0" prefWidth="125.0" styleClass="btn-sucess" stylesheets="@style.css" text="Others" textFill="WHITE">
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                                 <graphic>
+                                    <FontIcon iconColor="WHITE" iconLiteral="mdi2f-file-plus" iconSize="18" />
+                                 </graphic>
                               </JFXButton>
                            </children>
                            <VBox.margin>

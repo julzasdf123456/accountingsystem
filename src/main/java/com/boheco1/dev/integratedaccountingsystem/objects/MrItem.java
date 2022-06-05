@@ -15,6 +15,8 @@ public class MrItem {
     private String mrNo;
     private String rrNo;
     private String status;
+    private double price;
+    private String propertyNo;
 
     private LocalDate dateOfReturned;
 
@@ -155,5 +157,21 @@ public class MrItem {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public String getPropertyNo() {
+        return propertyNo;
+    }
+
+    public void setPropertyNo(String property_no) {
+        this.propertyNo = property_no;
     }
 }

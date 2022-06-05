@@ -4,8 +4,8 @@ import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.MR;
 import com.boheco1.dev.integratedaccountingsystem.objects.MrItem;
+import com.boheco1.dev.integratedaccountingsystem.objects.ReceivingItem;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
-import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -14,19 +14,17 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Paint;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class ViewMRItemHistoryController extends MenuControllerHandler implements Initializable {
@@ -86,8 +84,18 @@ public class ViewMRItemHistoryController extends MenuControllerHandler implement
         column3.setMinWidth(100);
         column3.setCellValueFactory(item -> {
             try {
-
-                return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getPrice());
+                double cost = 0;
+                if (item.getValue().getStockID() == null) {
+                    cost = item.getValue().getPrice();
+                }else{
+                    ReceivingItem rc = item.getValue().getStock().getReceivingItem();
+                    if (rc == null) {
+                        cost = item.getValue().getStock().getPrice();
+                    } else {
+                        cost = rc.getUnitCost();
+                    }
+                }
+                return new ReadOnlyObjectWrapper<>(cost);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -97,8 +105,18 @@ public class ViewMRItemHistoryController extends MenuControllerHandler implement
         column3a.setMinWidth(100);
         column3a.setCellValueFactory(item -> {
             try {
-
-                return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getPrice()*item.getValue().getQty());
+                double cost = 0;
+                if (item.getValue().getStockID() == null) {
+                    cost = item.getValue().getPrice();
+                }else {
+                    ReceivingItem rc = item.getValue().getStock().getReceivingItem();
+                    if (rc == null) {
+                        cost = item.getValue().getStock().getPrice();
+                    } else {
+                        cost = rc.getUnitCost();
+                    }
+                }
+                return new ReadOnlyObjectWrapper<>(cost*item.getValue().getQty());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -170,11 +188,15 @@ public class ViewMRItemHistoryController extends MenuControllerHandler implement
      */
     public void setMRs(){
         try {
-            Stock stock = mr_item.getStock();
-            this.description_tf.setText(stock.getDescription());
-            this.stock_id_tf.setText(stock.getId());
-            this.brand_tf.setText(stock.getBrand());
-            this.model_tf.setText(stock.getBrand());
+            if (mr_item.getStockID() != null) {
+                Stock stock = mr_item.getStock();
+                this.stock_id_tf.setText(stock.getId());
+                this.brand_tf.setText(stock.getBrand());
+                this.model_tf.setText(stock.getModel());
+                this.description_tf.setText(stock.getDescription());
+            }else{
+                this.description_tf.setText(mr_item.getDescription());
+            }
             this.initializeTable();
             this.populateTable();
         } catch (Exception e) {
@@ -191,7 +213,14 @@ public class ViewMRItemHistoryController extends MenuControllerHandler implement
         try {
             Platform.runLater(() -> {
                 try {
-                    mrItems = FXCollections.observableList(MrDAO.getMRItems(mr_item.getStockID(), null));
+                    List<MrItem> items = null;
+
+                    if (mr_item.getStockID() == null){
+                        items = MrDAO.getMRItemsOther(mr_item.getDescription());
+                    }else{
+                        items = MrDAO.getMRItems(mr_item.getStockID(), null);
+                    }
+                    mrItems = FXCollections.observableList(items);
                     this.table.getItems().setAll(mrItems);
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -98,8 +98,8 @@ public class MREntryController extends MenuControllerHandler implements Initiali
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please set the approved by!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else{
-            MR mr = new MR(mr_no, employee.getId(), ActiveUser.getUser().getEmployeeID(), LocalDate.now(), Utility.MR_FILED, this.recommending.getId(), this.approved.getId());
-            mr.setPurpose(this.purpose_tf.getText());
+            String purpose = this.purpose_tf.getText();
+            MR mr = new MR(mr_no, employee.getId(), ActiveUser.getUser().getEmployeeID(), LocalDate.now(), Utility.MR_FILED, this.recommending.getId(), this.approved.getId(), purpose);
             int count = 0;
             try {
                 MrDAO.add(mr);
@@ -253,6 +253,8 @@ public class MREntryController extends MenuControllerHandler implements Initiali
         this.mrItems =  FXCollections.observableArrayList();
         this.mr_items_table.setItems(this.mrItems);
         this.mr_items_table.setPlaceholder(new Label("No item added!"));
+        this.recommending_tf.setText("");
+        this.approve_tf.setText("");
     }
 
     @FXML
@@ -273,28 +275,26 @@ public class MREntryController extends MenuControllerHandler implements Initiali
         TableColumn<MrItem, String> column2 = new TableColumn<>("Unit");
         column2.setMinWidth(75);
         column2.setCellValueFactory(item -> {
-            try {
-                return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getUnit());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            if (item.getValue().getStockID() != null){
+                try {
+                    return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getUnit());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }else{
+                return new ReadOnlyObjectWrapper<>("piece");
             }
         });
         column2.setStyle("-fx-alignment: center;");
 
         TableColumn<MrItem, String> column3 = new TableColumn<>("Description");
         column3.setMinWidth(375);
-        column3.setCellValueFactory(item -> {
-            try {
-                return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getDescription());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        column3.setCellValueFactory(new PropertyValueFactory<>("description"));
         column3.setStyle("-fx-alignment: center-left;");
 
         TableColumn<MrItem, String> column4 = new TableColumn<>("Property No.");
         column4.setMinWidth(110);
-        column4.setCellValueFactory(new PropertyValueFactory<>("stockID"));
+        column4.setCellValueFactory(new PropertyValueFactory<>("propertyNo"));
         column4.setStyle("-fx-alignment: center-left;");
 
         TableColumn<MrItem, String> column5 = new TableColumn<>("RR No.");
@@ -304,12 +304,15 @@ public class MREntryController extends MenuControllerHandler implements Initiali
 
         TableColumn<MrItem, Double> column6 = new TableColumn<>("Unit Price");
         column6.setMinWidth(100);
-        column6.setCellValueFactory(
-                item -> {
-                    try {
-                        return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getReceivingItem().getUnitCost());
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
+        column6.setCellValueFactory( item -> {
+                    if (item.getValue().getStockID() != null) {
+                        try {
+                            return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getReceivingItem().getUnitCost());
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else {
+                        return new ReadOnlyObjectWrapper<>(item.getValue().getPrice());
                     }
                 }
         );
@@ -318,10 +321,14 @@ public class MREntryController extends MenuControllerHandler implements Initiali
         TableColumn<MrItem, Double> column7 = new TableColumn<>("Total Value");
         column7.setMinWidth(100);
         column7.setCellValueFactory(item -> {
-            try {
-                return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getReceivingItem().getUnitCost() * item.getValue().getQty());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            if (item.getValue().getStockID() != null) {
+                try {
+                    return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getReceivingItem().getUnitCost() * item.getValue().getQty());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                return new ReadOnlyObjectWrapper<>(item.getValue().getPrice() * item.getValue().getQty());
             }
         });
         column7.setStyle("-fx-alignment: center;");
@@ -395,6 +402,15 @@ public class MREntryController extends MenuControllerHandler implements Initiali
     private void addFromStock(){
         ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_add_mr_item.fxml", Utility.getStackPane());
     }
+
+    /**
+     * Displays the dialog to add items other than found in stock
+     * @return void
+     */
+    @FXML
+    private void addFromOther(){
+        ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_add_mr_item_others.fxml", Utility.getStackPane());
+    }
     /**
      * Sets the object returned from the child dialog and adds the MR item to the table
      * @param o the returned object
@@ -406,9 +422,21 @@ public class MREntryController extends MenuControllerHandler implements Initiali
         if (o instanceof MrItem){
             MrItem item = (MrItem) o;
             for (MrItem i: this.mrItems){
-                if (i.getStockID().equals(item.getStockID())){
-                    ok = false;
-                    break;
+                String curr = i.getStockID();
+                if (curr != null) {
+                    if (item.getStockID() != null) {
+                        if (i.getStockID().equals(item.getStockID())) {
+                            ok = false;
+                            break;
+                        }
+                    }
+                }else {
+                    if (item.getStockID() == null) {
+                        if (i.getDescription().equals(item.getDescription())) {
+                            ok = false;
+                            break;
+                        }
+                    }
                 }
             }
             if (ok) {

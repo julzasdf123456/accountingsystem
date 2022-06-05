@@ -113,13 +113,7 @@ public class MRInventoryController extends MenuControllerHandler implements Init
 
         TableColumn<MrItem, String> column1 = new TableColumn<>("Description");
         column1.setMinWidth(350);
-        column1.setCellValueFactory(item -> {
-            try {
-                return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getDescription());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        column1.setCellValueFactory(new PropertyValueFactory<>("description"));
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<MrItem, String> column2 = new TableColumn<>("Quantity");
@@ -131,8 +125,18 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         column3.setMinWidth(75);
         column3.setCellValueFactory(item -> {
             try {
-
-                return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getPrice());
+                double cost = 0;
+                if (item.getValue().getStockID() == null) {
+                    cost = item.getValue().getPrice();
+                }else{
+                    ReceivingItem rc = item.getValue().getStock().getReceivingItem();
+                    if (rc == null) {
+                        cost = item.getValue().getStock().getPrice();
+                    } else {
+                        cost = rc.getUnitCost();
+                    }
+                }
+                return new ReadOnlyObjectWrapper<>(cost);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -143,7 +147,18 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         column3a.setMinWidth(95);
         column3a.setCellValueFactory(item -> {
             try {
-                return new ReadOnlyObjectWrapper<>(item.getValue().getStock().getPrice()*item.getValue().getQty());
+                double cost = 0;
+                if (item.getValue().getStockID() == null) {
+                    cost = item.getValue().getPrice();
+                }else {
+                    ReceivingItem rc = item.getValue().getStock().getReceivingItem();
+                    if (rc == null) {
+                        cost = item.getValue().getStock().getPrice();
+                    } else {
+                        cost = rc.getUnitCost();
+                    }
+                }
+                return new ReadOnlyObjectWrapper<>(cost*item.getValue().getQty());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -281,10 +296,18 @@ public class MRInventoryController extends MenuControllerHandler implements Init
                 List<MrItem> items = MrDAO.getMRItems();
                 ArrayList<String[]> rows = new ArrayList<>();
                 for (MrItem item : items) {
-                    Stock stock = item.getStock();
                     MR mr = MrDAO.get(item.getMrNo());
                     EmployeeInfo employeeInfo = mr.getEmployeeInfo();
-                    String[] data = {item.getStockID(), item.getRrNo(), stock.getDescription(), item.getQty() + " "+stock.getUnit(), stock.getPrice() + "", item.getQty()*stock.getPrice()+"", item.getMrNo(), mr.getDateOfMR().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")), employeeInfo.getEmployeeFirstName() + " " + employeeInfo.getEmployeeLastName()};
+                    String desc = item.getDescription();
+                    if (item.getStockID() != null)
+                        desc = item.getStock().getDescription();
+                    String unit = "piece";
+                    if (item.getStockID() != null)
+                        unit = item.getStock().getUnit();
+                    double price = item.getPrice();
+                    if (item.getStockID() != null)
+                        price = item.getStock().getPrice();
+                    String[] data = {item.getStockID(), item.getRrNo(), desc, item.getQty() + " "+unit, price + "", item.getQty()*price+"", item.getMrNo(), mr.getDateOfMR().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")), employeeInfo.getEmployeeFirstName() + " " + employeeInfo.getEmployeeLastName()};
                     rows.add(data);
                 }
                 int[] rows_aligns = {Element.ALIGN_CENTER, Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_LEFT,
