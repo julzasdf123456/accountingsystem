@@ -108,7 +108,7 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
 
         TableColumn<MrItem, String> column4 = new TableColumn<>("Property No.");
         column4.setMinWidth(105);
-        column4.setCellValueFactory(new PropertyValueFactory<>("stockID"));
+        column4.setCellValueFactory(new PropertyValueFactory<>("propertyNo"));
         column4.setStyle("-fx-alignment: center-left;");
 
         TableColumn<MrItem, String> column5 = new TableColumn<>("RR No.");
