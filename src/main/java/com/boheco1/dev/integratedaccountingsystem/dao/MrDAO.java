@@ -577,7 +577,7 @@ public class MrDAO {
 
     public static List<MrItem> searchAvailableMRItem(String key, String status) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT TOP 1 * FROM MRItem WHERE (ItemName LIKE ? OR Description LIKE ?) AND StockID IS NULL AND Status = ? AND description NOT IN (SELECT description FROM mritem WHERE status = 'active') ORDER BY ORDER BY mr_no DESC");
+                "SELECT TOP 1 * FROM MRItem WHERE (ItemName LIKE ? OR Description LIKE ?) AND StockID IS NULL AND Status = ? AND description NOT IN (SELECT description FROM mritem WHERE status = 'active') ORDER BY mr_no DESC");
 
         ps.setString(1, "%"+key+"%");
         ps.setString(2, "%"+key+"%");

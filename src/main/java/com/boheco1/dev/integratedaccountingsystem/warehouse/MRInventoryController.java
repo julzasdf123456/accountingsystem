@@ -196,7 +196,7 @@ public class MRInventoryController extends MenuControllerHandler implements Init
                     icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
                     viewButton.setOnAction(actionEvent -> {
                         Utility.setSelectedObject(item);
-                        ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_view_mr_item_history.fxml", Utility.getStackPane(), "../warehouse_mr_inventory.fxml");
+                        ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_view_mr_item_history.fxml", Utility.getStackPane());
                     });
                     setGraphic(viewButton);
                 } else {
