@@ -344,10 +344,10 @@ public class MrDAO {
                     rs.getInt("Qty"),
                     rs.getString("Remarks")
             );
-            if(item.getStockID()==null) {
-                item.setItemName(rs.getString("ItemName"));
-                item.setDescription(rs.getString("Description"));
-            }
+
+            item.setItemName(rs.getString("ItemName"));
+            item.setDescription(rs.getString("Description"));
+
             item.setRrNo(rs.getString("RRNo"));
             item.setStatus(rs.getString("Status"));
             item.setPrice(rs.getDouble("Price"));
@@ -379,10 +379,10 @@ public class MrDAO {
                     rs.getInt("Qty"),
                     rs.getString("Remarks")
             );
-            if(item.getStockID()==null) {
-                item.setItemName(rs.getString("ItemName"));
-                item.setDescription(rs.getString("Description"));
-            }
+
+            item.setItemName(rs.getString("ItemName"));
+            item.setDescription(rs.getString("Description"));
+
             item.setRrNo(rs.getString("RRNo"));
             item.setStatus(rs.getString("Status"));
             item.setPrice(rs.getDouble("Price"));
