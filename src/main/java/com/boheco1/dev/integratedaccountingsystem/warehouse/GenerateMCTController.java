@@ -119,15 +119,7 @@ public class GenerateMCTController extends MenuControllerHandler implements Init
                 @Override
                 public void handle(ActionEvent __) {
                     try{
-                        /*Stage stage = (Stage) Utility.getContentPane().getScene().getWindow();
-                        FileChooser fileChooser = new FileChooser();
-                        fileChooser.getExtensionFilters().addAll(
-                                new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
-                        );
-                        fileChooser.setInitialFileName("MCT_report_"+mctNumber.getText()+".pdf");
-                        File selectedFile = fileChooser.showSaveDialog(stage);
-                        if (selectedFile != null) {
-                            }*/
+
                         MCT mct = new MCT();
                         mct.setMctNo(mctNumber.getText());
                         mct.setParticulars(particulars.getText());
@@ -149,7 +141,7 @@ public class GenerateMCTController extends MenuControllerHandler implements Init
 
                         MCTDao.create(mct,list);
 
-                        //PrintMCT.print(selectedFile, mct, list);
+
                         //loadAllUnchargeItems();
 
                         //reload the class
