@@ -154,7 +154,7 @@ public class MrDAO {
     }
 
     public static int countMRs(String status) throws Exception {
-        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT COUNT(id) AS 'count' FROM MR WHERE status=?");
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT COUNT(id) AS 'count' FROM MRItem WHERE status=?");
         ps.setString(1, status);
         ResultSet rs = ps.executeQuery();
 
@@ -166,7 +166,7 @@ public class MrDAO {
     }
 
     public static int countEmployeesWithMRs() throws Exception {
-        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT COUNT(employeeId) AS 'count' FROM EmployeeInfo WHERE employeeId IN (SELECT employeeId FROM MR WHERE status='active')");
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT COUNT(employeeId) AS 'count' FROM EmployeeInfo WHERE employeeId IN (SELECT employeeId FROM MR INNER JOIN MRItem ON MR.id=MRItem.mr_no WHERE MRItem.status='active')");
         ResultSet rs = ps.executeQuery();
 
         if(rs.next()) {
