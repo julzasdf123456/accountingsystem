@@ -216,7 +216,7 @@ public class StockController extends MenuControllerHandler implements Initializa
                             Stock stock = StockDAO.get(item.getId());
                             viewButton.setOnAction(actionEvent -> {
                                 Utility.setSelectedObject(stock);
-                                ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_stock_update.fxml", Utility.getStackPane(), "../warehouse_stock.fxml");
+                                ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_stock_update.fxml", Utility.getStackPane());
                             });
                         } catch (Exception e) {
 

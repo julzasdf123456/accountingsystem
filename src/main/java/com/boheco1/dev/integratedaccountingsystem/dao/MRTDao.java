@@ -83,20 +83,18 @@ public class MRTDao {
                 System.out.println("Item Quantity: " + item.getQuantity());
                 System.out.println("releasing.getStockID" + releasing.getStockID());
                 ps4.executeUpdate();
-
-                conn.commit();
-
-                ps1.close();
-                ps2.close();
-                ps3.close();
-                ps4.close();
-                conn.close();
             }catch(SQLException ex) {
                 conn.rollback();
                 throw new Exception(ex.getMessage());
             }
-
         }
+        conn.commit();
+
+        ps1.close();
+        ps2.close();
+        ps3.close();
+        ps4.close();
+        conn.setAutoCommit(true);
     }
 
     public static List<ReleasedItems> searchReleasedItems(String searchKey) throws Exception {

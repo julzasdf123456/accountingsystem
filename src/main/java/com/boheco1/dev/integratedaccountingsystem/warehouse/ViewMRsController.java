@@ -110,7 +110,7 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
 
                     viewButton.setOnAction(actionEvent -> {
                         Utility.setSelectedObject(employee);
-                        ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_view_mr.fxml", Utility.getStackPane(),  "../view_mrs_controller.fxml");
+                        ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_view_mr.fxml", Utility.getStackPane());
                     });
                     setGraphic(viewButton);
                 } else {
