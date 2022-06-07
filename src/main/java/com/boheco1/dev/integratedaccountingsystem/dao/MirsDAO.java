@@ -695,4 +695,70 @@ public class MirsDAO {
 
         return unchargedMIRSReleases;
     }
+
+    public static List<UnchargedMIRSReleases> getChargedMIRSReleases() throws Exception {
+        List<UnchargedMIRSReleases> unchargedMIRSReleases=new ArrayList();
+
+        /*ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                "SELECT * FROM dbo.MIRS m WHERE m.id IN " +
+                        "(SELECT r.MIRSID FROM Releasing r WHERE r.status='released' AND mct_no IS NULL);");
+
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT r.*, s.Description, s.Price FROM Releasing r " +
+                        "LEFT JOIN Stocks s ON s.id = r.StockID " +
+                        "WHERE r.MIRSID = ? AND r.Status = 'released' AND mct_no IS NULL;");*/
+
+        ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                "SELECT * FROM dbo.MIRS m WHERE m.id IN " +
+                        "(SELECT r.MIRSID FROM Releasing r WHERE (r.status='"+Utility.RELEASED+"' OR r.status='"+Utility.PARTIAL_RELEASED+"') AND mct_no IS NOT NULL);");
+
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT r.*, s.Description, s.Price FROM Releasing r " +
+                        "LEFT JOIN Stocks s ON s.id = r.StockID " +
+                        "WHERE r.MIRSID = ? AND (r.status='"+Utility.RELEASED+"' OR r.status='"+Utility.PARTIAL_RELEASED+"') AND mct_no IS NOT NULL;");
+
+        while(rs.next()) {
+            MIRS mirs = new MIRS(
+                    rs.getString("id"),
+                    rs.getDate("DateFiled").toLocalDate(),
+                    rs.getString("Purpose"),
+                    rs.getString("Details"),
+                    rs.getString("Status"),
+                    rs.getString("RequisitionerID"),
+                    rs.getString("UserID"),
+                    rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                    rs.getString("address"),
+                    rs.getString("applicant"),
+                    rs.getString("WorkOrderNo")
+            );
+
+            List<UnchargedItemDetails> items = new ArrayList();
+
+            ps.setString(1, mirs.getId());
+            ResultSet rs2 = ps.executeQuery();
+
+            while(rs2.next()) {
+                items.add(
+                        new UnchargedItemDetails(
+                                rs2.getString("id"),
+                                rs2.getString("Description"),
+                                rs2.getDouble("Price"),
+                                rs2.getInt("Quantity")
+                        )
+                );
+            }
+
+            rs2.close();
+
+            unchargedMIRSReleases.add(new UnchargedMIRSReleases(mirs, items));
+
+        }
+
+        ps.close();
+        rs.close();
+
+        return unchargedMIRSReleases;
+    }
+
 }
