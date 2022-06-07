@@ -186,7 +186,6 @@ public class MIRSReleasingFormController implements Initializable {
                 releasing.setQuantity(mirsItem.getQuantity());
                 releasing.setPrice(mirsItem.getPrice());
                 releasing.setUserID(ActiveUser.getUser().getId());
-                //releasing.setWorkOrderNo(mirsItem.getWorkOrderNo());
 
                 for(MIRSItem rem : remainingRequest){
                     if(rem.getId().equals(mirsItem.getId())) {
@@ -213,7 +212,7 @@ public class MIRSReleasingFormController implements Initializable {
                 mct.setParticulars(mirs.getPurpose());
                 mct.setAddress(mirs.getAddress());
                 mct.setMirsNo(mirs.getId());
-                //mct.setWorkOrderNo(forReleasing.get(0).getWorkOrderNo());
+                mct.setWorkOrderNo(mirs.getWorkOrderNo());
                 MCTDao.create(mct, releasedItemWithMCT);
             }
 
@@ -226,6 +225,7 @@ public class MIRSReleasingFormController implements Initializable {
             mirs.setDetails(details.getText());
             MirsDAO.update(mirs);
             releasingList.getItems().clear();
+            anchorpane.setDisable(true);
             AlertDialogBuilder.messgeDialog("System Message", "MIRS items released.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
         }catch (Exception e){
             AlertDialogBuilder.messgeDialog("System Error", "Item released: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
