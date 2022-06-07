@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.MCT;
 import com.boheco1.dev.integratedaccountingsystem.objects.MCTReleasings;
+import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
 import com.boheco1.dev.integratedaccountingsystem.objects.Releasing;
 
 import java.sql.Connection;
@@ -48,6 +49,7 @@ public class MCTDao {
             }
 
             conn.commit();
+            conn.setAutoCommit(true);
         }catch(SQLException ex) {
             ex.printStackTrace();
             conn.rollback();
@@ -97,6 +99,41 @@ public class MCTDao {
         ps.close();
 
         return mct;
+    }
+
+    public static List<MCT> getAllMCT(String key) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MCT WHERE " +
+                        "mct_no LIKE ? OR " +
+                        "particulars LIKE ? OR " +
+                        "address LIKE ? OR " +
+                        "MIRSNo LIKE ? OR " +
+                        "WorkOrderNo LIKE ?");
+        ps.setString(1, "%" + key + "%");
+        ps.setString(2, "%" + key + "%");
+        ps.setString(3, "%" + key + "%");
+        ps.setString(4, "%" + key + "%");
+        ps.setString(5, "%" + key + "%");
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<MCT> result = new ArrayList<>();
+
+        while(rs.next()) {
+            result.add(new MCT(
+                    rs.getString("mct_no"),
+                    rs.getString("particulars"),
+                    rs.getString("address"),
+                    rs.getString("MIRSNo"),
+                    rs.getString("WorkOrderNo"),
+                    rs.getDate("createdAt").toLocalDate()
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return result;
     }
 
     public static MCTReleasings getMCTReleasing(String mctNo) throws Exception {
