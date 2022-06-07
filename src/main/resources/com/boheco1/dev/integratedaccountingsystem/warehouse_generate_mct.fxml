@@ -21,14 +21,21 @@
                <children>
                   <VBox alignment="TOP_CENTER" prefHeight="680.0" prefWidth="428.0" HBox.hgrow="NEVER">
                      <children>
-                        <JFXTextField fx:id="searchMirs" alignment="CENTER" promptText="Search MIRS" style="-fx-background-color: #f5f5f5;">
+                        <VBox>
+                           <children>
+                              <JFXTextField fx:id="searchMirs" alignment="CENTER" promptText="Search MIRS" style="-fx-background-color: #f5f5f5;">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                                 <VBox.margin>
+                                    <Insets left="30.0" right="30.0" />
+                                 </VBox.margin>
+                              </JFXTextField>
+                           </children>
                            <VBox.margin>
-                              <Insets bottom="30.0" left="16.0" right="16.0" />
+                              <Insets bottom="30.0" />
                            </VBox.margin>
-                           <font>
-                              <Font size="18.0" />
-                           </font>
-                        </JFXTextField>
+                        </VBox>
                         <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="77.0">
                            <children>
                               <Label maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="115.0" text="MCT Number:">
@@ -37,6 +44,19 @@
                                  </font>
                               </Label>
                               <JFXTextField fx:id="mctNumber" onAction="#genMctNum" style="-fx-background-color: #f5f5f5;" HBox.hgrow="ALWAYS" />
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="10.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="107.0">
+                           <children>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="115.0" text="Description:">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <JFXTextField fx:id="description" style="-fx-background-color: #f5f5f5;" HBox.hgrow="ALWAYS" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="10.0" />
