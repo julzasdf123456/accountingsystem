@@ -129,6 +129,7 @@ public class HomeController implements Initializable {
         NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Teller"), new FontIcon("mdi2c-contactless-payment-circle"), homeStackPane);
         NavMenuHelper.addMenu(navMenuBox, collection, homeStackPane);
         NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Warehouse"), new FontIcon("mdi2s-sitemap"), homeStackPane);
+
         if(ActiveUser.getUser().can("manage-warehouse"))
             NavMenuHelper.addMenu(navMenuBox, warehouseDashboard, homeStackPane);
 
@@ -142,10 +143,11 @@ public class HomeController implements Initializable {
             NavMenuHelper.addMenu(navMenuBox, stocks, homeStackPane);
         }
         NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Administrator"), new FontIcon("mdi2s-security"), homeStackPane);
-        if(ActiveUser.getUser().can("manage-employees"))
+        if (ActiveUser.getUser().can("manage-employees")) {
             NavMenuHelper.addMenu(navMenuBox, employees, homeStackPane);
-        NavMenuHelper.addMenu(navMenuBox, users, homeStackPane);
-        NavMenuHelper.addMenu(navMenuBox, signatoriesButton, homeStackPane);
+            NavMenuHelper.addMenu(navMenuBox, users, homeStackPane);
+            NavMenuHelper.addMenu(navMenuBox, signatoriesButton, homeStackPane);
+        }
         NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("User"), new FontIcon("mdi2a-account-circle"), homeStackPane);
         NavMenuHelper.addMenu(navMenuBox, myAccount, homeStackPane);
         NavMenuHelper.addMenu(navMenuBox, logout, homeStackPane);
@@ -162,18 +164,20 @@ public class HomeController implements Initializable {
         // WAREHOUSE
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(warehouseDashboard, new FontIcon("mdi2v-view-dashboard"), drawerMenus, "Warehouse Dashboard", contentPane, "warehouse_dashboard_controller.fxml", subToolbar, new WarehouseDashboardController(), title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(fileMirs, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "File MIRS", contentPane, "warehouse_file_mirs.fxml", subToolbar, new FileMIRSController(), title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(generateMct, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Generate MCT", contentPane, "warehouse_generate_mct.fxml", subToolbar, new GenerateMCTController(), title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(mrT, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Material Return", contentPane, "warehouse_mrt_form.fxml", subToolbar, new MRTFormController(), title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(addMR, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "MR Entry", contentPane, "warehouse_mr_entry.fxml", subToolbar, new MREntryController(), title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(stocks, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Stock Entry", contentPane, "warehouse_stock_entry.fxml", subToolbar, new StockEntryController(), title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(receiving, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Receiving Entry", contentPane, "warehouse_receiving_entry.fxml", subToolbar, new ReceivingEntryController(), title);
-
+        if (ActiveUser.getUser().can("manage-warehouse")) {
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(generateMct, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Generate MCT", contentPane, "warehouse_generate_mct.fxml", subToolbar, new GenerateMCTController(), title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(mrT, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Material Return", contentPane, "warehouse_mrt_form.fxml", subToolbar, new MRTFormController(), title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(addMR, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "MR Entry", contentPane, "warehouse_mr_entry.fxml", subToolbar, new MREntryController(), title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(stocks, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Stock Entry", contentPane, "warehouse_stock_entry.fxml", subToolbar, new StockEntryController(), title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(receiving, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Receiving Entry", contentPane, "warehouse_receiving_entry.fxml", subToolbar, new ReceivingEntryController(), title);
+        }
         // USERS
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(employees,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, employees.getText(), contentPane, "manage_employees.fxml", subToolbar, new ManageEmployeesController(), "manage-users", homeStackPane, title);
-//        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(users,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, users.getText(), contentPane, "user_mgt.fxml", subToolbar, new UserMgtController(), "manage-users", homeStackPane, title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(users,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, users.getText(), contentPane, "all_users_controller.fxml", subToolbar, new AllUsersController(), "manage-users", homeStackPane, title);
-        DrawerMenuHelper.setMenuButton(signatoriesButton,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, signatoriesButton.getText());
-
+        if (ActiveUser.getUser().can("manage-employees")) {
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(employees, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, employees.getText(), contentPane, "manage_employees.fxml", subToolbar, new ManageEmployeesController(), "manage-users", homeStackPane, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(users, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, users.getText(), contentPane, "user_mgt.fxml", subToolbar, new UserMgtController(), "manage-users", homeStackPane, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(users, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, users.getText(), contentPane, "all_users_controller.fxml", subToolbar, new AllUsersController(), "manage-users", homeStackPane, title);
+            DrawerMenuHelper.setMenuButton(signatoriesButton, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, signatoriesButton.getText());
+        }
         DrawerMenuHelper.setMenuButton(myAccount,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "My Account");
         DrawerMenuHelper.setMenuButton(logout,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "Logout");
 

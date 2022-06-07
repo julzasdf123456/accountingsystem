@@ -8,16 +8,11 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
@@ -83,9 +78,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
     @FXML
     public void returnItem(){
         Object selectedItem = this.releasedItemTable.getSelectionModel().getSelectedItem();
-        if (this.returnedBy == null){
-            AlertDialogBuilder.messgeDialog("System Message", "No employee was set!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-        }else if (selectedItem == null) {
+        if (selectedItem == null) {
             AlertDialogBuilder.messgeDialog("Input Error", "Please select from the released item table before proceeding!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }else{
             ReleasedItems item = (ReleasedItems) selectedItem;
@@ -98,7 +91,6 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
                 if(qty_tf.getText().isEmpty()) {
                     AlertDialogBuilder.messgeDialog("System Message", "No return quantity provided", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }else{
-                    this.currentMRT = new MRT(null, this.returnedBy.getEmployeeID(), ActiveUser.getUser().getEmployeeID(), LocalDate.now());
                     try{
                         int qty_to_return = Integer.parseInt(qty_tf.getText());
 
@@ -132,6 +124,27 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
             });
         }
     }
+    /**
+     * Creates and MCT and returns the MRT items
+     * @return void
+     */
+    @FXML
+    public void returnItems(){
+        if (this.returnedBy == null){
+            AlertDialogBuilder.messgeDialog("System Message", "No employee was set!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }else {
+            this.currentMRT = new MRT(null, this.returnedBy.getEmployeeID(), ActiveUser.getUser().getEmployeeID(), LocalDate.now());
+            try {
+                MRTDao.create(this.currentMRT);
+                MRTDao.addItems(this.currentMRT, this.mrtItems);
+                AlertDialogBuilder.messgeDialog("Material Return", "The selected released items were successfully returned!", Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                this.reset();
+            } catch (Exception e) {
+                e.printStackTrace();
+                AlertDialogBuilder.messgeDialog("System Error", "An error occurred while returning the items due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            }
+        }
+    }
 
     /**
      * Initializes the Released items table
@@ -140,26 +153,33 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
     public void initializeReleasedItemTable() {
         TableColumn<ReleasedItems, String> column1 = new TableColumn<>("Stock ID");
         column1.setMinWidth(120);
+        column1.setMaxWidth(120);
+        column1.setPrefWidth(120);
         column1.setCellValueFactory(new PropertyValueFactory<>("id"));
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<ReleasedItems, String> column2 = new TableColumn<>("Description");
-        column2.setMinWidth(304);
         column2.setCellValueFactory(new PropertyValueFactory<>("description"));
         column2.setStyle("-fx-alignment: center-left;");
 
         TableColumn<ReleasedItems, String> column3 = new TableColumn<>("MCT No");
         column3.setMinWidth(115);
+        column3.setMaxWidth(115);
+        column3.setPrefWidth(115);
         column3.setCellValueFactory(new PropertyValueFactory<>("mctNo"));
         column3.setStyle("-fx-alignment: center;");
 
         TableColumn<ReleasedItems, String> column4 = new TableColumn<>("Price");
         column4.setMinWidth(115);
+        column4.setMaxWidth(115);
+        column4.setPrefWidth(115);
         column4.setCellValueFactory(new PropertyValueFactory<>("price"));
         column4.setStyle("-fx-alignment: center-left;");
 
         TableColumn<ReleasedItems, String> column5 = new TableColumn<>("Quantity");
         column5.setMinWidth(115);
+        column5.setMaxWidth(115);
+        column5.setPrefWidth(115);
         column5.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         column5.setStyle("-fx-alignment: center;");
 
@@ -180,11 +200,12 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
     public void initializeReturnItemTable() {
         TableColumn<MRTItem, String> column1 = new TableColumn<>("Stock ID");
         column1.setMinWidth(120);
+        column1.setMaxWidth(120);
+        column1.setPrefWidth(120);
         column1.setCellValueFactory(new PropertyValueFactory<>("releasingID"));
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<MRTItem, String> column2 = new TableColumn<>("Description");
-        column2.setMinWidth(304);
         column2.setCellValueFactory(item -> {
             try {
                 Stock stock = StockDAO.get(ReleasingDAO.get(item.getValue().getReleasingID()).getStockID());
@@ -197,10 +218,15 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
 
         TableColumn<MRTItem, String> column3 = new TableColumn<>("Quantity");
         column3.setMinWidth(75);
+        column3.setMaxWidth(75);
+        column3.setPrefWidth(75);
         column3.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         column3.setStyle("-fx-alignment: center;");
 
         TableColumn<MRTItem, String> column4 = new TableColumn<>("Action");
+        column4.setMinWidth(75);
+        column4.setMaxWidth(75);
+        column4.setPrefWidth(75);
         Callback<TableColumn<MRTItem, String>, TableCell<MRTItem, String>> removeBtn
                 = //
                 new Callback<TableColumn<MRTItem, String>, TableCell<MRTItem, String>>() {

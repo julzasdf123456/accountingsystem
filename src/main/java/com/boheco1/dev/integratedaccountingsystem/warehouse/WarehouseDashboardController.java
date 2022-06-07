@@ -113,6 +113,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
 
     @FXML
     private void mirsPendingApproval(MouseEvent event) {
+        this.searchMIRS.setVisible(true);
         display_lbl.setText(APPROVAL);
         initializedTable(Utility.PENDING);
         try {
@@ -125,6 +126,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
 
     @FXML
     private void mirsPendingReleases(MouseEvent event) {
+        this.searchMIRS.setVisible(true);
         display_lbl.setText(RELEASES);
         initializedTable(Utility.RELEASING);
         try {
@@ -137,6 +139,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
 
     @FXML
     private void viewCriticalItems(MouseEvent event) {
+        this.searchMIRS.setVisible(false);
         this.bindPages();
         this.setCriticalCount();
         this.initializeCriticalStocks();
@@ -145,11 +148,13 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
 
     @FXML
     private void viewMRItems(MouseEvent event) {
+        this.searchMIRS.setVisible(false);
         Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(MRInventoryController.class, "../warehouse_mr_inventory.fxml"));
     }
 
     @FXML
     private void viewEmployeesWithMR(MouseEvent event) {
+        this.searchMIRS.setVisible(false);
         Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(ViewMRsController.class, "../view_mrs_controller.fxml"));
     }
 
