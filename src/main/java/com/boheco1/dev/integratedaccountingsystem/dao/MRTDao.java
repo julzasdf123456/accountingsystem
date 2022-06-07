@@ -94,7 +94,7 @@ public class MRTDao {
         ps2.close();
         ps3.close();
         ps4.close();
-        conn.close();
+        conn.setAutoCommit(true);
     }
 
     public static List<ReleasedItems> searchReleasedItems(String searchKey) throws Exception {
