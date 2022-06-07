@@ -2,6 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.objects.MCT;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRSItem;
 import com.boheco1.dev.integratedaccountingsystem.objects.Releasing;
@@ -15,8 +16,8 @@ import java.util.List;
 public class ReleasingDAO {
     public static void add(Releasing releasing) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO Releasing (StockID, MIRSID, Quantity, Price, UserID, Status, CreatedAt, UpdatedAt, id, MR, WorkOrderNo) " +
-                        "VALUES (?,?,?,?,?,?,GETDATE(),GETDATE(),?, ?, ?)");
+                "INSERT INTO Releasing (StockID, MIRSID, Quantity, Price, UserID, Status, CreatedAt, UpdatedAt, id, MR, WorkOrderNo, acctCode) " +
+                        "VALUES (?,?,?,?,?,?,GETDATE(),GETDATE(),?, ?, ?, ?)");
 
         releasing.setId(Utility.generateRandomId());
 
@@ -29,6 +30,7 @@ public class ReleasingDAO {
         ps.setString(7, releasing.getId());
         ps.setString(8, releasing.getMR());
         ps.setString(9, releasing.getWorkOrderNo());
+        ps.setString(10, releasing.getAcctCode());
 
         ps.executeUpdate();
 
@@ -55,7 +57,8 @@ public class ReleasingDAO {
                     rs.getString("Status"),
                     rs.getString("MR"),
                     rs.getString("WorkOrderNo"),
-                    rs.getString("mct_no")
+                    rs.getString("mct_no"),
+                    rs.getString("acctCode")
             );
             releasing.setCreatedAt(rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime():null);
             releasing.setUpdatedAt(rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime():null);
@@ -87,7 +90,8 @@ public class ReleasingDAO {
                     rs.getString("Status"),
                     rs.getString("MR"),
                     rs.getString("WorkOrderNo"),
-                    rs.getString("mct_no")
+                    rs.getString("mct_no"),
+                    rs.getString("acctCode")
             );
             releasing.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
             releasing.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
@@ -120,7 +124,8 @@ public class ReleasingDAO {
                     rs.getString("Status"),
                     rs.getString("MR"),
                     rs.getString("WorkOrderNo"),
-                    rs.getString("mct_no")
+                    rs.getString("mct_no"),
+                    rs.getString("acctCode")
             );
             releasing.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
             releasing.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
