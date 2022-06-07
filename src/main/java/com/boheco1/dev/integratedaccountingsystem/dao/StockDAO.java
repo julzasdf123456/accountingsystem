@@ -1073,17 +1073,18 @@ public class StockDAO {
      * @return The list of stocks for this particular period
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static List<Stock> getStockEntries(LocalDate from, LocalDate to) throws Exception {
+    public static List<Stock> getStockEntries(LocalDate from, LocalDate to, String source) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT Stocks.*, StockEntryLogs.id as entryID, StockEntryLogs.Price as entryPrice, StockEntryLogs.Quantity as entryQuantity, StockEntryLogs.Source as entrySource, " +
-                        "StockEntryLogs.CreatedAt as entryCreatedAt, StockEntryLogs.UpdatedAt as entryUpdatedAt, StockEntryLogs.UserID as entryUserID " +
+                        "StockEntryLogs.CreatedAt as entryCreatedAt, StockEntryLogs.UpdatedAt as entryUpdatedAt, StockEntryLogs.UserID as entryUserID, RRNo " +
                         "FROM Stocks LEFT JOIN StockEntryLogs " +
                         "ON StockEntryLogs.StockID=Stocks.id " +
-                        "WHERE IsTrashed=0 AND StockEntryLogs.CreatedAt BETWEEN ? AND ? " +
+                        "WHERE IsTrashed=0 AND StockEntryLogs.CreatedAt BETWEEN ? AND ? AND StockEntryLogs.Source=? " +
                         "ORDER BY StockEntryLogs.CreatedAt ASC, Stocks.StockName ASC");
 
         ps.setDate(1, Date.valueOf(from));
         ps.setDate(2, Date.valueOf(to));
+        ps.setString(3, source);
 
         ResultSet rs = ps.executeQuery();
         ArrayList<Stock> stocks = new ArrayList<>();
@@ -1122,6 +1123,7 @@ public class StockDAO {
             log.setPrice(rs.getDouble("entryPrice"));
             log.setQuantity(rs.getInt("entryQuantity"));
             log.setUserID(rs.getString("entryUserID"));
+            log.setRrNo(rs.getString("RRNo"));
             log.setCreatedAt(rs.getTimestamp("entryCreatedAt")!=null ? rs.getTimestamp("entryCreatedAt").toLocalDateTime() : null);
             log.setUpdatedAt(rs.getTimestamp("entryUpdatedAt")!=null ? rs.getTimestamp("entryUpdatedAt").toLocalDateTime() : null);
             stock.setEntryLog(log);
@@ -1141,13 +1143,13 @@ public class StockDAO {
      * @return The list of stocks for this particular period
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static List<Stock> getStockEntries(LocalDate from, LocalDate to, int limit, int offset) throws Exception {
+    public static List<Stock> getStockEntries(LocalDate from, LocalDate to, int limit, int offset, String source) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT Stocks.*, StockEntryLogs.id as entryID, StockEntryLogs.Price as entryPrice, StockEntryLogs.Quantity as entryQuantity, StockEntryLogs.Source as entrySource, " +
-                        "StockEntryLogs.CreatedAt as entryCreatedAt, StockEntryLogs.UpdatedAt as entryUpdatedAt, StockEntryLogs.UserID as entryUserID " +
+                        "StockEntryLogs.CreatedAt as entryCreatedAt, StockEntryLogs.UpdatedAt as entryUpdatedAt, StockEntryLogs.UserID as entryUserID, RRNo " +
                         "FROM Stocks LEFT JOIN StockEntryLogs " +
                         "ON StockEntryLogs.StockID=Stocks.id " +
-                        "WHERE IsTrashed=0 AND StockEntryLogs.CreatedAt BETWEEN ? AND ? " +
+                        "WHERE IsTrashed=0 AND StockEntryLogs.CreatedAt BETWEEN ? AND ? AND StockEntryLogs.Source=? " +
                         "ORDER BY StockEntryLogs.CreatedAt ASC, Stocks.StockName ASC "+
                         "OFFSET ? ROWS " +
                         "FETCH NEXT ? ROWS ONLY");
@@ -1156,6 +1158,7 @@ public class StockDAO {
         ps.setDate(2, Date.valueOf(to));
         ps.setInt(3, offset);
         ps.setInt(4, limit);
+        ps.setString(5, source);
 
         ResultSet rs = ps.executeQuery();
         ArrayList<Stock> stocks = new ArrayList<>();
@@ -1194,6 +1197,7 @@ public class StockDAO {
             log.setPrice(rs.getDouble("entryPrice"));
             log.setQuantity(rs.getInt("entryQuantity"));
             log.setUserID(rs.getString("entryUserID"));
+            log.setRrNo(rs.getString("RRNo"));
             log.setCreatedAt(rs.getTimestamp("entryCreatedAt")!=null ? rs.getTimestamp("entryCreatedAt").toLocalDateTime() : null);
             log.setUpdatedAt(rs.getTimestamp("entryUpdatedAt")!=null ? rs.getTimestamp("entryUpdatedAt").toLocalDateTime() : null);
             stock.setEntryLog(log);
