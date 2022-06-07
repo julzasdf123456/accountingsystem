@@ -33,6 +33,7 @@ public class Stock {
     private StockEntryLog entryLog;
     private Releasing releasing;
     private ReceivingItem receivingItem;
+    private String rrNo;
 
     public Stock() {}
 
@@ -299,5 +300,13 @@ public class Stock {
 
     public void setOldPrice(Double oldPrice) {
         this.oldPrice = oldPrice;
+    }
+
+    public String getRrNo() {
+        return rrNo;
+    }
+
+    public void setRrNo(String rrNo) {
+        this.rrNo = rrNo;
     }
 }
