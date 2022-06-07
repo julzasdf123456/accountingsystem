@@ -514,7 +514,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
 
         mctReport.setOnAction(actionEvent -> {
             titleHolder.setText("MCT Report");
-            container.getChildren().setAll(ContentHandler.getNodeFromFxml(ReceivingReportController.class, "../warehouse_receiving_report.fxml"));
+            container.getChildren().setAll(ContentHandler.getNodeFromFxml(ReceivingReportController.class, "../view_all_mct_controller.fxml"));
         });
     }
 
