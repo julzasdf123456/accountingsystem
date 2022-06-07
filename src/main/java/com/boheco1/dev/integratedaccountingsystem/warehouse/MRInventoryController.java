@@ -112,7 +112,7 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         column0.setStyle("-fx-alignment: center;");
 
         TableColumn<MrItem, String> column1 = new TableColumn<>("Description");
-        column1.setMinWidth(350);
+        column1.setMinWidth(275);
         column1.setCellValueFactory(new PropertyValueFactory<>("description"));
         column1.setStyle("-fx-alignment: center-left;");
 
@@ -170,7 +170,7 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         column3b.setStyle("-fx-alignment: center;");
 
         TableColumn<MrItem, String> column4 = new TableColumn<>("Date of MR");
-        column4.setMinWidth(120);
+        column4.setMinWidth(75);
         column4.setCellValueFactory(item -> {
             try {
                 return new ReadOnlyObjectWrapper<>(MrDAO.get(item.getValue().getMrNo()).getDateOfMR().format(DateTimeFormatter.ofPattern("MM/dd/yyyy")));
@@ -196,7 +196,7 @@ public class MRInventoryController extends MenuControllerHandler implements Init
                     icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
                     viewButton.setOnAction(actionEvent -> {
                         Utility.setSelectedObject(item);
-                        ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_view_mr_item_history.fxml", Utility.getStackPane(), "../warehouse_mr_inventory.fxml");
+                        ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_view_mr_item_history.fxml", Utility.getStackPane());
                     });
                     setGraphic(viewButton);
                 } else {
@@ -212,29 +212,17 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         column7.setCellValueFactory(new PropertyValueFactory<>("remarks"));
         column7.setStyle("-fx-alignment: center;");
 
-        TableColumn<MrItem, String> column8 = new TableColumn<>("FirstName");
-        column8.setMinWidth(125);
+        TableColumn<MrItem, String> column8 = new TableColumn<>("Employee");
+        column8.setMinWidth(150);
         column8.setCellValueFactory(item -> {
             try {
                 MR mr = MrDAO.get(item.getValue().getMrNo());
-                return new ReadOnlyObjectWrapper<>(mr.getEmployeeInfo().getEmployeeFirstName());
+                return new ReadOnlyObjectWrapper<>(mr.getEmployeeInfo().getEmployeeFirstName()+" "+mr.getEmployeeInfo().getEmployeeLastName());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
         column8.setStyle("-fx-alignment: center-left;");
-
-        TableColumn<MrItem, String> column9 = new TableColumn<>("LastName");
-        column9.setMinWidth(125);
-        column9.setCellValueFactory(item -> {
-            try {
-                MR mr = MrDAO.get(item.getValue().getMrNo());
-                return new ReadOnlyObjectWrapper<>(mr.getEmployeeInfo().getEmployeeLastName());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-        column9.setStyle("-fx-alignment: center-left;");
 
         this.mrItems =  FXCollections.observableArrayList();
         this.table.setPlaceholder(new Label("No item added"));
@@ -249,7 +237,6 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         this.table.getColumns().add(column4);
         this.table.getColumns().add(column7);
         this.table.getColumns().add(column8);
-        this.table.getColumns().add(column9);
         this.table.getColumns().add(column5);
     }
     /**

@@ -4,296 +4,318 @@ import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.*;
+import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.HPos;
 import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
-import javafx.geometry.VPos;
-import javafx.scene.control.Label;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class MRTFormController implements Initializable {
+public class MRTFormController extends MenuControllerHandler implements Initializable {
 
     @FXML
-    private AnchorPane anchorpane;
+    private JFXTextField searchItem_tf,returned_tf;
 
     @FXML
-    private Label date, itemCounter, mirsNumber, applicant, requisitioner, address, signatories, purpose;
+    private TableView releasedItemTable, returnItemTable;
 
     @FXML
-    private TextArea details;
+    private JFXButton addItemBtn, removeItemBtn;
 
-
-    @FXML
-    private JFXButton acceptBtn, addAllQtyBtn, addPartialQtyBtn, removeItemBtn;
-
-    @FXML
-    private JFXListView<MIRSItem> requestedList, releasingList;
-
-    private Stock selectedStock = null;
-    private MIRSItem selectedMirsItem;
-    private MIRS mirs;
-    private String work_order_number;
+    private ObservableList<MRTItem> mrtItems = null;
+    private ObservableList<ReleasedItems> releasedItems = null;
+    private MRT currentMRT = null;
+    private User returnedBy = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        requestedList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        releasingList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        try {
-            mirs = MirsDAO.getMIRS(Utility.getActiveMIRS().getId());
-            List<MIRSItem> mirsItemList = MirsDAO.getUnreleasedItems(mirs);
-            List<MIRSSignatory> mirsSignatoryList = MIRSSignatoryDAO.get(mirs);
-
-            String signatures = "";
-            for (MIRSSignatory sig:mirsSignatoryList) {
-                signatures+=UserDAO.get(sig.getUserID()).getFullName();
-                signatures+="\n";
-            }
-            signatories.setText(signatures);
-
-            initializeItemList(mirsItemList);
-
-            itemCounter.setText(mirsItemList.size()+" items found");
-            mirsNumber.setText(""+mirs.getId());
-            date.setText(""+mirs.getDateFiled());
-            purpose.setText(mirs.getPurpose());
-            details.setText(mirs.getDetails());
-            address.setText(mirs.getAddress());
-            applicant.setText(mirs.getApplicant());
-            requisitioner.setText(mirs.getRequisitioner().getFullName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.initializeReleasedItemTable();
+        this.initializeReturnItemTable();
+        this.bindReturnedByAutocomplete(this.returned_tf);
     }
 
-    private void initializeItemList(List<MIRSItem> mirsItemList) throws Exception {
-        for (MIRSItem item: mirsItemList) {
-            item.setQuantity(MirsDAO.getBalance(item));
-            requestedList.getItems().add(item);
-        }
-    }
-
+    /**
+     * Searches for the released items  and displays them in the released items table
+     * @return void
+     */
     @FXML
-    private void returnItems(ActionEvent event) {
+    public void searchReleasedItem(){
+        String key = this.searchItem_tf.getText();
         try {
-            if(releasingList.getItems().size() == 0) {
-                AlertDialogBuilder.messgeDialog("System Message", "No available item(s) listed for releasing.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-                return;
-            }
-
-            JFXButton accept = new JFXButton("Accept");
-            JFXDialog dialog = DialogBuilder.showConfirmDialog("Releasing","Are sure you want to release listed item(s)?", accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
-
-            accept.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent __) {
-                    try{
-                        List<MIRSItem> forReleasing = releasingList.getItems();
-                        List<MIRSItem> remainingRequest = requestedList.getItems();
-                        boolean found = false;
-                        for (MIRSItem mirsItem : forReleasing){
-                            Releasing releasing = new Releasing();
-                            releasing.setStockID(mirsItem.getStockID());
-                            releasing.setMirsID(mirsItem.getMirsID());
-                            releasing.setQuantity(mirsItem.getQuantity());
-                            releasing.setPrice(mirsItem.getPrice());
-                            releasing.setUserID(ActiveUser.getUser().getId());
-
-                            for(MIRSItem rem : remainingRequest){
-                                if(rem.getId().equals(mirsItem.getId())) {
-                                    releasing.setStatus(Utility.PARTIAL_RELEASED);
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if(!found) {
-                                releasing.setStatus(Utility.RELEASED);
-                                ReleasingDAO.updateReleasedItem(releasing);
-                            }
-
-                            //releasing.setWorkOrderNo(mirsItem.getWorkOrderNo());
-                            ReleasingDAO.add(releasing);
-                            Stock temp = StockDAO.get(mirsItem.getStockID()); //temp stock object for quantity deduction
-                            StockDAO.deductStockQuantity(temp, mirsItem.getQuantity());
-                        }
-
-                        if(requestedList.getItems().size() == 0)
-                            mirs.setStatus(Utility.CLOSED);
-                        else
-                            mirs.setStatus(Utility.RELEASING);
-
-                        mirs.setDetails(details.getText());
-                        MirsDAO.update(mirs);
-
-                        AlertDialogBuilder.messgeDialog("System Message", "MIRS items released.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
-                        anchorpane.setDisable(true);
-                    }catch (Exception e){
-                        AlertDialogBuilder.messgeDialog("System Error", "Item released: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
-                    }
-                    dialog.close();
+            Platform.runLater(() -> {
+                try {
+                    this.releasedItems = FXCollections.observableList(MRTDao.searchReleasedItems(key));
+                    this.releasedItemTable.getItems().setAll(this.releasedItems);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while populating table due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
+            AlertDialogBuilder.messgeDialog("System Error", "An error occurred while populating table due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }
     }
 
+    /**
+     * Selects the released items from the released items table, displays the quantity to return and displays them in the return items table
+     * @return void
+     */
     @FXML
-    private void addAllQty(ActionEvent event) throws Exception {
-        addRemoveItem(addAllQtyBtn);
-    }
-
-    @FXML
-    private void removeItem(ActionEvent event) {
-        addRemoveItem(removeItemBtn);
-    }
-
-    @FXML
-    private void addPartialQty(ActionEvent event) {
-        addRemoveItem(addPartialQtyBtn);
-    }
-
-    private void addRemoveItem(JFXButton btn){
-        JFXListView<MIRSItem> mirsItemJFXListView = null;
-        if(btn == this.addAllQtyBtn){
-            mirsItemJFXListView = requestedList;
-        }else if(btn == this.addPartialQtyBtn){
-            mirsItemJFXListView = requestedList;
-        }else if(btn == this.removeItemBtn){
-            mirsItemJFXListView = releasingList;
-        }
-
-        if(mirsItemJFXListView.getItems().isEmpty()) {
-            AlertDialogBuilder.messgeDialog("System Message", "No available item.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+    public void returnItem(){
+        Object selectedItem = this.releasedItemTable.getSelectionModel().getSelectedItem();
+        if (this.returnedBy == null){
+            AlertDialogBuilder.messgeDialog("System Message", "No employee was set!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }else if (selectedItem == null) {
+            AlertDialogBuilder.messgeDialog("Input Error", "Please select from the released item table before proceeding!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }else{
-            ObservableList<MIRSItem> selectedItems = FXCollections.observableArrayList(mirsItemJFXListView.getSelectionModel().getSelectedItems());
-            if(selectedItems.size() == 0){
-                AlertDialogBuilder.messgeDialog("System Message", "No item(s) selected, please try again.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-            }else{
-                if(btn == addAllQtyBtn) {
-                    ObservableList<MIRSItem> toBeReleased = FXCollections.observableArrayList(releasingList.getItems());
-                    for (MIRSItem selected : selectedItems) {
+            ReleasedItems item = (ReleasedItems) selectedItem;
+            JFXButton returnNumber = new JFXButton("Return");
+            JFXTextField qty_tf = new JFXTextField();
+            qty_tf.setText(item.getQuantity()+"");
+            InputValidation.restrictNumbersOnly(qty_tf);
+            JFXDialog returnDialog = DialogBuilder.showInputDialog("Quantity To Return","Please enter the quantity:  ", "", qty_tf, returnNumber, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+            returnNumber.setOnAction(__ -> {
+                if(qty_tf.getText().isEmpty()) {
+                    AlertDialogBuilder.messgeDialog("System Message", "No return quantity provided", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }else{
+                    this.currentMRT = new MRT(null, this.returnedBy.getEmployeeID(), ActiveUser.getUser().getEmployeeID(), LocalDate.now());
+                    try{
+                        int qty_to_return = Integer.parseInt(qty_tf.getText());
 
-                        boolean found = false;
-                        for (MIRSItem listed : toBeReleased) {
-                            if (listed.getId().equals(selected.getId())) {
-                                listed.setQuantity(listed.getQuantity() + selected.getQuantity());
-                                requestedList.getItems().remove(selected);
-                                found = true;
-                            }
-                        }
-                        if (!found) {
-                            requestedList.getItems().remove(selected);
-                            releasingList.getItems().add(selected);
-                        }
+                        if (qty_to_return <= 0){
+                            AlertDialogBuilder.messgeDialog("System Message", "No return quantity provided", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                        }else if (qty_to_return > item.getQuantity()){
+                            AlertDialogBuilder.messgeDialog("System Message", "The return quantity provided should not exceed the maximum released quantity!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                        }else{
+                            MRTItem returnItem = new MRTItem(null, item.getId(), null, qty_to_return);
 
-                        requestedList.refresh();
-                        releasingList.refresh();
-                    }
-                }else if(btn == removeItemBtn){
-                    ObservableList<MIRSItem> requested = FXCollections.observableArrayList(requestedList.getItems());
-                    for (MIRSItem selected : selectedItems) {
-
-                        if(selected.getId() == null){
-                            releasingList.getItems().remove(selected);
-                            break;
-                        }
-
-                        boolean found = false;
-                        for (MIRSItem listed : requested) {
-                            if (listed.getId().equals(selected.getId())) {
-                                listed.setQuantity(listed.getQuantity() + selected.getQuantity());
-                                releasingList.getItems().remove(selected);
-                                found = true;
-                            }
-                        }
-                        if (!found) {
-                            requestedList.getItems().add(selected);
-                            releasingList.getItems().remove(selected);
-                        }
-
-                        requestedList.refresh();
-                        releasingList.refresh();
-                    }
-                }else if (btn == addPartialQtyBtn){
-                    if(selectedItems.size() > 1){
-                        AlertDialogBuilder.messgeDialog("System Message", "Can not perform multiple selection on partial release of item, please try again.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-                    }else{
-                        JFXButton accept = new JFXButton("Accept");
-                        JFXTextField input = new JFXTextField();
-                        JFXDialog dialog = DialogBuilder.showInputDialog("Partial Quantity","Enter desired quantity:  ", "Requested quantity: "+ selectedItems.get(0).getQuantity(), input, accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
-                        accept.setOnAction(new EventHandler<ActionEvent>() {
-                            @Override
-                            public void handle(ActionEvent __) {
-                                try {
-                                    if(input.getText().length() == 0 || Integer.parseInt(input.getText()) > selectedItems.get(0).getQuantity()) {
-                                        AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid partial quantity!",
-                                                Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-                                    }else{
-
-                                        ObservableList<MIRSItem> toBeReleased = FXCollections.observableArrayList(releasingList.getItems());
-                                        boolean found = false;
-                                        for (MIRSItem listed : toBeReleased) {
-                                            if (listed.getId().equals(selectedItems.get(0).getId())) {
-                                                found = true;
-                                                break;
-                                            }
-                                        }
-                                        if (found) {
-                                            AlertDialogBuilder.messgeDialog("System Message", "Please remove item to change partial release quantity.",
-                                                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-                                        }else{
-                                            MIRSItem mirsItem = new MIRSItem();
-                                            mirsItem.setId(selectedItems.get(0).getId());
-                                            mirsItem.setMirsID(selectedItems.get(0).getMirsID());
-                                            mirsItem.setStockID(selectedItems.get(0).getStockID());
-                                            mirsItem.setQuantity(Integer.parseInt(input.getText()));
-                                            mirsItem.setPrice(selectedItems.get(0).getPrice());
-                                            mirsItem.setRemarks(selectedItems.get(0).getRemarks());
-                                            mirsItem.setCreatedAt(selectedItems.get(0).getCreatedAt());
-                                            mirsItem.setUpdatedAt(selectedItems.get(0).getUpdatedAt());
-                                            //mirsItem.setWorkOrderNo(selectedItems.get(0).getWorkOrderNo());
-
-                                            selectedItems.get(0).setQuantity(selectedItems.get(0).getQuantity() - Integer.parseInt(input.getText()));
-                                            releasingList.getItems().add(mirsItem);
-
-                                            if(selectedItems.get(0).getQuantity() == 0)
-                                                requestedList.getItems().remove(selectedItems.get(0));
-                                        }
-                                        requestedList.refresh();
-                                        releasingList.refresh();
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
+                            boolean ok = true;
+                            for (MRTItem i : this.mrtItems){
+                                if (i.getReleasingID().equals(returnItem.getReleasingID())) {
+                                    ok = false;
+                                    break;
                                 }
-                                dialog.close();
                             }
-                        });
+                            if (!ok){
+                                AlertDialogBuilder.messgeDialog("System Message", "The selected item is already found in the return items table!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                            }else{
+                                this.mrtItems.add(returnItem);
+                                this.returnItemTable.setItems(this.mrtItems);
+                            }
+
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
                     }
                 }
-
-            }
+                returnDialog.close();
+            });
         }
-        releasingList.getSelectionModel().clearSelection();
-        requestedList.getSelectionModel().clearSelection();
+    }
+
+    /**
+     * Initializes the Released items table
+     * @return void
+     */
+    public void initializeReleasedItemTable() {
+        TableColumn<ReleasedItems, String> column1 = new TableColumn<>("Stock ID");
+        column1.setMinWidth(120);
+        column1.setCellValueFactory(new PropertyValueFactory<>("id"));
+        column1.setStyle("-fx-alignment: center-left;");
+
+        TableColumn<ReleasedItems, String> column2 = new TableColumn<>("Description");
+        column2.setMinWidth(304);
+        column2.setCellValueFactory(new PropertyValueFactory<>("description"));
+        column2.setStyle("-fx-alignment: center-left;");
+
+        TableColumn<ReleasedItems, String> column3 = new TableColumn<>("MCT No");
+        column3.setMinWidth(115);
+        column3.setCellValueFactory(new PropertyValueFactory<>("mctNo"));
+        column3.setStyle("-fx-alignment: center;");
+
+        TableColumn<ReleasedItems, String> column4 = new TableColumn<>("Price");
+        column4.setMinWidth(115);
+        column4.setCellValueFactory(new PropertyValueFactory<>("price"));
+        column4.setStyle("-fx-alignment: center-left;");
+
+        TableColumn<ReleasedItems, String> column5 = new TableColumn<>("Quantity");
+        column5.setMinWidth(115);
+        column5.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        column5.setStyle("-fx-alignment: center;");
+
+        this.releasedItems =  FXCollections.observableArrayList();
+        this.releasedItemTable.setPlaceholder(new Label("No item searched!"));
+
+        this.releasedItemTable.getColumns().add(column1);
+        this.releasedItemTable.getColumns().add(column2);
+        this.releasedItemTable.getColumns().add(column3);
+        this.releasedItemTable.getColumns().add(column4);
+        this.releasedItemTable.getColumns().add(column5);
+    }
+
+    /**
+     * Initializes the Return items table
+     * @return void
+     */
+    public void initializeReturnItemTable() {
+        TableColumn<MRTItem, String> column1 = new TableColumn<>("Stock ID");
+        column1.setMinWidth(120);
+        column1.setCellValueFactory(new PropertyValueFactory<>("releasingID"));
+        column1.setStyle("-fx-alignment: center-left;");
+
+        TableColumn<MRTItem, String> column2 = new TableColumn<>("Description");
+        column2.setMinWidth(304);
+        column2.setCellValueFactory(item -> {
+            try {
+                Stock stock = StockDAO.get(ReleasingDAO.get(item.getValue().getReleasingID()).getStockID());
+                return new ReadOnlyObjectWrapper<>(stock.getDescription());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        column2.setStyle("-fx-alignment: center-left;");
+
+        TableColumn<MRTItem, String> column3 = new TableColumn<>("Quantity");
+        column3.setMinWidth(75);
+        column3.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        column3.setStyle("-fx-alignment: center;");
+
+        TableColumn<MRTItem, String> column4 = new TableColumn<>("Action");
+        Callback<TableColumn<MRTItem, String>, TableCell<MRTItem, String>> removeBtn
+                = //
+                new Callback<TableColumn<MRTItem, String>, TableCell<MRTItem, String>>() {
+                    @Override
+                    public TableCell call(final TableColumn<MRTItem, String> param) {
+                        final TableCell<MRTItem, String> cell = new TableCell<MRTItem, String>() {
+
+                            Button btn = new Button("");
+                            FontIcon icon = new FontIcon("mdi2d-delete");
+
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
+                                btn.setStyle("-fx-background-color: #f44336");
+                                btn.setGraphic(icon);
+                                btn.setGraphicTextGap(5);
+                                btn.setTextFill(Paint.valueOf(ColorPalette.WHITE));
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    btn.setOnAction(event -> {
+                                        MRTItem selectedItem = getTableView().getItems().get(getIndex());
+
+                                        try {
+                                            mrtItems.remove(selectedItem);
+                                            returnItemTable.setItems(mrtItems);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    });
+                                    setGraphic(btn);
+                                    setText(null);
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+        column4.setCellFactory(removeBtn);
+        column4.setStyle("-fx-alignment: center;");
+
+        this.mrtItems =  FXCollections.observableArrayList();
+        this.returnItemTable.setPlaceholder(new Label("No item added!"));
+
+        this.returnItemTable.getColumns().add(column1);
+        this.returnItemTable.getColumns().add(column2);
+        this.returnItemTable.getColumns().add(column3);
+        this.returnItemTable.getColumns().add(column4);
+    }
+
+    /**
+     * Binds the textfield to autosuggest employee
+     * @return void
+     */
+    public void bindReturnedByAutocomplete(JFXTextField textField){
+        AutoCompletionBinding<User> employeeSuggest = TextFields.bindAutoCompletion(textField,
+                param -> {
+                    //Value typed in the textfield
+                    String query = param.getUserText();
+
+                    //Initialize list of stocks
+                    List<User> list = new ArrayList<>();
+
+                    //Perform DB query when length of search string is 2 or above
+                    if (query.length() > 1){
+                        try {
+                            list = UserDAO.search(query);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    if (list.size() == 0) {
+                       returnedBy = null;
+                    }
+
+                    return list;
+                }, new StringConverter<>() {
+                    //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
+                    @Override
+                    public String toString(User object) {
+                        return object.getFullName();
+                    }
+
+                    @Override
+                    public User fromString(String string) {
+                        throw new UnsupportedOperationException();
+                    }
+                });
+
+        //This will set the actions once the user clicks an item from the popupmenu.
+        employeeSuggest.setOnAutoCompleted(event -> {
+            User user = event.getCompletion();
+            textField.setText(user.getFullName());
+            returnedBy = user;
+        });
+    }
+
+    /**
+     * Resets all field values
+     * @return void
+     */
+    @FXML
+    public void reset(){
+        this.mrtItems = FXCollections.observableArrayList();;
+        this.releasedItems = FXCollections.observableArrayList();;
+        this.currentMRT = null;
+        this.returnedBy = null;
+        this.returned_tf.setText("");
+        this.searchItem_tf.setText("");
+        this.returnItemTable.setItems(this.mrtItems);
+        this.releasedItemTable.setItems(this.releasedItems);
+        this.returnItemTable.setPlaceholder(new Label("No item added!"));
+        this.releasedItemTable.setPlaceholder(new Label("No item searched!"));
     }
 }
