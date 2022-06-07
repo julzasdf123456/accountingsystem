@@ -48,6 +48,7 @@ public class MCTDao {
             }
 
             conn.commit();
+            conn.setAutoCommit(true);
         }catch(SQLException ex) {
             ex.printStackTrace();
             conn.rollback();
