@@ -1,5 +1,8 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
+import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+
 import java.time.LocalDateTime;
 
 public class MIRSSignatory {
@@ -77,5 +80,16 @@ public class MIRSSignatory {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String toString(){
+        String result ="";
+        try {
+            EmployeeInfo temp = EmployeeDAO.getOne(userID, DB.getConnection());
+            result = temp.getEmployeeFirstName()+" "+temp.getEmployeeLastName();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result.toUpperCase();
     }
 }
