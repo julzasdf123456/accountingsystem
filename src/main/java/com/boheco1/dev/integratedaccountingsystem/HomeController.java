@@ -85,6 +85,9 @@ public class HomeController implements Initializable {
     // USER
     public JFXButton myAccount, logout;
 
+    // Create controller instance variables
+    public WarehouseDashboardController warehouse;
+
     @FXML
     public FlowPane subToolbar, notificationBin;
     public List<JFXButton> submenuList;
@@ -135,7 +138,9 @@ public class HomeController implements Initializable {
 
         NavMenuHelper.addMenu(navMenuBox, fileMirs, homeStackPane);
 
+        //Create the menu and instantiate the controller for use in the menu item
         if(ActiveUser.getUser().can("manage-warehouse")) {
+            warehouse = new WarehouseDashboardController();
             NavMenuHelper.addMenu(navMenuBox, generateMct, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, mrT, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, receiving, homeStackPane);
@@ -162,7 +167,7 @@ public class HomeController implements Initializable {
         DrawerMenuHelper.setMenuButton(collection,  new FontIcon("mdi2c-cash-usd"), drawerMenus, collection.getText());
 
         // WAREHOUSE
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(warehouseDashboard, new FontIcon("mdi2v-view-dashboard"), drawerMenus, "Warehouse Dashboard", contentPane, "warehouse_dashboard_controller.fxml", subToolbar, new WarehouseDashboardController(), title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(warehouseDashboard, new FontIcon("mdi2v-view-dashboard"), drawerMenus, "Warehouse Dashboard", contentPane, "warehouse_dashboard_controller.fxml", subToolbar, warehouse, title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(fileMirs, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "File MIRS", contentPane, "warehouse_file_mirs.fxml", subToolbar, new FileMIRSController(), title);
         if (ActiveUser.getUser().can("manage-warehouse")) {
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(generateMct, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Generate MCT", contentPane, "warehouse_generate_mct.fxml", subToolbar, new GenerateMCTController(), title);
@@ -215,6 +220,11 @@ public class HomeController implements Initializable {
 //        }
         notifyUser();
 
+        if (ActiveUser.getUser().can("manage-warehouse")) {
+            Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "warehouse_dashboard_controller.fxml"));
+            title.setText("Warehouse Dashboard");
+            warehouse.setSubMenus(subToolbar);
+        }
     }
 
     public void notifyUser() {
@@ -226,6 +236,8 @@ public class HomeController implements Initializable {
                     Platform.runLater(new Runnable() {
                         public void run() {
                             try {
+                                if (ActiveUser.getUser() == null)
+                                    return;
                                 int count = NotificationsDAO.getNotifCount(ActiveUser.getUser().getId()+"");
                                 if (count > 0) {
                                     notificationButton.setTextFill(Paint.valueOf(ColorPalette.DANGER));

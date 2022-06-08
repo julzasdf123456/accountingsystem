@@ -7,14 +7,15 @@ import java.sql.SQLException;
 public class DB {
 
     private static Connection connection;
-
+    public static String host="localhost";
+    public static String db_user = "app_user";
     public static Connection getConnection() throws SQLException, ClassNotFoundException {
         if(connection==null) {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            String conString = "jdbc:sqlserver://localhost;" +
+            String conString = "jdbc:sqlserver://"+host+";" +
                     "Database=Accounting;" +
-                    "user=sa;" +
-                    "password=lntrx2022;" +
+                    "user="+db_user+";" +
+                    "password=Boheco_2021;" +
                     "encrypt=false;" +
                     "trustServerCertificate=false;" +
                     "loginTimeout=60";
