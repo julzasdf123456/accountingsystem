@@ -14,6 +14,7 @@ public class Releasing {
     private LocalDateTime updatedAt;
     private String MR;
     private String workOrderNo;
+    private String acctCode;
 
     private String mctNo;
     public Releasing(String id, String stockID, String mirsID, int quantity, double price, String userID, String status) {
@@ -48,6 +49,20 @@ public class Releasing {
         this.MR = MR;
         this.workOrderNo=workdOrderNo;
         this.mctNo = mctNo;
+    }
+
+    public Releasing(String id, String stockID, String mirsID, int quantity, double price, String userID, String status, String MR, String workdOrderNo, String mctNo, String acctCode) {
+        this.id = id;
+        this.stockID = stockID;
+        this.mirsID = mirsID;
+        this.quantity = quantity;
+        this.price = price;
+        this.userID = userID;
+        this.status = status;
+        this.MR = MR;
+        this.workOrderNo=workdOrderNo;
+        this.mctNo = mctNo;
+        this.acctCode = acctCode;
     }
     public String getWorkOrderNo() {
         return workOrderNo;
@@ -146,5 +161,13 @@ public class Releasing {
 
     public void setMctNo(String mctNo) {
         this.mctNo = mctNo;
+    }
+
+    public String getAcctCode() {
+        return acctCode;
+    }
+
+    public void setAcctCode(String acctgCode) {
+        this.acctCode = acctCode;
     }
 }
