@@ -34,14 +34,6 @@
                                  <content>
                                     <AnchorPane minWidth="60.0" prefHeight="764.0" prefWidth="922.0">
                                        <VBox fx:id="navMenuBox" layoutX="21.0" layoutY="169.0" prefHeight="200.0" prefWidth="100.0" spacing="1.0" style="-fx-background-color: #009688;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
-                                          <children>
-                                             <Label alignment="CENTER" prefHeight="30" text="Accounting" textAlignment="CENTER" textFill="#FFFFFF">
-                                                <padding>
-                                                   <Insets left="10" />
-                                                </padding>
-                                             </Label>
-
-                                          </children>
                                           <padding>
                                              <Insets top="15.0" />
                                           </padding>
