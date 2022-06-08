@@ -28,9 +28,19 @@
                               <FontIcon iconColor="WHITE" iconLiteral="mdi2p-printer" iconSize="20" />
                            </graphic>
                            <HBox.margin>
-                              <Insets left="24.0" />
+                              <Insets left="24.0" right="50.0" />
                            </HBox.margin>
                         </JFXButton>
+                        <JFXTextField fx:id="issuedBy" labelFloat="true" prefHeight="37.0" prefWidth="250.0" promptText="Issued By">
+                           <HBox.margin>
+                              <Insets left="16.0" right="16.0" />
+                           </HBox.margin>
+                        </JFXTextField>
+                        <JFXTextField fx:id="receivedBy" labelFloat="true" layoutX="312.0" layoutY="16.0" prefHeight="37.0" prefWidth="250.0" promptText="Received by">
+                           <HBox.margin>
+                              <Insets left="16.0" right="16.0" />
+                           </HBox.margin>
+                        </JFXTextField>
                      </children>
                   </HBox>
                </children>

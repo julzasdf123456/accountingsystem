@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.MCTDao;
 import com.boheco1.dev.integratedaccountingsystem.dao.ReleasingDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
@@ -18,27 +19,32 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.TextFields;
 
 import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class ViewAllMCTController extends MenuControllerHandler implements Initializable, SubMenuHelper {
 
     @FXML TableView mctTable;
-    @FXML private JFXTextField search_box;
+    @FXML private JFXTextField search_box, issuedBy, receivedBy;
 
+    private EmployeeInfo issuedByEmployee = null;
+    private EmployeeInfo receivedByEmployee = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initializeMirsTable();
+        bindEmployeeInfoAutocomplete(issuedBy);
+        bindEmployeeInfoAutocomplete(receivedBy);
+        populateTable("");
     }
 
     private void initializeMirsTable() {
@@ -56,9 +62,9 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
             mirsDateFiled.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
 
             TableColumn<MIRS, String> mirsStatus = new TableColumn<>("Address");
-            mirsStatus.setPrefWidth(200);
-            mirsStatus.setMaxWidth(200);
-            mirsStatus.setMinWidth(200);
+            mirsStatus.setPrefWidth(400);
+            mirsStatus.setMaxWidth(400);
+            mirsStatus.setMinWidth(400);
             mirsStatus.setCellValueFactory(new PropertyValueFactory<>("address"));
 
             TableColumn<MIRS, String> purposeCol = new TableColumn<>("Particulars");
@@ -85,11 +91,18 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                 return;
             }
 
+            if(issuedByEmployee == null || receivedByEmployee == null){
+                AlertDialogBuilder.messgeDialog("System Message", "Both signatories are required.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                return;
+            }
+
             MCTReleasings mctReleasings = MCTDao.getMCTReleasing(selected.getMctNo());
             if(mctReleasings == null){
                 AlertDialogBuilder.messgeDialog("System Information", "Can not find selected MCT record.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
                 return;
             }
+
+
             Stage stage = (Stage) Utility.getContentPane().getScene().getWindow();
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(
@@ -154,29 +167,110 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
 
                 //Create Table Content
                 ArrayList<String[]> rows = new ArrayList<>();
-                int[] rows_aligns = {Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_RIGHT,Element.ALIGN_RIGHT,Element.ALIGN_CENTER,Element.ALIGN_RIGHT};
+                int[] rows_aligns = {Element.ALIGN_CENTER, Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_RIGHT,Element.ALIGN_RIGHT,Element.ALIGN_CENTER,Element.ALIGN_RIGHT};
 
                 double total=0;
-
+                HashMap<String, Double> acctCodeSummary = new HashMap<String, Double>();
                 for (Releasing items : fromReleasing) {
                     Stock stock = StockDAO.get(ReleasingDAO.get(items.getId()).getStockID());
-                    String[] val = {stock.getAcctgCode(), stock.getLocalCode(),stock.getDescription(), String.format("%,.2f", items.getPrice()), String.format("%,.2f", (items.getPrice() * items.getQuantity())), stock.getUnit(), "" + items.getQuantity()};
+                    String[] val = {stock.getAcctgCode(), stock.getId(),stock.getDescription(), String.format("%,.2f", items.getPrice()), String.format("%,.2f", (items.getPrice() * items.getQuantity())), stock.getUnit(), "" + items.getQuantity()};
                     total += items.getPrice() * items.getQuantity();
                     rows.add(val);
+
+                    if(acctCodeSummary.get(stock.getAcctgCode()) == null){
+                        acctCodeSummary.put(stock.getAcctgCode(),items.getPrice() * items.getQuantity());
+                    }else{
+                        acctCodeSummary.replace(stock.getAcctgCode(),acctCodeSummary.get(stock.getAcctgCode()) + (items.getPrice() * items.getQuantity()) );
+                    }
                 }
-
-
                 pdf.tableContent(rows, header_spans, rows_aligns);
 
-                //Create Footer
+                //Create Total display
                 pdf.createCell(1,3);
                 pdf.createCell("TOTAL", 1, 11, Font.BOLD, Element.ALIGN_CENTER);
-                pdf.createCell(String.format("%,.2f",total), 1, 11, Font.BOLD, Element.ALIGN_CENTER);
+                pdf.createCell(String.format("%,.2f",total), 1, 11, Font.BOLD, Element.ALIGN_RIGHT);
                 pdf.createCell(1,2);
+
+                //Create account code summary
+                for(Map.Entry<String, Double> acctCode : acctCodeSummary.entrySet()){
+                    pdf.createCell(acctCode.getKey(), 1, 11, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+                    pdf.createCell(String.format("%,.2f", acctCode.getValue()), 1, 11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
+                    pdf.createCell(" ", 5, 11, Font.NORMAL, Element.ALIGN_RIGHT, Rectangle.NO_BORDER);
+                }
+
+                //create signatories
+                pdf.createCell(2,columns.length);
+                pdf.createCell("Issued By:",2, 11, Font.NORMAL, Element.ALIGN_RIGHT, Rectangle.NO_BORDER);
+                pdf.createCell(1,1);
+                pdf.createCell("Received By:",4, 11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
+                pdf.createCell(1,columns.length);
+                pdf.createCell(
+                        issuedByEmployee.getEmployeeFirstName().toUpperCase()+" " +
+                                issuedByEmployee.getEmployeeMidName().toUpperCase().charAt(0)+". " +
+                                issuedByEmployee.getEmployeeLastName().toUpperCase()+"\n"+issuedByEmployee.getDesignation(),3, 11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+
+                pdf.createCell(
+                        receivedByEmployee.getEmployeeFirstName().toUpperCase()+" " +
+                                receivedByEmployee.getEmployeeMidName().toUpperCase().charAt(0)+". " +
+                                receivedByEmployee.getEmployeeLastName().toUpperCase()+"\n"+receivedByEmployee.getDesignation(),4, 11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+
+
                 pdf.generate();
             }catch (Exception e){
                 e.printStackTrace();
                 AlertDialogBuilder.messgeDialog("System Error", "An error occurred while generating the pdf due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            }
+        });
+    }
+
+    private void bindEmployeeInfoAutocomplete(JFXTextField textField){
+        AutoCompletionBinding<EmployeeInfo> employeeSuggest = TextFields.bindAutoCompletion(textField,
+                param -> {
+                    //Value typed in the textfield
+                    String query = param.getUserText();
+
+                    //Initialize list of stocks
+                    List<EmployeeInfo> list = new ArrayList<>();
+
+                    //Perform DB query when length of search string is 4 or above
+                    if (query.length() > 3){
+                        try {
+                            list = EmployeeDAO.getEmployeeInfo(query);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    if (list.size() == 0) {
+                       if(textField == this.issuedBy)
+                            issuedByEmployee = null;
+                        else if(textField == this.receivedBy)
+                            receivedByEmployee = null;
+                    }
+
+                    return list;
+                }, new StringConverter<>() {
+                    //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
+                    @Override
+                    public String toString(EmployeeInfo object) {
+                        return object.getEmployeeFirstName() + " "+ object.getEmployeeLastName();
+                    }
+
+                    @Override
+                    public EmployeeInfo fromString(String string) {
+                        throw new UnsupportedOperationException();
+                    }
+                });
+
+        //This will set the actions once the user clicks an item from the popupmenu.
+        employeeSuggest.setOnAutoCompleted(event -> {
+
+            if(textField == this.issuedBy) {
+                issuedByEmployee = event.getCompletion();
+                issuedBy.setText(issuedByEmployee.getFullName());
+            }else if(textField == this.receivedBy) {
+                receivedByEmployee = event.getCompletion();
+                receivedBy.setText(receivedByEmployee.getFullName());
             }
         });
     }
