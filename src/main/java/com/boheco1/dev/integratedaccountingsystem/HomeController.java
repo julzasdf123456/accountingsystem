@@ -212,7 +212,7 @@ public class HomeController implements Initializable {
 //        DrawerMenuHelper.setMenuButton(myAccount,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "My Account");
         DrawerMenuHelper.setMenuButton(logout,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "Logout");
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(myAccount,new FontIcon("mdi2c-checkbox-blank-circle-outline"),drawerMenus,myAccount.getText(),contentPane,"view_my_account.fxml",subToolbar, new ViewMyAccountController(),title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(approvalTask,new FontIcon("mdi2c-checkbox-blank-circle-outline"),drawerMenus,approvalTask.getText(),contentPane,"view_mir_for_approval_controller.fxml",subToolbar, new ViewMyAccountController(),title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(approvalTask,new FontIcon("mdi2c-checkbox-blank-circle-outline"),drawerMenus,approvalTask.getText(),contentPane,"view_mirs_for_approval_controller.fxml",subToolbar, new ViewMyAccountController(),title);
         // CUSTOM IN-CONTROLLER EVENTS
 //        myAccount.setOnAction(actionEvent -> {
 //            this.replaceContent("view_my_account.fxml");

@@ -48,7 +48,7 @@ public class MirsDAO {
     public static void update(MIRS mirs) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE MIRS SET " +
-                        "DateFiled=?, Purpose=?, Details=?, Status=?, RequisitionerID=?, UpdatedAt=GETDATE(), address=?, applicant=? " +
+                        "DateFiled=?, Purpose=?, Details=?, Status=?, RequisitionerID=?, UpdatedAt=GETDATE(), address=?, applicant=?, WorkOrderNo = ? " +
                         "WHERE id=?");
         ps.setDate(1, Date.valueOf(mirs.getDateFiled()));
         ps.setString(2, mirs.getPurpose());
@@ -57,7 +57,8 @@ public class MirsDAO {
         ps.setString(5, mirs.getRequisitionerID());
         ps.setString(6, mirs.getAddress());
         ps.setString(7, mirs.getApplicant());
-        ps.setString(8, mirs.getId());
+        ps.setString(8, mirs.getWorkOrderNo());
+        ps.setString(9, mirs.getId());
 
         ps.executeUpdate();
 
