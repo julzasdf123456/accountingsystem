@@ -85,7 +85,7 @@ public class HomeController implements Initializable {
     public JFXButton employees, users, signatoriesButton;
 
     // USER
-    public JFXButton myAccount, logout;
+    public JFXButton approvalTask, myAccount, logout;
 
     // Create controller instance variables
     public WarehouseDashboardController warehouseCtrl;
@@ -121,6 +121,7 @@ public class HomeController implements Initializable {
         employees = new JFXButton("Employees");
         users = new JFXButton("Users");
         myAccount = new JFXButton("My Account");
+        approvalTask = new JFXButton("Approval Task");
         logout = new JFXButton("Logout");
         receiving = new JFXButton("Receiving Entry");
         addMR = new JFXButton("MR Entry");
@@ -166,6 +167,7 @@ public class HomeController implements Initializable {
         }
         NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("User"), new FontIcon("mdi2a-account-circle"), homeStackPane);
         NavMenuHelper.addMenu(navMenuBox, myAccount, homeStackPane);
+        NavMenuHelper.addMenu(navMenuBox, approvalTask, homeStackPane);
         NavMenuHelper.addMenu(navMenuBox, logout, homeStackPane);
 
         // INITIALIZE MENU FUNCTIONS
@@ -210,6 +212,7 @@ public class HomeController implements Initializable {
 //        DrawerMenuHelper.setMenuButton(myAccount,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "My Account");
         DrawerMenuHelper.setMenuButton(logout,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "Logout");
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(myAccount,new FontIcon("mdi2c-checkbox-blank-circle-outline"),drawerMenus,myAccount.getText(),contentPane,"view_my_account.fxml",subToolbar, new ViewMyAccountController(),title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(approvalTask,new FontIcon("mdi2c-checkbox-blank-circle-outline"),drawerMenus,approvalTask.getText(),contentPane,"view_mir_for_approval_controller.fxml",subToolbar, new ViewMyAccountController(),title);
         // CUSTOM IN-CONTROLLER EVENTS
 //        myAccount.setOnAction(actionEvent -> {
 //            this.replaceContent("view_my_account.fxml");
