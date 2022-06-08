@@ -185,6 +185,7 @@ public class MIRSReleasingFormController implements Initializable {
                 releasing.setMirsID(mirsItem.getMirsID());
                 releasing.setQuantity(mirsItem.getQuantity());
                 releasing.setPrice(mirsItem.getPrice());
+                releasing.setAcctCode(StockDAO.get(mirsItem.getStockID()).getAcctgCode());
                 releasing.setUserID(ActiveUser.getUser().getId());
 
                 for(MIRSItem rem : remainingRequest){
@@ -229,6 +230,7 @@ public class MIRSReleasingFormController implements Initializable {
             AlertDialogBuilder.messgeDialog("System Message", "MIRS items released.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
         }catch (Exception e){
             AlertDialogBuilder.messgeDialog("System Error", "Item released: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+            e.printStackTrace();
         }
     }
 

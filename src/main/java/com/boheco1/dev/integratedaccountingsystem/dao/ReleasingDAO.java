@@ -17,7 +17,7 @@ public class ReleasingDAO {
     public static void add(Releasing releasing) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "INSERT INTO Releasing (StockID, MIRSID, Quantity, Price, UserID, Status, CreatedAt, UpdatedAt, id, MR, WorkOrderNo) " +
-                        "VALUES (?,?,?,?,?,?,GETDATE(),GETDATE(),?, ?, ?, ?)");
+                        "VALUES (?,?,?,?,?,?,GETDATE(),GETDATE(),?, ?, ?)");
 
         releasing.setId(Utility.generateRandomId());
 
