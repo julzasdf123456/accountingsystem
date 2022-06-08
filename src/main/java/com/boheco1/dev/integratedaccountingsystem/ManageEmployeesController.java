@@ -5,8 +5,10 @@ import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.Department;
 import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
+import com.boheco1.dev.integratedaccountingsystem.objects.MRTItem;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
@@ -55,7 +57,13 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
     private TableColumn<EmployeeInfo, String> designationColumn;
 
     @FXML
-    StackPane employeeStackPane;
+    private TableColumn<EmployeeInfo, String> addressColumn;
+
+    @FXML
+    private TableColumn<EmployeeInfo, String> phoneColumn;
+
+    @FXML
+    private TableColumn<EmployeeInfo, String> signatoryColumn;
 
     private EmployeeInfo currentEmployee;
     private ObservableList<Department> listOfDepartments;
@@ -97,7 +105,7 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
                 );
 
                 EmployeeDAO.addEmployee(currentEmployee, DB.getConnection());
-                AlertDialogBuilder.messgeDialog("Success","A new employee record has been added!", employeeStackPane, AlertDialogBuilder.INFO_DIALOG);
+                AlertDialogBuilder.messgeDialog("Success","A new employee record has been added!", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
 
                 listOfEmployees.add(currentEmployee);
             }else {
@@ -113,13 +121,19 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
                 currentEmployee.setDepartmentID(departmentField.getSelectionModel().getSelectedItem().getDepartmentID());
 
                 EmployeeDAO.update(currentEmployee);
-
-                AlertDialogBuilder.messgeDialog("Success","The employee record has been updated!", employeeStackPane, AlertDialogBuilder.INFO_DIALOG);
+                int index = 0;
+                for (EmployeeInfo emp : this.employeesTable.getItems()){
+                    if (emp.getId().equals(this.currentEmployee.getId())){
+                        this.employeesTable.getItems().set(index, currentEmployee);
+                    }
+                    index++;
+                }
+                AlertDialogBuilder.messgeDialog("Success","The employee record has been updated!", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
 
             }
         }catch(Exception ex) {
             ex.printStackTrace();
-            AlertDialogBuilder.messgeDialog("Exception!", ex.getMessage(), employeeStackPane, AlertDialogBuilder.DANGER_DIALOG);
+            AlertDialogBuilder.messgeDialog("Exception!", ex.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }
     }
 
@@ -136,10 +150,29 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
         try {
             listOfDepartments = FXCollections.observableArrayList(DepartmentDAO.getAll(DB.getConnection()));
             departmentField.setItems(listOfDepartments);
+            nameColumn = new TableColumn<>("Employee Name");
+            nameColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
+            nameColumn.setStyle("-fx-alignment: center-left;");
 
-            nameColumn.setCellValueFactory(new PropertyValueFactory<EmployeeInfo, String>("fullName"));
-            designationColumn.setCellValueFactory(new PropertyValueFactory<EmployeeInfo, String>("designation"));
-            departmentColumn.setCellValueFactory(new PropertyValueFactory<EmployeeInfo, String>("departmentName"));
+            designationColumn = new TableColumn<>("Designation");
+            designationColumn.setCellValueFactory(new PropertyValueFactory<>("designation"));
+            designationColumn.setStyle("-fx-alignment: center-left;");
+
+            departmentColumn = new TableColumn<>("Department");
+            departmentColumn.setCellValueFactory(new PropertyValueFactory<>("departmentName"));
+            departmentColumn.setStyle("-fx-alignment: center-left;");
+
+            addressColumn = new TableColumn<>("Address");
+            addressColumn.setCellValueFactory(new PropertyValueFactory<>("employeeAddress"));
+            addressColumn.setStyle("-fx-alignment: center-left;");
+
+            phoneColumn = new TableColumn<>("Phone");
+            phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
+            phoneColumn.setStyle("-fx-alignment: center;");
+
+            signatoryColumn = new TableColumn<>("Signatory Level");
+            signatoryColumn.setCellValueFactory(new PropertyValueFactory<>("signatoryLevel"));
+            signatoryColumn.setStyle("-fx-alignment: center-left;");
 
             listOfEmployees = FXCollections.observableArrayList(EmployeeDAO.getAll(DB.getConnection()));
             employeesTable.setItems(listOfEmployees);
@@ -160,22 +193,34 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
                 }
             });
 
-            nameColumn.setCellFactory(new Callback<TableColumn<EmployeeInfo, String>, TableCell<EmployeeInfo, String>>() {
-                @Override
-                public TableCell<EmployeeInfo, String> call(TableColumn<EmployeeInfo, String> employeeInfoStringTableColumn) {
-                    return new TableCell<EmployeeInfo, String>() {
-                        @Override
-                        protected void updateItem(String s, boolean b) {
-                            super.updateItem(s, b);
-                            this.setFont(new Font("Arial", 14.0));
-                            this.setText(s);
-                        }
-                    };
-                }
-            });
+            this.nameColumn.setPrefWidth(200);
+            this.nameColumn.setMinWidth(200);
+            this.nameColumn.setMaxWidth(200);
 
+            this.departmentColumn.setPrefWidth(150);
+            this.departmentColumn.setMinWidth(150);
+            this.departmentColumn.setMaxWidth(150);
+
+            this.designationColumn.setPrefWidth(150);
+            this.designationColumn.setMinWidth(150);
+            this.designationColumn.setMaxWidth(150);
+
+            this.phoneColumn.setPrefWidth(125);
+            this.phoneColumn.setMinWidth(125);
+            this.phoneColumn.setMaxWidth(125);
+
+            this.signatoryColumn.setPrefWidth(250);
+            this.signatoryColumn.setMinWidth(250);
+            this.signatoryColumn.setMaxWidth(250);
+
+            this.employeesTable.getColumns().add(this.nameColumn);
+            this.employeesTable.getColumns().add(this.departmentColumn);
+            this.employeesTable.getColumns().add(this.designationColumn);
+            this.employeesTable.getColumns().add(this.addressColumn);
+            this.employeesTable.getColumns().add(this.phoneColumn);
+            this.employeesTable.getColumns().add(this.signatoryColumn);
         }catch(Exception ex) {
-            AlertDialogBuilder.messgeDialog("Exception!", ex.getMessage(), employeeStackPane, AlertDialogBuilder.DANGER_DIALOG);
+            AlertDialogBuilder.messgeDialog("Exception!", ex.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             ex.printStackTrace();
         }
     }
@@ -192,7 +237,7 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
             signatoryLevelField.getSelectionModel().select(currentEmployee.getSignatoryLevel());
             departmentField.getSelectionModel().select(currentEmployee.getDepartment());
         }catch(Exception ex) {
-            AlertDialogBuilder.messgeDialog("Exception!", ex.getMessage(), employeeStackPane, AlertDialogBuilder.DANGER_DIALOG);
+            AlertDialogBuilder.messgeDialog("Exception!", ex.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             ex.printStackTrace();
         }
     }
