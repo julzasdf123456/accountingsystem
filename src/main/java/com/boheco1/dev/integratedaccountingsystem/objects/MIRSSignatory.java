@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.objects;
 import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class MIRSSignatory {
@@ -14,9 +15,13 @@ public class MIRSSignatory {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    private LocalDate mirsdateFiled;
+    private String purpose;
+
     public MIRSSignatory(){}
 
-    public MIRSSignatory(String id, String mirsID, String userID, String status, String comments, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public MIRSSignatory(String id, String mirsID, String userID, String status, String comments, LocalDateTime createdAt, LocalDateTime updatedAt
+    ) {
         this.id = id;
         this.mirsID = mirsID;
         this.userID = userID;
@@ -24,6 +29,19 @@ public class MIRSSignatory {
         this.comments = comments;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+
+    }
+
+    public MIRSSignatory(String id, String mirsID, String userID, String status, String comments, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDate mirsdateFiled, String purpose) {
+        this.id = id;
+        this.mirsID = mirsID;
+        this.userID = userID;
+        this.status = status;
+        this.comments = comments;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.mirsdateFiled = mirsdateFiled;
+        this.purpose = purpose;
     }
 
     public String getId() {
@@ -80,6 +98,22 @@ public class MIRSSignatory {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public LocalDate getMirsdateFiled() {
+        return mirsdateFiled;
+    }
+
+    public void setMirsdateFiled(LocalDate mirsdateFiled) {
+        this.mirsdateFiled = mirsdateFiled;
+    }
+
+    public String getPurpose() {
+        return purpose;
+    }
+
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
     }
 
     public String toString(){
