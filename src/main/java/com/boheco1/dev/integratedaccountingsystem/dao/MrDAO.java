@@ -121,7 +121,7 @@ public class MrDAO {
     }
 
     public static List<MR> getMRsOfEmployee(EmployeeInfo employeeInfo) throws Exception {
-        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM MR WHERE employeeId=? ORDER BY dateOfMR DESC");
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM MR WHERE employeeId=? ORDER BY id DESC");
         ps.setString(1, employeeInfo.getId());
 
         ResultSet rs = ps.executeQuery();
@@ -436,15 +436,15 @@ public class MrDAO {
         String sql = "";
         PreparedStatement ps = null;
         if (status == null){
-            sql = "SELECT MRItem.id, mr_no, MRItem.StockID, Qty, Stocks.Description, StockName, MRItem.ItemName, MRItem.Description, StockEntryLogs.RRNo, Remarks, dateOfReturned, MRItem.status, StockEntryLogs.Price, updatedBy, PropertyNo "+
-                    "FROM MR INNER JOIN MRItem ON MR.id = MRItem.mr_no INNER JOIN Stocks ON MRItem.StockID = Stocks.id INNER JOIN StockEntryLogs ON StockEntryLogs.StockID = Stocks.id "+
-                    "WHERE Stocks.id=? ORDER BY Stocks.Description ASC, mr_no DESC";
+            sql = "SELECT MRItem.id, mr_no, MRItem.StockID, Qty, Stocks.Description, StockName, MRItem.ItemName, MRItem.Description, dateOfMR, MRItem.RRNo, Remarks, dateOfReturned, MRItem.status, MRItem.Price, updatedBy, PropertyNo " +
+                    "FROM MR INNER JOIN MRItem ON MR.id = MRItem.mr_no INNER JOIN Stocks ON MRItem.StockID = Stocks.id "+
+                    "WHERE Stocks.id=? ORDER BY Stocks.Description ASC, mr_no DESC, dateOfMR DESC";
             ps = DB.getConnection().prepareStatement(sql);
             ps.setString(1, stock_id);
         }else{
-            sql = "SELECT MRItem.id, mr_no, MRItem.StockID, Qty, Stocks.Description, StockName, MRItem.ItemName, MRItem.Description, StockEntryLogs.RRNo, Remarks, dateOfReturned, MRItem.status, StockEntryLogs.Price, updatedBy, PropertyNo "+
-                    "FROM MR INNER JOIN MRItem ON MR.id = MRItem.mr_no INNER JOIN Stocks ON MRItem.StockID = Stocks.id INNER JOIN StockEntryLogs ON StockEntryLogs.StockID = Stocks.id "+
-                    "WHERE MRItem.status=? AND Stocks.id=? ORDER BY Stocks.Description ASC, mr_no DESC";
+            sql = "SELECT MRItem.id, mr_no, MRItem.StockID, Qty, Stocks.Description, StockName, MRItem.ItemName, MRItem.Description, MRItem.RRNo, Remarks, dateOfReturned, MRItem.status, MRItem.Price, updatedBy, PropertyNo " +
+                    "FROM MR INNER JOIN MRItem ON MR.id = MRItem.mr_no INNER JOIN Stocks ON MRItem.StockID = Stocks.id "+
+                    "WHERE MRItem.status=? AND Stocks.id=? ORDER BY Stocks.Description ASC, mr_no DESC, dateOfMR DESC";
             ps = DB.getConnection().prepareStatement(sql);
             ps.setString(1, status);
             ps.setString(2, stock_id);

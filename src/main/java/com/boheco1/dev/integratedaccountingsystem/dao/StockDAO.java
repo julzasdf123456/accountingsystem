@@ -895,7 +895,7 @@ public class StockDAO {
      */
     public static List<StockEntryLog> getEntryLogs(Stock stock) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM StockEntryLogs WHERE StockID=?;");
+                "SELECT * FROM StockEntryLogs WHERE StockID=? ORDER BY CreatedAt DESC;");
         ps.setString(1, stock.getId());
 
         ResultSet rs = ps.executeQuery();
@@ -932,7 +932,7 @@ public class StockDAO {
      */
     public static List<Releasing> getReleasedStocks(Stock stock, String status) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM Releasing WHERE StockID=? AND status=?;");
+                "SELECT * FROM Releasing WHERE StockID=? AND status=? ORDER BY UpdatedAt DESC;");
         ps.setString(1, stock.getId());
         ps.setString(2, status);
         ResultSet rs = ps.executeQuery();

@@ -222,7 +222,7 @@ public class ViewStockController implements Initializable {
         column4.setCellValueFactory(stockEntryLog -> new SimpleStringProperty(stockEntryLog.getValue().getUpdatedAt().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))));
         column4.setStyle("-fx-alignment: center;");
 
-        TableColumn<StockEntryLog, String> column5 = new TableColumn<>("Receiving Report");
+        TableColumn<StockEntryLog, String> column5 = new TableColumn<>("RR No");
         column5.setMinWidth(135);
         column5.setStyle("-fx-alignment: center;");
         column5.setCellValueFactory(new PropertyValueFactory<>("rrNo"));
@@ -307,8 +307,8 @@ public class ViewStockController implements Initializable {
         });
         column8.setStyle("-fx-alignment: center-left;");
 
-        this.mr.getColumns().add(column);
         this.mr.getColumns().add(column4);
+        this.mr.getColumns().add(column);
         this.mr.getColumns().add(column2);
         this.mr.getColumns().add(column3);
         this.mr.getColumns().add(column3a);
