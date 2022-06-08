@@ -2,6 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem.usermgt;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
 import com.boheco1.dev.integratedaccountingsystem.objects.Permission;
@@ -14,7 +15,7 @@ import javafx.scene.control.TextArea;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class ViewMyAccountController implements Initializable {
+public class ViewMyAccountController extends MenuControllerHandler implements Initializable {
     @FXML
     Label userNameField, fullNameField, designationField, phoneNumberField;
 

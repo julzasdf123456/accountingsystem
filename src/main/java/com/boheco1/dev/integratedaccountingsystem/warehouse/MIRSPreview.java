@@ -1,12 +1,15 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.*;
-import com.boheco1.dev.integratedaccountingsystem.helpers.PrintMIRS;
-import com.boheco1.dev.integratedaccountingsystem.helpers.PrintReleasedItems;
-import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Rectangle;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXComboBox;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -23,24 +26,26 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MIRSPreview implements Initializable {
 
     @FXML
     private StackPane stackPane;
     @FXML
-    private Label  date, mirsNumber, applicant, address, requisitioner, signatories, purpose;
+    private Label  details, date, mirsNumber, applicant, address, requisitioner, signatories, purpose;
     @FXML
-    private TextArea details;
+    private JFXComboBox<MIRSSignatory> woOfficercb, checkedBycb, approvedBycb;
     @FXML
-    private JFXButton printRequest, printReleased;
+    private JFXButton printRequest;
     @FXML
     private TableView requestedTable;
     @FXML
@@ -49,13 +54,14 @@ public class MIRSPreview implements Initializable {
     private MIRS mirs;
     private List<Releasing> releasedIitems = null;
     private List<ReleasedItemDetails> mirsItemList = null;
+    private List<MIRSSignatory> mirsSignatoryList;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         mirs = Utility.getActiveMIRS();
 
         try {
             mirs = MirsDAO.getMIRS(Utility.getActiveMIRS().getId());
-            List<MIRSSignatory> mirsSignatoryList = MIRSSignatoryDAO.get(mirs);
+            mirsSignatoryList = MIRSSignatoryDAO.get(mirs);
 
             String signatures = "";
             for (MIRSSignatory sig:mirsSignatoryList) {
@@ -71,6 +77,9 @@ public class MIRSPreview implements Initializable {
             address.setText(mirs.getAddress());
             applicant.setText(mirs.getApplicant());
             requisitioner.setText(mirs.getRequisitioner().getFullName());
+            checkedBycb.getItems().addAll(mirsSignatoryList);
+            approvedBycb.getItems().addAll(mirsSignatoryList);
+            woOfficercb.getItems().addAll(mirsSignatoryList);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -214,33 +223,189 @@ public class MIRSPreview implements Initializable {
         releasedTable.getItems().setAll(observableList);
     }
 
-    @FXML
-    private void printReleasedMIRS(ActionEvent event) {
-        if(releasedIitems.size() == 0)
-            return;
-
-        try {
-            new PrintReleasedItems(mirs);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (DocumentException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     @FXML
     private void printRequestMIRS(ActionEvent event) {
-        try {
-            new PrintMIRS(mirs);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (DocumentException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Platform.runLater(() -> {
+            try {
+                Stage stage = (Stage) Utility.getContentPane().getScene().getWindow();
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.getExtensionFilters().addAll(
+                        new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
+                );
+                fileChooser.setInitialFileName("MIRS_report_"+mirs.getId()+".pdf");
+                File selectedFile = fileChooser.showSaveDialog(stage);
+                if (selectedFile != null) {
+                    float[] columns = {1f,1f,1f,1f,1f,1f};
+                    PrintPDF pdf = new PrintPDF(selectedFile, columns);
+
+                    //Create header info
+                    pdf.header(null, "Material Issuance Requisition Slip ".toUpperCase(), "".toUpperCase());
+                    String[] head_info = {"MIRS No.: ",mirs.getId(),"Work Order No.: ",mirs.getWorkOrderNo(),"Date: ", mirs.getDateFiled().format(DateTimeFormatter.ofPattern("MM/dd/yy"))};
+                    int[] head_span = {5,1,5,1,5,1};
+                    int[] head_aligns = {
+                            Element.ALIGN_RIGHT, Element.ALIGN_LEFT,
+                            Element.ALIGN_RIGHT, Element.ALIGN_LEFT,
+                            Element.ALIGN_RIGHT, Element.ALIGN_LEFT,
+                    };
+
+                    int[] head_fonts = {
+                            com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL,
+                            com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL,
+                            com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL};
+
+                    int[] head_borders = {
+                            Rectangle.NO_BORDER, Rectangle.NO_BORDER,
+                            Rectangle.NO_BORDER, Rectangle.NO_BORDER,
+                            Rectangle.NO_BORDER, Rectangle.NO_BORDER};
+
+                    pdf.other_details(head_info, head_span, head_fonts, head_aligns,head_borders, true);
+
+                    //MIRS description
+                    pdf.createCell("   TO: The General Manager\n   Please furnish the following materials/supplies for:", columns.length, 11, Font.NORMAL, Element.ALIGN_LEFT);
+
+                    pdf.createCell("Description: ".toUpperCase(), 1, 11, Font.NORMAL, Element.ALIGN_RIGHT,Rectangle.NO_BORDER);
+                    pdf.createCell(mirs.getPurpose(), 4, 11, Font.NORMAL, Element.ALIGN_LEFT,Rectangle.NO_BORDER);
+                    pdf.createCell(1,1);
+
+                    pdf.createCell("Applicant: ".toUpperCase(), 1, 11, Font.NORMAL, Element.ALIGN_RIGHT,Rectangle.NO_BORDER);
+                    pdf.createCell(mirs.getApplicant(), 4, 11, Font.NORMAL, Element.ALIGN_LEFT,Rectangle.NO_BORDER);
+                    pdf.createCell(1,1);
+
+                    pdf.createCell("Address: ".toUpperCase(), 1, 11, Font.NORMAL, Element.ALIGN_RIGHT,Rectangle.NO_BORDER);
+                    pdf.createCell(mirs.getAddress(), 4, 11, Font.NORMAL, Element.ALIGN_LEFT,Rectangle.NO_BORDER);
+                    pdf.createCell(1,1);
+
+                    pdf.createCell("NEA Code".toUpperCase(), 1, 11, Font.BOLD, Element.ALIGN_CENTER);
+                    pdf.createCell("Description".toUpperCase(), 4, 11, Font.BOLD, Element.ALIGN_CENTER);
+                    pdf.createCell("Project\nRequirements".toUpperCase(), 1, 10, Font.BOLD, Element.ALIGN_CENTER);
+
+                    //table content
+                    for(MIRSItem mirsItem : MirsDAO.getItems(mirs)){
+                        pdf.createCell(StockDAO.get(mirsItem.getStockID()).getNeaCode(), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
+                        pdf.createCell(StockDAO.get(mirsItem.getStockID()).getDescription().toUpperCase(), 4, 11, Font.NORMAL, Element.ALIGN_LEFT);
+                        pdf.createCell(""+mirsItem.getQuantity(), 1, 10, Font.NORMAL, Element.ALIGN_CENTER);
+                    }
+                    pdf.createCell(1,columns.length);
+
+                    //Footer Note
+                    pdf.createCell("   I HEREBY CERTIFY THAT the above-requested Materials/Supplies are necessary and will be used SOLELY for the\n   purpose stated above", columns.length, 11, Font.NORMAL, Element.ALIGN_LEFT);
+
+                    pdf.createCell(2,columns.length);
+
+                    //Signatories
+                    pdf.createCell("Prepared by:", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell("Checked by:", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell("Approved by:", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(2,columns.length);
+                    pdf.createCell(mirs.getRequisitioner().getSignatoryNameFormat(), 2, 11, Font.BOLD, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(EmployeeDAO.getOne(checkedBycb.getValue().getUserID(), DB.getConnection()).getSignatoryNameFormat(), 2, 11, Font.BOLD, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(EmployeeDAO.getOne(approvedBycb.getValue().getUserID(), DB.getConnection()).getSignatoryNameFormat(), 2, 11, Font.BOLD, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+
+                    pdf.createCell(mirs.getRequisitioner().getDesignation(), 2, 9, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(EmployeeDAO.getOne(checkedBycb.getValue().getUserID(), DB.getConnection()).getDesignation(), 2, 9, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(EmployeeDAO.getOne(approvedBycb.getValue().getUserID(), DB.getConnection()).getDesignation(), 2, 9, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+
+                    pdf.createCell(3,columns.length);
+
+                    pdf.createCell("Work Order Officer", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(" ", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(" ", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+
+                    pdf.createCell(2,columns.length);
+                    pdf.createCell(EmployeeDAO.getOne(woOfficercb.getValue().getUserID(), DB.getConnection()).getSignatoryNameFormat(), 2, 11, Font.BOLD, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(" ", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(" ", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+
+                    pdf.createCell(EmployeeDAO.getOne(woOfficercb.getValue().getUserID(), DB.getConnection()).getDesignation(), 2, 9, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(" ", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(" ", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+
+
+                    /*pdf.header(null, "Material Issuance Requisition Slip ".toUpperCase(), "".toUpperCase());
+                    String[] head_info = {" ","MIRS No.: ",mirs.getId()," ","Work Order No.: ",mirs.getWorkOrderNo()," ","Date: ", mirs.getDateFiled().format(DateTimeFormatter.ofPattern("MM/dd/yy"))};
+                    int[] head_span = {4,1,1,4,1,1,4,1,1};
+                    int[] head_aligns = {
+                            Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_LEFT,
+                            Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_LEFT,
+                            Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_LEFT
+                            };
+
+                    int[] head_fonts = {com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL,
+                            com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL,
+                            com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL,
+                            com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL};
+                    int[] head_borders = {Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER,
+                            Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER,
+                            Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER,
+                            Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER};
+                    pdf.other_details(head_info, head_span, head_fonts, head_aligns,head_borders, true);
+
+
+                    //Create Table Header
+                    String[] headers = {"Acct. Code", "Item Code", "Description", "Unit Cost", "Amount", "Unit", "Qty"};
+                    int[] header_spans = {1, 1, 1, 1, 1, 1, 1};
+                    pdf.tableHeader(headers, header_spans);
+
+                    //Create Table Content
+                    ArrayList<String[]> rows = new ArrayList<>();
+                    int[] rows_aligns = {Element.ALIGN_CENTER, Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_RIGHT,Element.ALIGN_RIGHT,Element.ALIGN_CENTER,Element.ALIGN_RIGHT};
+
+                    double total=0;
+                    HashMap<String, Double> acctCodeSummary = new HashMap<String, Double>();
+                    for (Releasing items : fromReleasing) {
+                        Stock stock = StockDAO.get(ReleasingDAO.get(items.getId()).getStockID());
+                        String[] val = {stock.getAcctgCode(), stock.getId(),stock.getDescription(), String.format("%,.2f", items.getPrice()), String.format("%,.2f", (items.getPrice() * items.getQuantity())), stock.getUnit(), "" + items.getQuantity()};
+                        total += items.getPrice() * items.getQuantity();
+                        rows.add(val);
+
+                        if(acctCodeSummary.get(stock.getAcctgCode()) == null){
+                            acctCodeSummary.put(stock.getAcctgCode(),items.getPrice() * items.getQuantity());
+                        }else{
+                            acctCodeSummary.replace(stock.getAcctgCode(),acctCodeSummary.get(stock.getAcctgCode()) + (items.getPrice() * items.getQuantity()) );
+                        }
+                    }
+                    pdf.tableContent(rows, header_spans, rows_aligns);
+
+                    //Create Total display
+                    pdf.createCell(1,3);
+                    pdf.createCell("TOTAL", 1, 11, Font.BOLD, Element.ALIGN_CENTER);
+                    pdf.createCell(String.format("%,.2f",total), 1, 11, Font.BOLD, Element.ALIGN_RIGHT);
+                    pdf.createCell(1,2);
+
+                    //Create account code summary
+                    for(Map.Entry<String, Double> acctCode : acctCodeSummary.entrySet()){
+                        pdf.createCell(acctCode.getKey(), 1, 11, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+                        pdf.createCell(String.format("%,.2f", acctCode.getValue()), 1, 11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
+                        pdf.createCell(" ", 5, 11, Font.NORMAL, Element.ALIGN_RIGHT, Rectangle.NO_BORDER);
+                    }
+
+                    //create signatories
+                    pdf.createCell(2,columns.length);
+                    pdf.createCell("Issued By:",2, 11, Font.NORMAL, Element.ALIGN_RIGHT, Rectangle.NO_BORDER);
+                    pdf.createCell(1,1);
+                    pdf.createCell("Received By:",4, 11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
+                    pdf.createCell(1,columns.length);
+                    pdf.createCell(
+                            issuedByEmployee.getEmployeeFirstName().toUpperCase()+" " +
+                                    issuedByEmployee.getEmployeeMidName().toUpperCase().charAt(0)+". " +
+                                    issuedByEmployee.getEmployeeLastName().toUpperCase()+"\n"+issuedByEmployee.getDesignation(),3, 11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+
+                    pdf.createCell(
+                            receivedByEmployee.getEmployeeFirstName().toUpperCase()+" " +
+                                    receivedByEmployee.getEmployeeMidName().toUpperCase().charAt(0)+". " +
+                                    receivedByEmployee.getEmployeeLastName().toUpperCase()+"\n"+receivedByEmployee.getDesignation(),4, 11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+
+                    */
+                    pdf.generate();
+                }
+
+
+            }catch (Exception e){
+                e.printStackTrace();
+                AlertDialogBuilder.messgeDialog("System Error", "An error occurred while generating the pdf due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            }
+        });
     }
 
 }

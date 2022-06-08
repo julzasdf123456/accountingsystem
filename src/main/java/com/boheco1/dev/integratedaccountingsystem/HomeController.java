@@ -7,6 +7,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.MR;
 import com.boheco1.dev.integratedaccountingsystem.objects.Notifications;
 import com.boheco1.dev.integratedaccountingsystem.usermgt.AllUsersController;
 import com.boheco1.dev.integratedaccountingsystem.usermgt.UserMgtController;
+import com.boheco1.dev.integratedaccountingsystem.usermgt.ViewMyAccountController;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.*;
 
 import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
@@ -206,13 +207,13 @@ public class HomeController implements Initializable {
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(users, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, users.getText(), contentPane, "all_users_controller.fxml", subToolbar, new AllUsersController(), "manage-users", homeStackPane, title);
             DrawerMenuHelper.setMenuButton(signatoriesButton, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, signatoriesButton.getText());
         }
-        DrawerMenuHelper.setMenuButton(myAccount,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "My Account");
+//        DrawerMenuHelper.setMenuButton(myAccount,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "My Account");
         DrawerMenuHelper.setMenuButton(logout,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "Logout");
-
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(myAccount,new FontIcon("mdi2c-checkbox-blank-circle-outline"),drawerMenus,myAccount.getText(),contentPane,"view_my_account.fxml",subToolbar, new ViewMyAccountController(),title);
         // CUSTOM IN-CONTROLLER EVENTS
-        myAccount.setOnAction(actionEvent -> {
-            this.replaceContent("view_my_account.fxml");
-        });
+//        myAccount.setOnAction(actionEvent -> {
+//            this.replaceContent("view_my_account.fxml");
+//        });
 
         logout.setOnAction(actionEvent -> {
             ActiveUser.setUser(null);
