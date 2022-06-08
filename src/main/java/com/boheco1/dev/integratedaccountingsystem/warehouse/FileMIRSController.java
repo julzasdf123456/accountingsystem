@@ -66,11 +66,11 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
     private void resetInputFields() {
         selectedStock = null;
-        requisitionerEmployee = null;
+
         selectedItem.clear();
         mirsItemTable.getItems().clear();
-        mirsNum.setText("");
-        requisitioner.setText("");
+
+
         purpose.setText("");
         particulars.setText("");
         quantity.setText("");
@@ -292,7 +292,8 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                         throw new UnsupportedOperationException();
                     }
                 });
-
+        stockSuggest.setVisibleRowCount(10);
+        stockSuggest.setMinWidth(500);
         //This will set the actions once the user clicks an item from the popupmenu.
         stockSuggest.setOnAutoCompleted(event -> {
             SlimStock result = event.getCompletion();
