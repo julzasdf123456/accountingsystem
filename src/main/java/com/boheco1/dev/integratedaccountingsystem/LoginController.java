@@ -45,9 +45,6 @@ public class LoginController implements Initializable {
             InputStream is = new FileInputStream("application.properties");
             properties.load(is);
             String user = properties.getProperty("user");
-            properties.setProperty("db_user", DB.db_user);
-            properties.setProperty("host", DB.host);
-
             if (user.length() > 0) {
                 this.username.setText(user);
                 this.remember_cb.setSelected(true);
@@ -70,7 +67,7 @@ public class LoginController implements Initializable {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            AlertDialogBuilder.messgeDialog("Cannot Log you In", ex.getMessage(), loginStackPane, AlertDialogBuilder.DANGER_DIALOG);
+            AlertDialogBuilder.messgeDialog("System Error", ex.getMessage(), loginStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }
     }
 
