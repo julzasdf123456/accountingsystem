@@ -198,12 +198,11 @@ public class GenerateMCTController extends MenuControllerHandler implements Init
             //remove items that are already added to the list for MCT
             unchargedItemDetailsListView.getItems().removeAll(forMctItemListView.getItems());
         }else{
-            AlertDialogBuilder.messgeDialog("System Message", "All released items under MIRS: " +mirs.getId() +" are ready for MCT issuance.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+            AlertDialogBuilder.messgeDialog("System Message", "All items under MIRS: " +mirs.getId() +" are either not yet released or already issued with an MCT number.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
         }
     }
 
     private void loadAllChargedItems(boolean loadAll){
-        System.out.println(loadAll);
         collectionOfUnchargeReleasedItem = new HashMap<>();
         try {
             List<UnchargedMIRSReleases> mirsItemReleasesList = MirsDAO.getUnchargedMIRSReleases();
