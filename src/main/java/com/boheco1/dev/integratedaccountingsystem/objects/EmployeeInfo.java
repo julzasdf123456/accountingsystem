@@ -132,4 +132,15 @@ public class EmployeeInfo {
     public Department getDepartment() throws Exception {
         return DepartmentDAO.get(departmentID);
     }
+
+    public String getSignatoryNameFormat(){
+        StringBuffer fullName = new StringBuffer();
+
+        if(employeeFirstName!=null && !employeeFirstName.isEmpty()) fullName.append(employeeFirstName).append(" ");
+        if(employeeMidName!=null && !employeeMidName.isEmpty()) fullName.append(" ").append(employeeMidName.charAt(0)).append(". ");
+        if(employeeLastName!=null && !employeeLastName.isEmpty()) fullName.append(employeeLastName).append(" ");
+        if(employeeSuffix!=null && !employeeSuffix.isEmpty()) fullName.append(employeeSuffix);
+
+        return fullName.toString().toUpperCase();
+    }
 }
