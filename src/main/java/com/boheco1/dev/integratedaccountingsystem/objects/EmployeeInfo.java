@@ -55,7 +55,7 @@ public class EmployeeInfo {
         if(employeeLastName!=null && !employeeLastName.isEmpty()) fullName.append(employeeLastName).append(", ");
         if(employeeSuffix!=null && !employeeSuffix.isEmpty()) fullName.append(" ").append(employeeSuffix).append(", ");
         if(employeeFirstName!=null && !employeeFirstName.isEmpty()) fullName.append(employeeFirstName);
-        if(employeeMidName!=null && !employeeMidName.isEmpty()) fullName.append(" ").append(employeeMidName.charAt(0));
+        if(employeeMidName!=null && !employeeMidName.isEmpty()) fullName.append(" ").append(employeeMidName.charAt(0)).append(".");
 
         return fullName.toString();
     }
@@ -142,5 +142,10 @@ public class EmployeeInfo {
         if(employeeSuffix!=null && !employeeSuffix.isEmpty()) fullName.append(employeeSuffix);
 
         return fullName.toString().toUpperCase();
+    }
+
+    @Override
+    public String toString() {
+        return this.getFullName();
     }
 }
