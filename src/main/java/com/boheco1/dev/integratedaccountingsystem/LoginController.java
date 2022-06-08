@@ -11,10 +11,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.Properties;
@@ -37,9 +34,16 @@ public class LoginController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
+            File appData = new File("application.properties");
+            if (!appData.exists()){
+                properties = new Properties();
+                properties.setProperty("user", "");
+                properties.setProperty("host", DB.host);
+                properties.setProperty("db_user", DB.db_user);
+                properties.store(new FileOutputStream("application.properties"), LocalDate.now().toString());
+            }
             InputStream is = new FileInputStream("application.properties");
             properties.load(is);
-            properties.list(System.out);
             String user = properties.getProperty("user");
             properties.setProperty("db_user", DB.db_user);
             properties.setProperty("host", DB.host);
@@ -52,9 +56,9 @@ public class LoginController implements Initializable {
             }
             DB.db_user = properties.getProperty("db_user");
             DB.host = properties.getProperty("host");
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            AlertDialogBuilder.messgeDialog("System Error", "An error occurred due to:"+e.getMessage()+" error.", loginStackPane, AlertDialogBuilder.DANGER_DIALOG);
+            AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), loginStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }
     }
 
@@ -70,7 +74,7 @@ public class LoginController implements Initializable {
         }
     }
 
-    private boolean login(){
+    private boolean login() throws Exception{
 
         String username = this.username.getText();
         String password = this.password.getText();
@@ -80,28 +84,19 @@ public class LoginController implements Initializable {
         }else if (password.length() == 0 || password== null || password.equals("")) {
             AlertDialogBuilder.messgeDialog("Input Error", "Please enter a valid password!", loginStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else {
-            try {
-                if (this.remember_cb.isSelected()) {
-                    properties.setProperty("user", this.username.getText());
-                    properties.setProperty("host", DB.host);
-                    properties.setProperty("db_user", DB.db_user);
-                }else{
-                    properties.setProperty("user", "");
-                    properties.setProperty("host", DB.host);
-                    properties.setProperty("db_user", DB.db_user);
-                }
-                properties.store(new FileOutputStream("application.properties"), LocalDate.now().toString());
-                User user = UserDAO.login(this.username.getText(), this.password.getText(), DB.getConnection());
-                return user != null;
-            } catch (IOException e) {
-                e.printStackTrace();
-                AlertDialogBuilder.messgeDialog("System Error", "An error occurred due to: " + e.getMessage() + " error.", loginStackPane, AlertDialogBuilder.DANGER_DIALOG);
-            } catch (Exception e) {
-                e.printStackTrace();
-                AlertDialogBuilder.messgeDialog("System Error", "An error occurred due to: " + e.getMessage() + " error.", loginStackPane, AlertDialogBuilder.DANGER_DIALOG);
-            }
+            this.saveAppData(this.remember_cb.isSelected());
+            User user = UserDAO.login(this.username.getText(), this.password.getText(), DB.getConnection());
+            return user != null;
         }
         return false;
     }
 
+    public void saveAppData(boolean remember) throws Exception {
+        this.properties.setProperty("user", "");
+        if (remember)
+            this.properties.setProperty("user", this.username.getText());
+        properties.setProperty("host", DB.host);
+        properties.setProperty("db_user", DB.db_user);
+        properties.store(new FileOutputStream("application.properties"), LocalDate.now().toString());
+    }
 }
