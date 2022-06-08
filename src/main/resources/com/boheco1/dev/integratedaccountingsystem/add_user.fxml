@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXPasswordField?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="671.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.usermgt.AddUserControlller">
+   <children>
+      <StackPane fx:id="addUserStackPane" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <Label layoutX="28.0" layoutY="30.0" prefHeight="30.0" prefWidth="198.0" text="Create New User">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+                  <VBox layoutX="28.0" layoutY="105.0" prefHeight="313.0" prefWidth="302.0" spacing="30.0">
+                     <children>
+                        <JFXComboBox fx:id="employeeCombo" focusColor="#40a868" labelFloat="true" onAction="#onSelectEmployee" prefHeight="26.0" prefWidth="346.0" promptText="Employee" />
+                        <JFXTextField fx:id="userNameField" focusColor="#40a861" labelFloat="true" promptText="User Name" />
+                        <JFXTextField fx:id="fullNameField" editable="false" focusColor="#40a861" labelFloat="true" layoutX="10.0" layoutY="10.0" promptText="Full Name" />
+                        <JFXPasswordField fx:id="passwordField" focusColor="#40a862" labelFloat="true" promptText="Password" />
+                        <JFXButton buttonType="RAISED" contentDisplay="CENTER" defaultButton="true" onAction="#onSave" prefHeight="46.0" prefWidth="151.0" style="-fx-background-color: #009688;" text="Save User" textFill="WHITE" />
+                     </children>
+                  </VBox>
+               </children>
+            </AnchorPane>
+         </children>
+      </StackPane>
+   </children>
+</AnchorPane>

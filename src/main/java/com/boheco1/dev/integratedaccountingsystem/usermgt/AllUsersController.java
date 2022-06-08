@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.usermgt;
 
+import com.boheco1.dev.integratedaccountingsystem.AllAccountsController;
 import com.boheco1.dev.integratedaccountingsystem.JournalEntriesController;
 import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
@@ -11,10 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
@@ -25,13 +23,32 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
-public class AllUsersController extends MenuControllerHandler implements Initializable {
+public class AllUsersController extends MenuControllerHandler implements Initializable, SubMenuHelper {
 
     @FXML TableView usersTable;
     @FXML StackPane allUsersStackPane;
     public AnchorPane contentPaneX;
+    public List<JFXButton> subToolbarMenus;
+
+    public JFXButton menu;
+    ContextMenuHelper contextMenuHelper;
+    MenuItem changeView = new MenuItem("Change View");
+    MenuItem showModal = new MenuItem("Show Modal View");
+
+    public AllUsersController() {
+        menu = new JFXButton("Menu");
+
+        // initialize context menu helper
+        contextMenuHelper = new ContextMenuHelper();
+
+        menu.setOnAction(actionEvent -> {
+            contextMenuHelper.initializePopupContextMenu(menu, changeView, showModal)
+                    .show(menu, NodeLocator.getNodeX(menu), NodeLocator.getNodeY(menu));
+        });
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -125,10 +142,18 @@ public class AllUsersController extends MenuControllerHandler implements Initial
         }
     }
 
+    @FXML
+    public void onCreateNew() {
+        //ModalBuilder.showModalFromXML(AllAccountsController.class, "add_user.fxml", allUsersStackPane);
+        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(JournalEntriesController.class, "add_user.fxml"));
+    }
+
     @Override
     public void setSubMenus(FlowPane flowPane) {
+        subToolbarMenus = new ArrayList<>();
+        subToolbarMenus.add(menu);
         flowPane.getChildren().removeAll();
-        flowPane.getChildren().setAll(new ArrayList<>());
+        flowPane.getChildren().setAll(subToolbarMenus);
     }
 
     @Override
