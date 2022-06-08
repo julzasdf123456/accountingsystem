@@ -40,6 +40,7 @@ public class LoginController implements Initializable {
                 properties.setProperty("user", "");
                 properties.setProperty("host", DB.host);
                 properties.setProperty("db_user", DB.db_user);
+                properties.setProperty("db_pass", DB.db_pass);
                 properties.store(new FileOutputStream("application.properties"), LocalDate.now().toString());
             }
             InputStream is = new FileInputStream("application.properties");
@@ -53,6 +54,7 @@ public class LoginController implements Initializable {
             }
             DB.db_user = properties.getProperty("db_user");
             DB.host = properties.getProperty("host");
+            DB.db_pass = properties.getProperty("db_pass");
         } catch (Exception e) {
             e.printStackTrace();
             AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), loginStackPane, AlertDialogBuilder.DANGER_DIALOG);
@@ -94,6 +96,7 @@ public class LoginController implements Initializable {
             this.properties.setProperty("user", this.username.getText());
         properties.setProperty("host", DB.host);
         properties.setProperty("db_user", DB.db_user);
+        properties.setProperty("db_pass", DB.db_pass);
         properties.store(new FileOutputStream("application.properties"), LocalDate.now().toString());
     }
 }
