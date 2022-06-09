@@ -152,29 +152,13 @@ public class UserMgtController extends MenuControllerHandler implements Initiali
     {
         try {
             if(currentUser==null) {
-                Department dept = (Department) departmentCombo.getSelectionModel().getSelectedItem();
 
-                if(dept==null) {
-                    AlertDialogBuilder.messgeDialog("No Department","It is required that an employee be assigned to a department.",userMgtStackPane,AlertDialogBuilder.WARNING_DIALOG);;
-                    return;
-                }
-
-                currentEmployee = new EmployeeInfo("",firstNameField.getText(),middleNameField.getText(),lastNameField.getText(),"",addressField.getText(),phoneNumberField.getText(),designationField.getText(),null, dept.getDepartmentID());
-                String fullName = currentEmployee.getEmployeeFirstName() + " " + currentEmployee.getEmployeeLastName();
-                EmployeeDAO.addEmployee(currentEmployee, conn);
-
-                currentUser = new User("", currentEmployee.getId(), userNameField.getText(), fullName);
-                currentUser.setPassword("Boheco1");
-                UserDAO.addUser(currentUser, conn);
-
-                listOfUsers.add(0, currentUser);
-//                selectUserCombo.getSelectionModel().select(0);
             }else {
                 AlertDialogBuilder.messgeDialog("Unavailable","This feature is not available yet.",userMgtStackPane,AlertDialogBuilder.WARNING_DIALOG);;
             }
-        }catch(SQLException ex) {
-            ex.printStackTrace();
-            AlertDialogBuilder.messgeDialog("Exception",ex.getMessage(),userMgtStackPane,AlertDialogBuilder.DANGER_DIALOG);;
+//        }catch(SQLException ex) {
+//            ex.printStackTrace();
+//            AlertDialogBuilder.messgeDialog("Exception",ex.getMessage(),userMgtStackPane,AlertDialogBuilder.DANGER_DIALOG);;
         }catch(Exception ex) {
             ex.printStackTrace();
         }

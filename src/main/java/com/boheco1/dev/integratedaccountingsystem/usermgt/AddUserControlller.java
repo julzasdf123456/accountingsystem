@@ -59,7 +59,7 @@ public class AddUserControlller extends MenuControllerHandler implements Initial
         }
         try {
             EmployeeInfo employeeInfo = (EmployeeInfo) employeeCombo.getSelectionModel().getSelectedItem();
-            User user = new User(null, employeeInfo.getId(),userNameField.getText(),fullNameField.getText());
+            User user = new User(employeeInfo.getId(),userNameField.getText());
             user.setPassword(passwordField.getText());
             UserDAO.addUser(user, DB.getConnection());
 
