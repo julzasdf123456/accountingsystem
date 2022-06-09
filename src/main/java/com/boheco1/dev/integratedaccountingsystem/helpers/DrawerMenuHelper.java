@@ -138,16 +138,11 @@ public class DrawerMenuHelper {
                                 fontIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
                                 drawerMenuList.get(i).setGraphic(fontIcon);
                             }
+                            button.getStyleClass().add("active-menu");
+                            icon.setIconColor(Paint.valueOf(ColorPalette.MAIN_COLOR));
+                            contentPane.getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, fxml, contentPane, subToolbar, titleHolder));
                         }
                     }).run();
-
-
-                    button.getStyleClass().add("active-menu");
-                    icon.setIconColor(Paint.valueOf(ColorPalette.MAIN_COLOR));
-                    contentPane.getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, fxml));
-
-                    controller.setSubMenus(subToolbar);
-                    controller.handleContentReplacements(contentPane, titleHolder);
                 }
             });
         } catch (Exception e) {
