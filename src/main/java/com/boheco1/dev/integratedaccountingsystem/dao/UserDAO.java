@@ -25,9 +25,7 @@ public class UserDAO {
 
         User user = new User(
                 rs.getString("id"),
-                rs.getString("EmployeeID"),
-                rs.getString("username"),
-                rs.getString("fullname")
+                rs.getString("username")
         );
 
         user.setPermissions(getPermissions(user, cxn));
@@ -50,9 +48,7 @@ public class UserDAO {
 
         User user =  new User(
                 rs.getString("id"),
-                rs.getString("EmployeeID"),
-                rs.getString("username"),
-                rs.getString("password")
+                rs.getString("username")
         );
 
         rs.close();
@@ -73,10 +69,7 @@ public class UserDAO {
         if(rs.next()) {
             user = new User(
                     rs.getString("id"),
-                    rs.getString("EmployeeID"),
-                    rs.getString("username"),
-                    rs.getString("fullname"),
-                    rs.getString("password")
+                    rs.getString("username")
             );
         }
 
@@ -86,26 +79,26 @@ public class UserDAO {
         return user;
     }
 
-    public static List<Role> getRoles(User user, Connection connection) throws SQLException {
-        PreparedStatement cs = connection.prepareStatement("SELECT roles.* FROM roles LEFT JOIN user_roles ON user_roles.role_id=roles.id WHERE user_roles.user_id=?");
-        cs.setString(1, user.getId());
-        ResultSet rs = cs.executeQuery();
-
-        ArrayList<Role> roles = new ArrayList();
-
-        while(rs.next()) {
-            roles.add(new Role(
-                    rs.getString("id"),
-                    rs.getString("role"),
-                    rs.getString("description")
-            ));
-        }
-
-        rs.close();
-        cs.close();
-
-        return roles;
-    }
+//    public static List<Role> getRoles(User user, Connection connection) throws SQLException {
+//        PreparedStatement cs = connection.prepareStatement("SELECT roles.* FROM roles LEFT JOIN user_roles ON user_roles.role_id=roles.id WHERE user_roles.user_id=?");
+//        cs.setString(1, user.getId());
+//        ResultSet rs = cs.executeQuery();
+//
+//        ArrayList<Role> roles = new ArrayList();
+//
+//        while(rs.next()) {
+//            roles.add(new Role(
+//                    rs.getString("id"),
+//                    rs.getString("role"),
+//                    rs.getString("description")
+//            ));
+//        }
+//
+//        rs.close();
+//        cs.close();
+//
+//        return roles;
+//    }
 
     private static List<Permission> getPermissions(User user, Connection cxn) throws SQLException {
         PreparedStatement cs = cxn.prepareStatement("SELECT permissions.* FROM permissions LEFT JOIN user_permissions ON user_permissions.permission_id=permissions.id WHERE user_permissions.user_id=?");
@@ -118,11 +111,11 @@ public class UserDAO {
             enlistPermission(permissions, p);
         }
 
-        for(Role role: getRoles(user, cxn)) {
-            for(Permission p: RoleDAO.getPermissions(role, cxn)) {
-                enlistPermission(permissions, p);
-            }
-        }
+//        for(Role role: getRoles(user, cxn)) {
+//            for(Permission p: RoleDAO.getPermissions(role, cxn)) {
+//                enlistPermission(permissions, p);
+//            }
+//        }
 
         rs.close();
         cs.close();
@@ -137,15 +130,14 @@ public class UserDAO {
     }
 
     public static List<User> getAll(Connection conn) throws SQLException {
-        PreparedStatement cs = conn.prepareStatement("SELECT * FROM users ORDER BY fullname");
+        PreparedStatement cs = conn.prepareStatement("SELECT u.* FROM users u INNER JOIN EmployeeInfo e ON e.EmployeeID=u.id \n" +
+                "ORDER BY e.EmployeeLastName, e.EmployeeFirstName;");
         ResultSet rs = cs.executeQuery();
         ArrayList<User> users = new ArrayList();
         while(rs.next()) {
             users.add(new User(
                     rs.getString("id"),
-                    rs.getString("EmployeeID"),
-                    rs.getString("username"),
-                    rs.getString("fullname")
+                    rs.getString("username")
             ));
         }
         rs.close();
@@ -161,9 +153,7 @@ public class UserDAO {
         while(rs.next()) {
             users.add(new User(
                     rs.getString("id"),
-                    rs.getString("EmployeeID"),
-                    rs.getString("username"),
-                    rs.getString("fullname")
+                    rs.getString("username")
             ));
         }
         rs.close();
@@ -174,16 +164,12 @@ public class UserDAO {
     public static void addUser(User user, Connection conn) throws Exception {
         String passwordHash = Hash.hash(user.getPassword());
         PreparedStatement cs = conn.prepareStatement(
-                "INSERT INTO users (username, fullname, password, EmployeeID, id) " +
-                "VALUES (?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+                "INSERT INTO users (username, password, id) " +
+                "VALUES (?,?,?)", Statement.RETURN_GENERATED_KEYS);
 
-        user.setId(Utility.generateRandomId());
-
+        cs.setString(3, user.getId());
+        cs.setString(2, passwordHash);
         cs.setString(1, user.getUserName());
-        cs.setString(2, user.getFullName());
-        cs.setString(3, passwordHash);
-        cs.setString(4, user.getEmployeeID());
-        cs.setString(5, user.getId());
 
         cs.executeUpdate();
 

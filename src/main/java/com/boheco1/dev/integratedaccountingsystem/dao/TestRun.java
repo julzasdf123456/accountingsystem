@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.NumberGenerator;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
@@ -13,18 +14,9 @@ import java.util.List;
 public class TestRun {
     public static void main(String[] args) {
         try {
-            List<UnchargedMIRSReleases> unchargedReleases = MirsDAO.getUnchargedMIRSReleases();
-
-            for(UnchargedMIRSReleases unchargedRelease: unchargedReleases) {
-                System.out.println("MIRS:" + unchargedRelease.getMirs().getId() + " "
-                        + unchargedRelease.getMirs().getPurpose() + " "
-                        + unchargedRelease.getReleases().size() + " records."
-                );
-                for(UnchargedItemDetails itemDetails: unchargedRelease.getReleases()) {
-                    System.out.println(itemDetails.getDescription() + " " + itemDetails.getQuantity());
-                }
-                System.out.println("");
-            }
+            System.out.println("Next MIRS:" + NumberGenerator.mirsNumber());
+            System.out.println("Next MCT:" + NumberGenerator.mctNumber("56"));
+            System.out.println("Next MR:" + NumberGenerator.mrNumber());
         }catch(Exception ex) {
             ex.printStackTrace();
         }

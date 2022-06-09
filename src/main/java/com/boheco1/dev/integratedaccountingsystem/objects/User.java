@@ -8,29 +8,21 @@ import java.util.List;
 public class User {
     private String id;
     private String userName;
-    private String fullName;
     private String passwordHash;
     private String password;
-    private String employeeID;
     private List<Permission> permissions;
     private static final String KEY = "ubhc1@securityxc";
 
     private EmployeeInfo employeeInfo;
 
-    public User(String id, String employeeID, String userName, String fullName) {
+    public User(String id, String userName) {
         this.id = id;
-        this.employeeID = employeeID;
         this.userName = userName;
-        this.fullName = fullName;
     }
 
-    public User(String id, String employeeID, String userName, String fullName, String passwordHash) {
-        this(id, employeeID, userName, fullName);
+    public User(String id, String userName, String passwordHash) {
+        this(id, userName);
         this.passwordHash = passwordHash;
-    }
-
-    public String getEmployeeID() {
-        return employeeID;
     }
 
     public String getPassword() {
@@ -47,14 +39,6 @@ public class User {
 
     public void setUserName(String userName) {
         this.userName = userName;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
     }
 
     public String getId() {
@@ -85,15 +69,32 @@ public class User {
     public EmployeeInfo getEmployeeInfo() throws Exception {
 
         if(employeeInfo==null) {
-            employeeInfo = EmployeeDAO.getOne(this.employeeID, DB.getConnection());
+            employeeInfo = EmployeeDAO.getOne(this.id, DB.getConnection());
         }
 
         return employeeInfo;
     }
 
+    public String getEmployeeID() {
+        return this.id;
+    }
+
+    public String getFullName() {
+        try {
+            return getEmployeeInfo().getFullName();
+        }catch(Exception ex) {
+            return "";
+        }
+    }
+
     @Override
     public String toString() {
-        return this.fullName + " [" + this.userName + "]";
+        try {
+            return getEmployeeInfo().getFullName();
+        }catch(Exception ex) {
+            ex.printStackTrace();
+            return "";
+        }
     }
 
 }
