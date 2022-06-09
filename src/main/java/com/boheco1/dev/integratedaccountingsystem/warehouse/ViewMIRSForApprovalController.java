@@ -51,7 +51,7 @@ public class ViewMIRSForApprovalController extends MenuControllerHandler impleme
         mirsTable.getItems().setAll(mirs);
 
         try {
-            if(EmployeeDAO.getOne(ActiveUser.getUser().getId(), DB.getConnection()).getDesignation().equals("Work Order Officer")){
+            if(EmployeeDAO.getOne(ActiveUser.getUser().getEmployeeID(), DB.getConnection()).getDesignation().equals("Work Order Officer")){
                 workOrderNum.setDisable(false);
             }
         } catch (Exception e) {

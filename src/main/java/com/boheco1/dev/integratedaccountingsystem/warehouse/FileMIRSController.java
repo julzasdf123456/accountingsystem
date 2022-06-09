@@ -44,7 +44,6 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     private TableView<MIRSItem> mirsItemTable;
 
     private Stock selectedStock = null;
-    private EmployeeInfo requisitionerEmployee = null;
     private EmployeeInfo signatory1Employee = null;
     private EmployeeInfo signatory2Employee = null;
     private EmployeeInfo signatory3Employee = null;
@@ -62,6 +61,8 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         InputValidation.restrictNumbersOnly(quantity);
         initializeItemTable();
         mirsNum.requestFocus();
+        requisitioner.setText(ActiveUser.getUser().getFullName());
+        requisitioner.setEditable(false);
     }
 
     private void resetInputFields() {
@@ -85,7 +86,6 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 address.getText().isEmpty() ||
                 purpose.getText().isEmpty() ||
                 mirsNum.getText().isEmpty() ||
-                requisitionerEmployee == null ||
                 signatory1Employee == null ||
                 signatory2Employee == null ||
                 signatory3Employee == null ||
@@ -109,7 +109,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                     mirs.setPurpose(purpose.getText());
                     mirs.setId(mirsNum.getText()); //id mean MIRS number from user input
                     mirs.setStatus(Utility.PENDING);
-                    mirs.setRequisitionerID(requisitionerEmployee.getId());
+                    mirs.setRequisitionerID(ActiveUser.getUser().getId());
                     mirs.setUserID(ActiveUser.getUser().getId());
                     MirsDAO.create(mirs); //add a new MIRS to the database
                     MirsDAO.addMIRSItems(mirs, mirsItemList); //add the items request from the MIRS filled
@@ -338,12 +338,12 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                     }
 
                     if (list.size() == 0) {
-                        if(textField == this.requisitioner)
-                            requisitionerEmployee = null;
-                        else if(textField == this.signatory1)
+                        if(textField == this.signatory1)
                             signatory1Employee = null;
                         else if(textField == this.signatory2)
                             signatory2Employee = null;
+                        else if(textField == this.signatory3)
+                            signatory3Employee = null;
                     }
 
                     return list;
@@ -362,10 +362,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
         //This will set the actions once the user clicks an item from the popupmenu.
         employeeSuggest.setOnAutoCompleted(event -> {
-            if(textField == this.requisitioner) {
-                requisitionerEmployee = event.getCompletion();
-                requisitioner.setText(requisitionerEmployee.getFullName());
-            }else if(textField == this.signatory1) {
+            if(textField == this.signatory1) {
                 signatory1Employee = event.getCompletion();
                 signatory1.setText(signatory1Employee.getFullName());
             }else if(textField == this.signatory2){

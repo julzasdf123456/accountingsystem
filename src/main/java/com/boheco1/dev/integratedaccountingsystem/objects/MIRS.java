@@ -161,7 +161,7 @@ public class MIRS {
 
     public EmployeeInfo getRequisitioner() throws Exception {
         if(requisitioner==null) {
-            requisitioner = EmployeeDAO.getOne(requisitionerID, DB.getConnection());
+            requisitioner = UserDAO.get(requisitionerID).getEmployeeInfo();
         }
         return requisitioner;
     }
