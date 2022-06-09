@@ -174,7 +174,7 @@ public class UserDAO {
     public static void addUser(User user, Connection conn) throws Exception {
         String passwordHash = Hash.hash(user.getPassword());
         PreparedStatement cs = conn.prepareStatement(
-                "INSERT INTO users (username, fullname, passsword, EmployeeID, id) " +
+                "INSERT INTO users (username, fullname, password, EmployeeID, id) " +
                 "VALUES (?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
 
         user.setId(Utility.generateRandomId());
