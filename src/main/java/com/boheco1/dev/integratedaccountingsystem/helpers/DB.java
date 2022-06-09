@@ -8,8 +8,8 @@ public class DB {
 
     private static Connection connection;
     public static String host="localhost";
-    public static String db_user = "app_user";
-    public static String db_pass = "Boheco_2021";
+    public static String db_user = "sa";
+    public static String db_pass = "lntrx2022";
     public static Connection getConnection() throws SQLException, ClassNotFoundException {
         if(connection==null) {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");

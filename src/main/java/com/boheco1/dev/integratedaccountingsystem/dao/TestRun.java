@@ -13,18 +13,17 @@ import java.util.List;
 public class TestRun {
     public static void main(String[] args) {
         try {
-            List<UnchargedMIRSReleases> unchargedReleases = MirsDAO.getUnchargedMIRSReleases();
+            EmployeeInfo emp = new EmployeeInfo(null, "Benjie","Basio","Lenteria","","Pob. Centro, Clarin, Bohol","0909 089 2350","Programmer",null,"2000");
+            EmployeeDAO.addEmployee(emp, DB.getConnection());
 
-            for(UnchargedMIRSReleases unchargedRelease: unchargedReleases) {
-                System.out.println("MIRS:" + unchargedRelease.getMirs().getId() + " "
-                        + unchargedRelease.getMirs().getPurpose() + " "
-                        + unchargedRelease.getReleases().size() + " records."
-                );
-                for(UnchargedItemDetails itemDetails: unchargedRelease.getReleases()) {
-                    System.out.println(itemDetails.getDescription() + " " + itemDetails.getQuantity());
-                }
-                System.out.println("");
-            }
+            User user = new User(emp.getId(), "lentrix");
+            user.setPassword("password123");
+            System.out.println(emp.getId());
+            System.out.println(user.getId());
+
+            UserDAO.addUser(user, DB.getConnection());
+
+            System.out.println("done.");
         }catch(Exception ex) {
             ex.printStackTrace();
         }

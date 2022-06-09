@@ -130,7 +130,8 @@ public class UserDAO {
     }
 
     public static List<User> getAll(Connection conn) throws SQLException {
-        PreparedStatement cs = conn.prepareStatement("SELECT * FROM users ORDER BY fullname");
+        PreparedStatement cs = conn.prepareStatement("SELECT u.* FROM users u INNER JOIN EmployeeInfo e ON e.EmployeeID=u.id \n" +
+                "ORDER BY e.EmployeeLastName, e.EmployeeFirstName;");
         ResultSet rs = cs.executeQuery();
         ArrayList<User> users = new ArrayList();
         while(rs.next()) {
@@ -165,8 +166,6 @@ public class UserDAO {
         PreparedStatement cs = conn.prepareStatement(
                 "INSERT INTO users (username, password, id) " +
                 "VALUES (?,?,?)", Statement.RETURN_GENERATED_KEYS);
-
-        user.setId(Utility.generateRandomId());
 
         cs.setString(3, user.getId());
         cs.setString(2, passwordHash);
