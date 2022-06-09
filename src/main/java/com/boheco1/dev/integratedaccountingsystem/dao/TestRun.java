@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.NumberGenerator;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
@@ -13,17 +14,9 @@ import java.util.List;
 public class TestRun {
     public static void main(String[] args) {
         try {
-            EmployeeInfo emp = new EmployeeInfo(null, "Benjie","Basio","Lenteria","","Pob. Centro, Clarin, Bohol","0909 089 2350","Programmer",null,"2000");
-            EmployeeDAO.addEmployee(emp, DB.getConnection());
-
-            User user = new User(emp.getId(), "lentrix");
-            user.setPassword("password123");
-            System.out.println(emp.getId());
-            System.out.println(user.getId());
-
-            UserDAO.addUser(user, DB.getConnection());
-
-            System.out.println("done.");
+            System.out.println("Next MIRS:" + NumberGenerator.mirsNumber());
+            System.out.println("Next MCT:" + NumberGenerator.mctNumber("56"));
+            System.out.println("Next MR:" + NumberGenerator.mrNumber());
         }catch(Exception ex) {
             ex.printStackTrace();
         }

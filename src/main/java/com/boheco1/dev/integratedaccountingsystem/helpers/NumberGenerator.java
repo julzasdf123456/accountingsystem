@@ -7,10 +7,31 @@ import java.sql.ResultSet;
 public class NumberGenerator {
     public static String mrNumber() {
         try {
-            ResultSet rs = DB.getConnection().createStatement().executeQuery(
-                    "SELECT id FROM MR ORDER BY id DESC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;");
-
             String year = Utility.CURRENT_YEAR();
+
+            ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                    "SELECT id FROM MR WHERE id LIKE '" + year + "%' ORDER BY id DESC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;");
+
+            if(!rs.next()) {
+                return year + "-0001";
+            }
+
+            String lastId = rs.getString("id");
+
+            return year + "-" + incrementStringID(lastId);
+
+        }catch(Exception ex) {
+            ex.printStackTrace();
+            return Utility.CURRENT_YEAR() + "-";
+        }
+    }
+
+    public static String mirsNumber() {
+        try {
+            String year = Utility.CURRENT_YEAR();
+
+            ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                    "SELECT id FROM MIRS WHERE id LIKE '" + year + "%' ORDER BY id DESC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;");
 
             if(!rs.next()) {
                 return year + "-0001";
@@ -28,10 +49,10 @@ public class NumberGenerator {
 
     public static String mctNumber(String townCode) {
         try {
-            ResultSet rs = DB.getConnection().createStatement().executeQuery(
-                    "SELECT mct_no FROM MCT WHERE mct_no LIKE '%-" + townCode + "-%' ORDER BY createdAt DESC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;");
-
             String year = Utility.CURRENT_YEAR();
+
+            ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                    "SELECT mct_no FROM MCT WHERE mct_no LIKE '" + year + "-" + townCode + "-%' ORDER BY createdAt DESC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;");
 
             if(!rs.next()) {
                 return year + "-" + townCode + "-0001";
