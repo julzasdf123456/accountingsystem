@@ -57,9 +57,6 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
     private TableColumn<EmployeeInfo, String> designationColumn;
 
     @FXML
-    private TableColumn<EmployeeInfo, String> addressColumn;
-
-    @FXML
     private TableColumn<EmployeeInfo, String> phoneColumn;
 
     @FXML
@@ -158,13 +155,9 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
             designationColumn.setCellValueFactory(new PropertyValueFactory<>("designation"));
             designationColumn.setStyle("-fx-alignment: center-left;");
 
-            departmentColumn = new TableColumn<>("Department");
+            departmentColumn = new TableColumn<>("Dept");
             departmentColumn.setCellValueFactory(new PropertyValueFactory<>("departmentName"));
             departmentColumn.setStyle("-fx-alignment: center-left;");
-
-            addressColumn = new TableColumn<>("Address");
-            addressColumn.setCellValueFactory(new PropertyValueFactory<>("employeeAddress"));
-            addressColumn.setStyle("-fx-alignment: center-left;");
 
             phoneColumn = new TableColumn<>("Phone");
             phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
@@ -193,21 +186,21 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
                 }
             });
 
-            this.nameColumn.setPrefWidth(200);
-            this.nameColumn.setMinWidth(200);
-            this.nameColumn.setMaxWidth(200);
+            this.nameColumn.setPrefWidth(250);
+            this.nameColumn.setMinWidth(250);
+            this.nameColumn.setMaxWidth(250);
 
-            this.departmentColumn.setPrefWidth(150);
-            this.departmentColumn.setMinWidth(150);
-            this.departmentColumn.setMaxWidth(150);
+            this.departmentColumn.setPrefWidth(100);
+            this.departmentColumn.setMinWidth(100);
+            this.departmentColumn.setMaxWidth(100);
 
-            this.designationColumn.setPrefWidth(150);
-            this.designationColumn.setMinWidth(150);
-            this.designationColumn.setMaxWidth(150);
+            this.designationColumn.setPrefWidth(200);
+            this.designationColumn.setMinWidth(200);
+            this.designationColumn.setMaxWidth(200);
 
-            this.phoneColumn.setPrefWidth(125);
-            this.phoneColumn.setMinWidth(125);
-            this.phoneColumn.setMaxWidth(125);
+            this.phoneColumn.setPrefWidth(150);
+            this.phoneColumn.setMinWidth(150);
+            this.phoneColumn.setMaxWidth(150);
 
             this.signatoryColumn.setPrefWidth(250);
             this.signatoryColumn.setMinWidth(250);
@@ -216,7 +209,6 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
             this.employeesTable.getColumns().add(this.nameColumn);
             this.employeesTable.getColumns().add(this.departmentColumn);
             this.employeesTable.getColumns().add(this.designationColumn);
-            this.employeesTable.getColumns().add(this.addressColumn);
             this.employeesTable.getColumns().add(this.phoneColumn);
             this.employeesTable.getColumns().add(this.signatoryColumn);
         }catch(Exception ex) {

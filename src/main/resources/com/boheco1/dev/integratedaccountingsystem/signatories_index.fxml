@@ -26,7 +26,7 @@
                   </JFXRadioButton>
                   <JFXRadioButton fx:id="approvedRadio" layoutX="146.0" layoutY="31.0" text="Approved" toggleGroup="$status" />
                   <TableView fx:id="signatoryItemsTable" layoutX="21.0" layoutY="60.0" prefHeight="574.0" prefWidth="552.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="21.0" AnchorPane.topAnchor="60.0" />
-                  <AnchorPane fx:id="detailsPane" layoutX="560.0" layoutY="58.0" prefHeight="579.0" prefWidth="495.0" style="-fx-background-color: #ffffff;" AnchorPane.bottomAnchor="27.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="58.0">
+                  <AnchorPane fx:id="detailsPane" layoutX="560.0" layoutY="58.0" prefHeight="579.0" prefWidth="495.0" style="-fx-background-color: #ffffff;" visible="false" AnchorPane.bottomAnchor="27.0" AnchorPane.leftAnchor="611.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="58.0">
                      <children>
                         <Label layoutX="35.0" layoutY="29.0" style="-fx-font-size: 18pt;" text="Signatory Details" underline="true" />
                         <Label layoutX="35.0" layoutY="88.0" text="MIRS ID:" />
