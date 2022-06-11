@@ -2,11 +2,13 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
+import com.boheco1.dev.integratedaccountingsystem.objects.MIRSSignatory;
 import com.boheco1.dev.integratedaccountingsystem.objects.Signatory;
+import com.boheco1.dev.integratedaccountingsystem.objects.SignatoryItem;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,6 +108,48 @@ public class SignatoryDAO {
         ps.close();
 
         return signatories;
+    }
+
+    /**
+     * Retrieves a list of MIRSSignatories into a SignatoryItem for table display
+     * @param status for filtering the status of the MIRSSignatory
+     * @return A list of SignatoryItems
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<SignatoryItem> getSignatoryItems(String status) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT m.id, m.MIRSID, ei.EmployeeFirstName , ei.EmployeeLastName, m.Status FROM MIRSSignatories m \n" +
+                        "INNER JOIN EmployeeInfo ei ON ei.EmployeeID = m.user_id \n" +
+                        "WHERE m.Status = ? ORDER BY m.CreatedAt DESC");
+        ps.setString(1, status);
+
+        List<SignatoryItem> items = new ArrayList();
+
+        ResultSet rs = ps.executeQuery();
+
+        while(rs.next()) {
+            items.add(new SignatoryItem(
+                    rs.getString("id"),
+                    rs.getString("MIRSID"),
+                    rs.getString("EmployeeLastName") + ", " + rs.getString("EmployeeFirstName"),
+                    rs.getString("Status")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return items;
+    }
+
+    public static void transferSignatory(String mirsSignatoryID, String userID) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE MIRSSignatories SET user_id=? WHERE id=?");
+        ps.setString(1, userID);
+        ps.setString(2, mirsSignatoryID);
+        ps.executeUpdate();
+
+        ps.close();
     }
 
 }

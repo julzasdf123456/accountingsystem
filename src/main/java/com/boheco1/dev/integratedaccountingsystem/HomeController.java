@@ -191,18 +191,12 @@ public class HomeController implements Initializable {
         // USERS
         if (ActiveUser.getUser().can("manage-employees")) {
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(employees, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, employees.getText(), contentPane, "manage_employees.fxml", subToolbar, null, "manage-users", homeStackPane, title);
-            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(users, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, users.getText(), contentPane, "user_mgt.fxml", subToolbar, null, "manage-users", homeStackPane, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(users, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, users.getText(), contentPane, "all_users_controller.fxml", subToolbar, null, "manage-users", homeStackPane, title);
-            DrawerMenuHelper.setMenuButton(signatoriesButton, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, signatoriesButton.getText());
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(signatoriesButton, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "Manage Signatories", contentPane, "signatories_index.fxml", subToolbar, null, "manage-users", homeStackPane, title);
         }
-//        DrawerMenuHelper.setMenuButton(myAccount,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "My Account");
         DrawerMenuHelper.setMenuButton(logout,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "Logout");
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(myAccount,new FontIcon("mdi2c-checkbox-blank-circle-outline"),drawerMenus,myAccount.getText(),contentPane,"view_my_account.fxml",subToolbar, null, title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(approvalTask,new FontIcon("mdi2c-checkbox-blank-circle-outline"),drawerMenus,approvalTask.getText(),contentPane,"view_mirs_for_approval_controller.fxml",subToolbar, null, title);
-        // CUSTOM IN-CONTROLLER EVENTS
-//        myAccount.setOnAction(actionEvent -> {
-//            this.replaceContent("view_my_account.fxml");
-//        });
 
         logout.setOnAction(actionEvent -> {
             ActiveUser.setUser(null);

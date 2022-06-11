@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXRadioButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+
+<AnchorPane prefHeight="664.0" prefWidth="1151.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.SignatoriesIndexController">
+    <padding>
+        <Insets left="16.0" right="16.0" />
+    </padding>
+   <children>
+      <StackPane fx:id="signatoriesIndexStackPane" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <AnchorPane prefHeight="718.0" prefWidth="1119.0">
+               <children>
+                  <JFXRadioButton fx:id="pendingRadio" layoutX="22.0" layoutY="31.0" selected="true" text="Pending">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="status" />
+                     </toggleGroup>
+                  </JFXRadioButton>
+                  <JFXRadioButton fx:id="approvedRadio" layoutX="146.0" layoutY="31.0" text="Approved" toggleGroup="$status" />
+                  <TableView fx:id="signatoryItemsTable" layoutX="21.0" layoutY="60.0" prefHeight="574.0" prefWidth="552.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="21.0" AnchorPane.topAnchor="60.0" />
+                  <AnchorPane fx:id="detailsPane" layoutX="560.0" layoutY="58.0" prefHeight="579.0" prefWidth="495.0" style="-fx-background-color: #ffffff;" AnchorPane.bottomAnchor="27.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="58.0">
+                     <children>
+                        <Label layoutX="35.0" layoutY="29.0" style="-fx-font-size: 18pt;" text="Signatory Details" underline="true" />
+                        <Label layoutX="35.0" layoutY="88.0" text="MIRS ID:" />
+                        <Label layoutX="35.0" layoutY="114.0" text="Date Filed:" />
+                        <Label layoutX="35.0" layoutY="140.0" text="Work Order No.:" />
+                        <Label layoutX="35.0" layoutY="166.0" text="Applicant:" />
+                        <Label layoutX="35.0" layoutY="192.0" text="Address:" />
+                        <Label layoutX="35.0" layoutY="218.0" text="Requisitioner:" />
+                        <Label layoutX="34.0" layoutY="244.0" text="Purpose:" />
+                        <Label fx:id="mirsIDValue" layoutX="186.0" layoutY="87.0" prefHeight="26.0" prefWidth="294.0" text="0000" />
+                        <Label fx:id="dateFiledValue" layoutX="186.0" layoutY="113.0" prefHeight="26.0" prefWidth="294.0" text="Feb-22-2022" />
+                        <Label fx:id="workOrderNoValue" layoutX="186.0" layoutY="139.0" prefHeight="26.0" prefWidth="294.0" text="2022-90-0989" />
+                        <Label fx:id="applicantValue" layoutX="186.0" layoutY="165.0" prefHeight="26.0" prefWidth="294.0" text="Xxxxxxxxxx, Xxxxxxxxx" />
+                        <Label fx:id="addressValue" layoutX="186.0" layoutY="191.0" prefHeight="26.0" prefWidth="294.0" text="Xxxxxxxxxx, Xxxxxxxxx" />
+                        <Label fx:id="requisitionerValue" layoutX="186.0" layoutY="217.0" prefHeight="26.0" prefWidth="294.0" text="Xxxxxxxxxx, Xxxxxxxxx" />
+                        <Label fx:id="purposeValue" alignment="TOP_LEFT" layoutX="186.0" layoutY="243.0" prefHeight="92.0" prefWidth="294.0" text="Xxxxxxxxxx, Xxxxxxxxx" wrapText="true" />
+                        <Label fx:id="detailsValue" alignment="TOP_LEFT" layoutX="186.0" layoutY="335.0" prefHeight="92.0" prefWidth="294.0" text="Xxxxxxxxxx, Xxxxxxxxx" wrapText="true" />
+                        <Label layoutX="34.0" layoutY="335.0" text="Details" />
+                        <Label layoutX="35.0" layoutY="473.0" text="Signatory:" />
+                        <Label fx:id="signatoryValue" layoutX="133.0" layoutY="473.0" prefHeight="26.0" prefWidth="270.0" text="Xxxxxx, Xxxxxxxx" />
+                        <Label layoutX="35.0" layoutY="520.0" text="Transfer to:" />
+                        <JFXButton fx:id="transferButton" layoutX="372.0" layoutY="513.0" prefHeight="38.0" prefWidth="97.0" styleClass="btn-info" text="Transfer" />
+                        <JFXTextField fx:id="transferToField" layoutX="125.0" layoutY="513.0" prefHeight="38.0" prefWidth="235.0" />
+                     </children></AnchorPane>
+               </children>
+            </AnchorPane>
+         </children>
+      </StackPane>
+   </children>
+</AnchorPane>
