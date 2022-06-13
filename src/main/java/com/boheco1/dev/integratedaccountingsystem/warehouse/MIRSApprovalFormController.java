@@ -1,13 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
-import com.boheco1.dev.integratedaccountingsystem.dao.MIRSSignatoryDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.MirsDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
-import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
-import com.boheco1.dev.integratedaccountingsystem.helpers.ColorPalette;
-import com.boheco1.dev.integratedaccountingsystem.helpers.DialogBuilder;
-import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.dao.*;
+import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRSItem;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRSSignatory;
@@ -70,7 +64,7 @@ public class MIRSApprovalFormController implements Initializable {
 
             String signatures = "";
             for (MIRSSignatory sig:mirsSignatoryList) {
-                signatures+=UserDAO.get(sig.getUserID()).getFullName();
+                signatures+= EmployeeDAO.getOne(sig.getUserID(), DB.getConnection()).getFullName();
                 signatures+="\n";
             }
             signatories.setText(signatures);

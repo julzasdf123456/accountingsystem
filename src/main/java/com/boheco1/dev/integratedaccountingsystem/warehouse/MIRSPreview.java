@@ -65,7 +65,7 @@ public class MIRSPreview implements Initializable {
 
             String signatures = "";
             for (MIRSSignatory sig:mirsSignatoryList) {
-                signatures+=UserDAO.get(sig.getUserID()).getFullName();
+                signatures+=EmployeeDAO.getOne(sig.getUserID(),DB.getConnection()).getFullName();
                 signatures+="\n";
             }
             signatories.setText(signatures);
