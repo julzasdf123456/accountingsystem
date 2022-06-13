@@ -39,7 +39,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
     private ObservableList<MRTItem> mrtItems = null;
     private ObservableList<ReleasedItems> releasedItems = null;
     private MRT currentMRT = null;
-    private User returnedBy = null;
+    private EmployeeInfo returnedBy = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -133,7 +133,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
         if (this.returnedBy == null){
             AlertDialogBuilder.messgeDialog("System Message", "No employee was set!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }else {
-            this.currentMRT = new MRT(null, this.returnedBy.getEmployeeID(), ActiveUser.getUser().getEmployeeID(), LocalDate.now());
+            this.currentMRT = new MRT(null, this.returnedBy.getId(), ActiveUser.getUser().getEmployeeID(), LocalDate.now());
             try {
                 MRTDao.create(this.currentMRT);
                 MRTDao.addItems(this.currentMRT, this.mrtItems);
@@ -284,18 +284,18 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
      * @return void
      */
     public void bindReturnedByAutocomplete(JFXTextField textField){
-        AutoCompletionBinding<User> employeeSuggest = TextFields.bindAutoCompletion(textField,
+        AutoCompletionBinding<EmployeeInfo> employeeSuggest = TextFields.bindAutoCompletion(textField,
                 param -> {
                     //Value typed in the textfield
                     String query = param.getUserText();
 
                     //Initialize list of stocks
-                    List<User> list = new ArrayList<>();
+                    List<EmployeeInfo> list = new ArrayList<>();
 
                     //Perform DB query when length of search string is 2 or above
                     if (query.length() > 1){
                         try {
-                            list = UserDAO.search(query);
+                            list = EmployeeDAO.getEmployeeInfo(query);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -309,19 +309,19 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
                 }, new StringConverter<>() {
                     //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
                     @Override
-                    public String toString(User object) {
+                    public String toString(EmployeeInfo object) {
                         return object.getFullName();
                     }
 
                     @Override
-                    public User fromString(String string) {
+                    public EmployeeInfo fromString(String string) {
                         throw new UnsupportedOperationException();
                     }
                 });
 
         //This will set the actions once the user clicks an item from the popupmenu.
         employeeSuggest.setOnAutoCompleted(event -> {
-            User user = event.getCompletion();
+            EmployeeInfo user = event.getCompletion();
             textField.setText(user.getFullName());
             returnedBy = user;
         });

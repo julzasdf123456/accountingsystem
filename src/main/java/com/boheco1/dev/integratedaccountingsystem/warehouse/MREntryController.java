@@ -2,7 +2,6 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXTextField;
@@ -129,18 +128,18 @@ public class MREntryController extends MenuControllerHandler implements Initiali
      * @return void
      */
     public void bindSignatoreesAutocomplete(JFXTextField textField){
-        AutoCompletionBinding<User> employeeSuggest = TextFields.bindAutoCompletion(textField,
+        AutoCompletionBinding<EmployeeInfo> employeeSuggest = TextFields.bindAutoCompletion(textField,
                 param -> {
                     //Value typed in the textfield
                     String query = param.getUserText();
 
                     //Initialize list of stocks
-                    List<User> list = new ArrayList<>();
+                    List<EmployeeInfo> list = new ArrayList<>();
 
                     //Perform DB query when length of search string is 2 or above
                     if (query.length() > 1){
                         try {
-                            list = UserDAO.search(query);
+                            list = EmployeeDAO.getEmployeeInfo(query);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -158,25 +157,25 @@ public class MREntryController extends MenuControllerHandler implements Initiali
                 }, new StringConverter<>() {
                     //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
                     @Override
-                    public String toString(User object) {
+                    public String toString(EmployeeInfo object) {
                         return object.getFullName();
                     }
 
                     @Override
-                    public User fromString(String string) {
+                    public EmployeeInfo fromString(String string) {
                         throw new UnsupportedOperationException();
                     }
                 });
 
         //This will set the actions once the user clicks an item from the popupmenu.
         employeeSuggest.setOnAutoCompleted(event -> {
-            User user = event.getCompletion();
+            EmployeeInfo user = event.getCompletion();
             textField.setText(user.getFullName());
             try {
                 if (textField == this.recommending_tf) {
-                    this.recommending = user.getEmployeeInfo();
+                    this.recommending = user;
                 }else if (textField == this.approve_tf) {
-                    this.approved = user.getEmployeeInfo();
+                    this.approved = user;
                 }
             } catch (Exception e) {
                 e.printStackTrace();

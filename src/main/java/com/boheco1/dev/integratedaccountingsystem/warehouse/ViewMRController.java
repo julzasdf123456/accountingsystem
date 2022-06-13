@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
@@ -362,8 +363,8 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
                 //Create Footer
                 int[] footer_spans = {4, 4};
                 String[] signatorees = {"Recommending Approval:", "Approved:"};
-                EmployeeInfo recommender = UserDAO.get(mr.getRecommending()).getEmployeeInfo();
-                EmployeeInfo approver = UserDAO.get(mr.getApprovedBy()).getEmployeeInfo();
+                EmployeeInfo recommender = EmployeeDAO.getOne(mr.getRecommending(), DB.getConnection());
+                EmployeeInfo approver = EmployeeDAO.getOne(mr.getApprovedBy(), DB.getConnection());
                 String[] designations = {recommender.getDesignation(), approver.getDesignation()};
                 String[] names = {recommender.getEmployeeFirstName()+" "+recommender.getEmployeeLastName().toUpperCase(), approver.getEmployeeFirstName()+" "+approver.getEmployeeLastName().toUpperCase()};
                 mr_pdf.footer(signatorees, designations, names, footer_spans, true, Element.ALIGN_CENTER, Element.ALIGN_CENTER);

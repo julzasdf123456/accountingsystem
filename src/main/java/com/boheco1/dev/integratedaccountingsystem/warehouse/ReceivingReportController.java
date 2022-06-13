@@ -237,6 +237,7 @@ public class ReceivingReportController extends MenuControllerHandler implements 
                     try (OutputStream fileOut = new FileOutputStream(selectedFile)) {
                         printReport(fileOut, rrno);
                     } catch (Exception e) {
+                        e.printStackTrace();
                         AlertDialogBuilder.messgeDialog("System Warning", "Process failed due to: " + e.getMessage(),
                                 stackPane, AlertDialogBuilder.DANGER_DIALOG);
                     }
@@ -253,6 +254,7 @@ public class ReceivingReportController extends MenuControllerHandler implements 
                     Process p = Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler "+path);
                     p.waitFor();
                 }catch (Exception e){
+                    e.printStackTrace();
                     AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request! Please try again!",
                             stackPane, AlertDialogBuilder.DANGER_DIALOG);
                 }

@@ -1,9 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
-import com.boheco1.dev.integratedaccountingsystem.dao.ReceivingDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.SupplierDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXTextField;
@@ -62,7 +59,7 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
 
     private ObservableList<Stock> receivedItems = null;
 
-    private User received = null, received_original = null, verified = null, posted = null;
+    private EmployeeInfo received = null, received_original = null, verified = null, posted = null;
     private SupplierInfo supplier = null;
 
     @Override
@@ -134,9 +131,9 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
             receiving.setPoNo(po_no);
             receiving.setSupplierId(this.supplier.getSupplierID());
             receiving.setInvoiceNo(inv_no);
-            receiving.setReceivedBy(this.received.getEmployeeID());
-            receiving.setReceivedOrigBy(this.received_original.getEmployeeID());
-            receiving.setVerifiedBy(this.verified.getEmployeeID());
+            receiving.setReceivedBy(this.received.getId());
+            receiving.setReceivedOrigBy(this.received_original.getId());
+            receiving.setVerifiedBy(this.verified.getId());
             //receiving.setPostedBinCardBy(this.posted.getEmployeeID());
 
             try {
@@ -349,18 +346,18 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
     }
 
     public void bindUserAutocomplete(JFXTextField textField){
-        AutoCompletionBinding<User> employeeSuggest = TextFields.bindAutoCompletion(textField,
+        AutoCompletionBinding<EmployeeInfo> employeeSuggest = TextFields.bindAutoCompletion(textField,
                 param -> {
                     //Value typed in the textfield
                     String query = param.getUserText();
 
                     //Initialize list of stocks
-                    List<User> list = new ArrayList<>();
+                    List<EmployeeInfo> list = new ArrayList<>();
 
                     //Perform DB query when length of search string is 2 or above
                     if (query.length() > 1){
                         try {
-                            list = UserDAO.search(query);
+                            list = EmployeeDAO.getEmployeeInfo(query);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -382,19 +379,19 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
                 }, new StringConverter<>() {
                     //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
                     @Override
-                    public String toString(User object) {
+                    public String toString(EmployeeInfo object) {
                         return object.getFullName();
                     }
 
                     @Override
-                    public User fromString(String string) {
+                    public EmployeeInfo fromString(String string) {
                         throw new UnsupportedOperationException();
                     }
                 });
 
         //This will set the actions once the user clicks an item from the popupmenu.
         employeeSuggest.setOnAutoCompleted(event -> {
-            User user = event.getCompletion();
+            EmployeeInfo user = event.getCompletion();
             textField.setText(user.getFullName());
             if (textField == this.received_tf) {
                 this.received = user;
