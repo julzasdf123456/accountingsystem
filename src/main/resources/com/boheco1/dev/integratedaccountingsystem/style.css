@@ -125,6 +125,10 @@
     -fx-background-color: #00AD8E;
 }
 
+.jfx-button{
+    -fx-cursor: hand;
+}
+
 .btn-sucess {
     -fx-background-color: #388e3c;
     -fx-text-fill: white;
