@@ -178,11 +178,11 @@ public class HomeController implements Initializable {
         }
 
         if (ActiveUser.getUser().can("file-mirs")) {
-            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(fileMirs, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "File MIRS", contentPane, "warehouse_file_mirs.fxml", subToolbar, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(fileMirs, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "File MIRS", contentPane, "warehouse_mirs_file.fxml", subToolbar, null, title);
         }
 
         if (ActiveUser.getUser().can("manage-warehouse")) {
-            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(generateMct, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Generate MCT", contentPane, "warehouse_generate_mct.fxml", subToolbar, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(generateMct, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Generate MCT", contentPane, "warehouse_mct_generate.fxml", subToolbar, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(mrT, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Material Return", contentPane, "warehouse_mrt_form.fxml", subToolbar, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(addMR, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "MR Entry", contentPane, "warehouse_mr_entry.fxml", subToolbar, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(stocks, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Stock Entry", contentPane, "warehouse_stock_entry.fxml", subToolbar, null, title);
@@ -196,7 +196,7 @@ public class HomeController implements Initializable {
         }
         DrawerMenuHelper.setMenuButton(logout,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "Logout");
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(myAccount,new FontIcon("mdi2c-checkbox-blank-circle-outline"),drawerMenus,myAccount.getText(),contentPane,"view_my_account.fxml",subToolbar, null, title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(approvalTask,new FontIcon("mdi2c-checkbox-blank-circle-outline"),drawerMenus,approvalTask.getText(),contentPane,"view_mirs_for_approval_controller.fxml",subToolbar, null, title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(approvalTask,new FontIcon("mdi2c-checkbox-blank-circle-outline"),drawerMenus,approvalTask.getText(),contentPane,"user_task_approval_mirs.fxml",subToolbar, null, title);
 
         logout.setOnAction(actionEvent -> {
             ActiveUser.setUser(null);

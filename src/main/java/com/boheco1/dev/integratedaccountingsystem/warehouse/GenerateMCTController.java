@@ -145,7 +145,7 @@ public class GenerateMCTController extends MenuControllerHandler implements Init
                         //loadAllUnchargeItems();
 
                         //reload the class
-                        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "warehouse_generate_mct.fxml"));
+                        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "warehouse_mct_generate.fxml"));
                         AlertDialogBuilder.messgeDialog("System Message", "MCT successfully generated.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
 
                     }catch (Exception e){

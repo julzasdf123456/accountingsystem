@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class MIRSReleasingFormController implements Initializable {
+public class MIRSReleasingController implements Initializable {
 
     @FXML
     private AnchorPane anchorpane;

@@ -1,8 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem;
 
-import com.boheco1.dev.integratedaccountingsystem.dao.MCTDao;
-import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.ReleasingDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.*;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -17,7 +16,9 @@ import java.util.List;
 public class POITest {
     public static void main(String[] args) {
         try {
-           testMCT();
+
+            Notifications tochecker = new Notifications("details", "Utility.NOTIF_MIRS_APROVAL", "ActiveUser.getUser().getEmployeeID()", "checkedEmployeeInfo", "mirs");
+            NotificationsDAO.create(tochecker);
         }catch(Exception ex) {
             ex.printStackTrace();
         }

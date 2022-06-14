@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class MIRSApprovalFormController implements Initializable {
+public class MIRSApprovalController implements Initializable {
     @FXML
     private HBox btnHolder;
 

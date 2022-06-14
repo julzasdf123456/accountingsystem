@@ -34,7 +34,7 @@ import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.*;
 
-public class ViewAllMIRSController extends MenuControllerHandler implements Initializable, SubMenuHelper {
+public class MIRSViewAllController extends MenuControllerHandler implements Initializable, SubMenuHelper {
 
     @FXML TableView mirsTable;
     @FXML private JFXTextField search_box;
@@ -99,7 +99,7 @@ public class ViewAllMIRSController extends MenuControllerHandler implements Init
             }
             try {
                 Utility.setActiveMIRS(selected);
-                ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_mirs_preview.fxml", Utility.getStackPane(), "../view_all_mirs_controller.fxml");
+                ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_mirs_preview.fxml", Utility.getStackPane(), "../warehouse_mirs_view_all.fxml");
             } catch (Exception e) {
                 e.printStackTrace();
             }

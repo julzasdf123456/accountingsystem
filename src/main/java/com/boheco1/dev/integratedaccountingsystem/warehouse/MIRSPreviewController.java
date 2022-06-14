@@ -36,7 +36,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class MIRSPreview implements Initializable {
+public class MIRSPreviewController implements Initializable {
 
     @FXML
     private StackPane stackPane;

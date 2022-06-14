@@ -32,7 +32,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class ViewMIRSForApprovalController extends MenuControllerHandler implements Initializable, SubMenuHelper {
+public class UserTaskApprovalController extends MenuControllerHandler implements Initializable, SubMenuHelper {
 
     @FXML TableView mirsTable;
     @FXML private JFXTextField remarks, workOrderNum;
@@ -98,7 +98,7 @@ public class ViewMIRSForApprovalController extends MenuControllerHandler impleme
             }
             try {
                 Utility.setActiveMIRS(selected);
-                ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../user_mirs_preview.fxml", Utility.getStackPane(), "../view_mirs_for_approval_controller.fxml");
+                ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../user_mirs_preview.fxml", Utility.getStackPane(), "../user_task_approval_mirs.fxml");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -144,13 +144,13 @@ public class ViewMIRSForApprovalController extends MenuControllerHandler impleme
                         AlertDialogBuilder.messgeDialog("System Message", "MIRS application has been "+status,
                                 Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
 
-                        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "view_mirs_for_approval_controller.fxml"));
+                        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "user_task_approval_mirs.fxml"));
 
 
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    AlertDialogBuilder.messgeDialog("Error on ViewMIRSForApprovalController", e.getMessage(),
+                    AlertDialogBuilder.messgeDialog("Error on UserTaskApprovalController", e.getMessage(),
                             Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }
                 MIRSapprovalDialog.close();

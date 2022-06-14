@@ -5,16 +5,12 @@
 
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
-import com.boheco1.dev.integratedaccountingsystem.HomeController;
-import com.boheco1.dev.integratedaccountingsystem.JournalEntriesController;
 import com.boheco1.dev.integratedaccountingsystem.dao.MIRSSignatoryDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.MirsDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.MrDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
-import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
-import com.boheco1.dev.integratedaccountingsystem.objects.MIRSSignatory;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 import com.jfoenix.controls.JFXButton;
 import java.net.URL;
@@ -22,30 +18,21 @@ import java.util.*;
 
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
-import com.jfoenix.controls.JFXTreeTableView;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Paint;
 import javafx.util.Callback;
-import jdk.jfr.EventType;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 public class  WarehouseDashboardController extends MenuControllerHandler implements Initializable, SubMenuHelper {
     public List<JFXButton> subMenus;
@@ -186,11 +173,11 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
             try {
                 Utility.setActiveMIRS(mirs);
                 if(display_lbl.getText().equals(APPROVAL)){
-                    ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_approval_form.fxml",Utility.getStackPane());
+                    ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_approval.fxml",Utility.getStackPane());
                 }else if(display_lbl.getText().equals(RELEASES)){
-                    Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(MIRSReleasingFormController.class, "../warehouse_mirs_releasing_form.fxml"));
+                    Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(MIRSReleasingController.class, "../warehouse_mirs_releasing.fxml"));
 
-                    //ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_releasing_form.fxml",Utility.getStackPane());
+                    //ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_releasing.fxml",Utility.getStackPane());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -436,7 +423,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
 
         viewAllMirs.setOnAction(actionEvent -> {
             titleHolder.setText("MIRS Repository");
-            container.getChildren().setAll(ContentHandler.getNodeFromFxml(ViewAllMIRSController.class, "../view_all_mirs_controller.fxml"));
+            container.getChildren().setAll(ContentHandler.getNodeFromFxml(MIRSViewAllController.class, "../warehouse_mirs_view_all.fxml"));
         });
 
         viewMRItems.setOnAction(actionEvent -> {
