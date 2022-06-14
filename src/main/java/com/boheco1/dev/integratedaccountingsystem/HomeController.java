@@ -320,7 +320,7 @@ public class HomeController implements Initializable {
         try {
             notificationPopup = new Popup();
             VBox vBox = new VBox();
-            vBox.setPrefWidth(240);
+            vBox.setPrefWidth(280);
             vBox.setFillWidth(true);
 
             List<Notifications> notificationsList = NotificationsDAO.getNotificationsForUser(ActiveUser.getUser().getId()+"");

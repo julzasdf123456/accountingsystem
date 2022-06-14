@@ -154,7 +154,7 @@ public class MIRSApprovalController implements Initializable {
                     mirs.setStatus(Utility.RELEASING);
                     mirs.setDetails(details.getText());
                     MirsDAO.update(mirs);
-                    String notif_details = "Your MIRS application ("+mirs.getId()+") was approved by "+ActiveUser.getUser().getEmployeeInfo()+" on "+ mirs.getUpdatedAt() +"!";
+                    String notif_details = "MIRS ("+mirs.getId()+") for releasing.";
                     Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
                     NotificationsDAO.create(torequisitioner);
                     AlertDialogBuilder.messgeDialog("System Message", "MIRS application was approved and ready for releasing.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
@@ -178,7 +178,7 @@ public class MIRSApprovalController implements Initializable {
                     mirs.setStatus(Utility.REJECTED);
                     mirs.setDetails(details.getText());
                     MirsDAO.update(mirs);
-                    String notif_details = "Your MIRS application ("+mirs.getId()+") was rejected by "+ActiveUser.getUser().getEmployeeInfo()+" on "+ mirs.getUpdatedAt() +" due to: "+ details.getText()+"!";
+                    String notif_details = "MIRS ("+mirs.getId()+") was rejected.";
                     Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
                     NotificationsDAO.create(torequisitioner);
                     AlertDialogBuilder.messgeDialog("System Message", "MIRS application rejected.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);

@@ -133,7 +133,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                     if(MirsDAO.create(mirs, mirsItemList,mirsSignatoryList)){ //return true saved successfully
                         AlertDialogBuilder.messgeDialog("System Message", "MIRS request successfully filed, please wait for the approval, thank you!",
                                 Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
-                        String details = "A MIRS application ("+mirs.getId()+") filed by "+mirs.getRequisitioner() +" on "+mirs.getDateFiled()+" needs attention.";
+                        String details = "New MIRS ("+mirs.getId()+") was filed.";
                         Notifications tochecker = new Notifications(details, Utility.NOTIF_MIRS_APROVAL, ActiveUser.getUser().getEmployeeID(), checkedEmployeeInfo.getId(), mirs.getId());
                         Notifications toApprover = new Notifications(details, Utility.NOTIF_MIRS_APROVAL, ActiveUser.getUser().getEmployeeID(), approvedEmployeeInfo.getId(), mirs.getId());
                         NotificationsDAO.create(tochecker);
