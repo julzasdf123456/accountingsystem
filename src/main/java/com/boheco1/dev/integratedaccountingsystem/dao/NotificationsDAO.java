@@ -2,7 +2,6 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
-import com.boheco1.dev.integratedaccountingsystem.objects.MIRSItem;
 import com.boheco1.dev.integratedaccountingsystem.objects.Notifications;
 
 import java.sql.PreparedStatement;
@@ -13,19 +12,13 @@ import java.util.List;
 
 public class NotificationsDAO {
 
-    public static String MIRS_APROVAL = "MIRS_APPROVAL"; // TYPE
-    public static String MIRS_APPROVAL_ICON = "mdi2n-notebook-check"; // TYPE
-
-    public static String INFORMATION = "INFORMATION"; // TYPE
-    public static String INFORMATION_ICON = "mdi2i-information"; // TYPE
-
     public static String getIconFromType(String type) {
-        if (type.equals(MIRS_APROVAL)) {
-            return MIRS_APPROVAL_ICON;
-        } else if (type.equals(INFORMATION)) {
-            return INFORMATION_ICON;
+        if (type.equals(Utility.NOTIF_MIRS_APROVAL)) {
+            return Utility.NOTIF_MIRS_APPROVAL_ICON;
+        } else if (type.equals(Utility.NOTIF_INFORMATION)) {
+            return Utility.NOTIF_INFORMATION_ICON;
         } else {
-            return INFORMATION_ICON;
+            return Utility.NOTIF_INFORMATION_ICON;
         }
     }
 

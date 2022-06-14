@@ -27,6 +27,11 @@ public class Utility {
     public static String MR_RETURNED = "returned";
     public static String MR_ACTIVE = "active";
 
+    public static String NOTIF_MIRS_APROVAL = "MIRS_APPROVAL"; // TYPE
+    public static String NOTIF_MIRS_APPROVAL_ICON = "mdi2n-notebook-check"; // TYPE
+
+    public static String NOTIF_INFORMATION = "INFORMATION"; // TYPE
+    public static String NOTIF_INFORMATION_ICON = "mdi2i-information"; // TYPE
 
     private static AnchorPane contentPane;
     private static MIRS activeMIRS;
