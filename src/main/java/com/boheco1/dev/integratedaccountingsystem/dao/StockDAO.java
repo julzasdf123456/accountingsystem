@@ -25,8 +25,8 @@ public class StockDAO {
                         "ValidityDate, TypeID, Unit, " +
                         "Quantity, Price, NEACode, " +
                         "IsTrashed, Comments, CreatedAt, " +
-                        "UserIDCreated, Critical, id, LocalCode, AcctgCode) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?,?,?,?,?)");
+                        "UserIDCreated, Critical, id, LocalCode, AcctgCode, Individualized) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?,?,?,?,?,?)");
 
         if(stock.getId()==null) stock.setId(Utility.generateRandomId());
 
@@ -56,6 +56,8 @@ public class StockDAO {
 
         ps.setString(18, stock.getLocalCode());
         ps.setString(19, stock.getAcctgCode());
+
+        ps.setBoolean(20, stock.isIndividualized());
 
         ps.executeUpdate();
 
@@ -125,7 +127,8 @@ public class StockDAO {
                     rs.getString("UserIDUpdated"),
                     rs.getString("UserIDTrashed"),
                     rs.getString("LocalCode"),
-                    rs.getString("AcctgCode")
+                    rs.getString("AcctgCode"),
+                    rs.getBoolean("Individualized")
             );
 
             rs.close();
@@ -476,7 +479,8 @@ public class StockDAO {
                     rs.getString("UserIDUpdated"),
                     rs.getString("UserIDTrashed"),
                     rs.getString("LocalCode"),
-                    rs.getString("AcctgCode")
+                    rs.getString("AcctgCode"),
+                    rs.getBoolean("Individualized")
             ));
         }
 
@@ -751,7 +755,8 @@ public class StockDAO {
                     rs.getString("UserIDUpdated"),
                     rs.getString("UserIDTrashed"),
                     rs.getString("LocalCode"),
-                    rs.getString("AcctgCode")
+                    rs.getString("AcctgCode"),
+                    rs.getBoolean("Individualized")
             ));
         }
 
@@ -801,7 +806,8 @@ public class StockDAO {
                     rs.getString("UserIDUpdated"),
                     rs.getString("UserIDTrashed"),
                     rs.getString("LocalCode"),
-                    rs.getString("AcctgCode")
+                    rs.getString("AcctgCode"),
+                    rs.getBoolean("Individualized")
             ));
         }
 
@@ -856,7 +862,9 @@ public class StockDAO {
                     rs.getString("UserIDUpdated"),
                     rs.getString("UserIDTrashed"),
                     rs.getString("LocalCode"),
-                    rs.getString("AcctgCode")
+                    rs.getString("AcctgCode"),
+                    rs.getBoolean("Individualized")
+
             ));
         }
 
@@ -1009,7 +1017,8 @@ public class StockDAO {
                     rs.getString("UserIDUpdated"),
                     rs.getString("UserIDTrashed"),
                     rs.getString("LocalCode"),
-                    rs.getString("AcctgCode")
+                    rs.getString("AcctgCode"),
+                    rs.getBoolean("Individualized")
             ));
         }
 
@@ -1057,7 +1066,8 @@ public class StockDAO {
                     rs.getString("UserIDUpdated"),
                     rs.getString("UserIDTrashed"),
                     rs.getString("LocalCode"),
-                    rs.getString("AcctgCode")
+                    rs.getString("AcctgCode"),
+                    rs.getBoolean("Individualized")
             ));
         }
 
@@ -1114,7 +1124,8 @@ public class StockDAO {
                     rs.getString("UserIDUpdated"),
                     rs.getString("UserIDTrashed"),
                     rs.getString("LocalCode"),
-                    rs.getString("AcctgCode")
+                    rs.getString("AcctgCode"),
+                    rs.getBoolean("Individualized")
             );
             StockEntryLog log = new StockEntryLog();
             log.setId(rs.getString("entryID"));
@@ -1188,7 +1199,8 @@ public class StockDAO {
                     rs.getString("UserIDUpdated"),
                     rs.getString("UserIDTrashed"),
                     rs.getString("LocalCode"),
-                    rs.getString("AcctgCode")
+                    rs.getString("AcctgCode"),
+                    rs.getBoolean("Individualized")
             );
             StockEntryLog log = new StockEntryLog();
             log.setId(rs.getString("entryID"));
@@ -1257,7 +1269,8 @@ public class StockDAO {
                     rs.getString("UserIDUpdated"),
                     rs.getString("UserIDTrashed"),
                     rs.getString("LocalCode"),
-                    rs.getString("AcctgCode")
+                    rs.getString("AcctgCode"),
+                    rs.getBoolean("Individualized")
             );
             Releasing log = new Releasing();
             log.setId(rs.getString("releasedID"));
@@ -1331,7 +1344,8 @@ public class StockDAO {
                     rs.getString("UserIDUpdated"),
                     rs.getString("UserIDTrashed"),
                     rs.getString("LocalCode"),
-                    rs.getString("AcctgCode")
+                    rs.getString("AcctgCode"),
+                    rs.getBoolean("Individualized")
             );
             stocks.add(stock);
         }
