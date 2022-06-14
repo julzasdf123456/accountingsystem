@@ -40,7 +40,7 @@ public class ContentHandler {
             contentPane.getChildren().setAll(pane);
             controller.setSubMenus(subToolbar);
             controller.handleContentReplacements(pane, titleHolder);
-
+            Utility.setSelectedObject(titleHolder);
             return pane;
         } catch (Exception e) {
             e.printStackTrace();
