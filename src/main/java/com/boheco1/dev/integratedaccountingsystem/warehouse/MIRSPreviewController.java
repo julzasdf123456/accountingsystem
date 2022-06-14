@@ -42,8 +42,7 @@ public class MIRSPreviewController implements Initializable {
     private StackPane stackPane;
     @FXML
     private Label  details, date, mirsNumber, applicant, address, requisitioner, signatories, purpose;
-    @FXML
-    private JFXComboBox<MIRSSignatory> woOfficercb, checkedBycb, approvedBycb;
+
     @FXML
     private JFXButton printRequest;
     @FXML
@@ -77,9 +76,6 @@ public class MIRSPreviewController implements Initializable {
             address.setText(mirs.getAddress());
             applicant.setText(mirs.getApplicant());
             requisitioner.setText(mirs.getRequisitioner().getFullName());
-            checkedBycb.getItems().addAll(mirsSignatoryList);
-            approvedBycb.getItems().addAll(mirsSignatoryList);
-            woOfficercb.getItems().addAll(mirsSignatoryList);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -290,8 +286,10 @@ public class MIRSPreviewController implements Initializable {
 
                     //Footer Note
                     pdf.createCell("   I HEREBY CERTIFY THAT the above-requested Materials/Supplies are necessary and will be used SOLELY for the\n   purpose stated above", columns.length, 11, Font.NORMAL, Element.ALIGN_LEFT);
-
+                    pdf.createCell("Note: "+mirs.getDetails(), columns.length, 11, Font.NORMAL, Element.ALIGN_LEFT,Rectangle.NO_BORDER);
                     pdf.createCell(2,columns.length);
+
+
 
                     //Signatories
                     pdf.createCell("Prepared by:", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
@@ -299,104 +297,14 @@ public class MIRSPreviewController implements Initializable {
                     pdf.createCell("Approved by:", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
                     pdf.createCell(2,columns.length);
                     pdf.createCell(mirs.getRequisitioner().getSignatoryNameFormat(), 2, 11, Font.BOLD, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
-                    pdf.createCell(EmployeeDAO.getOne(checkedBycb.getValue().getUserID(), DB.getConnection()).getSignatoryNameFormat(), 2, 11, Font.BOLD, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
-                    pdf.createCell(EmployeeDAO.getOne(approvedBycb.getValue().getUserID(), DB.getConnection()).getSignatoryNameFormat(), 2, 11, Font.BOLD, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(EmployeeDAO.getOne(mirsSignatoryList.get(0).getUserID(), DB.getConnection()).getSignatoryNameFormat(), 2, 11, Font.BOLD, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(EmployeeDAO.getOne(mirsSignatoryList.get(1).getUserID(), DB.getConnection()).getSignatoryNameFormat(), 2, 11, Font.BOLD, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+
 
                     pdf.createCell(mirs.getRequisitioner().getDesignation(), 2, 9, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
-                    pdf.createCell(EmployeeDAO.getOne(checkedBycb.getValue().getUserID(), DB.getConnection()).getDesignation(), 2, 9, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
-                    pdf.createCell(EmployeeDAO.getOne(approvedBycb.getValue().getUserID(), DB.getConnection()).getDesignation(), 2, 9, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(EmployeeDAO.getOne(mirsSignatoryList.get(0).getUserID(), DB.getConnection()).getDesignation(), 2, 9, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(EmployeeDAO.getOne(mirsSignatoryList.get(1).getUserID(), DB.getConnection()).getDesignation(), 2, 9, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
 
-                    pdf.createCell(3,columns.length);
-
-                    pdf.createCell("Work Order Officer", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
-                    pdf.createCell(" ", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
-                    pdf.createCell(" ", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
-
-                    pdf.createCell(2,columns.length);
-                    pdf.createCell(EmployeeDAO.getOne(woOfficercb.getValue().getUserID(), DB.getConnection()).getSignatoryNameFormat(), 2, 11, Font.BOLD, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
-                    pdf.createCell(" ", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
-                    pdf.createCell(" ", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
-
-                    pdf.createCell(EmployeeDAO.getOne(woOfficercb.getValue().getUserID(), DB.getConnection()).getDesignation(), 2, 9, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
-                    pdf.createCell(" ", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
-                    pdf.createCell(" ", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
-
-
-                    /*pdf.header(null, "Material Issuance Requisition Slip ".toUpperCase(), "".toUpperCase());
-                    String[] head_info = {" ","MIRS No.: ",mirs.getId()," ","Work Order No.: ",mirs.getWorkOrderNo()," ","Date: ", mirs.getDateFiled().format(DateTimeFormatter.ofPattern("MM/dd/yy"))};
-                    int[] head_span = {4,1,1,4,1,1,4,1,1};
-                    int[] head_aligns = {
-                            Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_LEFT,
-                            Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_LEFT,
-                            Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_LEFT
-                            };
-
-                    int[] head_fonts = {com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL,
-                            com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL,
-                            com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL,
-                            com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL, com.itextpdf.text.Font.NORMAL};
-                    int[] head_borders = {Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER,
-                            Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER,
-                            Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER,
-                            Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER};
-                    pdf.other_details(head_info, head_span, head_fonts, head_aligns,head_borders, true);
-
-
-                    //Create Table Header
-                    String[] headers = {"Acct. Code", "Item Code", "Description", "Unit Cost", "Amount", "Unit", "Qty"};
-                    int[] header_spans = {1, 1, 1, 1, 1, 1, 1};
-                    pdf.tableHeader(headers, header_spans);
-
-                    //Create Table Content
-                    ArrayList<String[]> rows = new ArrayList<>();
-                    int[] rows_aligns = {Element.ALIGN_CENTER, Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_RIGHT,Element.ALIGN_RIGHT,Element.ALIGN_CENTER,Element.ALIGN_RIGHT};
-
-                    double total=0;
-                    HashMap<String, Double> acctCodeSummary = new HashMap<String, Double>();
-                    for (Releasing items : fromReleasing) {
-                        Stock stock = StockDAO.get(ReleasingDAO.get(items.getId()).getStockID());
-                        String[] val = {stock.getAcctgCode(), stock.getId(),stock.getDescription(), String.format("%,.2f", items.getPrice()), String.format("%,.2f", (items.getPrice() * items.getQuantity())), stock.getUnit(), "" + items.getQuantity()};
-                        total += items.getPrice() * items.getQuantity();
-                        rows.add(val);
-
-                        if(acctCodeSummary.get(stock.getAcctgCode()) == null){
-                            acctCodeSummary.put(stock.getAcctgCode(),items.getPrice() * items.getQuantity());
-                        }else{
-                            acctCodeSummary.replace(stock.getAcctgCode(),acctCodeSummary.get(stock.getAcctgCode()) + (items.getPrice() * items.getQuantity()) );
-                        }
-                    }
-                    pdf.tableContent(rows, header_spans, rows_aligns);
-
-                    //Create Total display
-                    pdf.createCell(1,3);
-                    pdf.createCell("TOTAL", 1, 11, Font.BOLD, Element.ALIGN_CENTER);
-                    pdf.createCell(String.format("%,.2f",total), 1, 11, Font.BOLD, Element.ALIGN_RIGHT);
-                    pdf.createCell(1,2);
-
-                    //Create account code summary
-                    for(Map.Entry<String, Double> acctCode : acctCodeSummary.entrySet()){
-                        pdf.createCell(acctCode.getKey(), 1, 11, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
-                        pdf.createCell(String.format("%,.2f", acctCode.getValue()), 1, 11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
-                        pdf.createCell(" ", 5, 11, Font.NORMAL, Element.ALIGN_RIGHT, Rectangle.NO_BORDER);
-                    }
-
-                    //create signatories
-                    pdf.createCell(2,columns.length);
-                    pdf.createCell("Issued By:",2, 11, Font.NORMAL, Element.ALIGN_RIGHT, Rectangle.NO_BORDER);
-                    pdf.createCell(1,1);
-                    pdf.createCell("Received By:",4, 11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
-                    pdf.createCell(1,columns.length);
-                    pdf.createCell(
-                            issuedByEmployee.getEmployeeFirstName().toUpperCase()+" " +
-                                    issuedByEmployee.getEmployeeMidName().toUpperCase().charAt(0)+". " +
-                                    issuedByEmployee.getEmployeeLastName().toUpperCase()+"\n"+issuedByEmployee.getDesignation(),3, 11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
-
-                    pdf.createCell(
-                            receivedByEmployee.getEmployeeFirstName().toUpperCase()+" " +
-                                    receivedByEmployee.getEmployeeMidName().toUpperCase().charAt(0)+". " +
-                                    receivedByEmployee.getEmployeeLastName().toUpperCase()+"\n"+receivedByEmployee.getDesignation(),4, 11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
-
-                    */
                     pdf.generate();
                 }
 

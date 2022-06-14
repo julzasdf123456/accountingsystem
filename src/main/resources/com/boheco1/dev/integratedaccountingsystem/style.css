@@ -17,6 +17,9 @@
     -fx-font-size: 16px;
 }
 
+.jfx-text-field, .jfx-password-field, .jfx-textarea-field {
+    -fx-background-color :  #f5f5f5
+}
 .system-title {
     -fx-font-size: 34px;
     -fx-font-weight: bold;

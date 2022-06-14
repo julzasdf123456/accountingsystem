@@ -38,21 +38,11 @@ public class MIRSViewAllController extends MenuControllerHandler implements Init
 
     @FXML TableView mirsTable;
     @FXML private JFXTextField search_box;
-    @FXML private JFXComboBox<Integer> month;
-    @FXML private JFXTextField year;
-    @FXML private DatePicker dateSummary;
-    @FXML private JFXButton daily_summary_btn;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initializeMirsTable();
         populateMirsTable("");
-        Calendar cal = Calendar.getInstance();
-        year.setText(""+cal.get(Calendar.YEAR));
-
-        for(int i = 1; i <=12;i++){
-            month.getItems().add(i);
-        }
     }
 
     private void initializeMirsTable() {
@@ -112,37 +102,6 @@ public class MIRSViewAllController extends MenuControllerHandler implements Init
     }
 
     @FXML
-    private void monthly_summary_btn(ActionEvent event) {
-        try {
-            ObservableList<MIRS> mirs = FXCollections.observableList(MirsDAO.getByMonthYear(year.getText() +"-"+ month.getSelectionModel().getSelectedItem()));
-            if (mirs.size() == 0) {
-                AlertDialogBuilder.messgeDialog("System Information", "No record on selected month and year.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
-                return;
-            }
-            new PrintMIRSMonthlyChargeSummary(mirs);
-        } catch (Exception e) {
-            e.printStackTrace();
-            AlertDialogBuilder.messgeDialog("Error", "Error populating table: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-        }
-    }
-
-    @FXML
-    private void daily_summary_btn(ActionEvent event) {
-        try {
-            ObservableList<MIRS> mirs = FXCollections.observableList(MirsDAO.getByDateFiled(dateSummary.getValue()));
-            // allMirsTable.getItems().clear();
-            //allMirsTable.getItems().setAll(mirs);
-            if (mirs.size() == 0) {
-                AlertDialogBuilder.messgeDialog("System Information", "No record on selected date.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
-                return;
-            }
-            new PrintMIRSMonthlyChargeSummary(mirs);
-        } catch (Exception e) {
-            e.printStackTrace();
-            AlertDialogBuilder.messgeDialog("Error", "Error populating table: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-        }
-    }
-
     private void populateMirsTable(String q) {
         try {
             if(q.equals("")) {
