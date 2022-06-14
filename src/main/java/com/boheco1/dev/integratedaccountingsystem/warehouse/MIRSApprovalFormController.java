@@ -2,10 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
-import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
-import com.boheco1.dev.integratedaccountingsystem.objects.MIRSItem;
-import com.boheco1.dev.integratedaccountingsystem.objects.MIRSSignatory;
-import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
@@ -157,6 +154,9 @@ public class MIRSApprovalFormController implements Initializable {
                     mirs.setStatus(Utility.RELEASING);
                     mirs.setDetails(details.getText());
                     MirsDAO.update(mirs);
+                    String notif_details = "Your MIRS application ("+mirs.getId()+") was approved by "+ActiveUser.getUser().getEmployeeInfo()+" on "+ mirs.getUpdatedAt() +"!";
+                    Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
+                    NotificationsDAO.create(torequisitioner);
                     AlertDialogBuilder.messgeDialog("System Message", "MIRS application was approved and ready for releasing.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
                     btnHolder.setDisable(true);
                 } catch (Exception e) {
@@ -178,6 +178,9 @@ public class MIRSApprovalFormController implements Initializable {
                     mirs.setStatus(Utility.REJECTED);
                     mirs.setDetails(details.getText());
                     MirsDAO.update(mirs);
+                    String notif_details = "Your MIRS application ("+mirs.getId()+") was rejected by "+ActiveUser.getUser().getEmployeeInfo()+" on "+ mirs.getUpdatedAt() +" due to: "+ details.getText()+"!";
+                    Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
+                    NotificationsDAO.create(torequisitioner);
                     AlertDialogBuilder.messgeDialog("System Message", "MIRS application rejected.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
                     btnHolder.setDisable(true);
                 } catch (Exception e) {

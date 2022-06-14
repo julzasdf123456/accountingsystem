@@ -222,8 +222,10 @@ public class MIRSReleasingFormController implements Initializable {
 
             mirs.setDetails(details.getText());
             MirsDAO.update(mirs);
+            String notif_details = "Your MIRS application ("+mirs.getId()+") items was released by "+ActiveUser.getUser().getEmployeeInfo()+" on "+ mirs.getUpdatedAt() +"!";
+            Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
+            NotificationsDAO.create(torequisitioner);
             releasingList.getItems().clear();
-            anchorpane.setDisable(true);
             AlertDialogBuilder.messgeDialog("System Message", "MIRS items released.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
         }catch (Exception e){
             AlertDialogBuilder.messgeDialog("System Error", "Item released: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
