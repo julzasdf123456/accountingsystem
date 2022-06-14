@@ -152,7 +152,7 @@ public class StockDAO {
                         "ValidityDate=?, TypeID=?, Unit=?," +
                         "Quantity=?, Price=?, NEACode=?," +
                         "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=?, Critical=?," +
-                        "LocalCode=?, AcctgCode=? " +
+                        "LocalCode=?, AcctgCode=?, Individualized=? " +
                         "WHERE id=?");
 
         Stock oldStock = StockDAO.get(stock.getId());
@@ -188,8 +188,8 @@ public class StockDAO {
         ps.setInt(15, stock.getCritical());
         ps.setString(16, stock.getLocalCode());
         ps.setString(17, stock.getAcctgCode());
-        ps.setString(18, stock.getId());
-
+        ps.setBoolean(18, stock.isIndividualized());
+        ps.setString(19, stock.getId());
         ps.executeUpdate();
 
         //create a Stock History if price was updated.

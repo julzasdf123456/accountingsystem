@@ -40,7 +40,8 @@ public class ViewStockController implements Initializable {
 
     @FXML
     private JFXComboBox type;
-
+    @FXML
+    private JFXCheckBox individualized_cb;
     @FXML
     private TabPane tabPane;
 
@@ -168,7 +169,7 @@ public class ViewStockController implements Initializable {
         this.stock.setValidityDate(this.valDate.getValue());
         this.stock.setNeaCode(this.neaCode.getText());
         this.stock.setCritical(threshold);
-
+        this.stock.setIndividualized(this.individualized_cb.isSelected());
         if (localCode.length() == 0 || localCode == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid local code!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
@@ -389,6 +390,7 @@ public class ViewStockController implements Initializable {
             }
         }
         this.type.getSelectionModel().select(index);
+        this.individualized_cb.setSelected(stock.isIndividualized());
     }
     /**
      * Initializes the stock entries table

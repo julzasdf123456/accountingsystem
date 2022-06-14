@@ -6,10 +6,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXTextArea;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -49,7 +46,8 @@ public class StockEntryController extends MenuControllerHandler implements Initi
 
     @FXML
     private JFXButton saveBtn;
-
+    @FXML
+    private JFXCheckBox individualized_cb;
     private Stock stock = null;
 
     private boolean isNew = true;
@@ -64,6 +62,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.bindStockTypes();
         this.bindNumbers();
         this.localCode.setText(Utility.CURRENT_YEAR());
+        this.stockStackPane = Utility.getStackPane();
     }
 
     @FXML
@@ -153,7 +152,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                 this.stock.setQuantity(0);
 
                 this.stock.setAcctgCode(accountCode);
-
+                this.stock.setIndividualized(this.individualized_cb.isSelected());
                 try {
                     StockDAO.add(this.stock);
 
@@ -290,6 +289,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                 manuDate.setValue(stock.getManufacturingDate());
                 valDate.setValue(stock.getValidityDate());
                 threshold.setText(""+stock.getCritical());
+                individualized_cb.setSelected(stock.isIndividualized());
                 ObservableList<StockType> stocktypes = type.getItems();
                 int index = 0;
                 for (int i=0;  i < stocktypes.size(); i++){
@@ -313,6 +313,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                 valDate.setDisable(true);
                 threshold.setDisable(true);
                 type.setDisable(true);
+                individualized_cb.setDisable(true);
             } catch (Exception e) {
                 AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), this.stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
             }
@@ -353,6 +354,8 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.valDate.setDisable(false);
         this.threshold.setDisable(false);
         this.type.setDisable(false);
+        this.individualized_cb.setSelected(false);
+        this.individualized_cb.setDisable(false);
     }
 
     @Override
