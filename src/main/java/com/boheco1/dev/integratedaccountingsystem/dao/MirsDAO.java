@@ -4,10 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -762,5 +759,52 @@ public class MirsDAO {
         return unchargedMIRSReleases;
     }
 
+    public static boolean create(MIRS mirs, List<MIRSItem> mirsItems, List<MIRSSignatory> signatories) throws SQLException, ClassNotFoundException {
+        String query = "";
+        query +="INSERT INTO MIRS (DateFiled, Purpose, Details, Status, RequisitionerID, UserID, id, CreatedAt, UpdatedAt, address, applicant) " +
+                        "VALUES " +
+                        "('"+Date.valueOf(mirs.getDateFiled())+"'," +
+                        "'"+mirs.getPurpose()+"'," +
+                        "'"+mirs.getDetails()+"'," +
+                        "'"+mirs.getStatus()+"'," +
+                        "'"+mirs.getRequisitionerID()+"'," +
+                        "'"+mirs.getUserID()+"'," +
+                        "'"+mirs.getId()+"',GETDATE(), GETDATE()," +
+                        "'"+mirs.getAddress()+"'," +
+                        "'"+mirs.getApplicant()+"');\n";
+
+        for(MIRSItem item : mirsItems){
+            query +="INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id) " +
+                    "VALUES " +
+                    "('"+mirs.getId()+"','"+item.getStockID()+"','"+item.getQuantity()+"','"+item.getPrice()+"','"+item.getRemarks()+"',GETDATE(),GETDATE(), '"+Utility.generateRandomId()+"');\n";
+        }
+
+        for(MIRSSignatory msig : signatories){
+            query +="INSERT INTO MIRSSignatories " +
+                    "(MIRSID, user_id, Status, Comments, CreatedAt, UpdatedAt,id) " +
+                    "VALUES " +
+                    "('"+msig.getMirsID()+"'," +
+                    "'"+msig.getUserID()+"'," +
+                    "'"+msig.getStatus()+"'," +
+                    "'"+msig.getComments()+"',GETDATE(),GETDATE()," +
+                    "'"+msig.getId()+"'); \n";
+        }
+
+        Connection conn = DB.getConnection();
+
+        try {
+            conn.setAutoCommit(false);
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.executeUpdate();
+            conn.commit();
+            ps.close();
+            return true;
+        } catch (SQLException e) {
+            conn.rollback();
+            e.printStackTrace();
+        }
+        return false;
+
+    }
 
 }
