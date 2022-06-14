@@ -178,6 +178,9 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
 
     @FXML
     private void tableViewClicked(MouseEvent event) {
+        if(tableView.getItems().size() == 0)
+            return;
+
         if(event.getClickCount() == 2){
             MIRS mirs = (MIRS) tableView.getSelectionModel().getSelectedItem();
             try {
@@ -185,7 +188,9 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
                 if(display_lbl.getText().equals(APPROVAL)){
                     ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_approval_form.fxml",Utility.getStackPane());
                 }else if(display_lbl.getText().equals(RELEASES)){
-                    ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_releasing_form.fxml",Utility.getStackPane());
+                    Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(MIRSReleasingFormController.class, "../warehouse_mirs_releasing_form.fxml"));
+
+                    //ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_releasing_form.fxml",Utility.getStackPane());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -228,57 +233,6 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         column3.setCellValueFactory(new PropertyValueFactory<>("Purpose"));
         column3.setStyle("-fx-alignment: center-left;");
 
-        /*TableColumn<MIRS, String> column4 = new TableColumn<>("Action");
-        column4.setStyle("-fx-alignment: center;");
-        column4.setPrefWidth(80);
-        column4.setMaxWidth(80);
-        column4.setMinWidth(80);
-        Callback<TableColumn<MIRS, String>, TableCell<MIRS, String>> viewBtn
-                = //
-                new Callback<TableColumn<MIRS, String>, TableCell<MIRS, String>>() {
-                    @Override
-                    public TableCell call(final TableColumn<MIRS, String> param) {
-                        final TableCell<MIRS, String> cell = new TableCell<MIRS, String>() {
-
-                            final Button btn = new Button("");
-                            final FontIcon icon = new FontIcon("mdi2e-eye");
-
-                            @Override
-                            public void updateItem(String item, boolean empty) {
-                                super.updateItem(item, empty);
-                                icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
-                                btn.setStyle("-fx-background-color:"+ColorPalette.WARNING+";");
-                                btn.setPadding(new Insets(0, 7, 0, 7));
-                                btn.setGraphic(icon);
-                                btn.setGraphicTextGap(5);
-                                btn.setTextFill(Paint.valueOf(ColorPalette.WHITE));
-                                if (empty) {
-                                    setGraphic(null);
-                                    setText(null);
-                                } else {
-                                    btn.setOnAction(event -> {
-                                        MIRS mirs = getTableView().getItems().get(getIndex());
-                                        try {
-                                            Utility.setActiveMIRS(mirs);
-                                            if(s.equals("pending")){
-                                                ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_approval_form.fxml",Utility.getStackPane());
-                                            }else if (s.equals("releasing")){
-                                                ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_releasing_form.fxml",Utility.getStackPane());
-                                            }
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    });
-                                    setGraphic(btn);
-                                    setText(null);
-                                }
-                            }
-                        };
-                        return cell;
-                    }
-                };
-        column4.setCellFactory(viewBtn);*/
-
         TableColumn<MIRS, String> column5 = new TableColumn<>("Status");
         column5.setStyle("-fx-alignment: center;");
         column5.setPrefWidth(80);
@@ -306,16 +260,19 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
                                             Platform.runLater(new Runnable() {
                                                 public void run() {
                                                     try {
-                                                        if(display_lbl.getText().equals(APPROVAL)){
+                                                        Label titleLabel = (Label) Utility.getSelectedObject();
+
+                                                        if(titleLabel.getText().equals("Warehouse Dashboard")){
                                                             int index = getIndex();
                                                             if(index >= 0){
                                                                 if(getTableView().getItems().get(index) instanceof  MIRS && getTableView().getItems().get(index) != null){
                                                                     MIRS mirs = getTableView().getItems().get(index);
-                                                                    if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) >= 2){
+                                                                    int count = MIRSSignatoryDAO.getSignatoryCount(mirs.getId());
+                                                                    if( count >= 2){
                                                                         status.setStyle("-fx-background-color: "+ColorPalette.DANGER+"; -fx-background-radius: 12; -fx-font-size: 14");
-                                                                    }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 1){
+                                                                    }else if(count == 1){
                                                                         status.setStyle("-fx-background-color: "+ColorPalette.WARNING+"; -fx-background-radius: 12; -fx-font-size: 14");
-                                                                    }else if(MIRSSignatoryDAO.getSignatoryCount(mirs.getId()) == 0){
+                                                                    }else if(count == 0){
                                                                         status.setStyle("-fx-background-color: "+ColorPalette.SUCCESS+"; -fx-background-radius: 12; -fx-font-size: 14");
                                                                     }
                                                                 }
@@ -327,7 +284,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
                                                 }
                                             });
                                        }
-                                        }, 0, 1000); // 1 second
+                                        }, 0, 10000); // 10 seconds
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
@@ -345,7 +302,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         tableView.setPlaceholder(new Label("No rows to display"));
         tableView.getColumns().add(column0);
         tableView.getColumns().add(column1);
-        tableView.getColumns().add(column2);
+        //tableView.getColumns().add(column2); //Hide Requisitioner column
         tableView.getColumns().add(column3);
         //tableView.getColumns().add(column4);
 
