@@ -35,6 +35,8 @@ public class Utility {
     public static String NOTIF_INFORMATION = "INFORMATION"; // TYPE
     public static String NOTIF_INFORMATION_ICON = "mdi2i-information"; // TYPE
 
+    public static String NOTIF_READ = "READ";
+    public static String NOTIF_UNREAD = "UNREAD";
     private static AnchorPane contentPane;
     private static MIRS activeMIRS;
 

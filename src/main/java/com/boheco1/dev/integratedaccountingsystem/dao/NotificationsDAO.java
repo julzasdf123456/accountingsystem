@@ -37,7 +37,7 @@ public class NotificationsDAO {
         ps.setString(3, notifications.getNotificationType());
         ps.setString(4, notifications.getFromUser());
         ps.setString(5, notifications.getToUser());
-        ps.setString(6, "UNREAD");
+        ps.setString(6, Utility.NOTIF_UNREAD);
         ps.setString(7, notifications.getRelationId());
         ps.setString(8, getIconFromType(notifications.getNotificationType()));
 
