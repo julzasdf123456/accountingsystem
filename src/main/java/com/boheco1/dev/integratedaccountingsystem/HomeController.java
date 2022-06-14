@@ -330,7 +330,7 @@ public class HomeController implements Initializable {
 
             vBox.getChildren().add(notifTitle);
             for(Notifications notifications : notificationsList) {
-                FontIcon icon = new FontIcon(notifications.getIcon()!=null ? notifications.getIcon() : NotificationsDAO.INFORMATION_ICON);
+                FontIcon icon = new FontIcon(notifications.getIcon()!=null ? notifications.getIcon() : Utility.NOTIF_INFORMATION_ICON);
                 JFXButton item = new JFXButton(notifications.getNotificationDetails(), icon);
                 item.setGraphicTextGap(10);
                 item.setPadding(new Insets(10, 10, 10, 10));
@@ -354,9 +354,9 @@ public class HomeController implements Initializable {
                     }
 
                     // PERFORM EVENT HERE
-                    if (notifications.getNotificationType().equals(NotificationsDAO.INFORMATION)) {
+                    if (notifications.getNotificationType().equals(Utility.NOTIF_INFORMATION)) {
                         AlertDialogBuilder.messgeDialog("Notification", notifications.getNotificationDetails(), homeStackPane, AlertDialogBuilder.INFO_DIALOG);
-                    } else if (notifications.getNotificationType().equals(NotificationsDAO.MIRS_APROVAL)) {
+                    } else if (notifications.getNotificationType().equals(Utility.NOTIF_MIRS_APROVAL)) {
                         // forward to viewing of mirs
                     }
                 });

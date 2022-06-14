@@ -2,6 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.User;
 import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
 import com.jfoenix.controls.*;
@@ -34,13 +35,17 @@ public class LoginController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
+            //Read app properties
             File appData = new File("application.properties");
+            //Create defaults if first run
             if (!appData.exists()){
                 properties = new Properties();
                 properties.setProperty("user", "");
                 properties.setProperty("host", DB.host);
                 properties.setProperty("db_user", DB.db_user);
                 properties.setProperty("db_pass", DB.db_pass);
+                properties.setProperty("station", Utility.STATION);
+                properties.setProperty("office", Utility.OFFICE_PREFIX);
                 properties.store(new FileOutputStream("application.properties"), LocalDate.now().toString());
             }
             InputStream is = new FileInputStream("application.properties");
@@ -55,6 +60,8 @@ public class LoginController implements Initializable {
             DB.db_user = properties.getProperty("db_user");
             DB.host = properties.getProperty("host");
             DB.db_pass = properties.getProperty("db_pass");
+            Utility.STATION = properties.getProperty("station");
+            Utility.OFFICE_PREFIX = properties.getProperty("office");
         } catch (Exception e) {
             e.printStackTrace();
             AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), loginStackPane, AlertDialogBuilder.DANGER_DIALOG);
@@ -97,6 +104,8 @@ public class LoginController implements Initializable {
         properties.setProperty("host", DB.host);
         properties.setProperty("db_user", DB.db_user);
         properties.setProperty("db_pass", DB.db_pass);
+        properties.setProperty("station", Utility.STATION);
+        properties.setProperty("office", Utility.OFFICE_PREFIX);
         properties.store(new FileOutputStream("application.properties"), LocalDate.now().toString());
     }
 }
