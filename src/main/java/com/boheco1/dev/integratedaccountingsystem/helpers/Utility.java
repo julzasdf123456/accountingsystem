@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.Random;
 
 public class Utility {
+    public static String STATION = "main"; //main or sub
+    public static String OFFICE_PREFIX = "OSD";
     public static int ROW_PER_PAGE = 20;
     public static String RELEASING = "releasing";
     public static String REJECTED = "rejected";
