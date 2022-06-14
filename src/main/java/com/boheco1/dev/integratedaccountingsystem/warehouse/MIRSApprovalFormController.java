@@ -43,10 +43,7 @@ public class MIRSApprovalFormController implements Initializable {
     private HBox btnHolder;
 
     @FXML
-    private TextArea details;
-
-    @FXML
-    private Label purpose, requisitioner, itemCounter, mirsNumber, date, address, applicant, signatories;
+    private Label purpose, requisitioner, itemCounter, mirsNumber, date, address, applicant, signatories, details;
 
     @FXML
     private TableView<MIRSItem> mirsItemTable;
@@ -64,7 +61,7 @@ public class MIRSApprovalFormController implements Initializable {
 
             String signatures = "";
             for (MIRSSignatory sig:mirsSignatoryList) {
-                signatures+= EmployeeDAO.getOne(sig.getUserID(), DB.getConnection()).getFullName();
+                signatures+= sig.getStatus().toUpperCase()+" : "+EmployeeDAO.getOne(sig.getUserID(), DB.getConnection()).getFullName();
                 signatures+="\n";
             }
             signatories.setText(signatures);

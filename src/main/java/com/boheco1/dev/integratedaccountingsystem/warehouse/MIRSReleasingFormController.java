@@ -36,10 +36,7 @@ public class MIRSReleasingFormController implements Initializable {
     private AnchorPane anchorpane;
 
     @FXML
-    private Label inStock, pending, available, date, itemCounter, mirsNumber, applicant, requisitioner, address, signatories, purpose;
-
-    @FXML
-    private TextArea details;
+    private Label details, inStock, pending, available, date, itemCounter, mirsNumber, applicant, requisitioner, address, signatories, purpose;
 
     @FXML
     private JFXTextField particulars, quantity;
