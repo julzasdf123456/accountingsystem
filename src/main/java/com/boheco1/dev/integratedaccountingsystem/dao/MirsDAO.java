@@ -798,9 +798,11 @@ public class MirsDAO {
             ps.executeUpdate();
             conn.commit();
             ps.close();
+            conn.setAutoCommit(true);
             return true;
         } catch (SQLException e) {
             conn.rollback();
+            conn.setAutoCommit(true);
             e.printStackTrace();
         }
         return false;

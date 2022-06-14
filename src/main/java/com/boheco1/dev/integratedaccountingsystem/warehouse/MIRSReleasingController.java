@@ -222,7 +222,7 @@ public class MIRSReleasingController implements Initializable {
 
             mirs.setDetails(details.getText());
             MirsDAO.update(mirs);
-            String notif_details = "Your MIRS application ("+mirs.getId()+") items was released by "+ActiveUser.getUser().getEmployeeInfo()+" on "+ mirs.getUpdatedAt() +"!";
+            String notif_details = "MIRS ("+mirs.getId()+") was released.";
             Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
             NotificationsDAO.create(torequisitioner);
             releasingList.getItems().clear();

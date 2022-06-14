@@ -1,10 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
 import com.boheco1.dev.integratedaccountingsystem.HomeController;
-import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.MIRSSignatoryDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.MirsDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
@@ -140,7 +137,9 @@ public class UserTaskApprovalController extends MenuControllerHandler implements
                         temp.setComments(remarks.getText());
                         temp.setId(selected.getId());
                         MIRSSignatoryDAO.update(temp);
-
+                        String notif_details = "MIRS ("+mirs.getId()+") was "+status+".";
+                        Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
+                        NotificationsDAO.create(torequisitioner);
                         AlertDialogBuilder.messgeDialog("System Message", "MIRS application has been "+status,
                                 Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
 
