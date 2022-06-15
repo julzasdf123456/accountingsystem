@@ -46,8 +46,8 @@ public class MRTDao {
                         "VALUES (?,?,?,?,?,?,?,?)");
 
         //Update Quantity in Stocks
-        PreparedStatement ps4 = conn.prepareStatement(
-                "UPDATE Stocks SET Quantity = (Quantity + ?) WHERE id=?");
+//        PreparedStatement ps4 = conn.prepareStatement(
+//                "UPDATE Stocks SET Quantity = (Quantity + ?) WHERE id=?");
 
         for(MRTItem item: items) {
 
@@ -62,9 +62,9 @@ public class MRTDao {
                 ps1.executeUpdate();
 
                 //Update Quantity in Releasing
-                ps2.setInt(1, item.getQuantity());
-                ps2.setString(2, item.getReleasingID());
-                ps2.executeUpdate();
+//                ps2.setInt(1, item.getQuantity());
+//                ps2.setString(2, item.getReleasingID());
+//                ps2.executeUpdate();
 
                 //Insert StockEntryLogs
                 ps3.setString(1, Utility.generateRandomId());
@@ -78,11 +78,11 @@ public class MRTDao {
                 ps3.executeUpdate();
 
                 //Update Quantity in Stocks
-                ps4.setInt(1, item.getQuantity());
-                ps4.setString(2, releasing.getStockID());
-                System.out.println("Item Quantity: " + item.getQuantity());
-                System.out.println("releasing.getStockID" + releasing.getStockID());
-                ps4.executeUpdate();
+//                ps4.setInt(1, item.getQuantity());
+//                ps4.setString(2, releasing.getStockID());
+//                System.out.println("Item Quantity: " + item.getQuantity());
+//                System.out.println("releasing.getStockID" + releasing.getStockID());
+//                ps4.executeUpdate();
             }catch(SQLException ex) {
                 conn.rollback();
                 throw new Exception(ex.getMessage());
@@ -93,7 +93,7 @@ public class MRTDao {
         ps1.close();
         ps2.close();
         ps3.close();
-        ps4.close();
+//        ps4.close();
         conn.setAutoCommit(true);
     }
 
