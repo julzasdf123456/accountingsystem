@@ -184,16 +184,15 @@ public class MRInventoryController extends MenuControllerHandler implements Init
         column5.setMinWidth(50);
         column5.setCellValueFactory(mr -> new ReadOnlyObjectWrapper<>(mr.getValue()));
         column5.setCellFactory(mrtable -> new TableCell<>(){
-            FontIcon icon =  new FontIcon("mdi2e-eye");
+            FontIcon icon =  new FontIcon("mdi2e-eye-circle");
             private final JFXButton viewButton = new JFXButton("", icon);
 
             @Override
             public void updateItem(MrItem item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item != null) {
-                    viewButton.setStyle("-fx-background-color: #2196f3;");
-                    icon.setIconSize(13);
-                    icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
+                    icon.setIconSize(24);
+                    icon.setIconColor(Paint.valueOf(ColorPalette.INFO));
                     viewButton.setOnAction(actionEvent -> {
                         Utility.setSelectedObject(item);
                         ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_view_mr_item_history.fxml", Utility.getStackPane());
