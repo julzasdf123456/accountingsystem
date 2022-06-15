@@ -247,20 +247,22 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
                                             Platform.runLater(new Runnable() {
                                                 public void run() {
                                                     try {
-                                                        Label titleLabel = (Label) Utility.getSelectedObject();
+                                                        if(Utility.getSelectedObject() instanceof Label) {
+                                                            Label titleLabel = (Label) Utility.getSelectedObject();
 
-                                                        if(titleLabel.getText().equals("Warehouse Dashboard")){
-                                                            int index = getIndex();
-                                                            if(index >= 0){
-                                                                if(getTableView().getItems().get(index) instanceof  MIRS && getTableView().getItems().get(index) != null){
-                                                                    MIRS mirs = getTableView().getItems().get(index);
-                                                                    int count = MIRSSignatoryDAO.getSignatoryCount(mirs.getId());
-                                                                    if( count >= 2){
-                                                                        status.setStyle("-fx-background-color: "+ColorPalette.DANGER+"; -fx-background-radius: 12; -fx-font-size: 14");
-                                                                    }else if(count == 1){
-                                                                        status.setStyle("-fx-background-color: "+ColorPalette.WARNING+"; -fx-background-radius: 12; -fx-font-size: 14");
-                                                                    }else if(count == 0){
-                                                                        status.setStyle("-fx-background-color: "+ColorPalette.SUCCESS+"; -fx-background-radius: 12; -fx-font-size: 14");
+                                                            if (titleLabel.getText().equals("Warehouse Dashboard")) {
+                                                                int index = getIndex();
+                                                                if (index >= 0) {
+                                                                    if (getTableView().getItems().get(index) instanceof MIRS && getTableView().getItems().get(index) != null) {
+                                                                        MIRS mirs = getTableView().getItems().get(index);
+                                                                        int count = MIRSSignatoryDAO.getSignatoryCount(mirs.getId());
+                                                                        if (count >= 2) {
+                                                                            status.setStyle("-fx-background-color: " + ColorPalette.DANGER + "; -fx-background-radius: 12; -fx-font-size: 14");
+                                                                        } else if (count == 1) {
+                                                                            status.setStyle("-fx-background-color: " + ColorPalette.WARNING + "; -fx-background-radius: 12; -fx-font-size: 14");
+                                                                        } else if (count == 0) {
+                                                                            status.setStyle("-fx-background-color: " + ColorPalette.SUCCESS + "; -fx-background-radius: 12; -fx-font-size: 14");
+                                                                        }
                                                                     }
                                                                 }
                                                             }
