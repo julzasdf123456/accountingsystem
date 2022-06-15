@@ -356,8 +356,10 @@ public class HomeController implements Initializable {
                     // PERFORM EVENT HERE
                     if (notifications.getNotificationType().equals(Utility.NOTIF_INFORMATION)) {
                         AlertDialogBuilder.messgeDialog("Notification", notifications.getNotificationDetails(), homeStackPane, AlertDialogBuilder.INFO_DIALOG);
+                        contentPane.getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "user_task_approval_mirs.fxml", contentPane, subToolbar, new Label("Task Approval")));
                     } else if (notifications.getNotificationType().equals(Utility.NOTIF_MIRS_APROVAL)) {
                         // forward to viewing of mirs
+                        contentPane.getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "user_task_approval_mirs.fxml", contentPane, subToolbar, new Label("Task Approval")));
                     }
                 });
                 vBox.getChildren().add(item);
