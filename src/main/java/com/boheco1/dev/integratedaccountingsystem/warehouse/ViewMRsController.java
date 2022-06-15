@@ -87,7 +87,7 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
         column4.setStyle("-fx-alignment: center-left;");
 
         TableColumn<EmployeeInfo, String> column5 = new TableColumn<>("Designation");
-        column5.setMinWidth(150);
+        column5.setMinWidth(200);
         column5.setCellValueFactory(new PropertyValueFactory<>("designation"));
         column5.setStyle("-fx-alignment: center-left;");
 
@@ -96,7 +96,7 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
         column6.setCellValueFactory(emp -> new ReadOnlyObjectWrapper<>(emp.getValue()));
         column6.setCellFactory(mrtable -> new TableCell<>(){
 
-            FontIcon viewIcon =  new FontIcon("mdi2e-eye");
+            FontIcon viewIcon =  new FontIcon("mdi2p-pencil");
 
             private final JFXButton viewButton = new JFXButton("", viewIcon);
 
@@ -104,9 +104,8 @@ public class ViewMRsController extends MenuControllerHandler implements Initiali
             protected void updateItem(EmployeeInfo employee, boolean b) {
                 super.updateItem(employee, b);
                 if (employee != null) {
-                    viewButton.setStyle("-fx-background-color: #2196f3;");
-                    viewIcon.setIconSize(13);
-                    viewIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
+                    viewIcon.setIconSize(24);
+                    viewIcon.setIconColor(Paint.valueOf(ColorPalette.INFO));
 
                     viewButton.setOnAction(actionEvent -> {
                         Utility.setSelectedObject(employee);

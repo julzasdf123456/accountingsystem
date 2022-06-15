@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -233,17 +234,14 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
                     public TableCell call(final TableColumn<Stock, String> param) {
                         final TableCell<Stock, String> cell = new TableCell<Stock, String>() {
 
-                            Button btn = new Button("");
-                            FontIcon icon = new FontIcon("mdi2d-delete");
+                            FontIcon icon = new FontIcon("mdi2c-close-circle");
+                            JFXButton btn = new JFXButton("", icon);
 
                             @Override
                             public void updateItem(String item, boolean empty) {
                                 super.updateItem(item, empty);
-                                icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
-                                btn.setStyle("-fx-background-color: #f44336");
-                                btn.setGraphic(icon);
-                                btn.setGraphicTextGap(5);
-                                btn.setTextFill(Paint.valueOf(ColorPalette.WHITE));
+                                icon.setIconSize(24);
+                                icon.setIconColor(Paint.valueOf(ColorPalette.DANGER));
                                 if (empty) {
                                     setGraphic(null);
                                     setText(null);

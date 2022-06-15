@@ -115,16 +115,15 @@ public class TrashStockController extends MenuControllerHandler implements Initi
         column8.setMinWidth(50);
         column8.setCellValueFactory(stock -> new ReadOnlyObjectWrapper<>(stock.getValue()));
         column8.setCellFactory(stocktable -> new TableCell<>(){
-            FontIcon icon =  new FontIcon("mdi2f-file-document-outline");
+            FontIcon icon =  new FontIcon("mdi2p-pencil");
             private final JFXButton restoreButton = new JFXButton("", icon);
 
             @Override
             public void updateItem(SlimStock item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item != null) {
-                    restoreButton.setStyle("-fx-background-color: #00AD8E;");
-                    icon.setIconSize(13);
-                    icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
+                    icon.setIconSize(24);
+                    icon.setIconColor(Paint.valueOf(ColorPalette.INFO));
                     restoreButton.setOnAction(actionEvent -> {
                         JFXDialogLayout dialogLayout = new JFXDialogLayout();
                         dialogLayout.setHeading(new Text("Confirm Trash Stock"));

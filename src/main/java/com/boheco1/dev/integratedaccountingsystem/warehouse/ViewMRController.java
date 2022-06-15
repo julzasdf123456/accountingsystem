@@ -178,16 +178,15 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
         TableColumn<MrItem, MrItem> column9 = new TableColumn<>(" ");
         column9.setCellValueFactory(mr -> new ReadOnlyObjectWrapper<>(mr.getValue()));
         column9.setCellFactory(mritem -> new TableCell<>(){
-            FontIcon icon = new FontIcon("mdi2f-file-edit");
+            FontIcon icon = new FontIcon("mdi2p-pencil");
             private final JFXButton returnBtn = new JFXButton("", icon);
 
             @Override
             public void updateItem(MrItem item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item != null && !item.getStatus().contains(Utility.MR_RETURNED)) {
-                    returnBtn.setStyle("-fx-background-color: #2196f3;");
-                    icon.setIconSize(13);
-                    icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
+                    icon.setIconSize(24);
+                    icon.setIconColor(Paint.valueOf(ColorPalette.INFO));
                     returnBtn.setOnAction(actionEvent -> {
                         Utility.setSelectedObject(item);
                         ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_mr_return.fxml", Utility.getStackPane());
