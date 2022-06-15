@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.NumberGenerator;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
@@ -443,6 +444,81 @@ public class MirsDAO {
         return mirsList;
     }
 
+    /**
+     * Fetch all MIRS under requisitioner with pending status
+     * @return
+     * @throws Exception
+     */
+    public static List<MIRS> getMyMIRS(String requisitionerID, String status) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MIRS WHERE RequisitionerID = ? AND Status = ? ORDER BY DateFiled DESC");
+        ps.setString(1, requisitionerID);
+        ps.setString(2, status);
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<MIRS> mirsList = new ArrayList<>();
+
+        while(rs.next()) {
+            mirsList.add(new MIRS(
+                    rs.getString("id"),
+                    rs.getDate("DateFiled").toLocalDate(),
+                    rs.getString("Purpose"),
+                    rs.getString("Details"),
+                    rs.getString("Status"),
+                    rs.getString("RequisitionerID"),
+                    rs.getString("UserID"),
+                    rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                    rs.getString("address"),
+                    rs.getString("applicant"),
+                    rs.getString("WorkOrderNo")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return mirsList;
+    }
+
+    /**
+     * Fetch all MIRS under requisitioner
+     * @return
+     * @throws Exception
+     */
+    public static List<MIRS> getMyMIRS(String requisitionerID) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MIRS WHERE RequisitionerID = ? ORDER BY DateFiled DESC");
+        ps.setString(1, requisitionerID);
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<MIRS> mirsList = new ArrayList<>();
+
+        while(rs.next()) {
+            mirsList.add(new MIRS(
+                    rs.getString("id"),
+                    rs.getDate("DateFiled").toLocalDate(),
+                    rs.getString("Purpose"),
+                    rs.getString("Details"),
+                    rs.getString("Status"),
+                    rs.getString("RequisitionerID"),
+                    rs.getString("UserID"),
+                    rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                    rs.getString("address"),
+                    rs.getString("applicant"),
+                    rs.getString("WorkOrderNo")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return mirsList;
+    }
+
     public static List<MIRS> searchMIRS(String key, String status) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM MIRS WHERE (id LIKE ? OR Purpose LIKE ? OR Address LIKE ? OR Applicant LIKE ?) AND Status = ? ORDER BY DateFiled DESC");
@@ -807,6 +883,65 @@ public class MirsDAO {
         }
         return false;
 
+    }
+
+    public static boolean update(MIRS mirs, List<MIRSItem> mirsItems, List<MIRSSignatory> signatories) throws SQLException, ClassNotFoundException {
+        /*"UPDATE MIRSItems SET StockID=?, Quantity=?, Price=?, Comments=?, UpdatedAt=GETDATE() WHERE id=?");
+        ps.setString(1, item.getStockID());
+        ps.setInt(2, item.getQuantity());
+        ps.setDouble(3, item.getPrice());
+        ps.setString(4, item.getRemarks());*/
+
+        String query = "";
+        query = "UPDATE MIRS SET " +
+                "DateFiled='"+Date.valueOf(mirs.getDateFiled())+"', " +
+                "Purpose='"+mirs.getPurpose()+"', " +
+                "Details='"+mirs.getDetails()+"', " +
+                "Status='"+mirs.getStatus()+"', " +
+                "RequisitionerID='"+mirs.getRequisitionerID()+"', " +
+                "UpdatedAt=GETDATE(), " +
+                "address='"+mirs.getAddress()+"', " +
+                "applicant='"+mirs.getApplicant()+"' " +
+                "WHERE id='"+mirs.getId()+"';\n";
+
+        for(MIRSItem item : mirsItems){
+            if(item.getId() == null) {
+                query += "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id) " +
+                        "VALUES " +
+                        "('" + mirs.getId() + "','" + item.getStockID() + "','" + item.getQuantity() + "','" + item.getPrice() + "','" + item.getRemarks() + "',GETDATE(),GETDATE(), '" + Utility.generateRandomId() + "');\n";
+            }
+        }
+
+
+        query +="DELETE FROM MIRSSignatories WHERE MIRSID='"+mirs.getId()+"';\n";
+        for(MIRSSignatory msig : signatories){
+            query +="INSERT INTO MIRSSignatories " +
+                    "(MIRSID, user_id, Status, Comments, CreatedAt, UpdatedAt,id) " +
+                    "VALUES " +
+                    "('"+msig.getMirsID()+"'," +
+                    "'"+msig.getUserID()+"'," +
+                    "'"+msig.getStatus()+"'," +
+                    "'"+msig.getComments()+"',GETDATE(),GETDATE()," +
+                    "'"+Utility.generateRandomId()+"'); \n";
+        }
+
+        System.out.println(query);
+        Connection conn = DB.getConnection();
+
+        try {
+            conn.setAutoCommit(false);
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.executeUpdate();
+            conn.commit();
+            ps.close();
+            conn.setAutoCommit(true);
+            return true;
+        } catch (SQLException e) {
+            conn.rollback();
+            conn.setAutoCommit(true);
+            e.printStackTrace();
+        }
+        return false;
     }
 
 }

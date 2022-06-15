@@ -75,8 +75,9 @@ public class NotificationsDAO {
      */
     public static List<Notifications> getNotificationsForUser(String userId) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM Notifications WHERE ToUser=? OR ToUser IS NULL ORDER BY created_at DESC");
+                "SELECT * FROM Notifications WHERE ToUser=? AND Status=? ORDER BY created_at DESC");
         ps.setString(1, userId);
+        ps.setString(2, Utility.NOTIF_UNREAD);
 
         ResultSet rs = ps.executeQuery();
 

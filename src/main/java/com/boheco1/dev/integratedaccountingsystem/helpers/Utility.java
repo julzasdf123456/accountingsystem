@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.helpers;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 
 import java.util.Calendar;
@@ -43,6 +44,8 @@ public class Utility {
     private static StackPane stackPane;
 
     private static Object selected;
+
+    private static FlowPane subToolbar;
 
     private static ViewMRController mrController;
 
@@ -94,6 +97,14 @@ public class Utility {
 
     public static void setStackPane(StackPane stackPane) {
         Utility.stackPane = stackPane;
+    }
+
+    public static FlowPane getSubToolbar() {
+        return subToolbar;
+    }
+
+    public static void setSubToolbar(FlowPane subToolbar) {
+        Utility.subToolbar = subToolbar;
     }
 
     public static ViewMRController getMrController() { return mrController; }

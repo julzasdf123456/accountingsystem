@@ -32,7 +32,7 @@ import java.util.ResourceBundle;
 public class UserTaskApprovalController extends MenuControllerHandler implements Initializable, SubMenuHelper {
 
     @FXML TableView mirsTable;
-    @FXML private JFXTextField remarks, workOrderNum;
+    @FXML private JFXTextField remarks;
 
 
     @Override
@@ -46,14 +46,6 @@ public class UserTaskApprovalController extends MenuControllerHandler implements
             e.printStackTrace();
         }
         mirsTable.getItems().setAll(mirs);
-
-        try {
-            if(EmployeeDAO.getOne(ActiveUser.getUser().getEmployeeID(), DB.getConnection()).getDesignation().equals("Work Order Officer")){
-                workOrderNum.setDisable(false);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
     }
 
@@ -102,58 +94,5 @@ public class UserTaskApprovalController extends MenuControllerHandler implements
         }
     }
 
-    @FXML
-    private void approvedMirs(ActionEvent event) {
-        action(Utility.APPROVED);
-    }
 
-    @FXML
-    private void rejectMirs(ActionEvent event) {
-        action(Utility.REJECTED);
-    }
-
-    private void action(String status){
-        JFXButton accept = new JFXButton("Proceed");
-        JFXDialog MIRSapprovalDialog = DialogBuilder.showConfirmDialog("MIRS Approval","Confirm action on MIRS application.", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
-        accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
-        accept.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent __) {
-                try {
-                    MIRSSignatory selected = (MIRSSignatory) mirsTable.getSelectionModel().getSelectedItem();
-                    if (selected == null) {
-                        AlertDialogBuilder.messgeDialog("System Information", "Select item(s) before proceeding!", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
-                        return;
-                    }else{
-
-                        MIRS mirs = MirsDAO.getMIRS(selected.getMirsID());
-                        mirs.setWorkOrderNo(workOrderNum.getText());
-                        MirsDAO.update(mirs);
-
-                        MIRSSignatory temp = new MIRSSignatory();
-                        temp.setMirsID(selected.getMirsID());
-                        temp.setUserID(selected.getUserID());
-                        temp.setStatus(status);
-                        temp.setComments(remarks.getText());
-                        temp.setId(selected.getId());
-                        MIRSSignatoryDAO.update(temp);
-                        String notif_details = "MIRS ("+mirs.getId()+") was "+status+".";
-                        Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
-                        NotificationsDAO.create(torequisitioner);
-                        AlertDialogBuilder.messgeDialog("System Message", "MIRS application has been "+status,
-                                Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
-
-                        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "user_task_approval_mirs.fxml"));
-
-
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    AlertDialogBuilder.messgeDialog("Error on UserTaskApprovalController", e.getMessage(),
-                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-                }
-                MIRSapprovalDialog.close();
-            }
-        });
-    }
 }

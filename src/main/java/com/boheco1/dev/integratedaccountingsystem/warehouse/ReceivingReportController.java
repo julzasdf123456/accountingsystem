@@ -137,25 +137,25 @@ public class ReceivingReportController extends MenuControllerHandler implements 
         column2.setStyle("-fx-alignment: center;");
 
         TableColumn<Receiving, String> column3 = new TableColumn<>("RV Number");
-        column3.setMinWidth(150);
+        column3.setMinWidth(140);
         column3.setCellValueFactory(new PropertyValueFactory<>("rvNo"));
         column3.setStyle("-fx-alignment: center;");
 
         TableColumn<Stock, String> column4 = new TableColumn<>("BLWB Number");
-        column4.setMinWidth(150);
+        column4.setMinWidth(140);
         column4.setCellValueFactory(new PropertyValueFactory<>("blwbNo"));
         column4.setStyle("-fx-alignment: center;");
 
         TableColumn<Stock, String> column5 = new TableColumn<>("Invoice Number");
-        column5.setMinWidth(150);
+        column5.setMinWidth(140);
         column5.setCellValueFactory(new PropertyValueFactory<>("invoiceNo"));
         column5.setStyle("-fx-alignment: center;");
 
         TableColumn<Receiving, Receiving> column6 = new TableColumn<>("Action");
-        column6.setMinWidth(50);
+        column6.setMinWidth(100);
         column6.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue()));
         column6.setCellFactory(table -> new TableCell<>() {
-            FontIcon viewIcon = new FontIcon("mdi2e-eye");
+            FontIcon viewIcon = new FontIcon("mdi2e-eye-circle");
             private final JFXButton viewButton = new JFXButton("", viewIcon);
 
             FontIcon printIcon = new FontIcon("mdi2p-printer");
@@ -165,13 +165,11 @@ public class ReceivingReportController extends MenuControllerHandler implements 
             public void updateItem(Receiving item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item != null) {
-                    viewButton.setStyle("-fx-background-color: #2196f3;");
-                    viewIcon.setIconSize(13);
-                    viewIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
+                    viewIcon.setIconSize(24);
+                    viewIcon.setIconColor(Paint.valueOf(ColorPalette.INFO));
 
-                    printButton.setStyle("-fx-background-color: #00AD8E;");
-                    printIcon.setIconSize(13);
-                    printIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
+                    printIcon.setIconSize(24);
+                    printIcon.setIconColor(Paint.valueOf(ColorPalette.SUCCESS));
                     if (empty) {
                         setGraphic(null);
                         setText(null);
@@ -188,7 +186,7 @@ public class ReceivingReportController extends MenuControllerHandler implements 
                         HBox hBox = new HBox();
                         HBox filler = new HBox();
                         hBox.setHgrow(filler, Priority.ALWAYS);
-                        hBox.setSpacing(5);
+                        hBox.setSpacing(1);
                         hBox.getChildren().add(viewButton);
                         hBox.getChildren().add(filler);
                         hBox.getChildren().add(printButton);

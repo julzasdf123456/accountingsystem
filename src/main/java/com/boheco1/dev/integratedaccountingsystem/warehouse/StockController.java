@@ -188,10 +188,10 @@ public class StockController extends MenuControllerHandler implements Initializa
         column7.setStyle("-fx-alignment: center-left;");
 
         TableColumn<SlimStock, SlimStock> column8 = new TableColumn<>("Action");
-        column8.setMinWidth(50);
+        column8.setMinWidth(40);
         column8.setCellValueFactory(stock -> new ReadOnlyObjectWrapper<>(stock.getValue()));
         column8.setCellFactory(stocktable -> new TableCell<>(){
-            FontIcon icon =  new FontIcon("mdi2e-eye");
+            FontIcon icon =  new FontIcon("mdi2p-pencil");
             private final JFXButton viewButton = new JFXButton("", icon);
 
             FontIcon trashIcon =  new FontIcon("mdi2t-trash-can-outline");
@@ -201,13 +201,11 @@ public class StockController extends MenuControllerHandler implements Initializa
             public void updateItem(SlimStock item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item != null) {
-                    viewButton.setStyle("-fx-background-color: #2196f3;");
-                    icon.setIconSize(13);
-                    icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
+                    icon.setIconSize(24);
+                    icon.setIconColor(Paint.valueOf(ColorPalette.INFO));
 
-                    trashButton.setStyle("-fx-background-color: #f44336;");
-                    trashIcon.setIconSize(13);
-                    trashIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
+                    trashIcon.setIconSize(24);
+                    trashIcon.setIconColor(Paint.valueOf(ColorPalette.DANGER));
                     if (empty) {
                         setGraphic(null);
                         setText(null);
@@ -260,7 +258,7 @@ public class StockController extends MenuControllerHandler implements Initializa
                         HBox hBox = new HBox();
                         HBox filler = new HBox();
                         hBox.setHgrow(filler, Priority.ALWAYS);
-                        hBox.setSpacing(5);
+                        hBox.setSpacing(1);
                         hBox.getChildren().add(viewButton);
                         hBox.getChildren().add(filler);
                         hBox.getChildren().add(trashButton);

@@ -5,10 +5,13 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.Notifications;
 import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -75,7 +78,7 @@ public class HomeController implements Initializable {
     public JFXButton employees, users, signatoriesButton;
 
     // USER
-    public JFXButton approvalTask, myAccount, logout;
+    public JFXButton myMirs, approvalTask, myAccount, logout;
 
     @FXML
     public FlowPane subToolbar, notificationBin;
@@ -85,6 +88,7 @@ public class HomeController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Utility.setContentPane(contentPane);
         Utility.setStackPane(homeStackPane);
+        Utility.setSubToolbar(subToolbar);
         submenuList = new ArrayList<>();
         // INITIALIZE HAMBURGER
         hamburgerIcon = new FontIcon("mdi2a-arrow-left");
@@ -109,6 +113,7 @@ public class HomeController implements Initializable {
         users = new JFXButton("Users");
         myAccount = new JFXButton("My Account");
         approvalTask = new JFXButton("Approval Task");
+        myMirs = new JFXButton("My MIRS");
         logout = new JFXButton("Logout");
         receiving = new JFXButton("Receiving Entry");
         addMR = new JFXButton("MR Entry");
@@ -155,6 +160,7 @@ public class HomeController implements Initializable {
         NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("User"), new FontIcon("mdi2a-account-circle"), homeStackPane);
         NavMenuHelper.addMenu(navMenuBox, myAccount, homeStackPane);
         NavMenuHelper.addMenu(navMenuBox, approvalTask, homeStackPane);
+        NavMenuHelper.addMenu(navMenuBox, myMirs, homeStackPane);
         NavMenuHelper.addMenu(navMenuBox, logout, homeStackPane);
 
         // INITIALIZE MENU FUNCTIONS
@@ -197,14 +203,23 @@ public class HomeController implements Initializable {
         DrawerMenuHelper.setMenuButton(logout,  new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, "Logout");
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(myAccount,new FontIcon("mdi2c-checkbox-blank-circle-outline"),drawerMenus,myAccount.getText(),contentPane,"view_my_account.fxml",subToolbar, null, title);
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(approvalTask,new FontIcon("mdi2c-checkbox-blank-circle-outline"),drawerMenus,approvalTask.getText(),contentPane,"user_task_approval_mirs.fxml",subToolbar, null, title);
+        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(myMirs,new FontIcon("mdi2c-checkbox-blank-circle-outline"),drawerMenus,myMirs.getText(),contentPane,"user_my_mirs.fxml",subToolbar, null, title);
 
         logout.setOnAction(actionEvent -> {
-            ActiveUser.setUser(null);
-            try {
-                HostWindow.setRoot("login_controller");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            JFXButton accept = new JFXButton("Proceed");
+            JFXDialog dialog = DialogBuilder.showConfirmDialog("System Message","Are yoou sure you want to log out.", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+            accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+            accept.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent __) {
+                    ActiveUser.setUser(null);
+                    try {
+                        HostWindow.setRoot("login_controller");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         });
 
         // INITIALIZE NOTIFICATION BUTTON
@@ -356,8 +371,10 @@ public class HomeController implements Initializable {
                     // PERFORM EVENT HERE
                     if (notifications.getNotificationType().equals(Utility.NOTIF_INFORMATION)) {
                         AlertDialogBuilder.messgeDialog("Notification", notifications.getNotificationDetails(), homeStackPane, AlertDialogBuilder.INFO_DIALOG);
+                        contentPane.getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "user_task_approval_mirs.fxml", contentPane, subToolbar, new Label("Task Approval")));
                     } else if (notifications.getNotificationType().equals(Utility.NOTIF_MIRS_APROVAL)) {
                         // forward to viewing of mirs
+                        contentPane.getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "user_task_approval_mirs.fxml", contentPane, subToolbar, new Label("Task Approval")));
                     }
                 });
                 vBox.getChildren().add(item);

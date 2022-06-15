@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextArea?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="841.0" prefWidth="1148.0" style="-fx-background-color: #ffff;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.UserMyMIRSApplicationController">
+    <children>
+      <HBox prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+                    <VBox maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="809.0" prefWidth="457.0" HBox.hgrow="NEVER">
+                        <children>
+                  <Label fx:id="mirsNumber" maxWidth="1.7976931348623157E308" style="-fx-font-size: 24;" text="MIRS #: " VBox.vgrow="ALWAYS">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets bottom="16.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label text="Applicant" textFill="#8a8a8a" />
+                  <JFXTextField fx:id="applicant" layoutX="10.0" layoutY="243.0" style="-fx-background-color: #f5f5f5;" text="-">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets bottom="24.0" />
+                     </VBox.margin>
+                  </JFXTextField>
+                  <Label text="Address" textFill="#8a8a8a" />
+                  <JFXTextField fx:id="address" style="-fx-background-color: #f5f5f5;" text="-">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets bottom="16.0" />
+                     </VBox.margin>
+                  </JFXTextField>
+                  <HBox>
+                     <children>
+                        <Label text="Purpose/Description" textFill="#8a8a8a" />
+                        <Label style="-fx-font-size: 24;" text="*" textFill="RED">
+                           <font>
+                              <Font size="64.0" />
+                           </font>
+                           <padding>
+                              <Insets bottom="-15.0" top="-5.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                  </HBox>
+                            <JFXTextArea fx:id="purpose" focusColor="#00ad8e" prefHeight="106.0" prefWidth="350.0" style="-fx-background-color: #f5f5f5;">
+                                <VBox.margin>
+                                    <Insets bottom="24.0" />
+                                </VBox.margin>
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                     <padding>
+                        <Insets bottom="5.0" />
+                     </padding>
+                            </JFXTextArea>
+                  <HBox>
+                     <children>
+                        <Label text="Prepared" textFill="#8a8a8a" />
+                        <Label style="-fx-font-size: 24;" text="*" textFill="RED">
+                           <font>
+                              <Font size="64.0" />
+                           </font>
+                           <padding>
+                              <Insets bottom="-15.0" top="-5.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                  </HBox>
+                            <JFXTextField fx:id="prepared" style="-fx-background-color: #f5f5f5;">
+                                <VBox.margin>
+                                    <Insets bottom="24.0" />
+                                </VBox.margin>
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </JFXTextField>
+                  <HBox>
+                     <children>
+                        <Label text="Checked" textFill="#8a8a8a" />
+                        <Label style="-fx-font-size: 24;" text="*" textFill="RED">
+                           <font>
+                              <Font size="64.0" />
+                           </font>
+                           <padding>
+                              <Insets bottom="-15.0" top="-5.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <JFXTextField fx:id="checked" layoutX="10.0" layoutY="475.0" style="-fx-background-color: #f5f5f5;">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets bottom="24.0" />
+                     </VBox.margin>
+                  </JFXTextField>
+                  <HBox>
+                     <children>
+                        <Label text="Approved" textFill="#8a8a8a" />
+                        <Label style="-fx-font-size: 24;" text="*" textFill="RED">
+                           <font>
+                              <Font size="64.0" />
+                           </font>
+                           <padding>
+                              <Insets bottom="-15.0" top="-5.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <JFXTextField fx:id="approved" layoutX="10.0" layoutY="475.0" style="-fx-background-color: #f5f5f5;">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets bottom="24.0" />
+                     </VBox.margin>
+                  </JFXTextField>
+                  <HBox>
+                     <children>
+                        <Label text="Filed Date" textFill="#8a8a8a" />
+                        <Label style="-fx-font-size: 24;" text="*" textFill="RED">
+                           <font>
+                              <Font size="64.0" />
+                           </font>
+                           <padding>
+                              <Insets bottom="-15.0" top="-5.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                  </HBox>
+                            <DatePicker fx:id="filingDate" editable="false" maxWidth="1.7976931348623157E308" promptText="Date">
+                     <VBox.margin>
+                        <Insets bottom="24.0" />
+                     </VBox.margin></DatePicker>
+                  <HBox layoutX="10.0" layoutY="587.0">
+                     <children>
+                        <Label text="Remarks" textFill="#8a8a8a" />
+                     </children>
+                  </HBox>
+                  <JFXTextArea fx:id="remarks" maxWidth="1.7976931348623157E308" prefHeight="90.0" prefWidth="78.0" style="-fx-background-color: #f5f5f5;">
+                     <VBox.margin>
+                        <Insets bottom="16.0" />
+                     </VBox.margin>
+                  </JFXTextArea>
+                  <VBox alignment="CENTER" VBox.vgrow="ALWAYS">
+                     <children>
+                        <HBox alignment="CENTER">
+                           <children>
+                              <JFXButton fx:id="saveChanges" buttonType="RAISED" maxHeight="1.7976931348623157E308" onAction="#saveMirsChanges" prefHeight="35.0" prefWidth="139.0" styleClass="btn-info" text="Save Changes" textFill="WHITE">
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                                 <padding>
+                                    <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                 </padding>
+                                 <HBox.margin>
+                                    <Insets left="16.0" right="16.0" />
+                                 </HBox.margin>
+                              </JFXButton>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+                        </children>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+                    </VBox>
+            <Separator orientation="VERTICAL" prefHeight="200.0">
+               <HBox.margin>
+                  <Insets left="16.0" right="16.0" />
+               </HBox.margin>
+            </Separator>
+            <HBox HBox.hgrow="ALWAYS">
+               <children>
+                  <VBox prefHeight="640.0" prefWidth="844.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <HBox alignment="TOP_CENTER" prefHeight="23.0" prefWidth="401.0">
+                           <children>
+                              <VBox>
+                                 <children>
+                                    <HBox>
+                                       <children>
+                                          <JFXTextField fx:id="items" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="636.0" promptText="Search Item" style="-fx-background-color: #f5f5f5; -fx-font-size: 24;" styleClass="jfx-text-field">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </JFXTextField>
+                                          <JFXTextField fx:id="quantity" alignment="CENTER" labelFloat="true" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" onAction="#addItemToTable" prefWidth="83.0" promptText="Qty" style="-fx-background-color: #f5f5f5;" styleClass="jfx-text-field">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </JFXTextField>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER">
+                                       <children>
+                                          <Label fx:id="inStock" maxWidth="1.7976931348623157E308" style="-fx-background-radius: 0 0 0 6;" styleClass="btn-info" text="In Stock: 0" textFill="WHITE">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                             <padding>
+                                                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                             </padding>
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="pending" maxWidth="1.7976931348623157E308" styleClass="btn-sucess" text="Pending: 0" textFill="WHITE">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                             <padding>
+                                                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                             </padding>
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="available" maxWidth="1.7976931348623157E308" style="-fx-background-radius: 0 0 6 0;" styleClass="btn-warning" text="Available: 0" textFill="WHITE">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                             <padding>
+                                                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                             </padding>
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets bottom="16.0" top="2.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </HBox>
+                        <TableView fx:id="mirsItemTable" maxHeight="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
+                        </TableView>
+                        <HBox>
+                           <children>
+                              <Label text="Item Added: " />
+                              <Label fx:id="countRow" text="0" />
+                           </children>
+                        </HBox>
+                     </children>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </VBox>
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+         </padding>
+      </HBox>
+    </children>
+</AnchorPane>

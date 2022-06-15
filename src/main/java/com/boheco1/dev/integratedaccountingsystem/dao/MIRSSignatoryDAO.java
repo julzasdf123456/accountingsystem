@@ -46,6 +46,22 @@ public class MIRSSignatoryDAO {
 
         ps.close();
     }
+
+    public static void updateStatus(MIRSSignatory msig) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE MIRSSignatories SET " +
+                        "Status=?, Comments=?, UpdatedAt=GETDATE() " +
+                        "WHERE MIRSID=? AND user_id=?");
+        ps.setString(1, msig.getStatus());
+        ps.setString(2, msig.getComments());
+        ps.setString(3, msig.getMirsID());
+        ps.setString(4, msig.getUserID());
+
+        ps.executeUpdate();
+
+        ps.close();
+    }
+
     public static List<MIRSSignatory> getAllMIRS(User val) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "select MIRSSignatories.*, MIRS.DateFiled, MIRS.Purpose from MIRS LEFT JOIN MIRSSignatories on MIRS.id = MIRSSignatories.MIRSID WHERE MIRSSignatories.user_id = ? AND MIRSSignatories.Status = ? AND MIRS.Status = ? ORDER BY DateFiled DESC");

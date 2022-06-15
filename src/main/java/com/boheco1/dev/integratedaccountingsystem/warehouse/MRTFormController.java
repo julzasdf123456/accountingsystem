@@ -234,17 +234,14 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
                     public TableCell call(final TableColumn<MRTItem, String> param) {
                         final TableCell<MRTItem, String> cell = new TableCell<MRTItem, String>() {
 
-                            Button btn = new Button("");
-                            FontIcon icon = new FontIcon("mdi2d-delete");
+                            FontIcon icon = new FontIcon("mdi2c-close-circle");
+                            JFXButton btn = new JFXButton("", icon);
 
                             @Override
                             public void updateItem(String item, boolean empty) {
                                 super.updateItem(item, empty);
-                                icon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
-                                btn.setStyle("-fx-background-color: #f44336");
-                                btn.setGraphic(icon);
-                                btn.setGraphicTextGap(5);
-                                btn.setTextFill(Paint.valueOf(ColorPalette.WHITE));
+                                icon.setIconSize(24);
+                                icon.setIconColor(Paint.valueOf(ColorPalette.DANGER));
                                 if (empty) {
                                     setGraphic(null);
                                     setText(null);

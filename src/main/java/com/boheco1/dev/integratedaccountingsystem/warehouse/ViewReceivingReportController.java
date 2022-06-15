@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.ReceivingDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.SupplierDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
@@ -33,7 +34,7 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
             received_tf, received_original_tf, verified_tf, posted_tf;
 
     @FXML
-    private TextField net_sales_tf, vat_tf, total_tf;
+    private Label net_sales_lbl, vat_lbl, total_lbl;
 
     @FXML
     private TableView items_table;
@@ -63,7 +64,7 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
         column3.setCellValueFactory(new PropertyValueFactory<>("description"));
 
         TableColumn<Stock, String> column4 = new TableColumn<>("Unit");
-        column4.setMinWidth(50);
+        column4.setMinWidth(70);
         column4.setCellValueFactory(new PropertyValueFactory<>("unit"));
         column4.setStyle("-fx-alignment: center;");
 
@@ -78,11 +79,11 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
         column6.setStyle("-fx-alignment: center;");
 
         TableColumn<Stock, String> column7 = new TableColumn<>("Price");
-        column7.setMinWidth(103);
+        column7.setMinWidth(118);
         column7.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getReceivingItem().getUnitCost()+""));
 
         TableColumn<Stock, String> column8 = new TableColumn<>("Amount");
-        column8.setMinWidth(268);
+        column8.setMinWidth(250);
         column8.setStyle("-fx-alignment: center-right;");
         column8.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getReceivingItem().getQtyAccepted() * stocks.getValue().getReceivingItem().getUnitCost() +""));
 
@@ -110,9 +111,9 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
                 vat =  amount * (tax/100);
         total += vat + amount;
 
-        this.net_sales_tf.setText(amount+"");
-        this.vat_tf.setText(vat+"");
-        this.total_tf.setText(total+"");
+        this.net_sales_lbl.setText(amount+"");
+        this.vat_lbl.setText(vat+"");
+        this.total_lbl.setText(total+"");
     }
 
     public void setReceiving(Receiving report){
@@ -126,9 +127,9 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
             this.dr_tf.setText(report.getDrNo());
             this.rv_tf.setText(report.getRvNo());
             this.po_tf.setText(report.getPoNo());
-            User receiver = UserDAO.get(report.getReceivedBy());
-            User receiverOrig = UserDAO.get(report.getReceivedOrigBy());
-            User verifier = UserDAO.get(report.getVerifiedBy());
+            EmployeeInfo receiver = EmployeeDAO.getOne(report.getReceivedBy(), DB.getConnection());
+            EmployeeInfo receiverOrig = EmployeeDAO.getOne(report.getReceivedOrigBy(), DB.getConnection());
+            EmployeeInfo verifier = EmployeeDAO.getOne(report.getVerifiedBy(), DB.getConnection());
             this.received_tf.setText(receiver.getFullName());
             this.received_original_tf.setText(receiverOrig.getFullName());
             this.verified_tf.setText(verifier.getFullName());
