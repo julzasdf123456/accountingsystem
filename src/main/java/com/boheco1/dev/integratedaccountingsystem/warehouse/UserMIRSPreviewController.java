@@ -1,21 +1,22 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
+import com.boheco1.dev.integratedaccountingsystem.HomeController;
 import com.boheco1.dev.integratedaccountingsystem.dao.*;
-import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
-import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
-import com.boheco1.dev.integratedaccountingsystem.helpers.PrintPDF;
-import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Rectangle;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -23,6 +24,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -33,15 +35,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class UserMIRSPreview implements Initializable {
+public class UserMIRSPreviewController implements Initializable {
 
     @FXML
     private StackPane stackPane;
     @FXML
     private Label  details, date, mirsNumber, applicant, address, requisitioner, signatories, purpose;
-
+    @FXML private JFXButton approvedBtn,rejectBtn;
     @FXML
-    private JFXButton printRequest;
+    private JFXTextField comment;
     @FXML
     private TableView requestedTable;
 
@@ -127,7 +129,51 @@ public class UserMIRSPreview implements Initializable {
         requestedTable.getItems().setAll(observableList);
     }
 
+    @FXML
+    private void approvedMirs(ActionEvent event) {
+        action(Utility.APPROVED);
+    }
 
+    @FXML
+    private void rejectMirs(ActionEvent event) {
+        action(Utility.REJECTED);
+    }
+
+    private void action(String status){
+        JFXButton accept = new JFXButton("Proceed");
+        JFXDialog MIRSapprovalDialog = DialogBuilder.showConfirmDialog("MIRS Approval","Confirm action on MIRS application.", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+        accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+        accept.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent __) {
+                try {
+                        MIRSSignatory temp = new MIRSSignatory();
+                        temp.setMirsID(mirs.getId());
+                        temp.setUserID(ActiveUser.getUser().getId());
+                        temp.setStatus(status);
+                        temp.setComments(comment.getText());
+                        MIRSSignatoryDAO.updateStatus(temp);
+
+                        String notif_details = "MIRS ("+mirs.getId()+") was "+status+".";
+                        Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
+                        NotificationsDAO.create(torequisitioner);
+                        AlertDialogBuilder.messgeDialog("System Message", "MIRS application has been "+status,
+                                Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+
+                        approvedBtn.setDisable(true);
+                        rejectBtn.setDisable(true);
+
+                        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "user_task_approval_mirs.fxml"));
+
+                }catch (Exception e) {
+                    e.printStackTrace();
+                    AlertDialogBuilder.messgeDialog("Error on UserTaskApprovalController", e.getMessage(),
+                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }
+                MIRSapprovalDialog.close();
+            }
+        });
+    }
 
 
 
