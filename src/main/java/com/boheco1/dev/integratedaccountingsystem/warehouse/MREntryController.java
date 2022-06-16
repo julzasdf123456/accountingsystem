@@ -69,12 +69,6 @@ public class MREntryController extends MenuControllerHandler implements Initiali
         //Sets the stackpane for the dialog/modal displays
         this.stackPane = Utility.getStackPane();
     }
-
-    @Override
-    public void setSubMenus(FlowPane flowPane) {
-        flowPane.getChildren().removeAll();
-        flowPane.getChildren().setAll(new ArrayList<>());
-    }
     /**
      * Adds the MR and MR items to the database. Display prompts on success or error.
      * @return void

@@ -358,11 +358,6 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.individualized_cb.setDisable(false);
     }
 
-    @Override
-    public void setSubMenus(FlowPane flowPane) {
-        flowPane.getChildren().removeAll();
-        flowPane.getChildren().setAll(new ArrayList<>());
-    }
 
     @FXML
     private void clear()  {
