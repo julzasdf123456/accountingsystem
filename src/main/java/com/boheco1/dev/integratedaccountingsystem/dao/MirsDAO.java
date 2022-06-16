@@ -944,4 +944,69 @@ public class MirsDAO {
         return false;
     }
 
+    public static void explode(MIRSItem item) throws Exception {
+        Stock stock = StockDAO.get(item.getStockID());
+
+        if(!stock.isIndividualized()) {
+            throw new Exception("The item you selected is not set to be individualized.");
+        }
+
+        Connection conn = DB.getConnection();
+
+        conn.setAutoCommit(false);
+
+        PreparedStatement ps = conn.prepareStatement(
+                "INSERT INTO itemizedMirsItem (id, MIRSItemID) " +
+                        "VALUES (?,?)");
+
+        for(int i=0; i<item.getQuantity(); i++) {
+            ps.setString(1, Utility.generateRandomId());
+            ps.setString(2, item.getId());
+            ps.executeUpdate();
+        }
+
+        conn.commit();
+        conn.setAutoCommit(true);
+
+        ps.close();
+    }
+
+    public static List<ItemizedMirsItem> getExplodedItems(MIRSItem item) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM itemizedMirsItem WHERE MIRSItemID=?");
+        ps.setString(1, item.getId());
+
+        ResultSet rs = ps.executeQuery();
+
+        List<ItemizedMirsItem> explodedItems = new ArrayList<>();
+
+        while(rs.next()) {
+            explodedItems.add(new ItemizedMirsItem(
+                    rs.getString("id"),
+                    rs.getString("MIRSItemID"),
+                    rs.getString("serial"),
+                    rs.getString("brand"),
+                    rs.getString("remarks")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return explodedItems;
+    }
+
+    public static void updateExplodedItem(ItemizedMirsItem item) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE itemizedMirsItem SET brand=?, serial=?, remarks=? " +
+                        "WHERE id=?");
+
+        ps.setString(1, item.getBrand());
+        ps.setString(2,item.getSerial());
+        ps.setString(3, item.getRemarks());
+        ps.setString(4, item.getId());
+
+        ps.executeUpdate();
+    }
+
 }
