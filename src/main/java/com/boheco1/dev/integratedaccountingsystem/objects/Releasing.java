@@ -12,7 +12,6 @@ public class Releasing {
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String MR;
     private String workOrderNo;
     private String acctCode;
 
@@ -27,18 +26,18 @@ public class Releasing {
         this.status = status;
     }
 
-    public Releasing(String id, String stockID, String mirsID, int quantity, double price, String userID, String status, String MR) {
-        this.id = id;
-        this.stockID = stockID;
-        this.mirsID = mirsID;
-        this.quantity = quantity;
-        this.price = price;
-        this.userID = userID;
-        this.status = status;
-        this.MR = MR;
-    }
+//    public Releasing(String id, String stockID, String mirsID, int quantity, double price, String userID, String status, String MR) {
+//        this.id = id;
+//        this.stockID = stockID;
+//        this.mirsID = mirsID;
+//        this.quantity = quantity;
+//        this.price = price;
+//        this.userID = userID;
+//        this.status = status;
+//        this.MR = MR;
+//    }
 
-    public Releasing(String id, String stockID, String mirsID, int quantity, double price, String userID, String status, String MR, String workdOrderNo, String mctNo) {
+    public Releasing(String id, String stockID, String mirsID, int quantity, double price, String userID, String status, String workdOrderNo, String mctNo) {
         this.id = id;
         this.stockID = stockID;
         this.mirsID = mirsID;
@@ -46,12 +45,11 @@ public class Releasing {
         this.price = price;
         this.userID = userID;
         this.status = status;
-        this.MR = MR;
         this.workOrderNo=workdOrderNo;
         this.mctNo = mctNo;
     }
 
-    public Releasing(String id, String stockID, String mirsID, int quantity, double price, String userID, String status, String MR, String workdOrderNo, String mctNo, String acctCode) {
+    public Releasing(String id, String stockID, String mirsID, int quantity, double price, String userID, String status, String workdOrderNo, String mctNo, String acctCode) {
         this.id = id;
         this.stockID = stockID;
         this.mirsID = mirsID;
@@ -59,7 +57,6 @@ public class Releasing {
         this.price = price;
         this.userID = userID;
         this.status = status;
-        this.MR = MR;
         this.workOrderNo=workdOrderNo;
         this.mctNo = mctNo;
         this.acctCode = acctCode;
@@ -145,14 +142,6 @@ public class Releasing {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public String getMR() {
-        return MR;
-    }
-
-    public void setMR(String MR) {
-        this.MR = MR;
     }
 
     public String getMctNo() {
