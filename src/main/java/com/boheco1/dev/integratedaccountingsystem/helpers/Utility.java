@@ -6,9 +6,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Random;
+import java.util.*;
 
 public class Utility {
     public static String STATION = "main"; //main or sub
@@ -40,6 +38,7 @@ public class Utility {
     public static String NOTIF_UNREAD = "UNREAD";
     private static AnchorPane contentPane;
     private static MIRS activeMIRS;
+    private static HashMap<String, ItemizedMirsItem> itemizedMirsItems = new HashMap<>();
 
     private static StackPane stackPane;
 
@@ -74,6 +73,11 @@ public class Utility {
     public static void setContentPane(AnchorPane contentPane) {
         Utility.contentPane = contentPane;
     }
+
+    public static HashMap<String, ItemizedMirsItem> getItemizedMirsItems() {
+        return itemizedMirsItems;
+    }
+
 
     public static String generateRandomId() {
         return new Date().getTime() + "-" + generateRandomString(15);

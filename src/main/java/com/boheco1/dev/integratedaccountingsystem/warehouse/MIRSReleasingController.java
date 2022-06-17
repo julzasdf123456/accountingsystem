@@ -26,9 +26,7 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MIRSReleasingController implements Initializable {
 
@@ -42,15 +40,13 @@ public class MIRSReleasingController implements Initializable {
     private JFXTextField particulars, quantity;
 
     @FXML
-    private JFXButton acceptBtn, addAllQtyBtn, addPartialQtyBtn, removeItemBtn;
+    private JFXButton addAllQtyBtn, addPartialQtyBtn, removeItemBtn, detailstemBtn;
 
     @FXML
     private JFXListView<MIRSItem> requestedList, releasingList;
 
     private Stock selectedStock = null;
-    private MIRSItem selectedMirsItem;
     private MIRS mirs;
-    private String work_order_number;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -80,6 +76,9 @@ public class MIRSReleasingController implements Initializable {
             address.setText(mirs.getAddress());
             applicant.setText(mirs.getApplicant());
             requisitioner.setText(mirs.getRequisitioner().getFullName());
+
+            //clear hashmap that contains all itemized records
+            Utility.getItemizedMirsItems().clear();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -174,17 +173,18 @@ public class MIRSReleasingController implements Initializable {
         try{
             List<MIRSItem> forReleasing = releasingList.getItems();
             List<MIRSItem> remainingRequest = requestedList.getItems();
-            List<Releasing> releasedItemWithMCT = new ArrayList<>();
-            boolean found = false;
+            List<Releasing> readyForRelease = new ArrayList<>();
+            MCT mct = null;
+
             for (MIRSItem mirsItem : forReleasing){
                 Releasing releasing = new Releasing();
                 releasing.setStockID(mirsItem.getStockID());
                 releasing.setMirsID(mirsItem.getMirsID());
                 releasing.setQuantity(mirsItem.getQuantity());
                 releasing.setPrice(mirsItem.getPrice());
-                releasing.setAcctCode(StockDAO.get(mirsItem.getStockID()).getAcctgCode());
                 releasing.setUserID(ActiveUser.getUser().getId());
 
+                boolean found = false;
                 for(MIRSItem rem : remainingRequest){
                     if(rem.getId().equals(mirsItem.getId())) {
                         releasing.setStatus(Utility.PARTIAL_RELEASED);
@@ -195,47 +195,51 @@ public class MIRSReleasingController implements Initializable {
 
                 if(!found) {
                     releasing.setStatus(Utility.RELEASED);
-                    ReleasingDAO.updateReleasedItem(releasing);
+                    //ReleasingDAO.updateReleasedItem(releasing);
                 }
-
-                releasedItemWithMCT.add(releasing);
-                ReleasingDAO.add(releasing);
-                Stock temp = StockDAO.get(mirsItem.getStockID()); //temp stock object for quantity deduction
-                StockDAO.deductStockQuantity(temp, mirsItem.getQuantity());
+                readyForRelease.add(releasing);
+                //ReleasingDAO.add(releasing);
+                //Stock temp = StockDAO.get(mirsItem.getStockID()); //temp stock object for quantity deduction
+                //StockDAO.deductStockQuantity(temp, mirsItem.getQuantity());
             }
 
             if(mctNumber != null) {
-                MCT mct = new MCT();
+                mct = new MCT();
                 mct.setMctNo(mctNumber);
                 mct.setParticulars(mirs.getPurpose());
                 mct.setAddress(mirs.getAddress());
                 mct.setMirsNo(mirs.getId());
                 mct.setWorkOrderNo(mirs.getWorkOrderNo());
-                MCTDao.create(mct, releasedItemWithMCT);
+                //MCTDao.create(mct, readyForRelease);
             }
-
 
             if(requestedList.getItems().size() == 0)
                 mirs.setStatus(Utility.CLOSED);
             else
                 mirs.setStatus(Utility.RELEASING);
 
-            mirs.setDetails(details.getText());
-            MirsDAO.update(mirs);
-            String notif_details = "MIRS ("+mirs.getId()+") was released.";
-            Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
-            NotificationsDAO.create(torequisitioner);
-            releasingList.getItems().clear();
-            AlertDialogBuilder.messgeDialog("System Message", "MIRS items released.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+            //MirsDAO.update(mirs);
+
+            if(ReleasingDAO.add(readyForRelease, mct, mirs)) {
+                //clear hashmap that contains all itemized records
+                Utility.getItemizedMirsItems().clear();
+                String notif_details = "MIRS (" + mirs.getId() + ") was released.";
+                Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
+                NotificationsDAO.create(torequisitioner);
+                releasingList.getItems().clear();
+                AlertDialogBuilder.messgeDialog("System Message", "MIRS items released.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+            }else{
+                AlertDialogBuilder.messgeDialog("System Message", "Sorry an error was encountered during saving, please try again.",
+                        Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+            }
         }catch (Exception e){
-            AlertDialogBuilder.messgeDialog("System Error", "Item released: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
-            e.printStackTrace();
+        AlertDialogBuilder.messgeDialog("System Error", "Item released: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+        e.printStackTrace();
         }
     }
 
     @FXML
     private void addNewMIRSItem(ActionEvent event) throws Exception {
-
         if(selectedStock == null){
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
@@ -249,11 +253,11 @@ public class MIRSReleasingController implements Initializable {
         MIRSItem mirsItem = new MIRSItem();
         mirsItem.setMirsID(mirsNumber.getText());
         mirsItem.setStockID(selectedStock.getId());
-        mirsItem.setParticulars(selectedStock.getStockName());
+        mirsItem.setParticulars(selectedStock.getDescription());
         mirsItem.setUnit(selectedStock.getUnit());
         mirsItem.setQuantity(Integer.parseInt(quantity.getText()));
         mirsItem.setPrice(selectedStock.getPrice());
-
+        mirsItem.setId(Utility.generateRandomId());
         releasingList.getItems().add(mirsItem);
 
         selectedStock = null; //set to null for validation
@@ -406,6 +410,25 @@ public class MIRSReleasingController implements Initializable {
         requestedList.getSelectionModel().clearSelection();
     }
 
+    @FXML
+    private void addMoreDetails(ActionEvent event) throws Exception {
+        MIRSItem mirsItem = releasingList.getSelectionModel().getSelectedItem();
+        if(mirsItem == null) {
+            AlertDialogBuilder.messgeDialog("System Message", "Please select an from the Releasing MIRS Item.",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }else{
+            if(StockDAO.get(mirsItem.getStockID()).isIndividualized()) {
+                Utility.setSelectedObject(releasingList.getSelectionModel().getSelectedItem());
+                if (Utility.getSelectedObject() != null)
+                    ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_mirs_item_itemized.fxml", Utility.getStackPane());
+            }else{
+                AlertDialogBuilder.messgeDialog("System Message", "Item can not be individualized.",
+                        Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+            }
+        }
+
+    }
+
     private void bindParticularsAutocomplete(JFXTextField textField){
         AutoCompletionBinding<SlimStock> stockSuggest = TextFields.bindAutoCompletion(textField,
                 param -> {
@@ -442,7 +465,8 @@ public class MIRSReleasingController implements Initializable {
                         throw new UnsupportedOperationException();
                     }
                 });
-
+        stockSuggest.setVisibleRowCount(10);
+        stockSuggest.setMinWidth(500);
         //This will set the actions once the user clicks an item from the popupmenu.
         stockSuggest.setOnAutoCompleted(event -> {
             SlimStock result = event.getCompletion();

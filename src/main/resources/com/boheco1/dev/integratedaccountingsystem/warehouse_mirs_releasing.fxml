@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <AnchorPane fx:id="anchorpane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="712.0" prefWidth="1242.0" style="-fx-background-color: #ffff;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.MIRSReleasingController">
    <children>
@@ -242,26 +243,38 @@
                                     <JFXListView fx:id="requestedList" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="300.0" style="-fx-font-size: 1.5em;" VBox.vgrow="ALWAYS" />
                                  </children>
                               </VBox>
-                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                              <VBox alignment="CENTER" maxWidth="-Infinity" prefWidth="120.0" HBox.hgrow="ALWAYS">
                                  <children>
-                                    <JFXButton fx:id="addAllQtyBtn" buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#addAllQty" styleClass="btn-info" text="Add" VBox.vgrow="ALWAYS">
+                                    <JFXButton fx:id="addAllQtyBtn" buttonType="RAISED" contentDisplay="RIGHT" maxWidth="1.7976931348623157E308" onAction="#addAllQty" styleClass="btn-info" text="  Add " VBox.vgrow="ALWAYS">
                                        <VBox.margin>
-                                          <Insets bottom="5.0" top="5.0" />
+                                          <Insets bottom="16.0" top="16.0" />
                                        </VBox.margin>
+                                       <graphic>
+                                          <FontIcon iconColor="#f5f5f5" iconLiteral="mdi2a-arrow-right-circle" iconSize="12" />
+                                       </graphic>
                                     </JFXButton>
-                                    <JFXButton fx:id="addPartialQtyBtn" buttonType="RAISED" layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308" onAction="#addPartialQty" styleClass="btn-warning" text="Partial" textFill="WHITE" VBox.vgrow="ALWAYS">
+                                    <JFXButton fx:id="addPartialQtyBtn" buttonType="RAISED" contentDisplay="RIGHT" layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308" onAction="#addPartialQty" styleClass="btn-warning" text="Partial" textFill="WHITE" VBox.vgrow="ALWAYS">
                                        <VBox.margin>
-                                          <Insets bottom="5.0" top="5.0" />
+                                          <Insets bottom="16.0" top="16.0" />
                                        </VBox.margin>
-                                    </JFXButton>
-                                    <JFXButton fx:id="removeItemBtn1" buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#removeItem" styleClass="btn-theme" text="Replace" textFill="WHITE">
-                                       <VBox.margin>
-                                          <Insets bottom="5.0" top="5.0" />
-                                       </VBox.margin>
+                                       <graphic>
+                                          <FontIcon iconColor="#f5f5f5" iconLiteral="mdi2a-arrow-right-circle" iconSize="12" />
+                                       </graphic>
                                     </JFXButton>
                                     <JFXButton fx:id="removeItemBtn" buttonType="RAISED" layoutX="10.0" layoutY="47.0" maxWidth="1.7976931348623157E308" onAction="#removeItem" styleClass="btn-danger" text="Remove" textFill="WHITE" VBox.vgrow="ALWAYS">
                                        <VBox.margin>
-                                          <Insets bottom="5.0" top="5.0" />
+                                          <Insets bottom="16.0" top="16.0" />
+                                       </VBox.margin>
+                                       <graphic>
+                                          <FontIcon iconColor="WHITE" iconLiteral="mdi2a-arrow-left-circle" />
+                                       </graphic>
+                                    </JFXButton>
+                                    <JFXButton fx:id="detailstemBtn" buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#addMoreDetails" style="-fx-background-color: #FA0068;" text="Details" textFill="WHITE">
+                                       <graphic>
+                                          <FontIcon iconColor="WHITE" iconLiteral="mdi2i-information" />
+                                       </graphic>
+                                       <VBox.margin>
+                                          <Insets bottom="16.0" top="16.0" />
                                        </VBox.margin>
                                     </JFXButton>
                                  </children>

@@ -228,7 +228,6 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
         for(MIRSItem added: selectedItem){
             if(added.getStockID().equals(selectedStock.getId())){
                 added.setQuantity(added.getQuantity() + Integer.parseInt(quantity.getText()));
-                added.setId(null);
                 items.setText("");
                 quantity.setText("");
                 selectedStock = null;

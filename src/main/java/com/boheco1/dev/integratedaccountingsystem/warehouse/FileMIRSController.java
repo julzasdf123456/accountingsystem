@@ -68,6 +68,12 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        //character limiter
+        purpose.setTextFormatter(new TextFormatter<String>(change ->
+                change.getControlNewText().length() <= 365 ? change : null));
+        remarks.setTextFormatter(new TextFormatter<String>(change ->
+                change.getControlNewText().length() <= 200 ? change : null));
     }
 
     private void resetInputFields() {
@@ -107,30 +113,27 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             @Override
             public void handle(ActionEvent __) {
                 try {
-                    List<MIRSItem> mirsItemList = selectedItem; //from ObservableList to List
                     List<MIRSSignatory> mirsSignatoryList = new ArrayList<>();
                     MIRS mirs = new MIRS();
                     mirs.setDateFiled(filingDate.getValue());
-                    mirs.setApplicant(applicant.getText());
-                    mirs.setAddress(address.getText());
                     mirs.setPurpose(purpose.getText());
-                    mirs.setId(NumberGenerator.mirsNumber());
+                    mirs.setDetails(remarks.getText());
                     mirs.setStatus(Utility.PENDING);
                     mirs.setRequisitionerID(preparedEmployeeInfo.getId());
                     mirs.setUserID(ActiveUser.getUser().getId());
-                    mirs.setDetails(remarks.getText());
+                    mirs.setAddress(address.getText());
+                    mirs.setApplicant(applicant.getText());
+
 
                     EmployeeInfo[] signatories = {checkedEmployeeInfo, approvedEmployeeInfo};
                     for(EmployeeInfo s : signatories){
                         MIRSSignatory mirsSignatory = new MIRSSignatory();
-                        mirsSignatory.setMirsID(mirs.getId());
                         mirsSignatory.setUserID(s.getId());
                         mirsSignatory.setStatus(Utility.PENDING);
-                        mirsSignatory.setId(Utility.generateRandomId());
                         mirsSignatoryList.add(mirsSignatory);
                     }
 
-                    if(MirsDAO.create(mirs, mirsItemList,mirsSignatoryList)){ //return true saved successfully
+                    if(MirsDAO.create(mirs, selectedItem,mirsSignatoryList)){ //return true saved successfully
                         AlertDialogBuilder.messgeDialog("System Message", "MIRS request successfully filed, please wait for the approval, thank you!",
                                 Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
                         String details = "New MIRS ("+mirs.getId()+") was filed.";
@@ -183,7 +186,6 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         }
 
         MIRSItem mirsItem = new MIRSItem();
-        mirsItem.setMirsID(NumberGenerator.mirsNumber());
         mirsItem.setStockID(selectedStock.getId());
         mirsItem.setParticulars(selectedStock.getDescription());
         mirsItem.setUnit(selectedStock.getUnit());
@@ -191,7 +193,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         mirsItem.setPrice(selectedStock.getPrice());
 
         selectedItem.add(mirsItem);
-        mirsItemTable.setItems(selectedItem);
+        mirsItemTable.refresh();
 
         selectedStock = null; //set to null for validation
         items.setText("");
@@ -310,6 +312,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         mirsItemTable.setPlaceholder(new Label("No item Added"));
 
         selectedItem =  FXCollections.observableArrayList();
+        mirsItemTable.setItems(selectedItem);
     }
 
     private void bindParticularsAutocomplete(JFXTextField textField){

@@ -165,11 +165,11 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
 
     @FXML
     private void tableViewClicked(MouseEvent event) {
-        if(tableView.getItems().size() == 0)
+        MIRS mirs = (MIRS) tableView.getSelectionModel().getSelectedItem();
+        if(mirs == null)
             return;
 
         if(event.getClickCount() == 2){
-            MIRS mirs = (MIRS) tableView.getSelectionModel().getSelectedItem();
             try {
                 Utility.setActiveMIRS(mirs);
                 if(display_lbl.getText().equals(APPROVAL)){

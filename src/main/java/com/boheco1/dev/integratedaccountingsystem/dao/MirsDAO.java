@@ -836,6 +836,8 @@ public class MirsDAO {
     }
 
     public static boolean create(MIRS mirs, List<MIRSItem> mirsItems, List<MIRSSignatory> signatories) throws SQLException, ClassNotFoundException {
+        String mirsId = NumberGenerator.mirsNumber();
+
         String query = "";
         query +="INSERT INTO MIRS (DateFiled, Purpose, Details, Status, RequisitionerID, UserID, id, CreatedAt, UpdatedAt, address, applicant) " +
                         "VALUES " +
@@ -845,80 +847,21 @@ public class MirsDAO {
                         "'"+mirs.getStatus()+"'," +
                         "'"+mirs.getRequisitionerID()+"'," +
                         "'"+mirs.getUserID()+"'," +
-                        "'"+mirs.getId()+"',GETDATE(), GETDATE()," +
+                        "'"+mirsId+"',GETDATE(), GETDATE()," +
                         "'"+mirs.getAddress()+"'," +
                         "'"+mirs.getApplicant()+"');\n";
 
         for(MIRSItem item : mirsItems){
             query +="INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id) " +
                     "VALUES " +
-                    "('"+mirs.getId()+"','"+item.getStockID()+"','"+item.getQuantity()+"','"+item.getPrice()+"','"+item.getRemarks()+"',GETDATE(),GETDATE(), '"+Utility.generateRandomId()+"');\n";
+                    "('"+mirsId+"','"+item.getStockID()+"','"+item.getQuantity()+"','"+item.getPrice()+"','"+item.getRemarks()+"',GETDATE(),GETDATE(), '"+Utility.generateRandomId()+"');\n";
         }
 
         for(MIRSSignatory msig : signatories){
             query +="INSERT INTO MIRSSignatories " +
                     "(MIRSID, user_id, Status, Comments, CreatedAt, UpdatedAt,id) " +
                     "VALUES " +
-                    "('"+msig.getMirsID()+"'," +
-                    "'"+msig.getUserID()+"'," +
-                    "'"+msig.getStatus()+"'," +
-                    "'"+msig.getComments()+"',GETDATE(),GETDATE()," +
-                    "'"+msig.getId()+"'); \n";
-        }
-
-        Connection conn = DB.getConnection();
-
-        try {
-            conn.setAutoCommit(false);
-            PreparedStatement ps = conn.prepareStatement(query);
-            ps.executeUpdate();
-            conn.commit();
-            ps.close();
-            conn.setAutoCommit(true);
-            return true;
-        } catch (SQLException e) {
-            conn.rollback();
-            conn.setAutoCommit(true);
-            e.printStackTrace();
-        }
-        return false;
-
-    }
-
-    public static boolean update(MIRS mirs, List<MIRSItem> mirsItems, List<MIRSSignatory> signatories) throws SQLException, ClassNotFoundException {
-        /*"UPDATE MIRSItems SET StockID=?, Quantity=?, Price=?, Comments=?, UpdatedAt=GETDATE() WHERE id=?");
-        ps.setString(1, item.getStockID());
-        ps.setInt(2, item.getQuantity());
-        ps.setDouble(3, item.getPrice());
-        ps.setString(4, item.getRemarks());*/
-
-        String query = "";
-        query = "UPDATE MIRS SET " +
-                "DateFiled='"+Date.valueOf(mirs.getDateFiled())+"', " +
-                "Purpose='"+mirs.getPurpose()+"', " +
-                "Details='"+mirs.getDetails()+"', " +
-                "Status='"+mirs.getStatus()+"', " +
-                "RequisitionerID='"+mirs.getRequisitionerID()+"', " +
-                "UpdatedAt=GETDATE(), " +
-                "address='"+mirs.getAddress()+"', " +
-                "applicant='"+mirs.getApplicant()+"' " +
-                "WHERE id='"+mirs.getId()+"';\n";
-
-        for(MIRSItem item : mirsItems){
-            if(item.getId() == null) {
-                query += "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id) " +
-                        "VALUES " +
-                        "('" + mirs.getId() + "','" + item.getStockID() + "','" + item.getQuantity() + "','" + item.getPrice() + "','" + item.getRemarks() + "',GETDATE(),GETDATE(), '" + Utility.generateRandomId() + "');\n";
-            }
-        }
-
-
-        query +="DELETE FROM MIRSSignatories WHERE MIRSID='"+mirs.getId()+"';\n";
-        for(MIRSSignatory msig : signatories){
-            query +="INSERT INTO MIRSSignatories " +
-                    "(MIRSID, user_id, Status, Comments, CreatedAt, UpdatedAt,id) " +
-                    "VALUES " +
-                    "('"+msig.getMirsID()+"'," +
+                    "('"+mirsId+"'," +
                     "'"+msig.getUserID()+"'," +
                     "'"+msig.getStatus()+"'," +
                     "'"+msig.getComments()+"',GETDATE(),GETDATE()," +
@@ -942,36 +885,97 @@ public class MirsDAO {
             e.printStackTrace();
         }
         return false;
+
     }
 
-    public static void explode(MIRSItem item) throws Exception {
-        Stock stock = StockDAO.get(item.getStockID());
+    public static boolean update(MIRS mirs, List<MIRSItem> mirsItems, List<MIRSSignatory> signatories) throws SQLException, ClassNotFoundException  {
+        /*"UPDATE MIRSItems SET StockID=?, Quantity=?, Price=?, Comments=?, UpdatedAt=GETDATE() WHERE id=?");
+        ps.setString(1, item.getStockID());
+        ps.setInt(2, item.getQuantity());
+        ps.setDouble(3, item.getPrice());
+        ps.setString(4, item.getRemarks());*/
 
-        if(!stock.isIndividualized()) {
-            throw new Exception("The item you selected is not set to be individualized.");
+        String query = "";
+        query = "UPDATE MIRS SET " +
+                "DateFiled='"+Date.valueOf(mirs.getDateFiled())+"', " +
+                "Purpose='"+mirs.getPurpose()+"', " +
+                "Details='"+mirs.getDetails()+"', " +
+                "Status='"+mirs.getStatus()+"', " +
+                "RequisitionerID='"+mirs.getRequisitionerID()+"', " +
+                "UpdatedAt=GETDATE(), " +
+                "address='"+mirs.getAddress()+"', " +
+                "applicant='"+mirs.getApplicant()+"' " +
+                "WHERE id='"+mirs.getId()+"';\n";
+
+        for(MIRSItem item : mirsItems){
+            if(item.getId() == null) { // null mean new item was added
+                query += "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id) " +
+                        "VALUES " +
+                        "('" + mirs.getId() + "','" + item.getStockID() + "','" + item.getQuantity() + "','" + item.getPrice() + "','" + item.getRemarks() + "',GETDATE(),GETDATE(), '" + Utility.generateRandomId() + "');\n";
+            }else{
+                query+="UPDATE MIRSItems SET Quantity = '" + item.getQuantity() + "' WHERE id = '"+item.getId()+"';\n";
+            }
         }
+
+
+        query +="DELETE FROM MIRSSignatories WHERE MIRSID='"+mirs.getId()+"';\n";
+        for(MIRSSignatory msig : signatories){
+            query +="INSERT INTO MIRSSignatories " +
+                    "(MIRSID, user_id, Status, Comments, CreatedAt, UpdatedAt,id) " +
+                    "VALUES " +
+                    "('"+msig.getMirsID()+"'," +
+                    "'"+msig.getUserID()+"'," +
+                    "'"+msig.getStatus()+"'," +
+                    "'"+msig.getComments()+"',GETDATE(),GETDATE()," +
+                    "'"+Utility.generateRandomId()+"'); \n";
+        }
+
 
         Connection conn = DB.getConnection();
 
-        conn.setAutoCommit(false);
-
-        PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO itemizedMirsItem (id, MIRSItemID) " +
-                        "VALUES (?,?)");
-
-        for(int i=0; i<item.getQuantity(); i++) {
-            ps.setString(1, Utility.generateRandomId());
-            ps.setString(2, item.getId());
+        try {
+            conn.setAutoCommit(false);
+            PreparedStatement ps = conn.prepareStatement(query);
             ps.executeUpdate();
+            conn.commit();
+            ps.close();
+            conn.setAutoCommit(true);
+            return true;
+        } catch (SQLException e) {
+            conn.rollback();
+            conn.setAutoCommit(true);
+            e.printStackTrace();
         }
-
-        conn.commit();
-        conn.setAutoCommit(true);
-
-        ps.close();
+        return false;
     }
 
-    public static List<ItemizedMirsItem> getExplodedItems(MIRSItem item) throws Exception {
+    public static boolean itemizedMirsItem(List<ItemizedMirsItem> list) throws Exception {
+        String query = "";
+        for (ItemizedMirsItem i : list){
+            query+="INSERT INTO itemizedMirsItem (id, MIRSItemID, brand, serial, remarks) " +
+                        "VALUES ('"+i.getId()+"','"+i.getMirsItemID()+"','"+i.getBrand()+"','"+i.getSerial()+"','"+i.getRemarks()+"');\n";
+        }
+
+        System.out.println(query);
+        Connection conn = DB.getConnection();
+        try {
+            conn.setAutoCommit(false);
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.executeUpdate();
+            conn.commit();
+            ps.close();
+            conn.setAutoCommit(true);
+            return true;
+        } catch (SQLException e) {
+            conn.rollback();
+            conn.setAutoCommit(true);
+            e.printStackTrace();
+        }
+        return false;
+
+    }
+
+    public static List<ItemizedMirsItem> getItemizedMirsItem(MIRSItem item) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM itemizedMirsItem WHERE MIRSItemID=?");
         ps.setString(1, item.getId());
@@ -996,7 +1000,7 @@ public class MirsDAO {
         return explodedItems;
     }
 
-    public static void updateExplodedItem(ItemizedMirsItem item) throws Exception {
+    public static void updateItemizedMirsItem(ItemizedMirsItem item) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE itemizedMirsItem SET brand=?, serial=?, remarks=? " +
                         "WHERE id=?");
