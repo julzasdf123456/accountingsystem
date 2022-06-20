@@ -1,13 +1,13 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 import com.boheco1.dev.integratedaccountingsystem.objects.Receiving;
 import com.boheco1.dev.integratedaccountingsystem.objects.ReceivingItem;
 import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -196,6 +196,109 @@ public class ReceivingDAO {
         ps.executeBatch();
 
         ps.close();
+    }
+
+    public static void addItems(Receiving receiving, List<ReceivingItem> items) throws Exception {
+        Connection conn = DB.getConnection();
+        conn.setAutoCommit(false);
+        //Add Receiving statement
+        PreparedStatement ps = DB.getConnection().prepareStatement("INSERT INTO Receiving " +
+                "(RRNo, Date, RVNo, BLWBNo, Carrier, DRNo, PONo, SupplierID, InvoiceNo, ReceivedBy, ReceivedOrigBy, VerifiedBy) " +
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
+        //Add Receiving item statement
+        PreparedStatement ps2 = conn.prepareStatement(
+                "INSERT INTO ReceivingItem " +
+                        "(RRNo, StockID, QtyDelivered, QtyAccepted, UnitCost) " +
+                        "VALUES (?,?,?,?,?)");
+
+        PreparedStatement ps3 = conn.prepareStatement("UPDATE Stocks SET Price=?, Quantity=Quantity+? WHERE id=?");
+
+        PreparedStatement ps4 = conn.prepareStatement(
+                "INSERT INTO StockHistory (id, StockID, date, price, updatedBy) " +
+                        "VALUES (?,?,?,?,?)");
+
+        PreparedStatement ps5 = conn.prepareStatement(
+                "INSERT INTO StockEntryLogs " +
+                        "(StockID, Quantity, Source, Price, UserID, CreatedAt, UpdatedAt, id, RRNo) " +
+                        "VALUES " +
+                        "(?,?,?,?,?,GETDATE(),GETDATE(), ?, ?)");
+        try {
+            //Insert Receiving
+            String rrno = generateRRNo();
+            ps.setString(1, rrno);
+            ps.setDate(2, Date.valueOf(receiving.getDate()));
+            ps.setString(3, receiving.getRvNo());
+            ps.setString(4, receiving.getBlwbNo());
+            ps.setString(5, receiving.getCarrier());
+            ps.setString(6, receiving.getDrNo());
+            ps.setString(7, receiving.getPoNo());
+            ps.setString(8, receiving.getSupplierId());
+            ps.setString(9, receiving.getInvoiceNo());
+            ps.setString(10, receiving.getReceivedBy());
+            ps.setString(11, receiving.getReceivedOrigBy());
+            ps.setString(12, receiving.getVerifiedBy());
+
+            ps.executeUpdate();
+
+            //Set RRNO
+            receiving.setRrNo(rrno);
+
+            //Set RRNO to item
+            ps2.setString(1, rrno);
+            boolean createHistory = false;
+            for (ReceivingItem item : items) {
+                Stock stock = StockDAO.get(item.getStockId());
+
+                //Insert Receiving item
+                ps2.setString(2, item.getStockId());
+                ps2.setInt(3, item.getQtyDelivered());
+                ps2.setInt(4, item.getQtyAccepted());
+                ps2.setDouble(5, item.getUnitCost());
+                ps2.addBatch();
+
+                //Update quantity and prices in Stocks
+                ps3.setDouble(1, item.getUnitCost());
+                ps3.setInt(2, item.getQtyAccepted());
+                ps3.setString(3, item.getStockId());
+                ps3.addBatch();
+
+                if (stock.getPrice() != item.getUnitCost()) {
+                    //Insert Stock History
+                    ps4.setString(1, Utility.generateRandomId());
+                    ps4.setString(2, item.getStockId());
+                    ps4.setDate(3, java.sql.Date.valueOf(LocalDate.now()));
+                    ps4.setDouble(4, stock.getPrice());
+                    ps4.setString(5, ActiveUser.getUser().getId());
+                    ps4.addBatch();
+                    createHistory = true;
+                }
+
+                //Insert Stock Entry Log
+                ps5.setString(1, item.getStockId());
+                ps5.setInt(2, item.getQtyAccepted());
+                ps5.setString(3, "Purchased");
+                ps5.setDouble(4, item.getUnitCost());
+                ps5.setString(5, ActiveUser.getUser().getId());
+                ps5.setString(6, Utility.generateRandomId());
+                ps5.setString(7, rrno);
+                ps5.addBatch();
+            }
+            ps2.executeBatch();
+            ps3.executeBatch();
+            if (createHistory)
+                ps4.executeBatch();
+            ps5.executeBatch();
+            conn.commit();
+        }catch(SQLException ex) {
+            conn.rollback();
+            throw new Exception(ex.getMessage());
+        }
+        ps.close();
+        ps2.close();
+        ps3.close();
+        ps4.close();
+        ps5.close();
+        conn.setAutoCommit(true);
     }
 
     private static String generateRRNo() throws Exception {

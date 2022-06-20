@@ -42,7 +42,7 @@
                                     <VBox />
                                     <JFXCheckBox fx:id="confirm_cb" text="Confirm" />
                                     <VBox />
-                                    <JFXButton fx:id="update_btn" onAction="#updatePrices" prefHeight="30.0" prefWidth="100.0" styleClass="btn-danger" stylesheets="@style.css" text="Update Prices" textFill="WHITE">
+                                    <JFXButton fx:id="update_btn" onAction="#updatePrices" prefHeight="37.0" prefWidth="124.0" styleClass="btn-danger" stylesheets="@style.css" text="Update Prices" textFill="WHITE">
                                        <effect>
                                           <DropShadow />
                                        </effect>

@@ -50,7 +50,7 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
 
 
     @FXML
-    private JFXTextField supplier_tf, bno_tf, addr_tf, carrier_tf, invoice_tf, dr_tf, rv_tf, po_tf, received_tf, received_original_tf, verified_tf, posted_tf;
+    private JFXTextField supplier_tf, bno_tf, addr_tf, carrier_tf, invoice_tf, dr_tf, rv_tf, po_tf, received_tf, received_original_tf, verified_tf;
 
     @FXML
     private TextField net_sales_tf, vat_tf, total_tf;
@@ -60,7 +60,7 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
 
     private ObservableList<Stock> receivedItems = null;
 
-    private EmployeeInfo received = null, received_original = null, verified = null, posted = null;
+    private EmployeeInfo received = null, received_original = null, verified = null;
     private SupplierInfo supplier = null;
 
     @Override
@@ -70,11 +70,19 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
         this.bindUserAutocomplete(this.received_tf);
         this.bindUserAutocomplete(this.received_original_tf);
         this.bindUserAutocomplete(this.verified_tf);
-        this.bindUserAutocomplete(this.posted_tf);
         this.reset();
+        try {
+            this.received = ActiveUser.getUser().getEmployeeInfo();
+            this.received_tf.setText(this.received.getFullName());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         Utility.setParentController(this);
     }
-
+    /**
+     * Add receiving item from dialog
+     * @return void
+     */
     @FXML
     public void addReceivingItem(){
         if (this.supplier == null){
@@ -84,7 +92,10 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
             ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_add_receiving_item.fxml", Utility.getStackPane());
         }
     }
-
+    /**
+     * Inserts the receiving and receiving items, generates the printout
+     * @return void
+     */
     @FXML
     public void addEntry(){
         //Check if supplier was selected
@@ -135,43 +146,16 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
             receiving.setReceivedBy(this.received.getId());
             receiving.setReceivedOrigBy(this.received_original.getId());
             receiving.setVerifiedBy(this.verified.getId());
-            //receiving.setPostedBinCardBy(this.posted.getEmployeeID());
 
             try {
-                //Add Receiving
-                ReceivingDAO.add(receiving);
-
                 //List all Receiving Items
                 List<ReceivingItem> items = new ArrayList<>();
                 for (int i = 0; i < this.receivedItems.size(); i++) {
                     items.add(this.receivedItems.get(i).getReceivingItem());
                 }
 
-                //Add Receiving Items
-                ReceivingDAO.addItems(receiving.getRrNo(), items);
-
-                //Insert each Receiving Item as StockEntryLog
-                for (ReceivingItem item : items){
-
-                    //Create stock
-                    Stock stock = StockDAO.get(item.getStockId());
-
-                    //Update the Stock table's price to latest received item unit cost
-                    stock.setPrice(item.getUnitCost());
-                    StockDAO.updateDetails(stock);
-
-                    //Create StockEntryLog object
-                    StockEntryLog stockEntryLog = new StockEntryLog();
-                    stockEntryLog.setQuantity(item.getQtyAccepted());
-                    stockEntryLog.setSource("Purchased");
-                    stockEntryLog.setPrice(item.getUnitCost());
-
-                    //set the Entry Log RRNo
-                    stockEntryLog.setRrNo(receiving.getRrNo());
-
-                    //Insert StockEntryLog to database and update the Stock's quantity
-                    StockDAO.stockEntry(stock, stockEntryLog);
-                }
+                //Add Receiving and Receiving Items
+                ReceivingDAO.addItems(receiving, items);
 
                 this.saveReport(receiving.getRrNo());
                 this.reset();
@@ -180,12 +164,18 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
             }
         }
     }
-
+    /**
+     * Displays the Stock Entry form to enter new stock information
+     * @return void
+     */
     @FXML
     public void addStock(){
         ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_stock_entry.fxml", Utility.getStackPane(),  "../warehouse_receiving_entry.fxml");
     }
-
+    /**
+     * Creates the receiving items table
+     * @return void
+     */
     public void createTable(){
         TableColumn<Stock, String> column1 = new TableColumn<>("Code");
         column1.setMinWidth(100);
@@ -281,7 +271,12 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
         this.new_stocks_table.getColumns().add(column8);
         this.new_stocks_table.getColumns().add(column9);
     }
-
+    /**
+     * Calculates the tax
+     * @param tax the tax amount
+     * @param amount the amount to VAT
+     * @return void
+     */
     public void credit(double tax, double amount){
         double net_sales = 0, vat = 0, total = 0;
         try{
@@ -297,7 +292,11 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
         this.vat_tf.setText(vat+"");
         this.total_tf.setText(total+"");
     }
-
+    /**
+     * Attaches the supplier autocomplete to the textfield
+     * @param textField the text input
+     * @return void
+     */
     public void bindSupplierAutocomplete(JFXTextField textField){
         AutoCompletionBinding<SupplierInfo> supplierSuggest = TextFields.bindAutoCompletion(textField,
                 param -> {
@@ -342,7 +341,11 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
             this.addr_tf.setText(this.supplier.getCompanyAddress()+"");
         });
     }
-
+    /**
+     * Attaches the employee autocomplete to the textfield
+     * @param textField the text input
+     * @return void
+     */
     public void bindUserAutocomplete(JFXTextField textField){
         AutoCompletionBinding<EmployeeInfo> employeeSuggest = TextFields.bindAutoCompletion(textField,
                 param -> {
@@ -368,8 +371,6 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
                             this.received_original = null;
                         }else if (textField == this.verified_tf) {
                             this.verified = null;
-                        }else if (textField == this.posted_tf){
-                            this.posted = null;
                         }
                     }
 
@@ -397,12 +398,13 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
                 this.received_original = user;
             }else if (textField == this.verified_tf) {
                 this.verified = user;
-            }else if (textField == this.posted_tf){
-                this.posted = user;
             }
         });
     }
-
+    /**
+     * Initializes the information of the receiving and receiving items
+     * @return void
+     */
     public void clear(){
         this.receivedItems =  FXCollections.observableArrayList();
         this.new_stocks_table.setItems(this.receivedItems);
@@ -419,7 +421,6 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
         this.received_tf.setText("");
         this.received_original_tf.setText("");
         this.verified_tf.setText("");
-        this.posted_tf.setText("");
 
         this.total_tf.setText("0");
         this.vat_tf.setText("0");
@@ -429,9 +430,12 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
         this.received = null;
         this.received_original = null;
         this.verified = null;
-        this.posted = null;
     }
-
+    /**
+     * Prints the Receiving Report
+     * @param rrno the receiving report number
+     * @return void
+     */
     public void saveReport(String rrno){
 
         Stage stage = (Stage) contentPane.getScene().getWindow();
@@ -799,12 +803,18 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
             new Thread(task).start();
         }
     }
-
+    /**
+     * Resets every field and variables
+     * @return void
+     */
     @FXML
     public void reset(){
         clear();
     }
-
+    /**
+     * Receive the selected items from the dialog
+     * @return void
+     */
     @Override
     public void receive(Object o) {
         boolean ok = true;
