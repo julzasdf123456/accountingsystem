@@ -99,7 +99,7 @@ public class MRTDao {
 
     public static List<ReleasedItems> searchReleasedItems(String searchKey) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT r.id, s.Description, r.mct_no, r.Price, r.Quantity FROM Releasing r\n" +
+                "SELECT r.id, s.Description, r.mct_no, r.Price, r.Quantity, r.Quantity - (SELECT SUM(Quantity) FROM MRTItem WHERE releasing_id = r.id) as Balance FROM Releasing r\n" +
                         "INNER JOIN Stocks s ON s.id = r.StockID \n" +
                         "WHERE r.Quantity > 0 AND r.Status =? AND mct_no IS NOT NULL \n" +
                         "AND s.Description LIKE ? \n" +
@@ -117,7 +117,8 @@ public class MRTDao {
                     rs.getString("Description"),
                     rs.getString("mct_no"),
                     rs.getDouble("price"),
-                    rs.getInt("Quantity")
+                    rs.getInt("Quantity"),
+                    rs.getInt("Balance")
             ));
         }
 

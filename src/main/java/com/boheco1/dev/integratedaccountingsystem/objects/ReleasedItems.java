@@ -11,12 +11,23 @@ public class ReleasedItems {
     private double price;
     private int quantity;
 
+    private int balance;
+
     public ReleasedItems(String id, String description, String mctNo, double price, int quantity) {
         this.id = id;
         this.description = description;
         this.mctNo = mctNo;
         this.price = price;
         this.quantity = quantity;
+    }
+
+    public ReleasedItems(String id, String description, String mctNo, double price, int quantity, int balance) {
+        this.id = id;
+        this.description = description;
+        this.mctNo = mctNo;
+        this.price = price;
+        this.quantity = quantity;
+        this.balance = balance;
     }
 
     public String getId() {
@@ -37,5 +48,13 @@ public class ReleasedItems {
 
     public int getQuantity() {
         return quantity;
+    }
+
+    public int getBalance() {
+        return balance;
+    }
+
+    public void setBalance(int balance) {
+        this.balance = balance;
     }
 }

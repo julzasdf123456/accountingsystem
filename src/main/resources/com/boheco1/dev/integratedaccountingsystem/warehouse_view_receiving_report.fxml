@@ -109,7 +109,6 @@
                                     <Insets right="32.0" />
                                  </HBox.margin>
                               </Label>
-                              <Label prefWidth="268.0" text="Posted to Bin Card by" />
                            </children></HBox>
                         <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
@@ -135,14 +134,6 @@
                                  </font>
                                  <HBox.margin>
                                     <Insets left="16.0" right="16.0" />
-                                 </HBox.margin>
-                              </JFXTextField>
-                              <JFXTextField fx:id="posted_tf" focusColor="#00ad8e" prefHeight="30.0" prefWidth="268.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                                 <HBox.margin>
-                                    <Insets left="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
                            </children>

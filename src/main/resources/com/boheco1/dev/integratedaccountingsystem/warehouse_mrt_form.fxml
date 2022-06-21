@@ -74,9 +74,10 @@
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
                         </TableView>
+                        <Label text="Returned by" />
                         <HBox prefHeight="40.0" prefWidth="200.0">
                            <children>
-                              <JFXTextField fx:id="returned_tf" labelFloat="true" prefWidth="200.0" promptText="Returned by" style="-fx-background-color: #f5f5f5;">
+                              <JFXTextField fx:id="returned_tf" prefWidth="200.0" style="-fx-background-color: #f5f5f5;">
                                  <font>
                                     <Font size="18.0" />
                                  </font>

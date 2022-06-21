@@ -3,7 +3,6 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.ReceivingDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.SupplierDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXTextField;
@@ -31,7 +30,7 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
 
     @FXML
     private JFXTextField supplier_tf, bno_tf, addr_tf, carrier_tf, invoice_tf, dr_tf, rv_tf, po_tf,
-            received_tf, received_original_tf, verified_tf, posted_tf;
+            received_tf, received_original_tf, verified_tf;
 
     @FXML
     private Label net_sales_lbl, vat_lbl, total_lbl;
@@ -115,7 +114,10 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
         this.vat_lbl.setText(vat+"");
         this.total_lbl.setText(total+"");
     }
-
+    /**
+     * Initializes the information of the receiving and receiving items
+     * @return void
+     */
     public void setReceiving(Receiving report){
         try {
             SupplierInfo supplier = SupplierDAO.get(report.getSupplierId());

@@ -11,8 +11,8 @@ import java.util.List;
 public class ReleasingDAO {
     public static void add(Releasing releasing) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "INSERT INTO Releasing (StockID, MIRSID, Quantity, Price, UserID, Status, CreatedAt, UpdatedAt, id, MR, WorkOrderNo) " +
-                        "VALUES (?,?,?,?,?,?,GETDATE(),GETDATE(),?, ?, ?)");
+                "INSERT INTO Releasing (StockID, MIRSID, Quantity, Price, UserID, Status, CreatedAt, UpdatedAt, id, WorkOrderNo) " +
+                        "VALUES (?,?,?,?,?,?,GETDATE(),GETDATE(), ?, ?)");
 
         releasing.setId(Utility.generateRandomId());
 
@@ -23,8 +23,7 @@ public class ReleasingDAO {
         ps.setString(5, releasing.getUserID());
         ps.setString(6, releasing.getStatus());
         ps.setString(7, releasing.getId());
-        ps.setString(8, releasing.getMR());
-        ps.setString(9, releasing.getWorkOrderNo());
+        ps.setString(8, releasing.getWorkOrderNo());
 
         ps.executeUpdate();
 
@@ -113,7 +112,6 @@ public class ReleasingDAO {
                     rs.getDouble("Price"),
                     rs.getString("UserID"),
                     rs.getString("Status"),
-                    rs.getString("MR"),
                     rs.getString("WorkOrderNo"),
                     rs.getString("mct_no")
             );
@@ -145,7 +143,6 @@ public class ReleasingDAO {
                     rs.getDouble("Price"),
                     rs.getString("UserID"),
                     rs.getString("Status"),
-                    rs.getString("MR"),
                     rs.getString("WorkOrderNo"),
                     rs.getString("mct_no")
             );
@@ -178,7 +175,6 @@ public class ReleasingDAO {
                     rs.getDouble("Price"),
                     rs.getString("UserID"),
                     rs.getString("Status"),
-                    rs.getString("MR"),
                     rs.getString("WorkOrderNo"),
                     rs.getString("mct_no")
             );

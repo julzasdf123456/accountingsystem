@@ -75,7 +75,7 @@ public class StockDAO {
         for (Stock stock : stocks) {
             sql += "UPDATE Stocks SET Price = '" + stock.getPrice() + "' WHERE id= '" + stock.getId() + "'; ";
             sql += "INSERT INTO StockHistory (id, StockID, date, price, updatedBy) " +
-                    "VALUES ('" + Utility.generateRandomId() + "', '" + stock.getId() + "','" + LocalDate.now().minusDays(1) + "','" + stock.getOldPrice() + "','" + ActiveUser.getUser().getId() + "'); ";
+                    "VALUES ('" + Utility.generateRandomId() + "', '" + stock.getId() + "','" + LocalDate.now() + "','" + stock.getOldPrice() + "','" + ActiveUser.getUser().getId() + "'); ";
         }
         Connection conn = DB.getConnection();
 
