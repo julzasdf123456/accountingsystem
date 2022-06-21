@@ -6,6 +6,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
+import com.jfoenix.controls.JFXTextField;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -73,7 +74,7 @@ public class MIRSApprovalController implements Initializable {
             address.setText(mirs.getAddress());
             applicant.setText(mirs.getApplicant());
             requisitioner.setText(mirs.getRequisitioner().getFullName());
-            mirsItemTable.setSelectionModel(null);//disable row selection
+
 
             /*ObservableList<MIRSItem> observableList = FXCollections.observableArrayList(mirsItemList);
 
@@ -175,14 +176,35 @@ public class MIRSApprovalController implements Initializable {
             @Override
             public void handle(ActionEvent __) {
                 try {
-                    mirs.setStatus(Utility.REJECTED);
-                    mirs.setDetails(details.getText());
-                    MirsDAO.update(mirs);
-                    String notif_details = "MIRS ("+mirs.getId()+") was rejected.";
-                    Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
-                    NotificationsDAO.create(torequisitioner);
-                    AlertDialogBuilder.messgeDialog("System Message", "MIRS application rejected.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-                    btnHolder.setDisable(true);
+                    JFXButton accept = new JFXButton("Accept");
+                    JFXTextField remarks = new JFXTextField();
+                    remarks.setStyle("-fx-alignment: center; -fx-text-fill: "+ ColorPalette.BLACK + ";");
+                    remarks.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 18));
+                    remarks.setLabelFloat(false);
+                    JFXDialog dialogMCTNumber = DialogBuilder.showInputDialog("System Message","Please provide reason for the rejection of this MIRS.", Orientation.HORIZONTAL, remarks, accept, DialogBuilder.INFO_DIALOG, Utility.getStackPane());
+                    accept.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent __) {
+                            if(remarks.getText().isEmpty()) {
+                                AlertDialogBuilder.messgeDialog("System Message", "Please provide reason for this action.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+                            }else{
+                                try {
+                                    mirs.setStatus(Utility.REJECTED);
+                                    mirs.setDetails(details.getText());
+                                    MirsDAO.update(mirs);
+                                    String notif_details = "MIRS ("+mirs.getId()+") was rejected.";
+                                    Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
+                                    NotificationsDAO.create(torequisitioner);
+                                    AlertDialogBuilder.messgeDialog("System Message", "MIRS application rejected.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                                    btnHolder.setDisable(true);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            dialogMCTNumber.close();
+                        }
+                    });
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

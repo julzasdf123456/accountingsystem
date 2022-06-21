@@ -4,10 +4,11 @@ import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.*;
-import javafx.beans.property.ReadOnlyObjectWrapper;
+import com.opencsv.CSVReader;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -16,12 +17,16 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.io.File;
+import java.io.FileReader;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,6 +36,7 @@ import java.util.ResourceBundle;
 
 public class FileMIRSController extends MenuControllerHandler implements Initializable, SubMenuHelper {
 
+    String errorLog = "Log: \n";//set to global to access it in the Task class
     @FXML
     private DatePicker filingDate;
 
@@ -46,11 +52,11 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     @FXML
     private TableView<MIRSItem> mirsItemTable;
 
-    private Stock selectedStock = null;
+    private Stock stockToBeAdded = null;
     private EmployeeInfo preparedEmployeeInfo = null;
     private EmployeeInfo checkedEmployeeInfo = null;
     private EmployeeInfo approvedEmployeeInfo = null;
-    private ObservableList<MIRSItem> selectedItem;
+    private ObservableList<MIRSItem> mirsItemRequested;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -77,8 +83,8 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     }
 
     private void resetInputFields() {
-        selectedStock = null;
-        selectedItem.clear();
+        stockToBeAdded = null;
+        mirsItemRequested.clear();
         mirsItemTable.getItems().clear();
         purpose.setText("");
         items.setText("");
@@ -100,7 +106,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             return;
         }
 
-        if(selectedItem.isEmpty()){
+        if(mirsItemRequested.isEmpty()){
             AlertDialogBuilder.messgeDialog("Table Validation", "No item Added",
                     Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
             return;
@@ -133,14 +139,10 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                         mirsSignatoryList.add(mirsSignatory);
                     }
 
-                    if(MirsDAO.create(mirs, selectedItem,mirsSignatoryList)){ //return true saved successfully
+                    if(MirsDAO.create(mirs, mirsItemRequested,mirsSignatoryList)){ //return true saved successfully
                         AlertDialogBuilder.messgeDialog("System Message", "MIRS request successfully filed, please wait for the approval, thank you!",
                                 Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
-                        String details = "New MIRS ("+mirs.getId()+") was filed.";
-                        Notifications tochecker = new Notifications(details, Utility.NOTIF_MIRS_APROVAL, ActiveUser.getUser().getEmployeeID(), checkedEmployeeInfo.getId(), mirs.getId());
-                        Notifications toApprover = new Notifications(details, Utility.NOTIF_MIRS_APROVAL, ActiveUser.getUser().getEmployeeID(), approvedEmployeeInfo.getId(), mirs.getId());
-                        NotificationsDAO.create(tochecker);
-                        NotificationsDAO.create(toApprover);
+
                         resetInputFields();
                     }else{
                         AlertDialogBuilder.messgeDialog("System Message", "Sorry an error was encountered during saving, please try again.",
@@ -159,57 +161,174 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     @FXML
     private void addItemToTable(ActionEvent event) throws Exception {
         //Enter key on the qty text field to add items on the table
-        if(selectedStock == null){
+        if(stockToBeAdded == null){
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
-        }else if(quantity.getText().length() == 0 || Integer.parseInt(quantity.getText()) == 0 || Integer.parseInt(quantity.getText()) > StockDAO.countAvailable(selectedStock) ) {
+        }else if(quantity.getText().length() == 0 || Integer.parseInt(quantity.getText()) == 0 || Integer.parseInt(quantity.getText()) > StockDAO.countAvailable(stockToBeAdded) ) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid request quantity!",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }
+
+        addItem(stockToBeAdded, Integer.parseInt(quantity.getText()), false);
+    }
+
+    @FXML
+    void uploadMirsItem(ActionEvent event) {
+        Stage stage = (Stage) Utility.getStackPane().getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("CSV Files", "*.csv")
+        );
+        File selectedFile = fileChooser.showOpenDialog(stage);
+        JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing command.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+
+        if (selectedFile != null) {
+            try {
+                if (selectedFile != null) {
+                    // Create a background Task
+                    Task<Void> task = new Task<>() {
+                        @Override
+                        protected Void call() {
+                            try {
+                                dialog.show();
+                                CSVReader reader = new CSVReader(new FileReader(selectedFile.getAbsolutePath()));
+
+                                List<String[]> allRows = reader.readAll();
+                                for(int i = 1; i < allRows.size(); i++) { //start looping at 1 to skip column header
+                                    String[] row = allRows.get(i);
+                                    String id = row[0];
+                                    int qty = Integer.parseInt(row[row.length - 1]);
+                                    Stock stock = StockDAO.get(id);
+                                    if (stock == null) {
+                                        errorLog += "No such Stock Id: "+ id + ".\n";
+                                    } else {
+                                        if(qty > StockDAO.countAvailable(stock)){
+                                            errorLog += "Insufficient stock for item "+ id + ".\n";
+                                        }else{
+                                            addItem(stock, qty, true);
+                                        }
+                                    }
+                                }
+                            } catch (NumberFormatException e) {
+                                //e.printStackTrace();
+                                errorLog+="Invalid quantity provided.\n";
+                                dialog.close();
+                            }catch (Exception e){
+                                //e.printStackTrace();
+                                errorLog+=e.getMessage()+"\n";
+                                dialog.close();
+                            }
+                            return null;
+                        }
+                    };
+
+                    task.setOnSucceeded(wse -> {
+                        dialog.close();
+                        AlertDialogBuilder.messgeDialog("System Message", "Task complete.\n"+errorLog ,
+                                Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                        items.setText("");
+                        quantity.setText("");
+                        stockToBeAdded = null;
+                        inStock.setText("In Stock: 0");
+                        pending.setText("Pending: 0");
+                        available.setText("Available: 0");
+                        mirsItemTable.refresh();
+                        items.requestFocus();
+                        countRow.setText("" + mirsItemRequested.size());
+                    });
+
+                    task.setOnFailed(workerStateEvent -> {
+                        dialog.close();
+                        AlertDialogBuilder.messgeDialog("System Warning", "A problem was encountered, please try again.\n"+errorLog,
+                                Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                        items.setText("");
+                        quantity.setText("");
+                        stockToBeAdded = null;
+                        inStock.setText("In Stock: 0");
+                        pending.setText("Pending: 0");
+                        available.setText("Available: 0");
+                        mirsItemTable.refresh();
+                        items.requestFocus();
+                        countRow.setText("" + mirsItemRequested.size());
+                    });
+
+                    new Thread(task).start();
+                }else{
+                    AlertDialogBuilder.messgeDialog("System Warning", "Please select a CSV file before proceeding!",
+                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    items.setText("");
+                    quantity.setText("");
+                    stockToBeAdded = null;
+                    inStock.setText("In Stock: 0");
+                    pending.setText("Pending: 0");
+                    available.setText("Available: 0");
+                    mirsItemTable.refresh();
+                    items.requestFocus();
+                    countRow.setText("" + mirsItemRequested.size());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void addItem(Stock stock, int qty, boolean isUploaded) throws Exception {
+        if(stock == null){
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            return;
+        }else if(qty == 0 || qty > StockDAO.countAvailable(stock) ) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid request quantity!",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
         }
 
         //will update quantity if item is already added to the request
-        for(MIRSItem added: selectedItem){
-            if(added.getStockID().equals(selectedStock.getId())){
-                added.setQuantity(added.getQuantity() + Integer.parseInt(quantity.getText()));
-                items.setText("");
-                quantity.setText("");
-                selectedStock = null;
-                inStock.setText("In Stock: 0");
-                pending.setText("Pending: 0");
-                available.setText("Available: 0");
-                mirsItemTable.refresh();
-                items.requestFocus();
+        for(MIRSItem added: mirsItemRequested){
+            if(added.getStockID().equals(stock.getId())){
+                int newQty = added.getQuantity() + qty;
+                if(newQty > StockDAO.countAvailable(stock)){
+                    AlertDialogBuilder.messgeDialog("System Message", "Insufficient stock for item "+stock.getId(),
+                            Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                }else{
+                    added.setQuantity(added.getQuantity() + qty);
+                    if (!isUploaded) {
+                        items.setText("");
+                        quantity.setText("");
+                        stockToBeAdded = null;
+                        inStock.setText("In Stock: 0");
+                        pending.setText("Pending: 0");
+                        available.setText("Available: 0");
+                        mirsItemTable.refresh();
+                        items.requestFocus();
+                    }
+                }
+
                 return;
             }
         }
 
         MIRSItem mirsItem = new MIRSItem();
-        mirsItem.setStockID(selectedStock.getId());
-        mirsItem.setParticulars(selectedStock.getDescription());
-        mirsItem.setUnit(selectedStock.getUnit());
-        mirsItem.setQuantity(Integer.parseInt(quantity.getText()));
-        mirsItem.setPrice(selectedStock.getPrice());
+        mirsItem.setStockID(stock.getId());
+        mirsItem.setParticulars(stock.getDescription());
+        mirsItem.setUnit(stock.getUnit());
+        mirsItem.setQuantity(qty);
+        mirsItem.setPrice(stock.getPrice());
 
-        selectedItem.add(mirsItem);
+        mirsItemRequested.add(mirsItem);
         mirsItemTable.refresh();
-
-        selectedStock = null; //set to null for validation
-        items.setText("");
-        quantity.setText("");
-        items.requestFocus();
-        inStock.setText("In Stock: 0");
-        pending.setText("Pending: 0");
-        available.setText("Available: 0");
-        countRow.setText(""+selectedItem.size());
+        if (!isUploaded) {
+            stockToBeAdded = null; //set to null for validation
+            items.setText("");
+            quantity.setText("");
+            items.requestFocus();
+            inStock.setText("In Stock: 0");
+            pending.setText("Pending: 0");
+            available.setText("Available: 0");
+            countRow.setText("" + mirsItemRequested.size());
+        }
     }
-
-    @FXML
-    private void removeBtn(ActionEvent event) throws Exception {
-
-    }
-
     @Override
     public void setSubMenus(FlowPane flowPane) {
         flowPane.getChildren().removeAll();
@@ -281,9 +400,9 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                             accept.setOnAction(new EventHandler<ActionEvent>() {
                                                 @Override
                                                 public void handle(ActionEvent __) {
-                                                    selectedItem.remove(mirsItem);
+                                                    mirsItemRequested.remove(mirsItem);
                                                     mirsItemTable.refresh();
-                                                    countRow.setText(""+selectedItem.size());
+                                                    countRow.setText(""+ mirsItemRequested.size());
                                                     dialog.close();
                                                 }
                                             });
@@ -311,8 +430,8 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         mirsItemTable.getColumns().add(actionCol);
         mirsItemTable.setPlaceholder(new Label("No item Added"));
 
-        selectedItem =  FXCollections.observableArrayList();
-        mirsItemTable.setItems(selectedItem);
+        mirsItemRequested =  FXCollections.observableArrayList();
+        mirsItemTable.setItems(mirsItemRequested);
     }
 
     private void bindParticularsAutocomplete(JFXTextField textField){
@@ -334,7 +453,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                     }
 
                     if (list.size() == 0) {
-                        selectedStock = null;
+                        stockToBeAdded = null;
                     }
 
                     return list;
@@ -356,8 +475,8 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         stockSuggest.setOnAutoCompleted(event -> {
             SlimStock result = event.getCompletion();
             try {
-                selectedStock = StockDAO.get(result.getId());
-                int av = StockDAO.countAvailable(selectedStock);
+                stockToBeAdded = StockDAO.get(result.getId());
+                int av = StockDAO.countAvailable(stockToBeAdded);
                 if(av == 0) {
                     AlertDialogBuilder.messgeDialog("System Warning", "Insufficient stock.",
                             Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
@@ -366,8 +485,8 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
                     quantity.requestFocus();
 
-                    inStock.setText("In Stock: "+ selectedStock.getQuantity());
-                    pending.setText("Pending: "+ StockDAO.countPendingRequest(selectedStock));
+                    inStock.setText("In Stock: "+ stockToBeAdded.getQuantity());
+                    pending.setText("Pending: "+ StockDAO.countPendingRequest(stockToBeAdded));
                     available.setText("Available: "+ av);
                 }
             } catch (Exception e) {

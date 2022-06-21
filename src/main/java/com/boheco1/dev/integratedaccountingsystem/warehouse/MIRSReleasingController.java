@@ -46,6 +46,7 @@ public class MIRSReleasingController implements Initializable {
     private JFXListView<MIRSItem> requestedList, releasingList;
 
     private Stock selectedStock = null;
+    private List<MIRSItem> forIndividualized = new ArrayList<>();
     private MIRS mirs;
 
     @Override
@@ -176,6 +177,27 @@ public class MIRSReleasingController implements Initializable {
             List<Releasing> readyForRelease = new ArrayList<>();
             MCT mct = null;
 
+
+
+            for (MIRSItem mirsItem : forReleasing){
+                Stock stock = StockDAO.get(mirsItem.getStockID());
+                if(stock.isIndividualized()){
+                    boolean found = false;
+                    HashMap<String, ItemizedMirsItem> holder = Utility.getItemizedMirsItems();
+                    for (Map.Entry i : holder.entrySet()) {
+                        ItemizedMirsItem item = holder.get(i.getKey());
+                        if(item.getMirsItemID().equals(mirsItem.getId())){
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(!found){
+                        AlertDialogBuilder.messgeDialog("System Message", "Item specification is needed for the item " +mirsItem.getParticulars(), Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                        return;
+                    }
+                }
+            }
+
             for (MIRSItem mirsItem : forReleasing){
                 Releasing releasing = new Releasing();
                 releasing.setStockID(mirsItem.getStockID());
@@ -233,8 +255,8 @@ public class MIRSReleasingController implements Initializable {
                         Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
             }
         }catch (Exception e){
-        AlertDialogBuilder.messgeDialog("System Error", "Item released: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
-        e.printStackTrace();
+            AlertDialogBuilder.messgeDialog("System Error", "Item released: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+            e.printStackTrace();
         }
     }
 
@@ -414,7 +436,7 @@ public class MIRSReleasingController implements Initializable {
     private void addMoreDetails(ActionEvent event) throws Exception {
         MIRSItem mirsItem = releasingList.getSelectionModel().getSelectedItem();
         if(mirsItem == null) {
-            AlertDialogBuilder.messgeDialog("System Message", "Please select an from the Releasing MIRS Item.",
+            AlertDialogBuilder.messgeDialog("System Message", "Please select an item from the Releasing MIRS list.",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }else{
             if(StockDAO.get(mirsItem.getStockID()).isIndividualized()) {

@@ -174,7 +174,7 @@
                   </VBox>
                   <VBox HBox.hgrow="ALWAYS">
                      <children>
-                        <TableView fx:id="mirsItemTable" focusTraversable="false" maxWidth="1.7976931348623157E308" prefWidth="785.0" VBox.vgrow="ALWAYS">
+                        <TableView fx:id="mirsItemTable" maxWidth="1.7976931348623157E308" prefWidth="785.0" VBox.vgrow="ALWAYS">
                            <columnResizePolicy>
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>

@@ -27,6 +27,7 @@ import java.awt.event.InputMethodEvent;
 import java.awt.event.KeyEvent;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -64,6 +65,7 @@ public class MIRSItemItemizedController implements Initializable {
 
     private MIRSItem mirsItem;
     private ObservableList<ItemizedMirsItem> itemized;
+    private ItemizedMirsItem selectedAnItem;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -79,6 +81,25 @@ public class MIRSItemItemizedController implements Initializable {
             itemName.setText(StockDAO.get(mirsItem.getStockID()).getDescription());
             saveBtn.setDisable(true);
             prepareTable();
+
+            for(ItemizedMirsItem item : itemizedItemTable.getItems()){
+                HashMap<String, ItemizedMirsItem> holder = Utility.getItemizedMirsItems();
+
+                if(holder.containsKey(item.getId())){
+                    holder.replace(item.getId(), item);
+                }else {
+                    holder.put(item.getId(), item);
+                }
+            }
+            HashMap<String, ItemizedMirsItem> holder = Utility.getItemizedMirsItems();
+            for (Map.Entry i : holder.entrySet()) {
+                ItemizedMirsItem item = holder.get(i.getKey());
+                if(item.getMirsItemID().equals(mirsItem.getId())){
+                    itemized.add(item);
+                }
+            }
+            itemizedItemTable.refresh();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -93,21 +114,28 @@ public class MIRSItemItemizedController implements Initializable {
                     Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
             return;
         }
-        ItemizedMirsItem item= new ItemizedMirsItem(Utility.generateRandomId(), mirsItem.getId(), serial.getText(), brand.getText(), remarks.getText());
-        itemized.add(item);
-        itemizedItemTable.refresh();
-        clearFields(null);
+        if(selectedAnItem != null){
+            selectedAnItem.setBrand(brand.getText());
+            selectedAnItem.setSerial(serial.getText());
+            selectedAnItem.setRemarks(remarks.getText());
+        }else{
+            ItemizedMirsItem item= new ItemizedMirsItem(Utility.generateRandomId(), mirsItem.getId(), serial.getText(), brand.getText(), remarks.getText());
+            itemized.add(item);
+            clearFields(null);
+        }
+
+        selectedAnItem = null;
 
         if(itemized.size() == mirsItem.getQuantity()){
             addBtn.setDisable(true);
             saveBtn.setDisable(false);
         }
-
-
+        itemizedItemTable.refresh();
     }
 
     @FXML
     void clearFields(ActionEvent event) {
+        selectedAnItem = null;
         brand.setText("");
         serial.setText("");
         remarks.setText("");
@@ -152,10 +180,10 @@ public class MIRSItemItemizedController implements Initializable {
 
     @FXML
     void displayInfoWhenTableIsClick(MouseEvent event) {
-        ItemizedMirsItem item = itemizedItemTable.getSelectionModel().getSelectedItem();
-        brand.setText(item.getBrand());
-        serial.setText(item.getSerial());
-        remarks.setText(item.getRemarks());
+        selectedAnItem = itemizedItemTable.getSelectionModel().getSelectedItem();
+        brand.setText(selectedAnItem.getBrand());
+        serial.setText(selectedAnItem.getSerial());
+        remarks.setText(selectedAnItem.getRemarks());
         charCounter.setText(remarks.getText().length()+"/200");
     }
 

@@ -40,7 +40,7 @@ public class UserMIRSPreviewController implements Initializable {
     @FXML
     private StackPane stackPane;
     @FXML
-    private Label  details, date, mirsNumber, applicant, address, requisitioner, signatories, purpose;
+    private Label  details, date, mirsNumber, applicant, address, requisitioner, signatories, purpose, itemCounter;
     @FXML private JFXButton approvedBtn,rejectBtn;
     @FXML
     private JFXTextField comment;
@@ -127,6 +127,8 @@ public class UserMIRSPreviewController implements Initializable {
         requestedTable.getColumns().add(quantityCol);
         requestedTable.setPlaceholder(new Label("No item Added"));
         requestedTable.getItems().setAll(observableList);
+
+        itemCounter.setText(observableList.size() + " item(s) found");
     }
 
     @FXML

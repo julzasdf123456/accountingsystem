@@ -10,6 +10,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.boheco1.dev.integratedaccountingsystem.dao.NotificationsDAO.getIconFromType;
+
 public class MirsDAO {
 
     /**
@@ -868,7 +870,24 @@ public class MirsDAO {
                     "'"+Utility.generateRandomId()+"'); \n";
         }
 
-        System.out.println(query);
+
+        String details = "New MIRS ("+mirsId+") was filed.";
+        Notifications tochecker = new Notifications(details, Utility.NOTIF_MIRS_APROVAL, ActiveUser.getUser().getEmployeeID(), signatories.get(0).getUserID(), mirsId);
+        Notifications toApprover = new Notifications(details, Utility.NOTIF_MIRS_APROVAL, ActiveUser.getUser().getEmployeeID(), signatories.get(1).getUserID(), mirsId);
+        List<Notifications> not = new ArrayList<>();
+        not.add(tochecker);
+        not.add(toApprover);
+        for (Notifications notifications : not){
+            query+="INSERT INTO Notifications (id, NotificationDetails, NotificationType, FromUser, ToUser, Status, RelationId, Icon, created_at, updated_at) " +
+                    "VALUES " +
+                    "('"+Utility.generateRandomId()+"', " +
+                    "'"+notifications.getNotificationDetails()+"', " +
+                    "'"+notifications.getNotificationType()+"', " +
+                    "'"+notifications.getFromUser()+"', '"+notifications.getToUser()+"', '"+Utility.NOTIF_UNREAD+"', '"+notifications.getRelationId()+"', '"+getIconFromType(notifications.getNotificationType())+"', GETDATE(), GETDATE());\n";
+        }
+
+
+        //System.out.println(query);
         Connection conn = DB.getConnection();
 
         try {

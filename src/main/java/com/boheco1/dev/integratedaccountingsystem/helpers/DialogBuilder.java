@@ -171,4 +171,36 @@ public class DialogBuilder {
         return dialog;
     }
 
+    public static JFXDialog showWaitDialog(String title, String message, StackPane pane, String type){
+
+        JFXDialogLayout dialogContent = new JFXDialogLayout();
+        dialogContent.setStyle("-fx-border-width: 0 0 0 15; -fx-border-color: " + type + ";");
+        dialogContent.setPrefHeight(200);
+
+        Label head = new Label(title);
+        head.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 15));
+        head.setTextFill(Paint.valueOf(type));
+        dialogContent.setHeading(head);
+
+        FlowPane flowPane = new FlowPane();
+        flowPane.setOrientation(Orientation.VERTICAL);
+        flowPane.setAlignment(Pos.CENTER);
+        flowPane.setRowValignment(VPos.CENTER);
+        flowPane.setColumnHalignment(HPos.CENTER);
+        flowPane.setVgap(6);
+
+        Label context = new Label(message);
+        context.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 12));
+        context.setWrapText(true);
+        context.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
+
+        flowPane.getChildren().add(context);
+
+        dialogContent.setBody(flowPane);
+
+        JFXDialog dialog = new JFXDialog(pane, dialogContent, JFXDialog.DialogTransition.CENTER);
+        dialog.setOverlayClose(false);
+        return  dialog;
+    }
+
 }
