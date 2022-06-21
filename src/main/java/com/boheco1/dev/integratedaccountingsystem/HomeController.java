@@ -206,8 +206,8 @@ public class HomeController implements Initializable {
         DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(myMirs,new FontIcon("mdi2c-checkbox-blank-circle-outline"),drawerMenus,myMirs.getText(),contentPane,"user_my_mirs.fxml",subToolbar, null, title);
 
         logout.setOnAction(actionEvent -> {
-            JFXButton accept = new JFXButton("Proceed");
-            JFXDialog dialog = DialogBuilder.showConfirmDialog("System Message","Are yoou sure you want to log out.", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+            JFXButton accept = new JFXButton("Yes");
+            JFXDialog dialog = DialogBuilder.showConfirmDialog("System Message","Are you sure you want to log out?", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
             accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
             accept.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
@@ -218,6 +218,7 @@ public class HomeController implements Initializable {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    dialog.close();
                 }
             });
         });
@@ -371,7 +372,7 @@ public class HomeController implements Initializable {
                     // PERFORM EVENT HERE
                     if (notifications.getNotificationType().equals(Utility.NOTIF_INFORMATION)) {
                         AlertDialogBuilder.messgeDialog("Notification", notifications.getNotificationDetails(), homeStackPane, AlertDialogBuilder.INFO_DIALOG);
-                        contentPane.getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "user_task_approval_mirs.fxml", contentPane, subToolbar, new Label("Task Approval")));
+                        contentPane.getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "user_my_mirs.fxml", contentPane, subToolbar, new Label("My MIRS")));
                     } else if (notifications.getNotificationType().equals(Utility.NOTIF_MIRS_APROVAL)) {
                         // forward to viewing of mirs
                         contentPane.getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "user_task_approval_mirs.fxml", contentPane, subToolbar, new Label("Task Approval")));
