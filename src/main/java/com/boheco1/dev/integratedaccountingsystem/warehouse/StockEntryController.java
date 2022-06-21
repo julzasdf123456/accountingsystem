@@ -1,10 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
-import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
-import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
-import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
-import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.*;
 import javafx.collections.ObservableList;
@@ -12,8 +9,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.DatePicker;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Paint;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
@@ -146,52 +143,58 @@ public class StockEntryController extends MenuControllerHandler implements Initi
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please select enter a valid threshold remaining limit for the stock!",
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else{
-            if (isNew) {
-                this.stock.setId(localCode);
-                //If new Stock item, set stock quantity to 0 and insert Stock to database
-                this.stock.setQuantity(0);
+            JFXButton accept = new JFXButton("Proceed");
+            JFXDialog dialog = DialogBuilder.showConfirmDialog("Stock Entry","This process is final. Confirm Stock Entry?", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+            accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+            int finalQuantity = quantity;
+            accept.setOnAction(__ -> {
+                if (isNew) {
+                    this.stock.setId(localCode);
+                    //If new Stock item, set stock quantity to 0 and insert Stock to database
+                    this.stock.setQuantity(0);
 
-                this.stock.setAcctgCode(accountCode);
-                this.stock.setIndividualized(this.individualized_cb.isSelected());
-                try {
-                    StockDAO.add(this.stock);
-                    //If quantity is set, create stock entry log, otherwise just add record in stocks table
-                    if (quantity > 0 ) {
+                    this.stock.setAcctgCode(accountCode);
+                    this.stock.setIndividualized(this.individualized_cb.isSelected());
+                    try {
+                        StockDAO.add(this.stock);
+                        //If quantity is set, create stock entry log, otherwise just add record in stocks table
+                        if (finalQuantity > 0 ) {
+                            //Create StockEntryLog object
+                            StockEntryLog stockEntryLog = new StockEntryLog();
+                            stockEntryLog.setQuantity(finalQuantity);
+                            stockEntryLog.setPrice(this.stock.getPrice());
+                            stockEntryLog.setSource("Purchased");
+
+                            //Insert StockEntryLog to database
+                            StockDAO.stockEntry(this.stock, stockEntryLog);
+                        }
+                        AlertDialogBuilder.messgeDialog("Stock Entry", "New stock was successfully added!", stockStackPane, AlertDialogBuilder.SUCCESS_DIALOG);
+                    }catch (Exception e){
+                        AlertDialogBuilder.messgeDialog("System Error", "New stock was not successfully added due to:"+e.getMessage()+".", stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+                        e.printStackTrace();
+                    }
+                    this.reset();
+                }else{
+                    //If existing Stock item, update the stock basic details based on new entry, insert to StockEntryLog and update the Stock quantity.
+                    try {
+                        StockDAO.updateDetails(this.stock);
+
                         //Create StockEntryLog object
                         StockEntryLog stockEntryLog = new StockEntryLog();
-                        stockEntryLog.setQuantity(quantity);
+                        stockEntryLog.setQuantity(finalQuantity);
                         stockEntryLog.setPrice(this.stock.getPrice());
                         stockEntryLog.setSource("Purchased");
 
                         //Insert StockEntryLog to database
                         StockDAO.stockEntry(this.stock, stockEntryLog);
+                        AlertDialogBuilder.messgeDialog("Stock Entry", "New stock was successfully added!", stockStackPane, AlertDialogBuilder.SUCCESS_DIALOG);
+                        this.reset();
+                    }catch (Exception e){
+                        AlertDialogBuilder.messgeDialog("System Error", "New stock was not successfully added due to:"+e.getMessage()+" error.", stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
                     }
-                    AlertDialogBuilder.messgeDialog("Stock Entry", "New stock was successfully added!", stockStackPane, AlertDialogBuilder.SUCCESS_DIALOG);
-                }catch (Exception e){
-                    AlertDialogBuilder.messgeDialog("System Error", "New stock was not successfully added due to:"+e.getMessage()+".", stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
-                    e.printStackTrace();
                 }
-                this.reset();
-            }else{
-                //If existing Stock item, update the stock basic details based on new entry, insert to StockEntryLog and update the Stock quantity.
-                try {
-                    StockDAO.updateDetails(this.stock);
-
-                    //Create StockEntryLog object
-                    StockEntryLog stockEntryLog = new StockEntryLog();
-                    stockEntryLog.setQuantity(quantity);
-                    stockEntryLog.setPrice(this.stock.getPrice());
-                    stockEntryLog.setSource("Purchased");
-
-                    //Insert StockEntryLog to database
-                    StockDAO.stockEntry(this.stock, stockEntryLog);
-                    AlertDialogBuilder.messgeDialog("Stock Entry", "New stock was successfully added!", stockStackPane, AlertDialogBuilder.SUCCESS_DIALOG);
-                    this.reset();
-                }catch (Exception e){
-                    AlertDialogBuilder.messgeDialog("System Error", "New stock was not successfully added due to:"+e.getMessage()+" error.", stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
-                }
-            }
-
+                dialog.close();
+            });
         }
     }
     /**

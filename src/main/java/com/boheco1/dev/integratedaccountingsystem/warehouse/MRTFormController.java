@@ -33,9 +33,6 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
     @FXML
     private TableView releasedItemTable, returnItemTable;
 
-    @FXML
-    private JFXButton addItemBtn, removeItemBtn;
-
     private ObservableList<MRTItem> mrtItems = null;
     private ObservableList<ReleasedItems> releasedItems = null;
     private MRT currentMRT = null;
@@ -46,6 +43,12 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
         this.initializeReleasedItemTable();
         this.initializeReturnItemTable();
         this.bindReturnedByAutocomplete(this.returned_tf);
+        try {
+            this.returnedBy = ActiveUser.getUser().getEmployeeInfo();
+            this.returned_tf.setText(this.returnedBy.getFullName());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -84,7 +87,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
             ReleasedItems item = (ReleasedItems) selectedItem;
             JFXButton returnNumber = new JFXButton("Return");
             JFXTextField qty_tf = new JFXTextField();
-            qty_tf.setText(item.getQuantity()+"");
+            qty_tf.setText(item.getBalance()+"");
             InputValidation.restrictNumbersOnly(qty_tf);
             JFXDialog returnDialog = DialogBuilder.showInputDialog("Quantity To Return","Please enter the quantity:  ", "", qty_tf, returnNumber, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
             returnNumber.setOnAction(__ -> {
@@ -96,7 +99,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
 
                         if (qty_to_return <= 0){
                             AlertDialogBuilder.messgeDialog("System Message", "No return quantity provided", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-                        }else if (qty_to_return > item.getQuantity()){
+                        }else if (qty_to_return > item.getBalance()){
                             AlertDialogBuilder.messgeDialog("System Message", "The return quantity provided should not exceed the maximum released quantity!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                         }else{
                             MRTItem returnItem = new MRTItem(null, item.getId(), null, qty_to_return);
@@ -133,16 +136,22 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
         if (this.returnedBy == null){
             AlertDialogBuilder.messgeDialog("System Message", "No employee was set!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }else {
-            this.currentMRT = new MRT(null, this.returnedBy.getId(), ActiveUser.getUser().getEmployeeID(), LocalDate.now());
-            try {
-                MRTDao.create(this.currentMRT);
-                MRTDao.addItems(this.currentMRT, this.mrtItems);
-                AlertDialogBuilder.messgeDialog("Material Return", "The selected released items were successfully returned!", Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
-                this.reset();
-            } catch (Exception e) {
-                e.printStackTrace();
-                AlertDialogBuilder.messgeDialog("System Error", "An error occurred while returning the items due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            }
+            JFXButton accept = new JFXButton("Proceed");
+            JFXDialog dialog = DialogBuilder.showConfirmDialog("MRT","This process is final. Confirm Return Item(s)?", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+            accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+            accept.setOnAction(__ -> {
+                this.currentMRT = new MRT(null, this.returnedBy.getId(), ActiveUser.getUser().getEmployeeID(), LocalDate.now());
+                try {
+                    MRTDao.create(this.currentMRT);
+                    MRTDao.addItems(this.currentMRT, this.mrtItems);
+                    AlertDialogBuilder.messgeDialog("Material Return", "The selected released items were successfully returned!", Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                    this.reset();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while returning the items due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }
+                dialog.close();
+            });
         }
     }
 
@@ -180,7 +189,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
         column5.setMinWidth(115);
         column5.setMaxWidth(115);
         column5.setPrefWidth(115);
-        column5.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        column5.setCellValueFactory(new PropertyValueFactory<>("balance"));
         column5.setStyle("-fx-alignment: center;");
 
         this.releasedItems =  FXCollections.observableArrayList();

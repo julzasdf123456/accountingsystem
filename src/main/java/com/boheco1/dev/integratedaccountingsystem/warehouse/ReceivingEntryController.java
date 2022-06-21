@@ -4,6 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXTextField;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -121,47 +122,49 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
         }else if (this.verified == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please set the verified by field!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        /*
-        }else if (this.posted == null) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please set the posted to bin card by field!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);*/
         }else{
-            String rv_no = this.rv_tf.getText();
-            String blbw_no = this.bno_tf.getText();
-            String carrier = this.carrier_tf.getText();
-            String dr_no = this.dr_tf.getText();
-            String po_no = this.po_tf.getText();
-            String inv_no = this.invoice_tf.getText();
+            JFXButton accept = new JFXButton("Proceed");
+            JFXDialog dialog = DialogBuilder.showConfirmDialog("Receiving Entry","This process is final. Confirm Receiving Entry?", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+            accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+            accept.setOnAction(__ -> {
+                String rv_no = this.rv_tf.getText();
+                String blbw_no = this.bno_tf.getText();
+                String carrier = this.carrier_tf.getText();
+                String dr_no = this.dr_tf.getText();
+                String po_no = this.po_tf.getText();
+                String inv_no = this.invoice_tf.getText();
 
-            //Create Receiving object
-            Receiving receiving = new Receiving();
-            receiving.setDate(LocalDate.now());
-            receiving.setRvNo(rv_no);
-            receiving.setBlwbNo(blbw_no);
-            receiving.setCarrier(carrier);
-            receiving.setDrNo(dr_no);
-            receiving.setPoNo(po_no);
-            receiving.setSupplierId(this.supplier.getSupplierID());
-            receiving.setInvoiceNo(inv_no);
-            receiving.setReceivedBy(this.received.getId());
-            receiving.setReceivedOrigBy(this.received_original.getId());
-            receiving.setVerifiedBy(this.verified.getId());
+                //Create Receiving object
+                Receiving receiving = new Receiving();
+                receiving.setDate(LocalDate.now());
+                receiving.setRvNo(rv_no);
+                receiving.setBlwbNo(blbw_no);
+                receiving.setCarrier(carrier);
+                receiving.setDrNo(dr_no);
+                receiving.setPoNo(po_no);
+                receiving.setSupplierId(this.supplier.getSupplierID());
+                receiving.setInvoiceNo(inv_no);
+                receiving.setReceivedBy(this.received.getId());
+                receiving.setReceivedOrigBy(this.received_original.getId());
+                receiving.setVerifiedBy(this.verified.getId());
 
-            try {
-                //List all Receiving Items
-                List<ReceivingItem> items = new ArrayList<>();
-                for (int i = 0; i < this.receivedItems.size(); i++) {
-                    items.add(this.receivedItems.get(i).getReceivingItem());
+                try {
+                    //List all Receiving Items
+                    List<ReceivingItem> items = new ArrayList<>();
+                    for (int i = 0; i < this.receivedItems.size(); i++) {
+                        items.add(this.receivedItems.get(i).getReceivingItem());
+                    }
+
+                    //Add Receiving and Receiving Items
+                    ReceivingDAO.addItems(receiving, items);
+
+                    this.saveReport(receiving.getRrNo());
+                    this.reset();
+                } catch (Exception e) {
+                    AlertDialogBuilder.messgeDialog("System Error", "New Receiving Entry was not successfully added due to:" + e.getMessage() + " error.", stackPane, AlertDialogBuilder.DANGER_DIALOG);
                 }
-
-                //Add Receiving and Receiving Items
-                ReceivingDAO.addItems(receiving, items);
-
-                this.saveReport(receiving.getRrNo());
-                this.reset();
-            } catch (Exception e) {
-                AlertDialogBuilder.messgeDialog("System Error", "New Receiving Entry was not successfully added due to:"+e.getMessage()+" error.", stackPane, AlertDialogBuilder.DANGER_DIALOG);
-            }
+                dialog.close();
+            });
         }
     }
     /**
