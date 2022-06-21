@@ -15,10 +15,11 @@ public class MIRSItem {
     private String unit;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private boolean additional=false;
 
     public MIRSItem(){}
 
-    public MIRSItem(String id, String mirsID, String stockID, int quantity, double price, String remarks, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public MIRSItem(String id, String mirsID, String stockID, int quantity, double price, String remarks, LocalDateTime createdAt, LocalDateTime updatedAt, boolean additional) {
         this.id = id;
         this.mirsID = mirsID;
         this.stockID = stockID;
@@ -27,6 +28,7 @@ public class MIRSItem {
         this.remarks = remarks;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.additional = additional;
     }
 
     public String getId() {
@@ -107,6 +109,14 @@ public class MIRSItem {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public boolean isAdditional() {
+        return additional;
+    }
+
+    public void setAdditional(boolean additional) {
+        this.additional = additional;
     }
 
     public String toString(){

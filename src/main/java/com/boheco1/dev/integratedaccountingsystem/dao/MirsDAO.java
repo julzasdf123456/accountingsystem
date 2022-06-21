@@ -237,7 +237,8 @@ public class MirsDAO {
                     rs.getDouble("Price"),
                     rs.getString("Comments"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                    rs.getBoolean("additional")
             ));
         }
 
@@ -274,7 +275,8 @@ public class MirsDAO {
                     rs.getDouble("Price"),
                     rs.getString("Comments"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                    rs.getTimestamp("UpdatedAt").toLocalDateTime()
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                    rs.getBoolean("additional")
             ));
         }
 
