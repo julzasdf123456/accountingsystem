@@ -247,6 +247,7 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
         mirsItem.setUnit(selectedStock.getUnit());
         mirsItem.setQuantity(Integer.parseInt(quantity.getText()));
         mirsItem.setPrice(selectedStock.getPrice());
+        mirsItem.setAdditional(false);
 
         selectedItem.add(mirsItem);
         mirsItemTable.setItems(selectedItem);

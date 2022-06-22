@@ -177,8 +177,6 @@ public class MIRSReleasingController implements Initializable {
             List<Releasing> readyForRelease = new ArrayList<>();
             MCT mct = null;
 
-
-
             for (MIRSItem mirsItem : forReleasing){
                 Stock stock = StockDAO.get(mirsItem.getStockID());
                 if(stock.isIndividualized()){
@@ -192,7 +190,7 @@ public class MIRSReleasingController implements Initializable {
                         }
                     }
                     if(!found){
-                        AlertDialogBuilder.messgeDialog("System Message", "Item specification is needed for the item " +mirsItem.getParticulars(), Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                        AlertDialogBuilder.messgeDialog("System Message", "Item specification is needed for the item " +stock.getDescription(), Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
                         return;
                     }
                 }
@@ -280,6 +278,7 @@ public class MIRSReleasingController implements Initializable {
         mirsItem.setQuantity(Integer.parseInt(quantity.getText()));
         mirsItem.setPrice(selectedStock.getPrice());
         mirsItem.setId(Utility.generateRandomId());
+        mirsItem.setAdditional(true);
         releasingList.getItems().add(mirsItem);
 
         selectedStock = null; //set to null for validation
@@ -406,6 +405,7 @@ public class MIRSReleasingController implements Initializable {
                                             mirsItem.setRemarks(selectedItems.get(0).getRemarks());
                                             mirsItem.setCreatedAt(selectedItems.get(0).getCreatedAt());
                                             mirsItem.setUpdatedAt(selectedItems.get(0).getUpdatedAt());
+                                            mirsItem.setAdditional(selectedItems.get(0).isAdditional());
                                             //mirsItem.setWorkOrderNo(selectedItems.get(0).getWorkOrderNo());
 
                                             selectedItems.get(0).setQuantity(selectedItems.get(0).getQuantity() - Integer.parseInt(input.getText()));
