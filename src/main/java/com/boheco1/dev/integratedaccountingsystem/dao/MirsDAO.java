@@ -856,9 +856,9 @@ public class MirsDAO {
                         "'"+mirs.getApplicant()+"');\n";
 
         for(MIRSItem item : mirsItems){
-            query +="INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id) " +
+            query +="INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id, isAdditional) " +
                     "VALUES " +
-                    "('"+mirsId+"','"+item.getStockID()+"','"+item.getQuantity()+"','"+item.getPrice()+"','"+item.getRemarks()+"',GETDATE(),GETDATE(), '"+Utility.generateRandomId()+"');\n";
+                    "('"+mirsId+"','"+item.getStockID()+"','"+item.getQuantity()+"','"+item.getPrice()+"','"+item.getRemarks()+"',GETDATE(),GETDATE(), '"+Utility.generateRandomId()+"', '"+item.isAdditional()+"');\n";
         }
 
         for(MIRSSignatory msig : signatories){
@@ -909,13 +909,7 @@ public class MirsDAO {
 
     }
 
-    public static boolean update(MIRS mirs, List<MIRSItem> mirsItems, List<MIRSSignatory> signatories) throws SQLException, ClassNotFoundException  {
-        /*"UPDATE MIRSItems SET StockID=?, Quantity=?, Price=?, Comments=?, UpdatedAt=GETDATE() WHERE id=?");
-        ps.setString(1, item.getStockID());
-        ps.setInt(2, item.getQuantity());
-        ps.setDouble(3, item.getPrice());
-        ps.setString(4, item.getRemarks());*/
-
+    public static boolean update(MIRS mirs, List<MIRSItem> mirsItems, List<MIRSItem> removeMirsItems, List<MIRSSignatory> signatories) throws SQLException, ClassNotFoundException  {
         String query = "";
         query = "UPDATE MIRS SET " +
                 "DateFiled='"+Date.valueOf(mirs.getDateFiled())+"', " +
@@ -928,16 +922,20 @@ public class MirsDAO {
                 "applicant='"+mirs.getApplicant()+"' " +
                 "WHERE id='"+mirs.getId()+"';\n";
 
+        //delete mirs items that was cancelled
+        for(MIRSItem item : removeMirsItems){
+            query +="DELETE FROM MIRSItems WHERE id='"+item.getId()+"';\n";
+        }
+
         for(MIRSItem item : mirsItems){
             if(item.getId() == null) { // null mean new item was added
-                query += "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id) " +
+                query += "INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id, isAdditional) " +
                         "VALUES " +
-                        "('" + mirs.getId() + "','" + item.getStockID() + "','" + item.getQuantity() + "','" + item.getPrice() + "','" + item.getRemarks() + "',GETDATE(),GETDATE(), '" + Utility.generateRandomId() + "');\n";
+                        "('" + mirs.getId() + "','" + item.getStockID() + "','" + item.getQuantity() + "','" + item.getPrice() + "','" + item.getRemarks() + "',GETDATE(),GETDATE(), '" + Utility.generateRandomId() + "', '"+item.isAdditional()+"');\n";
             }else{
                 query+="UPDATE MIRSItems SET Quantity = '" + item.getQuantity() + "' WHERE id = '"+item.getId()+"';\n";
             }
         }
-
 
         query +="DELETE FROM MIRSSignatories WHERE MIRSID='"+mirs.getId()+"';\n";
         for(MIRSSignatory msig : signatories){
@@ -950,8 +948,6 @@ public class MirsDAO {
                     "'"+msig.getComments()+"',GETDATE(),GETDATE()," +
                     "'"+Utility.generateRandomId()+"'); \n";
         }
-
-
         Connection conn = DB.getConnection();
 
         try {

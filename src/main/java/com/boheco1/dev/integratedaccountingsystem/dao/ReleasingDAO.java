@@ -30,7 +30,7 @@ public class ReleasingDAO {
         ps.close();
     }
 
-    public static boolean add(List<Releasing> releasingList, MCT mct, MIRS mirs) throws Exception {
+    public static boolean add(List<Releasing> releasingList, List<MIRSItem> mirsItems, MCT mct, MIRS mirs) throws Exception {
         String query = "";
         String mct_number = null;
         if(mct != null) {
@@ -40,9 +40,13 @@ public class ReleasingDAO {
             mct_number = mct.getMctNo();
         }
 
+        for(MIRSItem item : mirsItems){
+            query +="INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id, isAdditional) " +
+                    "VALUES " +
+                    "('"+item.getMirsID()+"','"+item.getStockID()+"','"+item.getQuantity()+"','"+item.getPrice()+"','"+item.getRemarks()+"',GETDATE(),GETDATE(), '"+item.getId()+"', '"+item.isAdditional()+"');\n";
+        }
+
         for(Releasing releasing : releasingList){
-
-
             if(mct_number == null){
                 query+="INSERT INTO Releasing (StockID, MIRSID, Quantity, Price, UserID, Status, CreatedAt, UpdatedAt, id) " +
                         "VALUES ('"+releasing.getStockID()+"', " +

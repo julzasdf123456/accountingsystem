@@ -46,7 +46,7 @@ public class MIRSReleasingController implements Initializable {
     private JFXListView<MIRSItem> requestedList, releasingList;
 
     private Stock selectedStock = null;
-    private List<MIRSItem> forIndividualized = new ArrayList<>();
+    private List<MIRSItem> additionalMirsItem = new ArrayList<>();
     private MIRS mirs;
 
     @Override
@@ -240,13 +240,14 @@ public class MIRSReleasingController implements Initializable {
 
             //MirsDAO.update(mirs);
 
-            if(ReleasingDAO.add(readyForRelease, mct, mirs)) {
+            if(ReleasingDAO.add(readyForRelease, additionalMirsItem, mct, mirs)) {
                 //clear hashmap that contains all itemized records
                 Utility.getItemizedMirsItems().clear();
                 String notif_details = "MIRS (" + mirs.getId() + ") was released.";
                 Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
                 NotificationsDAO.create(torequisitioner);
                 releasingList.getItems().clear();
+                Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(MIRSReleasingController.class, "../warehouse_mirs_releasing.fxml"));
                 AlertDialogBuilder.messgeDialog("System Message", "MIRS items released.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
             }else{
                 AlertDialogBuilder.messgeDialog("System Message", "Sorry an error was encountered during saving, please try again.",
@@ -279,6 +280,7 @@ public class MIRSReleasingController implements Initializable {
         mirsItem.setPrice(selectedStock.getPrice());
         mirsItem.setId(Utility.generateRandomId());
         mirsItem.setAdditional(true);
+        additionalMirsItem.add(mirsItem);
         releasingList.getItems().add(mirsItem);
 
         selectedStock = null; //set to null for validation
@@ -347,7 +349,9 @@ public class MIRSReleasingController implements Initializable {
                     for (MIRSItem selected : selectedItems) {
 
                         if(selected.getId() == null){
-                            releasingList.getItems().remove(selected);
+                            releasingList.getItems().removeAll(additionalMirsItem); //remove additional items from the requested list
+                            releasingList.getItems().remove(selected); //remove selected item from the releasing list
+                            additionalMirsItem.remove(selected); //remove additional items from the additionalMirsItem list
                             break;
                         }
 

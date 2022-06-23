@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
+import com.boheco1.dev.integratedaccountingsystem.HomeController;
 import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
@@ -59,6 +60,7 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
     private MIRS mirs;
     private List<MIRSSignatory> mirsSignatoryList;
     private ObservableList<MIRSItem> mirsItemList;
+    private List<MIRSItem> removeMirsItems = new ArrayList<>();
 
 
     @Override
@@ -91,6 +93,7 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
 
     private void fillUpFields(MIRS m) throws Exception {
         mirsItemList = FXCollections.observableList(MirsDAO.getItems(m));
+
         mirsSignatoryList = MIRSSignatoryDAO.get(m);
         mirsNumber.setText("MIRS #: "+m.getId());
         applicant.setText(m.getApplicant());
@@ -112,6 +115,7 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
 
         selectedItem.addAll(mirsItemList);
         mirsItemTable.setItems(selectedItem);
+        mirsItemTable.sort();
         countRow.setText(""+selectedItem.size());
     }
 
@@ -188,9 +192,10 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
                         mirsSignatoryList.add(mirsSignatory);
                     }
 
-                    if(MirsDAO.update(mirsUpdate, mirsItemList,mirsSignatoryList)){ //return true saved successfully
+                    if(MirsDAO.update(mirsUpdate, mirsItemList,removeMirsItems,mirsSignatoryList)){ //return true saved successfully
                         AlertDialogBuilder.messgeDialog("System Message", "MIRS request successfully updated, please wait for the approval, thank you!",
                                 Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "user_my_mirs_application.fxml", Utility.getContentPane(), Utility.getSubToolbar(), new Label("My MIRS Application: ")));
                         String details = "New MIRS ("+mirs.getId()+") was updated.";
                         Notifications tochecker = new Notifications(details, Utility.NOTIF_MIRS_APROVAL, ActiveUser.getUser().getEmployeeID(), checkedEmployeeInfo.getId(), mirs.getId());
                         Notifications toApprover = new Notifications(details, Utility.NOTIF_MIRS_APROVAL, ActiveUser.getUser().getEmployeeID(), approvedEmployeeInfo.getId(), mirs.getId());
@@ -224,6 +229,7 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
             return;
         }
 
+
         //will update quantity if item is already added to the request
         for(MIRSItem added: selectedItem){
             if(added.getStockID().equals(selectedStock.getId())){
@@ -235,7 +241,7 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
                 pending.setText("Pending: 0");
                 available.setText("Available: 0");
                 mirsItemTable.refresh();
-
+                mirsItemTable.sort();
                 items.requestFocus();
                 return;
             }
@@ -250,7 +256,8 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
         mirsItem.setAdditional(false);
 
         selectedItem.add(mirsItem);
-        mirsItemTable.setItems(selectedItem);
+        mirsItemTable.refresh();
+        mirsItemTable.sort();
 
         selectedStock = null; //set to null for validation
         items.setText("");
@@ -335,12 +342,12 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
                                                 public void handle(ActionEvent __) {
                                                     try {
                                                         if(mirsItem.getId() != null){
-                                                            MirsDAO.removeItem(mirsItem);
+                                                            removeMirsItems.add(mirsItem);
+                                                            selectedItem.remove(mirsItem);
+                                                            mirsItemTable.refresh();
+                                                            countRow.setText(""+selectedItem.size());
+                                                            dialog.close();
                                                         }
-                                                        selectedItem.remove(mirsItem);
-                                                        mirsItemTable.refresh();
-                                                        countRow.setText(""+selectedItem.size());
-                                                        dialog.close();
                                                     } catch (Exception e) {
                                                         e.printStackTrace();
                                                     }
@@ -363,10 +370,12 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
 
         actionCol.setCellFactory(cellFactory);
         actionCol.setStyle("-fx-alignment: center;");
-
+        descriptionCol.setSortType(TableColumn.SortType.ASCENDING);
+        mirsItemTable.getSortOrder().add(descriptionCol);
         mirsItemTable.getColumns().add(neaCodeCol);
         mirsItemTable.getColumns().add(descriptionCol);
         mirsItemTable.getColumns().add(quantityCol);
+
 
         if(mirs.getStatus().equals(Utility.PENDING) )
             mirsItemTable.getColumns().add(actionCol);
@@ -375,6 +384,7 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
         mirsItemTable.setPlaceholder(new Label("No item Added"));
 
         selectedItem =  FXCollections.observableArrayList();
+
     }
 
     private void bindParticularsAutocomplete(JFXTextField textField){
