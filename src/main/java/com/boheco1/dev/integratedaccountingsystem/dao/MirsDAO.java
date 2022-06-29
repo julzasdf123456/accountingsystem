@@ -840,7 +840,7 @@ public class MirsDAO {
     }
 
     public static boolean create(MIRS mirs, List<MIRSItem> mirsItems, List<MIRSSignatory> signatories) throws SQLException, ClassNotFoundException {
-        String mirsId = NumberGenerator.mirsNumber();
+        String mirsId = Utility.STATION+"-"+NumberGenerator.mirsNumber();
 
         String query = "";
         query +="INSERT INTO MIRS (DateFiled, Purpose, Details, Status, RequisitionerID, UserID, id, CreatedAt, UpdatedAt, address, applicant) " +
