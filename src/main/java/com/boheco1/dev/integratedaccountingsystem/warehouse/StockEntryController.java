@@ -124,8 +124,8 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.stock.setNeaCode(neaCode);
         this.stock.setCritical(threshold);
 
-        if (localCode.length() < 10 || localCode == null) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid local code!",
+        if (localCode.length() < 4 || localCode == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid local code! Minimum of 4 characters!",
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (desc.length() == 0 || desc == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid description!",

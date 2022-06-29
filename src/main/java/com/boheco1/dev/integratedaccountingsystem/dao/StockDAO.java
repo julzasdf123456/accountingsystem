@@ -938,11 +938,10 @@ public class StockDAO {
      * @return The List of Releasing for this particular Stock
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static List<Releasing> getReleasedStocks(Stock stock, String status) throws Exception {
+    public static List<Releasing> getReleasedStocks(Stock stock) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM Releasing WHERE StockID=? AND status=? ORDER BY UpdatedAt DESC;");
+                "SELECT * FROM Releasing WHERE StockID=? ORDER BY UpdatedAt DESC;");
         ps.setString(1, stock.getId());
-        ps.setString(2, status);
         ResultSet rs = ps.executeQuery();
 
         ArrayList<Releasing> releasedStocks = new ArrayList<>();
@@ -956,7 +955,6 @@ public class StockDAO {
                     rs.getDouble("Price"),
                     rs.getString("UserID"),
                     rs.getString("Status"),
-                    rs.getString("MR"),
                     rs.getString("WorkOrderNo"),
                     rs.getString("mct_no")
             );
@@ -1235,7 +1233,7 @@ public class StockDAO {
                         "Releasing.CreatedAt as releasedCreatedAt, Releasing.UpdatedAt as releasedUpdatedAt " +
                         "FROM Stocks LEFT JOIN Releasing " +
                         "ON Releasing.StockID=Stocks.id " +
-                        "WHERE IsTrashed=0 AND Releasing.CreatedAt BETWEEN ? AND ? AND Releasing.Status='released' " +
+                        "WHERE IsTrashed=0 AND Releasing.CreatedAt BETWEEN ? AND ? " +
                         "ORDER BY Releasing.UpdatedAt ASC, Stocks.StockName ASC");
 
         ps.setDate(1, Date.valueOf(from));

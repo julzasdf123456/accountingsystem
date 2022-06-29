@@ -315,6 +315,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         mirsItem.setUnit(stock.getUnit());
         mirsItem.setQuantity(qty);
         mirsItem.setPrice(stock.getPrice());
+        mirsItem.setAdditional(false);
 
         mirsItemRequested.add(mirsItem);
         mirsItemTable.refresh();
