@@ -410,7 +410,7 @@ public class ViewStockController implements Initializable {
      */
     public void initializeStockReleases(){
         try {
-            ObservableList<Releasing> stocks = FXCollections.observableList(StockDAO.getReleasedStocks(stock, Utility.RELEASED));
+            ObservableList<Releasing> stocks = FXCollections.observableList(StockDAO.getReleasedStocks(stock));
             stockReleases.getItems().setAll(stocks);
         } catch (Exception e) {
             e.printStackTrace();
