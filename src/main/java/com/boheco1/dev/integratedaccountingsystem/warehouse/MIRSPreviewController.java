@@ -278,7 +278,7 @@ public class MIRSPreviewController implements Initializable {
 
                     //table content
                     for(MIRSItem mirsItem : MirsDAO.getItems(mirs)){
-                        pdf.createCell(StockDAO.get(mirsItem.getStockID()).getNeaCode(), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
+                        pdf.createCell(mirsItem.getStockID(), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
                         pdf.createCell(StockDAO.get(mirsItem.getStockID()).getDescription().toUpperCase(), 4, 11, Font.NORMAL, Element.ALIGN_LEFT);
                         pdf.createCell(""+mirsItem.getQuantity(), 1, 10, Font.NORMAL, Element.ALIGN_CENTER);
                     }

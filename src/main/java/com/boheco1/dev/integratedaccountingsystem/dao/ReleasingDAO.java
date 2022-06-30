@@ -40,6 +40,7 @@ public class ReleasingDAO {
             mct_number = mct.getMctNo();
         }
 
+        //insert additional MIRS item
         for(MIRSItem item : mirsItems){
             query +="INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id, isAdditional) " +
                     "VALUES " +
@@ -69,14 +70,22 @@ public class ReleasingDAO {
             }
         }
 
-        query+="UPDATE MIRS SET " +
-                        "Status='"+mirs.getStatus()+"', UpdatedAt=GETDATE() " +
-                        "WHERE id='"+mirs.getId()+"';\n";
-
         //get all itemized from the global variable itemizedMirsItems
         for (ItemizedMirsItem i : Utility.getItemizedMirsItems().values()){
             query+="INSERT INTO itemizedMirsItem (id, MIRSItemID, brand, serial, remarks) " +
                     "VALUES ('"+i.getId()+"','"+i.getMirsItemID()+"','"+i.getBrand()+"','"+i.getSerial()+"','"+i.getRemarks()+"');\n";
+        }
+
+        query+="UPDATE MIRS SET " +
+                        "Status='"+mirs.getStatus()+"', UpdatedAt=GETDATE() " +
+                        "WHERE id='"+mirs.getId()+"';\n";
+
+        for(Releasing releasing : releasingList){
+            Stock temp = StockDAO.get(releasing.getStockID());
+            int qty = temp.getQuantity() -releasing.getQuantity();
+
+            query+="UPDATE Stocks SET quantity='"+qty+"', UpdatedAt=GETDATE(), UserIDUpdated='"+ActiveUser.getUser().getId()+"' " +
+                    "WHERE id = '"+temp.getId()+"';\n";
         }
 
         System.out.println(query);
