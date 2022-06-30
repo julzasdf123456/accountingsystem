@@ -174,7 +174,6 @@ public class MCTDao {
                     rs2.getDouble("Price"),
                     rs2.getString("UserID"),
                     rs2.getString("Status"),
-                    rs2.getString("MR"),
                     rs2.getString("WorkOrderNo"),
                     rs2.getString("mct_no"));
             releasings.add(r);

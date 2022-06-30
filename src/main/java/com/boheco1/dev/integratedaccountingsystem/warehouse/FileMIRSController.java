@@ -337,14 +337,14 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     }
 
     private void initializeItemTable() {
-        TableColumn<MIRSItem, String> neaCodeCol = new TableColumn<>("NEA Code");
+        TableColumn<MIRSItem, String> neaCodeCol = new TableColumn<>("Stock ID");
         neaCodeCol.setStyle("-fx-alignment: center;");
         neaCodeCol.setPrefWidth(150);
         neaCodeCol.setMaxWidth(150);
         neaCodeCol.setMinWidth(150);
         neaCodeCol.setCellValueFactory(cellData -> {
             try {
-                return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getNeaCode());
+                return new SimpleStringProperty(Objects.requireNonNull(cellData.getValue().getStockID()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
