@@ -5,7 +5,7 @@ public class MRTItem {
     private String releasingID;
     private String mrtID;
     private int quantity;
-
+    private String stockID;
     public String getId() {
         return id;
     }
@@ -43,5 +43,13 @@ public class MRTItem {
         this.releasingID = releasingID;
         this.mrtID = mrtID;
         this.quantity = quantity;
+    }
+
+    public String getStockID() {
+        return stockID;
+    }
+
+    public void setStockID(String stockID) {
+        this.stockID = stockID;
     }
 }
