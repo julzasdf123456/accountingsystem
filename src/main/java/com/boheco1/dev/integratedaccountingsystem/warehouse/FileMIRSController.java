@@ -175,6 +175,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
     @FXML
     void uploadMirsItem(ActionEvent event) {
+        errorLog = "";
         Stage stage = (Stage) Utility.getStackPane().getScene().getWindow();
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(

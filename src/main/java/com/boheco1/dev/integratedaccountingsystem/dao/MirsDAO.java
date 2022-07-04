@@ -249,6 +249,43 @@ public class MirsDAO {
     }
 
     /**
+     * Retrieves one MIRSItems that belong to a single MIRS record
+     * @param id the MIRSItems id
+     * @return MIRSItem
+     * @throws Exception
+     */
+    public static MIRSItem getItems(String id) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MIRSItems WHERE id=?");
+        ps.setString(1, id);
+
+        ResultSet rs = ps.executeQuery();
+
+        if(rs.next()) {
+            MIRSItem mirsItem = new MIRSItem(
+                    rs.getString("id"),
+                    rs.getString("MIRSID"),
+                    rs.getString("StockID"),
+                    rs.getInt("Quantity"),
+                    rs.getDouble("Price"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                    rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                    rs.getBoolean("IsAdditional")
+            );
+
+            rs.close();
+            ps.close();
+            return mirsItem;
+        }
+
+        rs.close();
+        ps.close();
+
+        return null;
+    }
+
+    /**
      * Retrieves a group of MIRSItems that belong to a single MIRS record which are not yet released
      * @param mirs the MIRS File from which the the MIRSItems belong
      * @return List of MIRSItem

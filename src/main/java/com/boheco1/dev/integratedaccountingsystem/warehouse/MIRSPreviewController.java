@@ -92,14 +92,14 @@ public class MIRSPreviewController implements Initializable {
         }
 
         ObservableList<ReleasedItemDetails> observableList = FXCollections.observableArrayList(mirsItemList);
-        TableColumn<ReleasedItemDetails, String> neaCodeCol = new TableColumn<>("NEA Code");
-        neaCodeCol.setStyle("-fx-alignment: center;");
-        neaCodeCol.setPrefWidth(150);
-        neaCodeCol.setMaxWidth(150);
-        neaCodeCol.setMinWidth(150);
-        neaCodeCol.setCellValueFactory(cellData -> {
+        TableColumn<ReleasedItemDetails, String> stockIdCol = new TableColumn<>("Stock Id");
+        stockIdCol.setStyle("-fx-alignment: center;");
+        stockIdCol.setPrefWidth(150);
+        stockIdCol.setMaxWidth(150);
+        stockIdCol.setMinWidth(150);
+        stockIdCol.setCellValueFactory(cellData -> {
             try {
-                return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getNeaCode());
+                return new SimpleStringProperty(Objects.requireNonNull(cellData.getValue().getStockID()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -109,7 +109,12 @@ public class MIRSPreviewController implements Initializable {
         TableColumn<ReleasedItemDetails, String> descriptionCol = new TableColumn<>("Description");
         descriptionCol.setCellValueFactory(cellData -> {
             try {
-                return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getDescription());
+                String prefix = "";
+                MIRSItem temp = MirsDAO.getItems(cellData.getValue().getMirsItemId());
+                if(temp.isAdditional())
+                    prefix="+";
+
+                return new SimpleStringProperty(prefix+""+Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getDescription());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -144,11 +149,11 @@ public class MIRSPreviewController implements Initializable {
         statusCol.setMinWidth(100);
         statusCol.setCellValueFactory(new PropertyValueFactory<>("Status"));
 
-        //requestedTable.getColumns().add(neaCodeCol);
-        requestedTable.getColumns().add(descriptionCol);
         requestedTable.getColumns().add(quantityCol);
         requestedTable.getColumns().add(remainingCol);
         requestedTable.getColumns().add(actualCol);
+        requestedTable.getColumns().add(stockIdCol);
+        requestedTable.getColumns().add(descriptionCol);
         requestedTable.getColumns().add(statusCol);
         requestedTable.setPlaceholder(new Label("No item Added"));
         requestedTable.getItems().setAll(observableList);
@@ -165,15 +170,14 @@ public class MIRSPreviewController implements Initializable {
             return;
 
         ObservableList<Releasing> observableList = FXCollections.observableArrayList(releasedIitems);
-
-        TableColumn<Releasing, String> neaCodeCol = new TableColumn<>("NEA Code");
-        neaCodeCol.setStyle("-fx-alignment: center;");
-        neaCodeCol.setPrefWidth(150);
-        neaCodeCol.setMaxWidth(150);
-        neaCodeCol.setMinWidth(150);
-        neaCodeCol.setCellValueFactory(cellData -> {
+        TableColumn<Releasing, String> stockIdCol = new TableColumn<>("Stock Id");
+        stockIdCol.setStyle("-fx-alignment: center;");
+        stockIdCol.setPrefWidth(150);
+        stockIdCol.setMaxWidth(150);
+        stockIdCol.setMinWidth(150);
+        stockIdCol.setCellValueFactory(cellData -> {
             try {
-                return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getNeaCode());
+                return new SimpleStringProperty(Objects.requireNonNull(cellData.getValue().getStockID()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -211,10 +215,10 @@ public class MIRSPreviewController implements Initializable {
             return null;
         });
 
-        //releasedTable.getColumns().add(neaCodeCol);
-        releasedTable.getColumns().add(descriptionCol);
-        releasedTable.getColumns().add(quantityCol);
         releasedTable.getColumns().add(dateCol);
+        releasedTable.getColumns().add(quantityCol);
+        releasedTable.getColumns().add(stockIdCol);
+        releasedTable.getColumns().add(descriptionCol);
         releasedTable.setPlaceholder(new Label("No item Added"));
         releasedTable.getItems().setAll(observableList);
     }

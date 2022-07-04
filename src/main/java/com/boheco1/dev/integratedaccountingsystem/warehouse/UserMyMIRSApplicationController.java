@@ -276,14 +276,14 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
     }
 
     private void initializeItemTable() {
-        TableColumn<MIRSItem, String> neaCodeCol = new TableColumn<>("NEA Code");
-        neaCodeCol.setStyle("-fx-alignment: center;");
-        neaCodeCol.setPrefWidth(150);
-        neaCodeCol.setMaxWidth(150);
-        neaCodeCol.setMinWidth(150);
-        neaCodeCol.setCellValueFactory(cellData -> {
+        TableColumn<MIRSItem, String> stockIdCol = new TableColumn<>("Stock Id");
+        stockIdCol.setStyle("-fx-alignment: center;");
+        stockIdCol.setPrefWidth(150);
+        stockIdCol.setMaxWidth(150);
+        stockIdCol.setMinWidth(150);
+        stockIdCol.setCellValueFactory(cellData -> {
             try {
-                return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getNeaCode());
+                return new SimpleStringProperty(Objects.requireNonNull(cellData.getValue().getStockID()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -372,7 +372,7 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
         actionCol.setStyle("-fx-alignment: center;");
         descriptionCol.setSortType(TableColumn.SortType.ASCENDING);
         mirsItemTable.getSortOrder().add(descriptionCol);
-        mirsItemTable.getColumns().add(neaCodeCol);
+        mirsItemTable.getColumns().add(stockIdCol);
         mirsItemTable.getColumns().add(descriptionCol);
         mirsItemTable.getColumns().add(quantityCol);
 
