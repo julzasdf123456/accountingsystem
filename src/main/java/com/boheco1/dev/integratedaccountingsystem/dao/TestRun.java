@@ -14,10 +14,15 @@ import java.util.List;
 public class TestRun {
     public static void main(String[] args) {
         try {
-            List<StockDescription> list = new ArrayList<>();
-            list = StockDAO.searchDescription("BLADE");
-            for(StockDescription sd: list) {
-                System.out.println(sd.getId() + " : " + sd.getDescription());
+            String des = "TEST BLOCK 10 BLADES";
+            if(StockDAO.hasMultiple(des)) {
+                List<SlimStock> stocks = StockDAO.getByDescription(des);
+                System.out.println(des + " has the following brands...");
+                for(SlimStock s: stocks) {
+                    System.out.println(s.getBrand());
+                }
+            }else {
+                System.out.println(des + " is a single item.");
             }
         }catch(Exception ex) {
             ex.printStackTrace();

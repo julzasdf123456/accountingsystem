@@ -1427,6 +1427,47 @@ public class StockDAO {
             ));
         }
 
+        rs.close();
+        ps.close();
         return stockDescriptions;
+    }
+
+    public static boolean hasMultiple(String description) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT COUNT(id) as count FROM Stocks WHERE Description=?");
+        ps.setString(1, description);
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+
+        return rs.getInt("count")>1;
+    }
+
+    public static List<SlimStock> getByDescription(String description) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT id, StockName, Brand, Model, Description, Price, Unit, Quantity FROM Stocks " +
+                        "WHERE Description=? ORDER BY Brand");
+
+        ps.setString(1, description);
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<SlimStock> stocks = new ArrayList<>();
+        while(rs.next()) {
+            SlimStock stock = new SlimStock(
+                    rs.getString("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Model"),
+                    rs.getString("Brand"));
+            stock.setDescription(rs.getString("Description"));
+            stock.setPrice(rs.getDouble("Price"));
+            stock.setUnit(rs.getString("Unit"));
+            stock.setQuantity(rs.getInt("Quantity"));
+            stocks.add(stock);
+        }
+
+        rs.close();
+        ps.close();
+
+        return stocks;
     }
 }
