@@ -188,14 +188,13 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                 //Create Total display
                 pdf.createCell(1,3);
                 pdf.createCell("TOTAL", 1, 11, Font.BOLD, Element.ALIGN_CENTER);
-                pdf.createCell(String.format("%,.2f",total), 1, 11, Font.BOLD, Element.ALIGN_RIGHT);
-                pdf.createCell(1,2);
+                pdf.createCell(" "+String.format("%,.2f",total), 3, 11, Font.BOLD, Element.ALIGN_LEFT);
 
                 //Create account code summary
                 for(Map.Entry<String, Double> acctCode : acctCodeSummary.entrySet()){
                     pdf.createCell(acctCode.getKey(), 1, 11, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
-                    pdf.createCell(String.format("%,.2f", acctCode.getValue()), 1, 11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
-                    pdf.createCell(" ", 5, 11, Font.NORMAL, Element.ALIGN_RIGHT, Rectangle.NO_BORDER);
+                    pdf.createCell(String.format("%,.2f", acctCode.getValue()), 6, 11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
+                    //spdf.createCell(" ", 5, 11, Font.NORMAL, Element.ALIGN_RIGHT, Rectangle.NO_BORDER);
                 }
 
                 //create signatories
