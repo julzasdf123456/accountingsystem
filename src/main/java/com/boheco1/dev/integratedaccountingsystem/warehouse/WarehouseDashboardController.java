@@ -197,9 +197,9 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
 
         TableColumn<MIRS, String> column1 = new TableColumn<>("MIRS Number");
         column1.setCellValueFactory(new PropertyValueFactory<>("Id"));
-        column1.setPrefWidth(150);
-        column1.setMaxWidth(150);
-        column1.setMinWidth(150);
+        column1.setPrefWidth(200);
+        column1.setMaxWidth(200);
+        column1.setMinWidth(200);
         column1.setStyle("-fx-alignment: center;");
 
         TableColumn<MIRS, String> column2 = new TableColumn<>("Requisitioner");

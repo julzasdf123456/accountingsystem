@@ -247,7 +247,7 @@ public class MIRSReleasingController implements Initializable {
                 Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
                 NotificationsDAO.create(torequisitioner);
                 releasingList.getItems().clear();
-                Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(MIRSReleasingController.class, "../warehouse_mirs_releasing.fxml"));
+                Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(MIRSReleasingController.class, "../warehouse_dashboard_controller.fxml"));
                 AlertDialogBuilder.messgeDialog("System Message", "MIRS items released.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
             }else{
                 AlertDialogBuilder.messgeDialog("System Message", "Sorry an error was encountered during saving, please try again.",

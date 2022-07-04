@@ -52,12 +52,14 @@ public class UserTaskApprovalController extends MenuControllerHandler implements
     private void initializeMirsTable() {
         try {
             TableColumn<MIRS, String> mirsIdCol = new TableColumn<>("MIRS #");
-            mirsIdCol.setPrefWidth(100);
-            mirsIdCol.setMaxWidth(100);
-            mirsIdCol.setMinWidth(100);
+            mirsIdCol.setStyle("-fx-alignment: center;");
+            mirsIdCol.setPrefWidth(200);
+            mirsIdCol.setMaxWidth(200);
+            mirsIdCol.setMinWidth(200);
             mirsIdCol.setCellValueFactory(new PropertyValueFactory<>("mirsID"));
 
             TableColumn<MIRS, String> mirsDateFiled = new TableColumn<>("Date Filed");
+            mirsDateFiled.setStyle("-fx-alignment: center;");
             mirsDateFiled.setPrefWidth(150);
             mirsDateFiled.setMaxWidth(150);
             mirsDateFiled.setMinWidth(150);

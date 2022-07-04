@@ -48,18 +48,21 @@ public class MIRSViewAllController extends MenuControllerHandler implements Init
     private void initializeMirsTable() {
         try {
             TableColumn<MIRS, String> mirsIdCol = new TableColumn<>("MIRS #");
-            mirsIdCol.setPrefWidth(100);
-            mirsIdCol.setMaxWidth(100);
-            mirsIdCol.setMinWidth(100);
+            mirsIdCol.setStyle("-fx-alignment: center;");
+            mirsIdCol.setPrefWidth(200);
+            mirsIdCol.setMaxWidth(200);
+            mirsIdCol.setMinWidth(200);
             mirsIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 
             TableColumn<MIRS, String> mirsDateFiled = new TableColumn<>("Date Filed");
-            mirsDateFiled.setPrefWidth(100);
-            mirsDateFiled.setMaxWidth(100);
-            mirsDateFiled.setMinWidth(100);
+            mirsDateFiled.setStyle("-fx-alignment: center;");
+            mirsDateFiled.setPrefWidth(110);
+            mirsDateFiled.setMaxWidth(110);
+            mirsDateFiled.setMinWidth(110);
             mirsDateFiled.setCellValueFactory(new PropertyValueFactory<>("dateFiled"));
 
             TableColumn<MIRS, String> mirsStatus = new TableColumn<>("Status");
+            mirsStatus.setStyle("-fx-alignment: center;");
             mirsStatus.setPrefWidth(100);
             mirsStatus.setMaxWidth(100);
             mirsStatus.setMinWidth(100);

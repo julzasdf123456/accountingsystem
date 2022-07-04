@@ -90,14 +90,14 @@ public class UserMIRSPreviewController implements Initializable {
         }
 
         ObservableList<ReleasedItemDetails> observableList = FXCollections.observableArrayList(mirsItemList);
-        TableColumn<ReleasedItemDetails, String> neaCodeCol = new TableColumn<>("NEA Code");
-        neaCodeCol.setStyle("-fx-alignment: center;");
-        neaCodeCol.setPrefWidth(150);
-        neaCodeCol.setMaxWidth(150);
-        neaCodeCol.setMinWidth(150);
-        neaCodeCol.setCellValueFactory(cellData -> {
+        TableColumn<ReleasedItemDetails, String> stockIdCol = new TableColumn<>("Stock Id");
+        stockIdCol.setStyle("-fx-alignment: center;");
+        stockIdCol.setPrefWidth(200);
+        stockIdCol.setMaxWidth(200);
+        stockIdCol.setMinWidth(200);
+        stockIdCol.setCellValueFactory(cellData -> {
             try {
-                return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getNeaCode());
+                return new SimpleStringProperty(Objects.requireNonNull(cellData.getValue().getStockID()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -107,7 +107,12 @@ public class UserMIRSPreviewController implements Initializable {
         TableColumn<ReleasedItemDetails, String> descriptionCol = new TableColumn<>("Description");
         descriptionCol.setCellValueFactory(cellData -> {
             try {
-                return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getDescription());
+                String prefix = "";
+                MIRSItem temp = MirsDAO.getItems(cellData.getValue().getMirsItemId());
+                if(temp.isAdditional())
+                    prefix="+";
+
+                return new SimpleStringProperty(prefix+""+Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getDescription());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -122,7 +127,7 @@ public class UserMIRSPreviewController implements Initializable {
         quantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
 
 
-        //requestedTable.getColumns().add(neaCodeCol);
+        requestedTable.getColumns().add(stockIdCol);
         requestedTable.getColumns().add(descriptionCol);
         requestedTable.getColumns().add(quantityCol);
         requestedTable.setPlaceholder(new Label("No item Added"));

@@ -10,7 +10,7 @@ public class ReleasedItems {
     private String mctNo;
     private double price;
     private int quantity;
-
+    private String stockID;
     private int balance;
 
     public ReleasedItems(String id, String description, String mctNo, double price, int quantity) {
@@ -56,5 +56,13 @@ public class ReleasedItems {
 
     public void setBalance(int balance) {
         this.balance = balance;
+    }
+
+    public String getStockID() {
+        return stockID;
+    }
+
+    public void setStockID(String stockID) {
+        this.stockID = stockID;
     }
 }

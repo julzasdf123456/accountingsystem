@@ -103,7 +103,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
                             AlertDialogBuilder.messgeDialog("System Message", "The return quantity provided should not exceed the maximum released quantity!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                         }else{
                             MRTItem returnItem = new MRTItem(null, item.getId(), null, qty_to_return);
-
+                            returnItem.setStockID(item.getStockID());
                             boolean ok = true;
                             for (MRTItem i : this.mrtItems){
                                 if (i.getReleasingID().equals(returnItem.getReleasingID())) {
@@ -164,7 +164,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
         column1.setMinWidth(120);
         column1.setMaxWidth(120);
         column1.setPrefWidth(120);
-        column1.setCellValueFactory(new PropertyValueFactory<>("id"));
+        column1.setCellValueFactory(new PropertyValueFactory<>("stockID"));
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<ReleasedItems, String> column2 = new TableColumn<>("Description");
@@ -211,7 +211,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
         column1.setMinWidth(120);
         column1.setMaxWidth(120);
         column1.setPrefWidth(120);
-        column1.setCellValueFactory(new PropertyValueFactory<>("releasingID"));
+        column1.setCellValueFactory(new PropertyValueFactory<>("stockID"));
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<MRTItem, String> column2 = new TableColumn<>("Description");

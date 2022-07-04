@@ -37,8 +37,8 @@ public class MRTDao {
                 "VALUES (?,?,?,?)");
 
         //Update Releasing
-        PreparedStatement ps2 = conn.prepareStatement(
-                "UPDATE Releasing SET Quantity=(Quantity-?) WHERE id=?");
+        //PreparedStatement ps2 = conn.prepareStatement(
+        //        "UPDATE Releasing SET Quantity=(Quantity-?) WHERE id=?");
 
         //Insert StockEntryLogs
         PreparedStatement ps3 = conn.prepareStatement(
@@ -46,8 +46,8 @@ public class MRTDao {
                         "VALUES (?,?,?,?,?,?,?,?)");
 
         //Update Quantity in Stocks
-//        PreparedStatement ps4 = conn.prepareStatement(
-//                "UPDATE Stocks SET Quantity = (Quantity + ?) WHERE id=?");
+        PreparedStatement ps4 = conn.prepareStatement(
+                "UPDATE Stocks SET Quantity = (Quantity + ?) WHERE id=?");
 
         for(MRTItem item: items) {
 
@@ -78,11 +78,11 @@ public class MRTDao {
                 ps3.executeUpdate();
 
                 //Update Quantity in Stocks
-//                ps4.setInt(1, item.getQuantity());
-//                ps4.setString(2, releasing.getStockID());
-//                System.out.println("Item Quantity: " + item.getQuantity());
-//                System.out.println("releasing.getStockID" + releasing.getStockID());
-//                ps4.executeUpdate();
+                ps4.setInt(1, item.getQuantity());
+                ps4.setString(2, releasing.getStockID());
+                //System.out.println("Item Quantity: " + item.getQuantity());
+                //System.out.println("releasing.getStockID" + releasing.getStockID());
+                ps4.executeUpdate();
             }catch(SQLException ex) {
                 conn.rollback();
                 throw new Exception(ex.getMessage());
@@ -91,15 +91,16 @@ public class MRTDao {
         conn.commit();
 
         ps1.close();
-        ps2.close();
+        //ps2.close();
         ps3.close();
-//        ps4.close();
+        ps4.close();
         conn.setAutoCommit(true);
     }
 
     public static List<ReleasedItems> searchReleasedItems(String searchKey) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT r.id, s.Description, r.mct_no, r.Price, r.Quantity, r.Quantity - (SELECT COALESCE(SUM(quantity),0) FROM MRTItem WHERE releasing_id = r.id) as Balance FROM Releasing r\n" +
+                "SELECT r.id, s.Description, r.mct_no, r.Price, r.Quantity, r.Quantity - (SELECT COALESCE(SUM(quantity),0) FROM MRTItem WHERE releasing_id = r.id) as Balance, s.id as stockID " +
+                        "FROM Releasing r\n" +
                         "INNER JOIN Stocks s ON s.id = r.StockID \n" +
                         "WHERE r.Quantity > 0 AND mct_no IS NOT NULL \n" +
                         "AND s.Description LIKE ? \n" +
@@ -111,14 +112,16 @@ public class MRTDao {
         List<ReleasedItems> items = new ArrayList();
 
         while(rs.next()) {
-            items.add(new ReleasedItems(
+            ReleasedItems item = new ReleasedItems(
                     rs.getString("id"),
                     rs.getString("Description"),
                     rs.getString("mct_no"),
                     rs.getDouble("price"),
                     rs.getInt("Quantity"),
                     rs.getInt("Balance")
-            ));
+            );
+            item.setStockID(rs.getString("stockID"));
+            items.add(item);
         }
 
         rs.close();
