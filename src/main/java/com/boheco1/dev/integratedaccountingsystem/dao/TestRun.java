@@ -14,9 +14,11 @@ import java.util.List;
 public class TestRun {
     public static void main(String[] args) {
         try {
-            System.out.println("Next MIRS:" + NumberGenerator.mirsNumber());
-            System.out.println("Next MCT:" + NumberGenerator.mctNumber("56"));
-            System.out.println("Next MR:" + NumberGenerator.mrNumber());
+            List<StockDescription> list = new ArrayList<>();
+            list = StockDAO.searchDescription("BLADE");
+            for(StockDescription sd: list) {
+                System.out.println(sd.getId() + " : " + sd.getDescription());
+            }
         }catch(Exception ex) {
             ex.printStackTrace();
         }

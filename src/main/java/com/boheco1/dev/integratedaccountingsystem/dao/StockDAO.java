@@ -1400,4 +1400,33 @@ public class StockDAO {
 
         return stock.getQuantity()-pending;
     }
+
+    /**
+     * Get a list of Stock Descriptions based on a search key
+     * @param key
+     * @return
+     */
+    public static List<StockDescription> searchDescription(String key) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT (SELECT TOP 1 id FROM Stocks s2 WHERE s2.Description=s.Description) AS id, Description\n" +
+                        "FROM Stocks s \n" +
+                        "WHERE s.Description LIKE ? \n" +
+                        "GROUP BY Description\n" +
+                        "ORDER BY Description;");
+
+        ps.setString(1, "%" + key + "%");
+
+        List<StockDescription> stockDescriptions = new ArrayList();
+
+        ResultSet rs = ps.executeQuery();
+
+        while(rs.next()) {
+            stockDescriptions.add(new StockDescription(
+                    rs.getString("id"),
+                    rs.getString("Description")
+            ));
+        }
+
+        return stockDescriptions;
+    }
 }
