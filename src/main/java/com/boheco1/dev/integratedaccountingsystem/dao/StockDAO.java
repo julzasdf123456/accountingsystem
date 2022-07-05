@@ -282,7 +282,7 @@ public class StockDAO {
      */
     public static List<SlimStock> search(String key, int trashed) throws Exception  {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "Select TOP 50 id, StockName, Brand, Model, Description, Price, Unit, Quantity FROM Stocks " +
+                "Select TOP 50 id, StockName, Brand, Model, Description, Price, Unit, Quantity, NEACode, LocalCode FROM Stocks " +
                         "WHERE (StockName LIKE ? OR Description LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
                         "AND IsTrashed=? ORDER BY Description");
         ps.setString(1, "%" + key + "%");
@@ -304,6 +304,12 @@ public class StockDAO {
             stock.setPrice(rs.getDouble("Price"));
             stock.setUnit(rs.getString("Unit"));
             stock.setQuantity(rs.getInt("Quantity"));
+            String neaCode = rs.getString("NeaCode");
+            if (neaCode != null && neaCode.length() != 0) {
+                stock.setCode(neaCode);
+            }else{
+                stock.setCode(rs.getString("LocalCode"));
+            }
             stocks.add(stock);
         }
 
@@ -424,6 +430,12 @@ public class StockDAO {
             stock.setPrice(rs.getDouble("Price"));
             stock.setUnit(rs.getString("Unit"));
             stock.setQuantity(rs.getInt("Quantity"));
+            String neaCode = rs.getString("NeaCode");
+            if (neaCode != null && neaCode.length() != 0) {
+                stock.setCode(neaCode);
+            }else{
+                stock.setCode(rs.getString("LocalCode"));
+            }
             stocks.add(stock);
         }
 

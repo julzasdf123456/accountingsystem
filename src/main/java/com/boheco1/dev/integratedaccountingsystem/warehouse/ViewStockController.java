@@ -122,7 +122,7 @@ public class ViewStockController implements Initializable {
         String serialNumber = this.serialNumber.getText();
         String localCode = this.localCode.getText();
         String accountCode = this.accountCode.getText();
-
+        String neaCode = this.neaCode.getText();
         int threshold = 0;
         int quantity = 0;
         double price = 0;
@@ -170,8 +170,12 @@ public class ViewStockController implements Initializable {
         this.stock.setNeaCode(this.neaCode.getText());
         this.stock.setCritical(threshold);
         this.stock.setIndividualized(this.individualized_cb.isSelected());
-        if (localCode.length() == 0 || localCode == null) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid local code!",
+
+        if (accountCode.length() < 4 || accountCode == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid accounting code! Minimum of 4 characters!",
+                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if ((neaCode == null || neaCode.length() < 4) && (localCode == null || localCode.length() < 4)) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid NEA/Local code! Minimum of 4 characters!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (desc.length() == 0 || desc == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid description!",
@@ -363,7 +367,7 @@ public class ViewStockController implements Initializable {
      */
     public void initializeInformation(){
         this.stockName.setText(stock.getStockName());
-        this.localCode.setText(stock.getId());
+        this.localCode.setText(stock.getLocalCode());
         this.accountCode.setText(stock.getAcctgCode());
         this.neaCode.setText(stock.getNeaCode());
         this.serialNumber.setText(""+stock.getSerialNumber());

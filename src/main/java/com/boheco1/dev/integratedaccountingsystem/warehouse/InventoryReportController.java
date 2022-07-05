@@ -7,6 +7,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -158,7 +159,11 @@ public class InventoryReportController extends MenuControllerHandler implements 
                             row_header = sheet.createRow(row);
 
                             current_stock = row_header.createCell(0);
-                            current_stock.setCellValue(stock.getId());
+                            if (stock.getNeaCode() != null && stock.getNeaCode().length() !=0){
+                                current_stock.setCellValue(stock.getNeaCode());
+                            }else{
+                                current_stock.setCellValue(stock.getLocalCode());
+                            }
                             sname_addr = new CellRangeAddress(row, row, 0, 1);
                             sheet.addMergedRegion(sname_addr);
                             doc.styleMergedCells(sname_addr);
@@ -227,7 +232,13 @@ public class InventoryReportController extends MenuControllerHandler implements 
     public void createTable(){
         TableColumn<Stock, String> column1 = new TableColumn<>("Stock ID");
         column1.setMinWidth(125);
-        column1.setCellValueFactory(new PropertyValueFactory<>("id"));
+        column1.setCellValueFactory(item -> {
+            if (item.getValue().getNeaCode()!=null && item.getValue().getNeaCode().length()!=0) {
+                return new ReadOnlyObjectWrapper<>(item.getValue().getNeaCode());
+            }else{
+                return new ReadOnlyObjectWrapper<>(item.getValue().getLocalCode());
+            }
+        });
 
         TableColumn<Stock, String> column2 = new TableColumn<>("Description");
         column2.setMinWidth(400);
