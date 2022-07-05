@@ -327,7 +327,7 @@ public class StockDAO {
      */
     public static List<SlimStock> search_available(String key) throws Exception  {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "Select TOP 50 id, StockName, Brand, Model, Description, Price, Unit, Quantity FROM Stocks " +
+                "Select TOP 50 id, StockName, Brand, Model, Description, Price, Unit, Quantity, NEACode, LocalCode FROM Stocks " +
                         "WHERE (StockName LIKE ? OR Description LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
                         "AND IsTrashed=0 AND Quantity > 0 ORDER BY Description");
         ps.setString(1, "%" + key + "%");
@@ -348,6 +348,12 @@ public class StockDAO {
             stock.setPrice(rs.getDouble("Price"));
             stock.setUnit(rs.getString("Unit"));
             stock.setQuantity(rs.getInt("Quantity"));
+            String neaCode = rs.getString("NEACode");
+            if (neaCode != null && neaCode.length() != 0) {
+                stock.setCode(rs.getString("NEACode"));
+            }else{
+                stock.setCode(rs.getString("LocalCode"));
+            }
             stocks.add(stock);
         }
 
@@ -365,7 +371,7 @@ public class StockDAO {
      */
     public static List<SlimStock> search_available_in_rr(String key) throws Exception  {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "Select TOP 50 Stocks.id, StockName, Brand, Model, Description, StockEntryLogs.Price, Unit, Stocks.Quantity as Quantity, RRNo FROM Stocks INNER JOIN StockEntryLogs ON Stocks.id = StockEntryLogs.StockID " +
+                "Select TOP 50 Stocks.id, StockName, Brand, Model, Description, StockEntryLogs.Price, Unit, Stocks.Quantity as Quantity, RRNo, NEACode, LocalCode FROM Stocks INNER JOIN StockEntryLogs ON Stocks.id = StockEntryLogs.StockID " +
                         "WHERE (StockName LIKE ? OR Description LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
                         "AND IsTrashed=0 AND Stocks.Quantity > 0 ORDER BY RRNo");
         ps.setString(1, "%" + key + "%");
@@ -387,6 +393,12 @@ public class StockDAO {
             stock.setUnit(rs.getString("Unit"));
             stock.setQuantity(rs.getInt("Quantity"));
             stock.setRRNo(rs.getString("RRNo"));
+            String neaCode = rs.getString("NEACode");
+            if (neaCode != null && neaCode.length() != 0) {
+                stock.setCode(rs.getString("NEACode"));
+            }else{
+                stock.setCode(rs.getString("LocalCode"));
+            }
             stocks.add(stock);
         }
 

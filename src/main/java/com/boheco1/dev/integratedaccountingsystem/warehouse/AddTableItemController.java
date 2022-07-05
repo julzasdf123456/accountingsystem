@@ -108,7 +108,7 @@ public class AddTableItemController extends MenuControllerHandler implements Ini
     public void createTable(){
         TableColumn<SlimStock, String> column1 = new TableColumn<>("Code");
         column1.setMinWidth(100);
-        column1.setCellValueFactory(new PropertyValueFactory<>("id"));
+        column1.setCellValueFactory(new PropertyValueFactory<>("Code"));
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<SlimStock, String> column3 = new TableColumn<>("Description");
