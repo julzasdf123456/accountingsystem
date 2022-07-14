@@ -520,7 +520,11 @@ public class ReceivingReportController extends MenuControllerHandler implements 
             row_header = sheet.createRow(row);
 
             current_stock_code = row_header.createCell(0);
-            current_stock_code.setCellValue(stock.getId());
+            if (stock.getNeaCode() != null && stock.getNeaCode().length() != 0){
+                current_stock_code.setCellValue(stock.getNeaCode());
+            }else{
+                current_stock_code.setCellValue(stock.getLocalCode());
+            }
             doc.styleBorder(current_stock_code, 10, HorizontalAlignment.LEFT, false);
 
             current_desc = row_header.createCell(1);

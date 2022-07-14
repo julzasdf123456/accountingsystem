@@ -336,7 +336,7 @@ public class ReceivingDAO {
 
     public static List<Stock> getReceivingItems(String rrno) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT Stocks.id, Stocks.StockName, Stocks.Description, Stocks.Unit, Stocks.LocalCode, Stocks.AcctgCode, " +
+                "SELECT Stocks.id, Stocks.StockName, Stocks.Description, Stocks.Unit, Stocks.LocalCode, Stocks.AcctgCode, Stocks.NEACode, " +
                         "ReceivingItem.QtyDelivered, ReceivingItem.QtyAccepted, ReceivingItem.UnitCost " +
                         "FROM Stocks LEFT JOIN ReceivingItem " +
                         "ON ReceivingItem.StockID=Stocks.id " +
@@ -355,6 +355,7 @@ public class ReceivingDAO {
             stock.setUnit(rs.getString("Unit"));
             stock.setLocalCode(rs.getString("LocalCode"));
             stock.setAcctgCode(rs.getString("AcctgCode"));
+            stock.setNeaCode(rs.getString("NEACode"));
 
             ReceivingItem item = new ReceivingItem();
             item.setRrNo(rrno);

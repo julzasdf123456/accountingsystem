@@ -6,6 +6,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXTextField;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -183,7 +184,13 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
         TableColumn<Stock, String> column1 = new TableColumn<>("Code");
         column1.setMinWidth(100);
         column1.setPrefWidth(120);
-        column1.setCellValueFactory(new PropertyValueFactory<>("id"));
+        column1.setCellValueFactory(item -> {
+            if (item.getValue().getNeaCode()!=null && item.getValue().getNeaCode().length()!=0) {
+                return new ReadOnlyObjectWrapper<>(item.getValue().getNeaCode());
+            }else{
+                return new ReadOnlyObjectWrapper<>(item.getValue().getLocalCode());
+            }
+        });
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Stock, String> column3 = new TableColumn<>("Description");
@@ -695,7 +702,11 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
                             row_header = sheet.createRow(row);
 
                             current_stock_code = row_header.createCell(0);
-                            current_stock_code.setCellValue(stock.getId());
+                            if (stock.getNeaCode() != null && stock.getNeaCode().length() != 0){
+                                current_stock_code.setCellValue(stock.getNeaCode());
+                            }else{
+                                current_stock_code.setCellValue(stock.getLocalCode());
+                            }
                             doc.styleBorder(current_stock_code, 10, HorizontalAlignment.LEFT, false);
 
                             current_desc = row_header.createCell(1);

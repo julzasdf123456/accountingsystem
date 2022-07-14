@@ -25,10 +25,9 @@
                <children>
                   <VBox prefHeight="660.0" prefWidth="514.0">
                      <children>
-                        <Label maxHeight="-Infinity" prefHeight="16.0" prefWidth="150.0" text="Local Code" />
                         <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="500.0">
                            <children>
-                              <JFXTextField fx:id="localCode" focusColor="#00ad8e" prefHeight="30.0" prefWidth="150.0" promptText="Local Code" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="localCode" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="150.0" promptText="Local Code" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -54,7 +53,7 @@
                               </JFXTextField>
                            </children>
                            <VBox.margin>
-                              <Insets bottom="16.0" />
+                              <Insets bottom="16.0" top="16.0" />
                            </VBox.margin>
                         </HBox>
                         <JFXTextField fx:id="stockName" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="246.0" promptText="Stock name" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">

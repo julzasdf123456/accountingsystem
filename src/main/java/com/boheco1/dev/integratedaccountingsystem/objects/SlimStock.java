@@ -13,7 +13,7 @@ public class SlimStock {
     private String Unit;
     private double Price;
     private String RRNo;
-
+    private String Code;
     public SlimStock(String id, String stockName, String model, String brand) {
         this.id = id;
         StockName = stockName;
@@ -104,5 +104,13 @@ public class SlimStock {
 
     public void setRRNo(String RRNo) {
         this.RRNo = RRNo;
+    }
+
+    public String getCode() {
+        return Code;
+    }
+
+    public void setCode(String code) {
+        Code = code;
     }
 }

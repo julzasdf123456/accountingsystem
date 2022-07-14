@@ -6,6 +6,7 @@ import com.boheco1.dev.integratedaccountingsystem.dao.SupplierDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXTextField;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -56,7 +57,13 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
     public void createTable(){
         TableColumn<Stock, String> column1 = new TableColumn<>("Code");
         column1.setMinWidth(120);
-        column1.setCellValueFactory(new PropertyValueFactory<>("id"));
+        column1.setCellValueFactory(item -> {
+            if (item.getValue().getNeaCode()!=null && item.getValue().getNeaCode().length()!=0) {
+                return new ReadOnlyObjectWrapper<>(item.getValue().getNeaCode());
+            }else{
+                return new ReadOnlyObjectWrapper<>(item.getValue().getLocalCode());
+            }
+        });
 
         TableColumn<Stock, String> column3 = new TableColumn<>("Description");
         column3.setMinWidth(450);

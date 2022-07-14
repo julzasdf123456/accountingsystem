@@ -8,6 +8,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -209,7 +210,11 @@ public class StockLiquidationReportController extends MenuControllerHandler impl
                                 doc.styleBorder(current_entry, 10, HorizontalAlignment.CENTER, false);
 
                                 current_stock = row_header.createCell(1);
-                                current_stock.setCellValue(stock.getId());
+                                if (stock.getNeaCode() != null && stock.getNeaCode().length() !=0){
+                                    current_stock.setCellValue(stock.getNeaCode());
+                                }else{
+                                    current_stock.setCellValue(stock.getLocalCode());
+                                }
                                 sname_addr = new CellRangeAddress(row, row, 1, 2);
                                 current_stock.setCellStyle(style2);
                                 sheet.addMergedRegion(sname_addr);
@@ -276,7 +281,13 @@ public class StockLiquidationReportController extends MenuControllerHandler impl
     public void createTable(){
         TableColumn<Stock, String> column1 = new TableColumn<>("Stock ID");
         column1.setMinWidth(125);
-        column1.setCellValueFactory(new PropertyValueFactory<>("id"));
+        column1.setCellValueFactory(item -> {
+            if (item.getValue().getNeaCode()!=null && item.getValue().getNeaCode().length()!=0) {
+                return new ReadOnlyObjectWrapper<>(item.getValue().getNeaCode());
+            }else{
+                return new ReadOnlyObjectWrapper<>(item.getValue().getLocalCode());
+            }
+        });
 
         TableColumn<Stock, String> column2 = new TableColumn<>("Description");
         column2.setMinWidth(400);

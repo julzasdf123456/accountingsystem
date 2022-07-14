@@ -58,7 +58,6 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         }
         this.bindStockTypes();
         this.bindNumbers();
-        this.localCode.setText(Utility.CURRENT_YEAR());
         this.stockStackPane = Utility.getStackPane();
     }
     /**
@@ -122,10 +121,14 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         if (manDate != null) this.stock.setManufacturingDate(manDate);
         if (valDate != null) this.stock.setValidityDate(valDate);
         this.stock.setNeaCode(neaCode);
+        this.stock.setLocalCode(localCode);
         this.stock.setCritical(threshold);
 
-        if (localCode.length() < 4 || localCode == null) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid local code! Minimum of 4 characters!",
+        if (accountCode.length() < 4 || accountCode == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid accounting code! Minimum of 4 characters!",
+                    stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if ((neaCode.length() < 4 || neaCode == null) && (localCode.length() < 4 || localCode == null)) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid NEA/Local code! Minimum of 4 characters!",
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (desc.length() == 0 || desc == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid description!",
@@ -136,12 +139,6 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         }else if (unit == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for unit!",
                         stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (price == 0) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for price!",
-                    stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (threshold == 0){
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please select enter a valid threshold remaining limit for the stock!",
-                    stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else{
             JFXButton accept = new JFXButton("Proceed");
             JFXDialog dialog = DialogBuilder.showConfirmDialog("Stock Entry","This process is final. Confirm Stock Entry?", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
@@ -149,7 +146,6 @@ public class StockEntryController extends MenuControllerHandler implements Initi
             int finalQuantity = quantity;
             accept.setOnAction(__ -> {
                 if (isNew) {
-                    this.stock.setId(localCode);
                     //If new Stock item, set stock quantity to 0 and insert Stock to database
                     this.stock.setQuantity(0);
 
@@ -343,7 +339,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.isNew = true;
 
         this.stockName.setText("");
-        this.localCode.setText(Utility.CURRENT_YEAR());
+        this.localCode.setText("");
         this.accountCode.setText("");
         this.brand.setText("");
         this.quantity.setText("");

@@ -227,7 +227,11 @@ public class StockEntryReportController extends MenuControllerHandler implements
                                 doc.styleBorder(current_rr, font_size, HorizontalAlignment.CENTER, false);
 
                                 current_stock = row_header.createCell(2);
-                                current_stock.setCellValue(stock.getId());
+                                if (stock.getNeaCode() != null && stock.getNeaCode().length() !=0){
+                                    current_stock.setCellValue(stock.getNeaCode());
+                                }else{
+                                    current_stock.setCellValue(stock.getLocalCode());
+                                }
                                 doc.styleBorder(current_stock, font_size, HorizontalAlignment.LEFT, true);
 
                                 current_desc = row_header.createCell(3);
@@ -293,7 +297,13 @@ public class StockEntryReportController extends MenuControllerHandler implements
     public void createTable(){
         TableColumn<Stock, String> column1 = new TableColumn<>("Stock ID");
         column1.setMinWidth(95);
-        column1.setCellValueFactory(new PropertyValueFactory<>("id"));
+        column1.setCellValueFactory(item -> {
+            if (item.getValue().getNeaCode()!=null && item.getValue().getNeaCode().length()!=0) {
+                return new ReadOnlyObjectWrapper<>(item.getValue().getNeaCode());
+            }else{
+                return new ReadOnlyObjectWrapper<>(item.getValue().getLocalCode());
+            }
+        });
 
         TableColumn<Stock, String> column1a = new TableColumn<>("RR No");
         column1a.setMinWidth(95);
