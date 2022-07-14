@@ -4,6 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.NumberGenerator;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
+import com.microsoft.sqlserver.jdbc.SQLServerException;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -937,7 +938,13 @@ public class MirsDAO {
             ps.close();
             conn.setAutoCommit(true);
             return true;
-        } catch (SQLException e) {
+        } catch (SQLServerException e) {
+            conn.rollback();
+            conn.setAutoCommit(true);
+            e.printStackTrace();
+            //perform recursion to try inserting the record again
+            create(mirs, mirsItems,  signatories);
+        } catch (Exception e){
             conn.rollback();
             conn.setAutoCommit(true);
             e.printStackTrace();
@@ -1026,6 +1033,34 @@ public class MirsDAO {
             e.printStackTrace();
         }
         return false;
+
+    }
+
+    public static List<ItemizedMirsItem> getItemizedMirsItemDetails(String mirsId) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "select m.StockID as id, MIRSItemID, serial, brand, remarks from itemizedMirsItem i inner join mirsitems m on i.MIRSItemID = m.id " +
+                        "inner join releasing r on m.MIRSID = r.MIRSID and m.StockID = r.StockID where r.MIRSID = ?");
+        ps.setString(1, mirsId);
+
+        ResultSet rs = ps.executeQuery();
+
+        List<ItemizedMirsItem> explodedItems = new ArrayList<>();
+
+        while (rs.next()) {
+            explodedItems.add(new ItemizedMirsItem(
+                    rs.getString("id"),//temporarily using  ItemizedMirsItem id attribute to store stock id
+                    rs.getString("MIRSItemID"),
+                    rs.getString("serial"),
+                    rs.getString("brand"),
+                    rs.getString("remarks")
+            ));
+        }
+
+        rs.close();
+        ps.close();
+
+        return explodedItems;
+
 
     }
 

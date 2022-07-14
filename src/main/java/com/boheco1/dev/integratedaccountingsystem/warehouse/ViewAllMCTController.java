@@ -1,9 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
-import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.MCTDao;
-import com.boheco1.dev.integratedaccountingsystem.dao.ReleasingDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.itextpdf.text.Element;
@@ -172,8 +169,15 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                 double total=0;
                 HashMap<String, Double> acctCodeSummary = new HashMap<String, Double>();
                 for (Releasing items : fromReleasing) {
+                    List<ItemizedMirsItem> details = MirsDAO.getItemizedMirsItemDetails(items.getMirsID());
+                    String additionalDescription = "";
+                    for(ItemizedMirsItem i : details){
+                        if(i.getId().equals(items.getStockID())){
+                            additionalDescription += "\n(Brand: "+i.getBrand()+", Serial: "+i.getSerial()+", Remarks: "+i.getRemarks()+")";
+                        }
+                    }
                     Stock stock = StockDAO.get(ReleasingDAO.get(items.getId()).getStockID());
-                    String[] val = {stock.getAcctgCode(), stock.getId(),stock.getDescription(), String.format("%,.2f", items.getPrice()), String.format("%,.2f", (items.getPrice() * items.getQuantity())), stock.getUnit(), "" + items.getQuantity()};
+                    String[] val = {stock.getAcctgCode(), stock.getId(),stock.getDescription()+additionalDescription, String.format("%,.2f", items.getPrice()), String.format("%,.2f", (items.getPrice() * items.getQuantity())), stock.getUnit(), "" + items.getQuantity()};
                     total += items.getPrice() * items.getQuantity();
                     rows.add(val);
 

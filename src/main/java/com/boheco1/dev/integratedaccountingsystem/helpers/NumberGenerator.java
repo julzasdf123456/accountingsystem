@@ -31,7 +31,7 @@ public class NumberGenerator {
             String year = Utility.CURRENT_YEAR();
 
             ResultSet rs = DB.getConnection().createStatement().executeQuery(
-                    "SELECT id FROM MIRS WHERE id LIKE '" + year + "%' ORDER BY id DESC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;");
+                    "SELECT id FROM MIRS WHERE id LIKE '%" + year + "%' ORDER BY id DESC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;");
 
             if(!rs.next()) {
                 return year + "-0001";

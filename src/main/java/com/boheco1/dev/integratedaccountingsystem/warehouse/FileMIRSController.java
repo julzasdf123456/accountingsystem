@@ -62,7 +62,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         filingDate.setValue(LocalDate.now());
-        bindParticularsAutocomplete(items);
+        bindItemSearchAutocomplete(items);
         bindEmployeeInfoAutocomplete(prepared);
         bindEmployeeInfoAutocomplete(checked);
         bindEmployeeInfoAutocomplete(approved);
@@ -198,14 +198,14 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                 List<String[]> allRows = reader.readAll();
                                 for(int i = 1; i < allRows.size(); i++) { //start looping at 1 to skip column header
                                     String[] row = allRows.get(i);
-                                    String id = row[0];
+                                    String code = row[0];
                                     int qty = Integer.parseInt(row[row.length - 1]);
-                                    Stock stock = StockDAO.get(id);
+                                    Stock stock = StockDAO.getStockViaNEALocalCode(code);
                                     if (stock == null) {
-                                        errorLog += "No such Stock Id: "+ id + ".\n";
+                                        errorLog += "No such Stock with a NEA/Local: "+ code + ".\n";
                                     } else {
                                         if(qty > StockDAO.countAvailable(stock)){
-                                            errorLog += "Insufficient stock for item "+ id + ".\n";
+                                            errorLog += "Insufficient stock for item "+ code + ".\n";
                                         }else{
                                             addItem(stock, qty, true);
                                         }
@@ -338,7 +338,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     }
 
     private void initializeItemTable() {
-        TableColumn<MIRSItem, String> neaCodeCol = new TableColumn<>("Stock ID");
+        /*TableColumn<MIRSItem, String> neaCodeCol = new TableColumn<>("Stock ID");
         neaCodeCol.setStyle("-fx-alignment: center;");
         neaCodeCol.setPrefWidth(150);
         neaCodeCol.setMaxWidth(150);
@@ -350,7 +350,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 e.printStackTrace();
             }
             return null;
-        });
+        });*/
 
         TableColumn<MIRSItem, String> descriptionCol = new TableColumn<>("Description");
         descriptionCol.setStyle("-fx-alignment: center-left;");
@@ -426,7 +426,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         actionCol.setCellFactory(cellFactory);
         actionCol.setStyle("-fx-alignment: center;");
 
-        mirsItemTable.getColumns().add(neaCodeCol);
+        //mirsItemTable.getColumns().add(neaCodeCol);
         mirsItemTable.getColumns().add(descriptionCol);
         mirsItemTable.getColumns().add(quantityCol);
         mirsItemTable.getColumns().add(actionCol);
@@ -436,19 +436,19 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         mirsItemTable.setItems(mirsItemRequested);
     }
 
-    private void bindParticularsAutocomplete(JFXTextField textField){
-        AutoCompletionBinding<SlimStock> stockSuggest = TextFields.bindAutoCompletion(textField,
+    private void bindItemSearchAutocomplete(JFXTextField textField){
+        AutoCompletionBinding<StockDescription> stockSuggest = TextFields.bindAutoCompletion(textField,
                 param -> {
                     //Value typed in the textfield
                     String query = param.getUserText();
 
                     //Initialize list of stocks
-                    List<SlimStock> list = new ArrayList<>();
+                    List<StockDescription> list = new ArrayList<>();
 
                     //Perform DB query when length of search string is 4 or above
                     if (query.length() > 3){
                         try {
-                            list = StockDAO.search(query, 0);
+                            list = StockDAO.searchDescription(query);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -462,12 +462,12 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 }, new StringConverter<>() {
                     //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
                     @Override
-                    public String toString(SlimStock object) {
+                    public String toString(StockDescription object) {
                         return object.getDescription();
                     }
 
                     @Override
-                    public SlimStock fromString(String string) {
+                    public StockDescription fromString(String string) {
                         throw new UnsupportedOperationException();
                     }
                 });
@@ -475,7 +475,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         stockSuggest.setMinWidth(500);
         //This will set the actions once the user clicks an item from the popupmenu.
         stockSuggest.setOnAutoCompleted(event -> {
-            SlimStock result = event.getCompletion();
+            StockDescription result = event.getCompletion();
             try {
                 stockToBeAdded = StockDAO.get(result.getId());
                 int av = StockDAO.countAvailable(stockToBeAdded);

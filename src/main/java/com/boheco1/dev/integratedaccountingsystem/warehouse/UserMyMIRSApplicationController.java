@@ -276,7 +276,7 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
     }
 
     private void initializeItemTable() {
-        TableColumn<MIRSItem, String> stockIdCol = new TableColumn<>("Stock Id");
+        /*TableColumn<MIRSItem, String> stockIdCol = new TableColumn<>("Stock Id");
         stockIdCol.setStyle("-fx-alignment: center;");
         stockIdCol.setPrefWidth(150);
         stockIdCol.setMaxWidth(150);
@@ -288,7 +288,7 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
                 e.printStackTrace();
             }
             return null;
-        });
+        });*/
 
         TableColumn<MIRSItem, String> descriptionCol = new TableColumn<>("Description");
         descriptionCol.setStyle("-fx-alignment: center-left;");
@@ -370,9 +370,7 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
 
         actionCol.setCellFactory(cellFactory);
         actionCol.setStyle("-fx-alignment: center;");
-        descriptionCol.setSortType(TableColumn.SortType.ASCENDING);
-        mirsItemTable.getSortOrder().add(descriptionCol);
-        mirsItemTable.getColumns().add(stockIdCol);
+        //mirsItemTable.getColumns().add(stockIdCol);
         mirsItemTable.getColumns().add(descriptionCol);
         mirsItemTable.getColumns().add(quantityCol);
 
@@ -388,18 +386,18 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
     }
 
     private void bindParticularsAutocomplete(JFXTextField textField){
-        AutoCompletionBinding<SlimStock> stockSuggest = TextFields.bindAutoCompletion(textField,
+        AutoCompletionBinding<StockDescription> stockSuggest = TextFields.bindAutoCompletion(textField,
                 param -> {
                     //Value typed in the textfield
                     String query = param.getUserText();
 
                     //Initialize list of stocks
-                    List<SlimStock> list = new ArrayList<>();
+                    List<StockDescription> list = new ArrayList<>();
 
                     //Perform DB query when length of search string is 4 or above
                     if (query.length() > 3){
                         try {
-                            list = StockDAO.search(query, 0);
+                            list = StockDAO.searchDescription(query);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -413,12 +411,12 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
                 }, new StringConverter<>() {
                     //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
                     @Override
-                    public String toString(SlimStock object) {
+                    public String toString(StockDescription object) {
                         return object.getDescription();
                     }
 
                     @Override
-                    public SlimStock fromString(String string) {
+                    public StockDescription fromString(String string) {
                         throw new UnsupportedOperationException();
                     }
                 });
@@ -426,7 +424,7 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
         stockSuggest.setMinWidth(500);
         //This will set the actions once the user clicks an item from the popupmenu.
         stockSuggest.setOnAutoCompleted(event -> {
-            SlimStock result = event.getCompletion();
+            StockDescription result = event.getCompletion();
             try {
                 selectedStock = StockDAO.get(result.getId());
                 int av = StockDAO.countAvailable(selectedStock);

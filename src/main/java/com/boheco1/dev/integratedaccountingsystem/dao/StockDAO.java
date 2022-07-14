@@ -140,6 +140,55 @@ public class StockDAO {
     }
 
     /**
+     * Retrieves a single Stock record
+     * @param code the identifier of the Stock record to be retrieved
+     * @return Stock object
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static Stock getStockViaNEALocalCode(String code) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM Stocks WHERE NEACode=? OR LocalCode=? ");
+        ps.setString(1, code);
+        ps.setString(2, code);
+        ResultSet rs = ps.executeQuery();
+        if(rs.next()) {
+            Stock stock = new Stock(
+                    rs.getString("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Description"),
+                    rs.getString("SerialNumber"),
+                    rs.getString("Brand"),
+                    rs.getString("Model"),
+                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
+                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
+                    rs.getString("TypeID"),
+                    rs.getString("Unit"),
+                    rs.getInt("Quantity"),
+                    rs.getInt("Critical"),
+                    rs.getDouble("Price"),
+                    rs.getString("NEACode"),
+                    rs.getBoolean("IsTrashed"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
+                    rs.getString("UserIDCreated"),
+                    rs.getString("UserIDUpdated"),
+                    rs.getString("UserIDTrashed"),
+                    rs.getString("LocalCode"),
+                    rs.getString("AcctgCode"),
+                    rs.getBoolean("Individualized")
+            );
+
+            rs.close();
+
+            return stock;
+        }
+        rs.close();
+        return null;
+    }
+
+    /**
      * Updates an existing Stock record
      * @param stock the record to be updated
      * @throws Exception obligatory from DB.getConnection()

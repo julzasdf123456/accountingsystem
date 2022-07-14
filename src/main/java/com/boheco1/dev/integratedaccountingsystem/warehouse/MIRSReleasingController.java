@@ -28,7 +28,7 @@ import org.controlsfx.control.textfield.TextFields;
 import java.net.URL;
 import java.util.*;
 
-public class MIRSReleasingController implements Initializable {
+public class MIRSReleasingController extends MenuControllerHandler implements Initializable, ObjectTransaction {
 
     @FXML
     private AnchorPane anchorpane;
@@ -51,6 +51,7 @@ public class MIRSReleasingController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
         InputValidation.restrictNumbersOnly(quantity);
         requestedList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         releasingList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -80,6 +81,7 @@ public class MIRSReleasingController implements Initializable {
 
             //clear hashmap that contains all itemized records
             Utility.getItemizedMirsItems().clear();
+            Utility.setParentController(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -294,7 +296,15 @@ public class MIRSReleasingController implements Initializable {
 
     @FXML
     private void addAllQty(ActionEvent event) throws Exception {
-        addRemoveItem(addAllQtyBtn);
+        MIRSItem selected = requestedList.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+
+        if(!StockDAO.hasMultiple(StockDAO.get(selected.getStockID()).getDescription())){
+            Utility.setSelectedObject(selected);
+            ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_mirs_releasing_select_item.fxml", Utility.getStackPane());
+        }else{
+            addRemoveItem(addAllQtyBtn);
+        }
     }
 
     @FXML
@@ -456,18 +466,18 @@ public class MIRSReleasingController implements Initializable {
     }
 
     private void bindParticularsAutocomplete(JFXTextField textField){
-        AutoCompletionBinding<SlimStock> stockSuggest = TextFields.bindAutoCompletion(textField,
+        AutoCompletionBinding<StockDescription> stockSuggest = TextFields.bindAutoCompletion(textField,
                 param -> {
                     //Value typed in the textfield
                     String query = param.getUserText();
 
                     //Initialize list of stocks
-                    List<SlimStock> list = new ArrayList<>();
+                    List<StockDescription> list = new ArrayList<>();
 
                     //Perform DB query when length of search string is 4 or above
                     if (query.length() > 3){
                         try {
-                            list = StockDAO.search(query, 0);
+                            list = StockDAO.searchDescription(query);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -482,12 +492,12 @@ public class MIRSReleasingController implements Initializable {
                 }, new StringConverter<>() {
                     //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
                     @Override
-                    public String toString(SlimStock object) {
+                    public String toString(StockDescription object) {
                         return object.getDescription();
                     }
 
                     @Override
-                    public SlimStock fromString(String string) {
+                    public StockDescription fromString(String string) {
                         throw new UnsupportedOperationException();
                     }
                 });
@@ -495,7 +505,7 @@ public class MIRSReleasingController implements Initializable {
         stockSuggest.setMinWidth(500);
         //This will set the actions once the user clicks an item from the popupmenu.
         stockSuggest.setOnAutoCompleted(event -> {
-            SlimStock result = event.getCompletion();
+            StockDescription result = event.getCompletion();
             try {
                 selectedStock = StockDAO.get(result.getId());
                 int av = StockDAO.countAvailable(selectedStock);
@@ -527,5 +537,12 @@ public class MIRSReleasingController implements Initializable {
                 AlertDialogBuilder.messgeDialog("System Error", "bindParticularsAutocomplete(): "+e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }
         });
+    }
+
+
+    @Override
+    public void receive(Object o) {
+        MIRSItem mirsItem = (MIRSItem) o;
+        System.out.println(mirsItem);
     }
 }

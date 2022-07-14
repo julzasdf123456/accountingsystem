@@ -152,7 +152,7 @@
                            <children>
                               <HBox alignment="CENTER">
                                  <children>
-                                    <JFXButton fx:id="releaseBtn" buttonType="RAISED" onAction="#releaseItem" prefHeight="37.0" prefWidth="99.0" styleClass="btn-sucess" text="Release" textFill="WHITE">
+                                    <JFXButton fx:id="releaseMCTBtn" buttonType="RAISED" onAction="#releaseMCTItem" prefHeight="37.0" prefWidth="155.0" styleClass="btn-info" text="Release with MCT" textFill="WHITE">
                                        <font>
                                           <Font name="System Bold" size="18.0" />
                                        </font>
@@ -160,7 +160,7 @@
                                           <Insets left="5.0" right="5.0" />
                                        </HBox.margin>
                                     </JFXButton>
-                                    <JFXButton fx:id="releaseMCTBtn" buttonType="RAISED" onAction="#releaseMCTItem" prefHeight="37.0" prefWidth="155.0" styleClass="btn-info" text="Release with MCT" textFill="WHITE">
+                                    <JFXButton fx:id="releaseBtn" buttonType="RAISED" onAction="#releaseItem" prefHeight="37.0" prefWidth="99.0" styleClass="btn-sucess" text="Release" textFill="WHITE">
                                        <font>
                                           <Font name="System Bold" size="18.0" />
                                        </font>
