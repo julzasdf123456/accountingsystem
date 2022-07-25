@@ -696,7 +696,7 @@ public class MirsDAO {
 
     public static  List<ReleasedItemDetails> getReleasedMIRSItems(MIRS mirs) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT DISTINCT Stocks.Description, MIRSItems.*, Releasing.Status " +
+                "SELECT DISTINCT Stocks.Description, MIRSItems.* " +
                         "FROM MIRSItems " +
                         "LEFT JOIN Stocks ON Stocks.id = MIRSItems.StockID " +
                         "LEFT JOIN Releasing ON (Releasing.MIRSID=MIRSItems.MIRSID AND Releasing.StockID=MIRSItems.StockID) " +
@@ -716,7 +716,7 @@ public class MirsDAO {
                     rs.getString("StockID"),
                     rs.getInt("Quantity"),
                     rs.getDouble("Price"),
-                    rs.getString("Status"),
+                    "",
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
                     rs.getTimestamp("UpdatedAt").toLocalDateTime()
             ));
