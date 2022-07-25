@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.MIRSReleasingSelectItemController">
+   <children>
+      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="350.0" prefWidth="328.0" stylesheets="@style.css">
+         <children>
+            <VBox prefWidth="328.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <HBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label text="Brand: " />
+                        <JFXComboBox fx:id="brand" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#selectBrand" prefHeight="37.0" prefWidth="145.0" promptText="-" />
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="16.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <Label text="Price: " />
+                  <TextField fx:id="price" editable="false" prefHeight="37.0" prefWidth="328.0" />
+                  <Label text="Description: " />
+                  <TextArea fx:id="description" editable="false" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="106.0" prefWidth="328.0" wrapText="true" />
+                  <HBox>
+                     <children>
+                        <Label text="Qty: " />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
+                  <TextField fx:id="qty" prefHeight="37.0" prefWidth="328.0" />
+                  <HBox alignment="BOTTOM_RIGHT">
+                     <VBox.margin>
+                        <Insets top="16.0" />
+                     </VBox.margin>
+                     <children>
+                        <JFXButton fx:id="sendBtn" buttonType="RAISED" onAction="#send" prefHeight="37.0" prefWidth="98.0" styleClass="btn-theme" text="Add" textFill="WHITE" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </AnchorPane>
+   </children>
+</StackPane>
