@@ -730,11 +730,14 @@ public class MirsDAO {
     }
 
     public static int getBalance(MIRSItem item) throws Exception {
-        PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT SUM(Quantity) FROM Releasing r WHERE r.StockID = ? AND MIRSID = ?;");
+        //PreparedStatement ps = DB.getConnection().prepareStatement(
+         //       "SELECT SUM(Quantity) FROM Releasing r WHERE r.StockID = ? AND MIRSID = ?;");
 
-        ps.setString(1, item.getStockID());
-        ps.setString(2, item.getMirsID());
+        PreparedStatement ps = DB.getConnection().prepareStatement( "" +
+                        "SELECT SUM(r.Quantity) FROM Releasing r inner join Stocks s ON r.StockID = s.id WHERE s.Description = ?;");
+
+        ps.setString(1, StockDAO.get(item.getStockID()).getDescription());
+        //ps.setString(2, item.getMirsID());
 
         ResultSet rs = ps.executeQuery();
 

@@ -113,4 +113,9 @@ public class SlimStock {
     public void setCode(String code) {
         Code = code;
     }
+
+    @Override
+    public String toString() {
+        return Brand;
+    }
 }

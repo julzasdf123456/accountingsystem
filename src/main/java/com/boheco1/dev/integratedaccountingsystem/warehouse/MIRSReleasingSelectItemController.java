@@ -30,7 +30,7 @@ import java.util.*;
 public class MIRSReleasingSelectItemController implements Initializable {
 
     @FXML
-    private JFXComboBox<String> brand;
+    private JFXComboBox<SlimStock> brand;
 
     @FXML
     private TextField price;
@@ -41,9 +41,15 @@ public class MIRSReleasingSelectItemController implements Initializable {
     @FXML
     private TextField qty;
 
+    @FXML
+    private JFXButton sendBtn;
+
     private ObjectTransaction parentController = null;
     private MIRSItem mirsItem;
     private List<SlimStock> items;
+    private SlimStock currentSelection;
+
+    private int counter = 0;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
@@ -51,8 +57,9 @@ public class MIRSReleasingSelectItemController implements Initializable {
             items = StockDAO.getByDescription(StockDAO.get(mirsItem.getStockID()).getDescription());
             parentController = Utility.getParentController();
             for (SlimStock slimStock : items){
-                brand.getItems().add(slimStock.getBrand().toUpperCase());
+                brand.getItems().add(slimStock);
             }
+            qty.setPromptText("Max. value "+mirsItem.getQuantity());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -60,14 +67,46 @@ public class MIRSReleasingSelectItemController implements Initializable {
 
     @FXML
     void send(ActionEvent event) {
-        parentController.receive(mirsItem);
+
+        try{
+            if(qty.getText().isEmpty()) {
+                AlertDialogBuilder.messgeDialog("System Message", "Quantity is required.", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            }else{
+                int q = Integer.parseInt(qty.getText());
+                if(q > mirsItem.getQuantity()){
+                    AlertDialogBuilder.messgeDialog("System Message", "Invalid quantity, please try again.", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }else{
+                    MIRSItem mirsItem = new MIRSItem();
+                    mirsItem.setId(this.mirsItem.getId());
+                    mirsItem.setMirsID(this.mirsItem.getMirsID());
+                    mirsItem.setStockID(this.brand.getSelectionModel().getSelectedItem().getId());
+                    mirsItem.setQuantity(q);
+                    mirsItem.setPrice(this.mirsItem.getPrice());
+                    mirsItem.setRemarks(this.mirsItem.getRemarks());
+                    mirsItem.setCreatedAt(this.mirsItem.getCreatedAt());
+                    mirsItem.setUpdatedAt(this.mirsItem.getUpdatedAt());
+                    mirsItem.setAdditional(false);
+
+                    this.mirsItem.setQuantity(this.mirsItem.getQuantity()-q);
+                    qty.setPromptText("Max. value "+this.mirsItem.getQuantity());
+                    qty.setText("");
+                    parentController.receive(mirsItem);
+                    if(this.mirsItem.getQuantity() == 0){
+                        sendBtn.setDisable(true);
+                    }
+                }
+
+            }
+        }catch (Exception e){
+            AlertDialogBuilder.messgeDialog("System Message", "Error encounter: "+ e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }
     }
 
     @FXML
     void selectBrand(ActionEvent event) {
-        SlimStock stock = items.get(brand.getSelectionModel().getSelectedIndex());
-        price.setText(String.format("%,.2f",stock.getPrice()));
-        description.setText(stock.getDescription());
+        currentSelection = items.get(brand.getSelectionModel().getSelectedIndex());
+        price.setText(String.format("%,.2f",currentSelection.getPrice()));
+        description.setText(currentSelection.getDescription());
     }
 
 }

@@ -16,6 +16,7 @@ public class MIRSItem {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean isAdditional;
+    private boolean isSelected;
 
     public MIRSItem(){}
 
@@ -128,4 +129,14 @@ public class MIRSItem {
         }
         return display;
     }
+
+    //use for table checkbox on releasing
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
+
 }

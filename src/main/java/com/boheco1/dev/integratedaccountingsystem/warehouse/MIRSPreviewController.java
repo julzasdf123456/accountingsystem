@@ -25,6 +25,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -39,13 +40,6 @@ import java.util.*;
 public class MIRSPreviewController implements Initializable {
 
     @FXML
-    private StackPane stackPane;
-    @FXML
-    private Label  details, date, mirsNumber, applicant, address, requisitioner, signatories, purpose;
-
-    @FXML
-    private JFXButton printRequest;
-    @FXML
     private TableView requestedTable;
     @FXML
     private TableView releasedTable;
@@ -53,29 +47,14 @@ public class MIRSPreviewController implements Initializable {
     private MIRS mirs;
     private List<Releasing> releasedIitems = null;
     private List<ReleasedItemDetails> mirsItemList = null;
-    private List<MIRSSignatory> mirsSignatoryList;
+    private List<MIRSSignatory> signatories;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         mirs = Utility.getActiveMIRS();
 
         try {
             mirs = MirsDAO.getMIRS(Utility.getActiveMIRS().getId());
-            mirsSignatoryList = MIRSSignatoryDAO.get(mirs);
-
-            String signatures = "";
-            for (MIRSSignatory sig:mirsSignatoryList) {
-                signatures+=EmployeeDAO.getOne(sig.getUserID(),DB.getConnection()).getFullName();
-                signatures+="\n";
-            }
-            signatories.setText(signatures);
-
-            mirsNumber.setText(""+mirs.getId());
-            date.setText(""+mirs.getDateFiled());
-            purpose.setText(mirs.getPurpose());
-            details.setText(mirs.getDetails());
-            address.setText(mirs.getAddress());
-            applicant.setText(mirs.getApplicant());
-            requisitioner.setText(mirs.getRequisitioner().getFullName());
+            signatories = MIRSSignatoryDAO.get(mirs);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -152,11 +131,38 @@ public class MIRSPreviewController implements Initializable {
         requestedTable.getColumns().add(quantityCol);
         requestedTable.getColumns().add(remainingCol);
         requestedTable.getColumns().add(actualCol);
-        requestedTable.getColumns().add(stockIdCol);
+        //requestedTable.getColumns().add(stockIdCol);
         requestedTable.getColumns().add(descriptionCol);
-        requestedTable.getColumns().add(statusCol);
+        //requestedTable.getColumns().add(statusCol);
         requestedTable.setPlaceholder(new Label("No item Added"));
         requestedTable.getItems().setAll(observableList);
+    }
+
+    @FXML
+    void mirsDetails(MouseEvent event) throws Exception {
+
+        String details = "";
+
+        String signatures = "";
+        for (MIRSSignatory sig:signatories) {
+            signatures+=EmployeeDAO.getOne(sig.getUserID(),DB.getConnection()).getFullName();
+            signatures+=", ";
+        }
+        details += "MIRS #: "+mirs.getId();
+        details += "\nDate Filed: "+mirs.getDateFiled();
+        details += "\nRequisitioner: "+mirs.getRequisitioner().getFullName();
+        details += "\nSignatories: "+signatures;
+        details += "\n\nPurpose:\n"+mirs.getPurpose();
+        details += "\n\nDetails:\n"+mirs.getDetails();
+
+
+
+        details +="\n\nAdditional Info\n";
+
+        details += "Applicant: "+mirs.getApplicant();
+        details += "\nAddress: "+mirs.getAddress();
+
+        AlertDialogBuilder.messgeDialog("MIRS Details", details, Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
     }
 
     private void populateReleasedMIRSInfo() {
@@ -301,13 +307,13 @@ public class MIRSPreviewController implements Initializable {
                     pdf.createCell("Approved by:", 2, 11, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
                     pdf.createCell(2,columns.length);
                     pdf.createCell(mirs.getRequisitioner().getSignatoryNameFormat(), 2, 11, Font.BOLD, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
-                    pdf.createCell(EmployeeDAO.getOne(mirsSignatoryList.get(0).getUserID(), DB.getConnection()).getSignatoryNameFormat(), 2, 11, Font.BOLD, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
-                    pdf.createCell(EmployeeDAO.getOne(mirsSignatoryList.get(1).getUserID(), DB.getConnection()).getSignatoryNameFormat(), 2, 11, Font.BOLD, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(EmployeeDAO.getOne(signatories.get(0).getUserID(), DB.getConnection()).getSignatoryNameFormat(), 2, 11, Font.BOLD, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(EmployeeDAO.getOne(signatories.get(1).getUserID(), DB.getConnection()).getSignatoryNameFormat(), 2, 11, Font.BOLD, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
 
 
                     pdf.createCell(mirs.getRequisitioner().getDesignation(), 2, 9, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
-                    pdf.createCell(EmployeeDAO.getOne(mirsSignatoryList.get(0).getUserID(), DB.getConnection()).getDesignation(), 2, 9, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
-                    pdf.createCell(EmployeeDAO.getOne(mirsSignatoryList.get(1).getUserID(), DB.getConnection()).getDesignation(), 2, 9, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(EmployeeDAO.getOne(signatories.get(0).getUserID(), DB.getConnection()).getDesignation(), 2, 9, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
+                    pdf.createCell(EmployeeDAO.getOne(signatories.get(1).getUserID(), DB.getConnection()).getDesignation(), 2, 9, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
 
                     pdf.generate();
                 }

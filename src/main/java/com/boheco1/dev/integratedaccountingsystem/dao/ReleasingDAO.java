@@ -30,6 +30,10 @@ public class ReleasingDAO {
         ps.close();
     }
 
+    public static boolean add(List<Releasing> releasingList, List<MIRSItem> mirsItems,  MIRS mirs) throws Exception {
+        return add(releasingList, mirsItems, null, mirs);
+    }
+
     public static boolean add(List<Releasing> releasingList, List<MIRSItem> mirsItems, MCT mct, MIRS mirs) throws Exception {
         String query = "";
         String mct_number = null;
