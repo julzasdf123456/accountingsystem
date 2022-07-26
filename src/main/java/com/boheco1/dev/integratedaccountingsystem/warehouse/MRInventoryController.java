@@ -101,7 +101,7 @@ public class MRInventoryController extends MenuControllerHandler implements Init
      */
     public void createTable() {
 
-        TableColumn<MrItem, String> column = new TableColumn<>("Stock ID");
+        TableColumn<MrItem, String> column = new TableColumn<>("ID");
         column.setMinWidth(100);
         column.setCellValueFactory(new PropertyValueFactory<>("stockID"));
         column.setStyle("-fx-alignment: center;");
@@ -274,7 +274,7 @@ public class MRInventoryController extends MenuControllerHandler implements Init
                 mr_pdf.header(LocalDate.now(), "MR Inventory Report".toUpperCase());
 
                 //Create Table Header
-                String[] headers = {"Stock ID.", "RR No.", "Item", "Qty", "Unit Price", "Total", "MR No.", "Date of MR", "Assigned To"};
+                String[] headers = {"ID", "RR No.", "Item", "Qty", "Unit Price", "Total", "MR No.", "Date of MR", "Assigned To"};
                 int[] header_spans = {1, 1, 1, 1, 1, 1, 1, 1, 1};
                 mr_pdf.tableHeader(headers, header_spans);
 
