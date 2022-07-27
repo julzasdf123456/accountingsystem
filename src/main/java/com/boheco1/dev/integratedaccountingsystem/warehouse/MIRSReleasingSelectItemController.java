@@ -81,7 +81,7 @@ public class MIRSReleasingSelectItemController implements Initializable {
                     mirsItem.setMirsID(this.mirsItem.getMirsID());
                     mirsItem.setStockID(this.brand.getSelectionModel().getSelectedItem().getId());
                     mirsItem.setQuantity(q);
-                    mirsItem.setPrice(this.mirsItem.getPrice());
+                    mirsItem.setPrice(this.brand.getSelectionModel().getSelectedItem().getPrice());
                     mirsItem.setRemarks(this.mirsItem.getRemarks());
                     mirsItem.setCreatedAt(this.mirsItem.getCreatedAt());
                     mirsItem.setUpdatedAt(this.mirsItem.getUpdatedAt());
