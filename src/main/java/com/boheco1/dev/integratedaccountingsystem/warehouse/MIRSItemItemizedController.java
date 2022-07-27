@@ -6,6 +6,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.ItemizedMirsItem;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRSItem;
+import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
@@ -77,24 +78,18 @@ public class MIRSItemItemizedController implements Initializable {
             remarks.setOnKeyTyped( event -> {
                 charCounter.setText(remarks.getText().length()+"/200");
             } );
-
-            itemName.setText(StockDAO.get(mirsItem.getStockID()).getDescription());
+            Stock stock = StockDAO.get(mirsItem.getStockID());
+            brand.setText(stock.getBrand());
+            brand.setEditable(false);
+            itemName.setText(stock.getDescription());
             saveBtn.setDisable(true);
             prepareTable();
 
-            for(ItemizedMirsItem item : itemizedItemTable.getItems()){
-                HashMap<String, ItemizedMirsItem> holder = Utility.getItemizedMirsItems();
 
-                if(holder.containsKey(item.getId())){
-                    holder.replace(item.getId(), item);
-                }else {
-                    holder.put(item.getId(), item);
-                }
-            }
             HashMap<String, ItemizedMirsItem> holder = Utility.getItemizedMirsItems();
             for (Map.Entry i : holder.entrySet()) {
                 ItemizedMirsItem item = holder.get(i.getKey());
-                if(item.getMirsItemID().equals(mirsItem.getId())){
+                if(item.getStockID().equals(mirsItem.getStockID())){
                     itemized.add(item);
                 }
             }
@@ -104,8 +99,6 @@ public class MIRSItemItemizedController implements Initializable {
             e.printStackTrace();
         }
     }
-
-
 
     @FXML
     void addToTable(ActionEvent event) {
@@ -119,7 +112,7 @@ public class MIRSItemItemizedController implements Initializable {
             selectedAnItem.setSerial(serial.getText());
             selectedAnItem.setRemarks(remarks.getText());
         }else{
-            ItemizedMirsItem item= new ItemizedMirsItem(Utility.generateRandomId(), mirsItem.getId(), serial.getText(), brand.getText(), remarks.getText());
+            ItemizedMirsItem item= new ItemizedMirsItem(Utility.generateRandomId(), mirsItem.getStockID(), mirsItem.getId(), serial.getText(), brand.getText(), remarks.getText());
             itemized.add(item);
             clearFields(null);
         }

@@ -172,7 +172,7 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                     List<ItemizedMirsItem> details = MirsDAO.getItemizedMirsItemDetails(items.getMirsID());
                     String additionalDescription = "";
                     for(ItemizedMirsItem i : details){
-                        if(i.getId().equals(items.getStockID())){
+                        if(i.getStockID().equals(items.getStockID())){
                             additionalDescription += "\n(Brand: "+i.getBrand()+", Serial: "+i.getSerial()+", Remarks: "+i.getRemarks()+")";
                         }
                     }

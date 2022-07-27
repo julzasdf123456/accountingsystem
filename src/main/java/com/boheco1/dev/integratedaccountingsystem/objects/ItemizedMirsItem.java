@@ -2,13 +2,15 @@ package com.boheco1.dev.integratedaccountingsystem.objects;
 
 public class ItemizedMirsItem {
     private String id;
+    private String stockID;
     private String mirsItemID;
     private String serial;
     private String brand;
     private String remarks;
 
-    public ItemizedMirsItem(String id, String mirsItemID, String serial, String brand, String remarks) {
+    public ItemizedMirsItem(String id, String stockID, String mirsItemID, String serial, String brand, String remarks) {
         this.id = id;
+        this.stockID = stockID;
         this.mirsItemID = mirsItemID;
         this.serial = serial;
         this.brand = brand;
@@ -17,6 +19,14 @@ public class ItemizedMirsItem {
 
     public String getId() {
         return id;
+    }
+
+    public String getStockID() {
+        return stockID;
+    }
+
+    public void setStockID(String stockID) {
+        this.stockID = stockID;
     }
 
     public void setId(String id) {

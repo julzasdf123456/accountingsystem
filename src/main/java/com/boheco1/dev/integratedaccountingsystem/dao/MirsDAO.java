@@ -1041,7 +1041,7 @@ public class MirsDAO {
 
     public static List<ItemizedMirsItem> getItemizedMirsItemDetails(String mirsId) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "select m.StockID as id, MIRSItemID, serial, brand, remarks from itemizedMirsItem i inner join mirsitems m on i.MIRSItemID = m.id " +
+                "select i.id, i.StockID as stockID, MIRSItemID, serial, brand, remarks from itemizedMirsItem i inner join mirsitems m on i.MIRSItemID = m.id " +
                         "inner join releasing r on m.MIRSID = r.MIRSID and m.StockID = r.StockID where r.MIRSID = ?");
         ps.setString(1, mirsId);
 
@@ -1051,7 +1051,8 @@ public class MirsDAO {
 
         while (rs.next()) {
             explodedItems.add(new ItemizedMirsItem(
-                    rs.getString("id"),//temporarily using  ItemizedMirsItem id attribute to store stock id
+                    rs.getString("id"),
+                    rs.getString("stockID"),
                     rs.getString("MIRSItemID"),
                     rs.getString("serial"),
                     rs.getString("brand"),
@@ -1079,6 +1080,7 @@ public class MirsDAO {
         while(rs.next()) {
             explodedItems.add(new ItemizedMirsItem(
                     rs.getString("id"),
+                    rs.getString("stockID"),
                     rs.getString("MIRSItemID"),
                     rs.getString("serial"),
                     rs.getString("brand"),
