@@ -28,7 +28,7 @@
                      <children>
                         <HBox fillHeight="false" prefHeight="16.0" prefWidth="1024.0">
                            <children>
-                              <Label prefWidth="175.0" text="Stock ID">
+                              <Label prefWidth="175.0" text="ID">
                                  <font>
                                     <Font name="System Bold" size="14.0" />
                                  </font>

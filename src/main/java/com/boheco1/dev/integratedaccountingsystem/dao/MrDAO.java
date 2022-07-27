@@ -4,8 +4,10 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -504,6 +506,70 @@ public class MrDAO {
             Stock stock = item.getStock();
             StockDAO.deductStockQuantity(stock, item.getQty());
         }
+    }
+
+    public static void add(MR mr, List<MrItem> items) throws Exception{
+        Connection conn = DB.getConnection();
+        conn.setAutoCommit(false);
+
+        PreparedStatement ps = conn.prepareStatement(
+                "INSERT INTO MR (id, employeeId, dateOfMR, status, warehousePersonnelId, recommending, approvedBy, purpose) " +
+                        "VALUES (?,?,?,?,?,?,?,?)");
+
+        PreparedStatement ps2 = conn.prepareStatement(
+                "INSERT INTO MRItem (id, StockID, ItemName, Description, Qty, Remarks, mr_no, rrno, Status, Price, PropertyNo) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?)");
+
+        PreparedStatement ps3 = conn.prepareStatement("UPDATE Stocks SET Quantity=Quantity-?, UpdatedAt=GETDATE(), UserIDUpdated=?  WHERE id=?");
+
+        try {
+
+            ps.setString(1, mr.getId());
+            ps.setString(2, mr.getEmployeeId());
+            ps.setDate(3, java.sql.Date.valueOf(mr.getDateOfMR()));
+            ps.setString(4, mr.getStatus());
+            ps.setString(5, mr.getWarehousePersonnelId());
+            ps.setString(6, mr.getRecommending());
+            ps.setString(7, mr.getApprovedBy());
+            ps.setString(8, mr.getPurpose());
+
+            ps.executeUpdate();
+
+            for (MrItem item : items) {
+
+                if (item.getId() == null) item.setId(Utility.generateRandomId());
+
+                ps2.setString(1, item.getId());
+                ps2.setString(2, item.getStockID());
+                ps2.setString(3, item.getItemName());
+                ps2.setString(4, item.getDescription());
+                ps2.setInt(5, item.getQty());
+                ps2.setString(6, item.getRemarks());
+                ps2.setString(7, mr.getId());
+                ps2.setString(8, item.getRrNo());
+                ps2.setString(9, Utility.MR_ACTIVE);
+                ps2.setDouble(10, item.getPrice());
+                ps2.setString(11, item.getPropertyNo());
+                ps2.addBatch();
+
+                if (item.getStockID() != null) {
+                    ps3.setInt(1, item.getQty());
+                    ps3.setString(2, ActiveUser.getUser().getId());
+                    ps3.setString(3, item.getStockID());
+                    ps3.addBatch();
+                }
+            }
+            ps2.executeBatch();
+            ps3.executeBatch();
+            conn.commit();
+        }catch(SQLException ex) {
+            conn.rollback();
+            throw new Exception(ex.getMessage());
+        }
+        ps.close();
+        ps2.close();
+        ps3.close();
+        conn.setAutoCommit(true);
     }
 
     public static MrItem getItem(String id) throws Exception {
