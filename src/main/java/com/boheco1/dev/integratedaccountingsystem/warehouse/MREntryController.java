@@ -100,26 +100,14 @@ public class MREntryController extends MenuControllerHandler implements Initiali
             accept.setOnAction(__ -> {
                 String purpose = this.purpose_tf.getText();
                 MR mr = new MR(mr_no, employee.getId(), ActiveUser.getUser().getEmployeeID(), LocalDate.now(), Utility.MR_FILED, this.recommending.getId(), this.approved.getId(), purpose);
-                int count = 0;
                 try {
-                    MrDAO.add(mr);
-                    for (MrItem i : this.mrItems) {
-                        MrDAO.createItem(mr, i);
-                        count++;
-                    }
-                } catch (Exception e) {
-                    AlertDialogBuilder.messgeDialog("System Error", "Filing of Memorandum Receipt was not successfully added due to:" + e.getMessage() + " error.", stackPane, AlertDialogBuilder.DANGER_DIALOG);
-                }
-
-                if (count == 0) {
-                    AlertDialogBuilder.messgeDialog("System Error!", "Process failed! The Memorandum Receipt was not filed!",
-                            stackPane, AlertDialogBuilder.DANGER_DIALOG);
-                } else if (count != this.mrItems.size()) {
-                    AlertDialogBuilder.messgeDialog("System Error!", "Process failed! Some Memorandum Receipt items was not saved in the database!",
-                            stackPane, AlertDialogBuilder.DANGER_DIALOG);
-                } else {
+                    MrDAO.add(mr, this.mrItems);
                     AlertDialogBuilder.messgeDialog("MR Entry", "The Memorandum Receipt was successfully filed!", stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
                     this.reset();
+                    this.recommending = ActiveUser.getUser().getEmployeeInfo();
+                    this.recommending_tf.setText(this.recommending.getFullName());
+                } catch (Exception e) {
+                    AlertDialogBuilder.messgeDialog("System Error", "Filing of Memorandum Receipt was not successfully added due to:" + e.getMessage() + " error.", stackPane, AlertDialogBuilder.DANGER_DIALOG);
                 }
                 dialog.close();
             });
