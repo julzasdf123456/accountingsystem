@@ -141,7 +141,7 @@
                                     <Insets left="16.0" right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="quantity" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="150.0" promptText="Quantity" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="quantity" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="150.0" promptText="Quantity" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>

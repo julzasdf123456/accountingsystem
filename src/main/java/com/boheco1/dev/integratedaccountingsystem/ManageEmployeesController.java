@@ -80,6 +80,7 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
         designationField.setText(null);
         departmentField.getSelectionModel().clearSelection();
         employeesTable.getSelectionModel().clearSelection();
+        signatoryLevelField.getSelectionModel().clearSelection();
         firstNameField.requestFocus();
     }
 
@@ -105,6 +106,7 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
                 AlertDialogBuilder.messgeDialog("Success","A new employee record has been added!", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
 
                 listOfEmployees.add(currentEmployee);
+                this.reset();
             }else {
                 //update existing
                 currentEmployee.setEmployeeFirstName(firstNameField.getText());
@@ -232,5 +234,18 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
             AlertDialogBuilder.messgeDialog("Exception!", ex.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             ex.printStackTrace();
         }
+    }
+
+    private void reset(){
+        firstNameField.setText("");
+        middleNameField.setText("");
+        lastNameField.setText("");
+        suffixField.setText("");
+        addressField.setText("");
+        phoneField.setText("");
+        designationField.setText("");
+        signatoryLevelField.getSelectionModel().clearSelection();
+        departmentField.getSelectionModel().clearSelection();
+        currentEmployee = null;
     }
 }

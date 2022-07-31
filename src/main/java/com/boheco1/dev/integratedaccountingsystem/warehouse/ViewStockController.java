@@ -183,6 +183,9 @@ public class ViewStockController implements Initializable {
         }else if (price == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for price!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (quantity == 0) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for quantity!",
+                stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (unit == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for unit!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
