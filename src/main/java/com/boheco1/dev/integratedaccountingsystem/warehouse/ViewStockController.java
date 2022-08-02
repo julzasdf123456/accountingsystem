@@ -33,7 +33,7 @@ public class ViewStockController implements Initializable {
     private JFXTextField stockName, serialNumber, brand, model, quantity, unit, price, neaCode, threshold, localCode, accountCode;
 
     @FXML
-    private JFXTextArea description, comments;
+    private JFXTextArea description, comments, local_desc;
 
     @FXML
     private DatePicker manuDate, valDate;
@@ -115,6 +115,7 @@ public class ViewStockController implements Initializable {
     public void updateStock(){
         String name = this.stockName.getText();
         String desc = this.description.getText();
+        String ldesc = this.local_desc.getText();
         String brand = this.brand.getText();
         String model = this.model.getText();
         String unit = this.unit.getText();
@@ -148,7 +149,6 @@ public class ViewStockController implements Initializable {
         String id = this.stock.getId();
         this.stock = new Stock();
 
-        //Mandatory fields
         this.stock.setId(id);
         this.stock.setLocalCode(localCode);
         this.stock.setStockName(name);
@@ -161,8 +161,8 @@ public class ViewStockController implements Initializable {
         if (stockType != null) this.stock.setTypeID(stockType.getId());
         this.stock.setUnit(unit);
 
-        //Optional Fields
         this.stock.setDescription(this.description.getText());
+        this.stock.setLocalDescription(ldesc);
         this.stock.setComments(this.comments.getText());
         this.stock.setSerialNumber(serialNumber);
         this.stock.setManufacturingDate(this.manuDate.getValue());
@@ -178,8 +178,11 @@ public class ViewStockController implements Initializable {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid NEA/Local code! Minimum of 4 characters!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (desc.length() == 0 || desc == null) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid description!",
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid NEA description!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (ldesc.length() == 0 || ldesc == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid local description!",
+                stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (price == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for price!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
@@ -203,7 +206,7 @@ public class ViewStockController implements Initializable {
                 StockDAO.update(this.stock);
                 AlertDialogBuilder.messgeDialog("Update Stock", "Current stock details was successfully updated!", stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
             } catch (Exception e) {
-                AlertDialogBuilder.messgeDialog("System Error", "New stock was not successfully added due to:"+e.getMessage()+".", stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                AlertDialogBuilder.messgeDialog("System Error", "Stock record was not successfully updated due to:"+e.getMessage()+".", stackPane, AlertDialogBuilder.DANGER_DIALOG);
             }
         }
     }
@@ -377,6 +380,7 @@ public class ViewStockController implements Initializable {
         this.brand.setText(stock.getBrand());
         this.model.setText(stock.getModel());
         this.description.setText(stock.getDescription());
+        this.local_desc.setText(stock.getLocalDescription());
         LocalDate mDate = stock.getManufacturingDate();
         LocalDate vDate = stock.getValidityDate();
         if (mDate != null)

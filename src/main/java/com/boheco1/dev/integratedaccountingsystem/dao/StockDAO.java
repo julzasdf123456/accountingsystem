@@ -25,8 +25,8 @@ public class StockDAO {
                         "ValidityDate, TypeID, Unit, " +
                         "Quantity, Price, NEACode, " +
                         "IsTrashed, Comments, CreatedAt, " +
-                        "UserIDCreated, Critical, id, LocalCode, AcctgCode, Individualized) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?,?,?,?,?,?)");
+                        "UserIDCreated, Critical, id, LocalCode, AcctgCode, Individualized, localDescription) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?,?,?,?,?,?,?)");
 
         if(stock.getId()==null) stock.setId(Utility.generateRandomId());
 
@@ -58,7 +58,7 @@ public class StockDAO {
         ps.setString(19, stock.getAcctgCode());
 
         ps.setBoolean(20, stock.isIndividualized());
-
+        ps.setString(21, stock.getLocalDescription());
         ps.executeUpdate();
 
         ps.close();
@@ -130,7 +130,7 @@ public class StockDAO {
                     rs.getString("AcctgCode"),
                     rs.getBoolean("Individualized")
             );
-
+            stock.setLocalDescription(rs.getString("localDescription"));
             rs.close();
 
             return stock;
@@ -179,7 +179,7 @@ public class StockDAO {
                     rs.getString("AcctgCode"),
                     rs.getBoolean("Individualized")
             );
-
+            stock.setLocalDescription( rs.getString("localDescription"));
             rs.close();
 
             return stock;
@@ -201,7 +201,7 @@ public class StockDAO {
                         "ValidityDate=?, TypeID=?, Unit=?," +
                         "Quantity=?, Price=?, NEACode=?," +
                         "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=?, Critical=?," +
-                        "LocalCode=?, AcctgCode=?, Individualized=? " +
+                        "LocalCode=?, AcctgCode=?, Individualized=?, localDescription=? " +
                         "WHERE id=?");
 
         Stock oldStock = StockDAO.get(stock.getId());
@@ -238,7 +238,8 @@ public class StockDAO {
         ps.setString(16, stock.getLocalCode());
         ps.setString(17, stock.getAcctgCode());
         ps.setBoolean(18, stock.isIndividualized());
-        ps.setString(19, stock.getId());
+        ps.setString(19, stock.getLocalDescription());
+        ps.setString(20, stock.getId());
         ps.executeUpdate();
 
         //create a Stock History if price was updated.
@@ -273,7 +274,6 @@ public class StockDAO {
                         "LocalCode=?, AcctgCode=? " +
                         "WHERE id=?");
         Stock oldStock = StockDAO.get(stock.getId());
-
         ps.setString(1, stock.getStockName());
         ps.setString(2, stock.getDescription());
         ps.setString(3, stock.getSerialNumber());
@@ -283,17 +283,17 @@ public class StockDAO {
 
         if (stock.getManufacturingDate() != null) {
             ps.setDate(6, Date.valueOf(stock.getManufacturingDate()));
-        }else{
+        } else {
             ps.setDate(6, null);
         }
 
         if (stock.getValidityDate() != null) {
             ps.setDate(7, Date.valueOf(stock.getValidityDate()));
-        }else{
+        } else {
             ps.setDate(7, null);
         }
 
-        ps.setString(8,stock.getTypeID());
+        ps.setString(8, stock.getTypeID());
         ps.setString(9, stock.getUnit());
 
         ps.setDouble(10, stock.getPrice());
@@ -308,16 +308,14 @@ public class StockDAO {
         ps.executeUpdate();
 
         //create a Stock History if price was updated.
-        if(oldStock.getPrice()!=stock.getPrice()) {
-            StockHistoryDAO.create(
-                    new StockHistory(
-                            Utility.generateRandomId(),
-                            stock.getId(),
-                            LocalDate.now().minusDays(1),
-                            oldStock.getPrice(),
-                            ActiveUser.getUser().getId()
-                    )
-            );
+        if (oldStock.getPrice() != stock.getPrice()) {
+            StockHistoryDAO.create(new StockHistory(
+                                Utility.generateRandomId(),
+                                stock.getId(),
+                                LocalDate.now().minusDays(1),
+                                oldStock.getPrice(),
+                                ActiveUser.getUser().getId()
+                        ));
         }
         ps.close();
     }
@@ -331,14 +329,15 @@ public class StockDAO {
      */
     public static List<SlimStock> search(String key, int trashed) throws Exception  {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "Select TOP 50 id, StockName, Brand, Model, Description, Price, Unit, Quantity, NEACode, LocalCode FROM Stocks " +
-                        "WHERE (StockName LIKE ? OR Description LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
+                "Select TOP 50 id, StockName, Brand, Model, Description, localDescription, Price, Unit, Quantity, NEACode, LocalCode FROM Stocks " +
+                        "WHERE (StockName LIKE ? OR Description LIKE ? OR Brand LIKE ? OR Model LIKE ? OR localDescription LIKE ?) " +
                         "AND IsTrashed=? ORDER BY Description");
         ps.setString(1, "%" + key + "%");
         ps.setString(2, "%" + key + "%");
         ps.setString(3, "%" + key + "%");
         ps.setString(4, "%" + key + "%");
-        ps.setInt(5, trashed);
+        ps.setString(5, "%" + key + "%");
+        ps.setInt(6, trashed);
 
         ResultSet rs = ps.executeQuery();
 
@@ -350,6 +349,7 @@ public class StockDAO {
                     rs.getString("Model"),
                     rs.getString("Brand"));
             stock.setDescription(rs.getString("Description"));
+            stock.setLocalDescription(rs.getString("localDescription"));
             stock.setPrice(rs.getDouble("Price"));
             stock.setUnit(rs.getString("Unit"));
             stock.setQuantity(rs.getInt("Quantity"));
@@ -420,13 +420,14 @@ public class StockDAO {
      */
     public static List<SlimStock> search_available_in_rr(String key) throws Exception  {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "Select TOP 50 Stocks.id, StockName, Brand, Model, Description, StockEntryLogs.Price, Unit, Stocks.Quantity as Quantity, RRNo, NEACode, LocalCode FROM Stocks INNER JOIN StockEntryLogs ON Stocks.id = StockEntryLogs.StockID " +
-                        "WHERE (StockName LIKE ? OR Description LIKE ? OR Brand LIKE ? OR Model LIKE ? ) " +
+                "Select TOP 50 Stocks.id, StockName, Brand, Model, Description, localDescription, StockEntryLogs.Price, Unit, Stocks.Quantity as Quantity, RRNo, NEACode, LocalCode FROM Stocks INNER JOIN StockEntryLogs ON Stocks.id = StockEntryLogs.StockID " +
+                        "WHERE (StockName LIKE ? OR Description LIKE ? OR Brand LIKE ? OR Model LIKE ? OR localDescription LIKE ?) AND RRno IS NOT NULL " +
                         "AND IsTrashed=0 AND Stocks.Quantity > 0 ORDER BY RRNo");
         ps.setString(1, "%" + key + "%");
         ps.setString(2, "%" + key + "%");
         ps.setString(3, "%" + key + "%");
         ps.setString(4, "%" + key + "%");
+        ps.setString(5, "%" + key + "%");
 
         ResultSet rs = ps.executeQuery();
 
@@ -438,6 +439,7 @@ public class StockDAO {
                     rs.getString("Model"),
                     rs.getString("Brand"));
             stock.setDescription(rs.getString("Description"));
+            stock.setLocalDescription(rs.getString("localDescription"));
             stock.setPrice(rs.getDouble("Price"));
             stock.setUnit(rs.getString("Unit"));
             stock.setQuantity(rs.getInt("Quantity"));
@@ -488,6 +490,7 @@ public class StockDAO {
                     rs.getString("Brand"));
 
             stock.setDescription(rs.getString("Description"));
+            stock.setLocalDescription(rs.getString("localDescription"));
             stock.setPrice(rs.getDouble("Price"));
             stock.setUnit(rs.getString("Unit"));
             stock.setQuantity(rs.getInt("Quantity"));

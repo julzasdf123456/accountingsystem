@@ -18,13 +18,13 @@
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane fx:id="contentPane" prefHeight="650.0" prefWidth="1250.0" style="-fx-background-color: white;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.ViewStockController">
+<AnchorPane fx:id="contentPane" prefHeight="720.0" prefWidth="1250.0" style="-fx-background-color: white;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.ViewStockController">
    <children>
-      <VBox prefHeight="650.0" prefWidth="1250.0">
+      <VBox prefHeight="720.0" prefWidth="1250.0">
          <children>
-            <Pane prefHeight="650.0" prefWidth="1250.0">
+            <Pane prefHeight="720.0" prefWidth="1250.0">
                <children>
-                  <VBox prefHeight="650.0" prefWidth="514.0">
+                  <VBox prefHeight="720.0" prefWidth="514.0">
                      <children>
                         <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="514.0">
                            <children>
@@ -65,7 +65,12 @@
                               <Insets bottom="8.0" top="8.0" />
                            </VBox.margin>
                         </JFXTextField>
-                        <JFXTextArea fx:id="description" focusColor="#00ad8e" labelFloat="true" prefHeight="54.0" prefWidth="514.0" promptText="Description" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                        <JFXTextArea fx:id="description" focusColor="#00ad8e" labelFloat="true" prefHeight="54.0" prefWidth="514.0" promptText="NEA Description" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                           <VBox.margin>
+                              <Insets bottom="8.0" top="16.0" />
+                           </VBox.margin>
+                        </JFXTextArea>
+                        <JFXTextArea fx:id="local_desc" focusColor="#00ad8e" labelFloat="true" prefHeight="54.0" prefWidth="514.0" promptText="Local Description" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                            <VBox.margin>
                               <Insets bottom="8.0" top="16.0" />
                            </VBox.margin>
