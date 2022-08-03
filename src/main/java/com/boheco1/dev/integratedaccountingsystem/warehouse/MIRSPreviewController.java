@@ -78,7 +78,13 @@ public class MIRSPreviewController implements Initializable {
         stockIdCol.setMinWidth(150);
         stockIdCol.setCellValueFactory(cellData -> {
             try {
-                return new SimpleStringProperty(Objects.requireNonNull(cellData.getValue().getStockID()));
+                Stock stock = StockDAO.get(cellData.getValue().getStockID());
+                String code = "";
+                if(stock.getNeaCode() == null || stock.getNeaCode().isEmpty() || stock.getNeaCode().length() <= 4)
+                    code = stock.getLocalCode();
+                else if(stock.getLocalCode() == null || stock.getLocalCode().isEmpty() || stock.getLocalCode().length() <= 4)
+                    code = stock.getNeaCode();
+                return new SimpleStringProperty(Objects.requireNonNull(code));
             } catch (Exception e) {
                 e.printStackTrace();
             }
