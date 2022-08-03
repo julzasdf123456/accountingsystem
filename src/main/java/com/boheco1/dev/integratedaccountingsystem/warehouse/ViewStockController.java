@@ -180,9 +180,6 @@ public class ViewStockController implements Initializable {
         }else if (desc.length() == 0 || desc == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid NEA description!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (ldesc.length() == 0 || ldesc == null) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid local description!",
-                stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (price == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for price!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
