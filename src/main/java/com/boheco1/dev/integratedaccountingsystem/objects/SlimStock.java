@@ -14,6 +14,7 @@ public class SlimStock {
     private double Price;
     private String RRNo;
     private String Code;
+    private String localDescription;
     public SlimStock(String id, String stockName, String model, String brand) {
         this.id = id;
         StockName = stockName;
@@ -117,5 +118,13 @@ public class SlimStock {
     @Override
     public String toString() {
         return Brand;
+    }
+
+    public String getLocalDescription() {
+        return localDescription;
+    }
+
+    public void setLocalDescription(String localDescription) {
+        this.localDescription = localDescription;
     }
 }

@@ -34,7 +34,7 @@ public class Stock {
     private Releasing releasing;
     private ReceivingItem receivingItem;
     private String rrNo;
-
+    private String localDescription;
     private boolean individualized;
 
     public Stock() {}
@@ -319,5 +319,13 @@ public class Stock {
 
     public void setRrNo(String rrNo) {
         this.rrNo = rrNo;
+    }
+
+    public String getLocalDescription() {
+        return localDescription;
+    }
+
+    public void setLocalDescription(String localDescription) {
+        this.localDescription = localDescription;
     }
 }

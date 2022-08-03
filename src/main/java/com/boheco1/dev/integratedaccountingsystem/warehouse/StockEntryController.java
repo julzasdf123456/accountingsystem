@@ -33,7 +33,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
     private JFXTextField stockName, serialNumber, brand, model, quantity, unit, price, neaCode, threshold, localCode, accountCode;
 
     @FXML
-    private JFXTextArea comments, description;
+    private JFXTextArea comments, description, local_desc;
 
     @FXML
     private DatePicker manuDate, valDate;
@@ -68,6 +68,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
     private void saveBtn()  {
         String name = this.stockName.getText();
         String desc = this.description.getText();
+        String ldesc = this.local_desc.getText();
         String brand = this.brand.getText();
         String model = this.model.getText();
         String unit = this.unit.getText();
@@ -103,19 +104,16 @@ public class StockEntryController extends MenuControllerHandler implements Initi
 
         if (this.stock == null) this.stock = new Stock();
 
-        //Mandatory fields
-        this.stock.setStockName(name);
+        this.stock.setDescription(desc);
+        this.stock.setLocalDescription(ldesc);
         this.stock.setBrand(brand);
         this.stock.setModel(model);
         this.stock.setPrice(price);
-
         this.stock.setTrashed(false);
         this.stock.setUserIDCreated(ActiveUser.getUser().getId());
         if (stockType != null) this.stock.setTypeID(stockType.getId());
         this.stock.setUnit(unit);
-
-        //Optional Fields
-        this.stock.setDescription(desc);
+        this.stock.setStockName(name);
         this.stock.setComments(comments);
         this.stock.setSerialNumber(serialNumber);
         if (manDate != null) this.stock.setManufacturingDate(manDate);
@@ -131,7 +129,10 @@ public class StockEntryController extends MenuControllerHandler implements Initi
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid NEA/Local code! Minimum of 4 characters!",
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (desc.length() == 0 || desc == null) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid description!",
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid NEA description!",
+                    stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }else if (ldesc.length() == 0 || ldesc == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid local description!",
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (stockType == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please select a valid stock type!",
@@ -287,7 +288,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                 stock = StockDAO.get(result.getId());
                 stockName.setText(stock.getStockName());
                 accountCode.setText(stock.getAcctgCode());
-                localCode.setText(stock.getId());
+                localCode.setText(stock.getLocalCode());
                 //quantity.setText(""+stock.getQuantity());
                 price.setText(""+stock.getPrice());
                 serialNumber.setText(stock.getSerialNumber());
@@ -297,6 +298,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                 neaCode.setText(stock.getNeaCode());
                 comments.setText(stock.getComments());
                 description.setText(stock.getDescription());
+                local_desc.setText(stock.getLocalDescription());
                 manuDate.setValue(stock.getManufacturingDate());
                 valDate.setValue(stock.getValidityDate());
                 threshold.setText(""+stock.getCritical());
@@ -320,6 +322,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                 neaCode.setDisable(true);
                 comments.setDisable(true);
                 description.setDisable(true);
+                local_desc.setDisable(true);
                 manuDate.setDisable(true);
                 valDate.setDisable(true);
                 threshold.setDisable(true);
@@ -347,6 +350,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.price.setText("");
         this.type.getSelectionModel().select(null);
         this.description.setText("");
+        this.local_desc.setText("");
         this.model.setText("");
         this.serialNumber.setText("");
         this.neaCode.setText("");
@@ -364,6 +368,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.neaCode.setDisable(false);
         this.comments.setDisable(false);
         this.description.setDisable(false);
+        this.local_desc.setDisable(false);
         this.manuDate.setDisable(false);
         this.valDate.setDisable(false);
         this.threshold.setDisable(false);
