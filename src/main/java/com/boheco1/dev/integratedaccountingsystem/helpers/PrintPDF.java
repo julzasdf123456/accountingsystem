@@ -33,6 +33,25 @@ public class PrintPDF {
         this.table = new PdfPTable(this.column);
     }
 
+    public void generateLandscape() throws Exception{
+        document = new Document(PageSize.LETTER.rotate(),30f,30f,30f,30f);
+        Paragraph preface = new Paragraph();
+        PdfWriter.getInstance(document, new FileOutputStream(pdf));
+        document.open();
+        table.getDefaultCell().setFixedHeight(80);
+        table.setWidthPercentage(100);
+        table.setHorizontalAlignment(PdfPTable.ALIGN_CENTER);
+
+        preface.setAlignment(1);
+        preface.add(table);
+
+        document.add(preface);
+        document.setMarginMirroring(true);
+        document.close();
+
+        displayOutput(pdf);
+    }
+
     public void generate() throws Exception{
         document = new Document(PageSize.LETTER,30f,30f,30f,30f);
         Paragraph preface = new Paragraph();

@@ -1546,4 +1546,61 @@ public class StockDAO {
 
         return stocks;
     }
+
+    public static List<SummaryCharges> getSummaryCharges(String to, String from) throws SQLException, ClassNotFoundException {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT a.id, NEACode, LocalCode, AcctgCode, description, a.price, a.Quantity, \n" +
+                        "COALESCE((SELECT SUM(Quantity) FROM Releasing WHERE Releasing.StockID=a.id AND UpdatedAt >=? AND UpdatedAt <= ? GROUP BY Releasing.StockID),0) AS Issued, \n" +
+                        "COALESCE((SELECT SUM(QtyAccepted) FROM ReceivingItem INNER JOIN Receiving ON Receiving.RRNo = ReceivingItem.RRNo WHERE ReceivingItem.StockID=a.id AND Date >=? AND Date <= ? GROUP BY ReceivingItem.StockID),0) AS Received,\n" +
+                        "COALESCE((SELECT SUM(quantity) FROM MRTItem INNER JOIN MRT ON MRT.id=MRTItem.mrt_id WHERE MRTItem.releasing_id=a.id AND dateOfReturned >=? AND dateOfReturned <= ? GROUP BY MRTItem.releasing_id),0) AS Returned, \n" +
+                        "a.Quantity\n" +
+                        "+COALESCE((SELECT SUM(QtyAccepted) FROM ReceivingItem INNER JOIN Receiving ON Receiving.RRNo = ReceivingItem.RRNo WHERE ReceivingItem.StockID=a.id AND Date >=? AND Date <= ? GROUP BY ReceivingItem.StockID),0)\n" +
+                        "+COALESCE((SELECT SUM(quantity) FROM MRTItem INNER JOIN MRT ON MRT.id=MRTItem.mrt_id WHERE MRTItem.releasing_id=a.id AND dateOfReturned >=? AND dateOfReturned <= ? GROUP BY MRTItem.releasing_id),0)\n" +
+                        "-COALESCE((SELECT SUM(Quantity) FROM Releasing WHERE Releasing.StockID=a.id AND UpdatedAt >=? AND UpdatedAt <= ? GROUP BY Releasing.StockID),0)\n" +
+                        "AS Balance\n" +
+                        "FROM stocks a left join ReceivingItem b on a.id=b.StockID LEFT JOIN Releasing c ON a.id=c.StockID left join MRTItem d ON a.id=d.releasing_id");
+
+        ps.setString(1, to);
+        ps.setString(2, from);
+
+        ps.setString(3, to);
+        ps.setString(4, from);
+
+        ps.setString(5, to);
+        ps.setString(6, from);
+
+        ps.setString(7, to);
+        ps.setString(8, from);
+
+        ps.setString(9, to);
+        ps.setString(10, from);
+
+        ps.setString(11, to);
+        ps.setString(12, from);
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<SummaryCharges> list = new ArrayList<>();
+        while(rs.next()) {
+            SummaryCharges data = new SummaryCharges(
+                    rs.getString("id"),
+                    rs.getString("neacode"),
+                    rs.getString("localcode"),
+                    rs.getString("acctgcode"),
+                    rs.getString("description"),
+                    rs.getDouble("price"),
+                    rs.getInt("quantity"),
+                    rs.getInt("issued"),
+                    rs.getInt("received"),
+                    rs.getInt("returned"),
+                    rs.getInt("balance"));
+
+            list.add(data);
+        }
+
+        rs.close();
+        ps.close();
+
+        return list;
+    }
 }
