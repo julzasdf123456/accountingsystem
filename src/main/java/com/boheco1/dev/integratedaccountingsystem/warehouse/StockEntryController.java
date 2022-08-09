@@ -131,9 +131,6 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         }else if (desc.length() == 0 || desc == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid NEA description!",
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (ldesc.length() == 0 || ldesc == null) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid local description!",
-                    stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (stockType == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please select a valid stock type!",
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
