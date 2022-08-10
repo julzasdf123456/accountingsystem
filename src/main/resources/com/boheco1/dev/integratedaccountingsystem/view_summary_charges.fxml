@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="514.0" prefWidth="687.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.SummaryChargesReportController">
+   <children>
+      <TableView fx:id="chargesTable" layoutX="14.0" layoutY="68.0" prefHeight="441.0" prefWidth="677.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="68.0">
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy></TableView>
+      <JFXComboBox fx:id="month_cb" layoutX="8.0" layoutY="16.0" onAction="#selectByMonth" prefHeight="37.0" prefWidth="139.0" promptText="Month" visibleRowCount="12" AnchorPane.leftAnchor="8.0" AnchorPane.topAnchor="16.0" />
+      <JFXTextField fx:id="year_tf" alignment="CENTER" labelFloat="true" layoutX="157.0" layoutY="16.0" prefHeight="37.0" prefWidth="78.0" promptText="Year" AnchorPane.leftAnchor="157.0" AnchorPane.topAnchor="16.0" />
+      <JFXButton alignment="CENTER" contentDisplay="CENTER" layoutX="246.0" layoutY="16.0" onAction="#printSummary" styleClass="btn-sucess" text=" " AnchorPane.leftAnchor="246.0" AnchorPane.topAnchor="16.0">
+         <graphic>
+            <FontIcon iconColor="WHITE" iconLiteral="mdi2p-printer" />
+         </graphic>
+      </JFXButton>
+   </children>
+</AnchorPane>
