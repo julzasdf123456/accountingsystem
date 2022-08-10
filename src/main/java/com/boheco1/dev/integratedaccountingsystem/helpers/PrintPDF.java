@@ -4,9 +4,7 @@ import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,6 +19,8 @@ public class PrintPDF {
     private PdfPCell cell;
     private Document document;
     private File pdf;
+    String headerText = "";
+    String footerText = "";
 
     public PrintPDF(File pdf){
         this.pdf = pdf;
@@ -33,10 +33,21 @@ public class PrintPDF {
         this.table = new PdfPTable(this.column);
     }
 
+    public PrintPDF(File pdf, float[] column, String headerText, String footerText){
+        this.pdf = pdf;
+        this.column = column;
+        this.table = new PdfPTable(this.column);
+        this.headerText = headerText;
+        this.footerText = footerText;
+    }
+
+
     public void generateLandscape() throws Exception{
         document = new Document(PageSize.LETTER.rotate(),30f,30f,30f,30f);
         Paragraph preface = new Paragraph();
-        PdfWriter.getInstance(document, new FileOutputStream(pdf));
+        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdf));
+        HeaderFooter event = new HeaderFooter(headerText, footerText);
+        writer.setPageEvent(event);
         document.open();
         table.getDefaultCell().setFixedHeight(80);
         table.setWidthPercentage(100);
@@ -197,4 +208,29 @@ public class PrintPDF {
             ex.printStackTrace();
         }
     }
+
+    class HeaderFooter extends PdfPageEventHelper {
+        Font ffont = new Font(Font.FontFamily.UNDEFINED, 9, Font.ITALIC);
+        String headerText = "";
+        String footerText = "";
+        public HeaderFooter(String headerText, String footerText){
+            this.headerText = headerText;
+            this.footerText = footerText;
+        }
+
+        public void onEndPage(PdfWriter writer, Document document) {
+            PdfContentByte cb = writer.getDirectContent();
+            Phrase header = new Phrase(headerText, ffont);
+            Phrase footer = new Phrase(footerText, ffont);
+            ColumnText.showTextAligned(cb, Element.ALIGN_CENTER,
+                    header,
+                    (document.right() - document.left()) / 2 + document.leftMargin(),
+                    document.top() + 10, 0);
+            ColumnText.showTextAligned(cb, Element.ALIGN_CENTER,
+                    footer,
+                    (document.right() - document.left()) / 2 + document.leftMargin(),
+                    document.bottom() - 10, 0);
+        }
+    }
+
 }

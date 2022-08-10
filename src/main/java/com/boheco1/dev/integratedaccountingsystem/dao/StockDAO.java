@@ -1558,7 +1558,7 @@ public class StockDAO {
                         "+COALESCE((SELECT SUM(quantity) FROM MRTItem INNER JOIN MRT ON MRT.id=MRTItem.mrt_id WHERE MRTItem.releasing_id=a.id AND dateOfReturned >=? AND dateOfReturned <= ? GROUP BY MRTItem.releasing_id),0)\n" +
                         "-COALESCE((SELECT SUM(Quantity) FROM Releasing WHERE Releasing.StockID=a.id AND UpdatedAt >=? AND UpdatedAt <= ? GROUP BY Releasing.StockID),0)\n" +
                         "AS Balance\n" +
-                        "FROM stocks a left join ReceivingItem b on a.id=b.StockID LEFT JOIN Releasing c ON a.id=c.StockID left join MRTItem d ON a.id=d.releasing_id");
+                        "FROM stocks a left join ReceivingItem b on a.id=b.StockID LEFT JOIN Releasing c ON a.id=c.StockID left join MRTItem d ON a.id=d.releasing_id ORDER BY a.description ASC");
 
         ps.setString(1, to);
         ps.setString(2, from);

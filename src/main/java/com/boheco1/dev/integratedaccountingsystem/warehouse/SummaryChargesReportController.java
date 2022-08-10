@@ -2,14 +2,12 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.MirsDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.PrintPDF;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
-import com.boheco1.dev.integratedaccountingsystem.objects.MIRSItem;
-import com.boheco1.dev.integratedaccountingsystem.objects.ReleasedItemDetails;
-import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
-import com.boheco1.dev.integratedaccountingsystem.objects.SummaryCharges;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Rectangle;
@@ -86,7 +84,7 @@ public class SummaryChargesReportController implements Initializable {
 
                     if (selectedFile != null) {
                         float[] columns = {1f,1f,2f,1f,.5f,1f,1f,1f,1f,1f};
-                        PrintPDF pdf = new PrintPDF(selectedFile, columns);
+                        PrintPDF pdf = new PrintPDF(selectedFile, columns, "", "Prepared by: "+ActiveUser.getUser().getFullName());
                         pdf.header(null, "Summary of Charges (as of "+month+", "+year+")" .toUpperCase(), "".toUpperCase());
 
                         pdf.createCell(1,columns.length);
@@ -108,11 +106,11 @@ public class SummaryChargesReportController implements Initializable {
                             pdf.createCell(charges.getDescription(), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
                             pdf.createCell(String.format("%,.2f",charges.getPrice()), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
                             pdf.createCell(temp.getUnit(), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
-                            pdf.createCell(""+temp.getQuantity(), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
-                            pdf.createCell(""+charges.getIssued(), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
-                            pdf.createCell(""+charges.getReturned(), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
-                            pdf.createCell(""+charges.getReceived(), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
-                            pdf.createCell(""+charges.getBalance(), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
+                            pdf.createCell(isZero(temp.getQuantity()), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
+                            pdf.createCell(isZero(charges.getIssued()), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
+                            pdf.createCell(isZero(charges.getReturned()), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
+                            pdf.createCell(isZero(charges.getReceived()), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
+                            pdf.createCell(isZero(charges.getBalance()), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
                         }
 
                         pdf.generateLandscape();
@@ -134,6 +132,10 @@ public class SummaryChargesReportController implements Initializable {
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         });
         new Thread(task).start();
+    }
+
+    private String isZero(int n){
+        return n == 0 ? "-" : ""+n;
     }
 
 
