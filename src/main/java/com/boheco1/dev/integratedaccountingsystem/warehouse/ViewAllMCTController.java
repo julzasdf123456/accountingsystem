@@ -164,7 +164,7 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
 
                 //Create Table Content
                 ArrayList<String[]> rows = new ArrayList<>();
-                int[] rows_aligns = {Element.ALIGN_CENTER, Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_RIGHT,Element.ALIGN_RIGHT,Element.ALIGN_CENTER,Element.ALIGN_RIGHT};
+                int[] rows_aligns = {Element.ALIGN_CENTER, Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_RIGHT,Element.ALIGN_RIGHT,Element.ALIGN_CENTER,Element.ALIGN_CENTER};
 
                 double total=0;
                 HashMap<String, Double> acctCodeSummary = new HashMap<String, Double>();
@@ -177,7 +177,12 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                         }
                     }
                     Stock stock = StockDAO.get(ReleasingDAO.get(items.getId()).getStockID());
-                    String[] val = {stock.getAcctgCode(), stock.getId(),stock.getDescription()+additionalDescription, String.format("%,.2f", items.getPrice()), String.format("%,.2f", (items.getPrice() * items.getQuantity())), stock.getUnit(), "" + items.getQuantity()};
+                    String itemCode="-";
+                    if(stock.getNeaCode() != null || !stock.getNeaCode().isEmpty())
+                        itemCode = stock.getNeaCode();
+                    else
+                        itemCode = stock.getLocalCode();
+                    String[] val = {stock.getAcctgCode(), itemCode,stock.getDescription()+additionalDescription, String.format("%,.2f", items.getPrice()), String.format("%,.2f", (items.getPrice() * items.getQuantity())), stock.getUnit(), "" + items.getQuantity()};
                     total += items.getPrice() * items.getQuantity();
                     rows.add(val);
 
@@ -187,7 +192,7 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                         acctCodeSummary.replace(stock.getAcctgCode(),acctCodeSummary.get(stock.getAcctgCode()) + (items.getPrice() * items.getQuantity()) );
                     }
                 }
-                pdf.tableContent(rows, header_spans, rows_aligns);
+                pdf.tableContent(rows, header_spans, rows_aligns, Rectangle.NO_BORDER);
 
                 //Create Total display
                 pdf.createCell(1,3);
@@ -196,9 +201,8 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
 
                 //Create account code summary
                 for(Map.Entry<String, Double> acctCode : acctCodeSummary.entrySet()){
-                    pdf.createCell(acctCode.getKey(), 1, 11, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
-                    pdf.createCell(String.format("%,.2f", acctCode.getValue()), 6, 11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
-                    //spdf.createCell(" ", 5, 11, Font.NORMAL, Element.ALIGN_RIGHT, Rectangle.NO_BORDER);
+                    pdf.createCell(acctCode.getKey(), 1, 10, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+                    pdf.createCell(String.format("%,.2f", acctCode.getValue()), 6, 10, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
                 }
 
                 //create signatories
@@ -216,7 +220,6 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                         receivedByEmployee.getEmployeeFirstName().toUpperCase()+" " +
                                 receivedByEmployee.getEmployeeMidName().toUpperCase().charAt(0)+". " +
                                 receivedByEmployee.getEmployeeLastName().toUpperCase()+"\n"+receivedByEmployee.getDesignation(),4, 11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
-
 
                 pdf.generate();
             }catch (Exception e){

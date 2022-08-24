@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
+import org.openxmlformats.schemas.drawingml.x2006.main.STSystemColorVal;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -147,7 +148,7 @@ public class StockDAO {
      */
     public static Stock getStockViaNEALocalCode(String code) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM Stocks WHERE NEACode=? OR LocalCode=? ");
+                "SELECT * FROM Stocks WHERE (NEACode=? OR LocalCode=?) AND Quantity > 0 ");
         ps.setString(1, code);
         ps.setString(2, code);
         ResultSet rs = ps.executeQuery();
@@ -187,6 +188,22 @@ public class StockDAO {
         rs.close();
         return null;
     }
+
+    public static int getTotalStockViaNEALocalCode(String code) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT SUM(Stocks.Quantity) as Qty FROM Stocks WHERE NEACode=? OR LocalCode=? AND Quantity > 0 ");
+        ps.setString(1, code);
+        ps.setString(2, code);
+        ResultSet rs = ps.executeQuery();
+        int qty = 0;
+
+        if(rs.next()) {
+            qty = rs.getInt("Qty");
+        }
+        rs.close();
+        return qty;
+    }
+
 
     /**
      * Updates an existing Stock record
@@ -1437,9 +1454,10 @@ public class StockDAO {
      */
     public static int countPendingRequest(Stock stock) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT SUM(Quantity) AS 'pending' FROM MIRSItems mi " +
-                        "LEFT JOIN MIRS m ON m.id = mi.MIRSID WHERE (m.Status = 'Pending' OR m.Status = 'Releasing') AND mi.StockID = ?; ");
-        ps.setString(1, stock.getId());
+                "SELECT SUM(mi.Quantity) AS 'pending' FROM MIRSItems mi " +
+                        "LEFT JOIN MIRS m ON m.id = mi.MIRSID LEFT JOIN Stocks s ON s.id = mi.StockID " +
+                        "WHERE (m.Status = '"+Utility.PENDING+"' OR m.Status = '"+Utility.RELEASING+"') AND s.Description=?");
+        ps.setString(1, stock.getDescription());
         ResultSet rs = ps.executeQuery();
 
         int count = 0;
@@ -1449,14 +1467,13 @@ public class StockDAO {
         }
 
         int unavailable = StockDAO.countReleasingUnavailable(stock);
-
         return count-unavailable;
     }
 
     public static int countReleasingUnavailable(Stock stock) throws Exception {
-        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT SUM(r.Quantity) AS 'unavailable' FROM Releasing r " +
-                "WHERE r.MIRSID IN (SELECT m.id FROM MIRS m WHERE m.Status='releasing') " +
-                "AND r.StockID=?");
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT SUM(r.Quantity) AS 'unavailable' FROM Releasing r INNER JOIN Stocks s ON s.id=r.StockID " +
+                "WHERE r.MIRSID IN (SELECT m.id FROM MIRS m WHERE m.Status='"+Utility.RELEASING+"') " +
+                "AND s.Description=?");
 
         ps.setString(1, stock.getId());
 
@@ -1484,7 +1501,7 @@ public class StockDAO {
      */
     public static List<StockDescription> searchDescription(String key) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT (SELECT TOP 1 id FROM Stocks s2 WHERE s2.Description=s.Description) AS id, Description\n" +
+                "SELECT (SELECT TOP 1 id FROM Stocks s2 WHERE s2.Description=s.Description) AS id, Description, SUM(Quantity) as Qty\n" +
                         "FROM Stocks s \n" +
                         "WHERE s.Description LIKE ? \n" +
                         "GROUP BY Description\n" +
@@ -1499,7 +1516,8 @@ public class StockDAO {
         while(rs.next()) {
             stockDescriptions.add(new StockDescription(
                     rs.getString("id"),
-                    rs.getString("Description")
+                    rs.getString("Description"),
+                    rs.getInt("Qty")
             ));
         }
 
@@ -1507,6 +1525,9 @@ public class StockDAO {
         ps.close();
         return stockDescriptions;
     }
+
+
+
 
     public static boolean hasMultiple(String description) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
@@ -1521,7 +1542,7 @@ public class StockDAO {
     public static List<SlimStock> getByDescription(String description) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT id, StockName, Brand, Model, Description, Price, Unit, Quantity FROM Stocks " +
-                        "WHERE Description=? ORDER BY Brand");
+                        "WHERE Description=? and Quantity > 0 ORDER BY Brand");
 
         ps.setString(1, description);
 

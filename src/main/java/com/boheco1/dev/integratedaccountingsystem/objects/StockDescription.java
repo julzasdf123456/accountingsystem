@@ -2,11 +2,13 @@ package com.boheco1.dev.integratedaccountingsystem.objects;
 
 public class StockDescription {
     private String id;
-    private String Description;
+    private String description;
+    private int quantity;
 
-    public StockDescription(String id, String description) {
+    public StockDescription(String id, String description, int quantity) {
         this.id = id;
-        Description = description;
+        this.description = description;
+        this.quantity = quantity;
     }
 
     public String getId() {
@@ -18,10 +20,18 @@ public class StockDescription {
     }
 
     public String getDescription() {
-        return Description;
+        return description;
     }
 
     public void setDescription(String description) {
-        Description = description;
+        this.description = description;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }

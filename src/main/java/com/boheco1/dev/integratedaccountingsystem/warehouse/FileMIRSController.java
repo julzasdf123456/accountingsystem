@@ -25,6 +25,7 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
@@ -201,10 +202,11 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                     String code = row[0];
                                     int qty = Integer.parseInt(row[row.length - 1]);
                                     Stock stock = StockDAO.getStockViaNEALocalCode(code);
+                                    stock.setQuantity(StockDAO.getTotalStockViaNEALocalCode(code));
                                     if (stock == null) {
                                         errorLog += "No such Stock with a NEA/Local: "+ code + ".\n";
                                     } else {
-                                        if(qty > StockDAO.countAvailable(stock)){
+                                        if(qty >= StockDAO.countAvailable(stock)){
                                             errorLog += "Insufficient stock for item "+ code + ".\n";
                                         }else{
                                             addItem(stock, qty, true);
@@ -478,6 +480,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             StockDescription result = event.getCompletion();
             try {
                 stockToBeAdded = StockDAO.get(result.getId());
+                stockToBeAdded.setQuantity(result.getQuantity());
                 int av = StockDAO.countAvailable(stockToBeAdded);
                 if(av == 0) {
                     AlertDialogBuilder.messgeDialog("System Warning", "Insufficient stock.",

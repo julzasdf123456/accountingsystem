@@ -123,6 +123,15 @@ public class PrintPDF {
         }
     }
 
+    public  void tableContent(ArrayList<String[]> items, int[] spans, int[] positions, int border) {
+        for(int x=0;x<items.size();x++){
+            String[] data = items.get(x);
+            for (int i=0; i < data.length; i++){
+                createCell(data[i], spans[i],10, Font.NORMAL, positions[i], border);
+            }
+        }
+    }
+
     public void other_details(String[] details, int[] spans, int[] fonts, int[] aligns, int[] borders, boolean add_space){
         if (add_space)
             createCell(1,column.length);

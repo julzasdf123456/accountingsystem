@@ -427,6 +427,7 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
             StockDescription result = event.getCompletion();
             try {
                 selectedStock = StockDAO.get(result.getId());
+                selectedStock.setQuantity(result.getQuantity());
                 int av = StockDAO.countAvailable(selectedStock);
                 if(av == 0) {
                     AlertDialogBuilder.messgeDialog("System Warning", "Insufficient stock.",

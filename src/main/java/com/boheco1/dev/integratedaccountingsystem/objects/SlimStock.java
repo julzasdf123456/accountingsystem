@@ -15,6 +15,9 @@ public class SlimStock {
     private String RRNo;
     private String Code;
     private String localDescription;
+
+    public SlimStock(){}
+
     public SlimStock(String id, String stockName, String model, String brand) {
         this.id = id;
         StockName = stockName;
