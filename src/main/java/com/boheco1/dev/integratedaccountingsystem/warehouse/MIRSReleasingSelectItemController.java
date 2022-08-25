@@ -50,6 +50,7 @@ public class MIRSReleasingSelectItemController implements Initializable {
     private SlimStock currentSelection;
 
     private int counter = 0;
+    private int maxItem = 0;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
@@ -59,7 +60,7 @@ public class MIRSReleasingSelectItemController implements Initializable {
             for (SlimStock slimStock : items){
                 brand.getItems().add(slimStock);
             }
-            qty.setPromptText("Max. value "+mirsItem.getQuantity());
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -69,11 +70,14 @@ public class MIRSReleasingSelectItemController implements Initializable {
     void send(ActionEvent event) {
 
         try{
-            if(qty.getText().isEmpty()) {
+            if(brand.getSelectionModel().getSelectedItem() == null) {
+                AlertDialogBuilder.messgeDialog("System Message", "Please select a brand.", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            }else if(qty.getText().isEmpty()) {
                 AlertDialogBuilder.messgeDialog("System Message", "Quantity is required.", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }else{
                 int q = Integer.parseInt(qty.getText());
-                if(q > mirsItem.getQuantity()){
+
+                if(q > maxItem ){
                     AlertDialogBuilder.messgeDialog("System Message", "Invalid quantity, please try again.", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }else{
                     MIRSItem mirsItem = new MIRSItem();
@@ -87,17 +91,23 @@ public class MIRSReleasingSelectItemController implements Initializable {
                     mirsItem.setUpdatedAt(this.mirsItem.getUpdatedAt());
                     mirsItem.setAdditional(false);
 
+                    //update quantity of the selected item for releasing
                     this.mirsItem.setQuantity(this.mirsItem.getQuantity()-q);
-                    qty.setPromptText("Max. value "+this.mirsItem.getQuantity());
+
+                    currentSelection.setQuantity(currentSelection.getQuantity()-q);
+                    qty.setPromptText("");
                     qty.setText("");
+                    description.setText("");
+                    price.setText("");
                     parentController.receive(mirsItem);
-                    if(this.mirsItem.getQuantity() == 0){
-                        sendBtn.setDisable(true);
-                    }
+                    brand.valueProperty().set(null);
                 }
 
             }
-        }catch (Exception e){
+        }catch (NumberFormatException e){
+            AlertDialogBuilder.messgeDialog("System Message", "Invalid quantity, please try again.", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }
+        catch (Exception e){
             AlertDialogBuilder.messgeDialog("System Message", "Error encounter: "+ e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }
     }
@@ -107,6 +117,10 @@ public class MIRSReleasingSelectItemController implements Initializable {
         currentSelection = items.get(brand.getSelectionModel().getSelectedIndex());
         price.setText(String.format("%,.2f",currentSelection.getPrice()));
         description.setText(currentSelection.getDescription());
+        qty.setPromptText("Max. value "+currentSelection.getQuantity());
+        maxItem = currentSelection.getQuantity();
+
+        qty.setDisable(maxItem <= 0);
     }
 
 }
