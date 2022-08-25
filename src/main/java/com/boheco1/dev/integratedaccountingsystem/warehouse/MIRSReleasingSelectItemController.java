@@ -51,13 +51,26 @@ public class MIRSReleasingSelectItemController implements Initializable {
 
     private int counter = 0;
     private int maxItem = 0;
+
+    private HashMap<String, Integer> selected_items;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
-            mirsItem = (MIRSItem) Utility.getSelectedObject();
-            items = StockDAO.getByDescription(StockDAO.get(mirsItem.getStockID()).getDescription());
+            Object obj = Utility.getSelectedObject();
+            if (obj instanceof MIRSItem) {
+                mirsItem = (MIRSItem) obj;
+                items = StockDAO.getByDescription(StockDAO.get(mirsItem.getStockID()).getDescription());
+            }
+            selected_items = (HashMap<String, Integer>) Utility.getDictionary();
+
             parentController = Utility.getParentController();
             for (SlimStock slimStock : items){
+                String key = slimStock.getId();
+                int value = 0;
+                if (selected_items.containsKey(key)){
+                    value = selected_items.get(key);
+                    slimStock.setQuantity(slimStock.getQuantity()-value);
+                }
                 brand.getItems().add(slimStock);
             }
 
@@ -100,7 +113,16 @@ public class MIRSReleasingSelectItemController implements Initializable {
                     description.setText("");
                     price.setText("");
                     parentController.receive(mirsItem);
+                    String key = this.brand.getSelectionModel().getSelectedItem().getId();
+                    if (selected_items.containsKey(key)){
+                        int value = selected_items.get(key);
+                        int new_qty = value + q;
+                        selected_items.put(key, new_qty);
+                    }else{
+                        selected_items.put(key, q);
+                    }
                     brand.valueProperty().set(null);
+                    maxItem = 0;
                 }
 
             }

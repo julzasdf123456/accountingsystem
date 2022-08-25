@@ -44,6 +44,7 @@ public class Utility {
 
     private static Object selected;
 
+    private static HashMap dictionary;
     private static FlowPane subToolbar;
 
     private static ViewMRController mrController;
@@ -126,5 +127,13 @@ public class Utility {
 
     public static void setParentController(ObjectTransaction parentController) {
         Utility.parentController = parentController;
+    }
+
+    public static HashMap getDictionary() {
+        return dictionary;
+    }
+
+    public static void setDictionary(HashMap dictionary) {
+        Utility.dictionary = dictionary;
     }
 }

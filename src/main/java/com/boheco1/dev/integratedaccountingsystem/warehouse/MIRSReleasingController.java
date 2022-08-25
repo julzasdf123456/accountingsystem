@@ -62,6 +62,8 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
     private List<MIRSSignatory> signatories;
     private ObservableList<MIRSItem> requestedItem, releasingItem;
 
+    private HashMap<String, Integer> selected_items = new HashMap<>();
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         InputValidation.restrictNumbersOnly(quantity);
@@ -253,6 +255,10 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                                                 @Override
                                                 public void handle(ActionEvent __) {
                                                     releasingItem.remove(mirsItem);
+                                                    //Get quantity of stock in the hashmap
+                                                    int qty_current = selected_items.get(mirsItem.getStockID());
+                                                    //Deduct from the current quantity and update value in hashmap
+                                                    selected_items.put(mirsItem.getStockID(), qty_current - mirsItem.getQuantity());
                                                     if(!mirsItem.isAdditional()) {
                                                         boolean found = false;
                                                         for (MIRSItem m : requestedItem){
@@ -395,6 +401,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                     String hasMultipleBrand = hasMultipleBrand(); // return description
                     if(hasMultipleBrand != null){
                         Utility.setSelectedObject(mirsItem);
+                        Utility.setDictionary(selected_items);
                         ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_mirs_releasing_select_item.fxml", Utility.getStackPane());
                     }else{
                         System.out.println(mirsItem.getQuantity());
@@ -1083,18 +1090,21 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
 
     @Override
     public void receive(Object o) {
-        MIRSItem mirsItem = (MIRSItem) o;
-        releasingItem.add(mirsItem);
-
-        for (MIRSItem m : requestedItem){
-            if(m.getId().equals(mirsItem.getId())){
-                if(m.getQuantity() == 0) {
-                    requestedItem.remove(m);
+        if (o instanceof MIRSItem) {
+            MIRSItem mirsItem = (MIRSItem) o;
+            releasingItem.add(mirsItem);
+            for (MIRSItem m : requestedItem) {
+                if (m.getId().equals(mirsItem.getId())) {
+                    if (m.getQuantity() == 0) {
+                        requestedItem.remove(m);
+                    }
+                    break;
                 }
-                break;
             }
+            requestedItemTable.refresh();
+            releasingItemTable.refresh();
+        }else{
+
         }
-        requestedItemTable.refresh();
-        releasingItemTable.refresh();
     }
 }
