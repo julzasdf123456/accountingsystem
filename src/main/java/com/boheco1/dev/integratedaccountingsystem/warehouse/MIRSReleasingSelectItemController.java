@@ -90,8 +90,11 @@ public class MIRSReleasingSelectItemController implements Initializable {
             }else{
                 int q = Integer.parseInt(qty.getText());
 
-                if(q > maxItem ){
-                    AlertDialogBuilder.messgeDialog("System Message", "Invalid quantity, please try again.", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+
+                if(q > mirsItem.getQuantity()) {//check quantity of current item
+                    AlertDialogBuilder.messgeDialog("System Message", "Maximum allowed quantity is: " + mirsItem.getQuantity(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }else if(q > maxItem ){
+                    AlertDialogBuilder.messgeDialog("System Message", "Insufficient stock, please try again.", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }else{
                     MIRSItem mirsItem = new MIRSItem();
                     mirsItem.setId(this.mirsItem.getId());
@@ -123,6 +126,7 @@ public class MIRSReleasingSelectItemController implements Initializable {
                     }
                     brand.valueProperty().set(null);
                     maxItem = 0;
+                    sendBtn.setDisable(this.mirsItem.getQuantity() == 0);
                 }
 
             }
@@ -136,13 +140,15 @@ public class MIRSReleasingSelectItemController implements Initializable {
 
     @FXML
     void selectBrand(ActionEvent event) {
-        currentSelection = items.get(brand.getSelectionModel().getSelectedIndex());
-        price.setText(String.format("%,.2f",currentSelection.getPrice()));
-        description.setText(currentSelection.getDescription());
-        qty.setPromptText("Max. value "+currentSelection.getQuantity());
-        maxItem = currentSelection.getQuantity();
-
-        qty.setDisable(maxItem <= 0);
+        if(brand.getSelectionModel().getSelectedIndex() != -1) {
+            currentSelection = items.get(brand.getSelectionModel().getSelectedIndex());
+            price.setText(String.format("%,.2f", currentSelection.getPrice()));
+            description.setText(currentSelection.getDescription());
+            qty.setPromptText("Max. value " + currentSelection.getQuantity());
+            maxItem = currentSelection.getQuantity();
+            qty.setText("");
+            qty.setDisable(maxItem <= 0);
+        }
     }
 
 }

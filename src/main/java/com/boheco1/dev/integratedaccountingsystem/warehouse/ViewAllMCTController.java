@@ -192,7 +192,7 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                         acctCodeSummary.replace(stock.getAcctgCode(),acctCodeSummary.get(stock.getAcctgCode()) + (items.getPrice() * items.getQuantity()) );
                     }
                 }
-                pdf.tableContent(rows, header_spans, rows_aligns, Rectangle.NO_BORDER);
+                pdf.tableContent(rows, header_spans, rows_aligns, Element.ALIGN_TOP, Rectangle.NO_BORDER);
 
                 //Create Total display
                 pdf.createCell(1,3);

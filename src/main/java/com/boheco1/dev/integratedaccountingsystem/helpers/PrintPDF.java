@@ -132,6 +132,15 @@ public class PrintPDF {
         }
     }
 
+    public  void tableContent(ArrayList<String[]> items, int[] spans, int[] positions,int Valignment, int border ) {
+        for(int x=0;x<items.size();x++){
+            String[] data = items.get(x);
+            for (int i=0; i < data.length; i++){
+                createCell(data[i], spans[i],10, Font.NORMAL, positions[i], Valignment, border);
+            }
+        }
+    }
+
     public void other_details(String[] details, int[] spans, int[] fonts, int[] aligns, int[] borders, boolean add_space){
         if (add_space)
             createCell(1,column.length);
@@ -183,6 +192,15 @@ public class PrintPDF {
             cell.setBorder(Rectangle.NO_BORDER);
             table.addCell(cell);
         }
+    }
+
+    public void createCell(String text, int span, int size, int font, int Halignment, int valignment, int border){
+        cell=new PdfPCell(new Paragraph(text,new Font(Font.FontFamily.TIMES_ROMAN,size,font)));
+        cell.setColspan(span);
+        cell.setHorizontalAlignment(Halignment);
+        cell.setVerticalAlignment(valignment);
+        cell.setBorder(border);
+        table.addCell(cell);
     }
 
     public void createCell(String text, int span, int size, int font, int alignment, int border){

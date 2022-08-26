@@ -71,7 +71,10 @@ public class MIRSItemItemizedController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
-            mirsItem = (MIRSItem) Utility.getSelectedObject();
+            Object obj = Utility.getSelectedObject();
+            if (obj instanceof MIRSItem) {
+                mirsItem = (MIRSItem) obj;
+            }
             remarks.setTextFormatter(new TextFormatter<String>(change ->
                     change.getControlNewText().length() <= 200 ? change : null));
 
@@ -90,7 +93,7 @@ public class MIRSItemItemizedController implements Initializable {
             for (Map.Entry i : holder.entrySet()) {
                 ItemizedMirsItem item = holder.get(i.getKey());
                 if(item.getStockID().equals(mirsItem.getStockID())){
-                    itemized.add(item);
+                        itemized.add(item);
                 }
             }
             itemizedItemTable.refresh();
@@ -129,7 +132,6 @@ public class MIRSItemItemizedController implements Initializable {
     @FXML
     void clearFields(ActionEvent event) {
         selectedAnItem = null;
-        brand.setText("");
         serial.setText("");
         remarks.setText("");
         charCounter.setText(remarks.getText().length()+"/200");
@@ -181,8 +183,8 @@ public class MIRSItemItemizedController implements Initializable {
     }
 
     private void prepareTable(){
-        TableColumn<ItemizedMirsItem, String> brandCol = new TableColumn<>("Brand");
-        brandCol.setCellValueFactory(new PropertyValueFactory<>("Brand"));
+        TableColumn<ItemizedMirsItem, String> brandCol = new TableColumn<>("Serial");
+        brandCol.setCellValueFactory(new PropertyValueFactory<>("Serial"));
         itemized = FXCollections.observableArrayList();
         itemizedItemTable.setItems(itemized);
 
