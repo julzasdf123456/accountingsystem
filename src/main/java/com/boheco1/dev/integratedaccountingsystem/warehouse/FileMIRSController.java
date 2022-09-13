@@ -38,6 +38,9 @@ import java.util.ResourceBundle;
 public class FileMIRSController extends MenuControllerHandler implements Initializable, SubMenuHelper {
 
     String errorLog = "Log: \n";//set to global to access it in the Task class
+    String currentItem = "";
+    String messageType = "";
+    String messageTitle = "";
     @FXML
     private DatePicker filingDate;
 
@@ -176,6 +179,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
     @FXML
     void uploadMirsItem(ActionEvent event) {
+
         errorLog = "";
         Stage stage = (Stage) Utility.getStackPane().getScene().getWindow();
         FileChooser fileChooser = new FileChooser();
@@ -188,6 +192,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         if (selectedFile != null) {
             try {
                 if (selectedFile != null) {
+
                     // Create a background Task
                     Task<Void> task = new Task<>() {
                         @Override
@@ -200,25 +205,38 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                 for(int i = 1; i < allRows.size(); i++) { //start looping at 1 to skip column header
                                     String[] row = allRows.get(i);
                                     String code = row[0];
-                                    int qty = Integer.parseInt(row[row.length - 1]);
+                                    currentItem = row[1];
+                                    int qty = Integer.parseInt(row[row.length - 1].replace(" ",""));
                                     Stock stock = StockDAO.getStockViaNEALocalCode(code);
-                                    stock.setQuantity(StockDAO.getTotalStockViaNEALocalCode(code));
                                     if (stock == null) {
-                                        errorLog += "No such Stock with a NEA/Local: "+ code + ".\n";
+                                        errorLog += "Can not find NEA/Local: "+ code + ".\n";
                                     } else {
+                                        stock.setQuantity(StockDAO.getTotalStockViaNEALocalCode(code));
                                         if(qty >= StockDAO.countAvailable(stock)){
-                                            errorLog += "Insufficient stock for item "+ code + ".\n";
+                                            errorLog += "Insufficient stock for item "+ code + " (In-stock: "+stock.getQuantity()+").\n";
                                         }else{
                                             addItem(stock, qty, true);
                                         }
                                     }
+                                    messageTitle = "Task Complete";
+                                    messageType = AlertDialogBuilder.SUCCESS_DIALOG;
                                 }
-                            } catch (NumberFormatException e) {
-                                //e.printStackTrace();
-                                errorLog+="Invalid quantity provided.\n";
+                            }catch (NumberFormatException e) {
+                                e.printStackTrace();
+                                messageTitle = "Error Encounter";
+                                messageType = AlertDialogBuilder.DANGER_DIALOG;
+                                errorLog+="Invalid quantity provided for item "+currentItem+".";
+                                dialog.close();
+                            }catch (NullPointerException e){
+                                e.printStackTrace();
+                                messageTitle = "Error Encounter";
+                                messageType = AlertDialogBuilder.DANGER_DIALOG;
+                                errorLog+=e.getMessage()+"\n";
                                 dialog.close();
                             }catch (Exception e){
-                                //e.printStackTrace();
+                                e.printStackTrace();
+                                messageTitle = "Error Encounter";
+                                messageType = AlertDialogBuilder.DANGER_DIALOG;
                                 errorLog+=e.getMessage()+"\n";
                                 dialog.close();
                             }
@@ -228,8 +246,8 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
                     task.setOnSucceeded(wse -> {
                         dialog.close();
-                        AlertDialogBuilder.messgeDialog("System Message", "Task complete.\n"+errorLog ,
-                                Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                        AlertDialogBuilder.messgeDialog("System Message", messageTitle +"\n"+errorLog ,
+                                Utility.getStackPane(), messageType);
                         items.setText("");
                         quantity.setText("");
                         stockToBeAdded = null;
