@@ -209,7 +209,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                     int qty = Integer.parseInt(row[row.length - 1].replace(" ",""));
                                     Stock stock = StockDAO.getStockViaNEALocalCode(code);
                                     if (stock == null) {
-                                        errorLog += "Can not find NEA/Local: "+ code + ".\n";
+                                        errorLog += "Can not find NEA/Local: "+ code + ", or item is out of stock.\n";
                                     } else {
                                         stock.setQuantity(StockDAO.getTotalStockViaNEALocalCode(code));
                                         if(qty >= StockDAO.countAvailable(stock)){
