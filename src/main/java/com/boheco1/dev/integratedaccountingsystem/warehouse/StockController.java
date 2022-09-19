@@ -125,18 +125,11 @@ public class StockController extends MenuControllerHandler implements Initializa
             Platform.runLater(() -> {
                 try {
                     CSVWriter writer = new CSVWriter(new FileWriter(selectedFile));
-                    String[] header = "id,Code,Description,Model,Brand,Current Price,Updated Price".split(",");
+                    String[] header = "id,LocalCode, NEACode, Description,Model,Brand,Current Price,Updated Price".split(",");
                     writer.writeNext(header);
                     List<Stock> stocks = StockDAO.getInventory();
                     for (Stock stock : stocks) {
-                        String code = "";
-                        String neaCode = stock.getNeaCode();
-                        if (neaCode != null && neaCode.length() != 0) {
-                            code = neaCode;
-                        }else{
-                            code = stock.getLocalCode();
-                        }
-                        writer.writeNext(new String[]{stock.getId(), code, stock.getDescription(), stock.getModel(), stock.getBrand(), stock.getPrice() + "", stock.getPrice() + ""});
+                        writer.writeNext(new String[]{stock.getId(), stock.getLocalCode(), stock.getNeaCode(), stock.getDescription(), stock.getModel(), stock.getBrand(), stock.getPrice() + "", stock.getPrice() + ""});
                     }
                     writer.close();
                     if (selectedFile.exists()) {

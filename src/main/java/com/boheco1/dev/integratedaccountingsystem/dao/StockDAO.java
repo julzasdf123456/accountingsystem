@@ -94,6 +94,67 @@ public class StockDAO {
 
     /**
      * Retrieves a single Stock record
+     * @param code the local code or nea code identifier of the Stock record to be retrieved
+     * @param brand the brand identifier of the Stock record to be retrieved
+     * @return Stock object
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static Stock get(String code,String desc, String brand) throws Exception {
+        PreparedStatement ps = null;
+        if (brand == null || brand.isEmpty() || brand.equals("")) {
+            ps = DB.getConnection().prepareStatement(
+                    "SELECT * FROM Stocks WHERE id=(SELECT id FROM Stocks WHERE (localCode=? OR neacode=?) AND Description=? AND brand IS NULL)");
+            ps.setString(1, code);
+            ps.setString(2, code);
+            ps.setString(3, desc);
+        }else{
+            ps = DB.getConnection().prepareStatement(
+                    "SELECT * FROM Stocks WHERE id=(SELECT id FROM Stocks WHERE (localCode=? OR neacode=?) AND Description=? AND brand=?)");
+            ps.setString(1, code);
+            ps.setString(2, code);
+            ps.setString(3, desc);
+            ps.setString(4, brand);
+        }
+        ResultSet rs = ps.executeQuery();
+        if(rs.next()) {
+            Stock stock = new Stock(
+                    rs.getString("id"),
+                    rs.getString("StockName"),
+                    rs.getString("Description"),
+                    rs.getString("SerialNumber"),
+                    rs.getString("Brand"),
+                    rs.getString("Model"),
+                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
+                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
+                    rs.getString("TypeID"),
+                    rs.getString("Unit"),
+                    rs.getInt("Quantity"),
+                    rs.getInt("Critical"),
+                    rs.getDouble("Price"),
+                    rs.getString("NEACode"),
+                    rs.getBoolean("IsTrashed"),
+                    rs.getString("Comments"),
+                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
+                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
+                    rs.getString("UserIDCreated"),
+                    rs.getString("UserIDUpdated"),
+                    rs.getString("UserIDTrashed"),
+                    rs.getString("LocalCode"),
+                    rs.getString("AcctgCode"),
+                    rs.getBoolean("Individualized")
+            );
+            stock.setLocalDescription(rs.getString("localDescription"));
+            rs.close();
+
+            return stock;
+        }
+        rs.close();
+        return null;
+    }
+
+    /**
+     * Retrieves a single Stock record
      * @param id the identifier of the Stock record to be retrieved
      * @return Stock object
      * @throws Exception obligatory from DB.getConnection()
