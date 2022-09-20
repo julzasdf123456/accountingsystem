@@ -308,7 +308,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         //will update quantity if item is already added to the request
         for(MIRSItem added: mirsItemRequested){
             if(added.getStockID().equals(stock.getId())){
-                int newQty = added.getQuantity() + qty;
+                double newQty = added.getQuantity() + qty;
                 if(newQty > StockDAO.countAvailable(stock)){
                     AlertDialogBuilder.messgeDialog("System Message", "Insufficient stock for item "+stock.getId(),
                             Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
@@ -499,7 +499,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             try {
                 stockToBeAdded = StockDAO.get(result.getId());
                 stockToBeAdded.setQuantity(result.getQuantity());
-                int av = StockDAO.countAvailable(stockToBeAdded);
+                double av = StockDAO.countAvailable(stockToBeAdded);
                 if(av == 0) {
                     AlertDialogBuilder.messgeDialog("System Warning", "Insufficient stock.",
                             Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);

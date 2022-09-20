@@ -8,7 +8,7 @@ public class MIRSItem {
     private String id;
     private String mirsID;
     private String stockID;
-    private int quantity;
+    private double quantity;
     private double price;
     private String remarks;
     private String particulars;
@@ -20,7 +20,7 @@ public class MIRSItem {
 
     public MIRSItem(){}
 
-    public MIRSItem(String id, String mirsID, String stockID, int quantity, double price, String remarks, LocalDateTime createdAt, LocalDateTime updatedAt, boolean isAdditional) {
+    public MIRSItem(String id, String mirsID, String stockID, double quantity, double price, String remarks, LocalDateTime createdAt, LocalDateTime updatedAt, boolean isAdditional) {
         this.id = id;
         this.mirsID = mirsID;
         this.stockID = stockID;
@@ -56,11 +56,11 @@ public class MIRSItem {
         this.stockID = stockID;
     }
 
-    public int getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(double quantity) {
         this.quantity = quantity;
     }
 

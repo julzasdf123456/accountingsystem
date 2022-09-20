@@ -43,7 +43,7 @@ public class StockDAO {
         ps.setString(8, stock.getTypeID());
         ps.setString(9, stock.getUnit());
 
-        ps.setInt(10, stock.getQuantity());
+        ps.setDouble(10, stock.getQuantity());
         ps.setDouble(11, stock.getPrice());
         ps.setString(12, stock.getNeaCode());
 
@@ -306,7 +306,7 @@ public class StockDAO {
         ps.setString(8,stock.getTypeID());
         ps.setString(9, stock.getUnit());
 
-        ps.setInt(10, stock.getQuantity());
+        ps.setDouble(10, stock.getQuantity());
         ps.setDouble(11, stock.getPrice());
         ps.setString(12, stock.getNeaCode());
 
@@ -650,11 +650,11 @@ public class StockDAO {
      * @param quantity the new quantity to given to the stock
      * @throws Exception obligatory from DB.getConnection()
      */
-    private static void changeQuantity(Stock stock, int quantity) throws Exception {
+    private static void changeQuantity(Stock stock, double quantity) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE Stocks SET quantity=?, UpdatedAt=GETDATE(), UserIDUpdated=? " +
                         "WHERE id = ?");
-        ps.setInt(1, quantity);
+        ps.setDouble(1, quantity);
         ps.setString(2, ActiveUser.getUser().getId());
         ps.setString(3, stock.getId());
 
@@ -670,7 +670,7 @@ public class StockDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static void addStockQuantity(Stock stock, int quantity) throws Exception {
-        int newQty = stock.getQuantity() + quantity;
+        double newQty = stock.getQuantity() + quantity;
         changeQuantity(stock, newQty);
     }
 
@@ -680,8 +680,8 @@ public class StockDAO {
      * @param quantity the quantity to be deducted from the stock
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static void deductStockQuantity(Stock stock, int quantity) throws Exception {
-        int newQty = stock.getQuantity() - quantity;
+    public static void deductStockQuantity(Stock stock, double quantity) throws Exception {
+        double newQty = stock.getQuantity() - quantity;
         changeQuantity(stock, newQty);
     }
 
@@ -1549,7 +1549,7 @@ public class StockDAO {
         return count;
     }
 
-    public static int countAvailable(Stock stock) throws Exception {
+    public static double countAvailable(Stock stock) throws Exception {
         int pending = countPendingRequest(stock);
 
         return stock.getQuantity()-pending;

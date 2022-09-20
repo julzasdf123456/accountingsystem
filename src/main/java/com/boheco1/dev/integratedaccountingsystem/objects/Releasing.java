@@ -6,7 +6,7 @@ public class Releasing {
     private String id;
     private String stockID;
     private String mirsID;
-    private int quantity;
+    private double quantity;
     private double price;
     private String userID;
     private String status;
@@ -49,7 +49,7 @@ public class Releasing {
         this.mctNo = mctNo;
     }
 
-    public Releasing(String id, String stockID, String mirsID, int quantity, double price, String userID, String status, String workdOrderNo, String mctNo, String acctCode) {
+    public Releasing(String id, String stockID, String mirsID, double quantity, double price, String userID, String status, String workdOrderNo, String mctNo, String acctCode) {
         this.id = id;
         this.stockID = stockID;
         this.mirsID = mirsID;
@@ -96,11 +96,11 @@ public class Releasing {
         this.mirsID = mirsID;
     }
 
-    public int getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(double quantity) {
         this.quantity = quantity;
     }
 

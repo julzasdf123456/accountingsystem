@@ -3,11 +3,11 @@ package com.boheco1.dev.integratedaccountingsystem.objects;
 public class ReceivingItem {
     private String rrNo;
     private String stockId;
-    private int qtyDelivered;
-    private int qtyAccepted;
+    private double qtyDelivered;
+    private double qtyAccepted;
     private double unitCost;
 
-    public ReceivingItem(String rrNo, String stockId, int qtyDelivered, int qtyAccepted, double unitCost) {
+    public ReceivingItem(String rrNo, String stockId, double qtyDelivered, double qtyAccepted, double unitCost) {
         this.rrNo = rrNo;
         this.stockId = stockId;
         this.qtyDelivered = qtyDelivered;
@@ -41,7 +41,7 @@ public class ReceivingItem {
         this.stockId = stockId;
     }
 
-    public int getQtyDelivered() {
+    public double getQtyDelivered() {
         return qtyDelivered;
     }
 
@@ -49,7 +49,7 @@ public class ReceivingItem {
         this.qtyDelivered = qtyDelivered;
     }
 
-    public int getQtyAccepted() {
+    public double getQtyAccepted() {
         return qtyAccepted;
     }
 
@@ -57,7 +57,7 @@ public class ReceivingItem {
         this.qtyAccepted = qtyAccepted;
     }
 
-    public int getReturned() {
+    public double getReturned() {
         return qtyDelivered-qtyAccepted;
     }
 }

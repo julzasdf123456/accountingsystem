@@ -62,7 +62,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
     private List<MIRSSignatory> signatories;
     private ObservableList<MIRSItem> requestedItem, releasingItem;
 
-    private HashMap<String, Integer> selected_items = new HashMap<>();
+    private HashMap<String, Double> selected_items = new HashMap<>();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -256,14 +256,14 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                                                 public void handle(ActionEvent __) {
                                                     releasingItem.remove(mirsItem);
                                                     //Get quantity of stock in the hashmap
-                                                    int qty_current = selected_items.get(mirsItem.getStockID());
+                                                    double qty_current = selected_items.get(mirsItem.getStockID());
                                                     //Deduct from the current quantity and update value in hashmap
                                                     selected_items.put(mirsItem.getStockID(), qty_current - mirsItem.getQuantity());
                                                     if(!mirsItem.isAdditional()) {
                                                         boolean found = false;
                                                         for (MIRSItem m : requestedItem){
                                                             if(m.getId().equals(mirsItem.getId())){
-                                                                int updateQty = m.getQuantity() + mirsItem.getQuantity();
+                                                                double updateQty = m.getQuantity() + mirsItem.getQuantity();
                                                                 m.setQuantity(updateQty);
                                                                 found = true;
                                                                 break;
@@ -1057,7 +1057,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
             StockDescription result = event.getCompletion();
             try {
                 selectedStock = StockDAO.get(result.getId());
-                int av = StockDAO.countAvailable(selectedStock);
+                double av = StockDAO.countAvailable(selectedStock);
                 if(av == 0) {
                     AlertDialogBuilder.messgeDialog("System Warning", "Insufficient stock.",
                             Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
