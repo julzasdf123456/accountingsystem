@@ -9,7 +9,7 @@ public class ReleasedItemDetails {
     private String mirsItemId;
     private String mirsID;
     private String stockID;
-    private int quantity;
+    private double quantity;
     private double price;
     private String status;
     private String unit;
@@ -64,7 +64,7 @@ public class ReleasedItemDetails {
         this.stockID = stockID;
     }
 
-    public int getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 
@@ -112,7 +112,7 @@ public class ReleasedItemDetails {
         this.updatedAt = updatedAt;
     }
 
-    public int getRemaining() throws Exception {
+    public double getRemaining() throws Exception {
         MIRSItem mirsItem = new MIRSItem();
         mirsItem.setMirsID(mirsID);
         mirsItem.setStockID(stockID);
@@ -120,7 +120,7 @@ public class ReleasedItemDetails {
         return Math.max(MirsDAO.getBalance(mirsItem), 0);
     }
 
-    public int getActualReleased() throws Exception {
+    public double getActualReleased() throws Exception {
         MIRSItem mirsItem = new MIRSItem();
         mirsItem.setMirsID(mirsID);
         mirsItem.setStockID(stockID);

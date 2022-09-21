@@ -82,7 +82,7 @@ public class MirsDAO {
 
         ps.setString(1, mirs.getId());
         ps.setString(2, item.getStockID());
-        ps.setInt(3, item.getQuantity());
+        ps.setDouble(3, item.getQuantity());
         ps.setDouble(4, item.getPrice());
         ps.setString(5, item.getRemarks());
         ps.setString(6, item.getId());
@@ -107,7 +107,7 @@ public class MirsDAO {
         for(MIRSItem item: items) {
             ps.setString(1, mirs.getId());
             ps.setString(2, item.getStockID());
-            ps.setInt(3, item.getQuantity());
+            ps.setDouble(3, item.getQuantity());
             ps.setDouble(4, item.getPrice());
             ps.setString(5, item.getRemarks());
             ps.setString(6, Utility.generateRandomId());
@@ -130,7 +130,7 @@ public class MirsDAO {
                 "UPDATE MIRSItems SET StockID=?, Quantity=?, Price=?, Comments=?, UpdatedAt=GETDATE() " +
                         "WHERE id=?");
         ps.setString(1, item.getStockID());
-        ps.setInt(2, item.getQuantity());
+        ps.setDouble(2, item.getQuantity());
         ps.setDouble(3, item.getPrice());
         ps.setString(4, item.getRemarks());
 
@@ -729,7 +729,7 @@ public class MirsDAO {
         return releasedItemDetails;
     }
 
-    public static int getBalance(MIRSItem item) throws Exception {
+    public static double getBalance(MIRSItem item) throws Exception {
         //PreparedStatement ps = DB.getConnection().prepareStatement(
          //       "SELECT SUM(Quantity) FROM Releasing r WHERE r.StockID = ? AND MIRSID = ?;");
 

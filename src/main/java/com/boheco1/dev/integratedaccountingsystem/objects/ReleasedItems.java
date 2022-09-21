@@ -9,11 +9,11 @@ public class ReleasedItems {
     private String description;
     private String mctNo;
     private double price;
-    private int quantity;
+    private double quantity;
     private String stockID;
     private int balance;
 
-    public ReleasedItems(String id, String description, String mctNo, double price, int quantity) {
+    public ReleasedItems(String id, String description, String mctNo, double price, double quantity) {
         this.id = id;
         this.description = description;
         this.mctNo = mctNo;
@@ -46,7 +46,7 @@ public class ReleasedItems {
         return price;
     }
 
-    public int getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 

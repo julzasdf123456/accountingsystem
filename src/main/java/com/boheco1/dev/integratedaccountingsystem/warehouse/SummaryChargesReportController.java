@@ -138,6 +138,10 @@ public class SummaryChargesReportController implements Initializable {
         return n == 0 ? "-" : ""+n;
     }
 
+    private String isZero(double n){
+        return n == 0 ? "-" : ""+n;
+    }
+
 
     @FXML
     private void selectByMonth(ActionEvent event) throws SQLException, ClassNotFoundException {
