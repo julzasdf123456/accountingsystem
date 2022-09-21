@@ -499,7 +499,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             try {
                 stockToBeAdded = StockDAO.get(result.getId());
                 stockToBeAdded.setQuantity(result.getQuantity());
-                int av = StockDAO.countAvailable(stockToBeAdded);
+                double av = StockDAO.countAvailable(stockToBeAdded);
                 if(av == 0) {
                     AlertDialogBuilder.messgeDialog("System Warning", "Insufficient stock.",
                             Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);

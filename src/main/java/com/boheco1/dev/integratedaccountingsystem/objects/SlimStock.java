@@ -9,7 +9,7 @@ public class SlimStock {
     private String Model;
     private String Brand;
     private String Description;
-    private int Quantity;
+    private double Quantity;
     private String Unit;
     private double Price;
     private String RRNo;
@@ -65,11 +65,11 @@ public class SlimStock {
         this.Description = description;
     }
 
-    public int getQuantity() {
+    public double getQuantity() {
         return Quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(double quantity) {
         this.Quantity = quantity;
     }
 

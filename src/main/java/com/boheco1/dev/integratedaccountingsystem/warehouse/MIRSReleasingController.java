@@ -1057,7 +1057,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
             StockDescription result = event.getCompletion();
             try {
                 selectedStock = StockDAO.get(result.getId());
-                int av = StockDAO.countAvailable(selectedStock);
+                double av = StockDAO.countAvailable(selectedStock);
                 if(av == 0) {
                     AlertDialogBuilder.messgeDialog("System Warning", "Insufficient stock.",
                             Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);

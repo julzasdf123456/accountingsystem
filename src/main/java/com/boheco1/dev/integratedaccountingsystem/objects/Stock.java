@@ -15,7 +15,7 @@ public class Stock {
     private LocalDate validityDate;
     private String typeID;
     private String unit;
-    private int quantity;
+    private double quantity;
     private int critical;
     private double price;
     private String neaCode;
@@ -53,7 +53,7 @@ public class Stock {
     }
 
     /** Constructor with critical **/
-    public Stock(String id, String stockName, String description, String serialNumber, String brand, String model, LocalDate manufacturingDate, LocalDate validityDate, String typeID, String unit, int quantity, int critical, double price, String neaCode, boolean isTrashed, String comments, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime trashedAt, String userIDCreated, String userIDUpdated, String userIDTrashed, String localCode, String acctgCode, boolean individualized) {
+    public Stock(String id, String stockName, String description, String serialNumber, String brand, String model, LocalDate manufacturingDate, LocalDate validityDate, String typeID, String unit, double quantity, int critical, double price, String neaCode, boolean isTrashed, String comments, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime trashedAt, String userIDCreated, String userIDUpdated, String userIDTrashed, String localCode, String acctgCode, boolean individualized) {
         this.id = id;
         this.stockName = stockName;
         this.description = description;
@@ -193,11 +193,11 @@ public class Stock {
         this.unit = unit;
     }
 
-    public int getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(double quantity) {
         this.quantity = quantity;
     }
 

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class StockEntryLog {
     private String id;
     private String stockID;
-    private int quantity;
+    private double quantity;
     private String source;
     private double Price;
     private String userID;
@@ -22,7 +22,7 @@ public class StockEntryLog {
 
     public StockEntryLog() {}
 
-    public StockEntryLog(String id, String stockID, int quantity, String source, double price, String userID, LocalDateTime createdAt, LocalDateTime updatedAt, String rrNo) {
+    public StockEntryLog(String id, String stockID, double quantity, String source, double price, String userID, LocalDateTime createdAt, LocalDateTime updatedAt, String rrNo) {
         this.id = id;
         this.stockID = stockID;
         this.quantity = quantity;
@@ -58,11 +58,11 @@ public class StockEntryLog {
         this.stockID = stockID;
     }
 
-    public int getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(double quantity) {
         this.quantity = quantity;
     }
 

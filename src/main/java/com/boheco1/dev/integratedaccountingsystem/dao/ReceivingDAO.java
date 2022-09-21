@@ -186,8 +186,8 @@ public class ReceivingDAO {
         ps.setString(1, RRNo);
         for(ReceivingItem item: items) {
             ps.setString(2, item.getStockId());
-            ps.setInt(3, item.getQtyDelivered());
-            ps.setInt(4, item.getQtyAccepted());
+            ps.setDouble(3, item.getQtyDelivered());
+            ps.setDouble(4, item.getQtyAccepted());
             ps.setDouble(5, item.getUnitCost());
 
             ps.addBatch();
@@ -251,14 +251,14 @@ public class ReceivingDAO {
 
                 //Insert Receiving item
                 ps2.setString(2, item.getStockId());
-                ps2.setInt(3, item.getQtyDelivered());
-                ps2.setInt(4, item.getQtyAccepted());
+                ps2.setDouble(3, item.getQtyDelivered());
+                ps2.setDouble(4, item.getQtyAccepted());
                 ps2.setDouble(5, item.getUnitCost());
                 ps2.addBatch();
 
                 //Update quantity and prices in Stocks
                 ps3.setDouble(1, item.getUnitCost());
-                ps3.setInt(2, item.getQtyAccepted());
+                ps3.setDouble(2, item.getQtyAccepted());
                 ps3.setString(3, item.getStockId());
                 ps3.addBatch();
 
@@ -275,7 +275,7 @@ public class ReceivingDAO {
 
                 //Insert Stock Entry Log
                 ps5.setString(1, item.getStockId());
-                ps5.setInt(2, item.getQtyAccepted());
+                ps5.setDouble(2, item.getQtyAccepted());
                 ps5.setString(3, "Purchased");
                 ps5.setDouble(4, item.getUnitCost());
                 ps5.setString(5, ActiveUser.getUser().getId());

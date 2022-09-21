@@ -140,6 +140,34 @@ public class ExcelBuilder {
         cell.setCellStyle(style);
     }
 
+    public void styleBorder(Cell cell, int fontSize, HorizontalAlignment alignment, boolean wrap, boolean top, boolean right, boolean bottom, boolean left){
+        CellStyle style = wb.createCellStyle();
+        Font font = wb.createFont();
+        font.setFontHeightInPoints((short)fontSize);
+        font.setFontName("Arial");
+        style.setAlignment(alignment);
+
+        if (wrap)
+            style.setWrapText(wrap);
+        if (left) {
+            style.setBorderLeft(BorderStyle.THIN);
+            style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        }
+        if (right) {
+            style.setBorderRight(BorderStyle.THIN);
+            style.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        }
+        if (top) {
+            style.setBorderTop(BorderStyle.THIN);
+            style.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        }
+        if (bottom) {
+            style.setBorderBottom(BorderStyle.THIN);
+            style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        }
+        cell.setCellStyle(style);
+    }
+
     /**
      * Puts borders to the region of merged cells
      * @param address the region to set the border
@@ -151,6 +179,16 @@ public class ExcelBuilder {
         RegionUtil.setBorderBottom(BorderStyle.THIN, address, sheet);
     }
 
+    public void styleMergedCells(CellRangeAddress address,boolean wrap, boolean top, boolean right, boolean bottom, boolean left){
+        if (top)
+            RegionUtil.setBorderTop(BorderStyle.THIN, address, sheet);
+        if (left)
+            RegionUtil.setBorderLeft(BorderStyle.THIN, address, sheet);
+        if (right)
+            RegionUtil.setBorderRight(BorderStyle.THIN, address, sheet);
+        if (bottom)
+            RegionUtil.setBorderBottom(BorderStyle.THIN, address, sheet);
+    }
     /**
      * Puts borders to the cell
      * @param cell the cell to set the border

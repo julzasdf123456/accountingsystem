@@ -134,7 +134,7 @@ public class SummaryChargesReportController implements Initializable {
         new Thread(task).start();
     }
 
-    private String isZero(int n){
+    private String isZero(double n){
         return n == 0 ? "-" : ""+n;
     }
 

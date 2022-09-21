@@ -50,7 +50,7 @@ public class MIRSReleasingSelectItemController implements Initializable {
     private SlimStock currentSelection;
 
     private int counter = 0;
-    private int maxItem = 0;
+    private double maxItem = 0;
 
     private HashMap<String, Integer> selected_items;
     @Override

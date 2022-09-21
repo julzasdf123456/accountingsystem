@@ -130,6 +130,7 @@ public class ReceivingReportController extends MenuControllerHandler implements 
         TableColumn<Receiving, String> column1 = new TableColumn<>("Report Number");
         column1.setMinWidth(150);
         column1.setCellValueFactory(new PropertyValueFactory<>("rrNo"));
+        column1.setStyle("-fx-alignment: center;");
 
         TableColumn<Receiving, String> column2 = new TableColumn<>("Date");
         column2.setMinWidth(120);

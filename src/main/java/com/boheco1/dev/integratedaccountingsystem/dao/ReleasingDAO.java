@@ -86,7 +86,7 @@ public class ReleasingDAO {
 
         for(Releasing releasing : releasingList){
             Stock temp = StockDAO.get(releasing.getStockID());
-            int qty = temp.getQuantity() -releasing.getQuantity();
+            double qty = temp.getQuantity() - releasing.getQuantity();
 
             query+="UPDATE Stocks SET quantity='"+qty+"', UpdatedAt=GETDATE(), UserIDUpdated='"+ActiveUser.getUser().getId()+"' " +
                     "WHERE id = '"+temp.getId()+"';\n";

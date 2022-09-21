@@ -125,11 +125,11 @@ public class ViewStockController implements Initializable {
         String accountCode = this.accountCode.getText();
         String neaCode = this.neaCode.getText();
         int threshold = 0;
-        int quantity = 0;
+        double quantity = 0;
         double price = 0;
 
         try {
-            quantity = Integer.parseInt(this.quantity.getText());
+            quantity = Double.parseDouble(this.quantity.getText());
         }catch (Exception e){
 
         }

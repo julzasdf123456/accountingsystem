@@ -81,11 +81,11 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         String neaCode = this.neaCode.getText();
         String comments = this.comments.getText();
         int threshold = 0;
-        int quantity = 0;
+        double quantity = 0;
         double price = 0;
 
         try {
-            quantity = Integer.parseInt(this.quantity.getText());
+            quantity = Double.parseDouble(this.quantity.getText());
         }catch (Exception e){
 
         }
@@ -141,7 +141,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
             JFXButton accept = new JFXButton("Proceed");
             JFXDialog dialog = DialogBuilder.showConfirmDialog("Stock Entry","This process is final. Confirm Stock Entry?", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
             accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
-            int finalQuantity = quantity;
+            double finalQuantity = quantity;
             accept.setOnAction(__ -> {
                 if (isNew) {
                     //If new Stock item, set stock quantity to 0 and insert Stock to database
