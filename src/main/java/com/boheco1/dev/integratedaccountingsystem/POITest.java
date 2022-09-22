@@ -15,14 +15,19 @@ import java.util.List;
 
 public class POITest {
     public static void main(String[] args) {
-        try {
+//        try {
 
-            Notifications tochecker = new Notifications("details", "Utility.NOTIF_MIRS_APROVAL", "ActiveUser.getUser().getEmployeeID()", "checkedEmployeeInfo", "mirs");
-            NotificationsDAO.create(tochecker);
-        }catch(Exception ex) {
-            ex.printStackTrace();
-        }
+//            Notifications tochecker = new Notifications("details", "Utility.NOTIF_MIRS_APROVAL", "ActiveUser.getUser().getEmployeeID()", "checkedEmployeeInfo", "mirs");
+//            NotificationsDAO.create(tochecker);
+//            String ref = IRDao.getReceivingReference("1658746896033-OQ0RM8L0P29W9RV",2022,9);
+//            System.out.println(ref);
+//        }catch(Exception ex) {
+//            ex.printStackTrace();
+//        }
+        executePOITest();
+
     }
+
 
     public static void testMCT() throws Exception{
         MCT mct = new MCT("2022-89-001","Integral Testing Only", "Clarin, Bohol", "multiple","-", LocalDate.now());
@@ -44,34 +49,42 @@ public class POITest {
         }
     }
 
-
-
     public static void executePOITest() {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("Sample Sheet");
-        Object[][] data = {
-                {"Name", "Address","Phone"},
-                {"Bennie Saturno", "Clarin, Bohol", "123456789"},
-                {"Eric Matti", "Tubigon, Bohol", "143447589"},
-                {"Sarah Labatti", "Calape, Bohol", "636525417"},
-        };
-
-        System.out.println("Creating Excel File...");
-
-        for(int i=0; i<data.length; i++) {
-            Row row = sheet.createRow(i);
-            for(int j=0; j<3; j++) {
-                Cell cell = row.createCell(j);
-                cell.setCellValue((String)data[i][j]);
-            }
-        }
 
         try {
+            int year = 2022;
+            int month = 9;
+            List<IRItem> irItems = IRDao.generateReport(year,month);
+
+            System.out.println("Creating Excel File...");
+
+            int i=0;
+            for(IRItem item: irItems) {
+                Row row = sheet.createRow(i++);
+                row.createCell(0).setCellValue(item.getCode());
+                row.createCell(1).setCellValue(item.getDescription());
+                row.createCell(2).setCellValue(item.getBeginningQty());
+                row.createCell(3).setCellValue(item.getBeginningPrice());
+                row.createCell(4).setCellValue(item.getBeginningAmount());
+                row.createCell(5).setCellValue(item.getReceivedReference(year, month));
+                row.createCell(6).setCellValue(item.getReceivedQty());
+                row.createCell(7).setCellValue(item.getReceivedPrice()*item.getReceivedQty());
+                row.createCell(8).setCellValue(item.getReturnedReference(year, month));
+                row.createCell(9).setCellValue(item.getReturnedQty());
+                row.createCell(10).setCellValue(item.getReturnedPrice());
+                row.createCell(11).setCellValue(item.getReleasedQty());
+                row.createCell(12).setCellValue(item.getReleasedPrice());
+            }
+
+
             FileOutputStream out = new FileOutputStream("test.xlsx");
             workbook.write(out);
             workbook.close();
         }catch(Exception ex) {
             ex.printStackTrace();
         }
+
     }
 }

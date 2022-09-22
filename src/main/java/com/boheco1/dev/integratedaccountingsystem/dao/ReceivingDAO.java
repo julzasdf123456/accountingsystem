@@ -67,6 +67,30 @@ public class ReceivingDAO {
         return receiving;
     }
 
+    public List<ReceivingItem> getItemsByStockIDYearMonth(String stockID, int year, int month) throws Exception{
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM ReceivingItem INNER JOIN Receiving ON ReceivingItem.RRNo = Receiving.RRNo " +
+                        "WHERE ReceivingItem.StockID = ?" +
+                        "AND year(Receiving.[Date])=? AND month(Receiving.[Date])=?");
+        ps.setString(1, stockID);
+        ps.setInt(2, year);
+        ps.setInt(3, month);
+        ResultSet rs = ps.executeQuery();
+        ArrayList<ReceivingItem> receivingItems = new ArrayList<>();
+
+        while(rs.next()) {
+            ReceivingItem item = new ReceivingItem();
+            item.setRrNo(rs.getString("RRNo"));
+            item.setStockId(rs.getString("id"));
+            item.setUnitCost(rs.getDouble("UnitCost"));
+            item.setQtyDelivered(rs.getInt("QtyDelivered"));
+            item.setQtyAccepted(rs.getInt("QtyAccepted"));
+            receivingItems.add(item);
+        }
+
+        return receivingItems;
+    }
+
     public static ReceivingItem getItem(String rrno, String stock_id) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM ReceivingItem WHERE RRNo = ? AND StockID = ?");

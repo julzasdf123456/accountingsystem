@@ -14,15 +14,9 @@ import java.util.List;
 public class TestRun {
     public static void main(String[] args) {
         try {
-            String des = "TEST BLOCK 10 BLADES";
-            if(StockDAO.hasMultiple(des)) {
-                List<SlimStock> stocks = StockDAO.getByDescription(des);
-                System.out.println(des + " has the following brands...");
-                for(SlimStock s: stocks) {
-                    System.out.println(s.getBrand());
-                }
-            }else {
-                System.out.println(des + " is a single item.");
+            List<ReleasedItems> released = MRTDao.searchReleasedItems("CROSS");
+            for(ReleasedItems r: released) {
+                System.out.println(r.getDescription() + ": " + r.getQuantity());
             }
         }catch(Exception ex) {
             ex.printStackTrace();

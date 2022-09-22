@@ -1,148 +1,153 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.IRDao;
+
 public class IRItem {
-    private String codeNumber;
-    private String itemDescription;
-    private float begQty;
-    private float begCost;
-    private float begAmount;
-    private String receiptRef;
-    private float receiptQty;
-    private float receiptAmount;
-    private String returnsRef;
-    private float returnsQty;
-    private float returnsAmount;
-    private int chargesQty;
-    private float chargesAmount;
-    private float endingQty;
-    private float endingCost;
-    private float endingAmount;
+    private String localCode;
+    private String neaCode;
+    private String description;
+    private double quantity; //ending/current quantity
+    private double price; //ending/current price
+    private double beginningPrice;
+    private double receivedQty;
+    private double receivedPrice;
 
-    public String getCodeNumber() {
-        return codeNumber;
+    public String getReceivedReference(int year, int month) throws Exception {
+        if(this.getReceivedQty()>0) {
+            return IRDao.getReceivingReference(this.getStockId(), year, month);
+        }else {
+            return null;
+        }
     }
 
-    public void setCodeNumber(String codeNumber) {
-        this.codeNumber = codeNumber;
+    public String getReturnedReference(int year, int month) {
+        if(this.releasedQty>0) {
+            return null;
+        }else {
+            return null;
+        }
     }
 
-    public String getItemDescription() {
-        return itemDescription;
+    private double releasedQty;
+    private double releasedPrice;
+    private double returnedQty;
+    private double returnedPrice;
+    private String stockId;
+
+    public String getStockId() {
+        return stockId;
     }
 
-    public void setItemDescription(String itemDescription) {
-        this.itemDescription = itemDescription;
+    public void setStockId(String stockId) {
+        this.stockId = stockId;
     }
 
-    public float getBegQty() {
-        return begQty;
+    public double getBeginningQty() {
+        return this.quantity+this.releasedQty-(this.returnedQty+receivedQty);
     }
 
-    public void setBegQty(float begQty) {
-        this.begQty = begQty;
+    public double getBeginningPrice() {
+        return beginningPrice==0 ? this.price : beginningPrice;
     }
 
-    public float getBegCost() {
-        return begCost;
+    public double getBeginningAmount() {
+        return getBeginningPrice()*getBeginningQty();
     }
 
-    public void setBegCost(float begCost) {
-        this.begCost = begCost;
+    public void setBeginningPrice(double beginningPrice) {
+        this.beginningPrice = beginningPrice;
     }
 
-    public float getBegAmount() {
-        return begAmount;
+    public String getCode() {
+        return localCode==null ? neaCode : localCode;
     }
 
-    public void setBegAmount(float begAmount) {
-        this.begAmount = begAmount;
+    public String getLocalCode() {
+        return localCode;
     }
 
-    public String getReceiptRef() {
-        return receiptRef;
+    public void setLocalCode(String localCode) {
+        this.localCode = localCode;
     }
 
-    public void setReceiptRef(String receiptRef) {
-        this.receiptRef = receiptRef;
+    public String getNeaCode() {
+        return neaCode;
     }
 
-    public float getReceiptQty() {
-        return receiptQty;
+    public void setNeaCode(String neaCode) {
+        this.neaCode = neaCode;
     }
 
-    public void setReceiptQty(float receiptQty) {
-        this.receiptQty = receiptQty;
+    public String getDescription() {
+        return description;
     }
 
-    public float getReceiptAmount() {
-        return receiptAmount;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public void setReceiptAmount(float receiptAmount) {
-        this.receiptAmount = receiptAmount;
+    public double getQuantity() {
+        return quantity;
     }
 
-    public String getReturnsRef() {
-        return returnsRef;
+    public void setQuantity(double quantity) {
+        this.quantity = quantity;
     }
 
-    public void setReturnsRef(String returnsRef) {
-        this.returnsRef = returnsRef;
+    public double getPrice() {
+        return price;
     }
 
-    public float getReturnsQty() {
-        return returnsQty;
+    public void setPrice(double price) {
+        this.price = price;
     }
 
-    public void setReturnsQty(float returnsQty) {
-        this.returnsQty = returnsQty;
+    public double getReceivedQty() {
+        return receivedQty;
     }
 
-    public float getReturnsAmount() {
-        return returnsAmount;
+    public void setReceivedQty(double receivedQty) {
+        this.receivedQty = receivedQty;
     }
 
-    public void setReturnsAmount(float returnsAmount) {
-        this.returnsAmount = returnsAmount;
+    public double getReceivedPrice() {
+        return receivedPrice;
     }
 
-    public int getChargesQty() {
-        return chargesQty;
+    public void setReceivedPrice(double receivedPrice) {
+        this.receivedPrice = receivedPrice;
     }
 
-    public void setChargesQty(int chargesQty) {
-        this.chargesQty = chargesQty;
+    public double getReleasedQty() {
+        return releasedQty;
     }
 
-    public float getChargesAmount() {
-        return chargesAmount;
+    public void setReleasedQty(double releasedQty) {
+        this.releasedQty = releasedQty;
     }
 
-    public void setChargesAmount(float chargesAmount) {
-        this.chargesAmount = chargesAmount;
+    public double getReleasedPrice() {
+        return releasedPrice;
     }
 
-    public float getEndingQty() {
-        return endingQty;
+    public void setReleasedPrice(double releasedPrice) {
+        this.releasedPrice = releasedPrice;
     }
 
-    public void setEndingQty(float endingQty) {
-        this.endingQty = endingQty;
+    public double getReturnedQty() {
+        return returnedQty;
     }
 
-    public float getEndingCost() {
-        return endingCost;
+    public void setReturnedQty(double returnedQty) {
+        this.returnedQty = returnedQty;
     }
 
-    public void setEndingCost(float endingCost) {
-        this.endingCost = endingCost;
+    public double getReturnedPrice() {
+        return returnedPrice;
     }
 
-    public float getEndingAmount() {
-        return endingAmount;
+    public void setReturnedPrice(double returnedPrice) {
+        this.returnedPrice = returnedPrice;
     }
 
-    public void setEndingAmount(float endingAmount) {
-        this.endingAmount = endingAmount;
-    }
 }
