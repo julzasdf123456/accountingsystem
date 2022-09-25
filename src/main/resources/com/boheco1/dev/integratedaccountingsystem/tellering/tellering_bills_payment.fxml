@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<AnchorPane fx:id="contentPane" prefHeight="665.0" prefWidth="1250.0" style="-fx-background-color: white;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.tellering.PowerBillsPaymentController">
+   <children>
+      <StackPane fx:id="stackPane" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="16.0">
+         <children>
+            <BorderPane prefHeight="605.0" prefWidth="964.0">
+               <top>
+                  <VBox prefHeight="132.0" prefWidth="1166.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <HBox prefHeight="23.0" prefWidth="1168.0">
+                           <children>
+                              <Label prefHeight="25.0" prefWidth="250.0" text="Connection Name" />
+                              <Label prefHeight="25.0" prefWidth="200.0" text="Account Name">
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <Label prefHeight="25.0" prefWidth="200.0" text="Account Type">
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <Label prefHeight="25.0" prefWidth="168.0" text="Status">
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </Label>
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <JFXTextField fx:id="con_name_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="37.0" prefWidth="250.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXTextField fx:id="account_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="200.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXTextField fx:id="type_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="200.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXTextField fx:id="status_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="168.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <HBox prefHeight="100.0" prefWidth="200.0" />
+                              <JFXTextField fx:id="acct_no_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="168.0" promptText="Account Number" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </JFXTextField>
+                              <JFXButton fx:id="search_btn" buttonType="RAISED" maxWidth="1.7976931348623157E308" prefHeight="37.0" prefWidth="136.0" styleClass="btn-info" stylesheets="@../style.css" text="Search" textFill="WHITE">
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </JFXButton>
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="23.0" prefWidth="1168.0">
+                           <children>
+                              <Label prefHeight="25.0" prefWidth="250.0" text="Collection Address" />
+                              <Label prefHeight="25.0" prefWidth="200.0" text="Mobile Number">
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <Label prefHeight="25.0" prefWidth="200.0" text="BAPA">
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </Label>
+                           </children>
+                        </HBox>
+                        <HBox layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <JFXTextField fx:id="con_addr_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="250.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXTextField fx:id="cp_no_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="200.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXTextField fx:id="invoice_tf1" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="200.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXButton fx:id="view_account_tf" buttonType="RAISED" maxWidth="1.7976931348623157E308" prefHeight="37.0" prefWidth="121.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="View Account" textFill="WHITE">
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </JFXButton>
+                              <HBox prefHeight="100.0" prefWidth="200.0" />
+                              <JFXButton buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#reset" prefHeight="37.0" prefWidth="63.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Reset" textFill="WHITE">
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets left="64.0" right="16.0" />
+                                 </HBox.margin>
+                              </JFXButton>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </top>
+               <center>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <TableView fx:id="fees_table" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="8.0" />
+                     </children>
+                  </AnchorPane>
+               </center>
+               <right>
+                  <VBox prefHeight="469.0" prefWidth="352.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Label text="Payment Config" />
+                        <Separator prefWidth="200.0">
+                           <VBox.margin>
+                              <Insets bottom="8.0" />
+                           </VBox.margin>
+                        </Separator>
+                        <HBox prefHeight="40.0" prefWidth="322.0">
+                           <children>
+                              <Label minWidth="120.0" prefHeight="37.0" prefWidth="110.0" text="OR Number" />
+                              <TextField fx:id="or_no_tf" minWidth="150.0" prefHeight="37.0" prefWidth="150.0" />
+                              <JFXButton fx:id="set_or" buttonType="RAISED" maxWidth="1.7976931348623157E308" prefHeight="37.0" prefWidth="70.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Set" textFill="WHITE">
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </JFXButton>
+                           </children></HBox>
+                        <Label text="Payment Options">
+                           <VBox.margin>
+                              <Insets top="16.0" />
+                           </VBox.margin>
+                        </Label>
+                        <Separator prefWidth="200.0">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </Separator>
+                        <HBox prefHeight="40.0" prefWidth="322.0">
+                           <children>
+                              <Label minWidth="120.0" prefHeight="37.0" prefWidth="110.0" text="Cash Payment" />
+                              <TextField fx:id="payment_tf" minWidth="150.0" prefHeight="37.0" prefWidth="233.0" />
+                           </children>
+                           <VBox.margin>
+                              <Insets top="8.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <Separator prefWidth="200.0">
+                           <VBox.margin>
+                              <Insets top="8.0" />
+                           </VBox.margin>
+                        </Separator>
+                        <HBox prefHeight="40.0" prefWidth="322.0">
+                           <children>
+                              <Label minWidth="120.0" prefHeight="37.0" prefWidth="110.0" text="Check Payment" />
+                              <JFXButton fx:id="add_check_btn" buttonType="RAISED" maxWidth="1.7976931348623157E308" prefHeight="37.0" prefWidth="100.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Add Check" textFill="WHITE">
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </JFXButton>
+                              <JFXButton fx:id="clear_check_btn" buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#reset" prefHeight="37.0" prefWidth="100.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Clear" textFill="WHITE">
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </JFXButton>
+                           </children>
+                           <VBox.margin>
+                              <Insets top="8.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <ListView fx:id="checks_lv" prefHeight="126.0" prefWidth="352.0">
+                           <VBox.margin>
+                              <Insets bottom="8.0" top="8.0" />
+                           </VBox.margin>
+                        </ListView>
+                        <HBox prefHeight="40.0" prefWidth="322.0">
+                           <children>
+                              <Label minWidth="120.0" prefHeight="37.0" prefWidth="110.0" text="Total Paid" />
+                              <TextField fx:id="total_paid_tf" minWidth="150.0" prefHeight="37.0" prefWidth="233.0" />
+                           </children>
+                        </HBox>
+                        <Separator prefWidth="200.0">
+                           <VBox.margin>
+                              <Insets bottom="8.0" top="8.0" />
+                           </VBox.margin>
+                        </Separator>
+                        <HBox prefHeight="40.0" prefWidth="300.0">
+                           <children>
+                              <HBox prefHeight="40.0" prefWidth="216.0" />
+                              <JFXButton fx:id="transact_btn" buttonType="RAISED" maxWidth="1.7976931348623157E308" prefHeight="37.0" prefWidth="136.0" styleClass="btn-theme" text="Transact" textFill="WHITE">
+                                 <graphic>
+                                    <FontIcon iconColor="WHITE" iconLiteral="mdi2c-content-save" iconSize="18" />
+                                 </graphic>
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </JFXButton>
+                           </children>
+                        </HBox>
+                     </children>
+                     <BorderPane.margin>
+                        <Insets bottom="16.0" left="16.0" top="8.0" />
+                     </BorderPane.margin>
+                  </VBox>
+               </right>
+            </BorderPane>
+         </children>
+      </StackPane>
+   </children>
+</AnchorPane>
