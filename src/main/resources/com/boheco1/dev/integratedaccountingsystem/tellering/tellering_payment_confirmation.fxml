@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+
+<StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.tellering.PaymentConfirmationController">
+   <children>
+      <AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="275.0" prefWidth="450.0" style="-fx-background-color: white;" stylesheets="@../style.css">
+         <children>
+            <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="275.0" prefWidth="450.0">
+               <top>
+                  <Label styleClass="bold" text="Payment Confirmation" BorderPane.alignment="TOP_LEFT" />
+               </top>
+               <center>
+                  <GridPane BorderPane.alignment="CENTER">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="219.0" minWidth="10.0" prefWidth="186.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="264.0" minWidth="10.0" prefWidth="264.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Label styleClass="bold" text="CASH AMOUNT" />
+                        <Label styleClass="bold" text="CHECK AMOUNT" GridPane.rowIndex="1" />
+                        <Label styleClass="bold" text="TOTAL AMOUNT PAID" GridPane.rowIndex="2" />
+                        <Label styleClass="bold" text="TOTAL AMOUNT DUE" GridPane.rowIndex="3" />
+                        <Label styleClass="bold" text="CHANGE" GridPane.rowIndex="4" />
+                        <TextField fx:id="cash_tf" GridPane.columnIndex="1" />
+                        <TextField fx:id="check_tf" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField fx:id="total_amount_paid_tf" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <TextField fx:id="total_amount_due_tf" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <TextField fx:id="change_tf" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <JFXButton fx:id="confirm_btn" buttonType="RAISED" onAction="#confirm" prefHeight="37.0" prefWidth="264.0" styleClass="btn-theme" text="CONFIRM" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                     </children>
+                  </GridPane>
+               </center>
+            </BorderPane>
+         </children>
+      </AnchorPane>
+   </children>
+</StackPane>
