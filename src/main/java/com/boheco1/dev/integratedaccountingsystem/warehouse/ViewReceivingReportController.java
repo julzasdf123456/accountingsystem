@@ -106,15 +106,14 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
     }
     /**
      * Calculates the tax
-     * @param tax the tax amount
      * @param supplier the supplier object to determine if VAT is applied
      * @param amount the amount to VAT
      * @return void
      */
-    public void credit(double tax, SupplierInfo supplier, double amount){
+    public void credit( SupplierInfo supplier, double amount){
         double vat = 0, total = 0;
         if (supplier.getTaxType() != null && supplier.getTaxType().equals("VAT"))
-                vat =  amount * (tax/100);
+                vat =  amount * (Utility.TAX/100);
         total += vat + amount;
 
         this.net_sales_lbl.setText(amount+"");
@@ -151,7 +150,7 @@ public class ViewReceivingReportController extends MenuControllerHandler impleme
                 ReceivingItem receivingItem = this.receivedItems.get(i).getReceivingItem();
                 amount += receivingItem.getQtyAccepted() * receivingItem.getUnitCost();
             }
-            this.credit(12, supplier, amount);
+            this.credit(supplier, amount);
         } catch (Exception e) {
             e.printStackTrace();
         }

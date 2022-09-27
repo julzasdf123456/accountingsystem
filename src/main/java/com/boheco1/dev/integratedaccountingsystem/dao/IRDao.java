@@ -77,4 +77,25 @@ public class IRDao {
             return "No ref: " + year + ", " + month;
         }
     }
+
+    public static String getReturnedReference(String stockID, int year, int month) throws Exception{
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT mrt.id FROM MRT mrt INNER JOIN MRTItem ri ON mrt.id =ri.mrt_id INNER JOIN Releasing r ON ri.releasing_id = r.id " +
+                        "WHERE r.StockID=? " +
+                        "AND month(mrt.[dateOfReturned])=? AND year(mrt.[dateOfReturned])=?");
+
+        ps.setString(1, stockID);
+        ps.setInt(2, month);
+        ps.setInt(3,year);
+
+        ResultSet rs = ps.executeQuery();
+
+        System.out.println(stockID + " | " + year + " | " + month);
+
+        if(rs.next()) {
+            return rs.getString("RRNo");
+        }else {
+            return "No ref: " + year + ", " + month;
+        }
+    }
 }

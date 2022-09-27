@@ -9,6 +9,7 @@ import javafx.scene.layout.StackPane;
 import java.util.*;
 
 public class Utility {
+    public static double TAX = 12;
     public static String STATION = "main"; //main or sub
     public static String OFFICE_PREFIX = "OSD";
     public static int ROW_PER_PAGE = 20;

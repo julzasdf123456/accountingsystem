@@ -250,7 +250,7 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
                                         Stock selected_stock = getTableView().getItems().get(getIndex());
                                         ReceivingItem receivingItem = selected_stock.getReceivingItem();
                                         double amount = receivingItem.getQtyAccepted() * receivingItem.getUnitCost();
-                                        credit(12, -amount);
+                                        credit(-amount);
                                         try {
                                             receivedItems.remove(selected_stock);
                                             new_stocks_table.setItems(receivedItems);
@@ -283,17 +283,16 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
     }
     /**
      * Calculates the tax
-     * @param tax the tax amount
      * @param amount the amount to VAT
      * @return void
      */
-    public void credit(double tax, double amount){
+    public void credit(double amount){
         double net_sales = 0, vat = 0, total = 0;
         try{
             net_sales = Double.parseDouble(this.net_sales_tf.getText());
             net_sales += amount;
             if (this.supplier.getTaxType().equals("VAT"))
-                vat =  net_sales * (tax/100);
+                vat =  net_sales * (Utility.TAX/100);
             total += vat + net_sales;
         }catch (Exception e){
 
@@ -764,7 +763,7 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
 
                         org.apache.poi.ss.usermodel.Cell vat_amount_cell = vat_row.createCell(9);
                         if (supplier.getTaxType().equals("VAT"))
-                            vat_added = net_sales * 0.12;
+                            vat_added = net_sales * (Utility.TAX/100);
                         vat_amount_cell.setCellValue(vat_added);
                         doc.styleBorder(vat_amount_cell, 10, HorizontalAlignment.RIGHT, false);
 
@@ -844,7 +843,7 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
             if (ok) {
                 this.receivedItems.add(stock);
                 this.new_stocks_table.setItems(this.receivedItems);
-                this.credit(12, receivingItem.getQtyAccepted() * receivingItem.getUnitCost());
+                this.credit(receivingItem.getQtyAccepted() * receivingItem.getUnitCost());
             }
         }
     }

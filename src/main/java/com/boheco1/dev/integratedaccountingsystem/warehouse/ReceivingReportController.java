@@ -583,7 +583,7 @@ public class ReceivingReportController extends MenuControllerHandler implements 
 
         org.apache.poi.ss.usermodel.Cell vat_amount_cell = vat_row.createCell(9);
         if (supplier.getTaxType().equals("VAT"))
-            vat_added = net_sales * 0.12;
+            vat_added = net_sales * (Utility.TAX/100);
         vat_amount_cell.setCellValue(vat_added);
         doc.styleBorder(vat_amount_cell, 10, HorizontalAlignment.RIGHT, false);
 

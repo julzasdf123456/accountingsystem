@@ -29,8 +29,8 @@ public class IRItem {
 
     public String getReturnedReference() {
         try{
-            if(this.releasedQty>0) {
-                return null;
+            if(this.getReturnedQty()>0) {
+                return IRDao.getReturnedReference(this.getStockId(), getYear(), getMonth());
             }
         }catch (Exception e){
         }
