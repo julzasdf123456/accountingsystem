@@ -23,11 +23,11 @@ public class IRDao {
                         "stk.Description, " +
                         "stk.Quantity, " +
                         "stk.Price," +
-                        "(SELECT TOP 1 Price FROM StockHistory sh WHERE sh.StockID = stk.id AND month(date)=9 AND year(date)=2022 ORDER BY date DESC) AS BegPrice," +
-                        "(SELECT SUM(Quantity) FROM StockEntryLogs AS sel WHERE sel.StockID=stk.id AND month(sel.CreatedAt)=9 AND year(sel.CreatedAt)=2022 GROUP BY sel.StockID) AS Received," +
-                        "(SELECT AVG(Price) FROM StockEntryLogs AS sel WHERE sel.StockID=stk.id AND month(sel.CreatedAt)=9 AND year(sel.CreatedAt)=2022 GROUP BY sel.StockID) AS ReceivedPrice," +
-                        "(SELECT SUM(Quantity) FROM Releasing rls WHERE rls.StockID=stk.id AND month(rls.CreatedAt)=9 AND year(rls.CreatedAt)=2022 AND rls.Status='released' GROUP BY rls.StockID) AS Released," +
-                        "(SELECT AVG(Price) FROM Releasing rls WHERE rls.StockID=stk.id AND month(rls.CreatedAt)=9 AND year(rls.CreatedAt)=2022 AND rls.Status='released' GROUP BY rls.StockID) AS ReleasedPrice," +
+                        "(SELECT TOP 1 Price FROM StockHistory sh WHERE sh.StockID = stk.id AND month(date)="+month+" AND year(date)="+year+" ORDER BY date DESC) AS BegPrice," +
+                        "(SELECT SUM(Quantity) FROM StockEntryLogs AS sel WHERE sel.StockID=stk.id AND month(sel.CreatedAt)="+month+" AND year(sel.CreatedAt)="+year+" GROUP BY sel.StockID) AS Received," +
+                        "(SELECT AVG(Price) FROM StockEntryLogs AS sel WHERE sel.StockID=stk.id AND month(sel.CreatedAt)="+month+" AND year(sel.CreatedAt)="+year+" GROUP BY sel.StockID) AS ReceivedPrice," +
+                        "(SELECT SUM(Quantity) FROM Releasing rls WHERE rls.StockID=stk.id AND month(rls.CreatedAt)="+month+" AND year(rls.CreatedAt)="+year+" AND rls.Status='released' GROUP BY rls.StockID) AS Released," +
+                        "(SELECT AVG(Price) FROM Releasing rls WHERE rls.StockID=stk.id AND month(rls.CreatedAt)="+month+" AND year(rls.CreatedAt)="+year+" AND rls.Status='released' GROUP BY rls.StockID) AS ReleasedPrice," +
                         "(SELECT SUM(mri.Quantity) FROM MRTItem mri INNER JOIN Releasing rls2 ON rls2.id=mri.releasing_id WHERE rls2.StockID=stk.id GROUP BY rls2.StockID) AS Returned," +
                         "(SELECT AVG(rls2.Price) FROM MRTItem mri INNER JOIN Releasing rls2 ON rls2.id=mri.releasing_id WHERE rls2.StockID=stk.id GROUP BY rls2.StockID) AS ReturnedPrice " +
                         "FROM Stocks stk"
@@ -36,6 +36,7 @@ public class IRDao {
         while(rs.next()) {
             IRItem item = new IRItem();
             item.setStockId(rs.getString("id"));
+            item.setDescription(rs.getString("Description"));
             item.setLocalCode(rs.getString("LocalCode"));
             item.setNeaCode(rs.getString("NEACode"));
             item.setQuantity(rs.getDouble("Quantity"));
@@ -47,7 +48,8 @@ public class IRDao {
             item.setReleasedPrice(rs.getDouble("ReleasedPrice"));
             item.setReturnedQty(rs.getDouble("Returned"));
             item.setReturnedPrice(rs.getDouble("ReturnedPrice"));
-
+            item.setMonth(month);
+            item.setYear(year);
             irItems.add(item);
         }
 

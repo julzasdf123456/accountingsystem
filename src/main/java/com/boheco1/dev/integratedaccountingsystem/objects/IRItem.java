@@ -3,6 +3,11 @@ package com.boheco1.dev.integratedaccountingsystem.objects;
 import com.boheco1.dev.integratedaccountingsystem.dao.IRDao;
 
 public class IRItem {
+
+    private int year;
+
+    private int month;
+
     private String localCode;
     private String neaCode;
     private String description;
@@ -12,20 +17,24 @@ public class IRItem {
     private double receivedQty;
     private double receivedPrice;
 
-    public String getReceivedReference(int year, int month) throws Exception {
-        if(this.getReceivedQty()>0) {
-            return IRDao.getReceivingReference(this.getStockId(), year, month);
-        }else {
-            return null;
+    public String getReceivedReference() {
+        try{
+            if(this.getReceivedQty()>0) {
+                return IRDao.getReceivingReference(this.getStockId(), getYear(), getMonth());
+            }
+        }catch (Exception e){
         }
+        return "";
     }
 
-    public String getReturnedReference(int year, int month) {
-        if(this.releasedQty>0) {
-            return null;
-        }else {
-            return null;
+    public String getReturnedReference() {
+        try{
+            if(this.releasedQty>0) {
+                return null;
+            }
+        }catch (Exception e){
         }
+        return "";
     }
 
     private double releasedQty;
@@ -118,6 +127,10 @@ public class IRItem {
         this.receivedPrice = receivedPrice;
     }
 
+    public double getReceivedAmount() {
+        return getReceivedPrice()*getReceivedQty();
+    }
+
     public double getReleasedQty() {
         return releasedQty;
     }
@@ -132,6 +145,10 @@ public class IRItem {
 
     public void setReleasedPrice(double releasedPrice) {
         this.releasedPrice = releasedPrice;
+    }
+
+    public double getReleasedAmount() {
+        return getReleasedPrice()*getReleasedQty();
     }
 
     public double getReturnedQty() {
@@ -150,4 +167,23 @@ public class IRItem {
         this.returnedPrice = returnedPrice;
     }
 
+    public double getReturnedAmount() {
+        return getReturnedPrice()*getReturnedQty();
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public int getMonth() {
+        return month;
+    }
+
+    public void setMonth(int month) {
+        this.month = month;
+    }
 }

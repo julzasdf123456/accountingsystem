@@ -78,6 +78,8 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
     MenuItem mctReport = new MenuItem("MCT Report");
     MenuItem summaryOfCharges = new MenuItem("Summary of Charges");
 
+    MenuItem materialsInventory = new MenuItem("Construction Materials");
+
     public WarehouseDashboardController() {
         options = new JFXButton("Options");
         reports = new JFXButton("Reports");
@@ -90,7 +92,7 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         });
 
         reports.setOnAction(actionEvent -> {
-            contextMenuHelper.initializePopupContextMenu(reports, inventoryReport, inventoryMRReport, liquidationReport, stockEntryReport, receivingReport, mctReport, summaryOfCharges)
+            contextMenuHelper.initializePopupContextMenu(reports, inventoryReport, inventoryMRReport, liquidationReport, stockEntryReport, receivingReport, mctReport, summaryOfCharges, materialsInventory)
                     .show(reports, NodeLocator.getNodeX(reports), NodeLocator.getNodeY(reports));
         });
     };
@@ -479,6 +481,11 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
         summaryOfCharges.setOnAction(actionEvent -> {
             titleHolder.setText("Summary of Charges");
             container.getChildren().setAll(ContentHandler.getNodeFromFxml(ReceivingReportController.class, "../view_summary_charges.fxml"));
+        });
+
+        materialsInventory.setOnAction(actionEvent -> {
+            titleHolder.setText("Inventory of Construction Materials");
+            container.getChildren().setAll(ContentHandler.getNodeFromFxml(ReceivingReportController.class, "../materials_inventory_report.fxml"));
         });
     }
 
