@@ -1564,7 +1564,7 @@ public class StockDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT (SELECT TOP 1 id FROM Stocks s2 WHERE s2.Description=s.Description) AS id, Description, SUM(Quantity) as Qty\n" +
                         "FROM Stocks s \n" +
-                        "WHERE s.Description LIKE ? \n" +
+                        "WHERE s.Description LIKE ? AND s.Quantity > 0\n" +
                         "GROUP BY Description\n" +
                         "ORDER BY Description;");
 

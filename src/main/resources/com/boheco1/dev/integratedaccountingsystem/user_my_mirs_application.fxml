@@ -268,8 +268,14 @@
                         </TableView>
                         <HBox>
                            <children>
-                              <Label text="Item Added: " />
-                              <Label fx:id="countRow" text="0" />
+                              <Label text="Item Added: ">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" top="5.0" />
+                                 </HBox.margin></Label>
+                              <Label fx:id="countRow" text="0">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" top="5.0" />
+                                 </HBox.margin></Label>
                            </children>
                         </HBox>
                      </children>

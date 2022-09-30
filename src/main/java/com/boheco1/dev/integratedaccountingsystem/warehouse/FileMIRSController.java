@@ -14,7 +14,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
@@ -25,19 +24,15 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class FileMIRSController extends MenuControllerHandler implements Initializable, SubMenuHelper {
 
-    String errorLog = "Log: \n";//set to global to access it in the Task class
+    String messageLog = "Log: \n";//set to global to access it in the Task class
     String currentItem = "";
     String messageType = "";
     String messageTitle = "";
@@ -53,17 +48,23 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     @FXML
     private Label available, inStock, pending, countRow;
 
+
     @FXML
     private TableView<MIRSItem> mirsItemTable;
+
+    @FXML
+    private TextArea logsTA;
 
     private Stock stockToBeAdded = null;
     private EmployeeInfo preparedEmployeeInfo = null;
     private EmployeeInfo checkedEmployeeInfo = null;
     private EmployeeInfo approvedEmployeeInfo = null;
     private ObservableList<MIRSItem> mirsItemRequested;
+    private HashMap<String, Double> forQtyUpdate;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        forQtyUpdate = new HashMap<>();
 
         filingDate.setValue(LocalDate.now());
         bindItemSearchAutocomplete(items);
@@ -169,132 +170,14 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
-        }else if(quantity.getText().length() == 0 || Integer.parseInt(quantity.getText()) == 0 || Integer.parseInt(quantity.getText()) > StockDAO.countAvailable(stockToBeAdded) ) {
+        }else if(quantity.getText().length() == 0 || Double.parseDouble(quantity.getText()) == 0 || Double.parseDouble(quantity.getText()) > StockDAO.countAvailable(stockToBeAdded) ) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid request quantity!",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }
 
-        addItem(stockToBeAdded, Integer.parseInt(quantity.getText()), false);
+        addItem(stockToBeAdded, Double.parseDouble(quantity.getText()), false);
     }
-
-    @FXML
-    void uploadMirsItem(ActionEvent event) {
-
-        errorLog = "";
-        Stage stage = (Stage) Utility.getStackPane().getScene().getWindow();
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("CSV Files", "*.csv")
-        );
-        File selectedFile = fileChooser.showOpenDialog(stage);
-        JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing command.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
-
-        if (selectedFile != null) {
-            try {
-                if (selectedFile != null) {
-
-                    // Create a background Task
-                    Task<Void> task = new Task<>() {
-                        @Override
-                        protected Void call() {
-                            try {
-                                dialog.show();
-                                CSVReader reader = new CSVReader(new FileReader(selectedFile.getAbsolutePath()));
-
-                                List<String[]> allRows = reader.readAll();
-                                for(int i = 1; i < allRows.size(); i++) { //start looping at 1 to skip column header
-                                    String[] row = allRows.get(i);
-                                    String code = row[0];
-                                    currentItem = row[1];
-                                    int qty = Integer.parseInt(row[row.length - 1].replace(" ",""));
-                                    Stock stock = StockDAO.getStockViaNEALocalCode(code);
-                                    if (stock == null) {
-                                        errorLog += "Can not find NEA/Local: "+ code + ", or item is out of stock.\n";
-                                    } else {
-                                        stock.setQuantity(StockDAO.getTotalStockViaNEALocalCode(code));
-                                        if(qty >= StockDAO.countAvailable(stock)){
-                                            errorLog += "Insufficient stock for item "+ code + " (In-stock: "+stock.getQuantity()+").\n";
-                                        }else{
-                                            addItem(stock, qty, true);
-                                        }
-                                    }
-                                    messageTitle = "Task Complete";
-                                    messageType = AlertDialogBuilder.SUCCESS_DIALOG;
-                                }
-                            }catch (NumberFormatException e) {
-                                e.printStackTrace();
-                                messageTitle = "Error Encounter";
-                                messageType = AlertDialogBuilder.DANGER_DIALOG;
-                                errorLog+="Invalid quantity provided for item "+currentItem+".";
-                                dialog.close();
-                            }catch (NullPointerException e){
-                                e.printStackTrace();
-                                messageTitle = "Error Encounter";
-                                messageType = AlertDialogBuilder.DANGER_DIALOG;
-                                errorLog+=e.getMessage()+"\n";
-                                dialog.close();
-                            }catch (Exception e){
-                                e.printStackTrace();
-                                messageTitle = "Error Encounter";
-                                messageType = AlertDialogBuilder.DANGER_DIALOG;
-                                errorLog+=e.getMessage()+"\n";
-                                dialog.close();
-                            }
-                            return null;
-                        }
-                    };
-
-                    task.setOnSucceeded(wse -> {
-                        dialog.close();
-                        AlertDialogBuilder.messgeDialog("System Message", messageTitle +"\n"+errorLog ,
-                                Utility.getStackPane(), messageType);
-                        items.setText("");
-                        quantity.setText("");
-                        stockToBeAdded = null;
-                        inStock.setText("In Stock: 0");
-                        pending.setText("Pending: 0");
-                        available.setText("Available: 0");
-                        mirsItemTable.refresh();
-                        items.requestFocus();
-                        countRow.setText("" + mirsItemRequested.size());
-                    });
-
-                    task.setOnFailed(workerStateEvent -> {
-                        dialog.close();
-                        AlertDialogBuilder.messgeDialog("System Warning", "A problem was encountered, please try again.\n"+errorLog,
-                                Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-                        items.setText("");
-                        quantity.setText("");
-                        stockToBeAdded = null;
-                        inStock.setText("In Stock: 0");
-                        pending.setText("Pending: 0");
-                        available.setText("Available: 0");
-                        mirsItemTable.refresh();
-                        items.requestFocus();
-                        countRow.setText("" + mirsItemRequested.size());
-                    });
-
-                    new Thread(task).start();
-                }else{
-                    AlertDialogBuilder.messgeDialog("System Warning", "Please select a CSV file before proceeding!",
-                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-                    items.setText("");
-                    quantity.setText("");
-                    stockToBeAdded = null;
-                    inStock.setText("In Stock: 0");
-                    pending.setText("Pending: 0");
-                    available.setText("Available: 0");
-                    mirsItemTable.refresh();
-                    items.requestFocus();
-                    countRow.setText("" + mirsItemRequested.size());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void addItem(Stock stock, int qty, boolean isUploaded) throws Exception {
+    private void addItem(Stock stock, double qty, boolean isUploaded) throws Exception {
         if(stock == null){
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
@@ -351,6 +234,134 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             countRow.setText("" + mirsItemRequested.size());
         }
     }
+
+    @FXML
+    void uploadMirsItem(ActionEvent event) {
+
+        messageLog = "";
+        Stage stage = (Stage) Utility.getStackPane().getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("CSV Files", "*.csv")
+        );
+        File selectedFile = fileChooser.showOpenDialog(stage);
+        JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing command.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+
+        if (selectedFile != null) {
+            try {
+                if (selectedFile != null) {
+
+                    // Create a background Task
+                    Task<Void> task = new Task<>() {
+                        @Override
+                        protected Void call() {
+                            try {
+                                dialog.show();
+                                CSVReader reader = new CSVReader(new FileReader(selectedFile.getAbsolutePath()));
+
+                                List<String[]> allRows = reader.readAll();
+                                for(int i = 1; i < allRows.size(); i++) { //start looping at 1 to skip column header
+                                    String[] row = allRows.get(i);
+                                    String code = row[0];
+                                    currentItem = row[1];
+                                    double qty = Double.parseDouble(row[row.length - 1].replace(" ",""));
+                                    Stock stock = StockDAO.getStockViaNEALocalCode(code);
+                                    if (stock == null) {
+                                        messageLog += "CANNOT FIND: "+currentItem + " ("+ code +").\n";
+                                    }else if (stock.getQuantity() <= 0) {
+                                        messageLog += "OUT OF STOCK: "+stock.getDescription() + " ("+ code +").\n";
+                                    } else {
+                                        stock.setQuantity(StockDAO.getTotalStockViaNEALocalCode(code));
+                                        //check if Insufficient stock
+                                        if(qty >= StockDAO.countAvailable(stock)){
+                                            messageLog += "INSUFFICIENT STOCK: "+ stock.getDescription().substring(0,10) + " ("+ code +"), adding stock on-hand.\n";
+                                            //add to table the available stock
+                                            addItem(stock, StockDAO.countAvailable(stock), true);
+                                            //keep a copy of item added to table using the stocks available
+                                            forQtyUpdate.put(stock.getId(), StockDAO.countAvailable(stock));
+                                        }else{
+                                            addItem(stock, qty, true);
+                                            messageLog += "ADDED: "+stock.getDescription() + " ("+ code +").\n";
+                                        }
+                                    }
+                                    messageTitle = "Task Complete";
+                                    messageType = AlertDialogBuilder.SUCCESS_DIALOG;
+                                }
+                            }catch (NumberFormatException e) {
+                                e.printStackTrace();
+                                messageTitle = "Error Encounter";
+                                messageType = AlertDialogBuilder.DANGER_DIALOG;
+                                messageLog +="Invalid quantity provided for item "+currentItem+".";
+                                dialog.close();
+                            }catch (NullPointerException e){
+                                e.printStackTrace();
+                                messageTitle = "Error Encounter";
+                                messageType = AlertDialogBuilder.DANGER_DIALOG;
+                                messageLog +=e.getMessage()+"\n";
+                                dialog.close();
+                            }catch (Exception e){
+                                e.printStackTrace();
+                                messageTitle = "Error Encounter";
+                                messageType = AlertDialogBuilder.DANGER_DIALOG;
+                                messageLog +=e.getMessage()+"\n";
+                                dialog.close();
+                            }
+                            return null;
+                        }
+                    };
+
+                    task.setOnSucceeded(wse -> {
+                        dialog.close();
+                        AlertDialogBuilder.messgeDialog("System Message", "Task Complete, please view log panel for process logs." ,
+                                Utility.getStackPane(), messageType);
+                        logsTA.setText(messageLog);
+                        items.setText("");
+                        quantity.setText("");
+                        stockToBeAdded = null;
+                        inStock.setText("In Stock: 0");
+                        pending.setText("Pending: 0");
+                        available.setText("Available: 0");
+                        mirsItemTable.refresh();
+                        items.requestFocus();
+                        countRow.setText("" + mirsItemRequested.size());
+                    });
+
+                    task.setOnFailed(workerStateEvent -> {
+                        dialog.close();
+                        AlertDialogBuilder.messgeDialog("System Message", "Task Complete, please view log panel for process logs." ,
+                                Utility.getStackPane(), messageType);
+                        logsTA.setText(messageLog);
+                        items.setText("");
+                        quantity.setText("");
+                        stockToBeAdded = null;
+                        inStock.setText("In Stock: 0");
+                        pending.setText("Pending: 0");
+                        available.setText("Available: 0");
+                        mirsItemTable.refresh();
+                        items.requestFocus();
+                        countRow.setText("" + mirsItemRequested.size());
+                    });
+
+                    new Thread(task).start();
+                }else{
+                    AlertDialogBuilder.messgeDialog("System Warning", "Please select a CSV file before proceeding!",
+                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    items.setText("");
+                    quantity.setText("");
+                    stockToBeAdded = null;
+                    inStock.setText("In Stock: 0");
+                    pending.setText("Pending: 0");
+                    available.setText("Available: 0");
+                    mirsItemTable.refresh();
+                    items.requestFocus();
+                    countRow.setText("" + mirsItemRequested.size());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @Override
     public void setSubMenus(FlowPane flowPane) {
         flowPane.getChildren().removeAll();
@@ -372,6 +383,9 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             return null;
         });*/
 
+        //disable row highlight
+        mirsItemTable.setSelectionModel(null);
+
         TableColumn<MIRSItem, String> descriptionCol = new TableColumn<>("Description");
         descriptionCol.setStyle("-fx-alignment: center-left;");
         descriptionCol.setCellValueFactory(cellData -> {
@@ -384,17 +398,50 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         });
 
         TableColumn<MIRSItem, String> quantityCol = new TableColumn<>("Qty");
-        quantityCol.setStyle("-fx-alignment: center;");
         quantityCol.setPrefWidth(100);
         quantityCol.setMaxWidth(100);
         quantityCol.setMinWidth(100);
-        quantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
+        //quantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
+        Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> qtycellFactory
+                = //
+                new Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>>() {
+                    @Override
+                    public TableCell call(final TableColumn<MIRSItem, String> param) {
+                        final TableCell<MIRSItem, String> cell = new TableCell<MIRSItem, String>() {
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    MIRSItem mirsItem = getTableView().getItems().get(getIndex());
+                                    //set font color RED if item is added to table using the available stock not the requested quantity
+                                    if(forQtyUpdate.containsKey(mirsItem.getStockID())) {
+                                        setStyle("-fx-text-fill: " + ColorPalette.DANGER + "; -fx-alignment: center-right;");
+                                    }else{
+                                        setStyle("-fx-text-fill: " + ColorPalette.BLACK + "; -fx-alignment: center-right;");
+                                    }
+                                    setGraphic(null);
+                                    double req = mirsItem.getQuantity();
+                                    if(req%1 == 0)
+                                        setText(""+(int) req);
+                                    else
+                                        setText(""+req);
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
 
-        TableColumn<MIRSItem, String> actionCol = new TableColumn<>(" ");
-        actionCol.setPrefWidth(100);
-        actionCol.setMaxWidth(100);
-        actionCol.setMinWidth(100);
-        Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> cellFactory
+        quantityCol.setCellFactory(qtycellFactory);
+
+        TableColumn<MIRSItem, String> removeCol = new TableColumn<>(" ");
+        removeCol.setPrefWidth(100);
+        removeCol.setMaxWidth(100);
+        removeCol.setMinWidth(100);
+        Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> removeColCellFactory
                 = //
                 new Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>>() {
                     @Override
@@ -443,13 +490,86 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                     }
                 };
 
-        actionCol.setCellFactory(cellFactory);
-        actionCol.setStyle("-fx-alignment: center;");
+        removeCol.setCellFactory(removeColCellFactory);
+        removeCol.setStyle("-fx-alignment: center;");
+
+        TableColumn<MIRSItem, String> updateCol = new TableColumn<>(" ");
+        updateCol.setPrefWidth(100);
+        updateCol.setMaxWidth(100);
+        updateCol.setMinWidth(100);
+        Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> updateColCellFactory
+                = //
+                new Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>>() {
+                    @Override
+                    public TableCell call(final TableColumn<MIRSItem, String> param) {
+                        final TableCell<MIRSItem, String> cell = new TableCell<MIRSItem, String>() {
+
+                            FontIcon icon = new FontIcon("mdi2f-file-document-edit");
+                            private final JFXButton btn = new JFXButton("", icon);
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    //btn.setStyle("-fx-background-color: "+ColorPalette.DANGER+";");
+                                    icon.setIconSize(24);
+                                    icon.setIconColor(Paint.valueOf(ColorPalette.INFO));
+                                    btn.setOnAction(event -> {
+                                        try{
+                                            MIRSItem mirsItem = getTableView().getItems().get(getIndex());
+                                            Stock stock = StockDAO.get(mirsItem.getStockID());
+                                            JFXButton accept = new JFXButton("Accept");
+                                            JFXTextField input = new JFXTextField();
+                                            InputValidation.restrictNumbersOnly(input);
+                                            JFXDialog dialog = DialogBuilder.showInputDialog("Update Quantity","Enter desired quantity:  ", "Max value "+ StockDAO.getTotalStockViaNEALocalCode(stock.getNeaCode()), input, accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+                                            accept.setOnAction(new EventHandler<ActionEvent>() {
+                                                @Override
+                                                public void handle(ActionEvent __) {
+                                                    try {
+                                                        if(input.getText().length() == 0 || Double.parseDouble(input.getText()) > stock.getQuantity()) {
+                                                            AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid quantity!",
+                                                                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                                        }else {
+                                                            double reqQty = Double.parseDouble(input.getText());
+                                                            MIRSItem mirsItem = getTableView().getItems().get(getIndex());
+                                                            mirsItem.setQuantity(reqQty);
+                                                            setStyle("-fx-text-fill: " + ColorPalette.BLACK + "; -fx-alignment: center-right;");
+
+                                                            mirsItemTable.refresh();
+                                                        }
+                                                    } catch (Exception e) {
+                                                        AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                                    }
+                                                    dialog.close();
+                                                }
+                                            });
+                                        }catch (Exception e){
+                                            AlertDialogBuilder.messgeDialog("System Error", "Error encounter while Filing MIRS reason may be: ",
+                                                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                            return;
+                                        }
+                                    });
+                                    setGraphic(btn);
+                                    setText(null);
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+
+        updateCol.setCellFactory(updateColCellFactory);
+        updateCol.setStyle("-fx-alignment: center;");
+
 
         //mirsItemTable.getColumns().add(neaCodeCol);
         mirsItemTable.getColumns().add(descriptionCol);
         mirsItemTable.getColumns().add(quantityCol);
-        mirsItemTable.getColumns().add(actionCol);
+        mirsItemTable.getColumns().add(removeCol);
+        mirsItemTable.getColumns().add(updateCol);
         mirsItemTable.setPlaceholder(new Label("No item Added"));
 
         mirsItemRequested =  FXCollections.observableArrayList();
