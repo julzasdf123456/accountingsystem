@@ -178,15 +178,6 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         addItem(stockToBeAdded, Double.parseDouble(quantity.getText()), false);
     }
     private void addItem(Stock stock, double qty, boolean isUploaded) throws Exception {
-        if(stock == null){
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
-                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            return;
-        }else if(qty == 0 || qty > StockDAO.countAvailable(stock) ) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid request quantity!",
-                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            return;
-        }
 
         //will update quantity if item is already added to the request
         for(MIRSItem added: mirsItemRequested){
@@ -266,27 +257,32 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                     currentItem = row[1];
                                     double qty = Double.parseDouble(row[row.length - 1].replace(" ",""));
                                     Stock stock = StockDAO.getStockViaNEALocalCode(code);
+
                                     if (stock == null) {
                                         messageLog += "CANNOT FIND: "+currentItem + " ("+ code +").\n";
-                                    }else if (stock.getQuantity() <= 0) {
-                                        messageLog += "OUT OF STOCK: "+stock.getDescription() + " ("+ code +").\n";
-                                    } else {
-                                        stock.setQuantity(StockDAO.getTotalStockViaNEALocalCode(code));
-                                        //check if Insufficient stock
-                                        if(qty >= StockDAO.countAvailable(stock)){
-                                            messageLog += "INSUFFICIENT STOCK: "+ stock.getDescription().substring(0,10) + " ("+ code +"), adding stock on-hand.\n";
-                                            //add to table the available stock
-                                            addItem(stock, StockDAO.countAvailable(stock), true);
-                                            //keep a copy of item added to table using the stocks available
-                                            forQtyUpdate.put(stock.getId(), StockDAO.countAvailable(stock));
-                                        }else{
-                                            addItem(stock, qty, true);
-                                            messageLog += "ADDED: "+stock.getDescription() + " ("+ code +").\n";
+                                    }else{
+                                        double availableStock = StockDAO.countAvailable(stock);
+                                        stock.setQuantity(availableStock);
+
+                                        if (stock.getQuantity() == 0.0) {
+                                            messageLog += "OUT OF STOCK: "+stock.getDescription() + " ("+ code +").\n";
+                                        } else {
+                                            //check if Insufficient stock
+                                            if(qty > stock.getQuantity()){
+                                                messageLog += "INSUFFICIENT STOCK: "+ stock.getDescription().substring(0,30) + " ("+ code +"), adding stock on-hand.\n";
+                                                //add to table the available stock
+                                                addItem(stock, availableStock, true);
+                                                //keep a copy of item added to table using the stocks available
+                                                forQtyUpdate.put(stock.getId(), StockDAO.countAvailable(stock));
+                                            }else{
+                                                addItem(stock, qty, true);
+                                                messageLog += "ADDED: "+stock.getDescription() + " ("+ code +").\n";
+                                            }
                                         }
                                     }
-                                    messageTitle = "Task Complete";
-                                    messageType = AlertDialogBuilder.SUCCESS_DIALOG;
                                 }
+                                messageTitle = "Task Complete";
+                                messageType = AlertDialogBuilder.SUCCESS_DIALOG;
                             }catch (NumberFormatException e) {
                                 e.printStackTrace();
                                 messageTitle = "Error Encounter";

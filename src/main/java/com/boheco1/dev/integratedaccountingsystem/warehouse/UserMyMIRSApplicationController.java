@@ -106,7 +106,6 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
 
         //selectedItem.addAll(mirsItemRequested);
         mirsItemTable.setItems(mirsItemRequested);
-        mirsItemTable.sort();
         countRow.setText(""+mirsItemRequested.size());
     }
 
@@ -369,6 +368,7 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
                                             accept.setOnAction(new EventHandler<ActionEvent>() {
                                                 @Override
                                                 public void handle(ActionEvent __) {
+                                                    removeMirsItems.add(mirsItem);
                                                     mirsItemRequested.remove(mirsItem);
                                                     mirsItemTable.refresh();
                                                     countRow.setText(""+ mirsItemRequested.size());
