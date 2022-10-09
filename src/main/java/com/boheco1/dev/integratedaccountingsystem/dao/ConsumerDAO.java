@@ -26,7 +26,7 @@ public class ConsumerDAO {
 
         ResultSet rs = ps.executeQuery();
 
-        ArrayList<ConsumerInfo> list = new ArrayList<>();
+        List<ConsumerInfo> list = new ArrayList<>();
         while(rs.next()) {
             ConsumerInfo record = new ConsumerInfo(
                     rs.getString("AccountNumber"),
