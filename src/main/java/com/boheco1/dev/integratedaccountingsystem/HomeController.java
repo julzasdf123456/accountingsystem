@@ -69,12 +69,8 @@ public class HomeController implements Initializable {
     public JFXButton allAccounts;
 
     // TELLER
-    public JFXButton collection;
     public JFXButton power_bills_payment;
-    public JFXButton acknowledgement_receipt;
-    public JFXButton bank_remittances;
-
-
+    public JFXButton dcr;
 
     // WAREHOUSE
     public JFXButton warehouseDashboard, fileMirs, generateMct, mrT, stocks, receiving, addMR;
@@ -108,7 +104,6 @@ public class HomeController implements Initializable {
         signatoriesButton = new JFXButton("Signatories");
         budget = new JFXButton("Budget");
         allAccounts = new JFXButton("All Accounts");
-        collection = new JFXButton("Collection");
         warehouseDashboard = new JFXButton("Dashboard");
         fileMirs = new JFXButton("File MIRS");
         generateMct = new JFXButton("Generate MCT");
@@ -124,9 +119,7 @@ public class HomeController implements Initializable {
         addMR = new JFXButton("MR Entry");
 
         power_bills_payment = new JFXButton("Power Bills Payment");
-        acknowledgement_receipt = new JFXButton("Ack Receipts");
-        bank_remittances = new JFXButton("Bank Remittances");
-
+        dcr = new JFXButton("Daily Collection Report");
 
         // ADD ALL ITEMS TO NAV SEQUENTIALLY
         if(ActiveUser.getUser().can("manage-finance")) {
@@ -142,14 +135,8 @@ public class HomeController implements Initializable {
 
         if (ActiveUser.getUser().can("manage-tellering")){
             NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Teller"), new FontIcon("mdi2c-contactless-payment-circle"), homeStackPane);
-            NavMenuHelper.addMenu(navMenuBox, collection, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, power_bills_payment, homeStackPane);
-        }
-
-        if (ActiveUser.getUser().can("manage-cashiering")){
-            NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Cashier"), new FontIcon("mdi2c-contactless-payment-circle"), homeStackPane);
-            NavMenuHelper.addMenu(navMenuBox, bank_remittances, homeStackPane);
-            NavMenuHelper.addMenu(navMenuBox, acknowledgement_receipt, homeStackPane);
+            NavMenuHelper.addMenu(navMenuBox, dcr, homeStackPane);
         }
 
         if(ActiveUser.getUser().can("manage-warehouse")) {
@@ -192,14 +179,9 @@ public class HomeController implements Initializable {
         }
 
         if (ActiveUser.getUser().can("manage-tellering")) {
-            DrawerMenuHelper.setMenuButton(collection, new FontIcon("mdi2c-cash-usd"), drawerMenus, collection.getText());
             //DrawerMenuHelper.setMenuButton(power_bills_payment, new FontIcon("mdi2c-cash-usd"), drawerMenus, power_bills_payment.getText());
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(power_bills_payment, new FontIcon("mdi2c-cash-usd"), drawerMenus, power_bills_payment.getText(), contentPane, "tellering/tellering_bills_payment.fxml", null, null, title);
-        }
-
-        if (ActiveUser.getUser().can("manage-cashiering")) {
-            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(bank_remittances, new FontIcon("mdi2c-cash-usd"), drawerMenus, bank_remittances.getText(), contentPane, "tellering/tellering_bank_remittances.fxml", null, null, title);
-            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(acknowledgement_receipt, new FontIcon("mdi2c-cash-usd"), drawerMenus, "Acknowledgement Receipts", contentPane, "tellering/tellering_ack_receipts.fxml", null, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(dcr, new FontIcon("mdi2c-chart-bar"), drawerMenus, dcr.getText(), contentPane, "tellering/tellering_dcr.fxml", null, null, title);
         }
 
         // WAREHOUSE

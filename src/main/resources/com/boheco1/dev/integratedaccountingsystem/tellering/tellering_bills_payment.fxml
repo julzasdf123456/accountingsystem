@@ -80,25 +80,19 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <HBox prefHeight="100.0" prefWidth="200.0" />
+                              <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                               <JFXTextField fx:id="acct_no_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="37.0" prefWidth="178.0" promptText="Account Number" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                               </JFXTextField>
-                              <JFXButton fx:id="search_btn" buttonType="RAISED" maxWidth="1.7976931348623157E308" prefHeight="37.0" prefWidth="36.0" styleClass="btn-info" stylesheets="@../style.css" text=" " textAlignment="CENTER" textFill="WHITE">
-                                 <effect>
-                                    <DropShadow />
-                                 </effect>
-                                 <font>
-                                    <Font name="System Bold" size="16.0" />
-                                 </font>
+                              <JFXButton fx:id="search_btn" alignment="CENTER" contentDisplay="CENTER" styleClass="btn-info" text=" ">
+                                 <graphic>
+                                    <FontIcon iconColor="WHITE" iconLiteral="mdi2a-account-search" />
+                                 </graphic>
                                  <HBox.margin>
                                     <Insets left="16.0" />
                                  </HBox.margin>
-                                 <graphic>
-                                    <FontIcon iconColor="WHITE" iconLiteral="mdi2a-account-search" iconSize="18" textAlignment="CENTER" wrappingWidth="18.0" />
-                                 </graphic>
                               </JFXButton>
                            </children>
                         </HBox>
@@ -285,7 +279,7 @@
                         <HBox prefHeight="40.0" prefWidth="300.0">
                            <children>
                               <HBox prefHeight="40.0" prefWidth="216.0" />
-                              <JFXButton fx:id="transact_btn" buttonType="RAISED" maxWidth="1.7976931348623157E308" prefHeight="37.0" prefWidth="136.0" styleClass="btn-theme" text="Transact" textFill="WHITE">
+                              <JFXButton fx:id="transact_btn" buttonType="RAISED" maxWidth="1.7976931348623157E308" prefHeight="37.0" prefWidth="136.0" style="-fx-background-color: #009688;" styleClass="btn-theme" text="Transact" textFill="WHITE">
                                  <graphic>
                                     <FontIcon iconColor="WHITE" iconLiteral="mdi2c-content-save" iconSize="18" />
                                  </graphic>

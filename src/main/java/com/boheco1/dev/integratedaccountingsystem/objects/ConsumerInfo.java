@@ -7,6 +7,9 @@ public class ConsumerInfo {
     private String TINNo;
     private String emailAdd;
     private String contactNo;
+    private String meterNumber;
+    private String accountType;
+    private String accountStatus;
 
     public ConsumerInfo(String accountID, String consumerName, String consumerAddress, String TINNo, String emailAdd, String contactNo) {
         this.accountID = accountID;
@@ -63,5 +66,35 @@ public class ConsumerInfo {
 
     public void setContactNo(String contactNo) {
         this.contactNo = contactNo;
+    }
+
+    public String getMeterNumber() {
+        return meterNumber;
+    }
+
+    public void setMeterNumber(String meterNumber) {
+        this.meterNumber = meterNumber;
+    }
+
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(String accountType) {
+        if (accountType.equals("R")) {
+            this.accountType = "Residential";
+        }else if (accountType.equals("B")) {
+            this.accountType = "BAPA";
+        }else {
+            this.accountType = accountType;
+        }
+    }
+
+    public String getAccountStatus() {
+        return accountStatus;
+    }
+
+    public void setAccountStatus(String accountStatus) {
+        this.accountStatus = accountStatus;
     }
 }
