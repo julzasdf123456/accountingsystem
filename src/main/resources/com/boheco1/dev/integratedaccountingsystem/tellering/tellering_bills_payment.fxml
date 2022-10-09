@@ -29,7 +29,7 @@
                         <HBox prefHeight="23.0" prefWidth="1168.0">
                            <children>
                               <Label prefHeight="25.0" prefWidth="250.0" text="Consumer Name" />
-                              <Label prefHeight="25.0" prefWidth="200.0" text="Account Name">
+                              <Label prefHeight="25.0" prefWidth="200.0" text="Account Number">
                                  <HBox.margin>
                                     <Insets left="16.0" />
                                  </HBox.margin>
@@ -86,7 +86,7 @@
                                     <Font size="14.0" />
                                  </font>
                               </JFXTextField>
-                              <JFXButton fx:id="search_btn" alignment="CENTER" contentDisplay="CENTER" styleClass="btn-info" text=" ">
+                              <JFXButton fx:id="search_btn" alignment="CENTER" contentDisplay="CENTER" onAction="#advanceSearch" styleClass="btn-info" text=" ">
                                  <graphic>
                                     <FontIcon iconColor="WHITE" iconLiteral="mdi2a-account-search" />
                                  </graphic>
@@ -121,7 +121,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="cp_no_tf" editable="false" focusColor="#00ad8e" focusTraversable="false" labelFloat="true" prefHeight="30.0" prefWidth="200.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="meter_no_tf" editable="false" focusColor="#00ad8e" focusTraversable="false" labelFloat="true" prefHeight="30.0" prefWidth="200.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -129,7 +129,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="invoice_tf1" editable="false" focusColor="#00ad8e" focusTraversable="false" labelFloat="true" prefHeight="30.0" prefWidth="200.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="bapa_tf" editable="false" focusColor="#00ad8e" focusTraversable="false" labelFloat="true" prefHeight="30.0" prefWidth="200.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
