@@ -99,6 +99,11 @@ public class TelleringBankRemittances extends MenuControllerHandler implements I
 
     }
 
+    @FXML
+    public void onBankAccountsClick() {
+        ModalBuilder.showModalFromXML(TelleringAddBankRemittance.class, "../tellering/bank_accounts.fxml", Utility.getStackPane());
+    }
+
     @Override
     public void receive(Object o) {
         if(o instanceof BankRemittance){

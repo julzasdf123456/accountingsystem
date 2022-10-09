@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
@@ -64,12 +65,7 @@
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="bankDescription" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </JFXTextField>
-                  <JFXTextField fx:id="accountNumber" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                  <JFXTextField fx:id="accountNumber" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -86,6 +82,7 @@
                   </JFXTextField>
                   <DatePicker fx:id="orDateFrom" GridPane.columnIndex="1" />
                   <DatePicker fx:id="orDateTo" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <JFXComboBox fx:id="bankAccount" onAction="#onSelectBankAccount" prefHeight="38.0" prefWidth="238.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                </children>
             </GridPane>
             <JFXButton layoutX="237.0" layoutY="437.0" onAction="#onAddEntry" styleClass="btn-sucess" stylesheets="@../style.css" text="Add Entry" />

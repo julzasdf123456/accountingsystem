@@ -34,4 +34,9 @@ public class BankAccount {
     public void setAccountCode(String accountCode) {
         this.accountCode = accountCode;
     }
+
+    @Override
+    public String toString() {
+        return bankDescription;
+    }
 }
