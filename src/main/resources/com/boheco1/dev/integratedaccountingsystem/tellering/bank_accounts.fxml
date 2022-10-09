@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="568.0" prefWidth="1029.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.tellering.BankAccountsController">
+<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="568.0" prefWidth="1168.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.tellering.BankAccountsController">
    <children>
       <Label layoutX="33.0" layoutY="32.0" styleClass="heading-label" text="Bank Account Entry">
          <font>
@@ -20,7 +20,7 @@
       <JFXTextField fx:id="bankDescription" layoutX="33.0" layoutY="214.0" prefHeight="38.0" prefWidth="190.0" styleClass="jfx-text-area" />
       <Label layoutX="33.0" layoutY="285.0" text="Account Code" />
       <JFXTextField fx:id="accountCode" layoutX="33.0" layoutY="311.0" prefHeight="38.0" prefWidth="190.0" styleClass="jfx-text-area" />
-      <TableView fx:id="banksTable" layoutX="281.0" layoutY="87.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="363.0" prefWidth="558.0" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="281.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="87.0" />
+      <TableView fx:id="banksTable" layoutX="281.0" layoutY="87.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="363.0" prefWidth="558.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="281.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="87.0" />
       <JFXButton layoutX="33.0" layoutY="390.0" onAction="#onSaveChanges" prefHeight="38.0" prefWidth="190.0" styleClass="btn-theme" text="Save Changes" textFill="WHITE" />
    </children>
 </AnchorPane>

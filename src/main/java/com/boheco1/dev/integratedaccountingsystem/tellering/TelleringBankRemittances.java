@@ -49,8 +49,8 @@ public class TelleringBankRemittances extends MenuControllerHandler implements I
         TableColumn checkNumberColumn = new TableColumn<BankRemittance, String>("Check Number");
         checkNumberColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, String>("checkNumber"));
 
-        TableColumn amountColumn = new TableColumn<BankRemittance, Double>("Amount");
-        amountColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, Double>("amount"));
+        TableColumn amountColumn = new TableColumn<BankRemittance, String>("Amount");
+        amountColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, Double>("formattedAmount"));
         amountColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
 
         remittanceTable.getColumns().add(orDateFromColumn);

@@ -76,4 +76,8 @@ public class BankRemittance {
     public void setAmount(double amount) {
         this.amount = amount;
     }
+
+    public String getFormattedAmount() {
+        return String.format("%,.2f", amount);
+    }
 }

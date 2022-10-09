@@ -58,6 +58,7 @@ public class TelleringAddBankRemittance extends MenuControllerHandler implements
     }
 
     public void onSelectBankAccount() {
+        if(bankAccount.getSelectionModel().getSelectedIndex()==0) return;
         accountNumber.setText(bankAccount.getSelectionModel().getSelectedItem().getBankAccountNumber());
         checkNumber.requestFocus();
     }
@@ -65,7 +66,7 @@ public class TelleringAddBankRemittance extends MenuControllerHandler implements
     public void onClear() {
         orDateFrom.setValue(null);
         orDateTo.setValue(null);
-        bankAccount.getSelectionModel().select(0);
+        bankAccount.getSelectionModel().clearSelection();
         accountNumber.setText(null);
         checkNumber.setText(null);
         amount.setText(null);
