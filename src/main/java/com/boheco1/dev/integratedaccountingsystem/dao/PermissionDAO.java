@@ -79,7 +79,7 @@ public class PermissionDAO {
     }
 
     public static void updatePermission(Permission permission, Connection conn) throws SQLException {
-        PreparedStatement cs = conn.prepareStatement("UPDATE permissions SET permission=?, remakrs=? WHERE id=?");
+        PreparedStatement cs = conn.prepareStatement("UPDATE permissions SET permission=?, remarks=? WHERE id=?");
         cs.setString(3, permission.getId());
         cs.setString(1, permission.getPermission());
         cs.setString(2, permission.getRemarks());

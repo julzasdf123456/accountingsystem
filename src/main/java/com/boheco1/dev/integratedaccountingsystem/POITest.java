@@ -68,10 +68,10 @@ public class POITest {
                 row.createCell(2).setCellValue(item.getBeginningQty());
                 row.createCell(3).setCellValue(item.getBeginningPrice());
                 row.createCell(4).setCellValue(item.getBeginningAmount());
-                row.createCell(5).setCellValue(item.getReceivedReference(year, month));
+                row.createCell(5).setCellValue(item.getReceivedReference());
                 row.createCell(6).setCellValue(item.getReceivedQty());
                 row.createCell(7).setCellValue(item.getReceivedPrice()*item.getReceivedQty());
-                row.createCell(8).setCellValue(item.getReturnedReference(year, month));
+                row.createCell(8).setCellValue(item.getReturnedReference());
                 row.createCell(9).setCellValue(item.getReturnedQty());
                 row.createCell(10).setCellValue(item.getReturnedPrice());
                 row.createCell(11).setCellValue(item.getReleasedQty());

@@ -27,6 +27,9 @@ public class Demo {
 
             Connection connection = DB.getConnection();
 
+            User u = UserDAO.getUserByUserName("lentrix", connection);
+            UserDAO.updatePassword(u,"aa",connection);
+
 //            EmployeeInfo emp = new EmployeeInfo(1, "Benjie","Basio","Lenteria","Tubigon, Bohol","","Programmer",5);
 //            EmployeeDAO.addEmployee(emp, connection);
 //
