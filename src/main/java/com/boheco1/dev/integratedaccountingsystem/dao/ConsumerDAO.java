@@ -4,8 +4,11 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.Bill;
 import com.boheco1.dev.integratedaccountingsystem.objects.ConsumerInfo;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +22,7 @@ public class ConsumerDAO {
      */
     public static List<ConsumerInfo> getConsumerRecords(String key) throws Exception  {
         PreparedStatement ps = DB.getConnection("Billing").prepareStatement(
-                "SELECT * FROM dbo.ConsumerInquiry WHERE ConsumerName LIKE ? OR AccountNumber LIKE ? " +
+                "SELECT * FROM AccountMaster WHERE ConsumerName LIKE ? OR AccountNumber LIKE ? " +
                         "ORDER BY ConsumerName");
         ps.setString(1, '%'+ key+'%');
         ps.setString(2, '%'+ key+'%');
@@ -32,9 +35,9 @@ public class ConsumerDAO {
                     rs.getString("AccountNumber"),
                     rs.getString("ConsumerName"),
                     rs.getString("ConsumerAddress"),
-                    "",
-                    "",
-                    ""
+                    rs.getString("TINNo"),
+                    rs.getString("Email"),
+                    rs.getString("ContactNumber")
             );
 
             record.setMeterNumber(rs.getString("MeterNumber"));
@@ -57,7 +60,7 @@ public class ConsumerDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static ConsumerInfo getConsumerRecord(String accountNo) throws Exception {
-        PreparedStatement ps = DB.getConnection("Billing").prepareStatement("SELECT * FROM dbo.ConsumerInquiry WHERE AccountNumber = ?");
+        PreparedStatement ps = DB.getConnection("Billing").prepareStatement("SELECT * FROM AccountMaster WHERE AccountNumber = ?");
 
         ps.setString(1, accountNo);
 
@@ -67,12 +70,12 @@ public class ConsumerDAO {
 
         while(rs.next()) {
              record = new ConsumerInfo(
-                    rs.getString("AccountNumber"),
-                    rs.getString("ConsumerName"),
-                    rs.getString("ConsumerAddress"),
-                    "",
-                    "",
-                    ""
+                     rs.getString("AccountNumber"),
+                     rs.getString("ConsumerName"),
+                     rs.getString("ConsumerAddress"),
+                     rs.getString("TINNo"),
+                     rs.getString("Email"),
+                     rs.getString("ContactNumber")
             );
 
             record.setMeterNumber(rs.getString("MeterNumber"));
@@ -94,10 +97,10 @@ public class ConsumerDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static List<Bill> getConsumerBills(String accountNo, boolean paid) throws Exception {
-        String sql = "SELECT * FROM Bills WHERE BillNumber NOT IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ?";
+        String sql = "SELECT * FROM BillsInquiry WHERE BillNumber NOT IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ? ORDER BY DueDate DESC";
 
         if (paid)
-            sql = "SELECT * FROM Bills WHERE BillNumber IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ?";
+            sql = "SELECT * FROM BillsInquiry WHERE BillNumber IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ? ORDER BY DueDate DESC";
 
         PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
 
@@ -107,9 +110,6 @@ public class ConsumerDAO {
 
         List<Bill> bills = new ArrayList<>();
 
-        rs.close();
-        ps.close();
-
         while(rs.next()) {
             Bill bill = new Bill(
                     rs.getString("BillNumber"),
@@ -117,8 +117,16 @@ public class ConsumerDAO {
                     rs.getDate("ServiceDateTo"),
                     rs.getDate("DueDate"),
                     rs.getDouble("NetAmount"));
+            Date date = rs.getDate("ServicePeriodEnd");
+            LocalDate billMonth = date.toLocalDate();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM YYYY");
+
+            bill.setBillMonth(formatter.format(billMonth));
             bills.add(bill);
         }
+
+        rs.close();
+        ps.close();
 
         return bills;
     }
