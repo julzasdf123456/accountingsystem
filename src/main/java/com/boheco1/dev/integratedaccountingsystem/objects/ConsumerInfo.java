@@ -85,8 +85,10 @@ public class ConsumerInfo {
             this.accountType = "Residential";
         }else if (accountType.equals("B")) {
             this.accountType = "BAPA";
-        }else {
-            this.accountType = accountType;
+        }else if (accountType.equals("E")) {
+            this.accountType = "ECA";
+        }else{
+            this.accountType = "Commercial";
         }
     }
 
