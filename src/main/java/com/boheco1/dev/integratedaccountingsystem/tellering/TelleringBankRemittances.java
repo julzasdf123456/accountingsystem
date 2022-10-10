@@ -2,22 +2,18 @@ package com.boheco1.dev.integratedaccountingsystem.tellering;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.BankRemittance;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.JFXButton;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.StackPane;
 
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class TelleringBankRemittances extends MenuControllerHandler implements Initializable, ObjectTransaction {
@@ -31,14 +27,18 @@ public class TelleringBankRemittances extends MenuControllerHandler implements I
     @FXML Label totalCheckAmount;
     @FXML Label totalCashAmount;
     @FXML Label totalAmount;
+    @FXML DatePicker transactionDate;
+    @FXML JFXButton addEntryBtn;
 
     ObservableList<BankRemittance> tableList;
+
+    private StackPane stackPane;
     private void renderTable() {
         TableColumn orDateFromColumn = new TableColumn<BankRemittance, LocalDate>("OR Date From");
         orDateFromColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, LocalDate>("orDateFrom"));
 
-        TableColumn orDateToColumn = new TableColumn<BankRemittance, LocalDate>("OR Date To");
-        orDateToColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, LocalDate>("orDateTo"));
+//        TableColumn orDateToColumn = new TableColumn<BankRemittance, LocalDate>("OR Date To");
+//        orDateToColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, LocalDate>("orDateTo"));
 
         TableColumn descriptionColumn = new TableColumn<BankRemittance, String>("Bank Account Description");
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, String>("description"));
@@ -54,7 +54,7 @@ public class TelleringBankRemittances extends MenuControllerHandler implements I
         amountColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
 
         remittanceTable.getColumns().add(orDateFromColumn);
-        remittanceTable.getColumns().add(orDateToColumn);
+//        remittanceTable.getColumns().add(orDateToColumn);
         remittanceTable.getColumns().add(descriptionColumn);
         remittanceTable.getColumns().add(accountNoColumn);
         remittanceTable.getColumns().add(checkNumberColumn);
@@ -87,6 +87,8 @@ public class TelleringBankRemittances extends MenuControllerHandler implements I
         remittanceTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         renderTable();
         Utility.setParentController(this);
+
+        this.stackPane = Utility.getStackPane();
     }
 
     @FXML
@@ -94,9 +96,28 @@ public class TelleringBankRemittances extends MenuControllerHandler implements I
         ModalBuilder.showModalFromXML(TelleringAddBankRemittance.class, "../tellering/tellering_add_bank_remittance.fxml", Utility.getStackPane());
     }
 
+    public void enableAddEntry() {
+        if(transactionDate.getValue()!=null && !remittanceNo.getText().isEmpty()) {
+            addEntryBtn.setDisable(false);
+        }else {
+            addEntryBtn.setDisable(true);
+        }
+    }
+
     @FXML
     public void onSaveChanges() {
-
+        if(transactionDate.getValue()==null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please select a Transaction date",
+                    stackPane, AlertDialogBuilder.WARNING_DIALOG);
+        }else if(remittanceNo.getText().isEmpty()) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a Bank Remittance Number.",
+                    stackPane, AlertDialogBuilder.WARNING_DIALOG);
+        }else if(remittanceTable.getItems().size()==0){
+            AlertDialogBuilder.messgeDialog("Invalid Input", "The transaction is empty. Please add bank remittance entries.",
+                    stackPane, AlertDialogBuilder.WARNING_DIALOG);
+        }else {
+            System.out.println("OK for saving transaction");
+        }
     }
 
     @FXML
@@ -111,4 +132,5 @@ public class TelleringBankRemittances extends MenuControllerHandler implements I
             computeTotals();
         }
     }
+
 }

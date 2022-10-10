@@ -21,7 +21,7 @@ import java.util.ResourceBundle;
 public class TelleringAddBankRemittance extends MenuControllerHandler implements Initializable {
 
     @FXML DatePicker orDateFrom;
-    @FXML DatePicker orDateTo;
+//    @FXML DatePicker orDateTo;
     @FXML JFXComboBox<BankAccount> bankAccount;
     @FXML JFXTextField accountNumber;
     @FXML JFXTextField checkNumber;
@@ -46,7 +46,7 @@ public class TelleringAddBankRemittance extends MenuControllerHandler implements
 
         BankRemittance bankRemittance = new BankRemittance();
         bankRemittance.setOrDateFrom(orDateFrom.getValue());
-        bankRemittance.setOrDateTo(orDateTo.getValue());
+//        bankRemittance.setOrDateTo(orDateTo.getValue());
         bankRemittance.setDescription(bankAccount.getSelectionModel().getSelectedItem().getBankDescription());
         bankRemittance.setAccountNumber(accountNumber.getText());
         bankRemittance.setCheckNumber(checkNumber.getText());
@@ -65,7 +65,7 @@ public class TelleringAddBankRemittance extends MenuControllerHandler implements
 
     public void onClear() {
         orDateFrom.setValue(null);
-        orDateTo.setValue(null);
+//        orDateTo.setValue(null);
         bankAccount.getSelectionModel().clearSelection();
         accountNumber.setText(null);
         checkNumber.setText(null);

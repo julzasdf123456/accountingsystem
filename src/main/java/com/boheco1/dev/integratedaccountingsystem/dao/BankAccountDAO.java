@@ -18,13 +18,31 @@ public class BankAccountDAO
 
         while(rs.next()) {
             bankAccounts.add(new BankAccount(
+                    rs.getString("BankID"),
                     rs.getString("BankAccountNumber"),
                     rs.getString("BankDescription"),
                     rs.getString("AccountCode")
             ));
         }
 
+        rs.close();
+
         return bankAccounts;
+    }
+
+    public static BankAccount get(String id) throws Exception {
+        ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                "SELECT * FROM BankAccounts WHERE BankID='" + id + "'");
+        if(rs.first()){
+            return new BankAccount(
+                    rs.getString("BankID"),
+                    rs.getString("BankAccountNumber"),
+                    rs.getString("BankDescription"),
+                    rs.getString("AccountCode")
+            );
+        }else{
+            return null;
+        }
     }
 
     public static void add(BankAccount bankAccount) throws Exception {
@@ -36,5 +54,27 @@ public class BankAccountDAO
         ps.setString(3, bankAccount.getBankDescription());
         ps.setString(4, bankAccount.getAccountCode());
         ps.executeUpdate();
+        ps.close();
+    }
+
+    public static void update(BankAccount bankAccount) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE BankAccounts SET BankAccountNumber=?, BankDescription=?, AccountCode=? " +
+                        "WHERE BankID=?");
+        ps.setString(1, bankAccount.getBankAccountNumber());
+        ps.setString(2, bankAccount.getBankDescription());
+        ps.setString(3, bankAccount.getAccountCode());
+        ps.setString(4, bankAccount.getId());
+
+        ps.executeUpdate();
+        ps.close();
+    }
+
+    public static void delete(BankAccount bankAccount) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "DELETE FROM BankAccounts WHERE BankID=? ");
+        ps.setString(1, bankAccount.getId());
+        ps.executeUpdate();
+        ps.close();
     }
 }

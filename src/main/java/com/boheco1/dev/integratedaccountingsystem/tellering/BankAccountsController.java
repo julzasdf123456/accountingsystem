@@ -2,17 +2,25 @@ package com.boheco1.dev.integratedaccountingsystem.tellering;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.BankAccountDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
+import com.boheco1.dev.integratedaccountingsystem.helpers.ColorPalette;
+import com.boheco1.dev.integratedaccountingsystem.helpers.DialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.BankAccount;
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXTextField;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Paint;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -25,6 +33,11 @@ public class BankAccountsController implements Initializable {
     @FXML TableView banksTable;
 
     private StackPane stackPane;
+
+    private BankAccount currentBankAccount;
+
+    private JFXButton delBtn;
+    private JFXDialog confirmDelete;
 
     ObservableList<BankAccount> bankAccountsList;
 
@@ -41,18 +54,71 @@ public class BankAccountsController implements Initializable {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid Account Code.",
                     stackPane, AlertDialogBuilder.WARNING_DIALOG);
         }else {
-            BankAccount ba = new BankAccount(
-                    accountNumber.getText(),
-                    bankDescription.getText(),
-                    accountCode.getText()
-            );
+            if(currentBankAccount==null) {
+                BankAccount ba = new BankAccount(
+                        accountNumber.getText(),
+                        bankDescription.getText(),
+                        accountCode.getText()
+                );
 
-            try {
-                BankAccountDAO.add(ba);
-                banksTable.getItems().add(ba);
-            }catch(Exception ex) {
-                ex.printStackTrace();
+                try {
+                    BankAccountDAO.add(ba);
+                    banksTable.getItems().add(ba);
+                    currentBankAccount = null;
+                    reset();
+                }catch(Exception ex) {
+                    ex.printStackTrace();
+                }
+            }else {
+                //Update an existing bank account
+                currentBankAccount.setBankAccountNumber(accountNumber.getText());
+                currentBankAccount.setBankDescription(bankDescription.getText());
+                currentBankAccount.setAccountCode(accountCode.getText());
+                try {
+                    BankAccountDAO.update(currentBankAccount);
+                    banksTable.refresh();
+                }catch(Exception ex) {
+                    ex.printStackTrace();
+                }
             }
+
+        }
+    }
+
+    public void onNewReset() {
+        this.currentBankAccount = null;
+        reset();
+    }
+
+    private void reset() {
+        accountNumber.setText(null);
+        bankDescription.setText(null);
+        accountCode.setText(null);
+        accountNumber.requestFocus();
+    }
+
+    public void onTableClick() {
+        currentBankAccount = (BankAccount) banksTable.getSelectionModel().getSelectedItem();
+        accountNumber.setText(currentBankAccount.getBankAccountNumber());
+        bankDescription.setText(currentBankAccount.getBankDescription());
+        accountCode.setText(currentBankAccount.getAccountCode());
+        accountNumber.requestFocus();
+    }
+
+    public void onDelete() {
+        confirmDelete = DialogBuilder.showConfirmDialog("Delete?","Are you sure you want to delete this Bank Account?",delBtn,stackPane,DialogBuilder.DANGER_DIALOG);
+    }
+
+    public void deleteBankAccount() {
+        try {
+            BankAccountDAO.delete(currentBankAccount);
+            banksTable.getItems().remove(currentBankAccount);
+            banksTable.refresh();
+            currentBankAccount = null;
+            reset();
+            confirmDelete.close();
+        }catch(Exception ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -75,10 +141,19 @@ public class BankAccountsController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         renderTable();
         stackPane = Utility.getStackPane();
+        delBtn = new JFXButton("Delete");
+        delBtn.setTextFill(Paint.valueOf(ColorPalette.DANGER));
+        delBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                deleteBankAccount();
+            }
+        });
         try {
             bankAccountsList = FXCollections.observableList(BankAccountDAO.getAll());
             banksTable.setItems(bankAccountsList);
             banksTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+            banksTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         }catch(Exception ex) {
             ex.printStackTrace();
         }

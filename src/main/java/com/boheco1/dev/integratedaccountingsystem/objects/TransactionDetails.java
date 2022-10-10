@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class TransactionDetails {
-    private LocalDateTime period;
+    private LocalDate period;
     private String transactionNumber;
     private String transactionCode;
     private LocalDateTime transactionDate;
@@ -12,29 +12,33 @@ public class TransactionDetails {
     private String accountCode;
     private double debit;
     private double credit;
-    private LocalDate orDateFrom;
-    private LocalDate orDateTo;
+    private LocalDate orDate;
+//    private LocalDate orDateTo;
     private String bankID;
+    private String note;
+    private String checkNumber;
 
-    public TransactionDetails(LocalDateTime period, String transactionNumber, String transactionCode, LocalDateTime transactionDate, int sequenceNumber, String accountCode, double debit, double credit, LocalDate orDateFrom, LocalDate orDateTo, String bankID) {
-        this.period = period;
-        this.transactionNumber = transactionNumber;
-        this.transactionCode = transactionCode;
-        this.transactionDate = transactionDate;
-        this.sequenceNumber = sequenceNumber;
-        this.accountCode = accountCode;
-        this.debit = debit;
-        this.credit = credit;
-        this.orDateFrom = orDateFrom;
-        this.orDateTo = orDateTo;
-        this.bankID = bankID;
+    public String getNote() {
+        return note;
     }
 
-    public LocalDateTime getPeriod() {
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public String getCheckNumber() {
+        return checkNumber;
+    }
+
+    public void setCheckNumber(String checkNumber) {
+        this.checkNumber = checkNumber;
+    }
+
+    public LocalDate getPeriod() {
         return period;
     }
 
-    public void setPeriod(LocalDateTime period) {
+    public void setPeriod(LocalDate period) {
         this.period = period;
     }
 
@@ -94,21 +98,21 @@ public class TransactionDetails {
         this.credit = credit;
     }
 
-    public LocalDate getOrDateFrom() {
-        return orDateFrom;
+    public LocalDate getOrDate() {
+        return orDate;
     }
 
-    public void setOrDateFrom(LocalDate orDateFrom) {
-        this.orDateFrom = orDateFrom;
+    public void setOrDate(LocalDate orDate) {
+        this.orDate = orDate;
     }
 
-    public LocalDate getOrDateTo() {
-        return orDateTo;
-    }
-
-    public void setOrDateTo(LocalDate orDateTo) {
-        this.orDateTo = orDateTo;
-    }
+//    public LocalDate getOrDateTo() {
+//        return orDateTo;
+//    }
+//
+//    public void setOrDateTo(LocalDate orDateTo) {
+//        this.orDateTo = orDateTo;
+//    }
 
     public String getBankID() {
         return bankID;
