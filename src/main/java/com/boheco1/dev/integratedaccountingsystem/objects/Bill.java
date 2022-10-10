@@ -1,23 +1,28 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 public class Bill {
 
     private String billNo;
     private String billMonth;
-    private Date dueDate;
+    private LocalDate dueDate;
+    private int daysDelayed;
     private double amountDue;
     private double surCharge;
     private double ch2306;
     private double ch2307;
     private double totalAmount;
-    private Date serviceDatefrom;
-    private Date serviceDateto;
+    private LocalDate serviceDatefrom;
+    private LocalDate serviceDateto;
+    private LocalDate servicePeriodEnd;
+    private ConsumerInfo consumer;
+    private String consumerType;
 
     public Bill(){}
 
-    public Bill(String billNo, Date from, Date to, Date dueDate,
+    public Bill(String billNo, LocalDate from, LocalDate to, LocalDate dueDate,
                 double amountDue){
         this.billNo = billNo;
         this.serviceDatefrom = from;
@@ -42,11 +47,11 @@ public class Bill {
         this.billMonth = billMonth;
     }
 
-    public Date getDueDate() {
+    public LocalDate getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(Date dueDate) {
+    public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
     }
 
@@ -62,8 +67,31 @@ public class Bill {
         return surCharge;
     }
 
-    public void setSurCharge(double surCharge) {
-        this.surCharge = surCharge;
+    public void setSurCharge(double penalty) {
+        System.out.println(this.consumerType);
+        //Check the number of days from due date and apply penalty
+        if (this.getDaysDelayed() > 0) {
+            //Exemption of penalties due to Odette
+            if (this.getServicePeriodEnd().isEqual(LocalDate.of(2021, 12, 1))) {
+                this.surCharge = 0;
+            //Penalty computation for Residential, BAPA
+            }else if ((this.consumerType.equals("Residential") || this.consumerType.equals("BAPA") || this.consumerType.equals("ECA")) && this.getServicePeriodEnd().isAfter(LocalDate.of(2014, 8, 11))) {
+                this.surCharge = surCharge * 0.03;
+                this.surCharge += (this.surCharge * 0.12);
+            //For Commercial Types
+            }else{
+                if (this.getServicePeriodEnd().isAfter(LocalDate.of(2017, 4, 1))) {
+                    if (this.getDaysDelayed() < 6) {
+                        this.surCharge = 0;
+                    } else if (this.getDaysDelayed() > 30) {
+                        this.surCharge = this.getAmountDue() * 1.05;
+                    } else {
+                        this.surCharge = surCharge * 0.03;
+                        this.surCharge += (this.surCharge * 0.12);
+                    }
+                }
+            }
+        }
     }
 
     public double getCh2306() {
@@ -86,24 +114,56 @@ public class Bill {
         return totalAmount;
     }
 
-    public void setTotalAmount(double totalAmount) {
-        this.totalAmount = totalAmount;
+    public void setTotalAmount() {
+        this.totalAmount = this.getSurCharge() + this.getAmountDue() + this.getCh2306() + this.getCh2307();
     }
 
-    public Date getServiceDatefrom() {
+    public LocalDate getServiceDatefrom() {
         return serviceDatefrom;
     }
 
-    public void setServiceDatefrom(Date serviceDatefrom) {
+    public void setServiceDatefrom(LocalDate serviceDatefrom) {
         this.serviceDatefrom = serviceDatefrom;
     }
 
-    public Date getGetServiceDateto() {
+    public LocalDate getGetServiceDateto() {
         return serviceDateto;
     }
 
-    public void setGetServiceDateto(Date getServiceDateto) {
+    public void setGetServiceDateto(LocalDate getServiceDateto) {
         this.serviceDateto = getServiceDateto;
+    }
+
+    public int getDaysDelayed() {
+        return daysDelayed;
+    }
+
+    public void setDaysDelayed(int daysDelayed) {
+        this.daysDelayed = daysDelayed;
+    }
+
+    public LocalDate getServicePeriodEnd() {
+        return servicePeriodEnd;
+    }
+
+    public void setServicePeriodEnd(LocalDate servicePeriodEnd) {
+        this.servicePeriodEnd = servicePeriodEnd;
+    }
+
+    public ConsumerInfo getConsumer() {
+        return consumer;
+    }
+
+    public void setConsumer(ConsumerInfo consumer) {
+        this.consumer = consumer;
+    }
+
+    public String getConsumerType() {
+        return consumerType;
+    }
+
+    public void setConsumerType(String consumerType) {
+        this.consumerType = consumerType;
     }
 }
 

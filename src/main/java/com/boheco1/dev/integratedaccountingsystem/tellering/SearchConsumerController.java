@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
@@ -35,11 +36,18 @@ public class SearchConsumerController extends MenuControllerHandler implements I
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.createTable();
-        this.consumersTable.setOnMouseClicked(mouseEvent -> {
-            consumerInfo = consumersTable.getSelectionModel().getSelectedItem();
-            this.parentController.receive(consumerInfo);
+        this.consumersTable.setRowFactory(tv -> {
+            TableRow<ConsumerInfo> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    consumerInfo = row.getItem();
+                    this.parentController.receive(consumerInfo);
+                }
+            });
+            return row ;
         });
         this.parentController = Utility.getParentController();
+        this.query_tf.requestFocus();
     }
 
     /**
@@ -64,7 +72,7 @@ public class SearchConsumerController extends MenuControllerHandler implements I
     public void createTable() {
 
         TableColumn<ConsumerInfo, String> column1 = new TableColumn<>("Account No");
-        column1.setMinWidth(125);
+        column1.setMinWidth(123);
         column1.setCellValueFactory(new PropertyValueFactory<>("accountID"));
         column1.setStyle("-fx-alignment: center-left;");
 

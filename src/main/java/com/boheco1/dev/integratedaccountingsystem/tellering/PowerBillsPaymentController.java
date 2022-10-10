@@ -110,7 +110,6 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
                 try{
                     this.bills = FXCollections.observableArrayList(ConsumerDAO.getConsumerBills(this.consumerInfo.getAccountID(), false));
-                    System.out.println(this.bills.size());
                     this.fees_table.setItems(this.bills);
                 }catch (Exception e){
                     e.printStackTrace();
@@ -220,7 +219,6 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
             try{
                 this.bills = FXCollections.observableArrayList(ConsumerDAO.getConsumerBills(this.consumerInfo.getAccountID(), false));
-                System.out.println(this.bills.size());
                 this.fees_table.setItems(this.bills);
             }catch (Exception e){
                 e.printStackTrace();
