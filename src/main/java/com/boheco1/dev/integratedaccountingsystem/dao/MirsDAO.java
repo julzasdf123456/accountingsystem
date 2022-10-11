@@ -897,9 +897,11 @@ public class MirsDAO {
                         "'"+mirs.getApplicant()+"');\n";
 
         for(MIRSItem item : mirsItems){
-            query +="INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id, isAdditional) " +
-                    "VALUES " +
-                    "('"+mirsId+"','"+item.getStockID()+"','"+item.getQuantity()+"','"+item.getPrice()+"','"+item.getRemarks()+"',GETDATE(),GETDATE(), '"+Utility.generateRandomId()+"', '"+item.isAdditional()+"');\n";
+            if(item.getQuantity() > 0){
+                query +="INSERT INTO MIRSItems (MIRSID, StockID, Quantity, Price, Comments, CreatedAt, UpdatedAt, id, isAdditional) " +
+                        "VALUES " +
+                        "('"+mirsId+"','"+item.getStockID()+"','"+item.getQuantity()+"','"+item.getPrice()+"','"+item.getRemarks()+"',GETDATE(),GETDATE(), '"+Utility.generateRandomId()+"', '"+item.isAdditional()+"');\n";
+            }
         }
 
         for(MIRSSignatory msig : signatories){

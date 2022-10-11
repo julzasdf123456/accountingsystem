@@ -209,7 +209,7 @@ public class StockDAO {
      */
     public static Stock getStockViaNEALocalCode(String code) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM Stocks WHERE (NEACode=? OR LocalCode=?) AND Quantity > 0 ");
+                "SELECT * FROM Stocks WHERE (NEACode=? OR LocalCode=?) ");
         ps.setString(1, code);
         ps.setString(2, code);
         ResultSet rs = ps.executeQuery();
