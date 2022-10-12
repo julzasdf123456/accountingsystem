@@ -2,17 +2,20 @@ package com.boheco1.dev.integratedaccountingsystem.tellering;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.ConsumerDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
-import com.boheco1.dev.integratedaccountingsystem.objects.Bill;
-import com.boheco1.dev.integratedaccountingsystem.objects.ConsumerInfo;
-import com.boheco1.dev.integratedaccountingsystem.objects.SlimStock;
-import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.WarehouseDashboardController;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialogLayout;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,10 +25,14 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Paint;
+import javafx.util.Callback;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 public class PowerBillsPaymentController extends MenuControllerHandler implements Initializable, ObjectTransaction {
 
@@ -120,6 +127,22 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             }
         });
         this.createTable();
+        this.fees_table.setRowFactory(tv -> {
+            TableRow<Bill> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    ConsumerInfo consumer = row.getItem().getConsumer();
+                    this.setConsumerInfo(consumer);
+                }
+            });
+            return row ;
+        });
+        this.set_or.setOnAction(actionEvent -> {
+            this.or_no_tf.setDisable(!this.or_no_tf.isDisabled());
+        });
+        this.payment_tf.setOnKeyTyped(keyEvent -> {
+            total_paid_tf.setText(this.payment_tf.getText());
+        });
         Utility.setParentController(this);
     }
     /**
@@ -136,9 +159,11 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.type_tf.setText("");
         this.status_tf.setText("");
         this.bapa_tf.setText("");
-
         this.acct_no_tf.setText("");
-
+        this.total_payable_lbl.setText("0.00");
+        this.payment_tf.setText("0.00");
+        this.total_paid_tf.setText("0.00");
+        this.payment_tf.setDisable(true);
         this.bills = FXCollections.observableArrayList(new ArrayList<>());
         this.fees_table.setItems(this.bills);
     }
@@ -155,17 +180,17 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     public void createTable(){
         TableColumn<Bill, String> column0 = new TableColumn<>("Bill #");
 
-        column0.setPrefWidth(100);
-        column0.setMaxWidth(100);
-        column0.setMinWidth(100);
+        column0.setPrefWidth(110);
+        column0.setMaxWidth(110);
+        column0.setMinWidth(110);
         column0.setCellValueFactory(new PropertyValueFactory<>("billNo"));
         column0.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Bill, String> column = new TableColumn<>("Account #");
-        column.setPrefWidth(100);
-        column.setMaxWidth(100);
-        column.setMinWidth(100);
-        column.setCellValueFactory(new PropertyValueFactory<>("accountNo"));
+        column.setPrefWidth(110);
+        column.setMaxWidth(110);
+        column.setMinWidth(110);
+        column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumer().getAccountID()));
         column.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Bill, String> column1 = new TableColumn<>("Billing Month");
@@ -183,18 +208,18 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column2.setStyle("-fx-alignment: center;");
 
         TableColumn<Bill, String> column3 = new TableColumn<>("Amount Due");
-        column3.setPrefWidth(125);
-        column3.setMaxWidth(125);
-        column3.setMinWidth(125);
+        column3.setPrefWidth(100);
+        column3.setMaxWidth(100);
+        column3.setMinWidth(100);
         column3.setCellValueFactory(new PropertyValueFactory<>("amountDue"));
         column3.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column4 = new TableColumn<>("Surcharge");
-        column4.setPrefWidth(125);
-        column4.setMaxWidth(125);
-        column4.setMinWidth(125);
+        column4.setPrefWidth(100);
+        column4.setMaxWidth(100);
+        column4.setMinWidth(100);
         column4.setCellValueFactory(new PropertyValueFactory<>("surCharge"));
-        column4.setStyle("-fx-alignment: center;");
+        column4.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column5 = new TableColumn<>("2%");
         column5.setPrefWidth(75);
@@ -209,6 +234,47 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column6.setMinWidth(75);
         column6.setCellValueFactory(new PropertyValueFactory<>("ch2307"));
         column6.setStyle("-fx-alignment: center;");
+        TableColumn<Bill, String> columnWaive = new TableColumn<>("Waive");
+        Callback<TableColumn<Bill, String>, TableCell<Bill, String>> waiveBtn
+                = //
+                new Callback<TableColumn<Bill, String>, TableCell<Bill, String>>() {
+                    @Override
+                    public TableCell call(final TableColumn<Bill, String> param) {
+                        final TableCell<Bill, String> cell = new TableCell<Bill, String>() {
+
+                            FontIcon icon = new FontIcon("mdi2c-close-circle");
+                            JFXButton btn = new JFXButton("", icon);
+
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                icon.setIconSize(24);
+                                icon.setIconColor(Paint.valueOf(ColorPalette.INFO));
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    btn.setOnAction(event -> {
+                                        try {
+                                            Bill bill = getTableView().getItems().get(getIndex());
+                                            showWaiveForm(bill, getTableView(), total_payable_lbl);
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    });
+                                    setGraphic(btn);
+                                    setText(null);
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+        columnWaive.setCellFactory(waiveBtn);
+        columnWaive.setPrefWidth(58);
+        columnWaive.setMaxWidth(58);
+        columnWaive.setMinWidth(58);
+        columnWaive.setStyle("-fx-alignment: center;");
 
         TableColumn<Bill, String> column7 = new TableColumn<>("Total Amount");
         column7.setCellValueFactory(new PropertyValueFactory<>("totalAmount"));
@@ -226,6 +292,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.fees_table.getColumns().add(column4);
         this.fees_table.getColumns().add(column5);
         this.fees_table.getColumns().add(column6);
+        this.fees_table.getColumns().add(columnWaive);
         this.fees_table.getColumns().add(column7);
     }
 
@@ -233,12 +300,18 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     public void receive(Object o) {
         if (o instanceof ConsumerInfo) {
             this.consumerInfo = (ConsumerInfo) o;
-            this.setConsumerInfo(this.consumerInfo);
             try{
                 if (this.bills.size() == 0) this.bills = FXCollections.observableArrayList();
-                this.bills.addAll(ConsumerDAO.getConsumerBills(this.consumerInfo, false));
-                Utility.setAmount(this.total_payable_lbl, this.bills);
-                this.fees_table.setItems(this.bills);
+                List<Bill> consumerBills = ConsumerDAO.getConsumerBills(this.consumerInfo, false);
+                if (consumerBills.size() > 0) {
+                    this.bills.addAll(consumerBills);
+                    this.setConsumerInfo(this.consumerInfo);
+                    Utility.setAmount(this.total_payable_lbl, this.bills);
+                    this.fees_table.setItems(this.bills);
+                    this.payment_tf.setDisable(false);
+                    this.payment_tf.requestFocus();
+                    InputHelper.restrictNumbersOnly(payment_tf);
+                }
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -253,5 +326,17 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.type_tf.setText(consumerInfo.getAccountType());
         this.status_tf.setText(consumerInfo.getAccountStatus());
         this.bapa_tf.setText(consumerInfo.getAccountType().equals("BAPA") ? "BAPA Registered" : "");
+    }
+
+    public void showWaiveForm(Bill bill, TableView table, Label total) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_waive_surcharge.fxml"));
+        Parent parent = fxmlLoader.load();
+        WaiveChargesController waiveController = fxmlLoader.getController();
+        waiveController.setBill(bill);
+        waiveController.setData(table, total);
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setBody(parent);
+        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+        dialog.show();
     }
 }

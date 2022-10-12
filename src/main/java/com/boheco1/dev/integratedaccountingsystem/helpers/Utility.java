@@ -9,6 +9,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 public class Utility {
@@ -116,13 +118,17 @@ public class Utility {
         Utility.subToolbar = subToolbar;
     }
 
-    public static ViewMRController getMrController() { return mrController; }
+    public static ViewMRController getMrController() {
+        return mrController;
+    }
 
-    public static void setMrController(ViewMRController mrController) { Utility.mrController = mrController; }
+    public static void setMrController(ViewMRController mrController) {
+        Utility.mrController = mrController;
+    }
 
     public static String CURRENT_YEAR() {
         Calendar cal = Calendar.getInstance();
-        return ""+cal.get(Calendar.YEAR);
+        return "" + cal.get(Calendar.YEAR);
     }
 
     public static ObjectTransaction getParentController() {
@@ -141,20 +147,29 @@ public class Utility {
         Utility.dictionary = dictionary;
     }
 
-    public static void setAmount(Node control, Collection<?> data){
+    public static void setAmount(Node control, Collection<?> data) {
         double amount = 0;
-        for (Object e: data) {
-            if (e instanceof Bill){
+        for (Object e : data) {
+            if (e instanceof Bill) {
                 Bill bill = (Bill) e;
                 amount += bill.getTotalAmount();
             }
         }
-        if (control instanceof Label){
+        amount = round(amount,2);
+        if (control instanceof Label) {
             Label amount_control = (Label) control;
-            amount_control.setText(amount+"");
-        }else if (control instanceof TextField){
+            amount_control.setText(amount + "");
+        } else if (control instanceof TextField) {
             TextField textField = (TextField) control;
-            textField.setText(amount+"");
+            textField.setText(amount + "");
         }
+    }
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }

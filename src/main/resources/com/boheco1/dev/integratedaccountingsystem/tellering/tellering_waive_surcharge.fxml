@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+
+<StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.tellering.WaiveChargesController">
+   <children>
+      <AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="150.0" prefWidth="450.0" style="-fx-background-color: white;" stylesheets="@../style.css">
+         <children>
+            <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="150.0" prefWidth="900.0">
+               <top>
+                  <Label styleClass="bold" text="Waive Certain Amounts" BorderPane.alignment="TOP_LEFT" />
+               </top>
+               <center>
+                  <GridPane BorderPane.alignment="CENTER">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <JFXButton fx:id="save_btn" buttonType="RAISED" prefHeight="37.0" prefWidth="264.0" styleClass="btn-theme" text="SAVE" textFill="WHITE" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                        <Label text="Bill Number" />
+                        <Label text="Billing Month" GridPane.columnIndex="1" />
+                        <Label text="Surcharge" GridPane.columnIndex="2" />
+                        <Label text="2% EWT" GridPane.columnIndex="3" />
+                        <Label text="5% EVAT" GridPane.columnIndex="4" />
+                        <TextField fx:id="billno_tf" disable="true" editable="false" GridPane.rowIndex="1" />
+                        <TextField fx:id="billing_month_tf" disable="true" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField fx:id="surcharge_tf" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <TextField fx:id="ewt_tf" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                        <TextField fx:id="evat_tf" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                     </children>
+                  </GridPane>
+               </center>
+            </BorderPane>
+         </children>
+      </AnchorPane>
+   </children>
+</StackPane>
