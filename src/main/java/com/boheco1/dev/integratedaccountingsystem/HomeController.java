@@ -72,6 +72,8 @@ public class HomeController implements Initializable {
     public JFXButton power_bills_payment;
     public JFXButton dcr;
 
+    //CASHIER
+    public JFXButton issue_or;
     // WAREHOUSE
     public JFXButton warehouseDashboard, fileMirs, generateMct, mrT, stocks, receiving, addMR, bankRemittance;
 
@@ -122,6 +124,8 @@ public class HomeController implements Initializable {
         dcr = new JFXButton("Daily Collection Report");
         bankRemittance = new JFXButton("Bank Remittance");
 
+        issue_or = new JFXButton("Issue O.R");
+
         // ADD ALL ITEMS TO NAV SEQUENTIALLY
         if(ActiveUser.getUser().can("manage-finance")) {
             NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Finance"), new FontIcon("mdi2f-finance"), homeStackPane);
@@ -139,6 +143,11 @@ public class HomeController implements Initializable {
             NavMenuHelper.addMenu(navMenuBox, power_bills_payment, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, dcr, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, bankRemittance, homeStackPane);
+        }
+
+        if (ActiveUser.getUser().can("manage-cashiering")){
+            NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Cashier"), new FontIcon("mdi2c-cash-register"), homeStackPane);
+            NavMenuHelper.addMenu(navMenuBox, issue_or, homeStackPane);
         }
 
         if(ActiveUser.getUser().can("manage-warehouse")) {
@@ -185,6 +194,10 @@ public class HomeController implements Initializable {
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(power_bills_payment, new FontIcon("mdi2c-cash-usd"), drawerMenus, power_bills_payment.getText(), contentPane, "tellering/tellering_bills_payment.fxml", null, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(dcr, new FontIcon("mdi2c-chart-bar"), drawerMenus, dcr.getText(), contentPane, "tellering/tellering_dcr.fxml", null, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(bankRemittance, new FontIcon("mdi2c-chart-bar"), drawerMenus, bankRemittance.getText(), contentPane, "tellering/tellering_bank_remittances.fxml", null, null, title);
+        }
+
+        if (ActiveUser.getUser().can("manage-cashiering")) {
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(issue_or, new FontIcon("mdi2f-file"), drawerMenus, issue_or.getText(), contentPane, "cashiering/cashier_layout.fxml", null, null, title);
         }
 
         // WAREHOUSE
