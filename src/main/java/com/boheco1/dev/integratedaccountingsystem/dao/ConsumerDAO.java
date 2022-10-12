@@ -125,6 +125,7 @@ public class ConsumerDAO {
             bill.setBillMonth(formatter.format(billMonth));
             bill.setServicePeriodEnd(billMonth);
             bill.setConsumer(consumerInfo);
+
             String charge = "Select ServicePeriodEnd,isnull(NetAmount,0) AS NetAmount, "+
                     "DATEDIFF(day, DueDate, getdate()) AS daysDelayed, "+
                     "ISNULL(ConsumerType,'RM') as ConsumerType, "+
@@ -135,14 +136,13 @@ public class ConsumerDAO {
                     "isnull(ACRM_TAFPPCA,0) as ACRM_TAFPPCA, "+
                     "isnull(DAA_GRAM,0) as DAA_GRAM "+
                     "from bills where BillNumber=? and ServicePeriodEnd not in (Select ServicePeriodEnd from PaidBills where BillNumber=?) order by ServicePeriodEnd";
-
             PreparedStatement ps_charge = DB.getConnection("Billing").prepareStatement(charge);
 
             ps_charge.setString(1, billNo);
             ps_charge.setString(2, billNo);
 
             ResultSet rs2 = ps_charge.executeQuery();
-
+            //Compute the surcharge
             while(rs2.next()) {
                 bill.setConsumerType(rs2.getString("ConsumerType"));
                 double pkwh = rs2.getDouble("PowerKWH");
@@ -153,7 +153,6 @@ public class ConsumerDAO {
                 if (netAmount != bill.getAmountDue()) {
                     throw new Exception("NetAmounts from Bills and BillsInquiry does not match!");
                 }
-
                 double vat = rs2.getDouble("VATandTaxes");
                 double transformerRental = rs2.getDouble("TransformerRental");
                 double othersCharges = rs2.getDouble("OthersCharges");
@@ -161,7 +160,8 @@ public class ConsumerDAO {
                 double daa = rs2.getDouble("DAA_GRAM");
                 bill.setDaysDelayed(daysDelayed);
                 double penalty = (netAmount - (vat + transformerRental + othersCharges + acrm + daa));
-                bill.setSurCharge(penalty);
+                bill.setSurCharge(bill.computeSurCharge(penalty));
+                bill.setTotalAmount();
             }
             bills.add(bill);
 
