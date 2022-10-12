@@ -4,7 +4,6 @@ import java.sql.Date;
 import java.time.LocalDate;
 
 public class Bill {
-
     private String billNo;
     private String billMonth;
     private LocalDate dueDate;
@@ -19,7 +18,8 @@ public class Bill {
     private LocalDate servicePeriodEnd;
     private ConsumerInfo consumer;
     private String consumerType;
-
+    private double powerKWH;
+    private double discount;
     public Bill(){}
 
     public Bill(String billNo, LocalDate from, LocalDate to, LocalDate dueDate,
@@ -69,25 +69,29 @@ public class Bill {
 
     public void setSurCharge(double penalty) {
         System.out.println(this.consumerType);
-        //Check the number of days from due date and apply penalty
-        if (this.getDaysDelayed() > 0) {
-            //Exemption of penalties due to Odette
-            if (this.getServicePeriodEnd().isEqual(LocalDate.of(2021, 12, 1))) {
-                this.surCharge = 0;
-            //Penalty computation for Residential, BAPA
-            }else if ((this.consumerType.equals("Residential") || this.consumerType.equals("BAPA") || this.consumerType.equals("ECA")) && this.getServicePeriodEnd().isAfter(LocalDate.of(2014, 8, 11))) {
-                this.surCharge = surCharge * 0.03;
-                this.surCharge += (this.surCharge * 0.12);
-            //For Commercial Types
-            }else{
-                if (this.getServicePeriodEnd().isAfter(LocalDate.of(2017, 4, 1))) {
-                    if (this.getDaysDelayed() < 6) {
-                        this.surCharge = 0;
-                    } else if (this.getDaysDelayed() > 30) {
-                        this.surCharge = this.getAmountDue() * 1.05;
-                    } else {
-                        this.surCharge = surCharge * 0.03;
-                        this.surCharge += (this.surCharge * 0.12);
+        if (this.consumerType.equals("P") || this.consumerType.equals("S")) {
+            this.surCharge = 0;
+        }else {
+            //Check the number of days delayed from due date
+            if (this.getDaysDelayed() > 0) {
+                //Exemption of penalties due to Odette
+                if (this.getServicePeriodEnd().isEqual(LocalDate.of(2021, 12, 1))) {
+                    this.surCharge = 0;
+                //Penalty computation for Residential, BAPA, ECA
+                } else if ((this.consumerType.equals("RM") || this.consumerType.equals("B") || this.consumerType.equals("E")) && this.getServicePeriodEnd().isAfter(LocalDate.of(2014, 8, 11))) {
+                    this.surCharge = surCharge * 0.03;
+                    this.surCharge += (this.surCharge * 0.12);
+                //For Commercial Types
+                } else {
+                    if (this.getServicePeriodEnd().isAfter(LocalDate.of(2017, 4, 1))) {
+                        if (this.getDaysDelayed() < 6) {
+                            this.surCharge = 0;
+                        } else if (this.getDaysDelayed() > 30) {
+                            this.surCharge = this.getAmountDue() * 1.05;
+                        } else {
+                            this.surCharge = surCharge * 0.03;
+                            this.surCharge += (this.surCharge * 0.12);
+                        }
                     }
                 }
             }
@@ -164,6 +168,22 @@ public class Bill {
 
     public void setConsumerType(String consumerType) {
         this.consumerType = consumerType;
+    }
+
+    public double getPowerKWH() {
+        return powerKWH;
+    }
+
+    public void setPowerKWH(double powerKWH) {
+        this.powerKWH = powerKWH;
+    }
+
+    public double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(double discount) {
+        this.discount = discount;
     }
 }
 

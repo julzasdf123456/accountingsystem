@@ -2,6 +2,9 @@ package com.boheco1.dev.integratedaccountingsystem.helpers;
 
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
@@ -136,5 +139,22 @@ public class Utility {
 
     public static void setDictionary(HashMap dictionary) {
         Utility.dictionary = dictionary;
+    }
+
+    public static void setAmount(Node control, Collection<?> data){
+        double amount = 0;
+        for (Object e: data) {
+            if (e instanceof Bill){
+                Bill bill = (Bill) e;
+                amount += bill.getTotalAmount();
+            }
+        }
+        if (control instanceof Label){
+            Label amount_control = (Label) control;
+            amount_control.setText(amount+"");
+        }else if (control instanceof TextField){
+            TextField textField = (TextField) control;
+            textField.setText(amount+"");
+        }
     }
 }

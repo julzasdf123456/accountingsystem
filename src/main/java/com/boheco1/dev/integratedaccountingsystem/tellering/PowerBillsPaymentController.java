@@ -15,10 +15,13 @@ import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.ResourceBundle;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
@@ -88,6 +91,9 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     private TextField total_paid_tf;
 
     @FXML
+    private Label total_payable_lbl;
+
+    @FXML
     private JFXButton transact_btn;
 
     private ConsumerInfo consumerInfo = null;
@@ -99,17 +105,12 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.acct_no_tf.setOnAction(actionEvent -> {
             String no = acct_no_tf.getText();
             try {
-                consumerInfo = ConsumerDAO.getConsumerRecord(no);
-                this.con_name_tf.setText(consumerInfo.getConsumerName());
-                this.con_addr_tf.setText(consumerInfo.getConsumerAddress());
-                this.account_tf.setText(consumerInfo.getAccountID());
-                this.meter_no_tf.setText(consumerInfo.getMeterNumber());
-                this.type_tf.setText(consumerInfo.getAccountType());
-                this.status_tf.setText(consumerInfo.getAccountStatus());
-                this.bapa_tf.setText(consumerInfo.getAccountType().equals("BAPA") ? "BAPA Registered" : "");
-
+                this.consumerInfo = ConsumerDAO.getConsumerRecord(no);
+                this.setConsumerInfo(this.consumerInfo);
                 try{
-                    this.bills = FXCollections.observableArrayList(ConsumerDAO.getConsumerBills(this.consumerInfo.getAccountID(), false));
+                    if (this.bills.size() == 0) this.bills = FXCollections.observableArrayList();
+                    this.bills.addAll(ConsumerDAO.getConsumerBills(this.consumerInfo, false));
+                    Utility.setAmount(this.total_payable_lbl, this.bills);
                     this.fees_table.setItems(this.bills);
                 }catch (Exception e){
                     e.printStackTrace();
@@ -152,50 +153,73 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
      * @return void
      */
     public void createTable(){
-        TableColumn<Bill, String> column0 = new TableColumn<>("Bill Number");
-        column0.setMinWidth(125);
+        TableColumn<Bill, String> column0 = new TableColumn<>("Bill #");
+
+        column0.setPrefWidth(100);
+        column0.setMaxWidth(100);
+        column0.setMinWidth(100);
         column0.setCellValueFactory(new PropertyValueFactory<>("billNo"));
         column0.setStyle("-fx-alignment: center-left;");
 
+        TableColumn<Bill, String> column = new TableColumn<>("Account #");
+        column.setPrefWidth(100);
+        column.setMaxWidth(100);
+        column.setMinWidth(100);
+        column.setCellValueFactory(new PropertyValueFactory<>("accountNo"));
+        column.setStyle("-fx-alignment: center-left;");
+
         TableColumn<Bill, String> column1 = new TableColumn<>("Billing Month");
-        column1.setMinWidth(125);
+        column1.setPrefWidth(130);
+        column1.setMaxWidth(130);
+        column1.setMinWidth(130);
         column1.setCellValueFactory(new PropertyValueFactory<>("billMonth"));
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Bill, String> column2 = new TableColumn<>("Due Date");
+        column2.setPrefWidth(100);
+        column2.setMaxWidth(100);
         column2.setMinWidth(100);
         column2.setCellValueFactory(new PropertyValueFactory<>("dueDate"));
         column2.setStyle("-fx-alignment: center;");
 
         TableColumn<Bill, String> column3 = new TableColumn<>("Amount Due");
+        column3.setPrefWidth(125);
+        column3.setMaxWidth(125);
         column3.setMinWidth(125);
         column3.setCellValueFactory(new PropertyValueFactory<>("amountDue"));
         column3.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column4 = new TableColumn<>("Surcharge");
-        column4.setMinWidth(100);
+        column4.setPrefWidth(125);
+        column4.setMaxWidth(125);
+        column4.setMinWidth(125);
         column4.setCellValueFactory(new PropertyValueFactory<>("surCharge"));
         column4.setStyle("-fx-alignment: center;");
 
         TableColumn<Bill, String> column5 = new TableColumn<>("2%");
+        column5.setPrefWidth(75);
+        column5.setMaxWidth(75);
         column5.setMinWidth(75);
         column5.setCellValueFactory(new PropertyValueFactory<>("ch2306"));
         column5.setStyle("-fx-alignment: center;");
 
         TableColumn<Bill, String> column6 = new TableColumn<>("5%");
+        column6.setPrefWidth(75);
+        column6.setMaxWidth(75);
         column6.setMinWidth(75);
         column6.setCellValueFactory(new PropertyValueFactory<>("ch2307"));
         column6.setStyle("-fx-alignment: center;");
 
         TableColumn<Bill, String> column7 = new TableColumn<>("Total Amount");
-        column7.setMinWidth(150);
         column7.setCellValueFactory(new PropertyValueFactory<>("totalAmount"));
         column7.setStyle("-fx-alignment: center-right;");
 
         this.bills =  FXCollections.observableArrayList();
+        this.fees_table.setFixedCellSize(35);
         this.fees_table.setPlaceholder(new Label("No Bills added"));
 
         this.fees_table.getColumns().add(column0);
+        this.fees_table.getColumns().add(column);
         this.fees_table.getColumns().add(column1);
         this.fees_table.getColumns().add(column2);
         this.fees_table.getColumns().add(column3);
@@ -209,20 +233,25 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     public void receive(Object o) {
         if (o instanceof ConsumerInfo) {
             this.consumerInfo = (ConsumerInfo) o;
-            this.con_name_tf.setText(consumerInfo.getConsumerName());
-            this.con_addr_tf.setText(consumerInfo.getConsumerAddress());
-            this.account_tf.setText(consumerInfo.getAccountID());
-            this.meter_no_tf.setText(consumerInfo.getMeterNumber());
-            this.type_tf.setText(consumerInfo.getAccountType());
-            this.status_tf.setText(consumerInfo.getAccountStatus());
-            this.bapa_tf.setText(consumerInfo.getAccountType().equals("BAPA") ? "BAPA Registered" : "");
-
+            this.setConsumerInfo(this.consumerInfo);
             try{
-                this.bills = FXCollections.observableArrayList(ConsumerDAO.getConsumerBills(this.consumerInfo.getAccountID(), false));
+                if (this.bills.size() == 0) this.bills = FXCollections.observableArrayList();
+                this.bills.addAll(ConsumerDAO.getConsumerBills(this.consumerInfo, false));
+                Utility.setAmount(this.total_payable_lbl, this.bills);
                 this.fees_table.setItems(this.bills);
             }catch (Exception e){
                 e.printStackTrace();
             }
         }
+    }
+
+    public void setConsumerInfo(ConsumerInfo consumerInfo){
+        this.con_name_tf.setText(consumerInfo.getConsumerName());
+        this.con_addr_tf.setText(consumerInfo.getConsumerAddress());
+        this.account_tf.setText(consumerInfo.getAccountID());
+        this.meter_no_tf.setText(consumerInfo.getMeterNumber());
+        this.type_tf.setText(consumerInfo.getAccountType());
+        this.status_tf.setText(consumerInfo.getAccountStatus());
+        this.bapa_tf.setText(consumerInfo.getAccountType().equals("BAPA") ? "BAPA Registered" : "");
     }
 }

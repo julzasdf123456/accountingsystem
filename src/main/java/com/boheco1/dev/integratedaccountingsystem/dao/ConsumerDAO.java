@@ -91,12 +91,12 @@ public class ConsumerDAO {
 
     /**
      * Retrieves bills of customer based on Account Number (on Billing database)
-     * @param accountNo The consumer account number
+     * @param consumerInfo The consumer account number
      * @param paid The bill status
      * @return A list of Bill
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static List<Bill> getConsumerBills(String accountNo, boolean paid) throws Exception {
+    public static List<Bill> getConsumerBills(ConsumerInfo consumerInfo, boolean paid) throws Exception {
         String sql = "SELECT * FROM BillsInquiry WHERE BillNumber NOT IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ? ORDER BY DueDate DESC";
 
         if (paid)
@@ -104,7 +104,7 @@ public class ConsumerDAO {
 
         PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
 
-        ps.setString(1, accountNo);
+        ps.setString(1, consumerInfo.getAccountID());
 
         ResultSet rs = ps.executeQuery();
 
@@ -118,12 +118,13 @@ public class ConsumerDAO {
                     rs.getDate("ServiceDateTo").toLocalDate(),
                     rs.getDate("DueDate").toLocalDate(),
                     rs.getDouble("NetAmount"));
+
             Date date = rs.getDate("ServicePeriodEnd");
             LocalDate billMonth = date.toLocalDate();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM YYYY");
             bill.setBillMonth(formatter.format(billMonth));
             bill.setServicePeriodEnd(billMonth);
-
+            bill.setConsumer(consumerInfo);
             String charge = "Select ServicePeriodEnd,isnull(NetAmount,0) AS NetAmount, "+
                     "DATEDIFF(day, DueDate, getdate()) AS daysDelayed, "+
                     "ISNULL(ConsumerType,'RM') as ConsumerType, "+
@@ -144,12 +145,15 @@ public class ConsumerDAO {
 
             while(rs2.next()) {
                 bill.setConsumerType(rs2.getString("ConsumerType"));
+                double pkwh = rs2.getDouble("PowerKWH");
+                bill.setPowerKWH(pkwh);
                 int daysDelayed = rs2.getInt("daysDelayed");
                 double netAmount = rs2.getDouble("NetAmount");
 
                 if (netAmount != bill.getAmountDue()) {
                     throw new Exception("NetAmounts from Bills and BillsInquiry does not match!");
                 }
+
                 double vat = rs2.getDouble("VATandTaxes");
                 double transformerRental = rs2.getDouble("TransformerRental");
                 double othersCharges = rs2.getDouble("OthersCharges");
@@ -157,7 +161,6 @@ public class ConsumerDAO {
                 double daa = rs2.getDouble("DAA_GRAM");
                 bill.setDaysDelayed(daysDelayed);
                 double penalty = (netAmount - (vat + transformerRental + othersCharges + acrm + daa));
-                System.out.println(netAmount+" "+penalty);
                 bill.setSurCharge(penalty);
             }
             bills.add(bill);
