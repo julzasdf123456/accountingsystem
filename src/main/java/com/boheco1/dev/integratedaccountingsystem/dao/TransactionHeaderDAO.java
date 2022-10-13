@@ -14,7 +14,7 @@ public class TransactionHeaderDAO {
                         "(Period, TransactionNumber, TransactionCode, " +
                         "AccountID, Source, Particulars, TransactionDate, " +
                         "Bank, ReferenceNo, Amount, EnteredBy, DateEntered, " +
-                        "DateLastModified, UpdatedBy, Remarks, Office) " +
+                        "DateLastModified, UpdatedBy, Remarks) " +
                         "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         ps.setDate(1, java.sql.Date.valueOf(transactionHeader.getPeriod()));
         ps.setString(2, transactionHeader.getTransactionNumber());
@@ -27,11 +27,10 @@ public class TransactionHeaderDAO {
         ps.setString(9, transactionHeader.getReferenceNo());
         ps.setDouble(10, transactionHeader.getAmount());
         ps.setString(11, transactionHeader.getEnteredBy());
-        ps.setTimestamp(12, java.sql.Timestamp.valueOf(transactionHeader.getDateEntered()));
-        ps.setTimestamp(13, java.sql.Timestamp.valueOf(transactionHeader.getDateLastModified()));
+        ps.setTimestamp(12, transactionHeader.getDateEntered()!=null ? java.sql.Timestamp.valueOf(transactionHeader.getDateEntered()) : null);
+        ps.setTimestamp(13, transactionHeader.getDateLastModified()!=null ? java.sql.Timestamp.valueOf(transactionHeader.getDateLastModified()) : null);
         ps.setString(14, transactionHeader.getUpdatedBy());
         ps.setString(15, transactionHeader.getRemarks());
-        ps.setString(16,transactionHeader.getOffice());
 
         ps.executeUpdate();
         ps.close();
@@ -59,8 +58,8 @@ public class TransactionHeaderDAO {
             th.setReferenceNo(rs.getString("ReferenceNo"));
             th.setAmount(rs.getDouble("Amount"));
             th.setEnteredBy(rs.getString("EnteredBy"));
-            th.setDateEntered(rs.getTimestamp("DateEntered").toLocalDateTime());
-            th.setDateLastModified(rs.getTimestamp("DateLastModified").toLocalDateTime());
+            th.setDateEntered( rs.getTimestamp("DateEntered") !=null ? rs.getTimestamp("DateEntered").toLocalDateTime() : null);
+            th.setDateLastModified(rs.getTimestamp("DateLastModified") !=null ? rs.getTimestamp("DateLastModified").toLocalDateTime() : null);
             th.setUpdatedBy(rs.getString("UpdatedBy"));
             th.setRemarks(rs.getString("Remarks"));
             th.setOffice(rs.getString("Office"));

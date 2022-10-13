@@ -46,8 +46,7 @@ public class AddBankRemittance extends MenuControllerHandler implements Initiali
         BankRemittance bankRemittance = new BankRemittance();
         bankRemittance.setOrDateFrom(orDateFrom.getValue());
 //        bankRemittance.setOrDateTo(orDateTo.getValue());
-        bankRemittance.setDescription(bankAccount.getSelectionModel().getSelectedItem().getBankDescription());
-        bankRemittance.setAccountNumber(accountNumber.getText());
+        bankRemittance.setBankAccount(bankAccount.getSelectionModel().getSelectedItem());
         bankRemittance.setCheckNumber(checkNumber.getText());
         bankRemittance.setAmount(Double.parseDouble(amount.getText()));
 

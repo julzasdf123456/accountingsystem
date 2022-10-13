@@ -1,7 +1,11 @@
 package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.TransactionDetailsDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.BankRemittance;
+import com.boheco1.dev.integratedaccountingsystem.objects.TransactionDetails;
+import com.boheco1.dev.integratedaccountingsystem.objects.TransactionHeader;
 import com.jfoenix.controls.JFXButton;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -32,6 +36,8 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
     @FXML StackPane stackPane;
 
     ObservableList<BankRemittance> tableList;
+
+    private TransactionHeader transactionHeader;
 
     private void renderTable() {
         TableColumn orDateFromColumn = new TableColumn<BankRemittance, LocalDate>("OR Date From");
@@ -93,30 +99,40 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
 
     @FXML
     public void onAddEntry() {
-        ModalBuilder.showModalFromXML(AddBankRemittance.class, "../tellering/add_bank_remittance.fxml", Utility.getStackPane());
+        ModalBuilder.showModalFromXML(AddBankRemittance.class, "../cashiering/add_bank_remittance.fxml", Utility.getStackPane());
     }
 
     public void enableAddEntry() {
         if(transactionDate.getValue()!=null && !remittanceNo.getText().isEmpty()) {
-            addEntryBtn.setDisable(false);
+            try {
+                String transactionNumber = remittanceNo.getText();
+                transactionHeader = TransactionHeaderDAO.get(transactionNumber, "BR");
+
+                if(transactionHeader==null) {
+                    int year = transactionDate.getValue().getYear();
+                    int month = transactionDate.getValue().getMonthValue();
+
+                    transactionHeader = new TransactionHeader();
+                    transactionHeader.setTransactionCode("BR");
+                    transactionHeader.setTransactionNumber(remittanceNo.getText());
+                    transactionHeader.setPeriod(LocalDate.of(year, month, 1));
+                    transactionHeader.setTransactionDate(transactionDate.getValue());
+
+                    try {
+                        TransactionHeaderDAO.add(transactionHeader);
+                        AlertDialogBuilder.messgeDialog("New Transaction","A new transaction has been created for \"BR " + transactionNumber + ".",stackPane, AlertDialogBuilder.INFO_DIALOG);
+                    }catch(Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                addEntryBtn.setDisable(false);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }else {
             addEntryBtn.setDisable(true);
-        }
-    }
-
-    @FXML
-    public void onSaveChanges() {
-        if(transactionDate.getValue()==null) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please select a Transaction date",
-                    stackPane, AlertDialogBuilder.WARNING_DIALOG);
-        }else if(remittanceNo.getText().isEmpty()) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a Bank Remittance Number.",
-                    stackPane, AlertDialogBuilder.WARNING_DIALOG);
-        }else if(remittanceTable.getItems().size()==0){
-            AlertDialogBuilder.messgeDialog("Invalid Input", "The transaction is empty. Please add bank remittance entries.",
-                    stackPane, AlertDialogBuilder.WARNING_DIALOG);
-        }else {
-            System.out.println("OK for saving transaction");
         }
     }
 
@@ -128,8 +144,24 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
     @Override
     public void receive(Object o) {
         if(o instanceof BankRemittance){
-            tableList.add((BankRemittance) o);
-            computeTotals();
+            BankRemittance br = (BankRemittance) o;
+            TransactionDetails td = new TransactionDetails();
+            td.setTransactionCode("BR");
+            td.setTransactionNumber(transactionHeader.getTransactionNumber());
+            td.setPeriod(transactionHeader.getPeriod());
+            td.setOrDate(br.getOrDateFrom());
+            td.setBankID(br.getBankAccount().getId());
+            td.setAccountCode(br.getBankAccount().getAccountCode());
+
+            try {
+                TransactionDetailsDAO.add(td);
+                tableList.add((BankRemittance) o);
+                computeTotals();
+            }catch(Exception ex) {
+                ex.printStackTrace();
+            }
+
+
         }
     }
 
