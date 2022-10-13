@@ -193,5 +193,14 @@ public class Bill {
         }
         return amount;
     }
+
+    public boolean equals(Object o){
+        if (o instanceof Bill){
+            Bill bill = (Bill) o;
+            if (bill.getBillNo().equals(this.getBillNo()))
+                return true;
+        }
+        return false;
+    }
 }
 

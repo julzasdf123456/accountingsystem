@@ -85,7 +85,6 @@ public class Utility {
         return itemizedMirsItems;
     }
 
-
     public static String generateRandomId() {
         return new Date().getTime() + "-" + generateRandomString(15);
     }
@@ -153,14 +152,21 @@ public class Utility {
             if (e instanceof Bill) {
                 Bill bill = (Bill) e;
                 amount += bill.getTotalAmount();
+            }else if (e instanceof Check){
+                Check check = (Check) e;
+                amount += check.getAmount();
             }
         }
         amount = round(amount,2);
         if (control instanceof Label) {
             Label amount_control = (Label) control;
+            double current_amount = Double.parseDouble(amount_control.getText());
+            amount += current_amount;
             amount_control.setText(amount + "");
         } else if (control instanceof TextField) {
             TextField textField = (TextField) control;
+            double current_amount = Double.parseDouble(textField.getText());
+            amount += current_amount;
             textField.setText(amount + "");
         }
     }
