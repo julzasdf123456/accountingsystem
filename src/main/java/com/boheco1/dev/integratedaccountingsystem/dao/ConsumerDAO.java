@@ -22,7 +22,7 @@ public class ConsumerDAO {
      */
     public static List<ConsumerInfo> getConsumerRecords(String key) throws Exception  {
         PreparedStatement ps = DB.getConnection("Billing").prepareStatement(
-                "SELECT * FROM AccountMaster WHERE ConsumerName LIKE ? OR AccountNumber LIKE ? " +
+                "SELECT TOP 10 * FROM AccountMaster WHERE ConsumerName LIKE ? OR AccountNumber LIKE ? " +
                         "ORDER BY ConsumerName");
         ps.setString(1, '%'+ key+'%');
         ps.setString(2, '%'+ key+'%');
