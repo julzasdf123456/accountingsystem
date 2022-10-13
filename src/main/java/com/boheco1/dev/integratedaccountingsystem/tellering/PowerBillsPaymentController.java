@@ -3,28 +3,23 @@ package com.boheco1.dev.integratedaccountingsystem.tellering;
 import com.boheco1.dev.integratedaccountingsystem.dao.ConsumerDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.boheco1.dev.integratedaccountingsystem.warehouse.WarehouseDashboardController;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -35,7 +30,6 @@ import javafx.util.Callback;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 public class PowerBillsPaymentController extends MenuControllerHandler implements Initializable, ObjectTransaction {
-
 
     @FXML
     private AnchorPane contentPane;
@@ -92,7 +86,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     private JFXButton clear_check_btn;
 
     @FXML
-    private ListView<?> checks_lv;
+    private ListView<Check> checks_lv;
 
     @FXML
     private TextField total_paid_tf;
@@ -106,6 +100,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     private ConsumerInfo consumerInfo = null;
 
     private ObservableList<Bill> bills = null;
+    private ObservableList<Check> checks = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -143,6 +138,19 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.payment_tf.setOnKeyTyped(keyEvent -> {
             total_paid_tf.setText(this.payment_tf.getText());
         });
+
+        this.add_check_btn.setOnAction(action -> {
+            try {
+                this.showAddCheckForm();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        this.clear_check_btn.setOnAction(action ->{
+            this.resetChecks();
+        });
+
         Utility.setParentController(this);
     }
     /**
@@ -150,7 +158,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
      * @return void
      */
     @FXML
-    void reset(ActionEvent event) {
+    public void reset(ActionEvent event) {
         consumerInfo = null;
         this.con_name_tf.setText("");
         this.con_addr_tf.setText("");
@@ -166,8 +174,28 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.payment_tf.setDisable(true);
         this.bills = FXCollections.observableArrayList(new ArrayList<>());
         this.fees_table.setItems(this.bills);
+        this.resetChecks();
     }
-
+    /**
+     * Resets check details
+     * @return void
+     */
+    public void resetChecks(){
+        double amount = 0;
+        for(Check c : this.checks){
+            amount += c.getAmount();
+        }
+        double current_total = Double.parseDouble(this.total_paid_tf.getText()) - amount;
+        if (current_total < 0)
+            current_total = 0;
+        this.total_paid_tf.setText(current_total+"");
+        this.checks =  FXCollections.observableArrayList();
+        this.checks_lv.setItems(this.checks);
+    }
+    /**
+     * Displays Advance Consumer Search UI
+     * @return void
+     */
     @FXML
     public void advanceSearch(){
         ModalBuilderForWareHouse.showModalFromXMLNoClose(PowerBillsPaymentController.class, "../tellering/tellering_search_consumer.fxml", Utility.getStackPane());
@@ -257,7 +285,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                                     btn.setOnAction(event -> {
                                         try {
                                             Bill bill = getTableView().getItems().get(getIndex());
-                                            showWaiveForm(bill, getTableView(), total_payable_lbl);
+                                            showAuthenticate(bill, fees_table, total_payable_lbl);
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
@@ -295,7 +323,11 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.fees_table.getColumns().add(columnWaive);
         this.fees_table.getColumns().add(column7);
     }
-
+    /**
+     * Receives ConsumerInfo object from dialog
+     * @param o the object reference
+     * @return void
+     */
     @Override
     public void receive(Object o) {
         if (o instanceof ConsumerInfo) {
@@ -303,9 +335,14 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             try{
                 if (this.bills.size() == 0) this.bills = FXCollections.observableArrayList();
                 List<Bill> consumerBills = ConsumerDAO.getConsumerBills(this.consumerInfo, false);
+                this.setConsumerInfo(this.consumerInfo);
+                //TO VALIDATE
                 if (consumerBills.size() > 0) {
-                    this.bills.addAll(consumerBills);
-                    this.setConsumerInfo(this.consumerInfo);
+                    for (Bill b : consumerBills){
+                        if (!this.bills.contains(b)) {
+                            this.bills.add(b);
+                        }
+                    }
                     Utility.setAmount(this.total_payable_lbl, this.bills);
                     this.fees_table.setItems(this.bills);
                     this.payment_tf.setDisable(false);
@@ -317,7 +354,11 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             }
         }
     }
-
+    /**
+     * Sets ConsumerInfo details to UI
+     * @param consumerInfo the object reference
+     * @return void
+     */
     public void setConsumerInfo(ConsumerInfo consumerInfo){
         this.con_name_tf.setText(consumerInfo.getConsumerName());
         this.con_addr_tf.setText(consumerInfo.getConsumerAddress());
@@ -327,7 +368,37 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.status_tf.setText(consumerInfo.getAccountStatus());
         this.bapa_tf.setText(consumerInfo.getAccountType().equals("BAPA") ? "BAPA Registered" : "");
     }
-
+    /**
+     * Displays Add Check UI
+     * @return void
+     */
+    public void showAddCheckForm() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_add_check.fxml"));
+        Parent parent = fxmlLoader.load();
+        PaymentAddCheckController addCheckController = fxmlLoader.getController();
+        addCheckController.getAdd_btn().setOnAction(actionEvent -> {
+            Check check = addCheckController.getCheck();
+            if (check != null){
+                if (this.checks == null || this.checks.size() == 0)
+                    this.checks = FXCollections.observableArrayList();
+                this.checks.add(check);
+                this.checks_lv.setItems(this.checks);
+                double amount = Double.parseDouble(this.total_paid_tf.getText());
+                this.total_paid_tf.setText((amount+check.getAmount())+"");
+            }
+        });
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setBody(parent);
+        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+        dialog.show();
+    }
+    /**
+     * Displays Waive Form UI
+     * @param bill the bill object reference
+     * @param table the table to refresh
+     * @param total the total label to display amount
+     * @return void
+     */
     public void showWaiveForm(Bill bill, TableView table, Label total) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_waive_surcharge.fxml"));
         Parent parent = fxmlLoader.load();
@@ -337,6 +408,33 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
         dialogLayout.setBody(parent);
         JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+        dialog.show();
+    }
+    /**
+     * Displays Authenticate Form UI
+     * @param bill the bill object reference
+     * @param table the table to refresh
+     * @param total the total label to display amount
+     * @return void
+     */
+    public void showAuthenticate(Bill bill, TableView table, Label total) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_authenticate.fxml"));
+        Parent parent = fxmlLoader.load();
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setBody(parent);
+        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+        WaiveConfirmationController waiveController = fxmlLoader.getController();
+        waiveController.getAuthenticate_btn().setOnAction(actionEvent -> {
+            boolean ok = waiveController.login();
+            if (ok) {
+                try {
+                    dialog.close();
+                    showWaiveForm(bill, table, total);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
         dialog.show();
     }
 }

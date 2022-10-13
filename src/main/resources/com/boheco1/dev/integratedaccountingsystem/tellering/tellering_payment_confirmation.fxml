@@ -38,11 +38,11 @@
                         <Label styleClass="bold" text="TOTAL AMOUNT PAID" GridPane.rowIndex="2" />
                         <Label styleClass="bold" text="TOTAL AMOUNT DUE" GridPane.rowIndex="3" />
                         <Label styleClass="bold" text="CHANGE" GridPane.rowIndex="4" />
-                        <TextField fx:id="cash_tf" GridPane.columnIndex="1" />
-                        <TextField fx:id="check_tf" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <TextField fx:id="total_amount_paid_tf" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <TextField fx:id="total_amount_due_tf" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                        <TextField fx:id="change_tf" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <TextField fx:id="cash_tf" styleClass="bold" GridPane.columnIndex="1" />
+                        <TextField fx:id="check_tf" disable="true" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField fx:id="total_amount_paid_tf" disable="true" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <TextField fx:id="total_amount_due_tf" disable="true" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <TextField fx:id="change_tf" disable="true" editable="false" styleClass="bold" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                         <JFXButton fx:id="confirm_btn" buttonType="RAISED" onAction="#confirm" prefHeight="37.0" prefWidth="264.0" styleClass="btn-theme" text="CONFIRM" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                      </children>
                   </GridPane>
