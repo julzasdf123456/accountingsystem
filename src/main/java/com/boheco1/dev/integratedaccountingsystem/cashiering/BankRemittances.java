@@ -1,4 +1,4 @@
-package com.boheco1.dev.integratedaccountingsystem.tellering;
+package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.BankRemittance;
@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-public class TelleringBankRemittances extends MenuControllerHandler implements Initializable, ObjectTransaction {
+public class BankRemittances extends MenuControllerHandler implements Initializable, ObjectTransaction {
 
     @FXML
     TableView<BankRemittance> remittanceTable;
@@ -29,10 +29,10 @@ public class TelleringBankRemittances extends MenuControllerHandler implements I
     @FXML Label totalAmount;
     @FXML DatePicker transactionDate;
     @FXML JFXButton addEntryBtn;
+    @FXML StackPane stackPane;
 
     ObservableList<BankRemittance> tableList;
 
-    private StackPane stackPane;
     private void renderTable() {
         TableColumn orDateFromColumn = new TableColumn<BankRemittance, LocalDate>("OR Date From");
         orDateFromColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, LocalDate>("orDateFrom"));
@@ -93,7 +93,7 @@ public class TelleringBankRemittances extends MenuControllerHandler implements I
 
     @FXML
     public void onAddEntry() {
-        ModalBuilder.showModalFromXML(TelleringAddBankRemittance.class, "../tellering/tellering_add_bank_remittance.fxml", Utility.getStackPane());
+        ModalBuilder.showModalFromXML(AddBankRemittance.class, "../tellering/add_bank_remittance.fxml", Utility.getStackPane());
     }
 
     public void enableAddEntry() {
@@ -122,7 +122,7 @@ public class TelleringBankRemittances extends MenuControllerHandler implements I
 
     @FXML
     public void onBankAccountsClick() {
-        ModalBuilder.showModalFromXML(TelleringAddBankRemittance.class, "../tellering/bank_accounts.fxml", Utility.getStackPane());
+        ModalBuilder.showModalFromXML(AddBankRemittance.class, "../tellering/bank_accounts.fxml", Utility.getStackPane());
     }
 
     @Override

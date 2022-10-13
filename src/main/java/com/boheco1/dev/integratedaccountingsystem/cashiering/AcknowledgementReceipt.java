@@ -1,4 +1,4 @@
-package com.boheco1.dev.integratedaccountingsystem.tellering;
+package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import javafx.fxml.Initializable;
@@ -6,7 +6,7 @@ import javafx.fxml.Initializable;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class TelleringAcknowledgementReceipt extends MenuControllerHandler implements Initializable {
+public class AcknowledgementReceipt extends MenuControllerHandler implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
