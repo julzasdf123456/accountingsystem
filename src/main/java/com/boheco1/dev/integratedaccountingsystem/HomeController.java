@@ -150,11 +150,6 @@ public class HomeController implements Initializable {
             NavMenuHelper.addMenu(navMenuBox, bankRemittance, homeStackPane);
         }
 
-        if (ActiveUser.getUser().can("manage-cashiering")){
-            NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Cashier"), new FontIcon("mdi2c-cash-register"), homeStackPane);
-            NavMenuHelper.addMenu(navMenuBox, issue_or, homeStackPane);
-        }
-
         if(ActiveUser.getUser().can("manage-warehouse")) {
             NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Warehouse"), new FontIcon("mdi2s-sitemap"), homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, warehouseDashboard, homeStackPane);

@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.BankAccountDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionDetailsDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
@@ -18,6 +19,7 @@ import javafx.scene.layout.StackPane;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class BankRemittances extends MenuControllerHandler implements Initializable, ObjectTransaction {
@@ -103,58 +105,83 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
     }
 
     public void enableAddEntry() {
-        if(transactionDate.getValue()!=null && !remittanceNo.getText().isEmpty()) {
-            try {
-                String transactionNumber = remittanceNo.getText();
-                transactionHeader = TransactionHeaderDAO.get(transactionNumber, "BR");
 
-                if(transactionHeader==null) {
-                    int year = transactionDate.getValue().getYear();
-                    int month = transactionDate.getValue().getMonthValue();
+        try {
+            LocalDate tdate = transactionDate.getValue();
+            StringBuilder sb = new StringBuilder();
+            sb.append(tdate.getMonthValue()).append(tdate.getDayOfMonth()).append(tdate.getYear());
 
-                    transactionHeader = new TransactionHeader();
-                    transactionHeader.setTransactionCode("BR");
-                    transactionHeader.setTransactionNumber(remittanceNo.getText());
-                    transactionHeader.setPeriod(LocalDate.of(year, month, 1));
-                    transactionHeader.setTransactionDate(transactionDate.getValue());
+            remittanceNo.setText(sb.toString());
 
-                    try {
-                        TransactionHeaderDAO.add(transactionHeader);
-                        AlertDialogBuilder.messgeDialog("New Transaction","A new transaction has been created for \"BR " + transactionNumber + ".",stackPane, AlertDialogBuilder.INFO_DIALOG);
-                    }catch(Exception ex) {
-                        ex.printStackTrace();
-                    }
+            String transactionNumber = remittanceNo.getText();
+            transactionHeader = TransactionHeaderDAO.get(transactionNumber, "BR");
+
+            int year = transactionDate.getValue().getYear();
+            int month = transactionDate.getValue().getMonthValue();
+            LocalDate period = LocalDate.of(year, month, 1);
+
+
+
+            if(transactionHeader==null) {
+                transactionHeader = new TransactionHeader();
+                transactionHeader.setTransactionCode("BR");
+                transactionHeader.setTransactionNumber(remittanceNo.getText());
+                transactionHeader.setPeriod(period);
+                transactionHeader.setTransactionDate(transactionDate.getValue());
+
+                try {
+                    TransactionHeaderDAO.add(transactionHeader);
+                    AlertDialogBuilder.messgeDialog("New Transaction","A new transaction has been created for \"BR\" " + transactionNumber + ".",stackPane, AlertDialogBuilder.INFO_DIALOG);
+                    tableList.clear();
+                    computeTotals();
+                }catch(Exception ex) {
+                    ex.printStackTrace();
                 }
+                tableList.removeAll();
+                remittanceTable.refresh();
+                computeTotals();
+            }else {
+                List<TransactionDetails> tds = TransactionDetailsDAO.get(period,sb.toString(),"BR");
 
-                addEntryBtn.setDisable(false);
-            } catch (Exception e) {
-                e.printStackTrace();
+                tableList.clear();
+
+                for(TransactionDetails td: tds) {
+                    if(td.getCredit()>0) continue;
+                    tableList.add(new BankRemittance(td.getOrDate(),null,td.getCheckNumber(), td.getDebit(), BankAccountDAO.get(td.getBankID())));
+                }
+                remittanceTable.refresh();
+                computeTotals();
             }
 
-        }else {
-            addEntryBtn.setDisable(true);
+            addEntryBtn.setDisable(false);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 
     @FXML
     public void onBankAccountsClick() {
-        ModalBuilder.showModalFromXML(AddBankRemittance.class, "../tellering/bank_accounts.fxml", Utility.getStackPane());
+        ModalBuilder.showModalFromXML(AddBankRemittance.class, "../cashiering/bank_accounts.fxml", Utility.getStackPane());
     }
 
     @Override
     public void receive(Object o) {
         if(o instanceof BankRemittance){
-            BankRemittance br = (BankRemittance) o;
-            TransactionDetails td = new TransactionDetails();
-            td.setTransactionCode("BR");
-            td.setTransactionNumber(transactionHeader.getTransactionNumber());
-            td.setPeriod(transactionHeader.getPeriod());
-            td.setOrDate(br.getOrDateFrom());
-            td.setBankID(br.getBankAccount().getId());
-            td.setAccountCode(br.getBankAccount().getAccountCode());
-
             try {
+                BankRemittance br = (BankRemittance) o;
+                TransactionDetails td = new TransactionDetails();
+                td.setTransactionCode("BR");
+                td.setTransactionNumber(transactionHeader.getTransactionNumber());
+                td.setPeriod(transactionHeader.getPeriod());
+                td.setOrDate(br.getOrDateFrom());
+                td.setBankID(br.getBankAccount().getId());
+                td.setAccountCode(br.getBankAccount().getAccountCode());
+                td.setDebit(br.getAmount());
+                td.setSequenceNumber(TransactionDetailsDAO.getNextSequenceNumber(td.getPeriod(), td.getTransactionNumber()));
+
                 TransactionDetailsDAO.add(td);
+                TransactionDetailsDAO.syncDebit(td.getPeriod(), td.getTransactionNumber());
                 tableList.add((BankRemittance) o);
                 computeTotals();
             }catch(Exception ex) {

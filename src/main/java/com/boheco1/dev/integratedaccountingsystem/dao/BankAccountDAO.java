@@ -33,7 +33,7 @@ public class BankAccountDAO
     public static BankAccount get(String id) throws Exception {
         ResultSet rs = DB.getConnection().createStatement().executeQuery(
                 "SELECT * FROM BankAccounts WHERE BankID='" + id + "'");
-        if(rs.first()){
+        if(rs.next()){
             return new BankAccount(
                     rs.getString("BankID"),
                     rs.getString("BankAccountNumber"),

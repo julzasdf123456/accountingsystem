@@ -87,7 +87,7 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </Label>
-                        <TextField fx:id="remittanceNo" alignment="CENTER" onAction="#enableAddEntry" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <TextField fx:id="remittanceNo" alignment="CENTER" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
                            <font>
                               <Font name="System Bold" size="18.0" />
                            </font>

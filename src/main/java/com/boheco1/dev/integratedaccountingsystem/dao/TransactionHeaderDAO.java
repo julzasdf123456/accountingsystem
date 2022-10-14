@@ -62,7 +62,7 @@ public class TransactionHeaderDAO {
             th.setDateLastModified(rs.getTimestamp("DateLastModified") !=null ? rs.getTimestamp("DateLastModified").toLocalDateTime() : null);
             th.setUpdatedBy(rs.getString("UpdatedBy"));
             th.setRemarks(rs.getString("Remarks"));
-            th.setOffice(rs.getString("Office"));
+//            th.setOffice(rs.getString("Office"));
 
             return th;
         }else {
