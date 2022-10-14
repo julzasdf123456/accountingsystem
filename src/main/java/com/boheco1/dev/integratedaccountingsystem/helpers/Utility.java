@@ -2,10 +2,15 @@ package com.boheco1.dev.integratedaccountingsystem.helpers;
 
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 public class Utility {
@@ -80,7 +85,6 @@ public class Utility {
         return itemizedMirsItems;
     }
 
-
     public static String generateRandomId() {
         return new Date().getTime() + "-" + generateRandomString(15);
     }
@@ -113,13 +117,17 @@ public class Utility {
         Utility.subToolbar = subToolbar;
     }
 
-    public static ViewMRController getMrController() { return mrController; }
+    public static ViewMRController getMrController() {
+        return mrController;
+    }
 
-    public static void setMrController(ViewMRController mrController) { Utility.mrController = mrController; }
+    public static void setMrController(ViewMRController mrController) {
+        Utility.mrController = mrController;
+    }
 
     public static String CURRENT_YEAR() {
         Calendar cal = Calendar.getInstance();
-        return ""+cal.get(Calendar.YEAR);
+        return "" + cal.get(Calendar.YEAR);
     }
 
     public static ObjectTransaction getParentController() {
@@ -136,5 +144,38 @@ public class Utility {
 
     public static void setDictionary(HashMap dictionary) {
         Utility.dictionary = dictionary;
+    }
+
+    public static void setAmount(Node control, Collection<?> data) {
+        double amount = 0;
+        for (Object e : data) {
+            if (e instanceof Bill) {
+                Bill bill = (Bill) e;
+                amount += bill.getTotalAmount();
+            }else if (e instanceof Check){
+                Check check = (Check) e;
+                amount += check.getAmount();
+            }
+        }
+        amount = round(amount,2);
+        if (control instanceof Label) {
+            Label amount_control = (Label) control;
+            double current_amount = Double.parseDouble(amount_control.getText());
+            amount += current_amount;
+            amount_control.setText(amount + "");
+        } else if (control instanceof TextField) {
+            TextField textField = (TextField) control;
+            double current_amount = Double.parseDouble(textField.getText());
+            amount += current_amount;
+            textField.setText(amount + "");
+        }
+    }
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<AnchorPane prefHeight="710.0" prefWidth="989.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.CashierController">
+   <children>
+      <VBox fx:id="anchorpane" alignment="TOP_RIGHT" layoutX="28.0" layoutY="28.0" prefHeight="605.0" prefWidth="512.0" AnchorPane.leftAnchor="28.0" AnchorPane.topAnchor="28.0">
+         <children>
+            <VBox prefHeight="105.0" prefWidth="512.0">
+               <children>
+                  <HBox>
+                     <children>
+                        <JFXButton fx:id="search_btn" onAction="#search" text="Search">
+                           <graphic>
+                              <FontIcon iconLiteral="mdi2a-account-search" iconSize="20" />
+                           </graphic>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </JFXButton>
+                        <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                        </Label>
+                        <JFXButton fx:id="print_btn" onAction="#print" text="Print">
+                           <graphic>
+                              <FontIcon iconLiteral="mdi2p-printer" iconSize="20" />
+                           </graphic>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </JFXButton>
+                     </children>
+                  </HBox>
+                  <Label fx:id="consumer" maxWidth="1.7976931348623157E308" style="-fx-font-size: 24; -fx-font-weight: bold;" text="Juan Ddela Cruz" />
+                  <Label fx:id="address" maxWidth="1.7976931348623157E308" text="Address" />
+               </children>
+            </VBox>
+            <TableView fx:id="paymentTable" prefHeight="401.0" prefWidth="512.0" VBox.vgrow="ALWAYS">
+               <VBox.margin>
+                  <Insets bottom="10.0" top="10.0" />
+               </VBox.margin>
+               <cursor>
+                  <Cursor fx:constant="DEFAULT" />
+               </cursor>
+            </TableView>
+            <Label fx:id="payable" prefHeight="44.0" prefWidth="222.0" style="-fx-font-size: 20; -fx-font-weight: bold;" styleClass="context-menu" text="Total: 0.00" />
+         </children>
+         <cursor>
+            <Cursor fx:constant="DEFAULT" />
+         </cursor>
+      </VBox>
+   </children>
+   <cursor>
+      <Cursor fx:constant="HAND" />
+   </cursor>
+</AnchorPane>

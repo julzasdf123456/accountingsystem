@@ -22,7 +22,7 @@ public class ConsumerDAO {
      */
     public static List<ConsumerInfo> getConsumerRecords(String key) throws Exception  {
         PreparedStatement ps = DB.getConnection("Billing").prepareStatement(
-                "SELECT * FROM AccountMaster WHERE ConsumerName LIKE ? OR AccountNumber LIKE ? " +
+                "SELECT TOP 10 * FROM AccountMaster WHERE ConsumerName LIKE ? OR AccountNumber LIKE ? " +
                         "ORDER BY ConsumerName");
         ps.setString(1, '%'+ key+'%');
         ps.setString(2, '%'+ key+'%');
@@ -91,12 +91,12 @@ public class ConsumerDAO {
 
     /**
      * Retrieves bills of customer based on Account Number (on Billing database)
-     * @param accountNo The consumer account number
+     * @param consumerInfo The consumer account number
      * @param paid The bill status
      * @return A list of Bill
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static List<Bill> getConsumerBills(String accountNo, boolean paid) throws Exception {
+    public static List<Bill> getConsumerBills(ConsumerInfo consumerInfo, boolean paid) throws Exception {
         String sql = "SELECT * FROM BillsInquiry WHERE BillNumber NOT IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ? ORDER BY DueDate DESC";
 
         if (paid)
@@ -104,7 +104,7 @@ public class ConsumerDAO {
 
         PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
 
-        ps.setString(1, accountNo);
+        ps.setString(1, consumerInfo.getAccountID());
 
         ResultSet rs = ps.executeQuery();
 
@@ -118,11 +118,13 @@ public class ConsumerDAO {
                     rs.getDate("ServiceDateTo").toLocalDate(),
                     rs.getDate("DueDate").toLocalDate(),
                     rs.getDouble("NetAmount"));
+
             Date date = rs.getDate("ServicePeriodEnd");
             LocalDate billMonth = date.toLocalDate();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM YYYY");
             bill.setBillMonth(formatter.format(billMonth));
             bill.setServicePeriodEnd(billMonth);
+            bill.setConsumer(consumerInfo);
 
             String charge = "Select ServicePeriodEnd,isnull(NetAmount,0) AS NetAmount, "+
                     "DATEDIFF(day, DueDate, getdate()) AS daysDelayed, "+
@@ -134,16 +136,17 @@ public class ConsumerDAO {
                     "isnull(ACRM_TAFPPCA,0) as ACRM_TAFPPCA, "+
                     "isnull(DAA_GRAM,0) as DAA_GRAM "+
                     "from bills where BillNumber=? and ServicePeriodEnd not in (Select ServicePeriodEnd from PaidBills where BillNumber=?) order by ServicePeriodEnd";
-
             PreparedStatement ps_charge = DB.getConnection("Billing").prepareStatement(charge);
 
             ps_charge.setString(1, billNo);
             ps_charge.setString(2, billNo);
 
             ResultSet rs2 = ps_charge.executeQuery();
-
+            //Compute the surcharge
             while(rs2.next()) {
                 bill.setConsumerType(rs2.getString("ConsumerType"));
+                double pkwh = rs2.getDouble("PowerKWH");
+                bill.setPowerKWH(pkwh);
                 int daysDelayed = rs2.getInt("daysDelayed");
                 double netAmount = rs2.getDouble("NetAmount");
 
@@ -157,8 +160,8 @@ public class ConsumerDAO {
                 double daa = rs2.getDouble("DAA_GRAM");
                 bill.setDaysDelayed(daysDelayed);
                 double penalty = (netAmount - (vat + transformerRental + othersCharges + acrm + daa));
-                System.out.println(netAmount+" "+penalty);
-                bill.setSurCharge(penalty);
+                bill.setSurCharge(bill.computeSurCharge(penalty));
+                bill.setTotalAmount();
             }
             bills.add(bill);
 

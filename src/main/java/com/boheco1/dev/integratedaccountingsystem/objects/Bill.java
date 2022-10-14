@@ -1,10 +1,11 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+
 import java.sql.Date;
 import java.time.LocalDate;
 
 public class Bill {
-
     private String billNo;
     private String billMonth;
     private LocalDate dueDate;
@@ -19,11 +20,12 @@ public class Bill {
     private LocalDate servicePeriodEnd;
     private ConsumerInfo consumer;
     private String consumerType;
+    private double powerKWH;
+    private double discount;
 
     public Bill(){}
 
-    public Bill(String billNo, LocalDate from, LocalDate to, LocalDate dueDate,
-                double amountDue){
+    public Bill(String billNo, LocalDate from, LocalDate to, LocalDate dueDate, double amountDue){
         this.billNo = billNo;
         this.serviceDatefrom = from;
         this.serviceDateto = to;
@@ -64,34 +66,11 @@ public class Bill {
     }
 
     public double getSurCharge() {
-        return surCharge;
+        return this.surCharge;
     }
 
-    public void setSurCharge(double penalty) {
-        System.out.println(this.consumerType);
-        //Check the number of days from due date and apply penalty
-        if (this.getDaysDelayed() > 0) {
-            //Exemption of penalties due to Odette
-            if (this.getServicePeriodEnd().isEqual(LocalDate.of(2021, 12, 1))) {
-                this.surCharge = 0;
-            //Penalty computation for Residential, BAPA
-            }else if ((this.consumerType.equals("Residential") || this.consumerType.equals("BAPA") || this.consumerType.equals("ECA")) && this.getServicePeriodEnd().isAfter(LocalDate.of(2014, 8, 11))) {
-                this.surCharge = surCharge * 0.03;
-                this.surCharge += (this.surCharge * 0.12);
-            //For Commercial Types
-            }else{
-                if (this.getServicePeriodEnd().isAfter(LocalDate.of(2017, 4, 1))) {
-                    if (this.getDaysDelayed() < 6) {
-                        this.surCharge = 0;
-                    } else if (this.getDaysDelayed() > 30) {
-                        this.surCharge = this.getAmountDue() * 1.05;
-                    } else {
-                        this.surCharge = surCharge * 0.03;
-                        this.surCharge += (this.surCharge * 0.12);
-                    }
-                }
-            }
-        }
+    public void setSurCharge(double surCharge) {
+        this.surCharge = surCharge;
     }
 
     public double getCh2306() {
@@ -115,7 +94,7 @@ public class Bill {
     }
 
     public void setTotalAmount() {
-        this.totalAmount = this.getSurCharge() + this.getAmountDue() + this.getCh2306() + this.getCh2307();
+        this.totalAmount = Utility.round(this.getSurCharge() + this.getAmountDue() + this.getCh2306() + this.getCh2307(), 2);
     }
 
     public LocalDate getServiceDatefrom() {
@@ -164,6 +143,64 @@ public class Bill {
 
     public void setConsumerType(String consumerType) {
         this.consumerType = consumerType;
+    }
+
+    public double getPowerKWH() {
+        return powerKWH;
+    }
+
+    public void setPowerKWH(double powerKWH) {
+        this.powerKWH = powerKWH;
+    }
+
+    public double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(double discount) {
+        this.discount = discount;
+    }
+
+    public double computeSurCharge(double penalty) {
+        double amount = 0;
+        if (this.consumerType.equals("P") || this.consumerType.equals("S")) {
+            amount = 0;
+        }else {
+            //Check the number of days delayed from due date
+            if (this.getDaysDelayed() > 0) {
+                //Exemption of penalties due to Odette
+                if (this.getServicePeriodEnd().isEqual(LocalDate.of(2021, 12, 1))) {
+                    amount = 0;
+                //Penalty computation for Residential, BAPA, ECA
+                } else if ((this.consumerType.equals("RM") || this.consumerType.equals("B") || this.consumerType.equals("E")) && this.getServicePeriodEnd().isAfter(LocalDate.of(2014, 8, 11))) {
+                    amount = penalty * 0.03;
+                    amount += (amount * 0.12);
+                //For Commercial Types
+                } else {
+                    if (this.getServicePeriodEnd().isAfter(LocalDate.of(2017, 4, 1))) {
+                        if (this.getDaysDelayed() < 6) {
+                            amount = 0;
+                        } else if (this.getDaysDelayed() > 30) {
+                            amount = this.getAmountDue() * 0.05;
+                        } else {
+                            amount = penalty * 0.03;
+                            amount += (amount * 0.12);
+                        }
+                    }
+                }
+                amount = Utility.round(amount, 2);
+            }
+        }
+        return amount;
+    }
+
+    public boolean equals(Object o){
+        if (o instanceof Bill){
+            Bill bill = (Bill) o;
+            if (bill.getBillNo().equals(this.getBillNo()))
+                return true;
+        }
+        return false;
     }
 }
 

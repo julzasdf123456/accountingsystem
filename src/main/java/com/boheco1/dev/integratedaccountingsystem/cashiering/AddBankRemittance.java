@@ -1,4 +1,4 @@
-package com.boheco1.dev.integratedaccountingsystem.tellering;
+package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.BankAccountDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
@@ -15,10 +15,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.DatePicker;
 
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 
-public class TelleringAddBankRemittance extends MenuControllerHandler implements Initializable {
+public class AddBankRemittance extends MenuControllerHandler implements Initializable {
 
     @FXML DatePicker orDateFrom;
 //    @FXML DatePicker orDateTo;
@@ -47,8 +46,7 @@ public class TelleringAddBankRemittance extends MenuControllerHandler implements
         BankRemittance bankRemittance = new BankRemittance();
         bankRemittance.setOrDateFrom(orDateFrom.getValue());
 //        bankRemittance.setOrDateTo(orDateTo.getValue());
-        bankRemittance.setDescription(bankAccount.getSelectionModel().getSelectedItem().getBankDescription());
-        bankRemittance.setAccountNumber(accountNumber.getText());
+        bankRemittance.setBankAccount(bankAccount.getSelectionModel().getSelectedItem());
         bankRemittance.setCheckNumber(checkNumber.getText());
         bankRemittance.setAmount(Double.parseDouble(amount.getText()));
 
