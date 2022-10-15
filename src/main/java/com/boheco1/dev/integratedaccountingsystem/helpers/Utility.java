@@ -8,6 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
+import pl.allegro.finance.tradukisto.ValueConverters;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -177,5 +178,22 @@ public class Utility {
         BigDecimal bd = BigDecimal.valueOf(value);
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
+    }
+
+    public static String doubleAmountToWords(double amount) {
+        double money = Utility.round(amount, 2);
+        int pesos = (int) money;
+        System.out.println(money-pesos);
+
+        int cents = (int)Math.ceil((money-pesos)*100);
+        System.out.println(cents);
+
+        ValueConverters converters = ValueConverters.ENGLISH_INTEGER;
+
+        StringBuffer words = new StringBuffer();
+        words.append(converters.asWords(pesos));
+        words.append(" pesos and ").append(cents).append(" cents");
+
+        return words.toString();
     }
 }

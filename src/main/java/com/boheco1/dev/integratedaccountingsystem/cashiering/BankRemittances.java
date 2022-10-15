@@ -213,7 +213,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
                 tableList.clear();
 
                 for(TransactionDetails td: tds) {
-                    if(td.getCredit()>0) continue;
+                    if(td.getSequenceNumber()==999) continue;
                     BankRemittance br = new BankRemittance(td.getOrDate(),null,td.getCheckNumber(), td.getDebit(), BankAccountDAO.get(td.getBankID()));
                     br.setTransactionDetails(td);
                     tableList.add(br);

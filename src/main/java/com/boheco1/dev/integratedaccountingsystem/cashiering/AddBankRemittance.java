@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.BankAccountDAO;
+import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ObjectTransaction;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
@@ -13,6 +14,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.DatePicker;
+import javafx.scene.layout.StackPane;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -27,10 +29,12 @@ public class AddBankRemittance extends MenuControllerHandler implements Initiali
     @FXML JFXTextField amount;
 
     private ObjectTransaction parentController = null;
+    private StackPane stackPane;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.parentController = Utility.getParentController();
+        this.stackPane = Utility.getStackPane();
         try {
             ObservableList<BankAccount> bankAccountsList = FXCollections.observableArrayList(BankAccountDAO.getAll());
             bankAccountsList.add(0,null);
@@ -42,17 +46,23 @@ public class AddBankRemittance extends MenuControllerHandler implements Initiali
     }
 
     public void onAddEntry() {
+        if(bankAccount.getSelectionModel().isEmpty() || bankAccount.getSelectionModel().getSelectedItem()==null) {
+            AlertDialogBuilder.messgeDialog("Invalid Entry", "Please select a Bank Account", stackPane, AlertDialogBuilder.WARNING_DIALOG);
+        }else if(orDateFrom.getValue()==null){
+            AlertDialogBuilder.messgeDialog("Invalid Entry","Please enter a valid OR Date.",stackPane, AlertDialogBuilder.WARNING_DIALOG);
+        }else if(amount.getText().isEmpty()) {
+            AlertDialogBuilder.messgeDialog("Invalid Entry","Please enter a valid amount.",stackPane, AlertDialogBuilder.WARNING_DIALOG);
+        }else {
+            BankRemittance bankRemittance = new BankRemittance();
+            bankRemittance.setOrDateFrom(orDateFrom.getValue());
+            bankRemittance.setBankAccount(bankAccount.getSelectionModel().getSelectedItem());
+            bankRemittance.setCheckNumber(checkNumber.getText());
+            bankRemittance.setAmount(Double.parseDouble(amount.getText()));
 
-        BankRemittance bankRemittance = new BankRemittance();
-        bankRemittance.setOrDateFrom(orDateFrom.getValue());
-//        bankRemittance.setOrDateTo(orDateTo.getValue());
-        bankRemittance.setBankAccount(bankAccount.getSelectionModel().getSelectedItem());
-        bankRemittance.setCheckNumber(checkNumber.getText());
-        bankRemittance.setAmount(Double.parseDouble(amount.getText()));
+            this.parentController.receive(bankRemittance);
 
-        this.parentController.receive(bankRemittance);
-
-        this.onClear();
+            this.onClear();
+        }
     }
 
     public void onSelectBankAccount() {
@@ -63,7 +73,6 @@ public class AddBankRemittance extends MenuControllerHandler implements Initiali
 
     public void onClear() {
         orDateFrom.setValue(null);
-//        orDateTo.setValue(null);
         bankAccount.getSelectionModel().clearSelection();
         accountNumber.setText(null);
         checkNumber.setText(null);
@@ -71,7 +80,4 @@ public class AddBankRemittance extends MenuControllerHandler implements Initiali
         orDateFrom.requestFocus();
     }
 
-    public void onCancel() {
-
-    }
 }
