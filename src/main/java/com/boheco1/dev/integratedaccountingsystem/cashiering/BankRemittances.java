@@ -115,7 +115,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
     }
 
     private void confirmDelete(BankRemittance bankRemittance) {
-        JFXButton confirm = new JFXButton("Sige Go");
+        JFXButton confirm = new JFXButton("Confirm");
 
         final JFXDialog confirmDialog = DialogBuilder.showConfirmDialog("Delete Entry?","You are about to delete this entry.", confirm, stackPane, DialogBuilder.DANGER_DIALOG);;
         confirm.setOnAction(new EventHandler<ActionEvent>() {
