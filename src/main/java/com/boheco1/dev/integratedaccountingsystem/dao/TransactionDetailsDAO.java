@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.objects.BankRemittance;
 import com.boheco1.dev.integratedaccountingsystem.objects.TransactionDetails;
 
 import java.sql.PreparedStatement;
@@ -142,7 +143,7 @@ public class TransactionDetailsDAO {
 
     public static int getNextSequenceNumber(LocalDate period, String transactionNumber) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT COUNT(*) FROM TransactionDetails td WHERE td.Period=? AND td.TransactionNumber=? AND td.TransactionCode='BR' AND td.Credit=0");
+                "SELECT MAX(AccountSequence) FROM TransactionDetails td WHERE  Period=? AND TransactionCode ='BR' AND TransactionNumber = ? AND AccountSequence <> 999;");
         ps.setDate(1, java.sql.Date.valueOf(period));
         ps.setString(2, transactionNumber);
         ResultSet rs = ps.executeQuery();
@@ -168,7 +169,7 @@ public class TransactionDetailsDAO {
         ResultSet rs = psx.executeQuery();
 
         if(rs.next()) {
-            PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE TransactionDetails SET Credit=? WHERE Period=? AND TransactionNumber=? AND TransactionCode='BR' AND Debit=0");
+            PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE TransactionDetails SET Credit=? WHERE Period=? AND TransactionNumber=? AND TransactionCode='BR' AND Debit=0 AND AccountSequence=999");
             ps.setDouble(1, getTotalDebit(period, transactionNumber));
             ps.setDate(2, java.sql.Date.valueOf(period));
             ps.setString(3, transactionNumber);
@@ -184,5 +185,17 @@ public class TransactionDetailsDAO {
             td.setAccountCode("12110201000");
             TransactionDetailsDAO.add(td);
         }
+    }
+
+    public static void delete(TransactionDetails td) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement("DELETE FROM TransactionDetails " +
+                "WHERE Period=? AND TransactionNumber=? AND TransactionCode=? AND AccountSequence=?");
+        ps.setDate(1, java.sql.Date.valueOf(td.getPeriod()));
+        ps.setString(2, td.getTransactionNumber());
+        ps.setString(3, td.getTransactionCode());
+        ps.setInt(4, td.getSequenceNumber());
+
+        ps.executeUpdate();
+        ps.close();
     }
 }

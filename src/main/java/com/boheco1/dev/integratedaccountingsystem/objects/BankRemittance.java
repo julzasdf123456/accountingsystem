@@ -1,6 +1,8 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 
+import com.jfoenix.controls.JFXButton;
+
 import java.time.LocalDate;
 
 public class BankRemittance {
@@ -9,6 +11,8 @@ public class BankRemittance {
     private String checkNumber;
     private double amount;
     private BankAccount bankAccount;
+    private TransactionDetails transactionDetails;
+
 
     public BankRemittance(LocalDate orDateFrom, LocalDate orDateTo, String checkNumber, double amount, BankAccount bankAccount) {
         this.orDateFrom = orDateFrom;
@@ -25,8 +29,6 @@ public class BankRemittance {
         this.checkNumber = "";
         this.amount = 0.0;
     }
-
-
     public LocalDate getOrDateFrom() {
         return orDateFrom;
     }
@@ -37,6 +39,14 @@ public class BankRemittance {
 
     public LocalDate getOrDateTo() {
         return orDateTo;
+    }
+
+    public TransactionDetails getTransactionDetails() {
+        return transactionDetails;
+    }
+
+    public void setTransactionDetails(TransactionDetails transactionDetails) {
+        this.transactionDetails = transactionDetails;
     }
 
     public void setOrDateTo(LocalDate orDateTo) {

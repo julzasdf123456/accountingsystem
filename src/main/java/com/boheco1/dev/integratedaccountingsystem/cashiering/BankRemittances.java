@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
+import com.boheco1.dev.integratedaccountingsystem.JournalEntriesController;
 import com.boheco1.dev.integratedaccountingsystem.dao.BankAccountDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionDetailsDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDAO;
@@ -7,14 +8,22 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.BankRemittance;
 import com.boheco1.dev.integratedaccountingsystem.objects.TransactionDetails;
 import com.boheco1.dev.integratedaccountingsystem.objects.TransactionHeader;
+import com.boheco1.dev.integratedaccountingsystem.objects.User;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Paint;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -45,9 +54,6 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
         TableColumn orDateFromColumn = new TableColumn<BankRemittance, LocalDate>("OR Date From");
         orDateFromColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, LocalDate>("orDateFrom"));
 
-//        TableColumn orDateToColumn = new TableColumn<BankRemittance, LocalDate>("OR Date To");
-//        orDateToColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, LocalDate>("orDateTo"));
-
         TableColumn descriptionColumn = new TableColumn<BankRemittance, String>("Bank Account Description");
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, String>("description"));
 
@@ -61,16 +67,77 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
         amountColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, Double>("formattedAmount"));
         amountColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
 
+        TableColumn<BankRemittance, BankRemittance> actionCol = new TableColumn<>("Action");
+        actionCol.setMinWidth(40);
+        actionCol.setStyle( "-fx-alignment: CENTER-RIGHT;");
+
+        // ADD ACTION BUTTONS
+        actionCol.setCellValueFactory(stockStringCellDataFeatures -> new ReadOnlyObjectWrapper<BankRemittance>(stockStringCellDataFeatures.getValue()));
+        actionCol.setCellFactory(stockStockTableColumn -> new TableCell<>(){
+            FontIcon deleteIcon =  new FontIcon("mdi2t-trash-can");
+            private final JFXButton deleteButton = new JFXButton("", deleteIcon);
+
+            @Override
+            protected void updateItem(BankRemittance bankRemittance, boolean b) {
+                super.updateItem(bankRemittance, b);
+
+                if (bankRemittance != null) {
+
+                    deleteButton.setStyle("-fx-background-color: #f44336;");
+                    deleteIcon.setIconSize(13);
+                    deleteIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
+
+                    final JFXButton confirmDelete = new JFXButton("Confirm");
+
+                    deleteButton.setOnAction(actionEvent -> {
+                        confirmDelete(bankRemittance);
+                    });
+
+                    setGraphic(deleteButton);
+                } else {
+                    setGraphic(null);
+                    return;
+                }
+            }
+        });
+
+
         remittanceTable.getColumns().add(orDateFromColumn);
-//        remittanceTable.getColumns().add(orDateToColumn);
         remittanceTable.getColumns().add(descriptionColumn);
         remittanceTable.getColumns().add(accountNoColumn);
         remittanceTable.getColumns().add(checkNumberColumn);
         remittanceTable.getColumns().add(amountColumn);
+        remittanceTable.getColumns().add(actionCol);
 
         tableList = FXCollections.observableList(new ArrayList<BankRemittance>());
 
         remittanceTable.setItems(tableList);
+    }
+
+    private void confirmDelete(BankRemittance bankRemittance) {
+        JFXButton confirm = new JFXButton("Sige Go");
+
+        final JFXDialog confirmDialog = DialogBuilder.showConfirmDialog("Delete Entry?","You are about to delete this entry.", confirm, stackPane, DialogBuilder.DANGER_DIALOG);;
+        confirm.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                removeEntry(bankRemittance);
+                confirmDialog.close();
+            }
+        });
+    }
+
+    private void removeEntry(BankRemittance bankRemittance) {
+        try{
+            TransactionDetails td = bankRemittance.getTransactionDetails();
+            TransactionDetailsDAO.delete(td);
+            TransactionDetailsDAO.syncDebit(td.getPeriod(),td.getTransactionNumber());
+            tableList.remove(bankRemittance);
+            remittanceTable.refresh();
+            computeTotals();
+        }catch(Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void computeTotals() {
@@ -147,7 +214,9 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
 
                 for(TransactionDetails td: tds) {
                     if(td.getCredit()>0) continue;
-                    tableList.add(new BankRemittance(td.getOrDate(),null,td.getCheckNumber(), td.getDebit(), BankAccountDAO.get(td.getBankID())));
+                    BankRemittance br = new BankRemittance(td.getOrDate(),null,td.getCheckNumber(), td.getDebit(), BankAccountDAO.get(td.getBankID()));
+                    br.setTransactionDetails(td);
+                    tableList.add(br);
                 }
                 remittanceTable.refresh();
                 computeTotals();
@@ -179,6 +248,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
                 td.setAccountCode(br.getBankAccount().getAccountCode());
                 td.setDebit(br.getAmount());
                 td.setSequenceNumber(TransactionDetailsDAO.getNextSequenceNumber(td.getPeriod(), td.getTransactionNumber()));
+                td.setCheckNumber(br.getCheckNumber());
 
                 TransactionDetailsDAO.add(td);
                 TransactionDetailsDAO.syncDebit(td.getPeriod(), td.getTransactionNumber());
