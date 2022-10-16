@@ -2,6 +2,9 @@ package com.boheco1.dev.integratedaccountingsystem.tellering;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ObjectTransaction;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.objects.Bill;
+import com.boheco1.dev.integratedaccountingsystem.objects.Check;
 import com.jfoenix.controls.JFXButton;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -9,6 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class PaymentConfirmationController extends MenuControllerHandler implements Initializable {
@@ -34,12 +38,17 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
 
     @FXML
     private JFXButton confirm_btn;
+    private List<Bill> bills;
+    private List<Check> checks;
+    private double check_amount, total_payments, change, amount_due, cash;
 
     private ObjectTransaction parentController = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        this.cash_tf.setOnKeyTyped(type -> {
+            this.setFigures();
+        });
     }
 
     /**
@@ -48,5 +57,42 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
      */
     @FXML
     public void confirm(){
+    }
+
+    public void setFigures(){
+        try {
+            this.cash = Double.parseDouble(this.cash_tf.getText());
+            this.check_amount = 0;
+            if (this.checks.size() > 0) {
+                for (Check c : this.checks) {
+                    this.check_amount += c.getAmount();
+                }
+            }
+            this.total_payments = this.cash + this.check_amount;
+            this.change = this.total_payments - this.amount_due;
+            this.change_tf.setText(this.change+"");
+            this.total_amount_paid_tf.setText(Utility.round(total_payments, 2) + "");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void setPayments(List<Bill> bills, double amount_due, double cash, List<Check> checks){
+        this.bills = bills;
+        this.cash = cash;
+        this.checks = checks;
+        this.check_amount = 0;
+        this.amount_due = amount_due;
+
+        for (Check c: checks) {
+            this.check_amount += c.getAmount();
+        }
+        this.total_payments = this.cash + this.check_amount;
+        this.change = this.total_payments - this.amount_due;
+        this.cash_tf.setText(Utility.round(this.cash,2)+"");
+        this.check_tf.setText(Utility.round(this.check_amount,2)+"");
+        this.total_amount_paid_tf.setText(Utility.round(this.total_payments, 2)+"");
+        this.total_amount_due_tf.setText(Utility.round(this.amount_due,2)+"");
+        this.change_tf.setText(Utility.round(this.change, 2) + "");
     }
 }

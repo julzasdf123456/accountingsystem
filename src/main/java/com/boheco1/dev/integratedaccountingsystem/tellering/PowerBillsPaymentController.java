@@ -99,11 +99,12 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
     private ConsumerInfo consumerInfo = null;
 
-    private ObservableList<Bill> bills = null;
-    private ObservableList<Check> checks = null;
+    private ObservableList<Bill> bills = FXCollections.observableArrayList();
+    private ObservableList<Check> checks = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        this.transact_btn.setDisable(true);
         this.acct_no_tf.setOnAction(actionEvent -> {
             String no = acct_no_tf.getText();
             try {
@@ -135,8 +136,13 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.set_or.setOnAction(actionEvent -> {
             this.or_no_tf.setDisable(!this.or_no_tf.isDisabled());
         });
+
         this.payment_tf.setOnKeyTyped(keyEvent -> {
-            total_paid_tf.setText(this.payment_tf.getText());
+            this.setFigures();
+        });
+
+        this.payment_tf.setOnAction(actionEvent -> {
+            this.confirmPayment();
         });
 
         this.add_check_btn.setOnAction(action -> {
@@ -151,8 +157,76 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             this.resetChecks();
         });
 
+        this.transact_btn.setOnAction(actionEvent -> {
+            this.confirmPayment();
+        });
         Utility.setParentController(this);
     }
+
+    public void confirmPayment(){
+        try {
+            double totalBills = this.computeTotalBills();
+            double totalPayments = this.computeTotalPayments();
+            if (totalPayments < totalBills){
+                AlertDialogBuilder.messgeDialog("Partial Payment Warning", "The total payment does not exceed the total amount due! Please check the amount!",
+                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            }else {
+                this.showConfirmation(
+                        this.bills,
+                        Double.parseDouble(this.total_payable_lbl.getText()),
+                        Double.parseDouble(this.payment_tf.getText()),
+                        this.checks);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    /**
+     * Sets the payment values
+     * @return void
+     */
+    public void setFigures(){
+        try {
+            double total = this.computeTotalPayments();
+            this.total_paid_tf.setText(Utility.round(total, 2) + "");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public double computeChecks(){
+        double amount = 0;
+        if (this.checks.size() > 0) {
+            for (Check c : this.checks) {
+                amount += c.getAmount();
+            }
+        }
+
+        return amount;
+    }
+
+    public double computeTotalBills(){
+        double amount = 0;
+        if (this.bills.size() > 0) {
+            for (Bill b : this.bills) {
+                amount += b.getTotalAmount();
+            }
+        }
+        return amount;
+    }
+
+    public double computeTotalPayments(){
+        double total = 0;
+        try {
+            double cash = Double.parseDouble(this.payment_tf.getText());
+            double amount = computeChecks();
+            total = cash + amount;
+        }catch (Exception e){
+
+        }
+        return total;
+    }
+
     /**
      * Resets consumer, bills and payment details
      * @return void
@@ -171,9 +245,11 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.total_payable_lbl.setText("0.00");
         this.payment_tf.setText("0.00");
         this.total_paid_tf.setText("0.00");
+        this.total_paid_tf.setDisable(true);
         this.payment_tf.setDisable(true);
         this.bills = FXCollections.observableArrayList(new ArrayList<>());
         this.fees_table.setItems(this.bills);
+        this.transact_btn.setDisable(true);
         this.resetChecks();
     }
     /**
@@ -181,16 +257,15 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
      * @return void
      */
     public void resetChecks(){
-        double amount = 0;
-        for(Check c : this.checks){
-            amount += c.getAmount();
-        }
+        if (this.checks == null || this.checks.size() == 0) return;
+        double amount = this.computeChecks();
         double current_total = Double.parseDouble(this.total_paid_tf.getText()) - amount;
         if (current_total < 0)
             current_total = 0;
         this.total_paid_tf.setText(current_total+"");
         this.checks =  FXCollections.observableArrayList();
         this.checks_lv.setItems(this.checks);
+
     }
     /**
      * Displays Advance Consumer Search UI
@@ -335,18 +410,19 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             try{
                 if (this.bills.size() == 0) this.bills = FXCollections.observableArrayList();
                 List<Bill> consumerBills = ConsumerDAO.getConsumerBills(this.consumerInfo, false);
-                this.setConsumerInfo(this.consumerInfo);
-                //TO VALIDATE
                 if (consumerBills.size() > 0) {
                     for (Bill b : consumerBills){
                         if (!this.bills.contains(b)) {
                             this.bills.add(b);
                         }
                     }
+                    this.setConsumerInfo(this.consumerInfo);
                     Utility.setAmount(this.total_payable_lbl, this.bills);
                     this.fees_table.setItems(this.bills);
                     this.payment_tf.setDisable(false);
                     this.payment_tf.requestFocus();
+                    this.transact_btn.setDisable(false);
+                    this.total_paid_tf.setDisable(false);
                     InputHelper.restrictNumbersOnly(payment_tf);
                 }
             }catch (Exception e){
@@ -421,6 +497,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_authenticate.fxml"));
         Parent parent = fxmlLoader.load();
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setHeading(new Label("PAYMENT CONFIRMATION"));
         dialogLayout.setBody(parent);
         JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
         WaiveConfirmationController waiveController = fxmlLoader.getController();
@@ -435,6 +512,22 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 }
             }
         });
+        dialog.show();
+    }
+
+    /**
+     * Displays Payment Confirmation UI
+     * @return void
+     */
+    public void showConfirmation(List<Bill> bills, double amount_due, double cash, List<Check> checks) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_payment_confirmation.fxml"));
+        Parent parent = fxmlLoader.load();
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setHeading(new Label("PAYMENT CONFIRMATION"));
+        dialogLayout.setBody(parent);
+        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+        PaymentConfirmationController controller = fxmlLoader.getController();
+        controller.setPayments(bills, amount_due, cash, checks);
         dialog.show();
     }
 }

@@ -15,9 +15,6 @@
       <AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="150.0" prefWidth="450.0" style="-fx-background-color: white;" stylesheets="@../style.css">
          <children>
             <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="150.0" prefWidth="900.0">
-               <top>
-                  <Label styleClass="bold" text="Waive Certain Amounts" BorderPane.alignment="TOP_LEFT" />
-               </top>
                <center>
                   <GridPane BorderPane.alignment="CENTER">
                     <columnConstraints>

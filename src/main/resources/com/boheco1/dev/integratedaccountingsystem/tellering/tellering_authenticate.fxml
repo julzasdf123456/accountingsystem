@@ -14,13 +14,12 @@
 
 <StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.tellering.WaiveConfirmationController">
    <children>
-      <AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="175.0" prefWidth="300.0" style="-fx-background-color: white;" stylesheets="@../style.css">
+      <AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="150.0" prefWidth="300.0" style="-fx-background-color: white;" stylesheets="@../style.css">
          <children>
-            <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="175.0" prefWidth="300.0">
+            <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="150.0" prefWidth="300.0">
                <top>
                   <VBox BorderPane.alignment="TOP_LEFT">
                      <children>
-                        <Label styleClass="bold" text="Confirm Waiving" />
                         <Label fx:id="status_lbl" textFill="RED" />
                      </children>
                   </VBox>

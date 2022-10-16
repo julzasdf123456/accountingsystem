@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import java.lang.String?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -9,14 +10,19 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
 <StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.tellering.PaymentConfirmationController">
    <children>
-      <AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="275.0" prefWidth="450.0" style="-fx-background-color: white;" stylesheets="@../style.css">
+      <AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="286.0" prefWidth="450.0" style="-fx-background-color: white;" stylesheets="@../style.css">
          <children>
-            <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="275.0" prefWidth="450.0">
+            <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="286.0" prefWidth="450.0">
                <top>
-                  <Label styleClass="bold" text="Payment Confirmation" BorderPane.alignment="TOP_LEFT" />
+                  <VBox BorderPane.alignment="TOP_LEFT">
+                     <children>
+                        <Label textFill="RED" />
+                     </children>
+                  </VBox>
                </top>
                <center>
                   <GridPane BorderPane.alignment="CENTER">
@@ -38,11 +44,15 @@
                         <Label styleClass="bold" text="TOTAL AMOUNT PAID" GridPane.rowIndex="2" />
                         <Label styleClass="bold" text="TOTAL AMOUNT DUE" GridPane.rowIndex="3" />
                         <Label styleClass="bold" text="CHANGE" GridPane.rowIndex="4" />
-                        <TextField fx:id="cash_tf" styleClass="bold" GridPane.columnIndex="1" />
-                        <TextField fx:id="check_tf" disable="true" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <TextField fx:id="total_amount_paid_tf" disable="true" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <TextField fx:id="total_amount_due_tf" disable="true" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                        <TextField fx:id="change_tf" disable="true" editable="false" styleClass="bold" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <TextField fx:id="cash_tf" alignment="CENTER_RIGHT" styleClass="bold" GridPane.columnIndex="1" />
+                        <TextField fx:id="check_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" styleClass="bold" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField fx:id="total_amount_paid_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" styleClass="bold" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <TextField fx:id="total_amount_due_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" styleClass="bold" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <TextField fx:id="change_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                           <styleClass>
+                              <String fx:value="bold" />
+                              <String fx:value="red" />
+                           </styleClass></TextField>
                         <JFXButton fx:id="confirm_btn" buttonType="RAISED" onAction="#confirm" prefHeight="37.0" prefWidth="264.0" styleClass="btn-theme" text="CONFIRM" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                      </children>
                   </GridPane>
