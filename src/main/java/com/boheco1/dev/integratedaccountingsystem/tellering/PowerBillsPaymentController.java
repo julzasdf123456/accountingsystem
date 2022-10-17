@@ -5,6 +5,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -109,14 +110,16 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             String no = acct_no_tf.getText();
             try {
                 this.consumerInfo = ConsumerDAO.getConsumerRecord(no);
-                this.setConsumerInfo(this.consumerInfo);
-                try{
-                    if (this.bills.size() == 0) this.bills = FXCollections.observableArrayList();
-                    this.bills.addAll(ConsumerDAO.getConsumerBills(this.consumerInfo, false));
-                    Utility.setAmount(this.total_payable_lbl, this.bills);
-                    this.fees_table.setItems(this.bills);
-                }catch (Exception e){
-                    e.printStackTrace();
+                if (this.consumerInfo != null) {
+                    this.setConsumerInfo(this.consumerInfo);
+                    try {
+                        if (this.bills.size() == 0) this.bills = FXCollections.observableArrayList();
+                        this.bills.addAll(ConsumerDAO.getConsumerBills(this.consumerInfo, false));
+                        Utility.setAmount(this.total_payable_lbl, this.bills);
+                        this.fees_table.setItems(this.bills);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -131,6 +134,69 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     this.setConsumerInfo(consumer);
                 }
             });
+            final ContextMenu rowMenu = new ContextMenu();
+
+            MenuItem itemRemoveBill = new MenuItem("RemoveBill");
+            itemRemoveBill.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem itemAddPPD = new MenuItem("Less PPD");
+            itemAddPPD.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem itemRemovePPD = new MenuItem("Remove PPD");
+            itemRemovePPD.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem itemAddSurcharge = new MenuItem("Add Surcharge Manually");
+            itemAddSurcharge.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem itemWaiveSurcharge = new MenuItem("Remove Surcharge");
+            itemWaiveSurcharge.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem item2306 = new MenuItem("2306");
+            item2306.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem item2307 = new MenuItem("2307");
+            item2307.setOnAction(event -> {
+
+            });
+
+            MenuItem itemSLAdj = new MenuItem("Add SL Adjustment");
+            itemSLAdj.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem itemRemoveSLAdj = new MenuItem("Remove SL Adjustment");
+            itemRemoveSLAdj.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem itemOthersAdj = new MenuItem("Add Other Adjustment");
+            itemOthersAdj.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem itemRemoveOthersAdj = new MenuItem("Remove Other Adjustment");
+            itemRemoveOthersAdj.setOnAction(actionEvent -> {
+
+            });
+
+            rowMenu.getItems().addAll(itemRemoveBill, new SeparatorMenuItem(), itemAddPPD, itemRemovePPD,  new SeparatorMenuItem(), itemAddSurcharge, itemWaiveSurcharge,  new SeparatorMenuItem(), item2306, item2307,  new SeparatorMenuItem(), itemSLAdj, itemRemoveSLAdj,  new SeparatorMenuItem(), itemOthersAdj, itemRemoveOthersAdj);
+
+            row.contextMenuProperty().bind(
+                    Bindings.when(row.emptyProperty())
+                            .then((ContextMenu) null)
+                            .otherwise(rowMenu));
             return row ;
         });
         this.set_or.setOnAction(actionEvent -> {
@@ -337,7 +403,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column6.setMinWidth(75);
         column6.setCellValueFactory(new PropertyValueFactory<>("ch2307"));
         column6.setStyle("-fx-alignment: center;");
-        TableColumn<Bill, String> columnWaive = new TableColumn<>("Waive");
+        TableColumn<Bill, String> columnWaive = new TableColumn<>("Action");
         Callback<TableColumn<Bill, String>, TableCell<Bill, String>> waiveBtn
                 = //
                 new Callback<TableColumn<Bill, String>, TableCell<Bill, String>>() {
@@ -374,9 +440,9 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     }
                 };
         columnWaive.setCellFactory(waiveBtn);
-        columnWaive.setPrefWidth(58);
-        columnWaive.setMaxWidth(58);
-        columnWaive.setMinWidth(58);
+        columnWaive.setPrefWidth(60);
+        columnWaive.setMaxWidth(60);
+        columnWaive.setMinWidth(60);
         columnWaive.setStyle("-fx-alignment: center;");
 
         TableColumn<Bill, String> column7 = new TableColumn<>("Total Amount");
