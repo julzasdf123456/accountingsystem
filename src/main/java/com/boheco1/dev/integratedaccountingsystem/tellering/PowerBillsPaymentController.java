@@ -1,14 +1,17 @@
 package com.boheco1.dev.integratedaccountingsystem.tellering;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.ConsumerDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 
@@ -95,6 +98,36 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     private Label total_payable_lbl;
 
     @FXML
+    private TextField add_charges_tf;
+
+    @FXML
+    private TextField surcharge_tf;
+
+    @FXML
+    private TextField ppd_tf;
+
+    @FXML
+    private TextField adj_tf;
+
+    @FXML
+    private TextField ch2306_2307_tf;
+
+    @FXML
+    private TextField power_amt_tf;
+
+    @FXML
+    private TextField vat_tf;
+
+    @FXML
+    private TextField katas_tf;
+
+    @FXML
+    private TextField md_refund_tf;
+
+    @FXML
+    private Label bill_amount_lbl;
+
+    @FXML
     private JFXButton transact_btn;
 
     private ConsumerInfo consumerInfo = null;
@@ -109,20 +142,24 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             String no = acct_no_tf.getText();
             try {
                 this.consumerInfo = ConsumerDAO.getConsumerRecord(no);
-                this.setConsumerInfo(this.consumerInfo);
-                try{
-                    if (this.bills.size() == 0) this.bills = FXCollections.observableArrayList();
-                    this.bills.addAll(ConsumerDAO.getConsumerBills(this.consumerInfo, false));
-                    Utility.setAmount(this.total_payable_lbl, this.bills);
-                    this.fees_table.setItems(this.bills);
-                }catch (Exception e){
-                    e.printStackTrace();
+                if (this.consumerInfo != null) {
+                    this.setConsumerInfo(this.consumerInfo);
+                    try {
+                        if (this.bills.size() == 0) this.bills = FXCollections.observableArrayList();
+                        this.bills.addAll(ConsumerDAO.getConsumerBills(this.consumerInfo, false));
+                        Utility.setAmount(this.total_payable_lbl, this.bills);
+                        this.fees_table.setItems(this.bills);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
+
         this.createTable();
+
         this.fees_table.setRowFactory(tv -> {
             TableRow<Bill> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -131,6 +168,69 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     this.setConsumerInfo(consumer);
                 }
             });
+            final ContextMenu rowMenu = new ContextMenu();
+
+            MenuItem itemRemoveBill = new MenuItem("RemoveBill");
+            itemRemoveBill.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem itemAddPPD = new MenuItem("Less PPD");
+            itemAddPPD.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem itemRemovePPD = new MenuItem("Remove PPD");
+            itemRemovePPD.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem itemAddSurcharge = new MenuItem("Add Surcharge Manually");
+            itemAddSurcharge.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem itemWaiveSurcharge = new MenuItem("Remove Surcharge");
+            itemWaiveSurcharge.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem item2306 = new MenuItem("2306");
+            item2306.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem item2307 = new MenuItem("2307");
+            item2307.setOnAction(event -> {
+
+            });
+
+            MenuItem itemSLAdj = new MenuItem("Add SL Adjustment");
+            itemSLAdj.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem itemRemoveSLAdj = new MenuItem("Remove SL Adjustment");
+            itemRemoveSLAdj.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem itemOthersAdj = new MenuItem("Add Other Adjustment");
+            itemOthersAdj.setOnAction(actionEvent -> {
+
+            });
+
+            MenuItem itemRemoveOthersAdj = new MenuItem("Remove Other Adjustment");
+            itemRemoveOthersAdj.setOnAction(actionEvent -> {
+
+            });
+
+            rowMenu.getItems().addAll(itemRemoveBill, new SeparatorMenuItem(), itemAddPPD, itemRemovePPD,  new SeparatorMenuItem(), itemAddSurcharge, itemWaiveSurcharge,  new SeparatorMenuItem(), item2306, item2307,  new SeparatorMenuItem(), itemSLAdj, itemRemoveSLAdj,  new SeparatorMenuItem(), itemOthersAdj, itemRemoveOthersAdj);
+
+            row.contextMenuProperty().bind(
+                    Bindings.when(row.emptyProperty())
+                            .then((ContextMenu) null)
+                            .otherwise(rowMenu));
             return row ;
         });
         this.set_or.setOnAction(actionEvent -> {
@@ -337,7 +437,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column6.setMinWidth(75);
         column6.setCellValueFactory(new PropertyValueFactory<>("ch2307"));
         column6.setStyle("-fx-alignment: center;");
-        TableColumn<Bill, String> columnWaive = new TableColumn<>("Waive");
+        TableColumn<Bill, String> columnWaive = new TableColumn<>("Action");
         Callback<TableColumn<Bill, String>, TableCell<Bill, String>> waiveBtn
                 = //
                 new Callback<TableColumn<Bill, String>, TableCell<Bill, String>>() {
@@ -374,9 +474,9 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     }
                 };
         columnWaive.setCellFactory(waiveBtn);
-        columnWaive.setPrefWidth(58);
-        columnWaive.setMaxWidth(58);
-        columnWaive.setMinWidth(58);
+        columnWaive.setPrefWidth(60);
+        columnWaive.setMaxWidth(60);
+        columnWaive.setMinWidth(60);
         columnWaive.setStyle("-fx-alignment: center;");
 
         TableColumn<Bill, String> column7 = new TableColumn<>("Total Amount");
@@ -529,5 +629,34 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         PaymentConfirmationController controller = fxmlLoader.getController();
         controller.setPayments(bills, amount_due, cash, checks);
         dialog.show();
+    }
+
+    public void showSLAdjustment(){
+        JFXButton accept = new JFXButton("Accept");
+        JFXTextField input = new JFXTextField();
+        InputValidation.restrictNumbersOnly(input);
+        JFXDialog dialog = DialogBuilder.showInputDialog("Update Quantity","Enter desired quantity:  ", "Max value ", input, accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+        accept.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent __) {
+                try {
+                    /*
+                    if(input.getText().length() == 0 || Double.parseDouble(input.getText()) > stock.getQuantity()) {
+                        AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid quantity!",
+                                Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    }else {
+                        double reqQty = Double.parseDouble(input.getText());
+                        MIRSItem mirsItem = getTableView().getItems().get(getIndex());
+                        mirsItem.setQuantity(reqQty);
+                        setStyle("-fx-text-fill: " + ColorPalette.BLACK + "; -fx-alignment: center-right;");
+
+                        mirsItemTable.refresh();
+                    }*/
+                } catch (Exception e) {
+                    AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }
+                dialog.close();
+            }
+        });
     }
 }
