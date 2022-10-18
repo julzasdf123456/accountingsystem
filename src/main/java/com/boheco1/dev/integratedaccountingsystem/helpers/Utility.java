@@ -8,6 +8,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
+import org.apache.commons.text.WordUtils;
+import pl.allegro.finance.tradukisto.MoneyConverters;
 import pl.allegro.finance.tradukisto.ValueConverters;
 
 import java.math.BigDecimal;
@@ -181,19 +183,15 @@ public class Utility {
     }
 
     public static String doubleAmountToWords(double amount) {
-        double money = Utility.round(amount, 2);
-        int pesos = (int) money;
-        System.out.println(money-pesos);
 
-        int cents = (int)Math.ceil((money-pesos)*100);
-        System.out.println(cents);
+//        ValueConverters converters = ValueConverters.ENGLISH_INTEGER;
 
-        ValueConverters converters = ValueConverters.ENGLISH_INTEGER;
+        MoneyConverters converters = MoneyConverters.ENGLISH_BANKING_MONEY_VALUE;
 
         StringBuffer words = new StringBuffer();
-        words.append(converters.asWords(pesos));
-        words.append(" pesos and ").append(cents).append(" cents");
+        words.append(converters.asWords(BigDecimal.valueOf(amount)));
+        words.append(" pesos");
 
-        return words.toString();
+        return WordUtils.capitalizeFully(words.toString(), new char[]{' ','_'});
     }
 }

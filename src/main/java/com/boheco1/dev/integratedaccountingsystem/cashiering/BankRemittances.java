@@ -152,9 +152,9 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
             }
         }
 
-        totalCheckAmount.setText(String.format("%,.2f", check));
-        totalCashAmount.setText(String.format("%,.2f", cash));
-        totalAmount.setText(String.format("%,.2f", check+cash));
+        totalCheckAmount.setText(String.format("₱ %,.2f", check));
+        totalCashAmount.setText(String.format("₱ %,.2f", cash));
+        totalAmount.setText(String.format("₱ %,.2f", check+cash));
     }
 
     @Override

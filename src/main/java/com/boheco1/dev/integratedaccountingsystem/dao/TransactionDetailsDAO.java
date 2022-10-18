@@ -16,12 +16,12 @@ public class TransactionDetailsDAO {
                 "INSERT INTO TransactionDetails (" +
                         "Period, TransactionNumber, TransactionCode, TransactionDate, " +
                         "AccountSequence, AccountCode, Debit, Credit, ORDate, " +
-                        "BankID, Note, CheckNumber) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
+                        "BankID, Note, CheckNumber, Particulars) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
         ps.setDate(1, java.sql.Date.valueOf(td.getPeriod()));
         ps.setString(2, td.getTransactionNumber());
         ps.setString(3, td.getTransactionCode());
-        ps.setTimestamp(4, td.getTransactionDate() !=null ? java.sql.Timestamp.valueOf(td.getTransactionDate()):null);
+        ps.setDate(4, td.getTransactionDate() !=null ? java.sql.Date.valueOf(td.getTransactionDate()):null);
         ps.setInt(5, td.getSequenceNumber());
         ps.setString(6, td.getAccountCode());
         ps.setDouble(7, td.getDebit());
@@ -30,6 +30,7 @@ public class TransactionDetailsDAO {
         ps.setString(10, td.getBankID());
         ps.setString(11, td.getNote());
         ps.setString(12, td.getCheckNumber());
+        ps.setString(13,td.getParticulars());
 
         ps.executeUpdate();
 
@@ -41,8 +42,8 @@ public class TransactionDetailsDAO {
                 "INSERT INTO TransactionDetails (" +
                         "Period, TransactionNumber, TransactionCode, TransactionDate, " +
                         "AccountSequence, AccountCode, Debit, Credit, ORDate, " +
-                        "BankID, Note, CheckNumber) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
+                        "BankID, Note, CheckNumber, Particulars) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
         DB.getConnection().setAutoCommit(false);
 
@@ -50,7 +51,7 @@ public class TransactionDetailsDAO {
             ps.setDate(1, java.sql.Date.valueOf(td.getPeriod()));
             ps.setString(2, td.getTransactionNumber());
             ps.setString(3, td.getTransactionCode());
-            ps.setTimestamp(4, java.sql.Timestamp.valueOf(td.getTransactionDate()));
+            ps.setDate(4, java.sql.Date.valueOf(td.getTransactionDate()));
             ps.setInt(5, td.getSequenceNumber());
             ps.setString(6, td.getAccountCode());
             ps.setDouble(7, td.getDebit());
@@ -59,6 +60,7 @@ public class TransactionDetailsDAO {
             ps.setString(10, td.getBankID());
             ps.setString(11, td.getNote());
             ps.setString(12, td.getCheckNumber());
+            ps.setString(13,td.getParticulars());
 
             ps.addBatch();
         }
@@ -85,7 +87,7 @@ public class TransactionDetailsDAO {
             td.setPeriod(rs.getDate("Period").toLocalDate());
             td.setTransactionNumber(rs.getString("TransactionNumber"));
             td.setTransactionCode(rs.getString("TransactionCode"));
-            td.setTransactionDate(rs.getTimestamp("TransactionDate").toLocalDateTime());
+            td.setTransactionDate(rs.getDate("TransactionDate").toLocalDate());
             td.setSequenceNumber(rs.getInt("AccountSequence"));
             td.setAccountCode(rs.getString("AccountCode"));
             td.setDebit(rs.getDouble("Debit"));
@@ -94,6 +96,7 @@ public class TransactionDetailsDAO {
             td.setBankID(rs.getString("BankID"));
             td.setNote(rs.getString("Note"));
             td.setCheckNumber(rs.getString("CheckNumber"));
+            td.setParticulars(rs.getString("Particulars"));
 
             rs.close();
             ps.close();
@@ -123,7 +126,7 @@ public class TransactionDetailsDAO {
             td.setPeriod(rs.getDate("Period").toLocalDate());
             td.setTransactionNumber(rs.getString("TransactionNumber"));
             td.setTransactionCode(rs.getString("TransactionCode"));
-            td.setTransactionDate(rs.getTimestamp("TransactionDate")!=null?rs.getTimestamp("TransactionDate").toLocalDateTime():null);
+            td.setTransactionDate(rs.getDate("TransactionDate")!=null?rs.getDate("TransactionDate").toLocalDate():null);
             td.setSequenceNumber(rs.getInt("AccountSequence"));
             td.setAccountCode(rs.getString("AccountCode"));
             td.setDebit(rs.getDouble("Debit"));
@@ -132,6 +135,7 @@ public class TransactionDetailsDAO {
             td.setBankID(rs.getString("BankID"));
             td.setNote(rs.getString("Note"));
             td.setCheckNumber(rs.getString("CheckNumber"));
+            td.setParticulars(rs.getString("Particulars"));
             tds.add(td);
         }
 
@@ -189,11 +193,13 @@ public class TransactionDetailsDAO {
 
     public static void delete(TransactionDetails td) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement("DELETE FROM TransactionDetails " +
-                "WHERE Period=? AND TransactionNumber=? AND TransactionCode=? AND AccountSequence=?");
+                "WHERE Period=? AND TransactionNumber=? AND TransactionCode=? AND AccountSequence=? AND Debit=? AND Particulars=?");
         ps.setDate(1, java.sql.Date.valueOf(td.getPeriod()));
         ps.setString(2, td.getTransactionNumber());
         ps.setString(3, td.getTransactionCode());
         ps.setInt(4, td.getSequenceNumber());
+        ps.setDouble(5, td.getDebit());
+        ps.setString(6, td.getParticulars());
 
         ps.executeUpdate();
         ps.close();
