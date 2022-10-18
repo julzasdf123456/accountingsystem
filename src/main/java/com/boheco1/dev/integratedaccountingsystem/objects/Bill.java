@@ -18,11 +18,14 @@ public class Bill {
     private LocalDate servicePeriodEnd;
     private ConsumerInfo consumer;
     private String consumerType;
+    private double addCharges;
+    private double powerAmount;
     private double powerKWH;
     private double discount;
     private double slAdjustment;
     private double otherAdjustment;
     private double katas;
+    private double mdRefund;
     private double generationVat;
     private double transmissionVat;
     private double systemLossVat;
@@ -292,18 +295,31 @@ public class Bill {
                 if (this.getServicePeriodEnd().isEqual(LocalDate.of(2021, 12, 1))) {
                     amount = 0;
                 //Penalty computation for Residential, BAPA, ECA
-                } else if ((this.consumerType.equals("RM") || this.consumerType.equals("B") || this.consumerType.equals("E"))
-                        && this.getServicePeriodEnd().isAfter(LocalDate.of(2014, 8, 11))) {
+                } else if (
+                        (this.consumerType.equals("RM") && (this.getServicePeriodEnd().isEqual(LocalDate.of(2014, 8, 1)) || this.getServicePeriodEnd().isAfter(LocalDate.of(2014, 8, 1)))
+                        || this.consumerType.equals("B")
+                        || this.consumerType.equals("E"))) {
                     amount = penalty * 0.03;
                     amount += (amount * 0.12);
                 //For Commercial Types
                 } else {
-                    if (this.getServicePeriodEnd().isAfter(LocalDate.of(2017, 4, 1))) {
+                    //If CS with 1000kw below
+                    if ((this.consumerType.equals("CS") && this.powerKWH < 1000)
+                            && (this.getServicePeriodEnd().isEqual(LocalDate.of(2017, 4, 1)) || this.getServicePeriodEnd().isAfter(LocalDate.of(2017, 4, 1)) )) {
+                        amount = penalty * 0.03;
+                        amount += (amount * 0.12);
+                    //If I or CL or CS with 1000kwh and above
+                    }else if (this.consumerType.equals("CL")
+                            || this.consumerType.equals("I")
+                            || (this.consumerType.equals("CS") && this.powerKWH >= 1000)) {
+                        //No penalty if days delayed less than 6
                         if (this.getDaysDelayed() < 6) {
                             amount = 0;
-                        } else if (this.getDaysDelayed() > 30 && this.powerKWH > 1000) {
+                        //5% penalty if 30 days and above
+                        } else if (this.getDaysDelayed() >= 30) {
                             amount = penalty * 0.05;
                             amount += (amount * 0.12);
+                        //3% penalty if 30 days below
                         } else {
                             amount = penalty * 0.03;
                             amount += (amount * 0.12);
@@ -327,6 +343,30 @@ public class Bill {
 
     public void setTotalAmount() {
         this.totalAmount = Utility.round(this.getSurCharge() + this.getAmountDue() + this.getCh2306() + this.getCh2307(), 2);
+    }
+
+    public double getAddCharges() {
+        return addCharges;
+    }
+
+    public void setAddCharges(double addCharges) {
+        this.addCharges = addCharges;
+    }
+
+    public double getPowerAmount() {
+        return powerAmount;
+    }
+
+    public void setPowerAmount(double powerAmount) {
+        this.powerAmount = powerAmount;
+    }
+
+    public double getMdRefund() {
+        return mdRefund;
+    }
+
+    public void setMdRefund(double mdRefund) {
+        this.mdRefund = mdRefund;
     }
 }
 

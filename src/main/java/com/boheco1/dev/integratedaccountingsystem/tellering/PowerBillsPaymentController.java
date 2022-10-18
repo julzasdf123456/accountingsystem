@@ -1,7 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.tellering;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.BillDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.ConsumerDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXDialog;
@@ -11,7 +11,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 
@@ -146,7 +145,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     this.setConsumerInfo(this.consumerInfo);
                     try {
                         if (this.bills.size() == 0) this.bills = FXCollections.observableArrayList();
-                        this.bills.addAll(ConsumerDAO.getConsumerBills(this.consumerInfo, false));
+                        this.bills.addAll(BillDAO.getConsumerBills(this.consumerInfo, false));
                         Utility.setAmount(this.total_payable_lbl, this.bills);
                         this.fees_table.setItems(this.bills);
                     } catch (Exception e) {
@@ -170,59 +169,111 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             });
             final ContextMenu rowMenu = new ContextMenu();
 
-            MenuItem itemRemoveBill = new MenuItem("RemoveBill");
-            itemRemoveBill.setOnAction(actionEvent -> {
 
+            MenuItem itemRemoveBill = new MenuItem("Remove Bill");
+            itemRemoveBill.setOnAction(actionEvent -> {
+                this.fees_table.getItems().remove(row.getItem());
+                tv.refresh();
             });
 
             MenuItem itemAddPPD = new MenuItem("Less PPD");
             itemAddPPD.setOnAction(actionEvent -> {
-
+                //Only I, CL, CS with >= 1kwh, B, E
+                if ((row.getItem().getConsumerType().equals("B")
+                    || row.getItem().getConsumerType().equals("E")
+                    || row.getItem().getConsumerType().equals("I")
+                    || row.getItem().getConsumerType().equals("CL")
+                    || (row.getItem().getConsumerType().equals("CS") && row.getItem().getPowerKWH() >= 1000))
+                    && row.getItem().getDaysDelayed() > 0) {
+                    double ppd = 0;
+                    try {
+                        ppd = BillDAO.getDiscount(row.getItem());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    row.getItem().setDiscount(ppd);
+                    row.getItem().setTotalAmount();
+                    tv.refresh();
+                    this.setBillInfo(row.getItem());
+                }else{
+                    AlertDialogBuilder.messgeDialog("System Error", "Only consumer types BAPA, ECA, I, CL, and CS with more than 1KWH can avail the 1% discount on or before due date!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }
             });
 
             MenuItem itemRemovePPD = new MenuItem("Remove PPD");
             itemRemovePPD.setOnAction(actionEvent -> {
-
+                row.getItem().setDiscount(0);
+                row.getItem().setTotalAmount();
+                tv.refresh();
+                this.setBillInfo(row.getItem());
             });
 
             MenuItem itemAddSurcharge = new MenuItem("Add Surcharge Manually");
             itemAddSurcharge.setOnAction(actionEvent -> {
-
+                tv.refresh();
+                this.setBillInfo(row.getItem());
             });
 
             MenuItem itemWaiveSurcharge = new MenuItem("Remove Surcharge");
             itemWaiveSurcharge.setOnAction(actionEvent -> {
-
+                tv.refresh();
+                this.setBillInfo(row.getItem());
             });
 
             MenuItem item2306 = new MenuItem("2306");
             item2306.setOnAction(actionEvent -> {
-
+                if (row.getItem().getConsumerType().equals("RM") || row.getItem().getConsumerType().equals("B") || row.getItem().getConsumerType().equals("E")) return;
+                try {
+                    row.getItem().setCh2306(BillDAO.getForm2306(row.getItem()));
+                    row.getItem().setTotalAmount();
+                    tv.refresh();
+                    this.setBillInfo(row.getItem());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             });
 
             MenuItem item2307 = new MenuItem("2307");
             item2307.setOnAction(event -> {
-
+                if (row.getItem().getConsumerType().equals("RM") || row.getItem().getConsumerType().equals("B") || row.getItem().getConsumerType().equals("E")) return;
+                try {
+                    row.getItem().setCh2307(BillDAO.getForm2307(row.getItem()));
+                    row.getItem().setTotalAmount();
+                    tv.refresh();
+                    this.setBillInfo(row.getItem());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             });
 
             MenuItem itemSLAdj = new MenuItem("Add SL Adjustment");
             itemSLAdj.setOnAction(actionEvent -> {
-
+                this.showAdjustment(row.getItem(), "SL");
+                tv.refresh();
+                this.setBillInfo(row.getItem());
             });
 
             MenuItem itemRemoveSLAdj = new MenuItem("Remove SL Adjustment");
             itemRemoveSLAdj.setOnAction(actionEvent -> {
-
+                row.getItem().setSlAdjustment(0);
+                row.getItem().setTotalAmount();
+                tv.refresh();
+                this.setBillInfo(row.getItem());
             });
 
             MenuItem itemOthersAdj = new MenuItem("Add Other Adjustment");
             itemOthersAdj.setOnAction(actionEvent -> {
-
+                this.showAdjustment(row.getItem(), "Other");
+                tv.refresh();
+                this.setBillInfo(row.getItem());
             });
 
             MenuItem itemRemoveOthersAdj = new MenuItem("Remove Other Adjustment");
             itemRemoveOthersAdj.setOnAction(actionEvent -> {
-
+                row.getItem().setOtherAdjustment(0);
+                row.getItem().setTotalAmount();
+                tv.refresh();
+                this.setBillInfo(row.getItem());
             });
 
             rowMenu.getItems().addAll(itemRemoveBill, new SeparatorMenuItem(), itemAddPPD, itemRemovePPD,  new SeparatorMenuItem(), itemAddSurcharge, itemWaiveSurcharge,  new SeparatorMenuItem(), item2306, item2307,  new SeparatorMenuItem(), itemSLAdj, itemRemoveSLAdj,  new SeparatorMenuItem(), itemOthersAdj, itemRemoveOthersAdj);
@@ -231,8 +282,9 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     Bindings.when(row.emptyProperty())
                             .then((ContextMenu) null)
                             .otherwise(rowMenu));
-            return row ;
+            return row;
         });
+
         this.set_or.setOnAction(actionEvent -> {
             this.or_no_tf.setDisable(!this.or_no_tf.isDisabled());
         });
@@ -509,7 +561,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             this.consumerInfo = (ConsumerInfo) o;
             try{
                 if (this.bills.size() == 0) this.bills = FXCollections.observableArrayList();
-                List<Bill> consumerBills = ConsumerDAO.getConsumerBills(this.consumerInfo, false);
+                List<Bill> consumerBills = BillDAO.getConsumerBills(this.consumerInfo, false);
                 if (consumerBills.size() > 0) {
                     for (Bill b : consumerBills){
                         if (!this.bills.contains(b)) {
@@ -543,6 +595,23 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.type_tf.setText(consumerInfo.getAccountType());
         this.status_tf.setText(consumerInfo.getAccountStatus());
         this.bapa_tf.setText(consumerInfo.getAccountType().equals("BAPA") ? "BAPA Registered" : "");
+    }
+    /**
+     * Sets Bill details to UI
+     * @param bill the bill reference
+     * @return void
+     */
+    public void setBillInfo(Bill bill){
+        this.add_charges_tf.setText(Utility.round(bill.getAddCharges(),2)+"");
+        this.surcharge_tf.setText(Utility.round(bill.getSurCharge(),2)+"");
+        this.ppd_tf.setText(Utility.round(bill.getDiscount(),2)+"");
+        this.adj_tf.setText(Utility.round(bill.getSlAdjustment()+bill.getOtherAdjustment(),2)+"");
+        this.ch2306_2307_tf.setText(Utility.round(bill.getCh2306()+bill.getCh2307(),2)+"");
+        this.power_amt_tf.setText(Utility.round(bill.getPowerAmount(),2)+"");
+        this.katas_tf.setText(Utility.round(bill.getKatas(),2)+"");
+        this.vat_tf.setText(Utility.round(bill.getVatAndPassTax(),2)+"");
+        this.md_refund_tf.setText(Utility.round(bill.getMdRefund(),2)+"");
+        this.bill_amount_lbl.setText(Utility.round(bill.getTotalAmount(),2)+"");
     }
     /**
      * Displays Add Check UI
@@ -614,7 +683,6 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         });
         dialog.show();
     }
-
     /**
      * Displays Payment Confirmation UI
      * @return void
@@ -631,32 +699,35 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         dialog.show();
     }
 
-    public void showSLAdjustment(){
-        JFXButton accept = new JFXButton("Accept");
+    /**
+     * Displays Add Adjustment UI
+     * @return void
+     */
+    public void showAdjustment(Bill bill, String type){
+        JFXButton accept = new JFXButton("Add "+type+" Adjustment");
         JFXTextField input = new JFXTextField();
         InputValidation.restrictNumbersOnly(input);
-        JFXDialog dialog = DialogBuilder.showInputDialog("Update Quantity","Enter desired quantity:  ", "Max value ", input, accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
-        accept.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent __) {
+        JFXDialog dialog = DialogBuilder.showInputDialog("Add "+type+" Adjustment","Enter "+type+" Adjustment:  ", "0.00", input, accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+        accept.setOnAction(action -> {
                 try {
-                    /*
-                    if(input.getText().length() == 0 || Double.parseDouble(input.getText()) > stock.getQuantity()) {
-                        AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid quantity!",
+                    if (input.getText().length() == 0) {
+                        AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid amount!",
                                 Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                     }else {
-                        double reqQty = Double.parseDouble(input.getText());
-                        MIRSItem mirsItem = getTableView().getItems().get(getIndex());
-                        mirsItem.setQuantity(reqQty);
-                        setStyle("-fx-text-fill: " + ColorPalette.BLACK + "; -fx-alignment: center-right;");
-
-                        mirsItemTable.refresh();
-                    }*/
+                        double amount = Double.parseDouble(input.getText());
+                        if (type.equals("SL")) {
+                            bill.setSlAdjustment(amount);
+                        } else {
+                            bill.setOtherAdjustment(amount);
+                        }
+                        bill.setTotalAmount();
+                    }
                 } catch (Exception e) {
                     AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }
                 dialog.close();
-            }
         });
+        dialog.show();
     }
+
 }
