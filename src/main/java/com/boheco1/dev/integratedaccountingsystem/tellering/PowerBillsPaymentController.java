@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.tellering;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.ConsumerDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXDialog;
@@ -10,6 +11,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 
@@ -96,6 +98,36 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     private Label total_payable_lbl;
 
     @FXML
+    private TextField add_charges_tf;
+
+    @FXML
+    private TextField surcharge_tf;
+
+    @FXML
+    private TextField ppd_tf;
+
+    @FXML
+    private TextField adj_tf;
+
+    @FXML
+    private TextField ch2306_2307_tf;
+
+    @FXML
+    private TextField power_amt_tf;
+
+    @FXML
+    private TextField vat_tf;
+
+    @FXML
+    private TextField katas_tf;
+
+    @FXML
+    private TextField md_refund_tf;
+
+    @FXML
+    private Label bill_amount_lbl;
+
+    @FXML
     private JFXButton transact_btn;
 
     private ConsumerInfo consumerInfo = null;
@@ -125,7 +157,9 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 e.printStackTrace();
             }
         });
+
         this.createTable();
+
         this.fees_table.setRowFactory(tv -> {
             TableRow<Bill> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -595,5 +629,34 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         PaymentConfirmationController controller = fxmlLoader.getController();
         controller.setPayments(bills, amount_due, cash, checks);
         dialog.show();
+    }
+
+    public void showSLAdjustment(){
+        JFXButton accept = new JFXButton("Accept");
+        JFXTextField input = new JFXTextField();
+        InputValidation.restrictNumbersOnly(input);
+        JFXDialog dialog = DialogBuilder.showInputDialog("Update Quantity","Enter desired quantity:  ", "Max value ", input, accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+        accept.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent __) {
+                try {
+                    /*
+                    if(input.getText().length() == 0 || Double.parseDouble(input.getText()) > stock.getQuantity()) {
+                        AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid quantity!",
+                                Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    }else {
+                        double reqQty = Double.parseDouble(input.getText());
+                        MIRSItem mirsItem = getTableView().getItems().get(getIndex());
+                        mirsItem.setQuantity(reqQty);
+                        setStyle("-fx-text-fill: " + ColorPalette.BLACK + "; -fx-alignment: center-right;");
+
+                        mirsItemTable.refresh();
+                    }*/
+                } catch (Exception e) {
+                    AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }
+                dialog.close();
+            }
+        });
     }
 }
