@@ -302,7 +302,6 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
         });
 
         TableColumn<MIRSItem, String> quantityCol = new TableColumn<>("Qty");
-        quantityCol.setStyle("-fx-alignment: center;");
         quantityCol.setPrefWidth(100);
         quantityCol.setMaxWidth(100);
         quantityCol.setMinWidth(100);
@@ -321,6 +320,7 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
                                     setText(null);
                                 } else {
                                     MIRSItem mirsItem = getTableView().getItems().get(getIndex());
+
                                     setGraphic(null);
                                     double req = mirsItem.getQuantity();
                                     if(req%1 == 0)
@@ -530,21 +530,15 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
 
                     quantity.requestFocus();
 
-                    inStock.setText("In Stock: "+ formatDecimal(stockToBeAdded.getQuantity()));
-                    pending.setText("Pending: "+ formatDecimal(StockDAO.countPendingRequest(stockToBeAdded)));
-                    available.setText("Available: "+ formatDecimal(av));
+                    inStock.setText("In Stock: "+ stockToBeAdded.getQuantity());
+                    pending.setText("Pending: "+ StockDAO.countPendingRequest(stockToBeAdded));
+                    available.setText("Available: "+ av);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 AlertDialogBuilder.messgeDialog("System Error", "bindParticularsAutocomplete(): "+e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }
         });
-    }
-
-    private String formatDecimal(double val){
-        if(val%1 == 0)
-            return ""+(int) val;
-        return ""+val;
     }
 
     private void bindEmployeeInfoAutocomplete(JFXTextField textField){

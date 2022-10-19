@@ -234,7 +234,7 @@ public class MirsDAO {
                     rs.getString("id"),
                     rs.getString("MIRSID"),
                     rs.getString("StockID"),
-                    rs.getDouble("Quantity"),
+                    rs.getInt("Quantity"),
                     rs.getDouble("Price"),
                     rs.getString("Comments"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),

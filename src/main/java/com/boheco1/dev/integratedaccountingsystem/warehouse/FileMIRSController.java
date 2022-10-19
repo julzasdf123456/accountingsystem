@@ -59,11 +59,11 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     private EmployeeInfo checkedEmployeeInfo = null;
     private EmployeeInfo approvedEmployeeInfo = null;
     private ObservableList<MIRSItem> mirsItemRequested;
-    //private HashMap<String, Double> forQtyUpdate;
+    private HashMap<String, Double> forQtyUpdate;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        //forQtyUpdate = new HashMap<>();
+        forQtyUpdate = new HashMap<>();
 
         filingDate.setValue(LocalDate.now());
         bindItemSearchAutocomplete(items);
@@ -114,14 +114,6 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             AlertDialogBuilder.messgeDialog("Table Validation", "No item Added",
                     Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
             return;
-        }
-
-        for (MIRSItem m : mirsItemRequested) {
-            if(m.getRemarks().equals(Utility.NOT_FOUND) || m.getRemarks().equals(Utility.OUT_OF_STOCK)) {
-                AlertDialogBuilder.messgeDialog("System Message", "Please remove items that are NOT FOUND or OUT OF STOCK, and try again",
-                        Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-                return;
-            }
         }
 
         JFXButton accept = new JFXButton("Proceed");
@@ -182,7 +174,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }
 
-        addItem(stockToBeAdded, Double.parseDouble(quantity.getText()), false, Utility.ADDED);
+        addItem(stockToBeAdded, Double.parseDouble(quantity.getText()), false, "ADDED");
     }
     private void addItem(Stock stock, double qty, boolean isUploaded, String remarks) throws Exception {
 
@@ -267,10 +259,10 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
                                     if (stock == null) {
                                         Stock temp = new Stock();
-                                        temp.setId("temp_"+Utility.generateRandomId()); //assign temporary id, will not be save in the database
+                                        temp.setId(Utility.generateRandomId());
                                         temp.setDescription(currentItem);
                                         temp.setQuantity(0);
-                                        addItem(temp, -1, true, Utility.NOT_FOUND);
+                                        addItem(temp, 0, true, "NOT FOUND");
                                         //messageLog += "CANNOT FIND: "+currentItem + " ("+ code +").\n";
                                     }else{
                                         double availableStock = StockDAO.countAvailable(stock);
@@ -278,7 +270,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
                                         if (stock.getQuantity() == 0.0) {
                                             //messageLog += "OUT OF STOCK: "+stock.getDescription() + " ("+ code +").\n";
-                                            addItem(stock, -1, true,Utility.OUT_OF_STOCK);
+                                            addItem(stock, 0, true,"OUT OF STOCK");
                                         } else {
                                             //check if Insufficient stock
                                             if(qty > stock.getQuantity()){
@@ -291,11 +283,11 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                                 }else{
                                                     l = ""+lacking;
                                                 }
-                                                addItem(stock, availableStock, true,Utility.INSUFFICIENT_STOCK + " ("+ l +")" );
+                                                addItem(stock, availableStock, true,"INSUFFICIENT STOCK ("+ l +")" );
                                                 //keep a copy of item added to table using the stocks available
-                                                //forQtyUpdate.put(stock.getId(), StockDAO.countAvailable(stock));
+                                                forQtyUpdate.put(stock.getId(), StockDAO.countAvailable(stock));
                                             }else{
-                                                addItem(stock, qty, true,Utility.ADDED);
+                                                addItem(stock, qty, true,"ADDED");
                                                // messageLog += "ADDED: "+stock.getDescription() + " ("+ code +").\n";
                                             }
                                         }
@@ -407,7 +399,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
         TableColumn<MIRSItem, String> descriptionCol = new TableColumn<>("Description");
         descriptionCol.setStyle("-fx-alignment: center-left;");
-        //descriptionCol.setCellValueFactory(new PropertyValueFactory<>("particulars"));
+        descriptionCol.setCellValueFactory(new PropertyValueFactory<>("particulars"));
         Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> partcellFactory
                 = //
                 new Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>>() {
@@ -423,7 +415,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                 } else {
                                     MIRSItem mirsItem = getTableView().getItems().get(getIndex());
                                     //set font color RED if item is added to table using the available stock not the requested quantity
-                                    if (mirsItem.getRemarks().equals(Utility.OUT_OF_STOCK) || mirsItem.getRemarks().equals(Utility.NOT_FOUND)) {
+                                    if(mirsItem.getRemarks().equals("NOT FOUND")) {
                                         setStyle("-fx-text-fill: " + ColorPalette.DANGER + "; -fx-alignment: center-left;");
                                     }else{
                                         setStyle("-fx-text-fill: " + ColorPalette.BLACK + "; -fx-alignment: center-left;");
@@ -448,7 +440,6 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         });*/
 
         TableColumn<MIRSItem, String> quantityCol = new TableColumn<>("Qty");
-        quantityCol.setStyle("-fx-alignment: center;");
         quantityCol.setPrefWidth(80);
         quantityCol.setMaxWidth(80);
         quantityCol.setMinWidth(80);
@@ -468,11 +459,11 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                 } else {
                                     MIRSItem mirsItem = getTableView().getItems().get(getIndex());
                                     //set font color RED if item is added to table using the available stock not the requested quantity
-                                    if (mirsItem.getQuantity() > 0)
-                                        setStyle("-fx-text-fill: " + ColorPalette.BLACK + "; -fx-alignment: center;");
-                                    else
-                                        setStyle("-fx-text-fill: " + ColorPalette.DANGER + "; -fx-alignment: center;");
-
+                                    if(forQtyUpdate.containsKey(mirsItem.getStockID())) {
+                                        setStyle("-fx-text-fill: " + ColorPalette.DANGER + "; -fx-alignment: center-right;");
+                                    }else{
+                                        setStyle("-fx-text-fill: " + ColorPalette.BLACK + "; -fx-alignment: center-right;");
+                                    }
                                     setGraphic(null);
                                     double req = mirsItem.getQuantity();
                                     if(req%1 == 0)
@@ -515,10 +506,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                         MIRSItem mirsItem = getTableView().getItems().get(getIndex());
                                         try{
                                             JFXButton accept = new JFXButton("Accept");
-                                            JFXDialog dialog = DialogBuilder.showConfirmDialog("Remove Item","Confirm cancellation of item \n\n" +
-                                                    "Description: "+mirsItem.getParticulars() +"\n" +
-                                                    "Quantity    : " +mirsItem.getQuantity()+"\n"+
-                                                    "Remark      : "+mirsItem.getRemarks(), accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
+                                            JFXDialog dialog = DialogBuilder.showConfirmDialog("Remove Item","Confirm cancellation of MIRS item: "+StockDAO.get(mirsItem.getStockID()).getDescription(), accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
                                             accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
                                             accept.setOnAction(new EventHandler<ActionEvent>() {
                                                 @Override
@@ -530,9 +518,9 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                                 }
                                             });
                                         }catch (Exception e){
-                                            e.printStackTrace();
-                                            AlertDialogBuilder.messgeDialog("System Error", "Error encounter while Filing MIRS reason may be: "+ e.getMessage(),
+                                            AlertDialogBuilder.messgeDialog("System Error", "Error encounter while Filing MIRS reason may be: ",
                                                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                            return;
                                         }
                                     });
                                     setGraphic(btn);
@@ -569,11 +557,11 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                     setText(null);
                                 } else {
                                     //btn.setStyle("-fx-background-color: "+ColorPalette.DANGER+";");
-                                    MIRSItem mirsItem = getTableView().getItems().get(getIndex());
                                     icon.setIconSize(24);
                                     icon.setIconColor(Paint.valueOf(ColorPalette.INFO));
                                     btn.setOnAction(event -> {
                                         try{
+                                            MIRSItem mirsItem = getTableView().getItems().get(getIndex());
                                             Stock stock = StockDAO.get(mirsItem.getStockID());
                                             JFXButton accept = new JFXButton("Accept");
                                             JFXTextField input = new JFXTextField();
@@ -606,11 +594,8 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                             return;
                                         }
                                     });
-                                    if (mirsItem.getRemarks().equals(Utility.OUT_OF_STOCK) || mirsItem.getRemarks().equals(Utility.NOT_FOUND))
-                                        btn.setVisible(false);
                                     setGraphic(btn);
                                     setText(null);
-
                                 }
                             }
                         };
@@ -625,37 +610,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         remarksCols.setPrefWidth(250);
         remarksCols.setMaxWidth(250);
         remarksCols.setMinWidth(250);
-        //remarksCols.setCellValueFactory(new PropertyValueFactory<>("remarks"));
-        Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> remarkcellFactory
-                = //
-                new Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>>() {
-                    @Override
-                    public TableCell call(final TableColumn<MIRSItem, String> param) {
-                        final TableCell<MIRSItem, String> cell = new TableCell<MIRSItem, String>() {
-                            @Override
-                            public void updateItem(String item, boolean empty) {
-                                super.updateItem(item, empty);
-                                if (empty) {
-                                    setGraphic(null);
-                                    setText(null);
-                                } else {
-                                    MIRSItem mirsItem = getTableView().getItems().get(getIndex());
-                                    //set font color RED if item is added to table using the available stock not the requested quantity
-                                    if (mirsItem.getRemarks().equals(Utility.OUT_OF_STOCK) || mirsItem.getRemarks().equals(Utility.NOT_FOUND)) {
-                                        setStyle("-fx-text-fill: " + ColorPalette.DANGER + "; -fx-alignment: center-left;");
-                                    }else{
-                                        setStyle("-fx-text-fill: " + ColorPalette.BLACK + "; -fx-alignment: center-left;");
-                                    }
-                                    setGraphic(null);
-                                    setText(mirsItem.getRemarks());
-                                }
-                            }
-                        };
-                        return cell;
-                    }
-                };
-
-        remarksCols.setCellFactory(remarkcellFactory);
+        remarksCols.setCellValueFactory(new PropertyValueFactory<>("remarks"));
 
 
         //mirsItemTable.getColumns().add(neaCodeCol);
@@ -723,21 +678,15 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
                     quantity.requestFocus();
 
-                    inStock.setText("In Stock: "+ formatDecimal(stockToBeAdded.getQuantity()));
-                    pending.setText("Pending: "+ formatDecimal(StockDAO.countPendingRequest(stockToBeAdded)));
-                    available.setText("Available: "+ formatDecimal(av));
+                    inStock.setText("In Stock: "+ stockToBeAdded.getQuantity());
+                    pending.setText("Pending: "+ StockDAO.countPendingRequest(stockToBeAdded));
+                    available.setText("Available: "+ av);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 AlertDialogBuilder.messgeDialog("System Error", "bindParticularsAutocomplete(): "+e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }
         });
-    }
-
-    private String formatDecimal(double val){
-        if(val%1 == 0)
-            return ""+(int) val;
-        return ""+val;
     }
 
     private void bindEmployeeInfoAutocomplete(JFXTextField textField){

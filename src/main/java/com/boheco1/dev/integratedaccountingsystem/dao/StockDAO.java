@@ -176,7 +176,7 @@ public class StockDAO {
                     rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
                     rs.getString("TypeID"),
                     rs.getString("Unit"),
-                    rs.getDouble("Quantity"),
+                    rs.getInt("Quantity"),
                     rs.getInt("Critical"),
                     rs.getDouble("Price"),
                     rs.getString("NEACode"),
@@ -1513,7 +1513,7 @@ public class StockDAO {
      * @return
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static double countPendingRequest(Stock stock) throws Exception {
+    public static int countPendingRequest(Stock stock) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT SUM(mi.Quantity) AS 'pending' FROM MIRSItems mi " +
                         "LEFT JOIN MIRS m ON m.id = mi.MIRSID LEFT JOIN Stocks s ON s.id = mi.StockID " +
@@ -1521,17 +1521,17 @@ public class StockDAO {
         ps.setString(1, stock.getDescription());
         ResultSet rs = ps.executeQuery();
 
-        double count = 0;
+        int count = 0;
 
         if(rs.next()) {
-            count = rs.getDouble("pending");
+            count = rs.getInt("pending");
         }
 
-        double unavailable = StockDAO.countReleasingUnavailable(stock);
+        int unavailable = StockDAO.countReleasingUnavailable(stock);
         return count-unavailable;
     }
 
-    public static double countReleasingUnavailable(Stock stock) throws Exception {
+    public static int countReleasingUnavailable(Stock stock) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement("SELECT SUM(r.Quantity) AS 'unavailable' FROM Releasing r INNER JOIN Stocks s ON s.id=r.StockID " +
                 "WHERE r.MIRSID IN (SELECT m.id FROM MIRS m WHERE m.Status='"+Utility.RELEASING+"') " +
                 "AND s.Description=?");
@@ -1540,17 +1540,17 @@ public class StockDAO {
 
         ResultSet rs = ps.executeQuery();
 
-        double count = 0;
+        int count = 0;
 
         if(rs.next()) {
-            count = rs.getDouble("unavailable");
+            count = rs.getInt("unavailable");
         }
 
         return count;
     }
 
     public static double countAvailable(Stock stock) throws Exception {
-        double pending = countPendingRequest(stock);
+        int pending = countPendingRequest(stock);
 
         return stock.getQuantity()-pending;
     }
