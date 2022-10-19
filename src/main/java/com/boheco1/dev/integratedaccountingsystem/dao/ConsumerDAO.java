@@ -2,6 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.Bill;
+import com.boheco1.dev.integratedaccountingsystem.objects.CRMQueue;
 import com.boheco1.dev.integratedaccountingsystem.objects.ConsumerInfo;
 
 import java.sql.Date;
@@ -174,4 +175,42 @@ public class ConsumerDAO {
 
         return bills;
     }
+
+    /**
+     * Retrieves a ConsumerInfo based on Account Number (on Billing database, ConsumerInquiry view)
+     * @param key The reference number, consumer name, consumer address
+     * @return A ConsumerInfo
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static CRMQueue getConsumerRecordFromCRM(String key) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM CRMQueue WHERE ConsumerName LIKE ? OR ConsumerAddress LIKE ? ");
+
+        ps.setString(1, '%'+ key+'%');
+        ps.setString(2, '%'+ key+'%');
+
+        ResultSet rs = ps.executeQuery();
+
+        CRMQueue record = null;
+
+        while(rs.next()) {
+            record = new CRMQueue(
+                    rs.getString("id"),
+                    rs.getString("ConsumerName"),
+                    rs.getString("ConsumerAddress"),
+                    rs.getString("TransactionPurpose"),
+                    rs.getString("Source"),
+                    rs.getString("SourceId"),
+                    rs.getDouble("SubTotal"),
+                    rs.getDouble("VAT"),
+                    rs.getDouble("Total")
+            );
+        }
+
+        rs.close();
+        ps.close();
+
+        return record;
+    }
+
+
 }
