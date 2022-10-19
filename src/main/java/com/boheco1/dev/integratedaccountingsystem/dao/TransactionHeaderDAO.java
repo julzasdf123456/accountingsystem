@@ -6,6 +6,8 @@ import com.boheco1.dev.integratedaccountingsystem.objects.TransactionHeader;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TransactionHeaderDAO {
     public static void add(TransactionHeader transactionHeader) throws Exception {
@@ -38,6 +40,38 @@ public class TransactionHeaderDAO {
 
     public static void update(TransactionHeader th) throws Exception {
 
+    }
+
+    public static List<TransactionHeader> searchByPayee(String nameOfPayee) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM TransactionHeader WHERE Particulars LIKE ?");
+        ps.setString(1, nameOfPayee);
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<TransactionHeader> tas = new ArrayList<>();
+
+        while(rs.next()) {
+            TransactionHeader th = new TransactionHeader();
+            th.setPeriod(rs.getDate("Period").toLocalDate());
+            th.setTransactionNumber(rs.getString("TransactionNumber"));
+            th.setTransactionCode(rs.getString("TransactionCode"));
+            th.setAccountID(rs.getString("AccountID"));
+            th.setSource(rs.getString("Source"));
+            th.setParticulars(rs.getString("Particulars"));
+            th.setTransactionDate(rs.getDate("TransactionDate").toLocalDate());
+            th.setBank(rs.getString("Bank"));
+            th.setReferenceNo(rs.getString("ReferenceNo"));
+            th.setAmount(rs.getDouble("Amount"));
+            th.setEnteredBy(rs.getString("EnteredBy"));
+            th.setDateEntered( rs.getTimestamp("DateEntered") !=null ? rs.getTimestamp("DateEntered").toLocalDateTime() : null);
+            th.setDateLastModified(rs.getTimestamp("DateLastModified") !=null ? rs.getTimestamp("DateLastModified").toLocalDateTime() : null);
+            th.setUpdatedBy(rs.getString("UpdatedBy"));
+            th.setRemarks(rs.getString("Remarks"));
+
+            tas.add(th);
+        }
+
+        return tas;
     }
 
     public static TransactionHeader get(String transactionNumber, String transactionCode) throws Exception {

@@ -36,14 +36,14 @@
       <Separator layoutX="25.0" layoutY="126.0" prefHeight="7.0" prefWidth="1184.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="126.0" />
       <JFXButton layoutX="25.0" layoutY="556.0" onAction="#onSaveChanges" prefHeight="37.0" prefWidth="225.0" styleClass="btn-theme" text="Save Changes" textFill="WHITE" />
       <JFXButton layoutX="26.0" layoutY="607.0" onAction="#onReset" prefHeight="37.0" prefWidth="225.0" styleClass="btn-sucess" text="Reset" textFill="WHITE" />
-      <GridPane layoutX="24.0" layoutY="29.0" prefHeight="80.0" prefWidth="915.0" AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="25.0">
+      <GridPane layoutX="24.0" layoutY="29.0" prefHeight="80.0" prefWidth="952.0" AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="25.0">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="274.4000274658203" minWidth="10.0" prefWidth="118.19999389648437" />
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="394.40001220703124" minWidth="10.0" prefWidth="177.80001220703124" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="384.0" minWidth="10.0" prefWidth="24.99998779296874" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="384.0" minWidth="10.0" prefWidth="137.59996337890624" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="471.1999877929688" minWidth="10.0" prefWidth="351.20002441406245" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="418.20002441406245" minWidth="10.0" prefWidth="76.79997558593755" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="471.1999877929688" minWidth="10.0" prefWidth="310.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="418.20002441406245" minWidth="10.0" prefWidth="139.0" />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
@@ -59,7 +59,7 @@
             <TextField fx:id="receivedFrom" GridPane.columnIndex="4" />
             <TextField fx:id="paymentFor" GridPane.columnIndex="4" GridPane.rowIndex="2" />
             <DatePicker fx:id="orDate" onAction="#onTransactionCheck" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <JFXButton styleClass="btn-info" text="Find" GridPane.columnIndex="5">
+            <JFXButton onAction="#onSearchPayee" styleClass="btn-info" text="Search by Payee" GridPane.columnIndex="5">
                <GridPane.margin>
                   <Insets left="5.0" />
                </GridPane.margin>

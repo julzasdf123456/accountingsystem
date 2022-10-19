@@ -160,8 +160,8 @@ public class ConsumerDAO {
                 double daa = rs2.getDouble("DAA_GRAM");
                 bill.setDaysDelayed(daysDelayed);
                 double penalty = (netAmount - (vat + transformerRental + othersCharges + acrm + daa));
-                bill.setSurCharge(bill.computeSurCharge(penalty));
-                bill.setTotalAmount();
+//                bill.setSurCharge(bill.computeSurCharge(penalty));
+//                bill.setTotalAmount();
             }
             bills.add(bill);
 

@@ -41,6 +41,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
     @FXML
     TableView breakdownTable;
+    JFXDialog modal;
 
     private StackPane stackPane;
 
@@ -64,6 +65,8 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             transactionDetails = FXCollections.observableList(new ArrayList<>());
             renderTable();
             breakdownTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+
 
         }catch(Exception ex) {
             ex.printStackTrace();
@@ -134,8 +137,10 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
         LocalDate period = LocalDate.of(year, month, 1);
 
+        boolean isNew = false;
         //create Transaction Header if null
         if(currentTransaction==null) {
+            isNew=true;
             currentTransaction = new TransactionHeader();
             currentTransaction.setPeriod(period);
             currentTransaction.setTransactionCode("AR");
@@ -157,6 +162,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         }
 
         try {
+            int num = 0;
             for(TransactionDetails td: transactionDetails) {
                 if(td.getTransactionNumber()==null) {
                     td.setTransactionNumber(currentTransaction.getTransactionNumber());
@@ -165,8 +171,11 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
                     td.setTransactionCode("AR");
                     td.setOrDate(currentTransaction.getTransactionDate());
                     TransactionDetailsDAO.add(td);
+                    num++;
                 }
             }
+            AlertDialogBuilder.messgeDialog("Error!", (isNew ? "New AR transaction saved with " : "Current AR saved with ") + num + " new " + (num>1? " items." : "item"),
+                    stackPane, AlertDialogBuilder.INFO_DIALOG);
         }catch(Exception ex) {
             ex.printStackTrace();
             AlertDialogBuilder.messgeDialog("Error!", ex.getMessage(),
@@ -185,6 +194,8 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             orDate.setValue(null);
             paymentFor.setText(null);
             receivedFrom.setText(null);
+            paymentFor.setEditable(true);
+            receivedFrom.setEditable(true);
 
             transactionDetails.clear();
 
@@ -210,6 +221,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
                     TransactionDetailsDAO.delete(currentItem);
                     transactionDetails.remove(currentItem);
                     currentItem = null;
+                    recomputeTotal();
                     dialog.close();
                 }catch(Exception ex) {
                     ex.printStackTrace();
@@ -222,7 +234,9 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
     }
 
     public void onSearchPayee() {
-
+        Utility.setParentController(this);
+        Utility.setSelectedObject(receivedFrom);
+        modal = ModalBuilder.showModalFromXML(ArSearchPayeeController.class, "../cashiering/ar_search_payee.fxml", Utility.getStackPane());
     }
 
     public void onAmountEntry() {
@@ -270,15 +284,13 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
                 currentTransaction = TransactionHeaderDAO.get(orNumber.getText(),"AR", orDate.getValue());
 
                 if(currentTransaction!=null) {
-                    receivedFrom.setText(currentTransaction.getParticulars());
-                    paymentFor.setText(currentTransaction.getRemarks());
-
-                    transactionDetails.addAll(TransactionDetailsDAO.get(currentTransaction.getPeriod(),currentTransaction.getTransactionNumber(),"AR"));
-                    recomputeTotal();
+                    loadTransaction();
                 }else {
                     resetItemsEntry();
                     receivedFrom.setText(null);
                     paymentFor.setText(null);
+                    receivedFrom.setEditable(true);
+                    paymentFor.setEditable(true);
                     transactionDetails.clear();
                     receivedFrom.requestFocus();
                 }
@@ -302,8 +314,31 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         }
     }
 
+    private void loadTransaction() {
+        try {
+            receivedFrom.setText(currentTransaction.getParticulars());
+            paymentFor.setText(currentTransaction.getRemarks());
+            orNumber.setText(currentTransaction.getTransactionNumber());
+            orDate.setValue(currentTransaction.getTransactionDate());
+
+            transactionDetails.clear();
+            transactionDetails.addAll(TransactionDetailsDAO.get(currentTransaction.getPeriod(), currentTransaction.getTransactionNumber(), "AR"));
+            paymentFor.setEditable(false);
+            receivedFrom.setEditable(false);
+            recomputeTotal();
+        }catch(Exception ex) {
+            ex.printStackTrace();
+            AlertDialogBuilder.messgeDialog("Error!", ex.getMessage(),
+                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }
+    }
+
     @Override
     public void receive(Object o) {
-
+        if(o instanceof TransactionHeader) {
+            currentTransaction = (TransactionHeader) o;
+            loadTransaction();
+            modal.close();
+        }
     }
 }
