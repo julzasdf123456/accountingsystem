@@ -34,4 +34,9 @@ public class ParticularsAccount {
     public void setAmount(double amount) {
         this.amount = amount;
     }
+
+    @Override
+    public String toString() {
+        return this.particulars;
+    }
 }

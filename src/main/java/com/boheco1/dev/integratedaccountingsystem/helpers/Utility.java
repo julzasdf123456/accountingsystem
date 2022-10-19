@@ -8,6 +8,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
+import org.apache.commons.text.WordUtils;
+import pl.allegro.finance.tradukisto.MoneyConverters;
+import pl.allegro.finance.tradukisto.ValueConverters;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -91,7 +94,6 @@ public class Utility {
         return itemizedMirsItems;
     }
 
-
     public static String generateRandomId() {
         return new Date().getTime() + "-" + generateRandomString(15);
     }
@@ -159,14 +161,21 @@ public class Utility {
             if (e instanceof Bill) {
                 Bill bill = (Bill) e;
                 amount += bill.getTotalAmount();
+            }else if (e instanceof Check){
+                Check check = (Check) e;
+                amount += check.getAmount();
             }
         }
         amount = round(amount,2);
         if (control instanceof Label) {
             Label amount_control = (Label) control;
+            double current_amount = Double.parseDouble(amount_control.getText());
+            amount += current_amount;
             amount_control.setText(amount + "");
         } else if (control instanceof TextField) {
             TextField textField = (TextField) control;
+            double current_amount = Double.parseDouble(textField.getText());
+            amount += current_amount;
             textField.setText(amount + "");
         }
     }
@@ -177,5 +186,18 @@ public class Utility {
         BigDecimal bd = BigDecimal.valueOf(value);
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
+    }
+
+    public static String doubleAmountToWords(double amount) {
+
+//        ValueConverters converters = ValueConverters.ENGLISH_INTEGER;
+
+        MoneyConverters converters = MoneyConverters.ENGLISH_BANKING_MONEY_VALUE;
+
+        StringBuffer words = new StringBuffer();
+        words.append(converters.asWords(BigDecimal.valueOf(amount)));
+        words.append(" pesos");
+
+        return WordUtils.capitalizeFully(words.toString(), new char[]{' ','_'});
     }
 }

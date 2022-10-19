@@ -1,8 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
-
-import java.sql.Date;
 import java.time.LocalDate;
 
 public class Bill {
@@ -20,8 +18,29 @@ public class Bill {
     private LocalDate servicePeriodEnd;
     private ConsumerInfo consumer;
     private String consumerType;
+    private double addCharges;
+    private double powerAmount;
     private double powerKWH;
     private double discount;
+    private double slAdjustment;
+    private double otherAdjustment;
+    private double katas;
+    private double mdRefund;
+    private double generationVat;
+    private double transmissionVat;
+    private double systemLossVat;
+    private double distributionVat;
+    private double DAAVat;
+    private double acrmVat;
+    private double vat;
+    private double otherVat;
+    private double franchiseTax;
+    private double businessTax;
+    private double realPropertyTax;
+    private double vatAndPassTax;
+    private double transformerRental;
+    private double otherCharges;
+    private double surchargeTax;
 
     public Bill(){}
 
@@ -93,10 +112,6 @@ public class Bill {
         return totalAmount;
     }
 
-    public void setTotalAmount() {
-        this.totalAmount = Utility.round(this.getSurCharge() + this.getAmountDue() + this.getCh2306() + this.getCh2307(), 2);
-    }
-
     public LocalDate getServiceDatefrom() {
         return serviceDatefrom;
     }
@@ -161,8 +176,183 @@ public class Bill {
         this.discount = discount;
     }
 
-    public double computeSurCharge(double penalty) {
+    public double getSlAdjustment() {
+        return slAdjustment;
+    }
+
+    public void setSlAdjustment(double slAdjustment) {
+        this.slAdjustment = slAdjustment;
+    }
+
+    public double getOtherAdjustment() {
+        return otherAdjustment;
+    }
+
+    public void setOtherAdjustment(double otherAdjustment) {
+        this.otherAdjustment = otherAdjustment;
+    }
+
+    public double getKatas() {
+        return katas;
+    }
+
+    public void setKatas(double katas) {
+        this.katas = katas;
+    }
+
+    public double getGenerationVat() {
+        return generationVat;
+    }
+
+    public void setGenerationVat(double generationVat) {
+        this.generationVat = generationVat;
+    }
+
+    public double getTransmissionVat() {
+        return transmissionVat;
+    }
+
+    public void setTransmissionVat(double transmissionVat) {
+        this.transmissionVat = transmissionVat;
+    }
+
+    public double getSystemLossVat() {
+        return systemLossVat;
+    }
+
+    public void setSystemLossVat(double systemLossVat) {
+        this.systemLossVat = systemLossVat;
+    }
+
+    public double getDistributionVat() {
+        return distributionVat;
+    }
+
+    public void setDistributionVat(double distributionVat) {
+        this.distributionVat = distributionVat;
+    }
+
+    public double getDAAVat() {
+        return DAAVat;
+    }
+
+    public void setDAAVat(double DAAVat) {
+        this.DAAVat = DAAVat;
+    }
+
+    public double getAcrmVat() {
+        return acrmVat;
+    }
+
+    public void setAcrmVat(double acrmVat) {
+        this.acrmVat = acrmVat;
+    }
+
+    public double getOtherVat() {
+        return otherVat;
+    }
+
+    public void setOtherVat(double otherVat) {
+        this.otherVat = otherVat;
+    }
+
+    public double getFranchiseTax() {
+        return franchiseTax;
+    }
+
+    public void setFranchiseTax(double franchiseTax) {
+        this.franchiseTax = franchiseTax;
+    }
+
+    public double getBusinessTax() {
+        return businessTax;
+    }
+
+    public void setBusinessTax(double businessTax) {
+        this.businessTax = businessTax;
+    }
+
+    public double getRealPropertyTax() {
+        return realPropertyTax;
+    }
+
+    public void setRealPropertyTax(double realPropertyTax) {
+        this.realPropertyTax = realPropertyTax;
+    }
+
+    public double getVatAndPassTax() {
+        return vatAndPassTax;
+    }
+
+    public void setVatAndPassTax(double vatAndPassTax) {
+        this.vatAndPassTax = vatAndPassTax;
+    }
+
+    public double getAddCharges() {
+        return addCharges;
+    }
+
+    public void setAddCharges(double addCharges) {
+        this.addCharges = addCharges;
+    }
+
+    public double getPowerAmount() {
+        return powerAmount;
+    }
+
+    public void setPowerAmount(double powerAmount) {
+        this.powerAmount = powerAmount;
+    }
+
+    public double getMdRefund() {
+        return mdRefund;
+    }
+
+    public void setMdRefund(double mdRefund) {
+        this.mdRefund = mdRefund;
+    }
+
+    public double getSurChargeTax() {
+        return surchargeTax;
+    }
+
+    public void setSurChargeTax(double surchargeTax) {
+        this.surchargeTax = surchargeTax;
+    }
+
+    public double getTransformerRental() {
+        return transformerRental;
+    }
+
+    public void setTransformerRental(double transformerRental) {
+        this.transformerRental = transformerRental;
+    }
+
+    public double getOtherCharges() {
+        return otherCharges;
+    }
+
+    public void setOtherCharges(double otherCharges) {
+        this.otherCharges = otherCharges;
+    }
+
+    public double getVat() {
+        return vat;
+    }
+
+    public void setVat(double vat) {
+        this.vat = vat;
+    }
+
+    public void setTotalAmount(double amount){
+        this.totalAmount = amount;
+    }
+
+    public double computeSurCharge() {
+        double penalty = this.getAmountDue() - (this.getVatAndPassTax() + this.getTransformerRental() + this.getOtherCharges() + this.getAcrmVat() + this.getDAAVat());
+
         double amount = 0;
+
         if (this.consumerType.equals("P") || this.consumerType.equals("S")) {
             amount = 0;
         }else {
@@ -171,20 +361,31 @@ public class Bill {
                 //Exemption of penalties due to Odette
                 if (this.getServicePeriodEnd().isEqual(LocalDate.of(2021, 12, 1))) {
                     amount = 0;
-                //Penalty computation for Residential, BAPA, ECA
-                } else if ((this.consumerType.equals("RM") || this.consumerType.equals("B") || this.consumerType.equals("E")) && this.getServicePeriodEnd().isAfter(LocalDate.of(2014, 8, 11))) {
+                    //Penalty computation for Residential, BAPA, ECA
+                } else if (
+                        (this.consumerType.equals("RM") && (this.getServicePeriodEnd().isEqual(LocalDate.of(2014, 8, 1)) || this.getServicePeriodEnd().isAfter(LocalDate.of(2014, 8, 1)))
+                                || this.consumerType.equals("B")
+                                || this.consumerType.equals("E"))) {
                     amount = penalty * 0.03;
-                    amount += (amount * 0.12);
-                //For Commercial Types
+                    //For Commercial Types
                 } else {
-                    if (this.getServicePeriodEnd().isAfter(LocalDate.of(2017, 4, 1))) {
+                    //If CS with 1000kw below
+                    if ((this.consumerType.equals("CS") && this.powerKWH < 1000)
+                            && (this.getServicePeriodEnd().isEqual(LocalDate.of(2017, 4, 1)) || this.getServicePeriodEnd().isAfter(LocalDate.of(2017, 4, 1)) )) {
+                        amount = penalty * 0.03;
+                        //If I or CL or CS with 1000kwh and above
+                    }else if (this.consumerType.equals("CL")
+                            || this.consumerType.equals("I")
+                            || (this.consumerType.equals("CS") && this.powerKWH >= 1000)) {
+                        //No penalty if days delayed less than 6
                         if (this.getDaysDelayed() < 6) {
                             amount = 0;
-                        } else if (this.getDaysDelayed() > 30) {
-                            amount = this.getAmountDue() * 0.05;
+                            //5% penalty if 30 days and above
+                        } else if (this.getDaysDelayed() >= 30) {
+                            amount = penalty * 0.05;
+                            //3% penalty if 30 days below
                         } else {
                             amount = penalty * 0.03;
-                            amount += (amount * 0.12);
                         }
                     }
                 }
@@ -192,6 +393,21 @@ public class Bill {
             }
         }
         return amount;
+    }
+
+    public boolean equals(Object o){
+        if (o instanceof Bill){
+            Bill bill = (Bill) o;
+            if (bill.getBillNo().equals(this.getBillNo()))
+                return true;
+        }
+        return false;
+    }
+
+    public void computeTotalAmount() {
+        double charges = this.getSurCharge() + this.getSurChargeTax() + this.getAmountDue();
+        double deductions = this.getDiscount() + this.getMdRefund() + this.getKatas() + this.getCh2306() + this.getCh2307() + this.getSlAdjustment() + this.getOtherAdjustment();
+        this.setTotalAmount(Utility.round(charges - deductions, 2));
     }
 }
 

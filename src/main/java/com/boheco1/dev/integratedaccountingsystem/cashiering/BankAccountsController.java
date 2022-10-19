@@ -1,4 +1,4 @@
-package com.boheco1.dev.integratedaccountingsystem.tellering;
+package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.BankAccountDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;

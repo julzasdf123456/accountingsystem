@@ -7,8 +7,11 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import pl.allegro.finance.tradukisto.MoneyConverters;
+import pl.allegro.finance.tradukisto.ValueConverters;
 
 import java.io.FileOutputStream;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +27,10 @@ public class POITest {
 //        }catch(Exception ex) {
 //            ex.printStackTrace();
 //        }
-        executePOITest();
+//        executePOITest();
+        double money = 78945385.92;
 
+        System.out.println(Utility.doubleAmountToWords(money));
     }
 
 

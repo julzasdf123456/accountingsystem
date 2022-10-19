@@ -1,34 +1,34 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 
+import com.jfoenix.controls.JFXButton;
+
 import java.time.LocalDate;
 
 public class BankRemittance {
     private LocalDate orDateFrom;
     private LocalDate orDateTo;
-    private String description;
-    private String accountNumber;
     private String checkNumber;
     private double amount;
+    private BankAccount bankAccount;
+    private TransactionDetails transactionDetails;
 
-    public BankRemittance(LocalDate orDateFrom, LocalDate orDateTo, String description, String accountNumber, String checkNumber, double amount) {
+
+    public BankRemittance(LocalDate orDateFrom, LocalDate orDateTo, String checkNumber, double amount, BankAccount bankAccount) {
         this.orDateFrom = orDateFrom;
         this.orDateTo = orDateTo;
-        this.description = description;
-        this.accountNumber = accountNumber;
         this.checkNumber = checkNumber;
         this.amount = amount;
+        this.bankAccount = bankAccount;
     }
 
     public BankRemittance() {
         this.orDateFrom = null;
         this.orDateTo = null;
-        this.description = "";
-        this.accountNumber = "";
+        this.bankAccount = null;
         this.checkNumber = "";
         this.amount = 0.0;
     }
-
     public LocalDate getOrDateFrom() {
         return orDateFrom;
     }
@@ -41,24 +41,16 @@ public class BankRemittance {
         return orDateTo;
     }
 
+    public TransactionDetails getTransactionDetails() {
+        return transactionDetails;
+    }
+
+    public void setTransactionDetails(TransactionDetails transactionDetails) {
+        this.transactionDetails = transactionDetails;
+    }
+
     public void setOrDateTo(LocalDate orDateTo) {
         this.orDateTo = orDateTo;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getAccountNumber() {
-        return accountNumber;
-    }
-
-    public void setAccountNumber(String accountNumber) {
-        this.accountNumber = accountNumber;
     }
 
     public String getCheckNumber() {
@@ -79,5 +71,21 @@ public class BankRemittance {
 
     public String getFormattedAmount() {
         return String.format("%,.2f", amount);
+    }
+
+    public BankAccount getBankAccount() {
+        return bankAccount;
+    }
+
+    public void setBankAccount(BankAccount bankAccount) {
+        this.bankAccount = bankAccount;
+    }
+
+    public String getDescription() {
+        return bankAccount.getBankDescription();
+    }
+
+    public String getAccountNumber() {
+        return bankAccount.getBankAccountNumber();
     }
 }

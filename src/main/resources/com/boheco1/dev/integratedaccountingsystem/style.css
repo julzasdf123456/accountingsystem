@@ -226,3 +226,7 @@
 .table-view > .virtual-flow > .scroll-bar > .decrement-button {
     -fx-opacity: 0;
 }
+
+.red {
+-fx-text-fill: #ff0000;
+}

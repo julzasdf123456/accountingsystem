@@ -13,8 +13,8 @@ public class DB {
 
     //Same server and user credentials
     public static String host="localhost";
-    public static String db_user = "app_user";
-    public static String db_pass = "Boheco_2021";
+    public static String db_user = "sa";
+    public static String db_pass = "lntrx2022";
     public static String db_name = "Accounting";
 
     //Default connection for Accounting DB

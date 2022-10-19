@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXTextArea?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="669.0" prefWidth="1079.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.AcknowledgementReceipt">
+   <children>
+      <VBox layoutX="24.0" layoutY="142.0" prefHeight="278.0" prefWidth="304.0" spacing="5.0" AnchorPane.leftAnchor="24.0">
+         <children>
+            <Label text="Amount:" />
+            <JFXTextField fx:id="amount" onAction="#onItemEntry" onKeyReleased="#onAmountEntry" />
+            <Label layoutX="10.0" layoutY="92.0" text="Account Description:" />
+            <JFXComboBox fx:id="accountDescription" onAction="#onItemEntry" prefHeight="37.0" prefWidth="320.0" styleClass="jfx-combo-box" />
+            <Label layoutX="10.0" layoutY="174.0" text="Amount in Words:" />
+            <JFXTextArea fx:id="amountInWords" editable="false" prefHeight="105.0" prefWidth="304.0">
+               <font>
+                  <Font size="18.0" />
+               </font></JFXTextArea>
+         </children>
+      </VBox>
+      <Separator layoutX="25.0" layoutY="126.0" prefHeight="7.0" prefWidth="1184.0" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="126.0" />
+      <JFXButton layoutX="25.0" layoutY="556.0" onAction="#onSaveChanges" prefHeight="37.0" prefWidth="225.0" styleClass="btn-theme" text="Save Changes" textFill="WHITE" />
+      <JFXButton layoutX="26.0" layoutY="607.0" onAction="#onReset" prefHeight="37.0" prefWidth="225.0" styleClass="btn-sucess" text="Reset" textFill="WHITE" />
+      <GridPane layoutX="24.0" layoutY="29.0" prefHeight="80.0" prefWidth="915.0" AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="25.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="274.4000274658203" minWidth="10.0" prefWidth="118.19999389648437" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="394.40001220703124" minWidth="10.0" prefWidth="177.80001220703124" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="384.0" minWidth="10.0" prefWidth="24.99998779296874" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="384.0" minWidth="10.0" prefWidth="137.59996337890624" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="471.1999877929688" minWidth="10.0" prefWidth="351.20002441406245" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="418.20002441406245" minWidth="10.0" prefWidth="76.79997558593755" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="25.60001220703125" minHeight="10.0" prefHeight="12.000006103515624" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="48.79999389648437" minHeight="10.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="OR Number" />
+            <Label text="Date" GridPane.rowIndex="2" />
+            <Label text="Received From" GridPane.columnIndex="3" />
+            <Label text="Payment For" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+            <TextField fx:id="orNumber" onAction="#onTransactionCheck" GridPane.columnIndex="1" />
+            <TextField fx:id="receivedFrom" GridPane.columnIndex="4" />
+            <TextField fx:id="paymentFor" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+            <DatePicker fx:id="orDate" onAction="#onTransactionCheck" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <JFXButton styleClass="btn-info" text="Find" GridPane.columnIndex="5">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </JFXButton>
+         </children>
+         <opaqueInsets>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </opaqueInsets>
+      </GridPane>
+      <HBox layoutX="26.0" layoutY="445.0" prefWidth="226.0">
+         <children>
+            <JFXButton prefWidth="80.0" styleClass="btn-sucess" text="New" />
+            <JFXButton fx:id="addItemButton" disable="true" layoutX="10.0" layoutY="10.0" onAction="#onAddItem" prefWidth="80.0" styleClass="btn-info" text="Add">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </JFXButton>
+            <JFXButton fx:id="deleteItemButton" disable="true" layoutX="64.0" layoutY="10.0" onAction="#onDelete" prefWidth="80.0" styleClass="btn-danger" text="Del" textFill="WHITE">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </JFXButton>
+         </children>
+      </HBox>
+      <TableView fx:id="breakdownTable" layoutX="297.0" layoutY="143.0" onMouseClicked="#onTableClick" prefHeight="410.0" prefWidth="714.0" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="340.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="143.0" />
+      <Label fx:id="totalLabel" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="904.0" layoutY="593.0" prefHeight="25.0" prefWidth="160.0" style="-fx-font-size: 22;" text="PhP 0.00" textAlignment="RIGHT" AnchorPane.bottomAnchor="25.0" AnchorPane.rightAnchor="25.0">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="796.0" layoutY="610.0" prefHeight="32.0" prefWidth="85.0" style="-fx-font-size: 22;" text="TOTAL" textAlignment="RIGHT" AnchorPane.bottomAnchor="27.0" AnchorPane.rightAnchor="198.0">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

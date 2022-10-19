@@ -7,16 +7,23 @@ public class TransactionDetails {
     private LocalDate period;
     private String transactionNumber;
     private String transactionCode;
-    private LocalDateTime transactionDate;
+    private LocalDate transactionDate;
     private int sequenceNumber;
     private String accountCode;
     private double debit;
     private double credit;
     private LocalDate orDate;
-//    private LocalDate orDateTo;
     private String bankID;
     private String note;
     private String checkNumber;
+    private String particulars;
+    public String getParticulars() {
+        return particulars;
+    }
+
+    public void setParticulars(String particulars) {
+        this.particulars = particulars;
+    }
 
     public String getNote() {
         return note;
@@ -58,11 +65,11 @@ public class TransactionDetails {
         this.transactionCode = transactionCode;
     }
 
-    public LocalDateTime getTransactionDate() {
+    public LocalDate getTransactionDate() {
         return transactionDate;
     }
 
-    public void setTransactionDate(LocalDateTime transactionDate) {
+    public void setTransactionDate(LocalDate transactionDate) {
         this.transactionDate = transactionDate;
     }
 
@@ -120,5 +127,9 @@ public class TransactionDetails {
 
     public void setBankID(String bankID) {
         this.bankID = bankID;
+    }
+
+    public String getFormattedDebit() {
+        return String.format("%,.2f", debit);
     }
 }

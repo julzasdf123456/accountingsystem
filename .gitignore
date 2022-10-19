@@ -1,3 +1,4 @@
 .idea
 src/main/java/com/boheco1/dev/integratedaccountingsystem/helpers/DB.java
 target/
+/application.properties

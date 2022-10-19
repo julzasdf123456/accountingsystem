@@ -12,7 +12,10 @@
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -174,32 +177,120 @@
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                  </columnResizePolicy>
                               </TableView>
-                              <HBox prefHeight="40.0" prefWidth="850.0">
+                              <VBox prefHeight="197.0" prefWidth="927.0">
                                  <children>
-                                    <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                                    <Label text="Total Payable Amount">
-                                       <HBox.margin>
-                                          <Insets top="8.0" />
-                                       </HBox.margin>
-                                       <padding>
-                                          <Insets right="16.0" />
-                                       </padding>
-                                    </Label>
-                                    <Label styleClass="bold" text="₱">
-                                       <padding>
-                                          <Insets top="8.0" />
-                                       </padding>
-                                       <HBox.margin>
-                                          <Insets right="4.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <Label fx:id="total_payable_lbl" styleClass="bold" text="0.00" textAlignment="RIGHT">
-                                       <HBox.margin>
-                                          <Insets top="8.0" />
-                                       </HBox.margin>
-                                    </Label>
+                                    <Separator prefWidth="200.0" />
+                                    <HBox prefHeight="115.0" prefWidth="927.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <HBox prefHeight="100.0" prefWidth="631.0" HBox.hgrow="ALWAYS">
+                                             <children>
+                                                <VBox prefHeight="194.0" prefWidth="600.0">
+                                                   <children>
+                                                      <GridPane VBox.vgrow="ALWAYS">
+                                                        <columnConstraints>
+                                                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        </columnConstraints>
+                                                        <rowConstraints>
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                        </rowConstraints>
+                                                         <children>
+                                                            <Label text="Addt'nl Charges" />
+                                                            <Label text="Surcharge" GridPane.rowIndex="1" />
+                                                            <Label text="Prompt Payment" GridPane.rowIndex="2" />
+                                                            <Label text="SL Adj./Others" GridPane.rowIndex="3" />
+                                                            <Label text="2306/2307" GridPane.rowIndex="4" />
+                                                            <Label text="Power-Amt" GridPane.columnIndex="2">
+                                                               <GridPane.margin>
+                                                                  <Insets left="16.0" />
+                                                               </GridPane.margin>
+                                                            </Label>
+                                                            <Label text="V A T" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                                               <padding>
+                                                                  <Insets left="16.0" />
+                                                               </padding>
+                                                            </Label>
+                                                            <Label text="Less KATAS" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                                               <GridPane.margin>
+                                                                  <Insets left="16.0" />
+                                                               </GridPane.margin>
+                                                            </Label>
+                                                            <Label text="LESS MD Refund" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                                               <GridPane.margin>
+                                                                  <Insets left="16.0" />
+                                                               </GridPane.margin>
+                                                            </Label>
+                                                            <TextField fx:id="add_charges_tf" editable="false" focusTraversable="false" GridPane.columnIndex="1" />
+                                                            <TextField fx:id="surcharge_tf" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                            <TextField fx:id="ppd_tf" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                            <TextField fx:id="adj_tf" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                            <TextField fx:id="ch2306_2307_tf" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                            <TextField fx:id="power_amt_tf" editable="false" focusTraversable="false" GridPane.columnIndex="3" />
+                                                            <TextField fx:id="vat_tf" editable="false" focusTraversable="false" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                                            <TextField fx:id="katas_tf" editable="false" focusTraversable="false" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                                                            <TextField fx:id="md_refund_tf" editable="false" focusTraversable="false" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                                            <Label styleClass="bold" text="Bill Amount" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                                                               <GridPane.margin>
+                                                                  <Insets left="16.0" />
+                                                               </GridPane.margin>
+                                                            </Label>
+                                                            <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="4">
+                                                               <children>
+                                                                  <Label styleClass="bold" text="₱">
+                                                                     <padding>
+                                                                        <Insets top="8.0" />
+                                                                     </padding>
+                                                                     <HBox.margin>
+                                                                        <Insets right="4.0" />
+                                                                     </HBox.margin>
+                                                                  </Label>
+                                                                  <Label fx:id="bill_amount_lbl" styleClass="bold" text="0.00" textAlignment="RIGHT">
+                                                                     <HBox.margin>
+                                                                        <Insets top="8.0" />
+                                                                     </HBox.margin>
+                                                                  </Label>
+                                                               </children>
+                                                            </HBox>
+                                                         </children>
+                                                      </GridPane>
+                                                   </children>
+                                                   <HBox.margin>
+                                                      <Insets right="16.0" />
+                                                   </HBox.margin>
+                                                </VBox>
+                                             </children>
+                                          </HBox>
+                                          <Label styleClass="bold" text="Total Payable Amount">
+                                             <HBox.margin>
+                                                <Insets top="8.0" />
+                                             </HBox.margin>
+                                             <padding>
+                                                <Insets right="16.0" />
+                                             </padding>
+                                          </Label>
+                                          <Label styleClass="bold" text="₱">
+                                             <padding>
+                                                <Insets top="8.0" />
+                                             </padding>
+                                             <HBox.margin>
+                                                <Insets right="4.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                          <Label fx:id="total_payable_lbl" styleClass="bold" text="0.00" textAlignment="RIGHT">
+                                             <HBox.margin>
+                                                <Insets top="8.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                       </children>
+                                    </HBox>
                                  </children>
-                              </HBox>
+                              </VBox>
                            </children>
                         </VBox>
                      </children>
