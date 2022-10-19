@@ -32,11 +32,15 @@ public class Bill {
     private double distributionVat;
     private double DAAVat;
     private double acrmVat;
+    private double vat;
     private double otherVat;
     private double franchiseTax;
     private double businessTax;
     private double realPropertyTax;
     private double vatAndPassTax;
+    private double transformerRental;
+    private double otherCharges;
+    private double surchargeTax;
 
     public Bill(){}
 
@@ -284,67 +288,6 @@ public class Bill {
         this.vatAndPassTax = vatAndPassTax;
     }
 
-    public double computeSurCharge(double penalty) {
-        double amount = 0;
-        if (this.consumerType.equals("P") || this.consumerType.equals("S")) {
-            amount = 0;
-        }else {
-            //Check the number of days delayed from due date
-            if (this.getDaysDelayed() > 0) {
-                //Exemption of penalties due to Odette
-                if (this.getServicePeriodEnd().isEqual(LocalDate.of(2021, 12, 1))) {
-                    amount = 0;
-                //Penalty computation for Residential, BAPA, ECA
-                } else if (
-                        (this.consumerType.equals("RM") && (this.getServicePeriodEnd().isEqual(LocalDate.of(2014, 8, 1)) || this.getServicePeriodEnd().isAfter(LocalDate.of(2014, 8, 1)))
-                        || this.consumerType.equals("B")
-                        || this.consumerType.equals("E"))) {
-                    amount = penalty * 0.03;
-                    amount += (amount * 0.12);
-                //For Commercial Types
-                } else {
-                    //If CS with 1000kw below
-                    if ((this.consumerType.equals("CS") && this.powerKWH < 1000)
-                            && (this.getServicePeriodEnd().isEqual(LocalDate.of(2017, 4, 1)) || this.getServicePeriodEnd().isAfter(LocalDate.of(2017, 4, 1)) )) {
-                        amount = penalty * 0.03;
-                        amount += (amount * 0.12);
-                    //If I or CL or CS with 1000kwh and above
-                    }else if (this.consumerType.equals("CL")
-                            || this.consumerType.equals("I")
-                            || (this.consumerType.equals("CS") && this.powerKWH >= 1000)) {
-                        //No penalty if days delayed less than 6
-                        if (this.getDaysDelayed() < 6) {
-                            amount = 0;
-                        //5% penalty if 30 days and above
-                        } else if (this.getDaysDelayed() >= 30) {
-                            amount = penalty * 0.05;
-                            amount += (amount * 0.12);
-                        //3% penalty if 30 days below
-                        } else {
-                            amount = penalty * 0.03;
-                            amount += (amount * 0.12);
-                        }
-                    }
-                }
-                amount = Utility.round(amount, 2);
-            }
-        }
-        return amount;
-    }
-
-    public boolean equals(Object o){
-        if (o instanceof Bill){
-            Bill bill = (Bill) o;
-            if (bill.getBillNo().equals(this.getBillNo()))
-                return true;
-        }
-        return false;
-    }
-
-    public void setTotalAmount() {
-        this.totalAmount = Utility.round(this.getSurCharge() + this.getAmountDue() + this.getCh2306() + this.getCh2307(), 2);
-    }
-
     public double getAddCharges() {
         return addCharges;
     }
@@ -367,6 +310,104 @@ public class Bill {
 
     public void setMdRefund(double mdRefund) {
         this.mdRefund = mdRefund;
+    }
+
+    public double getSurChargeTax() {
+        return surchargeTax;
+    }
+
+    public void setSurChargeTax(double surchargeTax) {
+        this.surchargeTax = surchargeTax;
+    }
+
+    public double getTransformerRental() {
+        return transformerRental;
+    }
+
+    public void setTransformerRental(double transformerRental) {
+        this.transformerRental = transformerRental;
+    }
+
+    public double getOtherCharges() {
+        return otherCharges;
+    }
+
+    public void setOtherCharges(double otherCharges) {
+        this.otherCharges = otherCharges;
+    }
+
+    public double getVat() {
+        return vat;
+    }
+
+    public void setVat(double vat) {
+        this.vat = vat;
+    }
+
+    public void setTotalAmount(double amount){
+        this.totalAmount = amount;
+    }
+
+    public double computeSurCharge() {
+        double penalty = this.getAmountDue() - (this.getVatAndPassTax() + this.getTransformerRental() + this.getOtherCharges() + this.getAcrmVat() + this.getDAAVat());
+
+        double amount = 0;
+
+        if (this.consumerType.equals("P") || this.consumerType.equals("S")) {
+            amount = 0;
+        }else {
+            //Check the number of days delayed from due date
+            if (this.getDaysDelayed() > 0) {
+                //Exemption of penalties due to Odette
+                if (this.getServicePeriodEnd().isEqual(LocalDate.of(2021, 12, 1))) {
+                    amount = 0;
+                    //Penalty computation for Residential, BAPA, ECA
+                } else if (
+                        (this.consumerType.equals("RM") && (this.getServicePeriodEnd().isEqual(LocalDate.of(2014, 8, 1)) || this.getServicePeriodEnd().isAfter(LocalDate.of(2014, 8, 1)))
+                                || this.consumerType.equals("B")
+                                || this.consumerType.equals("E"))) {
+                    amount = penalty * 0.03;
+                    //For Commercial Types
+                } else {
+                    //If CS with 1000kw below
+                    if ((this.consumerType.equals("CS") && this.powerKWH < 1000)
+                            && (this.getServicePeriodEnd().isEqual(LocalDate.of(2017, 4, 1)) || this.getServicePeriodEnd().isAfter(LocalDate.of(2017, 4, 1)) )) {
+                        amount = penalty * 0.03;
+                        //If I or CL or CS with 1000kwh and above
+                    }else if (this.consumerType.equals("CL")
+                            || this.consumerType.equals("I")
+                            || (this.consumerType.equals("CS") && this.powerKWH >= 1000)) {
+                        //No penalty if days delayed less than 6
+                        if (this.getDaysDelayed() < 6) {
+                            amount = 0;
+                            //5% penalty if 30 days and above
+                        } else if (this.getDaysDelayed() >= 30) {
+                            amount = penalty * 0.05;
+                            //3% penalty if 30 days below
+                        } else {
+                            amount = penalty * 0.03;
+                        }
+                    }
+                }
+                amount = Utility.round(amount, 2);
+            }
+        }
+        return amount;
+    }
+
+    public boolean equals(Object o){
+        if (o instanceof Bill){
+            Bill bill = (Bill) o;
+            if (bill.getBillNo().equals(this.getBillNo()))
+                return true;
+        }
+        return false;
+    }
+
+    public void computeTotalAmount() {
+        double charges = this.getSurCharge() + this.getSurChargeTax() + this.getAmountDue();
+        double deductions = this.getDiscount() + this.getMdRefund() + this.getKatas() + this.getCh2306() + this.getCh2307() + this.getSlAdjustment() + this.getOtherAdjustment();
+        this.setTotalAmount(Utility.round(charges - deductions, 2));
     }
 }
 
