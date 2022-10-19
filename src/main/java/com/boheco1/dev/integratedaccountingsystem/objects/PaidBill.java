@@ -19,14 +19,16 @@ public class PaidBill extends Bill{
     private double SLAdjustment;
     private double OtherDeduction;
     private Date ORDate;
-    private double MDRefund;
-    private double Form2306;
-    private double Form2307;
     private double Amount2306;
     private double Amount2307;
     private double ServiceFee;
-    private double  Others1;
+    private double Others1;
     private double Others2;
+    private double cashAmount;
+    private double checkAmount;
+    private String bank;
+    private String checkNumber;
+    private Date checkExpiry;
 
     public PaidBill(){}
 
@@ -150,30 +152,6 @@ public class PaidBill extends Bill{
         this.ORDate = ORDate;
     }
 
-    public double getMDRefund() {
-        return MDRefund;
-    }
-
-    public void setMDRefund(double MDRefund) {
-        this.MDRefund = MDRefund;
-    }
-
-    public double getForm2306() {
-        return Form2306;
-    }
-
-    public void setForm2306(double form2306) {
-        Form2306 = form2306;
-    }
-
-    public double getForm2307() {
-        return Form2307;
-    }
-
-    public void setForm2307(double form2307) {
-        Form2307 = form2307;
-    }
-
     public double getAmount2306() {
         return Amount2306;
     }
@@ -212,5 +190,45 @@ public class PaidBill extends Bill{
 
     public void setOthers2(double others2) {
         Others2 = others2;
+    }
+
+    public double getCashAmount() {
+        return cashAmount;
+    }
+
+    public void setCashAmount(double cashAmount) {
+        this.cashAmount = cashAmount;
+    }
+
+    public double getCheckAmount() {
+        return checkAmount;
+    }
+
+    public void setCheckAmount(double checkAmount) {
+        this.checkAmount = checkAmount;
+    }
+
+    public String getBank() {
+        return bank;
+    }
+
+    public void setBank(String bank) {
+        this.bank = bank;
+    }
+
+    public String getCheckNumber() {
+        return checkNumber;
+    }
+
+    public void setCheckNumber(String checkNumber) {
+        this.checkNumber = checkNumber;
+    }
+
+    public Date getCheckExpiry() {
+        return checkExpiry;
+    }
+
+    public void setCheckExpiry(Date checkExpiry) {
+        this.checkExpiry = checkExpiry;
     }
 }

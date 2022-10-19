@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.Bill;
 import com.boheco1.dev.integratedaccountingsystem.objects.ConsumerInfo;
+import com.boheco1.dev.integratedaccountingsystem.objects.PaidBill;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -13,6 +14,77 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BillDAO {
+    /**
+     * Insert as PaidDetails
+     * @param bill The bill details
+     * @return void
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void addPaidBill(Bill bill) throws Exception{
+        String sql = " INSERT INTO PaidBills (" +
+                "AccountNumber, " +
+                "BillNumber, " +
+                "ServicePeriodEnd, " +
+                "Power, " +
+                "Meter, " +
+                "PR, " +
+                "Others, " +
+                "NetAmount, " +
+                "PaymentType, " +
+                "Teller, " +
+                "PromptPayment, " +
+                "Surcharge, " +
+                "SLAdjustment, " +
+                "OtherDeduction, " +
+                "MDRefund, " +
+                "Form2306, " +
+                "Form2307, " +
+                "Amount2306, " +
+                "Amount2307, " +
+                "ServiceFee, " +
+                "Others1, " +
+                "Others2, " +
+                "CashAmount, " +
+                "CheckAmount, " +
+                "Bank, " +
+                "CheckNumber, " +
+                "CheckExpiry) " +
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        PaidBill paid = (PaidBill) bill;
+        PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
+        ps.setString(1, bill.getConsumer().getAccountID());
+        ps.setString(2, bill.getBillNo());
+        ps.setDate(3, Date.valueOf(bill.getServicePeriodEnd()));
+        ps.setDouble(4, bill.getPowerAmount());
+        ps.setDouble(5, bill.getVatAndPassTax());
+        ps.setDouble(6, bill.getTransformerRental());
+        ps.setDouble(7, bill.getOtherCharges());
+        ps.setDouble(8, bill.getAmountDue());
+        ps.setString(9, paid.getPaymentType());
+        ps.setString(10, paid.getTeller());
+        ps.setDouble(11, bill.getDiscount());
+        ps.setDouble(12, bill.getSurCharge());
+        ps.setDouble(13, bill.getSlAdjustment());
+        ps.setDouble(14, bill.getOtherAdjustment());
+        ps.setDouble(15, bill.getMdRefund());
+        ps.setString(16, bill.getForm2306());
+        ps.setString(17, bill.getForm2307());
+        ps.setDouble(18, bill.getCh2306());
+        ps.setDouble(19, bill.getCh2307());
+        ps.setDouble(20, paid.getServiceFee());
+        ps.setDouble(21, paid.getOthers1());
+        ps.setDouble(22, paid.getOthers2());
+        ps.setDouble(23, paid.getCashAmount());
+        ps.setDouble(24, paid.getCheckAmount());
+        ps.setString(25, paid.getBank());
+        ps.setDouble(26, paid.getCheckAmount());
+        ps.setDate(27, paid.getCheckExpiry());
+
+        ps.executeUpdate();
+
+        ps.close();
+    }
+
     /**
      * Retrieves bills of customer based on Account Number (on Billing database)
      * @param consumerInfo The consumer account number
@@ -65,12 +137,14 @@ public class BillDAO {
                     "ISNULL(ACRM_TAFPPCA,0) AS ACRM_TAFPPCA, "+
                     "ISNULL(DAA_GRAM,0) AS DAA_GRAM "+
                     "FROM Bills WHERE BillNumber=? AND ServicePeriodEnd NOT IN (SELECT ServicePeriodEnd FROM PaidBills WHERE BillNumber=?) ORDER BY ServicePeriodEnd";
+
             PreparedStatement ps_charge = DB.getConnection("Billing").prepareStatement(charge);
 
             ps_charge.setString(1, billNo);
             ps_charge.setString(2, billNo);
 
             ResultSet rs2 = ps_charge.executeQuery();
+
             //Compute the surcharge
             while(rs2.next()) {
                 int daysDelayed = rs2.getInt("daysDelayed");

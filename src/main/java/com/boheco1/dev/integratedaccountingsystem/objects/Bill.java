@@ -41,6 +41,8 @@ public class Bill {
     private double transformerRental;
     private double otherCharges;
     private double surchargeTax;
+    private String Form2306;
+    private String Form2307;
 
     public Bill(){}
 
@@ -342,6 +344,22 @@ public class Bill {
 
     public void setVat(double vat) {
         this.vat = vat;
+    }
+
+    public String getForm2306() {
+        return Form2306;
+    }
+
+    public void setForm2306(String form2306) {
+        Form2306 = form2306;
+    }
+
+    public String getForm2307() {
+        return Form2307;
+    }
+
+    public void setForm2307(String form2307) {
+        Form2307 = form2307;
     }
 
     public void setTotalAmount(double amount){

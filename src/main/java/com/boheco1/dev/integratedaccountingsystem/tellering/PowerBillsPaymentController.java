@@ -6,12 +6,9 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -183,6 +180,8 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             itemRemoveBill.setOnAction(actionEvent -> {
                 this.fees_table.getItems().remove(row.getItem());
                 tv.refresh();
+                this.setPayables();
+                this.resetBillInfo();
             });
 
             MenuItem itemAddPPD = new MenuItem("Less PPD");
@@ -253,6 +252,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             item2306.setOnAction(actionEvent -> {
                 if (row.getItem().getConsumerType().equals("RM") || row.getItem().getConsumerType().equals("B") || row.getItem().getConsumerType().equals("E")) return;
                 try {
+                    this.showTIN(row.getItem(), "2306");
                     row.getItem().setCh2306(BillDAO.getForm2306(row.getItem()));
                     row.getItem().computeTotalAmount();
                     tv.refresh();
@@ -267,6 +267,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             item2307.setOnAction(event -> {
                 if (row.getItem().getConsumerType().equals("RM") || row.getItem().getConsumerType().equals("B") || row.getItem().getConsumerType().equals("E")) return;
                 try {
+                    this.showTIN(row.getItem(), "2307");
                     row.getItem().setCh2307(BillDAO.getForm2307(row.getItem()));
                     row.getItem().computeTotalAmount();
                     tv.refresh();
@@ -796,6 +797,34 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }
                 dialog.close();
+        });
+        dialog.show();
+    }
+
+    /**
+     * Displays TIN UI
+     * @return void
+     */
+    public void showTIN(Bill bill, String type){
+        JFXButton accept = new JFXButton("SAVE TIN");
+        JFXTextField input = new JFXTextField();
+        JFXDialog dialog = DialogBuilder.showInputDialog("TIN Entry for "+type,"Enter TIN:  ", "", input, accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+        accept.setOnAction(action -> {
+            try {
+                if (input.getText().length() == 0) {
+                    AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter TIN!",
+                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }else {
+                    if (type.equals("2306")){
+                        bill.setForm2306(input.getText());
+                    }else{
+                        bill.setForm2307(input.getText());
+                    }
+                }
+            } catch (Exception e) {
+                AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            }
+            dialog.close();
         });
         dialog.show();
     }
