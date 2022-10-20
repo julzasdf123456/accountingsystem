@@ -17,6 +17,7 @@ import java.math.RoundingMode;
 import java.util.*;
 
 public class Utility {
+    public static boolean TOGGLE_SEARCH = true;
     public static String NOT_FOUND = "NOT FOUND";
     public static String ADDED = "ADDED";
     public static String OUT_OF_STOCK = "OUT OF STOCK";
@@ -201,8 +202,8 @@ public class Utility {
 
     public static String formatDecimal(double val){
         if(val%1 == 0)
-            return String.format("%.0f",val);
-        return String.format("%.2f",val);
+            return String.format("%,.0f",val);
+        return String.format("%,.2f",val);
     }
 
 }

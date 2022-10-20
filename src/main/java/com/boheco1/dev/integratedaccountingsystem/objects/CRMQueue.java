@@ -1,5 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+
 public class CRMQueue {
     String id;
     String consumerName;

@@ -2,8 +2,8 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -50,7 +50,7 @@
                                         <Insets top="8.0" />
                                     </padding>
                                 </HBox>
-                                <TableView fx:id="consumersTable" prefHeight="394.0" prefWidth="800.0">
+                                <TableView fx:id="searchResultTable" prefHeight="394.0" prefWidth="800.0">
                                     <VBox.margin>
                                         <Insets />
                                     </VBox.margin>
@@ -62,13 +62,9 @@
                         </VBox>
                     </center>
                     <top>
-                        <HBox prefHeight="20.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+                        <HBox prefHeight="36.0" prefWidth="800.0" BorderPane.alignment="CENTER">
                             <children>
-                                <Label styleClass="bold" text="Search Consumer">
-                                    <HBox.margin>
-                                        <Insets bottom="8.0" />
-                                    </HBox.margin>
-                                </Label>
+                        <JFXToggleButton fx:id="toggleSearch" alignment="CENTER_LEFT" onAction="#toggleSearch" prefHeight="62.0" prefWidth="275.0" style="-fx-font-weight: bold; -fx-font-size: 18;" text="Search Consumer" />
                             </children>
                         </HBox>
                     </top>
