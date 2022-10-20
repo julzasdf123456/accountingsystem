@@ -1,7 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.tellering;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
-import com.boheco1.dev.integratedaccountingsystem.helpers.InputValidation;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.objects.Check;
 import com.jfoenix.controls.JFXButton;

@@ -4,6 +4,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -12,7 +13,7 @@
 
 <AnchorPane prefHeight="710.0" prefWidth="989.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.CashierController">
    <children>
-      <VBox fx:id="anchorpane" alignment="TOP_RIGHT" layoutX="28.0" layoutY="28.0" prefHeight="605.0" prefWidth="512.0" AnchorPane.leftAnchor="28.0" AnchorPane.topAnchor="28.0">
+      <VBox fx:id="anchorpane" alignment="TOP_RIGHT" layoutX="28.0" layoutY="28.0" prefHeight="669.0" prefWidth="512.0" AnchorPane.leftAnchor="28.0" AnchorPane.topAnchor="28.0">
          <children>
             <VBox prefHeight="105.0" prefWidth="512.0">
                <children>
@@ -40,9 +41,26 @@
                            </cursor>
                         </JFXButton>
                      </children>
+                     <VBox.margin>
+                        <Insets bottom="15.0" />
+                     </VBox.margin>
                   </HBox>
-                  <Label fx:id="consumer" maxWidth="1.7976931348623157E308" style="-fx-font-size: 24; -fx-font-weight: bold;" text="Juan Ddela Cruz" />
-                  <Label fx:id="address" maxWidth="1.7976931348623157E308" text="Address" />
+                  <Label maxWidth="1.7976931348623157E308" prefHeight="36.0" prefWidth="512.0" style="-fx-font-size: 14;" text="Name" />
+                  <Separator prefWidth="200.0" />
+                  <Label fx:id="name" maxWidth="1.7976931348623157E308" style="-fx-font-size: 24; -fx-font-weight: bold;" text="-" />
+                  <Label maxWidth="1.7976931348623157E308" text="Address">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin></Label>
+                  <Separator prefWidth="200.0" />
+                  <Label fx:id="address" maxWidth="1.7976931348623157E308" style="-fx-font-weight: bold;" text="-" />
+                  <Label maxWidth="1.7976931348623157E308" text="Purpose">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Separator prefWidth="200.0" />
+                  <Label fx:id="purpose" maxWidth="1.7976931348623157E308" style="-fx-font-weight: bold;" text="-" />
                </children>
             </VBox>
             <TableView fx:id="paymentTable" prefHeight="401.0" prefWidth="512.0" VBox.vgrow="ALWAYS">
@@ -52,6 +70,9 @@
                <cursor>
                   <Cursor fx:constant="DEFAULT" />
                </cursor>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
             </TableView>
             <Label fx:id="payable" prefHeight="44.0" prefWidth="222.0" style="-fx-font-size: 20; -fx-font-weight: bold;" styleClass="context-menu" text="Total: 0.00" />
          </children>

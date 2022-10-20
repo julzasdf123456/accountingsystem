@@ -17,6 +17,11 @@ import java.math.RoundingMode;
 import java.util.*;
 
 public class Utility {
+    public static boolean TOGGLE_SEARCH = true;
+    public static String NOT_FOUND = "NOT FOUND";
+    public static String ADDED = "ADDED";
+    public static String OUT_OF_STOCK = "OUT OF STOCK";
+    public static String INSUFFICIENT_STOCK = "INSUFFICIENT STOCK";
     public static double TAX = 12;
     public static String STATION = "main"; //main or sub
     public static String OFFICE_PREFIX = "OSD";
@@ -194,4 +199,11 @@ public class Utility {
 
         return WordUtils.capitalizeFully(words.toString(), new char[]{' ','_'});
     }
+
+    public static String formatDecimal(double val){
+        if(val%1 == 0)
+            return String.format("%,.0f",val);
+        return String.format("%,.2f",val);
+    }
+
 }

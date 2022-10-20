@@ -37,10 +37,11 @@ public class Bill {
     private double franchiseTax;
     private double businessTax;
     private double realPropertyTax;
-    private double vatAndPassTax;
     private double transformerRental;
     private double otherCharges;
     private double surchargeTax;
+    private String Form2306;
+    private String Form2307;
 
     public Bill(){}
 
@@ -280,14 +281,6 @@ public class Bill {
         this.realPropertyTax = realPropertyTax;
     }
 
-    public double getVatAndPassTax() {
-        return vatAndPassTax;
-    }
-
-    public void setVatAndPassTax(double vatAndPassTax) {
-        this.vatAndPassTax = vatAndPassTax;
-    }
-
     public double getAddCharges() {
         return addCharges;
     }
@@ -344,12 +337,28 @@ public class Bill {
         this.vat = vat;
     }
 
+    public String getForm2306() {
+        return Form2306;
+    }
+
+    public void setForm2306(String form2306) {
+        Form2306 = form2306;
+    }
+
+    public String getForm2307() {
+        return Form2307;
+    }
+
+    public void setForm2307(String form2307) {
+        Form2307 = form2307;
+    }
+
     public void setTotalAmount(double amount){
         this.totalAmount = amount;
     }
 
     public double computeSurCharge() {
-        double penalty = this.getAmountDue() - (this.getVatAndPassTax() + this.getTransformerRental() + this.getOtherCharges() + this.getAcrmVat() + this.getDAAVat());
+        double penalty = this.getAmountDue() - (this.getVat() + this.getTransformerRental() + this.getOtherCharges() + this.getAcrmVat() + this.getDAAVat());
 
         double amount = 0;
 
@@ -389,7 +398,6 @@ public class Bill {
                         }
                     }
                 }
-                amount = Utility.round(amount, 2);
             }
         }
         return amount;
@@ -407,7 +415,7 @@ public class Bill {
     public void computeTotalAmount() {
         double charges = this.getSurCharge() + this.getSurChargeTax() + this.getAmountDue();
         double deductions = this.getDiscount() + this.getMdRefund() + this.getKatas() + this.getCh2306() + this.getCh2307() + this.getSlAdjustment() + this.getOtherAdjustment();
-        this.setTotalAmount(Utility.round(charges - deductions, 2));
+        this.setTotalAmount(charges - deductions);
     }
 }
 

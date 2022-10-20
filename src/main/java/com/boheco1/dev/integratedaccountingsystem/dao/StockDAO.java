@@ -176,7 +176,7 @@ public class StockDAO {
                     rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
                     rs.getString("TypeID"),
                     rs.getString("Unit"),
-                    rs.getInt("Quantity"),
+                    rs.getDouble("Quantity"),
                     rs.getInt("Critical"),
                     rs.getDouble("Price"),
                     rs.getString("NEACode"),
@@ -388,12 +388,12 @@ public class StockDAO {
         //create a Stock History if price was updated.
         if (oldStock.getPrice() != stock.getPrice()) {
             StockHistoryDAO.create(new StockHistory(
-                                Utility.generateRandomId(),
-                                stock.getId(),
-                                LocalDate.now().minusDays(1),
-                                oldStock.getPrice(),
-                                ActiveUser.getUser().getId()
-                        ));
+                    Utility.generateRandomId(),
+                    stock.getId(),
+                    LocalDate.now().minusDays(1),
+                    oldStock.getPrice(),
+                    ActiveUser.getUser().getId()
+            ));
         }
         ps.close();
     }
@@ -1513,7 +1513,7 @@ public class StockDAO {
      * @return
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static int countPendingRequest(Stock stock) throws Exception {
+    public static double countPendingRequest(Stock stock) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT SUM(mi.Quantity) AS 'pending' FROM MIRSItems mi " +
                         "LEFT JOIN MIRS m ON m.id = mi.MIRSID LEFT JOIN Stocks s ON s.id = mi.StockID " +
@@ -1521,17 +1521,17 @@ public class StockDAO {
         ps.setString(1, stock.getDescription());
         ResultSet rs = ps.executeQuery();
 
-        int count = 0;
+        double count = 0;
 
         if(rs.next()) {
-            count = rs.getInt("pending");
+            count = rs.getDouble("pending");
         }
 
-        int unavailable = StockDAO.countReleasingUnavailable(stock);
+        double unavailable = StockDAO.countReleasingUnavailable(stock);
         return count-unavailable;
     }
 
-    public static int countReleasingUnavailable(Stock stock) throws Exception {
+    public static double countReleasingUnavailable(Stock stock) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement("SELECT SUM(r.Quantity) AS 'unavailable' FROM Releasing r INNER JOIN Stocks s ON s.id=r.StockID " +
                 "WHERE r.MIRSID IN (SELECT m.id FROM MIRS m WHERE m.Status='"+Utility.RELEASING+"') " +
                 "AND s.Description=?");
@@ -1540,17 +1540,17 @@ public class StockDAO {
 
         ResultSet rs = ps.executeQuery();
 
-        int count = 0;
+        double count = 0;
 
         if(rs.next()) {
-            count = rs.getInt("unavailable");
+            count = rs.getDouble("unavailable");
         }
 
         return count;
     }
 
     public static double countAvailable(Stock stock) throws Exception {
-        int pending = countPendingRequest(stock);
+        double pending = countPendingRequest(stock);
 
         return stock.getQuantity()-pending;
     }

@@ -15,15 +15,15 @@
 
 <StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.tellering.SearchConsumerController">
    <children>
-      <AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="450.0" prefWidth="800.0" style="-fx-background-color: white;" stylesheets="@../style.css">
+      <AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="450.0" prefWidth="976.0" style="-fx-background-color: white;" stylesheets="@../style.css">
          <children>
-            <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="450.0" prefWidth="800.0">
+            <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="450.0" prefWidth="976.0">
                <center>
-                  <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="450.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+                  <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="450.0" prefWidth="976.0" BorderPane.alignment="CENTER">
                      <children>
                         <HBox prefHeight="59.0" prefWidth="800.0">
                            <children>
-                              <JFXTextField fx:id="query_tf" focusColor="#00ad8e" labelFloat="true" onAction="#search" prefHeight="37.0" prefWidth="824.0" promptText="Last Name/First Name/Address" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="query_tf" focusColor="#00ad8e" labelFloat="true" onAction="#search" prefHeight="37.0" prefWidth="100.0" promptText="Last Name/First Name/Address" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5" HBox.hgrow="ALWAYS">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -31,7 +31,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXButton buttonType="RAISED" onAction="#search" prefHeight="30.0" prefWidth="246.0" styleClass="btn-theme" text="Search" textFill="WHITE">
+                              <JFXButton buttonType="RAISED" onAction="#search" prefHeight="30.0" prefWidth="125.0" styleClass="btn-theme" text="Search" textFill="WHITE">
                                  <effect>
                                     <DropShadow />
                                  </effect>
@@ -39,7 +39,7 @@
                                     <Font name="System Bold" size="14.0" />
                                  </font>
                                  <HBox.margin>
-                                    <Insets left="16.0" />
+                                    <Insets />
                                  </HBox.margin>
                               </JFXButton>
                            </children>
@@ -59,7 +59,7 @@
                   </VBox>
                </center>
                <top>
-                  <HBox prefHeight="20.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+                  <HBox prefHeight="20.0" prefWidth="976.0" BorderPane.alignment="CENTER">
                      <children>
                         <Label styleClass="bold" text="Consumer Advance Search">
                            <HBox.margin>
