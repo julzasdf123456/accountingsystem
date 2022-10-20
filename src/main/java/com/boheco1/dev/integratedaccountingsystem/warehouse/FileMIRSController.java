@@ -285,13 +285,8 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                                 //messageLog += "INSUFFICIENT STOCK: "+ stock.getDescription().substring(0,30) + " ("+ code +"), adding stock on-hand.\n";
                                                 //add to table the available stock
                                                 double lacking = qty - availableStock;
-                                                String l = "";
-                                                if(lacking%1==0){
-                                                    l = String.format("%.2f",lacking);
-                                                }else{
-                                                    l = ""+lacking;
-                                                }
-                                                addItem(stock, availableStock, true,Utility.INSUFFICIENT_STOCK + " ("+ l +")" );
+
+                                                addItem(stock, availableStock, true,Utility.INSUFFICIENT_STOCK + " ("+ Utility.formatDecimal(lacking) +")" );
                                                 //keep a copy of item added to table using the stocks available
                                                 //forQtyUpdate.put(stock.getId(), StockDAO.countAvailable(stock));
                                             }else{
