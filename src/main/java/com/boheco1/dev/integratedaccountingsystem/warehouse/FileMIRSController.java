@@ -270,7 +270,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                         temp.setId("temp_"+Utility.generateRandomId()); //assign temporary id, will not be save in the database
                                         temp.setDescription(currentItem);
                                         temp.setQuantity(0);
-                                        addItem(temp, -1, true, Utility.NOT_FOUND);
+                                        addItem(temp, temp.getQuantity(), true, Utility.NOT_FOUND);
                                         //messageLog += "CANNOT FIND: "+currentItem + " ("+ code +").\n";
                                     }else{
                                         double availableStock = StockDAO.countAvailable(stock);
@@ -278,7 +278,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
                                         if (stock.getQuantity() == 0.0) {
                                             //messageLog += "OUT OF STOCK: "+stock.getDescription() + " ("+ code +").\n";
-                                            addItem(stock, -1, true,Utility.OUT_OF_STOCK);
+                                            addItem(stock, qty * -1, true,Utility.OUT_OF_STOCK);
                                         } else {
                                             //check if Insufficient stock
                                             if(qty > stock.getQuantity()){
@@ -598,8 +598,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                             return;
                                         }
                                     });
-                                    if (mirsItem.getRemarks().equals(Utility.OUT_OF_STOCK) || mirsItem.getRemarks().equals(Utility.NOT_FOUND))
-                                        btn.setVisible(false);
+                                    btn.setVisible(!mirsItem.getRemarks().equals(Utility.OUT_OF_STOCK) && !mirsItem.getRemarks().equals(Utility.NOT_FOUND));
                                     setGraphic(btn);
                                     setText(null);
 
