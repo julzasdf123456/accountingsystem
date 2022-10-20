@@ -18,10 +18,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -29,6 +26,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.util.Callback;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -130,7 +128,32 @@ public class MIRSApprovalController implements Initializable {
         quantityCol.setPrefWidth(100);
         quantityCol.setMaxWidth(100);
         quantityCol.setMinWidth(100);
-        quantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
+        //quantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
+        Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> qtycellFactory
+                = //
+                new Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>>() {
+                    @Override
+                    public TableCell call(final TableColumn<MIRSItem, String> param) {
+                        final TableCell<MIRSItem, String> cell = new TableCell<MIRSItem, String>() {
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    MIRSItem mirsItem = getTableView().getItems().get(getIndex());
+                                    // System.out.println(mirsItem.getQuantity());
+                                    setGraphic(null);
+                                    setText(Utility.formatDecimal(mirsItem.getQuantity()));
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+
+        quantityCol.setCellFactory(qtycellFactory);
 
         //mirsItemTable.getColumns().add(neaCodeCol);
         mirsItemTable.getColumns().add(descriptionCol);

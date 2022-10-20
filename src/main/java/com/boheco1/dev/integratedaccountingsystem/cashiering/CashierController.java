@@ -5,6 +5,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ModalBuilderForWareHouse;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ObjectTransaction;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.objects.CRMQueue;
 import com.boheco1.dev.integratedaccountingsystem.objects.ConsumerInfo;
 import com.boheco1.dev.integratedaccountingsystem.tellering.PowerBillsPaymentController;
 import com.jfoenix.controls.JFXButton;
@@ -33,8 +34,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private TableView paymentTable;
 
 
-    private ConsumerInfo consumerInfo = null;
-
+    private CRMQueue consumerInfo = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -48,13 +48,13 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     @FXML
     private void search(ActionEvent event) {
-        ModalBuilderForWareHouse.showModalFromXMLNoClose(CashierController.class, "../tellering/tellering_search_consumer.fxml", Utility.getStackPane());
+        ModalBuilderForWareHouse.showModalFromXMLNoClose(CashierController.class, "../cashiering/cashiering_search_consumer.fxml", Utility.getStackPane());
     }
 
     @Override
     public void receive(Object o) {
-        if (o instanceof ConsumerInfo) {
-            this.consumerInfo = (ConsumerInfo) o;
+        if (o instanceof CRMQueue) {
+            this.consumerInfo = (CRMQueue) o;
             this.consumer.setText(consumerInfo.getConsumerName());
             this.address.setText(consumerInfo.getConsumerAddress());
         }

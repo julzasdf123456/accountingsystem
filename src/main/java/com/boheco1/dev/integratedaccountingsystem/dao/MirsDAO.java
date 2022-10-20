@@ -234,7 +234,7 @@ public class MirsDAO {
                     rs.getString("id"),
                     rs.getString("MIRSID"),
                     rs.getString("StockID"),
-                    rs.getInt("Quantity"),
+                    rs.getDouble("Quantity"),
                     rs.getDouble("Price"),
                     rs.getString("Comments"),
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
@@ -644,20 +644,20 @@ public class MirsDAO {
 
         while(rs.next()) {
             mirs.add(
-                new MIRS(
-                        rs.getString("id"),
-                        rs.getDate("DateFiled").toLocalDate(),
-                        rs.getString("Purpose"),
-                        rs.getString("Details"),
-                        rs.getString("Status"),
-                        rs.getString("RequisitionerID"),
-                        rs.getString("UserID"),
-                        rs.getTimestamp("CreatedAt").toLocalDateTime(),
-                        rs.getTimestamp("UpdatedAt").toLocalDateTime(),
-                        rs.getString("address"),
-                        rs.getString("applicant"),
-                        rs.getString("WorkOrderNo")
-                )
+                    new MIRS(
+                            rs.getString("id"),
+                            rs.getDate("DateFiled").toLocalDate(),
+                            rs.getString("Purpose"),
+                            rs.getString("Details"),
+                            rs.getString("Status"),
+                            rs.getString("RequisitionerID"),
+                            rs.getString("UserID"),
+                            rs.getTimestamp("CreatedAt").toLocalDateTime(),
+                            rs.getTimestamp("UpdatedAt").toLocalDateTime(),
+                            rs.getString("address"),
+                            rs.getString("applicant"),
+                            rs.getString("WorkOrderNo")
+                    )
             );
         }
         return mirs;
@@ -731,10 +731,10 @@ public class MirsDAO {
 
     public static double getBalance(MIRSItem item) throws Exception {
         //PreparedStatement ps = DB.getConnection().prepareStatement(
-         //       "SELECT SUM(Quantity) FROM Releasing r WHERE r.StockID = ? AND MIRSID = ?;");
+        //       "SELECT SUM(Quantity) FROM Releasing r WHERE r.StockID = ? AND MIRSID = ?;");
 
         PreparedStatement ps = DB.getConnection().prepareStatement( "" +
-                        "SELECT SUM(r.Quantity) FROM Releasing r inner join Stocks s ON r.StockID = s.id WHERE s.Description = ?;");
+                "SELECT SUM(r.Quantity) FROM Releasing r inner join Stocks s ON r.StockID = s.id WHERE s.Description = ?;");
 
         ps.setString(1, StockDAO.get(item.getStockID()).getDescription());
         //ps.setString(2, item.getMirsID());
@@ -885,16 +885,16 @@ public class MirsDAO {
 
         String query = "";
         query +="INSERT INTO MIRS (DateFiled, Purpose, Details, Status, RequisitionerID, UserID, id, CreatedAt, UpdatedAt, address, applicant) " +
-                        "VALUES " +
-                        "('"+Date.valueOf(mirs.getDateFiled())+"'," +
-                        "'"+mirs.getPurpose()+"'," +
-                        "'"+mirs.getDetails()+"'," +
-                        "'"+mirs.getStatus()+"'," +
-                        "'"+mirs.getRequisitionerID()+"'," +
-                        "'"+mirs.getUserID()+"'," +
-                        "'"+mirsId+"',GETDATE(), GETDATE()," +
-                        "'"+mirs.getAddress()+"'," +
-                        "'"+mirs.getApplicant()+"');\n";
+                "VALUES " +
+                "('"+Date.valueOf(mirs.getDateFiled())+"'," +
+                "'"+mirs.getPurpose()+"'," +
+                "'"+mirs.getDetails()+"'," +
+                "'"+mirs.getStatus()+"'," +
+                "'"+mirs.getRequisitionerID()+"'," +
+                "'"+mirs.getUserID()+"'," +
+                "'"+mirsId+"',GETDATE(), GETDATE()," +
+                "'"+mirs.getAddress()+"'," +
+                "'"+mirs.getApplicant()+"');\n";
 
         for(MIRSItem item : mirsItems){
             if(item.getQuantity() > 0){
@@ -1019,7 +1019,7 @@ public class MirsDAO {
         String query = "";
         for (ItemizedMirsItem i : list){
             query+="INSERT INTO itemizedMirsItem (id, MIRSItemID, brand, serial, remarks) " +
-                        "VALUES ('"+i.getId()+"','"+i.getMirsItemID()+"','"+i.getBrand()+"','"+i.getSerial()+"','"+i.getRemarks()+"');\n";
+                    "VALUES ('"+i.getId()+"','"+i.getMirsItemID()+"','"+i.getBrand()+"','"+i.getSerial()+"','"+i.getRemarks()+"');\n";
         }
 
         System.out.println(query);

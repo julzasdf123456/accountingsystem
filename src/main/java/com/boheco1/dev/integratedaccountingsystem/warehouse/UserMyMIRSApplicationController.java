@@ -43,7 +43,7 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
     @FXML
     private TableView<MIRSItem> mirsItemTable;
 
-     private Stock stockToBeAdded = null;
+    private Stock stockToBeAdded = null;
     private EmployeeInfo preparedEmployeeInfo = null;
     private EmployeeInfo checkedEmployeeInfo = null;
     private EmployeeInfo approvedEmployeeInfo = null;
@@ -302,6 +302,7 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
         });
 
         TableColumn<MIRSItem, String> quantityCol = new TableColumn<>("Qty");
+        quantityCol.setStyle("-fx-alignment: center;");
         quantityCol.setPrefWidth(100);
         quantityCol.setMaxWidth(100);
         quantityCol.setMinWidth(100);
@@ -320,13 +321,8 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
                                     setText(null);
                                 } else {
                                     MIRSItem mirsItem = getTableView().getItems().get(getIndex());
-
                                     setGraphic(null);
-                                    double req = mirsItem.getQuantity();
-                                    if(req%1 == 0)
-                                        setText(""+(int) req);
-                                    else
-                                        setText(""+req);
+                                    setText(Utility.formatDecimal(mirsItem.getQuantity()));
                                 }
                             }
                         };
@@ -530,9 +526,9 @@ public class UserMyMIRSApplicationController extends MenuControllerHandler imple
 
                     quantity.requestFocus();
 
-                    inStock.setText("In Stock: "+ stockToBeAdded.getQuantity());
-                    pending.setText("Pending: "+ StockDAO.countPendingRequest(stockToBeAdded));
-                    available.setText("Available: "+ av);
+                    inStock.setText("In Stock: "+ Utility.formatDecimal(stockToBeAdded.getQuantity()));
+                    pending.setText("Pending: "+ Utility.formatDecimal(StockDAO.countPendingRequest(stockToBeAdded)));
+                    available.setText("Available: "+ Utility.formatDecimal(av));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
