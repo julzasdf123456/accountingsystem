@@ -57,6 +57,7 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
      */
     @FXML
     public void confirm(){
+
     }
 
     public void setFigures(){
@@ -100,4 +101,10 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
         this.total_amount_due_tf.setText(Utility.formatDecimal(this.amount_due));
         this.change_tf.setText(Utility.formatDecimal(this.change));
     }
+
+    public JFXButton getConfirm_btn() {
+        return confirm_btn;
+    }
+
+    public TextField getCash_tf(){return cash_tf;}
 }

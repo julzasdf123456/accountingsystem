@@ -2,14 +2,14 @@ package com.boheco1.dev.integratedaccountingsystem.objects;
 
 public class Check {
     private String bank;
-    private String check_no;
+    private String checkNo;
     private double amount;
 
     public Check() {}
 
     public Check(String bank, String check, double amount) {
         this.bank = bank;
-        this.check_no = check;
+        this.checkNo = check;
         this.amount = amount;
     }
 
@@ -29,7 +29,15 @@ public class Check {
         this.amount = amount;
     }
 
+    public String getCheckNo() {
+        return checkNo;
+    }
+
+    public void setCheckNo(String checkno) {
+        this.checkNo = checkno;
+    }
+
     public String toString(){
-        return this.bank+", check no: "+this.check_no+", ₱ "+this.amount;
+        return this.bank+", check no: "+this.checkNo+", ₱ "+this.amount;
     }
 }

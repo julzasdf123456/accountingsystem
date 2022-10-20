@@ -77,12 +77,12 @@ public class SearchConsumerController extends MenuControllerHandler implements I
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<ConsumerInfo, String> column2 = new TableColumn<>("Consumer Name");
-        column2.setMinWidth(175);
+        column2.setMinWidth(265);
         column2.setCellValueFactory(new PropertyValueFactory<>("consumerName"));
         column2.setStyle("-fx-alignment: center-left;");
 
         TableColumn<ConsumerInfo, String> column3 = new TableColumn<>("Address");
-        column3.setMinWidth(250);
+        column3.setMinWidth(336);
         column3.setCellValueFactory(new PropertyValueFactory<>("consumerAddress"));
         column3.setStyle("-fx-alignment: center-left;");
 

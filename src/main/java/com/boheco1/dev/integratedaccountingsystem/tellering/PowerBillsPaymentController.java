@@ -16,6 +16,7 @@ import javafx.fxml.Initializable;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -353,20 +354,21 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
     public void confirmPayment(){
         try {
-            double totalBills = this.computeTotalBills();
-            double totalPayments = this.computeTotalPayments();
+            double totalBills = Utility.round(this.computeTotalBills(),2);
+            double totalPayments = Utility.round(this.computeTotalPayments(),2);
             if (totalPayments < totalBills){
                 AlertDialogBuilder.messgeDialog("Partial Payment Warning", "The total payment does not exceed the total amount due! Please check the amount!",
                         Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }else {
                 this.showConfirmation(
                         this.bills,
-                        Double.parseDouble(this.total_payable_lbl.getText()),
-                        Double.parseDouble(this.payment_tf.getText()),
+                        Double.parseDouble(this.total_payable_lbl.getText().replace(",","")),
+                        Double.parseDouble(this.payment_tf.getText().replace(",","")),
                         this.checks);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            AlertDialogBuilder.messgeDialog("System Error", e.getMessage(),
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }
     }
     /**
@@ -433,6 +435,10 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
      */
     @FXML
     public void reset(ActionEvent event) {
+        this.reset();
+    }
+
+    public void reset(){
         consumerInfo = null;
         this.con_name_tf.setText("");
         this.con_addr_tf.setText("");
@@ -689,7 +695,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     this.checks = FXCollections.observableArrayList();
                 this.checks.add(check);
                 this.checks_lv.setItems(this.checks);
-                double amount = Double.parseDouble(this.total_paid_tf.getText());
+                double amount = Double.parseDouble(this.total_paid_tf.getText().replace(",",""));
                 this.total_paid_tf.setText((amount+check.getAmount())+"");
             }
         });
@@ -763,6 +769,26 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
         PaymentConfirmationController controller = fxmlLoader.getController();
         controller.setPayments(bills, amount_due, cash, checks);
+        controller.getConfirm_btn().setOnAction(action ->{
+            for (Bill b: bills){
+                try {
+                    PaidBill paidBill = (PaidBill) b;
+                    paidBill.setTeller(ActiveUser.getUser().getUserName());
+                    paidBill.setChecks(checks);
+                    //double cash_amount = Double.parseDouble(controller.getCash_tf().getText().replace(",",""));
+                    double check_amount = computeChecks();
+                    paidBill.setCashAmount(amount_due - check_amount);
+                    paidBill.setCheckAmount(check_amount);
+                    BillDAO.addPaidBill(b);
+                    this.reset();
+                    dialog.close();
+                } catch (SQLException ex){
+                    AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + ex.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                } catch (Exception e) {
+                    AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }
+            }
+        });
         dialog.show();
     }
 

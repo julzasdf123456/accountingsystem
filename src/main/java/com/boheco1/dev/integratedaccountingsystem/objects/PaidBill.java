@@ -1,6 +1,8 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 import java.sql.Date;
+import java.time.LocalDate;
+import java.util.List;
 
 public class PaidBill extends Bill{
 
@@ -23,11 +25,13 @@ public class PaidBill extends Bill{
     private double Amount2307;
     private double cashAmount;
     private double checkAmount;
-    private String bank;
-    private String checkNumber;
-    private Date checkExpiry;
+    private List<Check> checks;
 
     public PaidBill(){}
+
+    public PaidBill(String billNo, LocalDate from, LocalDate to, LocalDate dueDate, double amountDue){
+        super(billNo, from, to, dueDate, amountDue);
+    }
 
     public double getPower() {
         return power;
@@ -181,27 +185,11 @@ public class PaidBill extends Bill{
         this.checkAmount = checkAmount;
     }
 
-    public String getBank() {
-        return bank;
+    public List<Check> getChecks() {
+        return checks;
     }
 
-    public void setBank(String bank) {
-        this.bank = bank;
-    }
-
-    public String getCheckNumber() {
-        return checkNumber;
-    }
-
-    public void setCheckNumber(String checkNumber) {
-        this.checkNumber = checkNumber;
-    }
-
-    public Date getCheckExpiry() {
-        return checkExpiry;
-    }
-
-    public void setCheckExpiry(Date checkExpiry) {
-        this.checkExpiry = checkExpiry;
+    public void setChecks(List<Check> checks) {
+        this.checks = checks;
     }
 }
