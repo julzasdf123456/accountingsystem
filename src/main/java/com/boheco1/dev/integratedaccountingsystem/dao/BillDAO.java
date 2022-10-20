@@ -41,25 +41,22 @@ public class BillDAO {
                 "Form2307, " +
                 "Amount2306, " +
                 "Amount2307, " +
-                "ServiceFee, " +
-                "Others1, " +
-                "Others2, " +
                 "CashAmount, " +
                 "CheckAmount, " +
                 "Bank, " +
                 "CheckNumber, " +
                 "CheckExpiry) " +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         PaidBill paid = (PaidBill) bill;
         PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
         ps.setString(1, bill.getConsumer().getAccountID());
         ps.setString(2, bill.getBillNo());
         ps.setDate(3, Date.valueOf(bill.getServicePeriodEnd()));
         ps.setDouble(4, bill.getPowerAmount());
-        ps.setDouble(5, bill.getVatAndPassTax());
+        ps.setDouble(5, bill.getVat());
         ps.setDouble(6, bill.getTransformerRental());
         ps.setDouble(7, bill.getOtherCharges());
-        ps.setDouble(8, bill.getAmountDue());
+        ps.setDouble(8, bill.getTotalAmount());
         ps.setString(9, paid.getPaymentType());
         ps.setString(10, paid.getTeller());
         ps.setDouble(11, bill.getDiscount());
@@ -71,14 +68,11 @@ public class BillDAO {
         ps.setString(17, bill.getForm2307());
         ps.setDouble(18, bill.getCh2306());
         ps.setDouble(19, bill.getCh2307());
-        ps.setDouble(20, paid.getServiceFee());
-        ps.setDouble(21, paid.getOthers1());
-        ps.setDouble(22, paid.getOthers2());
-        ps.setDouble(23, paid.getCashAmount());
-        ps.setDouble(24, paid.getCheckAmount());
-        ps.setString(25, paid.getBank());
-        ps.setDouble(26, paid.getCheckAmount());
-        ps.setDate(27, paid.getCheckExpiry());
+        ps.setDouble(20, paid.getCashAmount());
+        ps.setDouble(21, paid.getCheckAmount());
+        ps.setString(22, paid.getBank());
+        ps.setDouble(23, paid.getCheckAmount());
+        ps.setDate(24, paid.getCheckExpiry());
 
         ps.executeUpdate();
 
@@ -93,7 +87,16 @@ public class BillDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static List<Bill> getConsumerBills(ConsumerInfo consumerInfo, boolean paid) throws Exception {
-        String sql = "SELECT * FROM BillsForDCRRevision WHERE BillNumber NOT IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ? ORDER BY DueDate DESC";
+        String sql = "SELECT " +
+                "BillNumber, AccountNumber, ServicePeriodEnd, ServiceDateFrom, ServiceDateTo, DueDate, " +
+                "(SELECT PowerNew FROM BillsForDCRRevision WHERE BillNumber NOT IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ?) AS PowerNew, " +
+                "(SELECT KatasAmt FROM BillsForDCRRevision WHERE BillNumber NOT IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ?) AS KatasAmt, " +
+                "DATEDIFF(day, DueDate, getdate()) AS daysDelayed, ISNULL(NetAmount,0) AS NetAmount, ISNULL(ConsumerType,'RM') AS ConsumerType, ISNULL(PowerKWH,0) AS PowerKWH, " +
+                "ISNULL(Item2, 0) AS VATandTaxes, ISNULL(PR,0) AS TransformerRental, ISNULL(Others,0) AS OthersCharges, ISNULL(ACRM_TAFPPCA,0) AS ACRM_TAFPPCA, ISNULL(ACRM_TAFPPCA,0) AS ACRM_TAFPPCA, " +
+                "ISNULL(DAA_GRAM,0) AS DAA_GRAM " +
+                "FROM Bills " +
+                "WHERE BillNumber NOT IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ? " +
+                "ORDER BY DueDate DESC";
 
         if (paid)
             sql = "SELECT * FROM BillsForDCRRevision WHERE BillNumber IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ? ORDER BY DueDate DESC";
@@ -101,6 +104,9 @@ public class BillDAO {
         PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
 
         ps.setString(1, consumerInfo.getAccountID());
+        ps.setString(2, consumerInfo.getAccountID());
+        ps.setString(3, consumerInfo.getAccountID());
+        ps.setString(3, consumerInfo.getAccountID());
 
         ResultSet rs = ps.executeQuery();
 
@@ -123,58 +129,28 @@ public class BillDAO {
             bill.setConsumer(consumerInfo);
             bill.setPowerAmount(rs.getDouble("PowerNew"));
             bill.setKatas(rs.getDouble("KatasAmt"));
-            bill.setVat(rs.getDouble("VATAmt"));
+            int daysDelayed = rs.getInt("daysDelayed");
+            double pkwh = rs.getDouble("PowerKWH");
+            double vaTandTaxes = rs.getDouble("VATandTaxes");
+            double transformerRental = rs.getDouble("TransformerRental");
+            double othersCharges = rs.getDouble("OthersCharges");
+            double acrm = rs.getDouble("ACRM_TAFPPCA");
+            double daa = rs.getDouble("DAA_GRAM");
+            bill.setConsumerType(rs.getString("ConsumerType"));
+            bill.setPowerKWH(pkwh);
+            bill.setTransformerRental(transformerRental);
+            bill.setOtherCharges(othersCharges);
+            bill.setAcrmVat(acrm);
+            bill.setDAAVat(daa);
+            bill.setVat(vaTandTaxes);
+            bill.setDaysDelayed(daysDelayed);
+            bill.setSurCharge(bill.computeSurCharge());
+            bill.setSurChargeTax(bill.getSurCharge()*0.12);
+            bill.computeTotalAmount();
 
-            String charge = "SELECT ServicePeriodEnd, " +
-                    "BillingPeriod, "+
-                    "DATEDIFF(day, DueDate, getdate()) AS daysDelayed, "+
-                    "ISNULL(NetAmount,0) AS NetAmount," +
-                    "ISNULL(ConsumerType,'RM') AS ConsumerType, "+
-                    "ISNULL(PowerKWH,0) AS PowerKWH, "+
-                    "ISNULL(Item2,0) AS VATandTaxes, "+
-                    "ISNULL(PR,0) AS TransformerRental, "+
-                    "ISNULL(Others,0) AS OthersCharges, "+
-                    "ISNULL(ACRM_TAFPPCA,0) AS ACRM_TAFPPCA, "+
-                    "ISNULL(DAA_GRAM,0) AS DAA_GRAM "+
-                    "FROM Bills WHERE BillNumber=? AND ServicePeriodEnd NOT IN (SELECT ServicePeriodEnd FROM PaidBills WHERE BillNumber=?) ORDER BY ServicePeriodEnd";
-
-            PreparedStatement ps_charge = DB.getConnection("Billing").prepareStatement(charge);
-
-            ps_charge.setString(1, billNo);
-            ps_charge.setString(2, billNo);
-
-            ResultSet rs2 = ps_charge.executeQuery();
-
-            //Compute the surcharge
-            while(rs2.next()) {
-                int daysDelayed = rs2.getInt("daysDelayed");
-                double netAmount = rs2.getDouble("NetAmount");
-                if (netAmount != bill.getAmountDue())
-                    throw new Exception("NetAmounts from Bills and BillsInquiry does not match!");
-                double pkwh = rs2.getDouble("PowerKWH");
-                double vaTandTaxes = rs2.getDouble("VATandTaxes");
-                double transformerRental = rs2.getDouble("TransformerRental");
-                double othersCharges = rs2.getDouble("OthersCharges");
-                double acrm = rs2.getDouble("ACRM_TAFPPCA");
-                double daa = rs2.getDouble("DAA_GRAM");
-                bill.setConsumerType(rs2.getString("ConsumerType"));
-                bill.setPowerKWH(pkwh);
-                bill.setTransformerRental(transformerRental);
-                bill.setOtherCharges(othersCharges);
-                bill.setAcrmVat(acrm);
-                bill.setDAAVat(daa);
-                bill.setVatAndPassTax(vaTandTaxes);
-                bill.setDaysDelayed(daysDelayed);
-                bill.setSurCharge(bill.computeSurCharge());
-                bill.setSurChargeTax(bill.getSurCharge()*0.12);
-                bill.computeTotalAmount();
-            }
             double amount = getMDRefund(bill);
             bill.setMdRefund(amount);
             bills.add(bill);
-
-            ps_charge.close();
-            ps_charge.close();
         }
 
         rs.close();

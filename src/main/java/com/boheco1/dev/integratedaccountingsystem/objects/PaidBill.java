@@ -21,9 +21,6 @@ public class PaidBill extends Bill{
     private Date ORDate;
     private double Amount2306;
     private double Amount2307;
-    private double ServiceFee;
-    private double Others1;
-    private double Others2;
     private double cashAmount;
     private double checkAmount;
     private String bank;
@@ -166,30 +163,6 @@ public class PaidBill extends Bill{
 
     public void setAmount2307(double amount2307) {
         Amount2307 = amount2307;
-    }
-
-    public double getServiceFee() {
-        return ServiceFee;
-    }
-
-    public void setServiceFee(double serviceFee) {
-        ServiceFee = serviceFee;
-    }
-
-    public double getOthers1() {
-        return Others1;
-    }
-
-    public void setOthers1(double others1) {
-        Others1 = others1;
-    }
-
-    public double getOthers2() {
-        return Others2;
-    }
-
-    public void setOthers2(double others2) {
-        Others2 = others2;
     }
 
     public double getCashAmount() {

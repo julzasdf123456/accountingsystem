@@ -37,7 +37,6 @@ public class Bill {
     private double franchiseTax;
     private double businessTax;
     private double realPropertyTax;
-    private double vatAndPassTax;
     private double transformerRental;
     private double otherCharges;
     private double surchargeTax;
@@ -282,14 +281,6 @@ public class Bill {
         this.realPropertyTax = realPropertyTax;
     }
 
-    public double getVatAndPassTax() {
-        return vatAndPassTax;
-    }
-
-    public void setVatAndPassTax(double vatAndPassTax) {
-        this.vatAndPassTax = vatAndPassTax;
-    }
-
     public double getAddCharges() {
         return addCharges;
     }
@@ -367,7 +358,7 @@ public class Bill {
     }
 
     public double computeSurCharge() {
-        double penalty = this.getAmountDue() - (this.getVatAndPassTax() + this.getTransformerRental() + this.getOtherCharges() + this.getAcrmVat() + this.getDAAVat());
+        double penalty = this.getAmountDue() - (this.getVat() + this.getTransformerRental() + this.getOtherCharges() + this.getAcrmVat() + this.getDAAVat());
 
         double amount = 0;
 
@@ -407,7 +398,6 @@ public class Bill {
                         }
                     }
                 }
-                amount = Utility.round(amount, 2);
             }
         }
         return amount;
@@ -425,7 +415,7 @@ public class Bill {
     public void computeTotalAmount() {
         double charges = this.getSurCharge() + this.getSurChargeTax() + this.getAmountDue();
         double deductions = this.getDiscount() + this.getMdRefund() + this.getKatas() + this.getCh2306() + this.getCh2307() + this.getSlAdjustment() + this.getOtherAdjustment();
-        this.setTotalAmount(Utility.round(charges - deductions, 2));
+        this.setTotalAmount(charges - deductions);
     }
 }
 

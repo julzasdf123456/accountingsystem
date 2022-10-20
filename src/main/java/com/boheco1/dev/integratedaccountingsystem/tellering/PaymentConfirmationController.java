@@ -70,8 +70,14 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
             }
             this.total_payments = this.cash + this.check_amount;
             this.change = this.total_payments - this.amount_due;
-            this.change_tf.setText(this.change+"");
-            this.total_amount_paid_tf.setText(Utility.round(total_payments, 2) + "");
+            this.change_tf.setText(Utility.formatDecimal(this.change));
+            this.total_amount_paid_tf.setText(Utility.formatDecimal(total_payments));
+
+            if (this.change < 0)
+                this.confirm_btn.setDisable(true);
+            else
+                this.confirm_btn.setDisable(false);
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -83,16 +89,15 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
         this.checks = checks;
         this.check_amount = 0;
         this.amount_due = amount_due;
-
         for (Check c: checks) {
             this.check_amount += c.getAmount();
         }
         this.total_payments = this.cash + this.check_amount;
         this.change = this.total_payments - this.amount_due;
-        this.cash_tf.setText(Utility.round(this.cash,2)+"");
-        this.check_tf.setText(Utility.round(this.check_amount,2)+"");
-        this.total_amount_paid_tf.setText(Utility.round(this.total_payments, 2)+"");
-        this.total_amount_due_tf.setText(Utility.round(this.amount_due,2)+"");
-        this.change_tf.setText(Utility.round(this.change, 2) + "");
+        this.cash_tf.setText(Utility.formatDecimal(this.cash));
+        this.check_tf.setText(Utility.formatDecimal(this.check_amount));
+        this.total_amount_paid_tf.setText(Utility.formatDecimal(this.total_payments));
+        this.total_amount_due_tf.setText(Utility.formatDecimal(this.amount_due));
+        this.change_tf.setText(Utility.formatDecimal(this.change));
     }
 }

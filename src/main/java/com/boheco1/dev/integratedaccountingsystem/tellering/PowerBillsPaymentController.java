@@ -376,7 +376,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     public void setPayments(){
         try {
             double total = this.computeTotalPayments();
-            this.total_paid_tf.setText(Utility.round(total, 2) + "");
+            this.total_paid_tf.setText(Utility.formatDecimal(total));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -388,7 +388,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     public void setPayables(){
         try {
             double total = this.computeTotalBills();
-            this.total_payable_lbl.setText(Utility.round(total, 2) + "");
+            this.total_payable_lbl.setText(Utility.formatDecimal(total));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -531,22 +531,22 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column3.setPrefWidth(100);
         column3.setMaxWidth(100);
         column3.setMinWidth(100);
-        column3.setCellValueFactory(new PropertyValueFactory<>("amountDue"));
-        column3.setStyle("-fx-alignment: center-right;");
+        column3.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getAmountDue())));
+        column3.setStyle("-fx-alignment: center-right; -fx-text-fill: #6002EE;");
 
         TableColumn<Bill, String> column4 = new TableColumn<>("Surcharge");
         column4.setPrefWidth(100);
         column4.setMaxWidth(100);
         column4.setMinWidth(100);
-        column4.setCellValueFactory(new PropertyValueFactory<>("surCharge"));
-        column4.setStyle("-fx-alignment: center-right;");
+        column4.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getSurCharge())));
+        column4.setStyle("-fx-alignment: center-right; -fx-text-fill: #ff0000;");
 
         TableColumn<Bill, String> column5 = new TableColumn<>("2306/07");
         column5.setPrefWidth(100);
         column5.setMaxWidth(100);
         column5.setMinWidth(100);
-        column5.setCellValueFactory(obj -> new SimpleStringProperty(Utility.round((obj.getValue().getCh2306()+obj.getValue().getCh2307()), 2)+""));
-        column5.setStyle("-fx-alignment: center;");
+        column5.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal((obj.getValue().getCh2306()+obj.getValue().getCh2307()))));
+        column5.setStyle("-fx-alignment: center; -fx-text-fill: #009688;");
 
         TableColumn<Bill, String> columnWaive = new TableColumn<>("Waive");
         Callback<TableColumn<Bill, String>, TableCell<Bill, String>> waiveBtn
@@ -591,8 +591,8 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         columnWaive.setStyle("-fx-alignment: center;");
 
         TableColumn<Bill, String> column7 = new TableColumn<>("Total Amount");
-        column7.setCellValueFactory(new PropertyValueFactory<>("totalAmount"));
-        column7.setStyle("-fx-alignment: center-right;");
+        column7.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getTotalAmount())));
+        column7.setStyle("-fx-alignment: center-right; -fx-text-fill: #6002EE;");
 
         this.bills =  FXCollections.observableArrayList();
         this.fees_table.setFixedCellSize(35);
@@ -660,20 +660,19 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
      * @return void
      */
     public void setBillInfo(Bill bill){
-        this.add_charges_tf.setText(Utility.round(bill.getAddCharges(),2)+"");
-        this.surcharge_tf.setText(Utility.round(bill.getSurCharge(),2)+"");
-        this.ppd_tf.setText(Utility.round(bill.getDiscount(),2)+"");
-        this.adj_tf.setText(Utility.round(bill.getSlAdjustment()+bill.getOtherAdjustment(),2)+"");
-        this.ch2306_2307_tf.setText(Utility.round(bill.getCh2306()+bill.getCh2307(),2)+"");
-        this.power_amt_tf.setText(Utility.round(bill.getPowerAmount(),2)+"");
-        this.katas_tf.setText(Utility.round(bill.getKatas(),2)+"");
-        this.vat_tf.setText(Utility.round(bill.getVatAndPassTax(),2)+"");
-        this.md_refund_tf.setText(Utility.round(bill.getMdRefund(),2)+"");
-        this.bill_amount_lbl.setText(Utility.round(bill.getTotalAmount(),2)+"");
-        this.vat_tf.setText(Utility.round(bill.getVat() + bill.getSurChargeTax(),2)+"");
-        this.add_charges_tf.setText(Utility.round(bill.getOtherCharges()+bill.getTransformerRental(), 2)+"");
-        this.power_amt_tf.setText(Utility.round(bill.getPowerAmount(),2)+"");
-        this.katas_tf.setText(Utility.round(bill.getKatas(),2)+"");
+        this.add_charges_tf.setText(Utility.formatDecimal(bill.getAddCharges()));
+        this.surcharge_tf.setText(Utility.formatDecimal(bill.getSurCharge()));
+        this.ppd_tf.setText(Utility.formatDecimal(bill.getDiscount()));
+        this.adj_tf.setText(Utility.formatDecimal(bill.getSlAdjustment()+bill.getOtherAdjustment()));
+        this.ch2306_2307_tf.setText(Utility.formatDecimal(bill.getCh2306()+bill.getCh2307()));
+        this.power_amt_tf.setText(Utility.formatDecimal(bill.getPowerAmount()));
+        this.katas_tf.setText(Utility.formatDecimal(bill.getKatas()));
+        this.md_refund_tf.setText(Utility.formatDecimal(bill.getMdRefund()));
+        this.bill_amount_lbl.setText(Utility.formatDecimal(bill.getTotalAmount()));
+        this.vat_tf.setText(Utility.formatDecimal(bill.getVat() + bill.getSurChargeTax()));
+        this.add_charges_tf.setText(Utility.formatDecimal(bill.getOtherCharges()+bill.getTransformerRental()));
+        this.power_amt_tf.setText(Utility.formatDecimal(bill.getPowerAmount()));
+        this.katas_tf.setText(Utility.formatDecimal(bill.getKatas()));
     }
     /**
      * Displays Add Check UI
