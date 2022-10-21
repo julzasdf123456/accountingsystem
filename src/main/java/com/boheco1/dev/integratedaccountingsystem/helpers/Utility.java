@@ -168,14 +168,14 @@ public class Utility {
         amount = round(amount,2);
         if (control instanceof Label) {
             Label amount_control = (Label) control;
-            double current_amount = Double.parseDouble(amount_control.getText());
+            double current_amount = Double.parseDouble(amount_control.getText().replace(",",""));
             amount += current_amount;
-            amount_control.setText(amount + "");
+            amount_control.setText(Utility.formatDecimal(amount));
         } else if (control instanceof TextField) {
             TextField textField = (TextField) control;
-            double current_amount = Double.parseDouble(textField.getText());
+            double current_amount = Double.parseDouble(textField.getText().replace(",",""));
             amount += current_amount;
-            textField.setText(amount + "");
+            textField.setText(Utility.formatDecimal(amount));
         }
     }
 

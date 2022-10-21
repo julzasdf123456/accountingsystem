@@ -187,13 +187,13 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
             MenuItem itemAddPPD = new MenuItem("Less PPD");
             itemAddPPD.setOnAction(actionEvent -> {
-                //Only I, CL, CS with >= 1kwh, B, E
+                //Only I, CL, CS with >= 1kwh, B, E, AND DAYS BEFORE DUE DATE
                 if ((row.getItem().getConsumerType().equals("B")
                     || row.getItem().getConsumerType().equals("E")
                     || row.getItem().getConsumerType().equals("I")
                     || row.getItem().getConsumerType().equals("CL")
                     || (row.getItem().getConsumerType().equals("CS") && row.getItem().getPowerKWH() >= 1000))
-                    && row.getItem().getDaysDelayed() > 0) {
+                    && row.getItem().getDaysDelayed() <= 0) {
                     double ppd = 0;
                     try {
                         ppd = BillDAO.getDiscount(row.getItem());
@@ -251,7 +251,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
             MenuItem item2306 = new MenuItem("2306");
             item2306.setOnAction(actionEvent -> {
-                if (row.getItem().getConsumerType().equals("RM") || row.getItem().getConsumerType().equals("B") || row.getItem().getConsumerType().equals("E")) return;
+                if (row.getItem().getConsumerType().equals("RM")) return;
                 try {
                     this.showTIN(row.getItem(), "2306");
                     row.getItem().setCh2306(BillDAO.getForm2306(row.getItem()));
@@ -266,7 +266,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
             MenuItem item2307 = new MenuItem("2307");
             item2307.setOnAction(event -> {
-                if (row.getItem().getConsumerType().equals("RM") || row.getItem().getConsumerType().equals("B") || row.getItem().getConsumerType().equals("E")) return;
+                if (row.getItem().getConsumerType().equals("RM")) return;
                 try {
                     this.showTIN(row.getItem(), "2307");
                     row.getItem().setCh2307(BillDAO.getForm2307(row.getItem()));
@@ -469,7 +469,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         double current_total = Double.parseDouble(this.total_paid_tf.getText()) - amount;
         if (current_total < 0)
             current_total = 0;
-        this.total_paid_tf.setText(current_total+"");
+        this.total_paid_tf.setText(Utility.formatDecimal(current_total));
         this.checks =  FXCollections.observableArrayList();
         this.checks_lv.setItems(this.checks);
 
@@ -696,7 +696,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 this.checks.add(check);
                 this.checks_lv.setItems(this.checks);
                 double amount = Double.parseDouble(this.total_paid_tf.getText().replace(",",""));
-                this.total_paid_tf.setText((amount+check.getAmount())+"");
+                this.total_paid_tf.setText(Utility.formatDecimal(amount+check.getAmount()));
             }
         });
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
