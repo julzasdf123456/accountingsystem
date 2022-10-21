@@ -128,10 +128,35 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
 
         TableColumn<MIRSItem, String> reqQuantityCol = new TableColumn<>("Qty");
         reqQuantityCol.setStyle("-fx-alignment: center;");
-        reqQuantityCol.setPrefWidth(50);
-        reqQuantityCol.setMaxWidth(50);
-        reqQuantityCol.setMinWidth(50);
-        reqQuantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
+        reqQuantityCol.setPrefWidth(80);
+        reqQuantityCol.setMaxWidth(80);
+        reqQuantityCol.setMinWidth(80);
+        //reqQuantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
+        Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> qtycellFactory
+                = //
+                new Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>>() {
+                    @Override
+                    public TableCell call(final TableColumn<MIRSItem, String> param) {
+                        final TableCell<MIRSItem, String> cell = new TableCell<MIRSItem, String>() {
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    MIRSItem mirsItem = getTableView().getItems().get(getIndex());
+                                    setGraphic(null);
+                                    setText(Utility.formatDecimal(mirsItem.getQuantity()));
+
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+
+        reqQuantityCol.setCellFactory(qtycellFactory);
 
         requestedItemTable.getColumns().add(reqCheckBoxCol);
         requestedItemTable.getColumns().add(reqDescriptionCol);
@@ -1057,6 +1082,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
             StockDescription result = event.getCompletion();
             try {
                 selectedStock = StockDAO.get(result.getId());
+                selectedStock.setQuantity(result.getQuantity());
                 double av = StockDAO.countAvailable(selectedStock);
                 if(av == 0) {
                     AlertDialogBuilder.messgeDialog("System Warning", "Insufficient stock.",
@@ -1077,9 +1103,9 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                         }
                     }
                     quantity.requestFocus();
-                    inStock.setText("In Stock: "+ selectedStock.getQuantity());
-                    pending.setText("Pending: "+ (StockDAO.countPendingRequest(selectedStock)));
-                    available.setText("Available: "+ (av));
+                    inStock.setText("In Stock: "+ Utility.formatDecimal(selectedStock.getQuantity()));
+                    pending.setText("Pending: "+ Utility.formatDecimal(StockDAO.countPendingRequest(selectedStock)));
+                    available.setText("Available: "+ Utility.formatDecimal(av));
                 }
             } catch (Exception e) {
                 e.printStackTrace();

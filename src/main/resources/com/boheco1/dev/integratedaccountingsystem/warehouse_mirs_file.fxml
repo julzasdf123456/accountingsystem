@@ -13,10 +13,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="841.0" prefWidth="1148.0" style="-fx-background-color: #ffff;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.FileMIRSController">
+<AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="863.0" prefWidth="1026.0" style="-fx-background-color: #ffff;" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.FileMIRSController">
     <children>
-      <HBox prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <HBox prefHeight="841.0" prefWidth="1181.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
                     <VBox maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="809.0" prefWidth="457.0" HBox.hgrow="NEVER">
                         <children>
@@ -51,7 +52,7 @@
                         </Label>
                      </children>
                   </HBox>
-                            <JFXTextArea fx:id="purpose" focusColor="#00ad8e" prefHeight="106.0" prefWidth="350.0" style="-fx-background-color: #f5f5f5;">
+                            <JFXTextArea fx:id="purpose" focusColor="#00ad8e" prefHeight="70.0" prefWidth="233.0" style="-fx-background-color: #f5f5f5;">
                                 <VBox.margin>
                                     <Insets bottom="24.0" />
                                 </VBox.margin>
@@ -147,7 +148,7 @@
                         <Label text="Remarks" textFill="#8a8a8a" />
                      </children>
                   </HBox>
-                  <JFXTextArea fx:id="remarks" maxWidth="1.7976931348623157E308" prefHeight="90.0" prefWidth="78.0" style="-fx-background-color: #f5f5f5;">
+                  <JFXTextArea fx:id="remarks" maxWidth="1.7976931348623157E308" prefHeight="72.0" prefWidth="233.0" style="-fx-background-color: #f5f5f5;">
                      <VBox.margin>
                         <Insets bottom="16.0" />
                      </VBox.margin>
@@ -156,21 +157,7 @@
                      <children>
                         <HBox alignment="CENTER">
                            <children>
-                              <JFXButton fx:id="submitBtn" buttonType="RAISED" maxHeight="1.7976931348623157E308" onAction="#submitMirsApplication" prefHeight="35.0" prefWidth="139.0" styleClass="btn-info" text="Submit Request" textFill="WHITE">
-                                 <font>
-                                    <Font name="System Bold" size="16.0" />
-                                 </font>
-                                 <effect>
-                                    <DropShadow />
-                                 </effect>
-                                 <padding>
-                                    <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
-                                 </padding>
-                                 <HBox.margin>
-                                    <Insets left="16.0" right="16.0" />
-                                 </HBox.margin>
-                              </JFXButton>
-                              <JFXButton fx:id="uploadMirsBtn" buttonType="RAISED" maxHeight="1.7976931348623157E308" onAction="#uploadMirsItem" prefHeight="35.0" prefWidth="75.0" style="-fx-background-color: #a7a5a5;" styleClass="btn-info" text="Upload" textFill="WHITE">
+                              <JFXButton fx:id="submitBtn" buttonType="RAISED" maxHeight="1.7976931348623157E308" onAction="#submitMirsApplication" prefHeight="35.0" prefWidth="139.0" styleClass="btn-theme" text="Submit Request" textFill="WHITE">
                                  <font>
                                     <Font name="System Bold" size="16.0" />
                                  </font>
@@ -202,13 +189,13 @@
                <children>
                   <VBox prefHeight="640.0" prefWidth="844.0" HBox.hgrow="ALWAYS">
                      <children>
-                        <HBox alignment="TOP_CENTER" prefHeight="23.0" prefWidth="401.0">
+                        <HBox alignment="TOP_CENTER" prefHeight="90.0" prefWidth="466.0">
                            <children>
-                              <VBox>
+                              <VBox HBox.hgrow="ALWAYS">
                                  <children>
                                     <HBox>
                                        <children>
-                                          <JFXTextField fx:id="items" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="636.0" promptText="Search Item" style="-fx-background-color: #f5f5f5; -fx-font-size: 24;" styleClass="jfx-text-field">
+                                          <JFXTextField fx:id="items" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="528.0" promptText="Search Item" style="-fx-background-color: #f5f5f5; -fx-font-size: 24;" styleClass="jfx-text-field" HBox.hgrow="ALWAYS">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
@@ -218,9 +205,40 @@
                                                 <Font size="14.0" />
                                              </font>
                                           </JFXTextField>
+                                          <JFXButton fx:id="uploadMirsBtn" buttonType="RAISED" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" onAction="#uploadMirsItem" prefHeight="37.0" prefWidth="39.0" styleClass="btn-info" text=" " textFill="WHITE">
+                                             <font>
+                                                <Font name="System Bold" size="16.0" />
+                                             </font>
+                                             <effect>
+                                                <DropShadow />
+                                             </effect>
+                                             <padding>
+                                                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                             </padding>
+                                             <HBox.margin>
+                                                <Insets left="16.0" right="16.0" />
+                                             </HBox.margin>
+                                             <graphic>
+                                                <FontIcon iconColor="WHITE" iconLiteral="mdi2f-file-upload" iconSize="20" />
+                                             </graphic>
+                                          </JFXButton>
+                                          <JFXButton fx:id="removeInvalidItemsBtn" buttonType="RAISED" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" onAction="#removeInvalidItems" prefHeight="35.0" prefWidth="39.0" styleClass="btn-danger" text=" " textFill="WHITE">
+                                             <font>
+                                                <Font name="System Bold" size="16.0" />
+                                             </font>
+                                             <effect>
+                                                <DropShadow />
+                                             </effect>
+                                             <padding>
+                                                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                             </padding>
+                                             <graphic>
+                                                <FontIcon iconColor="WHITE" iconLiteral="mdi2s-sort-variant-remove" iconSize="20" />
+                                             </graphic>
+                                          </JFXButton>
                                        </children>
                                     </HBox>
-                                    <HBox alignment="CENTER">
+                                    <HBox alignment="CENTER_LEFT">
                                        <children>
                                           <Label fx:id="inStock" maxWidth="1.7976931348623157E308" style="-fx-background-radius: 0 0 0 6;" styleClass="btn-info" text="In Stock: 0" textFill="WHITE">
                                              <HBox.margin>

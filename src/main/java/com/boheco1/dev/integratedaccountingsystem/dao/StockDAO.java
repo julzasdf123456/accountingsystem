@@ -209,41 +209,29 @@ public class StockDAO {
      */
     public static Stock getStockViaNEALocalCode(String code) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM Stocks WHERE (NEACode=? OR LocalCode=?) ");
+                "SELECT id, Description, Unit, Price, localDescription FROM Stocks WHERE (NEACode=? OR LocalCode=?) ");
         ps.setString(1, code);
         ps.setString(2, code);
-        ResultSet rs = ps.executeQuery();
-        if(rs.next()) {
-            Stock stock = new Stock(
-                    rs.getString("id"),
-                    rs.getString("StockName"),
-                    rs.getString("Description"),
-                    rs.getString("SerialNumber"),
-                    rs.getString("Brand"),
-                    rs.getString("Model"),
-                    rs.getDate("ManufacturingDate")!=null ? rs.getDate("ManufacturingDate").toLocalDate() : null,
-                    rs.getDate("ValidityDate")!=null ? rs.getDate("ValidityDate").toLocalDate() : null,
-                    rs.getString("TypeID"),
-                    rs.getString("Unit"),
-                    rs.getInt("Quantity"),
-                    rs.getInt("Critical"),
-                    rs.getDouble("Price"),
-                    rs.getString("NEACode"),
-                    rs.getBoolean("IsTrashed"),
-                    rs.getString("Comments"),
-                    rs.getTimestamp("CreatedAt")!=null ? rs.getTimestamp("CreatedAt").toLocalDateTime() : null,
-                    rs.getTimestamp("UpdatedAt")!=null ? rs.getTimestamp("UpdatedAt").toLocalDateTime() : null,
-                    rs.getTimestamp("TrashedAt")!=null ? rs.getTimestamp("TrashedAt").toLocalDateTime() : null,
-                    rs.getString("UserIDCreated"),
-                    rs.getString("UserIDUpdated"),
-                    rs.getString("UserIDTrashed"),
-                    rs.getString("LocalCode"),
-                    rs.getString("AcctgCode"),
-                    rs.getBoolean("Individualized")
-            );
-            stock.setLocalDescription( rs.getString("localDescription"));
-            rs.close();
 
+        PreparedStatement ps2 = DB.getConnection().prepareStatement(
+                "SELECT SUM(Quantity) as Qty FROM Stocks WHERE (NEACode=? OR LocalCode=?) ");
+        ps2.setString(1, code);
+        ps2.setString(2, code);
+
+        ResultSet rs = ps.executeQuery();
+        ResultSet rs2 = ps2.executeQuery();
+        if(rs.next()) {
+            Stock stock = new Stock();
+            stock.setId(rs.getString("id"));
+            stock.setDescription(rs.getString("Description"));
+            stock.setUnit(rs.getString("Unit"));
+            stock.setPrice(rs.getDouble("Price"));
+            stock.setLocalDescription( rs.getString("localDescription"));
+            if(rs2.next()) {
+                stock.setQuantity(rs2.getDouble("Qty"));
+            }
+            rs.close();
+            rs2.close();
             return stock;
         }
         rs.close();

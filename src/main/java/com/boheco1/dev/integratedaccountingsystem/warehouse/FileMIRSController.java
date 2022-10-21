@@ -267,23 +267,18 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
                                     if (stock == null) {
                                         Stock temp = new Stock();
-                                        temp.setId("temp_"+Utility.generateRandomId()); //assign temporary id, will not be save in the database
+                                        //assign temporary id, will not be save in the database
+                                        temp.setId("temp_"+Utility.generateRandomId());
                                         temp.setDescription(currentItem);
                                         temp.setQuantity(0);
                                         addItem(temp, temp.getQuantity(), true, Utility.NOT_FOUND);
-                                        //messageLog += "CANNOT FIND: "+currentItem + " ("+ code +").\n";
                                     }else{
                                         double availableStock = StockDAO.countAvailable(stock);
                                         stock.setQuantity(availableStock);
 
-                                        if (stock.getQuantity() == 0.0) {
-                                            //messageLog += "OUT OF STOCK: "+stock.getDescription() + " ("+ code +").\n";
-                                            addItem(stock, qty * -1, true,Utility.OUT_OF_STOCK);
-                                        } else {
+                                        if (stock.getQuantity() > 0.0) {
                                             //check if Insufficient stock
                                             if(qty > stock.getQuantity()){
-                                                //messageLog += "INSUFFICIENT STOCK: "+ stock.getDescription().substring(0,30) + " ("+ code +"), adding stock on-hand.\n";
-                                                //add to table the available stock
                                                 double lacking = qty - availableStock;
 
                                                 addItem(stock, availableStock, true,Utility.INSUFFICIENT_STOCK + " ("+ Utility.formatDecimal(lacking) +")" );
@@ -291,8 +286,9 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                                 //forQtyUpdate.put(stock.getId(), StockDAO.countAvailable(stock));
                                             }else{
                                                 addItem(stock, qty, true,Utility.ADDED);
-                                                // messageLog += "ADDED: "+stock.getDescription() + " ("+ code +").\n";
                                             }
+                                        } else {
+                                            addItem(stock, qty * -1, true,Utility.OUT_OF_STOCK);
                                         }
                                     }
                                 }
@@ -375,6 +371,25 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             }
         }
     }
+    @FXML
+    private void removeInvalidItems(ActionEvent event) {
+        if(mirsItemRequested.isEmpty())
+            return;
+
+        JFXButton accept = new JFXButton("Accept");
+        JFXDialog dialog = DialogBuilder.showConfirmDialog("Remove Item","Are you sure you want to remove all NOT FOUND and OUT OF STOCK item(s)?"
+                , accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
+        accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+        accept.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent __) {
+                mirsItemRequested.removeIf(mirsItem -> mirsItem.getRemarks().equals(Utility.OUT_OF_STOCK) || mirsItem.getRemarks().equals(Utility.NOT_FOUND));
+                mirsItemTable.refresh();
+                countRow.setText("" + mirsItemRequested.size());
+                dialog.close();
+            }
+        });
+    }
 
     @Override
     public void setSubMenus(FlowPane flowPane) {
@@ -398,7 +413,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         });*/
 
         //disable row highlight
-        mirsItemTable.setSelectionModel(null);
+        //mirsItemTable.setSelectionModel(null);
 
         TableColumn<MIRSItem, String> descriptionCol = new TableColumn<>("Description");
         descriptionCol.setStyle("-fx-alignment: center-left;");
@@ -713,7 +728,6 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 }else{
 
                     quantity.requestFocus();
-
                     inStock.setText("In Stock: "+ Utility.formatDecimal(stockToBeAdded.getQuantity()));
                     pending.setText("Pending: "+ Utility.formatDecimal(StockDAO.countPendingRequest(stockToBeAdded)));
                     available.setText("Available: "+ Utility.formatDecimal(av));
