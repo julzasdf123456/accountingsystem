@@ -1520,11 +1520,14 @@ public class StockDAO {
     }
 
     public static double countReleasingUnavailable(Stock stock) throws Exception {
-        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT SUM(r.Quantity) AS 'unavailable' FROM Releasing r INNER JOIN Stocks s ON s.id=r.StockID " +
-                "WHERE r.MIRSID IN (SELECT m.id FROM MIRS m WHERE m.Status='"+Utility.RELEASING+"') " +
-                "AND s.Description=?");
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT SUM(r.Quantity) AS 'Unavailable' FROM Releasing r " +
+                        "INNER JOIN Stocks s ON s.id = r.StockID " +
+                        "WHERE r.MIRSID IN (SELECT m.id FROM MIRS m WHERE m.Status='releasing') " +
+                        "AND s.Description = ?"
+        );
 
-        ps.setString(1, stock.getId());
+        ps.setString(1, stock.getDescription());
 
         ResultSet rs = ps.executeQuery();
 
