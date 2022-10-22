@@ -288,14 +288,18 @@ public class MirsDAO {
 
     /**
      * Retrieves a group of MIRSItems that belong to a single MIRS record which are not yet released
-     * @param mirs the MIRS File from which the the MIRSItems belong
+     * @param mirs the MIRS File from which the MIRSItems belong
      * @return List of MIRSItem
      * @throws Exception
      */
     public static List<MIRSItem> getUnreleasedItems(MIRS mirs) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM MIRSItems m WHERE m.MIRSID=? AND m.StockID NOT IN " +
-                        "(SELECT StockID FROM Releasing r WHERE r.MIRSID=? AND r.status='"+Utility.RELEASED+"');");
+                "SELECT m.*, s.Description FROM MIRSItems m " +
+                        "INNER JOIN Stocks s ON m.StockID = s.id " +
+                        "WHERE m.MIRSID = ? AND s.Description IN " +
+                        "(SELECT s2.Description FROM Releasing r " +
+                        "INNER JOIN Stocks s2 ON r.StockID=s2.id " +
+                        "WHERE r.MIRSID=? AND r.Status<>'released')");
 
         ps.setString(1, mirs.getId());
         ps.setString(2, mirs.getId());
