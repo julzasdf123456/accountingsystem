@@ -10,7 +10,6 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import org.apache.commons.text.WordUtils;
 import pl.allegro.finance.tradukisto.MoneyConverters;
-import pl.allegro.finance.tradukisto.ValueConverters;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

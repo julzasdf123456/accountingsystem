@@ -238,16 +238,16 @@ public class StockDAO {
         return null;
     }
 
-    public static int getTotalStockViaNEALocalCode(String code) throws Exception {
+    public static double getTotalStockViaNEALocalCode(String code) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT SUM(Stocks.Quantity) as Qty FROM Stocks WHERE NEACode=? OR LocalCode=? AND Quantity > 0 ");
         ps.setString(1, code);
         ps.setString(2, code);
         ResultSet rs = ps.executeQuery();
-        int qty = 0;
+        double qty = 0;
 
         if(rs.next()) {
-            qty = rs.getInt("Qty");
+            qty = rs.getDouble("Qty");
         }
         rs.close();
         return qty;

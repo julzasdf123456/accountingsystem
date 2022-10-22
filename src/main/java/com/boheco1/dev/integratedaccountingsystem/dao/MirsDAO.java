@@ -296,10 +296,15 @@ public class MirsDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT m.*, s.Description FROM MIRSItems m " +
                         "INNER JOIN Stocks s ON m.StockID = s.id " +
-                        "WHERE m.MIRSID = ? AND s.Description IN " +
+                        "WHERE m.MIRSID = ? AND s.Description NOT IN " +
                         "(SELECT s2.Description FROM Releasing r " +
                         "INNER JOIN Stocks s2 ON r.StockID=s2.id " +
-                        "WHERE r.MIRSID=? AND r.Status<>'released')");
+                        "WHERE r.MIRSID=? AND r.Status='"+Utility.RELEASED+"')");
+
+        /*PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MIRSItems m WHERE m.MIRSID=? AND m.StockID NOT IN " +
+                        "(SELECT StockID FROM Releasing r WHERE r.MIRSID=? AND r.status='"+Utility.RELEASED+"');");*/
+
 
         ps.setString(1, mirs.getId());
         ps.setString(2, mirs.getId());
@@ -745,10 +750,10 @@ public class MirsDAO {
 
         ResultSet rs = ps.executeQuery();
 
-        int releasedCount = 0;
+        double releasedCount = 0;
 
         if(rs.next()) {
-            releasedCount = rs.getInt(1);
+            releasedCount = rs.getDouble(1);
         }
 
         return item.getQuantity() - releasedCount;

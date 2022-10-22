@@ -577,15 +577,18 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                 } else {
                                     //btn.setStyle("-fx-background-color: "+ColorPalette.DANGER+";");
                                     MIRSItem mirsItem = getTableView().getItems().get(getIndex());
+
+
                                     icon.setIconSize(24);
                                     icon.setIconColor(Paint.valueOf(ColorPalette.INFO));
                                     btn.setOnAction(event -> {
                                         try{
                                             Stock stock = StockDAO.get(mirsItem.getStockID());
+                                            stock.setQuantity(StockDAO.getTotalStockViaNEALocalCode(stock.getNeaCode()));
                                             JFXButton accept = new JFXButton("Accept");
                                             JFXTextField input = new JFXTextField();
                                             InputValidation.restrictNumbersOnly(input);
-                                            JFXDialog dialog = DialogBuilder.showInputDialog("Update Quantity","Enter desired quantity:  ", "Max value "+ StockDAO.getTotalStockViaNEALocalCode(stock.getNeaCode()), input, accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+                                            JFXDialog dialog = DialogBuilder.showInputDialog("Update Quantity","Enter desired quantity:  ", "Max value "+ Utility.formatDecimal(stock.getQuantity()), input, accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
                                             accept.setOnAction(new EventHandler<ActionEvent>() {
                                                 @Override
                                                 public void handle(ActionEvent __) {
