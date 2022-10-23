@@ -304,4 +304,62 @@ public class BillDAO {
 
         return refund;
     }
+    /**
+     * Retrieves paid bills from a specified date
+     * @param year The posting year
+     * @param month The posting month
+     * @param day The posting day
+     * @return list The list of paid bills
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<Bill> getAllPaidBills(int year, int month, int day) throws Exception {
+        String sql = "SELECT p.accountnumber, p.billnumber, power, p.meter, p.pr, p.others, p.netamount as amountpaid, PaymentType, ornumber, teller, dcrnumber, postingdate, postingsequence, PromptPayment, surcharge, SLAdjustment, otherdeduction, " +
+                "Amount2306, Amount2307, MDRefund, " +
+                "b.NetAmount as amountdue, ConsumerName, ConsumerAddress, TINNo, ContactNumber, Email, b.ConsumerType " +
+                "FROM paidbills p INNER JOIN accountmaster a ON p.AccountNumber=a.AccountNumber INNER JOIN Bills b ON b.AccountNumber=a.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd " +
+                "WHERE PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59';";
+
+        PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
+
+        ResultSet rs = ps.executeQuery();
+
+        List<Bill> bills = new ArrayList<>();
+
+        while(rs.next()) {
+            String accountNo = rs.getString("AccountNumber");
+
+            ConsumerInfo consumerInfo = new ConsumerInfo(
+                    accountNo,
+                    rs.getString("ConsumerName"),
+                    rs.getString("ConsumerAddress"),
+                    rs.getString("TINNo"),
+                    rs.getString("Email"),
+                    rs.getString("ContactNumber")
+                    );
+
+            PaidBill bill = new PaidBill();
+            bill.setConsumerType(rs.getString("ConsumerType"));
+            bill.setConsumer(consumerInfo);
+            bill.setBillNo(rs.getString("BillNumber"));
+            bill.setAmountDue(rs.getDouble("amountdue"));
+            bill.setTotalAmount(rs.getDouble("amountpaid"));
+            bill.setPower(rs.getDouble("power"));
+            bill.setMeter(rs.getDouble("meter"));
+            bill.setPr(rs.getDouble("PR"));
+            bill.setOthers(rs.getDouble("Others"));
+            bill.setPromptPayment(rs.getDouble("PromptPayment"));
+            bill.setSurcharge(rs.getDouble("surcharge"));
+            bill.setSLAdjustment(rs.getDouble("SLAdjustment"));
+            bill.setOtherDeduction(rs.getDouble("otherdeduction"));
+            bill.setAmount2306(rs.getDouble("Amount2306"));
+            bill.setAmount2307(rs.getDouble("Amount2307"));
+
+            bills.add(bill);
+        }
+
+        rs.close();
+        ps.close();
+
+        return bills;
+    }
 }
