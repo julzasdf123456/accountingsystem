@@ -1,6 +1,8 @@
 package com.boheco1.dev.integratedaccountingsystem.tellering;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.BillDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ColorPalette;
+import com.boheco1.dev.integratedaccountingsystem.helpers.InputValidation;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.Bill;
@@ -49,7 +51,10 @@ public class DCRController extends MenuControllerHandler implements Initializabl
     private TableView<?> dcr_breakdown_table;
 
     @FXML
-    private TableView<Bill> payments_table;
+    private TableView<?> payments_table;
+
+    @FXML
+    private TableView<Bill> dcr_power_table;
 
     @FXML
     private Label dcr_total;
@@ -61,12 +66,28 @@ public class DCRController extends MenuControllerHandler implements Initializabl
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.setParams();
-
+        this.createTable();
+        InputValidation.restrictNumbersOnly(this.year_tf);
+        InputValidation.restrictNumbersOnly(this.day_tf);
+        this.view_btn.setOnAction(action ->{
+            int day=0, year=0, month=0;
+            try{
+                day = Integer.parseInt(this.day_tf.getText());
+                year = Integer.parseInt(this.year_tf.getText());
+                month = this.month_cb.getSelectionModel().getSelectedIndex()+1;
+                this.bills = FXCollections.observableArrayList(BillDAO.getAllPaidBills(year, month, day));
+                this.dcr_power_table.setItems(this.bills);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
     }
 
     public void setParams(){
         this.month_cb.getItems().addAll(this.month);
+        this.month_cb.getSelectionModel().select(Calendar.getInstance().get(Calendar.MONTH));
         this.year_tf.setText(""+ Calendar.getInstance().get(Calendar.YEAR));
+        this.day_tf.setText(""+Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
     }
 
     /**
@@ -90,70 +111,74 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         column.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Bill, String> column1 = new TableColumn<>("Consumer Name");
-        column1.setPrefWidth(130);
-        column1.setMaxWidth(130);
-        column1.setMinWidth(130);
         column1.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumer().getConsumerName()));
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Bill, String> column2 = new TableColumn<>("Bill Balance");
-        column2.setPrefWidth(100);
-        column2.setMaxWidth(100);
-        column2.setMinWidth(100);
-        column2.setCellValueFactory(new PropertyValueFactory<>("totalAmount"));
-        column2.setStyle("-fx-alignment: center;");
+        column2.setPrefWidth(120);
+        column2.setMaxWidth(120);
+        column2.setMinWidth(120);
+        column2.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getAmountDue())));
+        column2.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column3 = new TableColumn<>("Type");
-        column3.setPrefWidth(100);
-        column3.setMaxWidth(100);
-        column3.setMinWidth(100);
+        column3.setPrefWidth(75);
+        column3.setMaxWidth(75);
+        column3.setMinWidth(75);
         column3.setCellValueFactory(new PropertyValueFactory<>("consumerType"));
-        column3.setStyle("-fx-alignment: center-right; -fx-text-fill: #6002EE;");
+        column3.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column4 = new TableColumn<>("Sys. Loss");
         column4.setPrefWidth(100);
         column4.setMaxWidth(100);
         column4.setMinWidth(100);
-        column4.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getSlAdjustment()+""));
-        column4.setStyle("-fx-alignment: center; -fx-text-fill: #009688;");
+        column4.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getSlAdjustment())));
+        column4.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column5 = new TableColumn<>("PPD");
         column5.setPrefWidth(100);
         column5.setMaxWidth(100);
         column5.setMinWidth(100);
-        column5.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getDiscount()+""));
-        column5.setStyle("-fx-alignment: center-right; -fx-text-fill: #ff0000;");
+        column5.setCellValueFactory(obj -> new SimpleStringProperty((Utility.formatDecimal(obj.getValue().getDiscount()))));
+        column5.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column6 = new TableColumn<>("Surcharge");
         column6.setPrefWidth(100);
         column6.setMaxWidth(100);
         column6.setMinWidth(100);
-        column6.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getSurCharge()+""));
-        column6.setStyle("-fx-alignment: center-right; -fx-text-fill: #ff0000;");
+        column6.setCellValueFactory(obj -> new SimpleStringProperty((Utility.formatDecimal(obj.getValue().getSurCharge()))));
+        column6.setStyle("-fx-alignment: center-right;");
 
-        TableColumn<Bill, String> column7 = new TableColumn<>("Surcharge");
-        column7.setPrefWidth(100);
-        column7.setMaxWidth(100);
-        column7.setMinWidth(100);
-        column7.setCellValueFactory(new PropertyValueFactory<>("amountDue"));
-        column7.setStyle("-fx-alignment: center-right; -fx-text-fill: #ff0000;");
+        TableColumn<Bill, String> column7 = new TableColumn<>("Net-Amt.");
+        column7.setPrefWidth(125);
+        column7.setMaxWidth(125);
+        column7.setMinWidth(125);
+        column7.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getTotalAmount())));
+        column7.setStyle("-fx-alignment: center-right;");
 
-        TableColumn<Bill, String> column8 = new TableColumn<>("Total Amount");
-        column8.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getTotalAmount())));
-        column8.setStyle("-fx-alignment: center-right; -fx-text-fill: #6002EE;");
+        TableColumn<Bill, String> column8 = new TableColumn<>("Time");
+        column8.setCellValueFactory(obj -> new SimpleStringProperty(
+                ((PaidBill) obj.getValue()).getPostingTime()+""
+        ));
+        column8.setPrefWidth(75);
+        column8.setMaxWidth(75);
+        column8.setMinWidth(75);
+        column8.setStyle("-fx-alignment: center;");
 
         this.bills =  FXCollections.observableArrayList();
-        this.payments_table.setFixedCellSize(35);
-        this.payments_table.setPlaceholder(new Label("No Bills added"));
+        this.dcr_power_table.setFixedCellSize(35);
+        this.dcr_power_table.setPlaceholder(new Label("No Bills added"));
 
-        this.payments_table.getColumns().add(column0);
-        this.payments_table.getColumns().add(column);
-        this.payments_table.getColumns().add(column1);
-        this.payments_table.getColumns().add(column2);
-        this.payments_table.getColumns().add(column3);
-        this.payments_table.getColumns().add(column4);
-        this.payments_table.getColumns().add(column5);
-        this.payments_table.getColumns().add(column7);
+        this.dcr_power_table.getColumns().add(column0);
+        this.dcr_power_table.getColumns().add(column);
+        this.dcr_power_table.getColumns().add(column1);
+        this.dcr_power_table.getColumns().add(column2);
+        this.dcr_power_table.getColumns().add(column3);
+        this.dcr_power_table.getColumns().add(column4);
+        this.dcr_power_table.getColumns().add(column5);
+        this.dcr_power_table.getColumns().add(column6);
+        this.dcr_power_table.getColumns().add(column7);
+        this.dcr_power_table.getColumns().add(column8);
     }
 
 }

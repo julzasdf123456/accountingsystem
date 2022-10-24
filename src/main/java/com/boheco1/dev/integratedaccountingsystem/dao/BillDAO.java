@@ -69,7 +69,7 @@ public class BillDAO {
             ps.setInt(10, paid.getPostingSequence());
             ps.setString(11, paid.getTeller());
             ps.setDouble(12, bill.getDiscount());
-            ps.setDouble(13, bill.getSurCharge()+bill.getSurChargeTax());
+            ps.setDouble(13, bill.getSurCharge());
             ps.setDouble(14, bill.getSlAdjustment());
             ps.setDouble(15, bill.getOtherAdjustment());
             ps.setDouble(16, bill.getMdRefund());
@@ -125,8 +125,7 @@ public class BillDAO {
                 "(SELECT PowerNew FROM BillsForDCRRevision a WHERE b.BillNumber = a.BillNumber) AS PowerNew, " +
                 "(SELECT KatasAmt FROM BillsForDCRRevision c WHERE b.BillNumber = c.BillNumber) AS KatasAmt, " +
                 "DATEDIFF(day, DueDate, getdate()) AS daysDelayed, ISNULL(NetAmount,0) AS NetAmount, ISNULL(ConsumerType,'RM') AS ConsumerType, ISNULL(PowerKWH,0) AS PowerKWH, " +
-                "ISNULL(Item2, 0) AS VATandTaxes, ISNULL(PR,0) AS TransformerRental, ISNULL(Others,0) AS OthersCharges, ISNULL(ACRM_TAFPPCA,0) AS ACRM_TAFPPCA, ISNULL(ACRM_TAFPPCA,0) AS ACRM_TAFPPCA, " +
-                "ISNULL(DAA_GRAM,0) AS DAA_GRAM " +
+                "ISNULL(Item2, 0) AS VATandTaxes, ISNULL(PR,0) AS TransformerRental, ISNULL(Others,0) AS OthersCharges, ISNULL(ACRM_TAFPPCA,0) AS ACRM_TAFPPCA, ISNULL(DAA_GRAM,0) AS DAA_GRAM " +
                 "FROM Bills b " +
                 "WHERE BillNumber NOT IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ? " +
                 "ORDER BY DueDate DESC";
@@ -313,11 +312,12 @@ public class BillDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static List<Bill> getAllPaidBills(int year, int month, int day) throws Exception {
-        String sql = "SELECT p.accountnumber, p.billnumber, power, p.meter, p.pr, p.others, p.netamount as amountpaid, PaymentType, ornumber, teller, dcrnumber, postingdate, postingsequence, PromptPayment, surcharge, SLAdjustment, otherdeduction, " +
-                "Amount2306, Amount2307, MDRefund, " +
+        String sql = "SELECT p.accountnumber, p.billnumber, power, p.meter, p.pr, p.others, p.netamount as amountpaid, PaymentType, ornumber, teller, dcrnumber, postingdate, " +
+                "postingsequence, PromptPayment, surcharge, SLAdjustment, otherdeduction, " +
+                "Amount2306, Amount2307, MDRefund, FORMAT(PostingDate,'hh:mm') as postingtime, " +
                 "b.NetAmount as amountdue, ConsumerName, ConsumerAddress, TINNo, ContactNumber, Email, b.ConsumerType " +
                 "FROM paidbills p INNER JOIN accountmaster a ON p.AccountNumber=a.AccountNumber INNER JOIN Bills b ON b.AccountNumber=a.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd " +
-                "WHERE PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59';";
+                "WHERE PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59' ORDER BY PostingDate ASC;";
 
         PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
 
@@ -348,12 +348,15 @@ public class BillDAO {
             bill.setPr(rs.getDouble("PR"));
             bill.setOthers(rs.getDouble("Others"));
             bill.setPromptPayment(rs.getDouble("PromptPayment"));
-            bill.setSurcharge(rs.getDouble("surcharge"));
+            Bill b = bill;
+            b.setMdRefund(rs.getDouble("MDRefund"));
+            b.setSurCharge(rs.getDouble("surcharge"));
             bill.setSLAdjustment(rs.getDouble("SLAdjustment"));
             bill.setOtherDeduction(rs.getDouble("otherdeduction"));
             bill.setAmount2306(rs.getDouble("Amount2306"));
             bill.setAmount2307(rs.getDouble("Amount2307"));
-
+            bill.setPostingDate(rs.getDate("postingdate"));
+            bill.setPostingTime(rs.getString("postingtime"));
             bills.add(bill);
         }
 

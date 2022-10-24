@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 import java.sql.Date;
+import java.sql.Time;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -15,8 +16,10 @@ public class PaidBill extends Bill{
     private String teller;
     private int dcrNumber;
     private Date postingDate;
+    private String postingTime;
     private int postingSequence;
     private double promptPayment;
+
     private double Surcharge;
     private double SLAdjustment;
     private double OtherDeduction;
@@ -121,14 +124,6 @@ public class PaidBill extends Bill{
         this.promptPayment = promptPayment;
     }
 
-    public double getSurcharge() {
-        return Surcharge;
-    }
-
-    public void setSurcharge(double surcharge) {
-        Surcharge = surcharge;
-    }
-
     public double getSLAdjustment() {
         return SLAdjustment;
     }
@@ -191,5 +186,13 @@ public class PaidBill extends Bill{
 
     public void setChecks(List<Check> checks) {
         this.checks = checks;
+    }
+
+    public String getPostingTime() {
+        return postingTime;
+    }
+
+    public void setPostingTime(String postingTime) {
+        this.postingTime = postingTime;
     }
 }
