@@ -1,6 +1,5 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
-import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import java.time.LocalDate;
 
 public class Bill {
@@ -26,10 +25,12 @@ public class Bill {
     private double otherAdjustment;
     private double katas;
     private double mdRefund;
+    private double scDiscount;
     private double generationVat;
     private double transmissionVat;
     private double systemLossVat;
     private double distributionVat;
+    private double katasNgVat;
     private double DAAVat;
     private double acrmVat;
     private double vat;
@@ -40,6 +41,8 @@ public class Bill {
     private double transformerRental;
     private double otherCharges;
     private double surchargeTax;
+    private double arGen;
+    private double arTran;
     private String Form2306;
     private String Form2307;
 
@@ -376,6 +379,10 @@ public class Bill {
                                 || this.consumerType.equals("B")
                                 || this.consumerType.equals("E"))) {
                     amount = penalty * 0.03;
+
+                    if (amount <= 50)
+                        amount = 50;
+
                     //For Commercial Types
                 } else {
                     //If CS with 1000kw below
@@ -416,6 +423,38 @@ public class Bill {
         double charges = this.getSurCharge() + this.getSurChargeTax() + this.getAmountDue();
         double deductions = this.getDiscount() + this.getMdRefund() + this.getKatas() + this.getCh2306() + this.getCh2307() + this.getSlAdjustment() + this.getOtherAdjustment();
         this.setTotalAmount(charges - deductions);
+    }
+
+    public double getScDiscount() {
+        return scDiscount;
+    }
+
+    public void setScDiscount(double scDiscount) {
+        this.scDiscount = scDiscount;
+    }
+
+    public double getKatasNgVat() {
+        return katasNgVat;
+    }
+
+    public void setKatasNgVat(double katasNgVat) {
+        this.katasNgVat = katasNgVat;
+    }
+
+    public double getArGen() {
+        return arGen;
+    }
+
+    public void setArGen(double arGen) {
+        this.arGen = arGen;
+    }
+
+    public double getArTran() {
+        return arTran;
+    }
+
+    public void setArTran(double arTran) {
+        this.arTran = arTran;
     }
 }
 

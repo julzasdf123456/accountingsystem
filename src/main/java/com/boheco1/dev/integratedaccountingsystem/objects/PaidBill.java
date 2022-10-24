@@ -19,8 +19,6 @@ public class PaidBill extends Bill{
     private String postingTime;
     private int postingSequence;
     private double promptPayment;
-
-    private double Surcharge;
     private double SLAdjustment;
     private double OtherDeduction;
     private Date ORDate;

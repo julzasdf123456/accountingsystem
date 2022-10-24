@@ -19,11 +19,6 @@ public class DB {
 
     //Default connection for Accounting DB
     public static Connection getConnection() throws SQLException, ClassNotFoundException {
-        if (other_connection != null) {
-            other_connection.close();
-            other_connection = null;
-        }
-
         if(connection==null) {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             String conString = "jdbc:sqlserver://"+host+";" +
@@ -41,11 +36,6 @@ public class DB {
 
     //Connection for switching database and querying selected information such as in Tellering (Searching of consumer info in Billing db)
     public static Connection getConnection(String db) throws SQLException, ClassNotFoundException {
-        if (connection != null) {
-            connection.close();
-            connection = null;
-        }
-
         if(other_connection==null) {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             String conString = "jdbc:sqlserver://"+host+";" +

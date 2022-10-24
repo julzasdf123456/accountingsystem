@@ -311,15 +311,31 @@ public class BillDAO {
      * @return list The list of paid bills
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static List<Bill> getAllPaidBills(int year, int month, int day) throws Exception {
-        String sql = "SELECT p.accountnumber, p.billnumber, power, p.meter, p.pr, p.others, p.netamount as amountpaid, PaymentType, ornumber, teller, dcrnumber, postingdate, " +
-                "postingsequence, PromptPayment, surcharge, SLAdjustment, otherdeduction, " +
-                "Amount2306, Amount2307, MDRefund, FORMAT(PostingDate,'hh:mm') as postingtime, " +
+    public static List<Bill> getAllPaidBills(int year, int month, int day, String teller) throws Exception {
+
+        String sql = "SELECT p.accountnumber, p.billnumber, power, p.meter, p.pr, p.others, p.netamount as amountpaid, PaymentType, ornumber, teller, dcrnumber, postingdate, cashAmount, checkAmount, " +
+                "postingsequence, PromptPayment, surcharge, SLAdjustment, otherdeduction, ISNULL(SeniorCitizenDiscount,0) AS SeniorCitizenDiscount, ISNULL(item7,0) AS KatasNgVAT, " +
+                "ISNULL(DAA_VAT,0) AS DAA_VAT, ISNULL(ACRM_VAT, 0) AS ACRM_VAT, ISNULL(SLVAT, 0) AS SLVAT, ISNULL(GenerationVAT,0) AS GenerationVAT, ISNULL(TransmissionVAT, 0) AS TransmissionVAT, " +
+                "Amount2306, Amount2307, MDRefund, FORMAT(PostingDate,'hh:mm') as postingtime, ISNULL(PowerKWH,0) AS PowerKWH, " +
                 "b.NetAmount as amountdue, ConsumerName, ConsumerAddress, TINNo, ContactNumber, Email, b.ConsumerType " +
                 "FROM paidbills p INNER JOIN accountmaster a ON p.AccountNumber=a.AccountNumber INNER JOIN Bills b ON b.AccountNumber=a.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd " +
+                "INNER JOIN BillsExtension c ON b.AccountNumber=c.AccountNumber AND b.ServicePeriodEnd=c.ServicePeriodEnd "+
                 "WHERE PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59' ORDER BY PostingDate ASC;";
 
+        if (teller != null)
+            sql = "SELECT p.accountnumber, p.billnumber, power, p.meter, p.pr, p.others, p.netamount as amountpaid, PaymentType, ornumber, teller, dcrnumber, postingdate, cashAmount, checkAmount, " +
+                    "postingsequence, PromptPayment, surcharge, SLAdjustment, otherdeduction, ISNULL(SeniorCitizenDiscount,0) AS SeniorCitizenDiscount, ISNULL(item7,0) AS KatasNgVAT, " +
+                    "ISNULL(DAA_VAT,0) AS DAA_VAT, ISNULL(ACRM_VAT, 0) AS ACRM_VAT, ISNULL(SLVAT, 0) AS SLVAT, ISNULL(GenerationVAT,0) AS GenerationVAT, ISNULL(TransmissionVAT, 0) AS TransmissionVAT, " +
+                    "Amount2306, Amount2307, MDRefund, FORMAT(PostingDate,'hh:mm') as postingtime, ISNULL(PowerKWH,0) AS PowerKWH, " +
+                    "b.NetAmount as amountdue, ConsumerName, ConsumerAddress, TINNo, ContactNumber, Email, b.ConsumerType " +
+                    "FROM paidbills p INNER JOIN accountmaster a ON p.AccountNumber=a.AccountNumber INNER JOIN Bills b ON b.AccountNumber=a.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd " +
+                    "INNER JOIN BillsExtension c ON b.AccountNumber=c.AccountNumber AND b.ServicePeriodEnd=c.ServicePeriodEnd "+
+                    "WHERE PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59' AND Teller = ? ORDER BY PostingDate ASC;";
+
         PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
+
+        if (teller != null)
+            ps.setString(1, teller);
 
         ResultSet rs = ps.executeQuery();
 
@@ -349,6 +365,16 @@ public class BillDAO {
             bill.setOthers(rs.getDouble("Others"));
             bill.setPromptPayment(rs.getDouble("PromptPayment"));
             Bill b = bill;
+            b.setPowerKWH(rs.getDouble("PowerKWH"));
+            b.setGenerationVat(rs.getDouble("GenerationVAT"));
+            b.setScDiscount(rs.getDouble("SeniorCitizenDiscount"));
+            b.setKatasNgVat(rs.getDouble("KatasNgVAT"));
+            b.setTransmissionVat(rs.getDouble("TransmissionVAT"));
+            b.setDAAVat(rs.getDouble("DAA_VAT"));
+            b.setAcrmVat(rs.getDouble("ACRM_VAT"));
+            b.setSystemLossVat(rs.getDouble("SLVAT"));
+            b.setArGen(b.getGenerationVat()+b.getSystemLossVat()+b.getDAAVat()+b.getAcrmVat());
+            b.setArTran(b.getTransmissionVat());
             b.setMdRefund(rs.getDouble("MDRefund"));
             b.setSurCharge(rs.getDouble("surcharge"));
             bill.setSLAdjustment(rs.getDouble("SLAdjustment"));
@@ -357,6 +383,8 @@ public class BillDAO {
             bill.setAmount2307(rs.getDouble("Amount2307"));
             bill.setPostingDate(rs.getDate("postingdate"));
             bill.setPostingTime(rs.getString("postingtime"));
+            bill.setCashAmount(rs.getDouble("cashAmount") == 0 ? rs.getDouble("amountpaid") : rs.getDouble("cashAmount"));
+            bill.setCheckAmount(rs.getDouble("checkAmount"));
             bills.add(bill);
         }
 
