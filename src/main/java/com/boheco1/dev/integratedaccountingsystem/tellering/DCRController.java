@@ -19,6 +19,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class DCRController extends MenuControllerHandler implements Initializable {
@@ -63,16 +65,30 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                 @Override
                 protected Void call() throws SQLException {
                     int day=0, year=0, month=0;
+
                     totalKwh = 0;
+                    billTotal = 0;
+                    amountDue = 0;
                     grandTotal = 0;
                     cashAmount = 0;
                     checkAmount = 0;
+
                     try{
                         month = date_pker.getValue().getMonthValue();
                         day = date_pker.getValue().getDayOfMonth();
                         year = date_pker.getValue().getYear();
                         bills = FXCollections.observableArrayList(BillDAO.getAllPaidBills(year, month, day, "engel"));
 
+                        HashMap<String, List<ItemSummary>> breakdown = BillDAO.getDCRBreakDown(year, month, day, "engel");
+                        dcrItems = FXCollections.observableArrayList(breakdown.get("Breakdown"));
+                        dcrPayments = FXCollections.observableArrayList(breakdown.get("Payments"));
+
+                        List<ItemSummary> misc = breakdown.get("Misc");
+                        totalKwh = misc.get(0).getTotal();
+                        grandTotal = misc.get(1).getTotal();
+                        billTotal = misc.get(2).getTotal();
+                        amountDue = misc.get(3).getTotal();
+                        /*
                         ItemSummary energy = new ItemSummary("Energy", 0);
                         ItemSummary tr = new ItemSummary("TSF/TR", 0);
                         ItemSummary others = new ItemSummary("Others", 0);
@@ -93,8 +109,8 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                         ItemSummary checkPayments = new ItemSummary("Check", 0);
                         ItemSummary totalPayments = new ItemSummary("Total", 0);
 
-                        double power = 0, pr = 0, meter = 0, other = 0, surcharge = 0, slAdj = 0, pDisc = 0, katasVat = 0, otherDeduct = 0, mdRef = 0,
-                                seniorDiscount = 0, a2307 = 0, a2306 = 0, transAmt = 0, genAmt = 0;
+                        double power = 0, pr = 0, vat = 0, other = 0, surcharge = 0, slAdj = 0, pDisc = 0, katasVat = 0, otherDeduct = 0, mdRef = 0,
+                                seniorDiscount = 0, a2307 = 0, a2306 = 0, transAmt = 0, genAmt = 0, item1 = 0, item2 = 0, item3 = 0, item4 = 0, fbhcamt = 0, item16 = 0, item17 = 0;
 
                         for (Bill b: bills) {
                             PaidBill bill = (PaidBill) b;
@@ -102,7 +118,6 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                             pr += bill.getPr();
                             other += bill.getOthers();
                             surcharge += bill.getSurCharge();
-                            meter += bill.getMeter();
                             slAdj += bill.getSLAdjustment();
                             pDisc += bill.getPromptPayment();
                             katasVat += bill.getKatasNgVat();
@@ -113,15 +128,20 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                             a2306 += bill.getAmount2306();
                             transAmt += bill.getArTran();
                             genAmt += bill.getArGen();
-                            totalKwh += bill.getPowerKWH();
-                            cashAmount += bill.getCashAmount();
-                            checkAmount += bill.getCheckAmount();
+                            item1 += bill.getGenVatFeb21();
+                            item2 += bill.getItem2();
+                            item3 += bill.getItem3();
+                            item4 += bill.getItem4();
+                            fbhcamt += bill.getFbhcAmt();
+                            item16 += bill.getItem16();
+                            item17 += bill.getItem17();
 
                             energy.setTotal(power);
                             tr.setTotal(pr);
                             others.setTotal(other);
                             surCharge.setTotal(surcharge);
-                            evat.setTotal(meter);
+                            vat = (item2 + (surcharge*0.12)) - (fbhcamt + item17 + item16 + transAmt + genAmt);
+                            evat.setTotal(vat);
                             slAdjustments.setTotal(slAdj);
                             ppd.setTotal(pDisc);
                             katasvat.setTotal(katasVat);
@@ -132,8 +152,12 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                             ch2307.setTotal(a2307);
                             arVATTrans.setTotal(transAmt);
                             arVATGen.setTotal(genAmt);
+
                             amountDue += b.getAmountDue();
                             billTotal += b.getTotalAmount();
+                            totalKwh += bill.getPowerKWH();
+                            cashAmount += bill.getCashAmount();
+                            checkAmount += bill.getCheckAmount();
                         }
                         dcrItems = FXCollections.observableArrayList();
                         dcrPayments = FXCollections.observableArrayList();
@@ -157,12 +181,13 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                         cashPayments.setTotal(cashAmount);
                         checkPayments.setTotal(checkAmount);
                         totalPayments.setTotal(cashAmount + checkAmount);
+
                         dcrPayments.add(cashPayments);
                         dcrPayments.add(checkPayments);
                         dcrPayments.add(totalPayments);
 
-                        grandTotal = (power + pr + meter + other + surcharge + transAmt + genAmt) - (slAdj + pDisc + katasVat + otherDeduct + mdRef +
-                                seniorDiscount + a2307 + a2306) ;
+                        grandTotal = (power + pr + vat + other + surcharge + transAmt + genAmt) - (slAdj + pDisc + katasVat + otherDeduct + mdRef +
+                                seniorDiscount + a2307 + a2306) ;*/
 
                     }catch (Exception e){
                         e.printStackTrace();

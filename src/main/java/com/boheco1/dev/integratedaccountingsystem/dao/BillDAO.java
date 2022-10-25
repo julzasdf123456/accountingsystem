@@ -1,15 +1,13 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
-import com.boheco1.dev.integratedaccountingsystem.objects.Bill;
-import com.boheco1.dev.integratedaccountingsystem.objects.Check;
-import com.boheco1.dev.integratedaccountingsystem.objects.ConsumerInfo;
-import com.boheco1.dev.integratedaccountingsystem.objects.PaidBill;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class BillDAO {
@@ -314,9 +312,9 @@ public class BillDAO {
     public static List<Bill> getAllPaidBills(int year, int month, int day, String teller) throws Exception {
 
         String sql = "SELECT p.accountnumber, p.billnumber, power, p.meter, p.pr, p.others, p.netamount as amountpaid, PaymentType, ornumber, teller, dcrnumber, postingdate, cashAmount, checkAmount, " +
-                "postingsequence, PromptPayment, surcharge, SLAdjustment, otherdeduction, ISNULL(SeniorCitizenDiscount,0) AS SeniorCitizenDiscount, ISNULL(item7,0) AS KatasNgVAT, " +
+                "postingsequence, PromptPayment, surcharge, SLAdjustment, otherdeduction, ISNULL(SeniorCitizenDiscount,0) AS SeniorCitizenDiscount, ISNULL(item7,0) AS KatasNgVAT, ISNULL(Item16,0) AS Item16, ISNULL(Item17,0) AS Item17, " +
                 "ISNULL(b.Item1,0) AS GenVatFeb21, ISNULL(DAA_VAT,0) AS DAA_VAT, ISNULL(ACRM_VAT, 0) AS ACRM_VAT, ISNULL(SLVAT, 0) AS SLVAT, ISNULL(GenerationVAT,0) AS GenerationVAT, ISNULL(TransmissionVAT, 0) AS TransmissionVAT, " +
-                "Amount2306, Amount2307, MDRefund, FORMAT(PostingDate,'hh:mm') as postingtime, ISNULL(PowerKWH,0) AS PowerKWH, " +
+                "Amount2306, Amount2307, MDRefund, FORMAT(PostingDate,'hh:mm') as postingtime, ISNULL(PowerKWH,0) AS PowerKWH, ISNULL(FBHCAmt,0) AS FBHCAmt, ISNULL(Item2, 0) AS VATandTaxes, ISNULL(Item3, 0) AS Item3, ISNULL(Item4, 0) AS Item4, " +
                 "b.NetAmount as amountdue, ConsumerName, ConsumerAddress, TINNo, ContactNumber, Email, b.ConsumerType " +
                 "FROM paidbills p INNER JOIN accountmaster a ON p.AccountNumber=a.AccountNumber INNER JOIN Bills b ON b.AccountNumber=a.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd " +
                 "INNER JOIN BillsExtension c ON b.AccountNumber=c.AccountNumber AND b.ServicePeriodEnd=c.ServicePeriodEnd "+
@@ -324,9 +322,9 @@ public class BillDAO {
 
         if (teller != null)
             sql = "SELECT p.accountnumber, p.billnumber, power, p.meter, p.pr, p.others, p.netamount as amountpaid, PaymentType, ornumber, teller, dcrnumber, postingdate, cashAmount, checkAmount, " +
-                    "postingsequence, PromptPayment, surcharge, SLAdjustment, otherdeduction, ISNULL(SeniorCitizenDiscount,0) AS SeniorCitizenDiscount, ISNULL(item7,0) AS KatasNgVAT, " +
+                    "postingsequence, PromptPayment, surcharge, SLAdjustment, otherdeduction, ISNULL(SeniorCitizenDiscount,0) AS SeniorCitizenDiscount, ISNULL(item7,0) AS KatasNgVAT, ISNULL(Item16,0) AS Item16, ISNULL(Item17,0) AS Item17, " +
                     "ISNULL(b.Item1,0) AS GenVatFeb21, ISNULL(DAA_VAT,0) AS DAA_VAT, ISNULL(ACRM_VAT, 0) AS ACRM_VAT, ISNULL(SLVAT, 0) AS SLVAT, ISNULL(GenerationVAT,0) AS GenerationVAT, ISNULL(TransmissionVAT, 0) AS TransmissionVAT, " +
-                    "Amount2306, Amount2307, MDRefund, FORMAT(PostingDate,'hh:mm') as postingtime, ISNULL(PowerKWH,0) AS PowerKWH, " +
+                    "Amount2306, Amount2307, MDRefund, FORMAT(PostingDate,'hh:mm') as postingtime, ISNULL(PowerKWH,0) AS PowerKWH, ISNULL(FBHCAmt,0) AS FBHCAmt, ISNULL(Item2, 0) AS VATandTaxes, ISNULL(Item3, 0) AS Item3, ISNULL(Item4, 0) AS Item4, " +
                     "b.NetAmount as amountdue, ConsumerName, ConsumerAddress, TINNo, ContactNumber, Email, b.ConsumerType " +
                     "FROM paidbills p INNER JOIN accountmaster a ON p.AccountNumber=a.AccountNumber INNER JOIN Bills b ON b.AccountNumber=a.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd " +
                     "INNER JOIN BillsExtension c ON b.AccountNumber=c.AccountNumber AND b.ServicePeriodEnd=c.ServicePeriodEnd "+
@@ -343,7 +341,6 @@ public class BillDAO {
 
         while(rs.next()) {
             String accountNo = rs.getString("AccountNumber");
-
             ConsumerInfo consumerInfo = new ConsumerInfo(
                     accountNo,
                     rs.getString("ConsumerName"),
@@ -352,7 +349,6 @@ public class BillDAO {
                     rs.getString("Email"),
                     rs.getString("ContactNumber")
                     );
-
             PaidBill bill = new PaidBill();
             bill.setConsumerType(rs.getString("ConsumerType"));
             bill.setConsumer(consumerInfo);
@@ -374,6 +370,12 @@ public class BillDAO {
             b.setAcrmVat(rs.getDouble("ACRM_VAT"));
             b.setSystemLossVat(rs.getDouble("SLVAT"));
             b.setGenVatFeb21(rs.getDouble("GenVatFeb21"));
+            b.setFbhcAmt(rs.getDouble("FBHCAmt"));
+            b.setItem2(rs.getDouble("VATandTaxes"));
+            b.setItem3(rs.getDouble("Item3"));
+            b.setItem4(rs.getDouble("Item4"));
+            b.setItem16(rs.getDouble("Item16"));
+            b.setItem17(rs.getDouble("Item17"));
             b.setArGen(b.getGenerationVat()+b.getSystemLossVat()+b.getDAAVat()+b.getAcrmVat()+b.getGenVatFeb21());
             b.setArTran(b.getTransmissionVat());
             b.setMdRefund(rs.getDouble("MDRefund"));
@@ -393,5 +395,144 @@ public class BillDAO {
         ps.close();
 
         return bills;
+    }
+
+    /**
+     * Retrieves paid bills from a specified date
+     * @param year The posting year
+     * @param month The posting month
+     * @param day The posting day
+     * @return list The list of paid bills
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static HashMap<String, List<ItemSummary>> getDCRBreakDown(int year, int month, int day, String teller) throws Exception{
+        String sql = "SELECT "+
+            "SUM(p.power) AS Energy, "+
+            "SUM(p.meter) AS Meter, "+
+            "SUM(p.pr) AS TransformerRental, "+
+            "SUM(p.others) AS Others, "+
+            "SUM(p.PromptPayment) AS PPD, "+
+            "SUM(p.surcharge) AS Surcharge, "+
+            "(SUM(ISNULL(b.Item2, 0)) + (SUM(p.surcharge) * 0.12) - SUM(ISNULL(b.FBHCAmt, 0)) - SUM(ISNULL(x.Item17, 0)) - SUM(ISNULL(x.Item16, 0)) - SUM(ISNULL(x.TransmissionVAT, 0)) - " +
+            "(SUM(ISNULL(x.GenerationVAT,0)) + SUM(ISNULL(x.SLVAT, 0)) + SUM(ISNULL(b.DAA_VAT, 0)) + SUM(ISNULL(b.ACRM_VAT, 0)) + SUM(ISNULL(b.Item1, 0)))) AS Evat, "+
+            "SUM(p.SLAdjustment) AS SLAdj, "+
+            "SUM(p.otherdeduction) AS OtherDeduction, "+
+            "SUM(ISNULL(p.Amount2306, 0)) AS Amount2306, "+
+            "SUM(ISNULL(p.Amount2307, 0)) AS Amount2307, "+
+            "SUM(ISNULL(p.MDRefund, 0)) AS MDRefund, "+
+            "SUM(ISNULL(b.PowerKWH, 0)) AS PowerKWH, "+
+            "SUM(p.netamount) AS AmountPaid, "+
+            "SUM(ISNULL(p.cashAmount, 0)) AS CashAmount, "+
+            "SUM(ISNULL(p.checkAmount, 0)) AS CheckAmount, "+
+            "SUM(ISNULL(b.SeniorCitizenDiscount,0)) AS SeniorCitizenDiscount, "+
+            "SUM(b.NetAmount) AS AmountDue, "+
+            "SUM(ISNULL(x.TransmissionVAT, 0)) AS ARVATTrans, "+
+            "(SUM(ISNULL(x.GenerationVAT,0)) + SUM(ISNULL(x.SLVAT, 0)) + SUM(ISNULL(b.DAA_VAT, 0)) + SUM(ISNULL(b.ACRM_VAT, 0)) + SUM(ISNULL(b.Item1, 0))) AS ARVATGen, "+
+            "SUM(ISNULL(x.item7, 0)) AS KatasNgVAT "+
+            "FROM paidbills p INNER JOIN accountmaster a ON p.AccountNumber=a.AccountNumber INNER JOIN Bills b ON b.AccountNumber=a.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd "+
+            "INNER JOIN BillsExtension x ON b.AccountNumber=x.AccountNumber AND b.ServicePeriodEnd=x.ServicePeriodEnd "+
+            "WHERE PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59'";
+
+        if (teller != null)
+            sql += " AND TELLER = ?";
+
+        PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
+
+        if (teller != null)
+            ps.setString(1, teller);
+
+        ResultSet rs = ps.executeQuery();
+
+        List<ItemSummary> dcrBreakdown = new ArrayList<>();
+        List<ItemSummary> paymentBreakdown = new ArrayList<>();
+        List<ItemSummary> misc = new ArrayList<>();
+
+        while(rs.next()) {
+            double kwh = rs.getDouble("PowerKWH");
+            double energy = rs.getDouble("Energy");
+            double tr = rs.getDouble("TransformerRental");
+            double others = rs.getDouble("Others");
+            double surcharge = rs.getDouble("Surcharge");
+
+            double slAdj = rs.getDouble("SLAdj");
+            double ppD = rs.getDouble("PPD");
+            double katasNgVAT = rs.getDouble("KatasNgVAT");
+            double otherDeduction = rs.getDouble("OtherDeduction");
+            double mdRefund = rs.getDouble("MDRefund");
+            double scDiscount = rs.getDouble("SeniorCitizenDiscount");
+            double amount2307 = rs.getDouble("Amount2307");
+            double amount2306 = rs.getDouble("Amount2306");
+
+            double arTrans = rs.getDouble("ARVATTrans");
+            double arGen = rs.getDouble("ARVATGen");
+
+            double evat = rs.getDouble("evat");
+
+            double total = (energy + tr + others + surcharge + evat) + (-slAdj - ppD - katasNgVAT - otherDeduction - mdRefund - scDiscount - amount2307 - amount2306) + arTrans + arGen;
+            double totalPaid = rs.getDouble("AmountPaid");
+            double amountDue = rs.getDouble("AmountDue");
+            double totalCash = rs.getDouble("CashAmount") == 0 ? totalPaid : rs.getDouble("CashAmount");
+            double totalCheck = rs.getDouble("CheckAmount");
+            double totalPayments = totalCash + totalCheck;
+
+            ItemSummary energyItem = new ItemSummary("Energy", energy);
+            ItemSummary trItem = new ItemSummary("TSF/TR", tr);
+            ItemSummary othersItem = new ItemSummary("Others", others);
+            ItemSummary surChargeItem = new ItemSummary("Surcharge", surcharge);
+            ItemSummary evatItem = new ItemSummary("Evat", evat);
+            ItemSummary slAdjItem = new ItemSummary("S/L Adjustments", slAdj);
+            ItemSummary ppdItem = new ItemSummary("PPD", ppD);
+            ItemSummary katasvatItem = new ItemSummary("Katas Ng VAT", katasNgVAT);
+            ItemSummary otherDeductionsItem = new ItemSummary("Other Deductions", otherDeduction);
+            ItemSummary mdRefundItem = new ItemSummary("MD Refund", mdRefund);
+            ItemSummary scDiscountItem = new ItemSummary("SC Discount", scDiscount);
+            ItemSummary ch2307Item = new ItemSummary("2307 (2%)", amount2307);
+            ItemSummary ch2306Item = new ItemSummary("2307 (5%)", amount2306);
+            ItemSummary arVATTransItem = new ItemSummary("ARVAT - Trans", arTrans);
+            ItemSummary arVATGenItem = new ItemSummary("ARVAT - Gen", arGen);
+            ItemSummary totalItem = new ItemSummary("Grand Total", total);
+
+            dcrBreakdown.add(energyItem);
+            dcrBreakdown.add(trItem);
+            dcrBreakdown.add(othersItem);
+            dcrBreakdown.add(surChargeItem);
+            dcrBreakdown.add(evatItem);
+            dcrBreakdown.add(slAdjItem);
+            dcrBreakdown.add(ppdItem);
+            dcrBreakdown.add(katasvatItem);
+            dcrBreakdown.add(otherDeductionsItem);
+            dcrBreakdown.add(mdRefundItem);
+            dcrBreakdown.add(scDiscountItem);
+            dcrBreakdown.add(ch2307Item);
+            dcrBreakdown.add(ch2306Item);
+            dcrBreakdown.add(arVATTransItem);
+            dcrBreakdown.add(arVATGenItem);
+
+            ItemSummary kwhItem = new ItemSummary("KWH", kwh);
+            ItemSummary totalDueItem = new ItemSummary("Amount Due", amountDue);
+            ItemSummary totalPaidBillsItem = new ItemSummary("Total Payments", totalPaid);
+
+            misc.add(kwhItem);
+            misc.add(totalItem);
+            misc.add(totalPaidBillsItem);
+            misc.add(totalDueItem);
+
+            ItemSummary cashPaymentsItem = new ItemSummary("Cash", totalCash);
+            ItemSummary checkPaymentsItem = new ItemSummary("Check", totalCheck);
+            ItemSummary totalPaymentsItem = new ItemSummary("Total", totalPayments);
+            paymentBreakdown.add(cashPaymentsItem);
+            paymentBreakdown.add(checkPaymentsItem);
+            paymentBreakdown.add(totalPaymentsItem);
+        }
+
+        HashMap<String, List<ItemSummary>> results = new HashMap<>();
+        results.put("Breakdown", dcrBreakdown);
+        results.put("Payments", paymentBreakdown);
+        results.put("Misc", misc);
+
+        rs.close();
+        ps.close();
+
+        return results;
     }
 }

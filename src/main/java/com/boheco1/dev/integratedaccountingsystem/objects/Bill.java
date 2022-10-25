@@ -33,7 +33,7 @@ public class Bill {
     private double katasNgVat;
     private double DAAVat;
     private double acrmVat;
-    private double GenVatFeb21;
+    private double GenVatFeb21; //Item1
     private double vat;
     private double otherVat;
     private double franchiseTax;
@@ -44,6 +44,12 @@ public class Bill {
     private double surchargeTax;
     private double arGen;
     private double arTran;
+    private double item2;
+    private double item3;
+    private double item4;
+    private double item16;
+    private double item17;
+    private double fbhcAmt;
     private String Form2306;
     private String Form2307;
 
@@ -464,6 +470,54 @@ public class Bill {
 
     public void setGenVatFeb21(double genVatFeb21) {
         GenVatFeb21 = genVatFeb21;
+    }
+
+    public double getItem16() {
+        return item16;
+    }
+
+    public void setItem16(double item16) {
+        this.item16 = item16;
+    }
+
+    public double getItem17() {
+        return item17;
+    }
+
+    public void setItem17(double item17) {
+        this.item17 = item17;
+    }
+
+    public double getFbhcAmt() {
+        return fbhcAmt;
+    }
+
+    public void setFbhcAmt(double fbhcAmt) {
+        this.fbhcAmt = fbhcAmt;
+    }
+
+    public double getItem2() {
+        return item2;
+    }
+
+    public void setItem2(double item2) {
+        this.item2 = item2;
+    }
+
+    public double getItem3() {
+        return item3;
+    }
+
+    public void setItem3(double item3) {
+        this.item3 = item3;
+    }
+
+    public double getItem4() {
+        return item4;
+    }
+
+    public void setItem4(double item4) {
+        this.item4 = item4;
     }
 }
 
