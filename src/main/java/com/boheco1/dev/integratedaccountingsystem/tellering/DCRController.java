@@ -161,8 +161,8 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                         dcrPayments.add(checkPayments);
                         dcrPayments.add(totalPayments);
 
-                        grandTotal = power + pr + meter + other + surcharge - (slAdj + pDisc + katasVat + otherDeduct + mdRef +
-                                seniorDiscount + a2307 + a2306) + transAmt + genAmt;
+                        grandTotal = (power + pr + meter + other + surcharge + transAmt + genAmt) - (slAdj + pDisc + katasVat + otherDeduct + mdRef +
+                                seniorDiscount + a2307 + a2306) ;
 
                     }catch (Exception e){
                         e.printStackTrace();

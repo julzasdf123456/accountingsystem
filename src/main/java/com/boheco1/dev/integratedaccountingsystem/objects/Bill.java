@@ -33,6 +33,7 @@ public class Bill {
     private double katasNgVat;
     private double DAAVat;
     private double acrmVat;
+    private double GenVatFeb21;
     private double vat;
     private double otherVat;
     private double franchiseTax;
@@ -455,6 +456,14 @@ public class Bill {
 
     public void setArTran(double arTran) {
         this.arTran = arTran;
+    }
+
+    public double getGenVatFeb21() {
+        return GenVatFeb21;
+    }
+
+    public void setGenVatFeb21(double genVatFeb21) {
+        GenVatFeb21 = genVatFeb21;
     }
 }
 

@@ -315,7 +315,7 @@ public class BillDAO {
 
         String sql = "SELECT p.accountnumber, p.billnumber, power, p.meter, p.pr, p.others, p.netamount as amountpaid, PaymentType, ornumber, teller, dcrnumber, postingdate, cashAmount, checkAmount, " +
                 "postingsequence, PromptPayment, surcharge, SLAdjustment, otherdeduction, ISNULL(SeniorCitizenDiscount,0) AS SeniorCitizenDiscount, ISNULL(item7,0) AS KatasNgVAT, " +
-                "ISNULL(DAA_VAT,0) AS DAA_VAT, ISNULL(ACRM_VAT, 0) AS ACRM_VAT, ISNULL(SLVAT, 0) AS SLVAT, ISNULL(GenerationVAT,0) AS GenerationVAT, ISNULL(TransmissionVAT, 0) AS TransmissionVAT, " +
+                "ISNULL(b.Item1,0) AS GenVatFeb21, ISNULL(DAA_VAT,0) AS DAA_VAT, ISNULL(ACRM_VAT, 0) AS ACRM_VAT, ISNULL(SLVAT, 0) AS SLVAT, ISNULL(GenerationVAT,0) AS GenerationVAT, ISNULL(TransmissionVAT, 0) AS TransmissionVAT, " +
                 "Amount2306, Amount2307, MDRefund, FORMAT(PostingDate,'hh:mm') as postingtime, ISNULL(PowerKWH,0) AS PowerKWH, " +
                 "b.NetAmount as amountdue, ConsumerName, ConsumerAddress, TINNo, ContactNumber, Email, b.ConsumerType " +
                 "FROM paidbills p INNER JOIN accountmaster a ON p.AccountNumber=a.AccountNumber INNER JOIN Bills b ON b.AccountNumber=a.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd " +
@@ -325,7 +325,7 @@ public class BillDAO {
         if (teller != null)
             sql = "SELECT p.accountnumber, p.billnumber, power, p.meter, p.pr, p.others, p.netamount as amountpaid, PaymentType, ornumber, teller, dcrnumber, postingdate, cashAmount, checkAmount, " +
                     "postingsequence, PromptPayment, surcharge, SLAdjustment, otherdeduction, ISNULL(SeniorCitizenDiscount,0) AS SeniorCitizenDiscount, ISNULL(item7,0) AS KatasNgVAT, " +
-                    "ISNULL(DAA_VAT,0) AS DAA_VAT, ISNULL(ACRM_VAT, 0) AS ACRM_VAT, ISNULL(SLVAT, 0) AS SLVAT, ISNULL(GenerationVAT,0) AS GenerationVAT, ISNULL(TransmissionVAT, 0) AS TransmissionVAT, " +
+                    "ISNULL(b.Item1,0) AS GenVatFeb21, ISNULL(DAA_VAT,0) AS DAA_VAT, ISNULL(ACRM_VAT, 0) AS ACRM_VAT, ISNULL(SLVAT, 0) AS SLVAT, ISNULL(GenerationVAT,0) AS GenerationVAT, ISNULL(TransmissionVAT, 0) AS TransmissionVAT, " +
                     "Amount2306, Amount2307, MDRefund, FORMAT(PostingDate,'hh:mm') as postingtime, ISNULL(PowerKWH,0) AS PowerKWH, " +
                     "b.NetAmount as amountdue, ConsumerName, ConsumerAddress, TINNo, ContactNumber, Email, b.ConsumerType " +
                     "FROM paidbills p INNER JOIN accountmaster a ON p.AccountNumber=a.AccountNumber INNER JOIN Bills b ON b.AccountNumber=a.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd " +
@@ -373,7 +373,8 @@ public class BillDAO {
             b.setDAAVat(rs.getDouble("DAA_VAT"));
             b.setAcrmVat(rs.getDouble("ACRM_VAT"));
             b.setSystemLossVat(rs.getDouble("SLVAT"));
-            b.setArGen(b.getGenerationVat()+b.getSystemLossVat()+b.getDAAVat()+b.getAcrmVat());
+            b.setGenVatFeb21(rs.getDouble("GenVatFeb21"));
+            b.setArGen(b.getGenerationVat()+b.getSystemLossVat()+b.getDAAVat()+b.getAcrmVat()+b.getGenVatFeb21());
             b.setArTran(b.getTransmissionVat());
             b.setMdRefund(rs.getDouble("MDRefund"));
             b.setSurCharge(rs.getDouble("surcharge"));
