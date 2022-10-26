@@ -119,7 +119,7 @@ public class BillDAO {
      */
     public static List<Bill> getConsumerBills(ConsumerInfo consumerInfo, boolean paid) throws Exception {
         String sql = "SELECT " +
-                "BillNumber, AccountNumber, ServicePeriodEnd, ServiceDateFrom, ServiceDateTo, DueDate, " +
+                "BillNumber, AccountNumber, ServicePeriodEnd, ServiceDateFrom, ServiceDateTo, DueDate, ISNULL(PR,0) AS PR, " +
                 "(SELECT PowerNew FROM BillsForDCRRevision a WHERE b.BillNumber = a.BillNumber) AS PowerNew, " +
                 "(SELECT KatasAmt FROM BillsForDCRRevision c WHERE b.BillNumber = c.BillNumber) AS KatasAmt, " +
                 "DATEDIFF(day, DueDate, getdate()) AS daysDelayed, ISNULL(NetAmount,0) AS NetAmount, ISNULL(ConsumerType,'RM') AS ConsumerType, ISNULL(PowerKWH,0) AS PowerKWH, " +
@@ -141,6 +141,7 @@ public class BillDAO {
         int i = 0;
         while(rs.next()) {
             String billNo = rs.getString("BillNumber");
+
             Bill bill = new PaidBill(
                     billNo,
                     rs.getDate("ServiceDateFrom").toLocalDate(),
@@ -156,21 +157,17 @@ public class BillDAO {
             bill.setConsumer(consumerInfo);
             bill.setPowerAmount(rs.getDouble("PowerNew"));
             bill.setKatas(rs.getDouble("KatasAmt"));
-            int daysDelayed = rs.getInt("daysDelayed");
-            double pkwh = rs.getDouble("PowerKWH");
-            double vaTandTaxes = rs.getDouble("VATandTaxes");
-            double transformerRental = rs.getDouble("TransformerRental");
-            double othersCharges = rs.getDouble("OthersCharges");
-            double acrm = rs.getDouble("ACRM_TAFPPCA");
-            double daa = rs.getDouble("DAA_GRAM");
+
             bill.setConsumerType(rs.getString("ConsumerType"));
-            bill.setPowerKWH(pkwh);
-            bill.setTransformerRental(transformerRental);
-            bill.setOtherCharges(othersCharges);
-            bill.setAcrmVat(acrm);
-            bill.setDAAVat(daa);
-            bill.setVat(vaTandTaxes);
-            bill.setDaysDelayed(daysDelayed);
+            bill.setPowerKWH(rs.getDouble("PowerKWH"));
+            bill.setTransformerRental(rs.getDouble("TransformerRental"));
+            bill.setOtherCharges(rs.getDouble("OthersCharges"));
+            bill.setPr(rs.getDouble("PR"));
+            bill.setAcrmVat(rs.getDouble("ACRM_TAFPPCA"));
+            bill.setDAAVat(rs.getDouble("DAA_GRAM"));
+            bill.setVat(rs.getDouble("VATandTaxes"));
+            bill.setDaysDelayed(rs.getInt("daysDelayed"));
+            bill.setAddCharges(bill.getPr()+bill.getOtherCharges());
             bill.setSurCharge(bill.computeSurCharge());
             bill.setSurChargeTax(bill.getSurCharge()*0.12);
             bill.computeTotalAmount();

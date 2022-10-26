@@ -19,6 +19,7 @@ public class Bill {
     private ConsumerInfo consumer;
     private String consumerType;
     private double addCharges;
+    private double pr;
     private double powerAmount;
     private double powerKWH;
     private double discount;
@@ -527,6 +528,14 @@ public class Bill {
 
     public void setPeriod(String period) {
         this.period = period;
+    }
+
+    public double getPr() {
+        return pr;
+    }
+
+    public void setPr(double pr) {
+        this.pr = pr;
     }
 }
 

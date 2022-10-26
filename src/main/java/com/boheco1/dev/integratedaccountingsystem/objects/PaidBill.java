@@ -8,7 +8,6 @@ public class PaidBill extends Bill{
 
     private double power;
     private double meter;
-    private double pr;
     private double others;
     private String paymentType;
     private int orNumber;
@@ -18,7 +17,6 @@ public class PaidBill extends Bill{
     private String postingTime;
     private int postingSequence;
     private double promptPayment;
-    private double SLAdjustment;
     private double OtherDeduction;
     private Date ORDate;
     private double Amount2306;
@@ -47,14 +45,6 @@ public class PaidBill extends Bill{
 
     public void setMeter(double meter) {
         this.meter = meter;
-    }
-
-    public double getPr() {
-        return pr;
-    }
-
-    public void setPr(double pr) {
-        this.pr = pr;
     }
 
     public double getOthers() {
