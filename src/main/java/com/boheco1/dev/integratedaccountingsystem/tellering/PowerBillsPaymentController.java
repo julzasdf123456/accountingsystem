@@ -6,10 +6,12 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -28,6 +30,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.util.Callback;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -72,12 +75,6 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
     @FXML
     private TableView<Bill> fees_table;
-
-    @FXML
-    private TextField or_no_tf;
-
-    @FXML
-    private JFXButton set_or;
 
     @FXML
     private TextField payment_tf;
@@ -130,16 +127,28 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     @FXML
     private JFXButton transact_btn;
 
+    @FXML
+    private VBox sidebar_vbox;
+
+    @FXML
+    private ProgressBar progressBar;
+
     private ConsumerInfo consumerInfo = null;
 
     private ObservableList<Bill> bills = FXCollections.observableArrayList();
     private ObservableList<Check> checks = FXCollections.observableArrayList();
 
-    private double amount_adjustment = 0;
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        if (ActiveUser.getUser().can("manage-billing"))
+            sidebar_vbox.setVisible(false);
+
         this.transact_btn.setDisable(true);
+
+        this.view_account_tf.setOnAction(actionEvent -> {
+            //connect to CRM
+        });
 
         this.acct_no_tf.setOnAction(actionEvent -> {
             String no = acct_no_tf.getText();
@@ -150,7 +159,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     try {
                         if (this.bills.size() == 0) this.bills = FXCollections.observableArrayList();
                         this.bills.addAll(BillDAO.getConsumerBills(this.consumerInfo, false));
-                        Utility.setAmount(this.total_payable_lbl, this.bills);
+                        this.setPayables();
                         this.fees_table.setItems(this.bills);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -174,156 +183,156 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 }
             });
 
-            final ContextMenu rowMenu = new ContextMenu();
+            if (ActiveUser.getUser().can("manage-tellering")) {
+                final ContextMenu rowMenu = new ContextMenu();
 
 
-            MenuItem itemRemoveBill = new MenuItem("Remove Bill");
-            itemRemoveBill.setOnAction(actionEvent -> {
-                this.fees_table.getItems().remove(row.getItem());
-                tv.refresh();
-                this.setPayables();
-                this.resetBillInfo();
-            });
+                MenuItem itemRemoveBill = new MenuItem("Remove Bill");
+                itemRemoveBill.setOnAction(actionEvent -> {
+                    this.fees_table.getItems().remove(row.getItem());
+                    tv.refresh();
+                    this.setPayables();
+                    this.resetBillInfo();
+                    if (this.fees_table.getItems().size() == 0)
+                        this.reset();
+                });
 
-            MenuItem itemAddPPD = new MenuItem("Less PPD");
-            itemAddPPD.setOnAction(actionEvent -> {
-                //Only I, CL, CS with >= 1kwh, B, E, AND DAYS BEFORE DUE DATE
-                if ((row.getItem().getConsumerType().equals("B")
-                    || row.getItem().getConsumerType().equals("E")
-                    || row.getItem().getConsumerType().equals("I")
-                    || row.getItem().getConsumerType().equals("CL")
-                    || (row.getItem().getConsumerType().equals("CS") && row.getItem().getPowerKWH() >= 1000))
-                    && row.getItem().getDaysDelayed() <= 0) {
-                    double ppd = 0;
+                MenuItem itemAddPPD = new MenuItem("Less PPD");
+                itemAddPPD.setOnAction(actionEvent -> {
+                    //Only I, CL, CS with >= 1kwh, B, E, AND DAYS BEFORE DUE DATE
+                    if ((row.getItem().getConsumerType().equals("B")
+                        || row.getItem().getConsumerType().equals("E")
+                        || row.getItem().getConsumerType().equals("I")
+                        || row.getItem().getConsumerType().equals("CL")
+                        || (row.getItem().getConsumerType().equals("CS") && row.getItem().getPowerKWH() >= 1000))
+                        && row.getItem().getDaysDelayed() <= 0) {
+                        double ppd = 0;
+                        try {
+                            ppd = BillDAO.getDiscount(row.getItem());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        row.getItem().setDiscount(ppd);
+                        row.getItem().computeTotalAmount();
+                        tv.refresh();
+                        this.setBillInfo(row.getItem());
+                    }else{
+                        AlertDialogBuilder.messgeDialog("System Error", "Only consumer types BAPA, ECA, I, CL, and CS with more than 1KWH can avail the 1% discount on or before due date!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    }
+                });
+
+                MenuItem itemRemovePPD = new MenuItem("Remove PPD");
+                itemRemovePPD.setOnAction(actionEvent -> {
+                    row.getItem().setDiscount(0);
+                    row.getItem().computeTotalAmount();
+                    tv.refresh();
+                    this.setBillInfo(row.getItem());
+                    this.setPayables();
+                });
+
+                MenuItem itemClear = new MenuItem("Clear");
+                itemClear.setOnAction(actionEvent -> {
+                    row.getItem().setDiscount(0);
+                    row.getItem().setCh2306(0);
+                    row.getItem().setCh2307(0);
+                    row.getItem().setSlAdjustment(0);
+                    row.getItem().setOtherAdjustment(0);
+                    row.getItem().computeTotalAmount();
+                    tv.refresh();
+                    this.setBillInfo(row.getItem());
+                    this.setPayables();
+                });
+
+                MenuItem itemAddSurcharge = new MenuItem("Add Surcharge Manually");
+                itemAddSurcharge.setOnAction(actionEvent -> {
                     try {
-                        ppd = BillDAO.getDiscount(row.getItem());
+                        showAuthenticate(row.getItem(), this.fees_table, this.total_payable_lbl);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+                MenuItem itemWaiveSurcharge = new MenuItem("Remove Surcharge");
+                itemWaiveSurcharge.setOnAction(actionEvent -> {
+                    try {
+                        showAuthenticate(row.getItem(), this.fees_table, this.total_payable_lbl);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+                MenuItem item2306 = new MenuItem("2306");
+                item2306.setOnAction(actionEvent -> {
+                    if (row.getItem().getConsumerType().equals("RM")) return;
+                    try {
+                        this.showTIN(row.getItem(), "2306");
+                        row.getItem().setCh2306(BillDAO.getForm2306(row.getItem()));
+                        row.getItem().computeTotalAmount();
+                        tv.refresh();
+                        this.setBillInfo(row.getItem());
+                        this.setPayables();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    row.getItem().setDiscount(ppd);
-                    row.getItem().computeTotalAmount();
+                });
+
+                MenuItem item2307 = new MenuItem("2307");
+                item2307.setOnAction(event -> {
+                    if (row.getItem().getConsumerType().equals("RM")) return;
+                    try {
+                        this.showTIN(row.getItem(), "2307");
+                        row.getItem().setCh2307(BillDAO.getForm2307(row.getItem()));
+                        row.getItem().computeTotalAmount();
+                        tv.refresh();
+                        this.setBillInfo(row.getItem());
+                        this.setPayables();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+
+                MenuItem itemSLAdj = new MenuItem("Add SL Adjustment");
+                itemSLAdj.setOnAction(actionEvent -> {
+                    this.showAdjustment(row.getItem(),"SL");
                     tv.refresh();
                     this.setBillInfo(row.getItem());
-                }else{
-                    AlertDialogBuilder.messgeDialog("System Error", "Only consumer types BAPA, ECA, I, CL, and CS with more than 1KWH can avail the 1% discount on or before due date!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-                }
-            });
+                    this.setPayables();
+                });
 
-            MenuItem itemRemovePPD = new MenuItem("Remove PPD");
-            itemRemovePPD.setOnAction(actionEvent -> {
-                row.getItem().setDiscount(0);
-                row.getItem().computeTotalAmount();
-                tv.refresh();
-                this.setBillInfo(row.getItem());
-                this.setPayables();
-            });
-
-            MenuItem itemClear = new MenuItem("Clear");
-            itemClear.setOnAction(actionEvent -> {
-                row.getItem().setDiscount(0);
-                row.getItem().setCh2306(0);
-                row.getItem().setCh2307(0);
-                row.getItem().setSlAdjustment(0);
-                row.getItem().setOtherAdjustment(0);
-                row.getItem().computeTotalAmount();
-                tv.refresh();
-                this.setBillInfo(row.getItem());
-                this.setPayables();
-            });
-
-            MenuItem itemAddSurcharge = new MenuItem("Add Surcharge Manually");
-            itemAddSurcharge.setOnAction(actionEvent -> {
-                try {
-                    showAuthenticate(row.getItem(), this.fees_table, this.total_payable_lbl);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-
-            MenuItem itemWaiveSurcharge = new MenuItem("Remove Surcharge");
-            itemWaiveSurcharge.setOnAction(actionEvent -> {
-                try {
-                    showAuthenticate(row.getItem(), this.fees_table, this.total_payable_lbl);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-
-            MenuItem item2306 = new MenuItem("2306");
-            item2306.setOnAction(actionEvent -> {
-                if (row.getItem().getConsumerType().equals("RM")) return;
-                try {
-                    this.showTIN(row.getItem(), "2306");
-                    row.getItem().setCh2306(BillDAO.getForm2306(row.getItem()));
+                MenuItem itemRemoveSLAdj = new MenuItem("Remove SL Adjustment");
+                itemRemoveSLAdj.setOnAction(actionEvent -> {
+                    row.getItem().setSlAdjustment(0);
                     row.getItem().computeTotalAmount();
                     tv.refresh();
                     this.setBillInfo(row.getItem());
                     this.setPayables();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
+                });
 
-            MenuItem item2307 = new MenuItem("2307");
-            item2307.setOnAction(event -> {
-                if (row.getItem().getConsumerType().equals("RM")) return;
-                try {
-                    this.showTIN(row.getItem(), "2307");
-                    row.getItem().setCh2307(BillDAO.getForm2307(row.getItem()));
+                MenuItem itemOthersAdj = new MenuItem("Add Other Deduction");
+                itemOthersAdj.setOnAction(actionEvent -> {
+                    this.showAdjustment(row.getItem(),"Other");
+                    tv.refresh();
+                    this.setBillInfo(row.getItem());
+                    this.setPayables();
+                });
+
+                MenuItem itemRemoveOthersAdj = new MenuItem("Remove Other Deduction");
+                itemRemoveOthersAdj.setOnAction(actionEvent -> {
+                    row.getItem().setOtherAdjustment(0);
                     row.getItem().computeTotalAmount();
                     tv.refresh();
                     this.setBillInfo(row.getItem());
                     this.setPayables();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
+                });
 
-            MenuItem itemSLAdj = new MenuItem("Add SL Adjustment");
-            itemSLAdj.setOnAction(actionEvent -> {
-                this.showAdjustment(row.getItem(),"SL");
-                tv.refresh();
-                this.setBillInfo(row.getItem());
-                this.setPayables();
-            });
+                rowMenu.getItems().addAll(itemRemoveBill, new SeparatorMenuItem(), itemClear, new SeparatorMenuItem(), itemAddPPD, itemRemovePPD,  new SeparatorMenuItem(), itemAddSurcharge, itemWaiveSurcharge,  new SeparatorMenuItem(), item2306, item2307,  new SeparatorMenuItem(), itemSLAdj, itemRemoveSLAdj,  new SeparatorMenuItem(), itemOthersAdj, itemRemoveOthersAdj);
 
-            MenuItem itemRemoveSLAdj = new MenuItem("Remove SL Adjustment");
-            itemRemoveSLAdj.setOnAction(actionEvent -> {
-                row.getItem().setSlAdjustment(0);
-                row.getItem().computeTotalAmount();
-                tv.refresh();
-                this.setBillInfo(row.getItem());
-                this.setPayables();
-            });
-
-            MenuItem itemOthersAdj = new MenuItem("Add Other Deduction");
-            itemOthersAdj.setOnAction(actionEvent -> {
-                this.showAdjustment(row.getItem(),"Other");
-                tv.refresh();
-                this.setBillInfo(row.getItem());
-                this.setPayables();
-            });
-
-            MenuItem itemRemoveOthersAdj = new MenuItem("Remove Other Deduction");
-            itemRemoveOthersAdj.setOnAction(actionEvent -> {
-                row.getItem().setOtherAdjustment(0);
-                row.getItem().computeTotalAmount();
-                tv.refresh();
-                this.setBillInfo(row.getItem());
-                this.setPayables();
-            });
-
-            rowMenu.getItems().addAll(itemRemoveBill, new SeparatorMenuItem(), itemClear, new SeparatorMenuItem(), itemAddPPD, itemRemovePPD,  new SeparatorMenuItem(), itemAddSurcharge, itemWaiveSurcharge,  new SeparatorMenuItem(), item2306, item2307,  new SeparatorMenuItem(), itemSLAdj, itemRemoveSLAdj,  new SeparatorMenuItem(), itemOthersAdj, itemRemoveOthersAdj);
-
-            row.contextMenuProperty().bind(
-                    Bindings.when(row.emptyProperty())
-                            .then((ContextMenu) null)
-                            .otherwise(rowMenu));
+                row.contextMenuProperty().bind(
+                        Bindings.when(row.emptyProperty())
+                                .then((ContextMenu) null)
+                                .otherwise(rowMenu));
+            }
             return row;
-        });
-
-        this.set_or.setOnAction(actionEvent -> {
-            this.or_no_tf.setDisable(!this.or_no_tf.isDisabled());
         });
 
         this.payment_tf.setOnKeyTyped(keyEvent -> {
@@ -354,15 +363,17 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
     public void confirmPayment(){
         try {
-            double totalBills = Utility.round(this.computeTotalBills(),2);
-            double totalPayments = Utility.round(this.computeTotalPayments(),2);
+
+            double totalBills = Utility.getTotalAmount(this.bills);
+            double totalPayments = this.computeTotalPayments();
+
             if (totalPayments < totalBills){
-                AlertDialogBuilder.messgeDialog("Partial Payment Warning", "The total payment does not exceed the total amount due! Please check the amount!",
+                AlertDialogBuilder.messgeDialog("Partial Payment Warning", "The total payment does not exceed the total payable amount! Please check the amount!",
                         Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }else {
                 this.showConfirmation(
                         this.bills,
-                        Double.parseDouble(this.total_payable_lbl.getText().replace(",","")),
+                        totalBills,
                         Double.parseDouble(this.payment_tf.getText().replace(",","")),
                         this.checks);
             }
@@ -389,39 +400,18 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
      */
     public void setPayables(){
         try {
-            double total = this.computeTotalBills();
+            double total = Utility.getTotalAmount(this.bills);
             this.total_payable_lbl.setText(Utility.formatDecimal(total));
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    public double computeChecks(){
-        double amount = 0;
-        if (this.checks.size() > 0) {
-            for (Check c : this.checks) {
-                amount += c.getAmount();
-            }
-        }
-
-        return amount;
-    }
-
-    public double computeTotalBills(){
-        double amount = 0;
-        if (this.bills.size() > 0) {
-            for (Bill b : this.bills) {
-                amount += b.getTotalAmount();
-            }
-        }
-        return amount;
-    }
-
     public double computeTotalPayments(){
         double total = 0;
         try {
             double cash = Double.parseDouble(this.payment_tf.getText());
-            double amount = computeChecks();
+            double amount = Utility.getTotalAmount(this.checks);
             total = cash + amount;
         }catch (Exception e){
 
@@ -465,8 +455,8 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
      */
     public void resetChecks(){
         if (this.checks == null || this.checks.size() == 0) return;
-        double amount = this.computeChecks();
-        double current_total = Double.parseDouble(this.total_paid_tf.getText()) - amount;
+        double amount = Utility.getTotalAmount(this.checks);
+        double current_total = Double.parseDouble(this.total_paid_tf.getText().replace(",","")) - amount;
         if (current_total < 0)
             current_total = 0;
         this.total_paid_tf.setText(Utility.formatDecimal(current_total));
@@ -538,21 +528,21 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column3.setMaxWidth(100);
         column3.setMinWidth(100);
         column3.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getAmountDue())));
-        column3.setStyle("-fx-alignment: center-right; -fx-text-fill: #6002EE;");
+        column3.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column4 = new TableColumn<>("Surcharge");
         column4.setPrefWidth(100);
         column4.setMaxWidth(100);
         column4.setMinWidth(100);
         column4.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getSurCharge())));
-        column4.setStyle("-fx-alignment: center-right; -fx-text-fill: #ff0000;");
+        column4.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column5 = new TableColumn<>("2306/07");
         column5.setPrefWidth(100);
         column5.setMaxWidth(100);
         column5.setMinWidth(100);
         column5.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal((obj.getValue().getCh2306()+obj.getValue().getCh2307()))));
-        column5.setStyle("-fx-alignment: center; -fx-text-fill: #009688;");
+        column5.setStyle("-fx-alignment: center;");
 
         TableColumn<Bill, String> columnWaive = new TableColumn<>("Waive");
         Callback<TableColumn<Bill, String>, TableCell<Bill, String>> waiveBtn
@@ -598,11 +588,11 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
         TableColumn<Bill, String> column7 = new TableColumn<>("Total Amount");
         column7.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getTotalAmount())));
-        column7.setStyle("-fx-alignment: center-right; -fx-text-fill: #6002EE;");
+        column7.setStyle("-fx-alignment: center-right;");
 
         this.bills =  FXCollections.observableArrayList();
         this.fees_table.setFixedCellSize(35);
-        this.fees_table.setPlaceholder(new Label("No Bills added"));
+        this.fees_table.setPlaceholder(new Label("No bills added! Search or input the account number!"));
 
         this.fees_table.getColumns().add(column0);
         this.fees_table.getColumns().add(column);
@@ -610,7 +600,10 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.fees_table.getColumns().add(column2);
         this.fees_table.getColumns().add(column3);
         this.fees_table.getColumns().add(column4);
-        this.fees_table.getColumns().add(columnWaive);
+
+        if (ActiveUser.getUser().can("manage-tellering"))
+            this.fees_table.getColumns().add(columnWaive);
+
         this.fees_table.getColumns().add(column5);
         this.fees_table.getColumns().add(column7);
     }
@@ -622,28 +615,49 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     @Override
     public void receive(Object o) {
         if (o instanceof ConsumerInfo) {
-            this.consumerInfo = (ConsumerInfo) o;
-            try{
-                if (this.bills.size() == 0) this.bills = FXCollections.observableArrayList();
-                List<Bill> consumerBills = BillDAO.getConsumerBills(this.consumerInfo, false);
-                if (consumerBills.size() > 0) {
-                    for (Bill b : consumerBills){
-                        if (!this.bills.contains(b)) {
-                            this.bills.add(b);
+            Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() throws SQLException {
+                consumerInfo = (ConsumerInfo) o;
+                try{
+                    if (bills.size() == 0) bills = FXCollections.observableArrayList();
+                    List<Bill> consumerBills = BillDAO.getConsumerBills(consumerInfo, false);
+                    if (consumerBills.size() > 0) {
+                        for (Bill b : consumerBills){
+                            if (!bills.contains(b)) {
+                                bills.add(b);
+                            }
                         }
                     }
-                    this.setConsumerInfo(this.consumerInfo);
-                    Utility.setAmount(this.total_payable_lbl, this.bills);
-                    this.fees_table.setItems(this.bills);
-                    this.payment_tf.setDisable(false);
-                    this.payment_tf.requestFocus();
-                    this.transact_btn.setDisable(false);
-                    this.total_paid_tf.setDisable(false);
-                    InputHelper.restrictNumbersOnly(payment_tf);
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+                    return null;
+                }
+            };
+
+            task.setOnRunning(wse -> {
+                progressBar.setVisible(true);
+            });
+
+            task.setOnSucceeded(wse -> {
+                setConsumerInfo(consumerInfo);
+                fees_table.setItems(bills);
+                setPayables();
+                payment_tf.setDisable(false);
+                payment_tf.requestFocus();
+                transact_btn.setDisable(false);
+                total_paid_tf.setDisable(false);
+                InputHelper.restrictNumbersOnly(payment_tf);
+                progressBar.setVisible(false);
+            });
+
+            task.setOnFailed(wse -> {
+                //Do nothing
+                progressBar.setVisible(false);
+            });
+
+            new Thread(task).start();
         }
     }
     /**
@@ -775,8 +789,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     PaidBill paidBill = (PaidBill) b;
                     paidBill.setTeller(ActiveUser.getUser().getUserName());
                     paidBill.setChecks(checks);
-                    //double cash_amount = Double.parseDouble(controller.getCash_tf().getText().replace(",",""));
-                    double check_amount = computeChecks();
+                    double check_amount = Utility.getTotalAmount(this.checks);
                     paidBill.setCashAmount(amount_due - check_amount);
                     paidBill.setCheckAmount(check_amount);
                     BillDAO.addPaidBill(b);

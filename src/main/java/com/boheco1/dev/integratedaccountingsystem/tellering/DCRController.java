@@ -16,6 +16,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
+
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -114,11 +116,6 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                 dcr_transNo_lbl.setText(bills.size()+"");
                 dcr_total_kwh.setText(Utility.formatDecimal(totalKwh));
                 dcr_total.setText(Utility.formatDecimal(grandTotal));
-
-                System.out.println("Bill Total: "+billTotal);
-                System.out.println("Bill Total Amount Due: "+amountDue);
-                System.out.println("DCR Total: "+grandTotal);
-                System.out.println("Bill Total - DCR Total: "+(billTotal-grandTotal));
             });
 
             task.setOnFailed(wse -> {
@@ -248,7 +245,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
 
         this.dcrItems =  FXCollections.observableArrayList();
         this.dcr_breakdown_table.setFixedCellSize(35);
-        this.dcr_breakdown_table.setPlaceholder(new Label("No report was generated added"));
+        this.dcr_breakdown_table.setPlaceholder(new Label("No report was generated!"));
 
         this.dcr_breakdown_table.getColumns().add(column1);
         this.dcr_breakdown_table.getColumns().add(column2);
@@ -265,7 +262,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
 
         this.dcrPayments =  FXCollections.observableArrayList();
         this.payments_table.setFixedCellSize(35);
-        this.payments_table.setPlaceholder(new Label("No report was generated added"));
+        this.payments_table.setPlaceholder(new Label("No report was generated!"));
 
         this.payments_table.getColumns().add(column1);
         this.payments_table.getColumns().add(column2);

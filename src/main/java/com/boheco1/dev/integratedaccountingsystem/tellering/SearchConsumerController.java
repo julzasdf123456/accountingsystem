@@ -1,8 +1,8 @@
 package com.boheco1.dev.integratedaccountingsystem.tellering;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.BillDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.ConsumerDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
-import com.boheco1.dev.integratedaccountingsystem.objects.Bill;
 import com.boheco1.dev.integratedaccountingsystem.objects.ConsumerInfo;
 import com.jfoenix.controls.JFXTextField;
 import javafx.collections.FXCollections;
@@ -28,6 +28,9 @@ public class SearchConsumerController extends MenuControllerHandler implements I
     private JFXTextField query_tf;
 
     @FXML
+    private Label status_lbl;
+
+    @FXML
     private TableView<ConsumerInfo> consumersTable;
     private ObservableList<ConsumerInfo> consumers = null;
     private ConsumerInfo consumerInfo = null;
@@ -42,6 +45,14 @@ public class SearchConsumerController extends MenuControllerHandler implements I
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     consumerInfo = row.getItem();
                     this.parentController.receive(consumerInfo);
+                    try {
+                        if (BillDAO.getConsumerBills(consumerInfo, false).size() == 0)
+                            this.setMessage("Consumer has no unpaid bills!");
+                        else
+                            this.setMessage("");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             });
             return row ;
@@ -64,7 +75,13 @@ public class SearchConsumerController extends MenuControllerHandler implements I
             e.printStackTrace();
         }
     }
-
+    /**
+     * Set the message on the label to notify users!
+     * @return void
+     */
+    public void setMessage(String msg){
+        this.status_lbl.setText(msg);
+    }
     /**
      * Initializes the consumers table
      * @return void

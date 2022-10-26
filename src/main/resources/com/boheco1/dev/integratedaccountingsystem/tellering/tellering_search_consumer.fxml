@@ -2,6 +2,7 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXTextField?>
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
@@ -61,11 +62,18 @@
                <top>
                   <HBox prefHeight="20.0" prefWidth="976.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Label styleClass="bold" text="Consumer Advance Search">
+                        <Label prefWidth="200.0" styleClass="bold" text="Consumer Advance Search">
                            <HBox.margin>
                               <Insets bottom="8.0" />
                            </HBox.margin>
                         </Label>
+                        <Label fx:id="status_lbl" alignment="CENTER" prefWidth="576.0">
+                           <styleClass>
+                              <String fx:value="red" />
+                              <String fx:value="bold" />
+                           </styleClass>
+                        </Label>
+                        <HBox prefHeight="100.0" prefWidth="200.0" />
                      </children>
                   </HBox>
                </top>

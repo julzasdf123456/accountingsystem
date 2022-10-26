@@ -153,7 +153,7 @@ public class Utility {
         Utility.dictionary = dictionary;
     }
 
-    public static void setAmount(Node control, Collection<?> data) {
+    public static double getTotalAmount(Collection<?> data) {
         double amount = 0;
         for (Object e : data) {
             if (e instanceof Bill) {
@@ -165,17 +165,7 @@ public class Utility {
             }
         }
         amount = round(amount,2);
-        if (control instanceof Label) {
-            Label amount_control = (Label) control;
-            double current_amount = Double.parseDouble(amount_control.getText().replace(",",""));
-            amount += current_amount;
-            amount_control.setText(Utility.formatDecimal(amount));
-        } else if (control instanceof TextField) {
-            TextField textField = (TextField) control;
-            double current_amount = Double.parseDouble(textField.getText().replace(",",""));
-            amount += current_amount;
-            textField.setText(Utility.formatDecimal(amount));
-        }
+        return amount;
     }
 
     public static double round(double value, int places) {
