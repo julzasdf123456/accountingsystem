@@ -311,24 +311,20 @@ public class BillDAO {
      */
     public static List<Bill> getAllPaidBills(int year, int month, int day, String teller) throws Exception {
 
-        String sql = "SELECT p.accountnumber, p.billnumber, power, p.meter, p.pr, p.others, p.netamount as amountpaid, PaymentType, ornumber, teller, dcrnumber, postingdate, cashAmount, checkAmount, " +
-                "postingsequence, PromptPayment, surcharge, SLAdjustment, otherdeduction, ISNULL(SeniorCitizenDiscount,0) AS SeniorCitizenDiscount, ISNULL(item7,0) AS KatasNgVAT, ISNULL(Item16,0) AS Item16, ISNULL(Item17,0) AS Item17, " +
-                "ISNULL(b.Item1,0) AS GenVatFeb21, ISNULL(DAA_VAT,0) AS DAA_VAT, ISNULL(ACRM_VAT, 0) AS ACRM_VAT, ISNULL(SLVAT, 0) AS SLVAT, ISNULL(GenerationVAT,0) AS GenerationVAT, ISNULL(TransmissionVAT, 0) AS TransmissionVAT, " +
-                "Amount2306, Amount2307, MDRefund, FORMAT(PostingDate,'hh:mm') as postingtime, ISNULL(PowerKWH,0) AS PowerKWH, ISNULL(FBHCAmt,0) AS FBHCAmt, ISNULL(Item2, 0) AS VATandTaxes, ISNULL(Item3, 0) AS Item3, ISNULL(Item4, 0) AS Item4, " +
-                "b.NetAmount as amountdue, ConsumerName, ConsumerAddress, TINNo, ContactNumber, Email, b.ConsumerType " +
-                "FROM paidbills p INNER JOIN accountmaster a ON p.AccountNumber=a.AccountNumber INNER JOIN Bills b ON b.AccountNumber=a.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd " +
-                "INNER JOIN BillsExtension c ON b.AccountNumber=c.AccountNumber AND b.ServicePeriodEnd=c.ServicePeriodEnd "+
-                "WHERE PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59' ORDER BY PostingDate ASC;";
+        String sql = "SELECT pbx.BillNumber, pbx.AccountNumber, pbx.ConsumerName, pbx.TotalAmount, pbx.ConsumerType, pbx.Period, pbx.GenerationVAT, pbx.TransmissionVAT, " +
+                "pbx.OthersVAT, pbx.DistributionVAT, pbx.SLVAT, pbx.Item3, pbx.Item2, pbx.SLAdjustment, pbx.PromptPayment, pbx.Surcharge, pbx.NetAmount, pbx.Teller, pbx.ORNumber, " +
+                "pbx.PostingDate, pbx.PostingSequence, pbx.CurrentBills, pbx.Within30Days, pbx.Over30Days, pbx.PR, pbx.Others, pbx.Powerkwh, pbx.KatasAMount, pbx.OtherDeduction, " +
+                "pbx.MDRefund, pbx.NetAmountLessMDRefund, pbx.SeniorCitizenDiscount, pbx.GroupTag, pbx.Amount2306, pbx.Amount2307, b.FBHCAmt AS FranchiseTax, x.Item16 AS BusinessTax, " +
+                "x.Item17 AS RealPropertyTax, b.DAA_VAT, b.ACRM_VAT, b.Item1 as GenVatFeb21, FORMAT(pbx.PostingDate,'hh:mm') as PostingTime, CashAmount, CheckAmount " +
+                "FROM PaidBillsWithRoute pbx INNER JOIN Bills b ON pbx.AccountNumber=b.AccountNumber AND pbx.ServicePeriodEnd=b.ServicePeriodEnd " +
+                "INNER JOIN PaidBills p ON p.AccountNumber=b.AccountNumber AND p.ServicePeriodEnd=b.ServicePeriodEnd " +
+                "INNER JOIN BillsExtension x ON  pbx.AccountNumber=x.AccountNumber AND pbx.ServicePeriodEnd=x.ServicePeriodEnd " +
+                "WHERE pbx.PostingDate>='"+year+"-"+month+"-"+day+" 00:00:00' AND pbx.PostingDate<='"+year+"-"+month+"-"+day+" 23:59:59'";
 
         if (teller != null)
-            sql = "SELECT p.accountnumber, p.billnumber, power, p.meter, p.pr, p.others, p.netamount as amountpaid, PaymentType, ornumber, teller, dcrnumber, postingdate, cashAmount, checkAmount, " +
-                    "postingsequence, PromptPayment, surcharge, SLAdjustment, otherdeduction, ISNULL(SeniorCitizenDiscount,0) AS SeniorCitizenDiscount, ISNULL(item7,0) AS KatasNgVAT, ISNULL(Item16,0) AS Item16, ISNULL(Item17,0) AS Item17, " +
-                    "ISNULL(b.Item1,0) AS GenVatFeb21, ISNULL(DAA_VAT,0) AS DAA_VAT, ISNULL(ACRM_VAT, 0) AS ACRM_VAT, ISNULL(SLVAT, 0) AS SLVAT, ISNULL(GenerationVAT,0) AS GenerationVAT, ISNULL(TransmissionVAT, 0) AS TransmissionVAT, " +
-                    "Amount2306, Amount2307, MDRefund, FORMAT(PostingDate,'hh:mm') as postingtime, ISNULL(PowerKWH,0) AS PowerKWH, ISNULL(FBHCAmt,0) AS FBHCAmt, ISNULL(Item2, 0) AS VATandTaxes, ISNULL(Item3, 0) AS Item3, ISNULL(Item4, 0) AS Item4, " +
-                    "b.NetAmount as amountdue, ConsumerName, ConsumerAddress, TINNo, ContactNumber, Email, b.ConsumerType " +
-                    "FROM paidbills p INNER JOIN accountmaster a ON p.AccountNumber=a.AccountNumber INNER JOIN Bills b ON b.AccountNumber=a.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd " +
-                    "INNER JOIN BillsExtension c ON b.AccountNumber=c.AccountNumber AND b.ServicePeriodEnd=c.ServicePeriodEnd "+
-                    "WHERE PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59' AND Teller = ? ORDER BY PostingDate ASC;";
+            sql += " AND pbx.Teller = ? ";
+
+        sql += "ORDER BY pbx.PostingDate, pbx.PostingSequence";
 
         PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
 
@@ -344,50 +340,48 @@ public class BillDAO {
             ConsumerInfo consumerInfo = new ConsumerInfo(
                     accountNo,
                     rs.getString("ConsumerName"),
-                    rs.getString("ConsumerAddress"),
-                    rs.getString("TINNo"),
-                    rs.getString("Email"),
-                    rs.getString("ContactNumber")
-                    );
+                   "",
+                   "",
+                    "",
+                    ""
+            );
             PaidBill bill = new PaidBill();
             bill.setConsumerType(rs.getString("ConsumerType"));
             bill.setConsumer(consumerInfo);
             bill.setBillNo(rs.getString("BillNumber"));
-            bill.setAmountDue(rs.getDouble("amountdue"));
-            bill.setTotalAmount(rs.getDouble("amountpaid"));
-            bill.setPower(rs.getDouble("power"));
-            bill.setMeter(rs.getDouble("meter"));
+            bill.setAmountDue(rs.getDouble("TotalAmount"));
+            bill.setTotalAmount(rs.getDouble("NetAmount"));
             bill.setPr(rs.getDouble("PR"));
             bill.setOthers(rs.getDouble("Others"));
             bill.setPromptPayment(rs.getDouble("PromptPayment"));
             Bill b = bill;
-            b.setPowerKWH(rs.getDouble("PowerKWH"));
+            b.setPeriod(rs.getString("Period"));
+            b.setPowerKWH(rs.getDouble("Powerkwh"));
             b.setGenerationVat(rs.getDouble("GenerationVAT"));
             b.setScDiscount(rs.getDouble("SeniorCitizenDiscount"));
-            b.setKatasNgVat(rs.getDouble("KatasNgVAT"));
+            b.setKatasNgVat(rs.getDouble("KatasAMount"));
             b.setTransmissionVat(rs.getDouble("TransmissionVAT"));
             b.setDAAVat(rs.getDouble("DAA_VAT"));
             b.setAcrmVat(rs.getDouble("ACRM_VAT"));
             b.setSystemLossVat(rs.getDouble("SLVAT"));
             b.setGenVatFeb21(rs.getDouble("GenVatFeb21"));
-            b.setFbhcAmt(rs.getDouble("FBHCAmt"));
-            b.setItem2(rs.getDouble("VATandTaxes"));
+            b.setFbhcAmt(rs.getDouble("FranchiseTax"));
+            b.setItem2(rs.getDouble("Item2"));
             b.setItem3(rs.getDouble("Item3"));
-            b.setItem4(rs.getDouble("Item4"));
-            b.setItem16(rs.getDouble("Item16"));
-            b.setItem17(rs.getDouble("Item17"));
+            b.setItem16(rs.getDouble("BusinessTax"));
+            b.setItem17(rs.getDouble("RealPropertyTax"));
             b.setArGen(b.getGenerationVat()+b.getSystemLossVat()+b.getDAAVat()+b.getAcrmVat()+b.getGenVatFeb21());
             b.setArTran(b.getTransmissionVat());
             b.setMdRefund(rs.getDouble("MDRefund"));
-            b.setSurCharge(rs.getDouble("surcharge"));
-            bill.setSLAdjustment(rs.getDouble("SLAdjustment"));
-            bill.setOtherDeduction(rs.getDouble("otherdeduction"));
+            b.setSurCharge(rs.getDouble("Surcharge"));
+            b.setSlAdjustment(rs.getDouble("SLAdjustment"));
+            bill.setOtherDeduction(rs.getDouble("OtherDeduction"));
             bill.setAmount2306(rs.getDouble("Amount2306"));
             bill.setAmount2307(rs.getDouble("Amount2307"));
-            bill.setPostingDate(rs.getDate("postingdate"));
-            bill.setPostingTime(rs.getString("postingtime"));
-            bill.setCashAmount(rs.getDouble("cashAmount") == 0 ? rs.getDouble("amountpaid") : rs.getDouble("cashAmount"));
-            bill.setCheckAmount(rs.getDouble("checkAmount"));
+            bill.setPostingDate(rs.getDate("PostingDate"));
+            bill.setPostingTime(rs.getString("PostingTime"));
+            bill.setCashAmount(rs.getDouble("CashAmount") == 0 ? rs.getDouble("NetAmount") : rs.getDouble("CashAmount"));
+            bill.setCheckAmount(rs.getDouble("CheckAmount"));
             bills.add(bill);
         }
 
@@ -447,8 +441,8 @@ public class BillDAO {
 
         "SUM(ISNULL(p.SLAdjustment,0)) AS SLAdj, "+
         "SUM(ISNULL(p.otherdeduction,0)) AS OtherDeduction, "+
-        "SUM(ISNULL(p.Amount2306, 0)) AS Amount2307, "+
-        "SUM(ISNULL(p.Amount2307, 0)) AS Amount2306, "+
+        "SUM(ISNULL(p.Amount2306, 0)) AS Amount2306, "+
+        "SUM(ISNULL(p.Amount2307, 0)) AS Amount2307, "+
         "SUM(ISNULL(p.MDRefund, 0)) AS MDRefund, "+
         "SUM(ISNULL(p.PowerKWH, 0)) AS PowerKWH, "+
         "SUM(ISNULL(p.NetAmount,0)) AS AmountPaid, "+
@@ -467,7 +461,7 @@ public class BillDAO {
         "INNER JOIN BillsExtension x ON b.AccountNumber=x.AccountNumber AND b.ServicePeriodEnd=x.ServicePeriodEnd "+
         "INNER JOIN PaidBillsWithRoute p ON b.AccountNumber=p.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd "+
         "INNER JOIN PaidBills pb ON b.AccountNumber=pb.AccountNumber AND b.ServicePeriodEnd=pb.ServicePeriodEnd "+
-            "WHERE p.PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND p.PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59'";
+        "WHERE p.PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND p.PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59'";
 
         if (teller != null)
             sql += " AND p.TELLER = ?";
@@ -502,7 +496,7 @@ public class BillDAO {
             double arTrans = rs.getDouble("ARVATTrans");
             double arGen = rs.getDouble("ARVATGen");
 
-            double evat = rs.getDouble("evat");
+            double evat = rs.getDouble("Evat");
 
             double total = (energy + tr + others + surcharge + evat) + (-slAdj - ppD - katasNgVAT - otherDeduction - mdRefund - scDiscount - amount2307 - amount2306) + arTrans + arGen;
             double totalPaid = rs.getDouble("AmountPaid");

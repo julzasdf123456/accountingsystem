@@ -15,6 +15,7 @@ public class Bill {
     private LocalDate serviceDatefrom;
     private LocalDate serviceDateto;
     private LocalDate servicePeriodEnd;
+    private String period;
     private ConsumerInfo consumer;
     private String consumerType;
     private double addCharges;
@@ -518,6 +519,14 @@ public class Bill {
 
     public void setItem4(double item4) {
         this.item4 = item4;
+    }
+
+    public String getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(String period) {
+        this.period = period;
     }
 }
 

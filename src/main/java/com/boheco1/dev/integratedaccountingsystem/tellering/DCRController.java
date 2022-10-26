@@ -77,9 +77,9 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                         month = date_pker.getValue().getMonthValue();
                         day = date_pker.getValue().getDayOfMonth();
                         year = date_pker.getValue().getYear();
-                        bills = FXCollections.observableArrayList(BillDAO.getAllPaidBills(year, month, day, "sol"));
+                        bills = FXCollections.observableArrayList(BillDAO.getAllPaidBills(year, month, day, "engel"));
 
-                        HashMap<String, List<ItemSummary>> breakdown = BillDAO.getDCRBreakDown(year, month, day, "sol");
+                        HashMap<String, List<ItemSummary>> breakdown = BillDAO.getDCRBreakDown(year, month, day, "engel");
                         dcrItems = FXCollections.observableArrayList(breakdown.get("Breakdown"));
                         dcrPayments = FXCollections.observableArrayList(breakdown.get("Payments"));
 
@@ -174,7 +174,14 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         column3.setMaxWidth(75);
         column3.setMinWidth(75);
         column3.setCellValueFactory(new PropertyValueFactory<>("consumerType"));
-        column3.setStyle("-fx-alignment: center-right;");
+        column3.setStyle("-fx-alignment: center;");
+
+        TableColumn<Bill, String> column31 = new TableColumn<>("Month");
+        column31.setPrefWidth(75);
+        column31.setMaxWidth(75);
+        column31.setMinWidth(75);
+        column31.setCellValueFactory(new PropertyValueFactory<>("period"));
+        column31.setStyle("-fx-alignment: center;");
 
         TableColumn<Bill, String> column4 = new TableColumn<>("Sys. Loss");
         column4.setPrefWidth(100);
@@ -187,7 +194,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         column5.setPrefWidth(100);
         column5.setMaxWidth(100);
         column5.setMinWidth(100);
-        column5.setCellValueFactory(obj -> new SimpleStringProperty((Utility.formatDecimal(obj.getValue().getDiscount()))));
+        column5.setCellValueFactory(obj -> new SimpleStringProperty((Utility.formatDecimal(((PaidBill)obj.getValue()).getPromptPayment()))));
         column5.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column6 = new TableColumn<>("Surcharge");
@@ -222,6 +229,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         this.dcr_power_table.getColumns().add(column1);
         this.dcr_power_table.getColumns().add(column2);
         this.dcr_power_table.getColumns().add(column3);
+        this.dcr_power_table.getColumns().add(column31);
         this.dcr_power_table.getColumns().add(column4);
         this.dcr_power_table.getColumns().add(column5);
         this.dcr_power_table.getColumns().add(column6);

@@ -1,7 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 import java.sql.Date;
-import java.sql.Time;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -120,14 +119,6 @@ public class PaidBill extends Bill{
 
     public void setPromptPayment(double promptPayment) {
         this.promptPayment = promptPayment;
-    }
-
-    public double getSLAdjustment() {
-        return SLAdjustment;
-    }
-
-    public void setSLAdjustment(double SLAdjustment) {
-        this.SLAdjustment = SLAdjustment;
     }
 
     public double getOtherDeduction() {
