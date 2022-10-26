@@ -20,7 +20,7 @@ public class Utility {
     public static String NOT_FOUND = "NOT FOUND";
     public static String ADDED = "ADDED";
     public static String OUT_OF_STOCK = "OUT OF STOCK";
-    public static String INSUFFICIENT_STOCK = "INSUFFICIENT STOCK";
+    public static String INSUFFICIENT_STOCK = "INSUFFICIENT";
     public static double TAX = 12;
     public static String STATION = "main"; //main or sub
     public static String OFFICE_PREFIX = "OSD";

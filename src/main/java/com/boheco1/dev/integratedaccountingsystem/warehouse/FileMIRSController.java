@@ -16,7 +16,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -25,6 +27,7 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
@@ -391,6 +394,16 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         });
     }
 
+/*
+    @FXML
+    private void tableClick(MouseEvent event) {
+        MIRSItem mirsItem = mirsItemTable.selectionModelProperty().get().getSelectedItem();
+        if(mirsItem.getRemarks().equals(Utility.OUT_OF_STOCK)){
+           // mirsItemTable.getSelectionModel().sele
+           // setStyle("-fx-text-fill: " + ColorPalette.BLACK + "; -fx-alignment: center;");
+        }
+    }*/
+
     @Override
     public void setSubMenus(FlowPane flowPane) {
         flowPane.getChildren().removeAll();
@@ -415,6 +428,45 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         //disable row highlight
         //mirsItemTable.setSelectionModel(null);
 
+        TableColumn<MIRSItem, String> remarksCols = new TableColumn<>("Remarks");
+        remarksCols.setPrefWidth(200);
+        remarksCols.setMaxWidth(200);
+        remarksCols.setMinWidth(200);
+        //remarksCols.setCellValueFactory(new PropertyValueFactory<>("remarks"));
+        Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> remarkcellFactory
+                = //
+                new Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>>() {
+                    @Override
+                    public TableCell call(final TableColumn<MIRSItem, String> param) {
+                        final TableCell<MIRSItem, String> cell = new TableCell<MIRSItem, String>() {
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    MIRSItem mirsItem = getTableView().getItems().get(getIndex());
+                                    //set font color RED if item is added to table using the available stock not the requested quantity
+                                    if (mirsItem.getRemarks().equals(Utility.OUT_OF_STOCK) || mirsItem.getRemarks().equals(Utility.NOT_FOUND)) {
+                                        setStyle("" +
+                                                "-fx-background-color: #f7e1df; " +
+                                                "-fx-text-fill: #212121;" +
+                                                "-fx-alignment: center-left;");
+                                    }else{
+                                        setStyle("-fx-background-color: transparent; -fx-alignment: center-left;");
+                                    }
+                                    setGraphic(null);
+                                    setText(mirsItem.getRemarks());
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+
+        remarksCols.setCellFactory(remarkcellFactory);
+
         TableColumn<MIRSItem, String> descriptionCol = new TableColumn<>("Description");
         descriptionCol.setStyle("-fx-alignment: center-left;");
         //descriptionCol.setCellValueFactory(new PropertyValueFactory<>("particulars"));
@@ -432,14 +484,26 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                     setText(null);
                                 } else {
                                     MIRSItem mirsItem = getTableView().getItems().get(getIndex());
+
+
+                                    Text text = new Text(mirsItem.getParticulars());
                                     //set font color RED if item is added to table using the available stock not the requested quantity
-                                    if (mirsItem.getRemarks().equals(Utility.OUT_OF_STOCK) || mirsItem.getRemarks().equals(Utility.NOT_FOUND)) {
-                                        setStyle("-fx-text-fill: " + ColorPalette.DANGER + "; -fx-alignment: center-left;");
+                                    if (mirsItem.getRemarks().equals(Utility.ADDED)) {
+                                        setStyle("-fx-background-color: transparent; -fx-alignment: center-left; ");
+                                        setText(mirsItem.getParticulars());
+                                        setGraphic(null);
                                     }else{
-                                        setStyle("-fx-text-fill: " + ColorPalette.BLACK + "; -fx-alignment: center-left;");
+                                        text.setStyle("" +
+                                                "-fx-fill: #212121; " +
+                                                "-fx-alignment: center-left; " +
+                                                "-fx-text-wrap: true; ");
+                                        setStyle("-fx-background-color: #f7e1df; ");
+                                        text.wrappingWidthProperty().bind(getTableColumn().widthProperty().subtract(35));
+                                        setPrefHeight(text.getLayoutBounds().getHeight()+10);
+                                        setGraphic(text);
+                                        setText(null);
                                     }
-                                    setGraphic(null);
-                                    setText(mirsItem.getParticulars());
+
                                 }
                             }
                         };
@@ -478,21 +542,22 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                 } else {
                                     MIRSItem mirsItem = getTableView().getItems().get(getIndex());
                                     //set font color RED if item is added to table using the available stock not the requested quantity
-                                    if (mirsItem.getQuantity() > 0)
-                                        setStyle("-fx-text-fill: " + ColorPalette.BLACK + "; -fx-alignment: center;");
-                                    else
-                                        setStyle("-fx-text-fill: " + ColorPalette.DANGER + "; -fx-alignment: center;");
+                                    if (mirsItem.getQuantity() > 0){
+                                        setStyle("-fx-background-color: transparent; -fx-alignment: center;");
+                                    }else{
+                                        setStyle("" +
+                                                "-fx-background-color: #f7e1df; " +
+                                                "-fx-text-fill: #212121; -fx-alignment: center;");
+                                    }
 
                                     setGraphic(null);
                                     setText(Utility.formatDecimal(mirsItem.getQuantity()));
-
                                 }
                             }
                         };
                         return cell;
                     }
                 };
-
         quantityCol.setCellFactory(qtycellFactory);
 
         TableColumn<MIRSItem, String> removeCol = new TableColumn<>(" ");
@@ -516,10 +581,10 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                     setText(null);
                                 } else {
                                     //btn.setStyle("-fx-background-color: "+ColorPalette.DANGER+";");
+                                    MIRSItem mirsItem = getTableView().getItems().get(getIndex());
                                     icon.setIconSize(24);
-                                    icon.setIconColor(Paint.valueOf(ColorPalette.DANGER));
+                                    icon.setIconColor(Paint.valueOf(ColorPalette.WARNING));
                                     btn.setOnAction(event -> {
-                                        MIRSItem mirsItem = getTableView().getItems().get(getIndex());
                                         try{
                                             JFXButton accept = new JFXButton("Accept");
                                             JFXDialog dialog = DialogBuilder.showConfirmDialog("Remove Item","Confirm cancellation of item \n\n" +
@@ -542,6 +607,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                                         }
                                     });
+                                    setStyle("-fx-background-color: #ffff; -fx-alignment: center; ");
                                     setGraphic(btn);
                                     setText(null);
                                 }
@@ -550,9 +616,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                         return cell;
                     }
                 };
-
         removeCol.setCellFactory(removeColCellFactory);
-        removeCol.setStyle("-fx-alignment: center;");
 
         TableColumn<MIRSItem, String> updateCol = new TableColumn<>(" ");
         updateCol.setPrefWidth(50);
@@ -577,10 +641,8 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                 } else {
                                     //btn.setStyle("-fx-background-color: "+ColorPalette.DANGER+";");
                                     MIRSItem mirsItem = getTableView().getItems().get(getIndex());
-
-
                                     icon.setIconSize(24);
-                                    icon.setIconColor(Paint.valueOf(ColorPalette.INFO));
+                                    icon.setIconColor(Paint.valueOf(ColorPalette.SUCCESS));
                                     btn.setOnAction(event -> {
                                         try{
                                             Stock stock = StockDAO.get(mirsItem.getStockID());
@@ -616,6 +678,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                             return;
                                         }
                                     });
+                                    setStyle("-fx-background-color: #ffff; -fx-alignment: center; ");
                                     btn.setVisible(!mirsItem.getRemarks().equals(Utility.OUT_OF_STOCK) && !mirsItem.getRemarks().equals(Utility.NOT_FOUND));
                                     setGraphic(btn);
                                     setText(null);
@@ -626,45 +689,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                         return cell;
                     }
                 };
-
         updateCol.setCellFactory(updateColCellFactory);
-        updateCol.setStyle("-fx-alignment: center;");
-
-        TableColumn<MIRSItem, String> remarksCols = new TableColumn<>("Remarks");
-        remarksCols.setPrefWidth(270);
-        remarksCols.setMaxWidth(270);
-        remarksCols.setMinWidth(270);
-        //remarksCols.setCellValueFactory(new PropertyValueFactory<>("remarks"));
-        Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> remarkcellFactory
-                = //
-                new Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>>() {
-                    @Override
-                    public TableCell call(final TableColumn<MIRSItem, String> param) {
-                        final TableCell<MIRSItem, String> cell = new TableCell<MIRSItem, String>() {
-                            @Override
-                            public void updateItem(String item, boolean empty) {
-                                super.updateItem(item, empty);
-                                if (empty) {
-                                    setGraphic(null);
-                                    setText(null);
-                                } else {
-                                    MIRSItem mirsItem = getTableView().getItems().get(getIndex());
-                                    //set font color RED if item is added to table using the available stock not the requested quantity
-                                    if (mirsItem.getRemarks().equals(Utility.OUT_OF_STOCK) || mirsItem.getRemarks().equals(Utility.NOT_FOUND)) {
-                                        setStyle("-fx-text-fill: " + ColorPalette.DANGER + "; -fx-alignment: center-left;");
-                                    }else{
-                                        setStyle("-fx-text-fill: " + ColorPalette.BLACK + "; -fx-alignment: center-left;");
-                                    }
-                                    setGraphic(null);
-                                    setText(mirsItem.getRemarks());
-                                }
-                            }
-                        };
-                        return cell;
-                    }
-                };
-
-        remarksCols.setCellFactory(remarkcellFactory);
 
 
         //mirsItemTable.getColumns().add(neaCodeCol);

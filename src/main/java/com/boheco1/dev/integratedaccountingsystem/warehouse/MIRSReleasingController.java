@@ -184,7 +184,32 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
         relQuantityCol.setPrefWidth(50);
         relQuantityCol.setMaxWidth(50);
         relQuantityCol.setMinWidth(50);
-        relQuantityCol.setCellValueFactory((new PropertyValueFactory<>("Quantity")));
+        //relQuantityCol.setCellValueFactory((new PropertyValueFactory<>("Quantity")));
+        Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> qtycellFactory
+                = //
+                new Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>>() {
+                    @Override
+                    public TableCell call(final TableColumn<MIRSItem, String> param) {
+                        final TableCell<MIRSItem, String> cell = new TableCell<MIRSItem, String>() {
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    MIRSItem mirsItem = getTableView().getItems().get(getIndex());
+                                    setGraphic(null);
+                                    setText(Utility.formatDecimal(mirsItem.getQuantity()));
+
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+
+        relQuantityCol.setCellFactory(qtycellFactory);
 
         TableColumn<MIRSItem, String> relBrandCol = new TableColumn<>("Brand");
         relBrandCol.setStyle("-fx-alignment: center;");
@@ -280,10 +305,13 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                                                 @Override
                                                 public void handle(ActionEvent __) {
                                                     releasingItem.remove(mirsItem);
-                                                    //Get quantity of stock in the hashmap
-                                                    double qty_current = selected_items.get(mirsItem.getStockID());
-                                                    //Deduct from the current quantity and update value in hashmap
-                                                    selected_items.put(mirsItem.getStockID(), qty_current - mirsItem.getQuantity());
+                                                    if(!selected_items.isEmpty()){
+                                                        //Get quantity of stock in the hashmap
+                                                        double qty_current = selected_items.get(mirsItem.getStockID());
+                                                        //Deduct from the current quantity and update value in hashmap
+                                                        selected_items.put(mirsItem.getStockID(), qty_current - mirsItem.getQuantity());
+                                                    }
+
                                                     if(!mirsItem.isAdditional()) {
                                                         boolean found = false;
                                                         for (MIRSItem m : requestedItem){
@@ -479,11 +507,11 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                             @Override
                             public void handle(ActionEvent __) {
                                 try {
-                                    if(input.getText().length() == 0 || Integer.parseInt(input.getText()) > mirsItem.getQuantity()) {
+                                    if(input.getText().length() == 0 || Double.parseDouble(input.getText()) > mirsItem.getQuantity()) {
                                         AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid quantity!",
                                                 Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                                     }else {
-                                        int reqQty = Integer.parseInt(input.getText());
+                                        double reqQty = Double.parseDouble(input.getText());
                                         MIRSItem parMirsItem = new MIRSItem();
                                         parMirsItem.setId(mirsItem.getId());
                                         parMirsItem.setMirsID(mirsItem.getMirsID());
@@ -527,7 +555,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
         if(selectedStock == null){
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid stock item!",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-        }else if(quantity.getText().length() == 0 || Integer.parseInt(quantity.getText()) > StockDAO.countAvailable(selectedStock)) {
+        }else if(quantity.getText().length() == 0 || Double.parseDouble(quantity.getText()) > StockDAO.countAvailable(selectedStock)) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid request quantity!",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }else{
@@ -536,7 +564,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
             mirsItem.setStockID(selectedStock.getId());
             mirsItem.setParticulars(selectedStock.getDescription());
             mirsItem.setUnit(selectedStock.getUnit());
-            mirsItem.setQuantity(Integer.parseInt(quantity.getText()));
+            mirsItem.setQuantity(Double.parseDouble(quantity.getText()));
             mirsItem.setPrice(selectedStock.getPrice());
             mirsItem.setId(Utility.generateRandomId());
             mirsItem.setAdditional(true);

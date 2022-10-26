@@ -52,7 +52,7 @@ public class MIRSReleasingSelectItemController implements Initializable {
     private int counter = 0;
     private double maxItem = 0;
 
-    private HashMap<String, Integer> selected_items;
+    private HashMap<String, Double> selected_items;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
@@ -61,12 +61,12 @@ public class MIRSReleasingSelectItemController implements Initializable {
                 mirsItem = (MIRSItem) obj;
                 items = StockDAO.getByDescription(StockDAO.get(mirsItem.getStockID()).getDescription());
             }
-            selected_items = (HashMap<String, Integer>) Utility.getDictionary();
+            selected_items = (HashMap<String, Double>) Utility.getDictionary();
 
             parentController = Utility.getParentController();
             for (SlimStock slimStock : items){
                 String key = slimStock.getId();
-                int value = 0;
+                double value = 0;
                 if (selected_items.containsKey(key)){
                     value = selected_items.get(key);
                     slimStock.setQuantity(slimStock.getQuantity()-value);
@@ -88,7 +88,7 @@ public class MIRSReleasingSelectItemController implements Initializable {
             }else if(qty.getText().isEmpty()) {
                 AlertDialogBuilder.messgeDialog("System Message", "Quantity is required.", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }else{
-                int q = Integer.parseInt(qty.getText());
+                double q = Double.parseDouble(qty.getText());
 
 
                 if(q > mirsItem.getQuantity()) {//check quantity of current item
@@ -118,8 +118,8 @@ public class MIRSReleasingSelectItemController implements Initializable {
                     parentController.receive(mirsItem);
                     String key = this.brand.getSelectionModel().getSelectedItem().getId();
                     if (selected_items.containsKey(key)){
-                        int value = selected_items.get(key);
-                        int new_qty = value + q;
+                        double value = selected_items.get(key);
+                        double new_qty = value + q;
                         selected_items.put(key, new_qty);
                     }else{
                         selected_items.put(key, q);
