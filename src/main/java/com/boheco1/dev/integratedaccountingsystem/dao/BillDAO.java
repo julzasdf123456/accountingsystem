@@ -398,43 +398,79 @@ public class BillDAO {
     }
 
     /**
-     * Retrieves paid bills from a specified date
+     * Retrieves DCR Breakdown from a specified date
      * @param year The posting year
      * @param month The posting month
      * @param day The posting day
-     * @return list The list of paid bills
+     * @param teller The posting day
+     * @return list The list of dcr breakdown
      * @throws Exception obligatory from DB.getConnection()
      */
     public static HashMap<String, List<ItemSummary>> getDCRBreakDown(int year, int month, int day, String teller) throws Exception{
         String sql = "SELECT "+
-            "SUM(p.power) AS Energy, "+
-            "SUM(p.meter) AS Meter, "+
-            "SUM(p.pr) AS TransformerRental, "+
-            "SUM(p.others) AS Others, "+
-            "SUM(p.PromptPayment) AS PPD, "+
-            "SUM(p.surcharge) AS Surcharge, "+
-            "(SUM(ISNULL(b.Item2, 0)) + (SUM(p.surcharge) * 0.12) - SUM(ISNULL(b.FBHCAmt, 0)) - SUM(ISNULL(x.Item17, 0)) - SUM(ISNULL(x.Item16, 0)) - SUM(ISNULL(x.TransmissionVAT, 0)) - " +
-            "(SUM(ISNULL(x.GenerationVAT,0)) + SUM(ISNULL(x.SLVAT, 0)) + SUM(ISNULL(b.DAA_VAT, 0)) + SUM(ISNULL(b.ACRM_VAT, 0)) + SUM(ISNULL(b.Item1, 0)))) AS Evat, "+
-            "SUM(p.SLAdjustment) AS SLAdj, "+
-            "SUM(p.otherdeduction) AS OtherDeduction, "+
-            "SUM(ISNULL(p.Amount2306, 0)) AS Amount2306, "+
-            "SUM(ISNULL(p.Amount2307, 0)) AS Amount2307, "+
-            "SUM(ISNULL(p.MDRefund, 0)) AS MDRefund, "+
-            "SUM(ISNULL(b.PowerKWH, 0)) AS PowerKWH, "+
-            "SUM(p.netamount) AS AmountPaid, "+
-            "SUM(ISNULL(p.cashAmount, 0)) AS CashAmount, "+
-            "SUM(ISNULL(p.checkAmount, 0)) AS CheckAmount, "+
-            "SUM(ISNULL(b.SeniorCitizenDiscount,0)) AS SeniorCitizenDiscount, "+
-            "SUM(b.NetAmount) AS AmountDue, "+
-            "SUM(ISNULL(x.TransmissionVAT, 0)) AS ARVATTrans, "+
-            "(SUM(ISNULL(x.GenerationVAT,0)) + SUM(ISNULL(x.SLVAT, 0)) + SUM(ISNULL(b.DAA_VAT, 0)) + SUM(ISNULL(b.ACRM_VAT, 0)) + SUM(ISNULL(b.Item1, 0))) AS ARVATGen, "+
-            "SUM(ISNULL(x.item7, 0)) AS KatasNgVAT "+
-            "FROM paidbills p INNER JOIN accountmaster a ON p.AccountNumber=a.AccountNumber INNER JOIN Bills b ON b.AccountNumber=a.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd "+
-            "INNER JOIN BillsExtension x ON b.AccountNumber=x.AccountNumber AND b.ServicePeriodEnd=x.ServicePeriodEnd "+
-            "WHERE PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59'";
+        "( "+
+        "        (SUM(ISNULL(p.CurrentBills,0)) + SUM(ISNULL(p.Within30Days,0)) + SUM(ISNULL(p.Over30Days,0))) "+
+        "        - (SUM(IIF(p.ConsumerType = 'R', ISNULL(p.surcharge*0.12,0), 0))) "+
+        "        - (SUM(ISNULL(p.pr,0)) + SUM(ISNULL(p.others,0))) "+
+        "        - SUM(ISNULL(p.surcharge,0)) "+
+        "        - SUM(ISNULL(p.Item2, 0)) "+
+        "        + (SUM(ISNULL(p.SLAdjustment,0)) + SUM(ISNULL(p.PromptPayment,0))) "+
+        "        + SUM(ISNULL(p.otherdeduction, 0)) "+
+        "        - SUM(ISNULL(p.SeniorCitizenDiscount,0)) "+
+        "        + SUM(IIF(p.ConsumerType = 'E', ISNULL(p.others,0), 0)) "+
+        "        + SUM(IIF(p.ConsumerType = 'B', ISNULL(p.others,0), 0)) "+
+        "        + SUM(ISNULL(p.Amount2306, 0)) "+
+        "        + SUM(ISNULL(p.Amount2307, 0)) "+
+        "        + SUM(ISNULL(b.FBHCAmt, 0)) "+
+        "        + SUM(ISNULL(x.Item16, 0)) "+
+        "        + SUM(ISNULL(x.Item17, 0))  "+
+        "	) AS Energy, "+
+        "SUM(ISNULL(p.pr,0)) AS TransformerRental, "+
+        "SUM(ISNULL(p.others,0)) AS Others, "+
+        "SUM(ISNULL(p.PromptPayment,0)) AS PPD, "+
+        "SUM(ISNULL(p.surcharge,0)) AS Surcharge, "+
+        "(SUM(ISNULL(p.Item2, 0)) "+
+        "        + (SUM(IIF(p.ConsumerType = 'R', p.surcharge*0.12, 0))) "+
+        "        - SUM(ISNULL(b.FBHCAmt, 0)) "+
+        "        - SUM(ISNULL(x.Item17, 0)) "+
+        "        - SUM(ISNULL(x.Item16, 0)) "+
+        "        - SUM(IIF(p.Period >'201502', (ISNULL(p.TransmissionVAT, 0)), 0)) "+
+        "        - "+
+        "        ( "+
+        "                SUM(IIF(p.Period >'201502', (ISNULL(p.GenerationVAT,0)), 0)) "+
+        "                        + SUM(IIF(p.Period >'201503', (ISNULL(p.SLVAT,0)), 0)) "+
+        "                        + SUM(IIF(p.Period >'201503', (ISNULL(b.DAA_VAT,0)), 0)) "+
+        "                        + SUM(IIF(p.Period >'201503', (ISNULL(b.ACRM_VAT,0)), 0)) "+
+        "                        + SUM(IIF(p.Period >'202111', (ISNULL(b.Item1,0)), 0)) "+
+        "        ) "+
+        ") AS Evat, "+
+
+        "SUM(ISNULL(p.SLAdjustment,0)) AS SLAdj, "+
+        "SUM(ISNULL(p.otherdeduction,0)) AS OtherDeduction, "+
+        "SUM(ISNULL(p.Amount2306, 0)) AS Amount2307, "+
+        "SUM(ISNULL(p.Amount2307, 0)) AS Amount2306, "+
+        "SUM(ISNULL(p.MDRefund, 0)) AS MDRefund, "+
+        "SUM(ISNULL(p.PowerKWH, 0)) AS PowerKWH, "+
+        "SUM(ISNULL(p.NetAmount,0)) AS AmountPaid, "+
+        "SUM(ISNULL(pb.cashAmount, 0)) AS CashAmount, "+
+        "SUM(ISNULL(pb.checkAmount, 0)) AS CheckAmount, "+
+        "SUM(ISNULL(p.SeniorCitizenDiscount,0)) AS SeniorCitizenDiscount, "+
+        "SUM(ISNULL(b.NetAmount,0)) AS AmountDue, "+
+        "SUM(IIF(p.Period >'201502', (ISNULL(p.TransmissionVAT, 0)), 0)) AS ARVATTrans, "+
+        "(SUM(IIF(p.Period >'201502', (ISNULL(p.GenerationVAT,0)), 0)) "+
+        "        + SUM(IIF(p.Period >'201503', (ISNULL(p.SLVAT,0)), 0)) "+
+        "        + SUM(IIF(p.Period >'201503', (ISNULL(b.DAA_VAT,0)), 0)) "+
+        "        + SUM(IIF(p.Period >'201503', (ISNULL(b.ACRM_VAT,0)), 0)) "+
+        "        + SUM(IIF(p.Period >'202111', (ISNULL(b.Item1,0)), 0))) AS ARVATGen, "+
+        "SUM(ISNULL(p.KatasAMount, 0)) AS KatasNgVAT "+
+        "FROM Bills b "+
+        "INNER JOIN BillsExtension x ON b.AccountNumber=x.AccountNumber AND b.ServicePeriodEnd=x.ServicePeriodEnd "+
+        "INNER JOIN PaidBillsWithRoute p ON b.AccountNumber=p.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd "+
+        "INNER JOIN PaidBills pb ON b.AccountNumber=pb.AccountNumber AND b.ServicePeriodEnd=pb.ServicePeriodEnd "+
+            "WHERE p.PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND p.PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59'";
 
         if (teller != null)
-            sql += " AND TELLER = ?";
+            sql += " AND p.TELLER = ?";
 
         PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
 
@@ -503,8 +539,8 @@ public class BillDAO {
             dcrBreakdown.add(otherDeductionsItem);
             dcrBreakdown.add(mdRefundItem);
             dcrBreakdown.add(scDiscountItem);
-            dcrBreakdown.add(ch2307Item);
             dcrBreakdown.add(ch2306Item);
+            dcrBreakdown.add(ch2307Item);
             dcrBreakdown.add(arVATTransItem);
             dcrBreakdown.add(arVATGenItem);
 

@@ -77,9 +77,9 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                         month = date_pker.getValue().getMonthValue();
                         day = date_pker.getValue().getDayOfMonth();
                         year = date_pker.getValue().getYear();
-                        bills = FXCollections.observableArrayList(BillDAO.getAllPaidBills(year, month, day, "engel"));
+                        bills = FXCollections.observableArrayList(BillDAO.getAllPaidBills(year, month, day, "sol"));
 
-                        HashMap<String, List<ItemSummary>> breakdown = BillDAO.getDCRBreakDown(year, month, day, "engel");
+                        HashMap<String, List<ItemSummary>> breakdown = BillDAO.getDCRBreakDown(year, month, day, "sol");
                         dcrItems = FXCollections.observableArrayList(breakdown.get("Breakdown"));
                         dcrPayments = FXCollections.observableArrayList(breakdown.get("Payments"));
 
@@ -88,106 +88,6 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                         grandTotal = misc.get(1).getTotal();
                         billTotal = misc.get(2).getTotal();
                         amountDue = misc.get(3).getTotal();
-                        /*
-                        ItemSummary energy = new ItemSummary("Energy", 0);
-                        ItemSummary tr = new ItemSummary("TSF/TR", 0);
-                        ItemSummary others = new ItemSummary("Others", 0);
-                        ItemSummary surCharge = new ItemSummary("Surcharge", 0);
-                        ItemSummary evat = new ItemSummary("Evat", 0);
-                        ItemSummary slAdjustments = new ItemSummary("S/L Adjustments", 0);
-                        ItemSummary ppd = new ItemSummary("PPD", 0);
-                        ItemSummary katasvat = new ItemSummary("Katas Ng VAT", 0);
-                        ItemSummary otherDeductions = new ItemSummary("Other Deductions", 0);
-                        ItemSummary mdRefund = new ItemSummary("MD Refund", 0);
-                        ItemSummary scDiscount = new ItemSummary("SC Discount", 0);
-                        ItemSummary ch2307 = new ItemSummary("2307 (5%)", 0);
-                        ItemSummary ch2306 = new ItemSummary("2307 (2%)", 0);
-                        ItemSummary arVATTrans = new ItemSummary("ARVAT - Trans", 0);
-                        ItemSummary arVATGen = new ItemSummary("ARVAT - Gen", 0);
-
-                        ItemSummary cashPayments = new ItemSummary("Cash", 0);
-                        ItemSummary checkPayments = new ItemSummary("Check", 0);
-                        ItemSummary totalPayments = new ItemSummary("Total", 0);
-
-                        double power = 0, pr = 0, vat = 0, other = 0, surcharge = 0, slAdj = 0, pDisc = 0, katasVat = 0, otherDeduct = 0, mdRef = 0,
-                                seniorDiscount = 0, a2307 = 0, a2306 = 0, transAmt = 0, genAmt = 0, item1 = 0, item2 = 0, item3 = 0, item4 = 0, fbhcamt = 0, item16 = 0, item17 = 0;
-
-                        for (Bill b: bills) {
-                            PaidBill bill = (PaidBill) b;
-                            power += bill.getPower();
-                            pr += bill.getPr();
-                            other += bill.getOthers();
-                            surcharge += bill.getSurCharge();
-                            slAdj += bill.getSLAdjustment();
-                            pDisc += bill.getPromptPayment();
-                            katasVat += bill.getKatasNgVat();
-                            otherDeduct += bill.getOtherDeduction();
-                            mdRef += bill.getMdRefund();
-                            seniorDiscount += bill.getScDiscount();
-                            a2307 += bill.getAmount2307();
-                            a2306 += bill.getAmount2306();
-                            transAmt += bill.getArTran();
-                            genAmt += bill.getArGen();
-                            item1 += bill.getGenVatFeb21();
-                            item2 += bill.getItem2();
-                            item3 += bill.getItem3();
-                            item4 += bill.getItem4();
-                            fbhcamt += bill.getFbhcAmt();
-                            item16 += bill.getItem16();
-                            item17 += bill.getItem17();
-
-                            energy.setTotal(power);
-                            tr.setTotal(pr);
-                            others.setTotal(other);
-                            surCharge.setTotal(surcharge);
-                            vat = (item2 + (surcharge*0.12)) - (fbhcamt + item17 + item16 + transAmt + genAmt);
-                            evat.setTotal(vat);
-                            slAdjustments.setTotal(slAdj);
-                            ppd.setTotal(pDisc);
-                            katasvat.setTotal(katasVat);
-                            otherDeductions.setTotal(otherDeduct);
-                            mdRefund.setTotal(mdRef);
-                            scDiscount.setTotal(seniorDiscount);
-                            ch2306.setTotal(a2306);
-                            ch2307.setTotal(a2307);
-                            arVATTrans.setTotal(transAmt);
-                            arVATGen.setTotal(genAmt);
-
-                            amountDue += b.getAmountDue();
-                            billTotal += b.getTotalAmount();
-                            totalKwh += bill.getPowerKWH();
-                            cashAmount += bill.getCashAmount();
-                            checkAmount += bill.getCheckAmount();
-                        }
-                        dcrItems = FXCollections.observableArrayList();
-                        dcrPayments = FXCollections.observableArrayList();
-
-                        dcrItems.add(energy);
-                        dcrItems.add(tr);
-                        dcrItems.add(others);
-                        dcrItems.add(surCharge);
-                        dcrItems.add(evat);
-                        dcrItems.add(slAdjustments);
-                        dcrItems.add(ppd);
-                        dcrItems.add(katasvat);
-                        dcrItems.add(otherDeductions);
-                        dcrItems.add(mdRefund);
-                        dcrItems.add(scDiscount);
-                        dcrItems.add(ch2306);
-                        dcrItems.add(ch2307);
-                        dcrItems.add(arVATTrans);
-                        dcrItems.add(arVATGen);
-
-                        cashPayments.setTotal(cashAmount);
-                        checkPayments.setTotal(checkAmount);
-                        totalPayments.setTotal(cashAmount + checkAmount);
-
-                        dcrPayments.add(cashPayments);
-                        dcrPayments.add(checkPayments);
-                        dcrPayments.add(totalPayments);
-
-                        grandTotal = (power + pr + vat + other + surcharge + transAmt + genAmt) - (slAdj + pDisc + katasVat + otherDeduct + mdRef +
-                                seniorDiscount + a2307 + a2306) ;*/
 
                     }catch (Exception e){
                         e.printStackTrace();
