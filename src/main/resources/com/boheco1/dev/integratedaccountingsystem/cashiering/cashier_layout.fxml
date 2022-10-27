@@ -41,8 +41,9 @@
                         </JFXButton>
                      </children>
                   </HBox>
-                  <Label fx:id="consumer" maxWidth="1.7976931348623157E308" style="-fx-font-size: 24; -fx-font-weight: bold;" text="Juan Ddela Cruz" />
-                  <Label fx:id="address" maxWidth="1.7976931348623157E308" text="Address" />
+                  <Label fx:id="consumer" maxWidth="1.7976931348623157E308" style="-fx-font-size: 24; -fx-font-weight: bold;" text="-" />
+                  <Label fx:id="address" maxWidth="1.7976931348623157E308" text="-" />
+                  <Label fx:id="purpose" maxWidth="1.7976931348623157E308" text="-" />
                </children>
             </VBox>
             <TableView fx:id="paymentTable" prefHeight="401.0" prefWidth="512.0" VBox.vgrow="ALWAYS">

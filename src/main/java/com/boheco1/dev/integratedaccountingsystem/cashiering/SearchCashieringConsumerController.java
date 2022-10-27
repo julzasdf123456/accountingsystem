@@ -7,6 +7,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.ObjectTransaction;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.CRMQueue;
 import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
+import com.boheco1.dev.integratedaccountingsystem.objects.MIRSItem;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
 import javafx.collections.FXCollections;
@@ -14,14 +15,14 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Text;
+import javafx.util.Callback;
 
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -31,10 +32,13 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
     private AnchorPane contentPane;
 
     @FXML
-    private JFXTextField query_tf;
+    private JFXTextField searchTf;
 
     @FXML
     private JFXToggleButton toggleSearch;
+
+    @FXML
+    private DatePicker searchDate;
 
     @FXML
     private TableView searchResultTable;
@@ -56,13 +60,18 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
             return row ;
         });
         this.parentController = Utility.getParentController();
-        this.query_tf.requestFocus();
+        this.searchTf.requestFocus();
         this.toggleSearch.setSelected(Utility.TOGGLE_SEARCH);
-
-        if(this.toggleSearch.isSelected())
+        this.searchDate.setValue(LocalDate.now());
+        if(this.toggleSearch.isSelected()) {
             this.toggleSearch.setText("Search Consumer");
-        else
+            this.searchDate.setVisible(false);
+            this.searchTf.setPromptText("Reference Number/Last Name/First Name/Address");
+        }else {
             this.toggleSearch.setText("Search Teller");
+            this.searchDate.setVisible(true);
+            this.searchTf.setPromptText("Username/Last Name/First Name");
+        }
     }
 
     /**
@@ -71,7 +80,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
      */
     @FXML
     public void search(){
-        String query = this.query_tf.getText();
+        String query = this.searchTf.getText();
         if(this.toggleSearch.isSelected()){
             try {
                 ObservableList<CRMQueue> result = FXCollections.observableArrayList(ConsumerDAO.getConsumerRecordFromCRM(query));
@@ -103,32 +112,32 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
             return;
         searchResultTable.getColumns().clear();
         if(result.get(0) instanceof CRMQueue){
-            TableColumn<CRMQueue, String> column1 = new TableColumn<>("Consumer");
-            column1.setMinWidth(200);
-            column1.setMaxWidth(200);
-            column1.setPrefWidth(200);
-            column1.setCellValueFactory(new PropertyValueFactory<>("consumerName"));
-            column1.setStyle("-fx-alignment: center-left;");
+            TableColumn<CRMQueue, String> consumerCol = new TableColumn<>("Consumer");
+            consumerCol.setMinWidth(150);
+            consumerCol.setMaxWidth(150);
+            consumerCol.setPrefWidth(150);
+            consumerCol.setCellValueFactory(new PropertyValueFactory<>("consumerName"));
+            consumerCol.setStyle("-fx-alignment: center-left;");
 
-            TableColumn<CRMQueue, String> column2 = new TableColumn<>("Address");
-            column2.setMinWidth(200);
-            column2.setMaxWidth(200);
-            column2.setPrefWidth(200);
-            column2.setCellValueFactory(new PropertyValueFactory<>("consumerAddress"));
-            column2.setStyle("-fx-alignment: center-left;");
+            TableColumn<CRMQueue, String> addressCol = new TableColumn<>("Address");
+            addressCol.setMinWidth(200);
+            addressCol.setMaxWidth(200);
+            addressCol.setPrefWidth(200);
+            addressCol.setCellValueFactory(new PropertyValueFactory<>("consumerAddress"));
+            addressCol.setStyle("-fx-alignment: center-left;");
 
-            TableColumn<CRMQueue, String> column3 = new TableColumn<>("Purpose");
-            column3.setCellValueFactory(new PropertyValueFactory<>("transactionPurpose"));
-            column3.setStyle("-fx-alignment: center-left;");
+            TableColumn<CRMQueue, String> purposeCol = new TableColumn<>("Purpose");
+            purposeCol.setCellValueFactory(new PropertyValueFactory<>("transactionPurpose"));
+            purposeCol.setStyle("-fx-alignment: center-left;");
 
-            this.searchResultTable.getColumns().add(column1);
-            this.searchResultTable.getColumns().add(column2);
-            this.searchResultTable.getColumns().add(column3);
+            this.searchResultTable.getColumns().add(consumerCol);
+            this.searchResultTable.getColumns().add(addressCol);
+            this.searchResultTable.getColumns().add(purposeCol);
         } else if (result.get(0) instanceof EmployeeInfo) {
-            TableColumn<EmployeeInfo, String> column1 = new TableColumn<>("Teller");
-            column1.setCellValueFactory(new PropertyValueFactory<>("signatoryNameFormat"));
-            column1.setStyle("-fx-alignment: center-left;");
-            this.searchResultTable.getColumns().add(column1);
+            TableColumn<EmployeeInfo, String> tellerCol = new TableColumn<>("Teller");
+            tellerCol.setCellValueFactory(new PropertyValueFactory<>("signatoryNameFormat"));
+            tellerCol.setStyle("-fx-alignment: center-left;");
+            this.searchResultTable.getColumns().add(tellerCol);
         }
         this.searchResultTable.setPlaceholder(new Label("No consumer records was searched."));
     }
@@ -137,10 +146,15 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
     private  void toggleSearch(ActionEvent event) {
         searchResultTable.getColumns().clear();
         Utility.TOGGLE_SEARCH = toggleSearch.isSelected();
-        if(toggleSearch.isSelected())
-            toggleSearch.setText("Search Consumer");
-        else
-            toggleSearch.setText("Search Teller");
+        if(this.toggleSearch.isSelected()) {
+            this.toggleSearch.setText("Search Consumer");
+            this.searchDate.setVisible(false);
+            this.searchTf.setPromptText("Reference Number/Last Name/First Name/Address");
+        }else {
+            this.toggleSearch.setText("Search Teller");
+            this.searchDate.setVisible(true);
+            this.searchTf.setPromptText("Username/Last Name/First Name");
+        }
 
     }
 }

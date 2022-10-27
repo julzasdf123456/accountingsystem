@@ -12,10 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
@@ -32,7 +29,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private JFXButton print_btn;
 
     @FXML
-    private Label name, address, purpose, payable;
+    private Label consumer, address, purpose, payable;
 
     @FXML
     private TableView paymentTable;
@@ -53,7 +50,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     @FXML
     private void search(ActionEvent event) {
-
         ModalBuilderForWareHouse.showModalFromXMLNoClose(CashierController.class, "../cashiering/cashiering_search_consumer.fxml", Utility.getStackPane());
     }
 
@@ -63,15 +59,15 @@ public class CashierController extends MenuControllerHandler implements Initiali
         payable.setText("Total: 0");
         if (o instanceof CRMQueue) {
             this.consumerInfo = (CRMQueue) o;
-            this.name.setText(consumerInfo.getConsumerName());
+            this.consumer.setText(consumerInfo.getConsumerName());
             this.address.setText(consumerInfo.getConsumerAddress());
             this.purpose.setText(consumerInfo.getTransactionPurpose());
             setUpPaymentTable(consumerInfo);
         }else if (o instanceof EmployeeInfo) {
             this.employeeInfo = (EmployeeInfo) o;
-            this.name.setText(employeeInfo.getSignatoryNameFormat());
-            this.address.setText("-");
-            this.purpose.setText("-");
+            this.consumer.setText(employeeInfo.getSignatoryNameFormat());
+            this.address.setText(employeeInfo.getEmployeeAddress());
+            this.purpose.setText(employeeInfo.getDesignation());
         }
     }
 

@@ -495,11 +495,12 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                     }else{
                                         text.setStyle("" +
                                                 "-fx-fill: #212121; " +
-                                                "-fx-alignment: center-left; " +
-                                                "-fx-text-wrap: true; ");
-                                        setStyle("-fx-background-color: #f7e1df; ");
+                                                "-fx-text-alignment: center-left;" +
+                                                "-fx-text-wrap: true;");
+                                        //setStyle("-fx-background-color: #f7e1df; -fx-text-alignment: center-left;");
                                         text.wrappingWidthProperty().bind(getTableColumn().widthProperty().subtract(35));
                                         setPrefHeight(text.getLayoutBounds().getHeight()+10);
+                                        setMinHeight(text.getLayoutBounds().getHeight()+10);
                                         setGraphic(text);
                                         setText(null);
                                     }
@@ -583,7 +584,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                     //btn.setStyle("-fx-background-color: "+ColorPalette.DANGER+";");
                                     MIRSItem mirsItem = getTableView().getItems().get(getIndex());
                                     icon.setIconSize(24);
-                                    icon.setIconColor(Paint.valueOf(ColorPalette.WARNING));
+                                    icon.setIconColor(Paint.valueOf(ColorPalette.DANGER));
                                     btn.setOnAction(event -> {
                                         try{
                                             JFXButton accept = new JFXButton("Accept");
@@ -642,7 +643,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                     //btn.setStyle("-fx-background-color: "+ColorPalette.DANGER+";");
                                     MIRSItem mirsItem = getTableView().getItems().get(getIndex());
                                     icon.setIconSize(24);
-                                    icon.setIconColor(Paint.valueOf(ColorPalette.SUCCESS));
+                                    icon.setIconColor(Paint.valueOf(ColorPalette.INFO));
                                     btn.setOnAction(event -> {
                                         try{
                                             Stock stock = StockDAO.get(mirsItem.getStockID());

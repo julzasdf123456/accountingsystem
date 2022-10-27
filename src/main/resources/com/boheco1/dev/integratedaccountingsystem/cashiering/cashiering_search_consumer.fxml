@@ -4,6 +4,7 @@
 <?import com.jfoenix.controls.JFXTextField?>
 <?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -23,12 +24,12 @@
                             <children>
                                 <HBox prefHeight="59.0" prefWidth="800.0">
                                     <children>
-                                        <JFXTextField fx:id="query_tf" focusColor="#00ad8e" labelFloat="true" onAction="#search" prefHeight="37.0" prefWidth="824.0" promptText="Reference Number/Last Name/First Name/Address" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                        <JFXTextField fx:id="searchTf" focusColor="#00ad8e" labelFloat="true" onAction="#search" prefHeight="37.0" prefWidth="824.0" promptText="Reference Number/Last Name/First Name/Address" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                             <font>
                                                 <Font size="14.0" />
                                             </font>
                                             <HBox.margin>
-                                                <Insets right="16.0" />
+                                                <Insets />
                                             </HBox.margin>
                                         </JFXTextField>
                                         <JFXButton buttonType="RAISED" onAction="#search" prefHeight="30.0" prefWidth="246.0" styleClass="btn-theme" text="Search" textFill="WHITE">
@@ -44,10 +45,10 @@
                                         </JFXButton>
                                     </children>
                                     <VBox.margin>
-                                        <Insets bottom="16.0" />
+                                        <Insets bottom="8.0" />
                                     </VBox.margin>
                                     <padding>
-                                        <Insets top="8.0" />
+                                        <Insets top="12.0" />
                                     </padding>
                                 </HBox>
                                 <TableView fx:id="searchResultTable" prefHeight="394.0" prefWidth="800.0">
@@ -62,9 +63,10 @@
                         </VBox>
                     </center>
                     <top>
-                        <HBox prefHeight="36.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+                        <HBox alignment="CENTER_LEFT" prefHeight="36.0" prefWidth="800.0" BorderPane.alignment="CENTER">
                             <children>
-                        <JFXToggleButton fx:id="toggleSearch" alignment="CENTER_LEFT" onAction="#toggleSearch" prefHeight="62.0" prefWidth="275.0" style="-fx-font-weight: bold; -fx-font-size: 18;" text="Search Consumer" />
+                        <JFXToggleButton fx:id="toggleSearch" alignment="CENTER_LEFT" onAction="#toggleSearch" prefHeight="62.0" prefWidth="234.0" style="-fx-font-weight: bold; -fx-font-size: 18;" text="Search Consumer" />
+                        <DatePicker fx:id="searchDate" />
                             </children>
                         </HBox>
                     </top>
