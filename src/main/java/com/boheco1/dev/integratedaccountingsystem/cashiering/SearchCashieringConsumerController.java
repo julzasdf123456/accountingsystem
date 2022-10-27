@@ -1,17 +1,16 @@
 package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.BillDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.ConsumerDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
-import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
-import com.boheco1.dev.integratedaccountingsystem.helpers.ObjectTransaction;
-import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
-import com.boheco1.dev.integratedaccountingsystem.objects.CRMQueue;
-import com.boheco1.dev.integratedaccountingsystem.objects.EmployeeInfo;
-import com.boheco1.dev.integratedaccountingsystem.objects.MIRSItem;
+import com.boheco1.dev.integratedaccountingsystem.helpers.*;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
+import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -22,7 +21,9 @@ import javafx.scene.text.Text;
 import javafx.util.Callback;
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -54,7 +55,49 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     resultInfo = row.getItem();
-                    this.parentController.receive(resultInfo);
+                    if(resultInfo instanceof EmployeeInfo){
+                        try {
+                            JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing request.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+                            Task<Void> task = new Task<>() {
+                                @Override
+                                protected Void call() throws Exception {
+                                    EmployeeInfo employeeInfo = (EmployeeInfo) resultInfo;
+                                    int month = searchDate.getValue().getMonthValue();
+                                    int day = searchDate.getValue().getDayOfMonth();
+                                    int year = searchDate.getValue().getYear();
+
+                                    HashMap<String, List<ItemSummary>> DCRBreakDown = BillDAO.getDCRBreakDown(year,month,day,"sol");
+                                    Teller teller = new Teller(employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), DCRBreakDown);
+                                    resultInfo = teller;
+                                    return null;
+                                }
+                            };
+
+                            task.setOnRunning(wse -> {
+                                dialog.show();
+                            });
+
+                            task.setOnSucceeded(wse -> {
+                                dialog.close();
+                                AlertDialogBuilder.messgeDialog("System Message", "Task successful." ,
+                                        Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                                this.parentController.receive(resultInfo);
+                            });
+
+                            task.setOnFailed(wse -> {
+                                dialog.close();
+                                AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request! Please try again!",
+                                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                            });
+
+                            new Thread(task).start();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }else{
+                        this.parentController.receive(resultInfo);
+                    }
+
                 }
             });
             return row ;

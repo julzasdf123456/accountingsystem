@@ -1,12 +1,14 @@
 package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
 
+import com.boheco1.dev.integratedaccountingsystem.dao.BillDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.CRMDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.boheco1.dev.integratedaccountingsystem.tellering.PowerBillsPaymentController;
 import com.jfoenix.controls.JFXButton;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -18,6 +20,8 @@ import javafx.util.Callback;
 
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class CashierController extends MenuControllerHandler implements Initializable, ObjectTransaction {
@@ -36,7 +40,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
 
     private CRMQueue consumerInfo = null;
-    private EmployeeInfo employeeInfo = null;
+    private Teller tellerInfo = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -63,21 +67,23 @@ public class CashierController extends MenuControllerHandler implements Initiali
             this.address.setText(consumerInfo.getConsumerAddress());
             this.purpose.setText(consumerInfo.getTransactionPurpose());
             setUpPaymentTable(consumerInfo);
-        }else if (o instanceof EmployeeInfo) {
-            this.employeeInfo = (EmployeeInfo) o;
-            this.consumer.setText(employeeInfo.getSignatoryNameFormat());
-            this.address.setText(employeeInfo.getEmployeeAddress());
-            this.purpose.setText(employeeInfo.getDesignation());
+        }else if (o instanceof Teller) {
+            this.tellerInfo = (Teller) o;
+            this.consumer.setText(tellerInfo.getName());
+            this.address.setText(tellerInfo.getAddress());
+            this.purpose.setText(tellerInfo.getPhone());
+            setUpPaymentTable(tellerInfo);
         }
     }
 
     private void setUpPaymentTable(Object o) {
+        paymentTable.getColumns().clear();
         if(o instanceof CRMQueue){
             CRMQueue crmQueue = (CRMQueue) o;
             TableColumn<CRMDetails, String> column1 = new TableColumn<>("Reference No");
-            column1.setMinWidth(150);
-            column1.setMaxWidth(150);
-            column1.setPrefWidth(150);
+            column1.setMinWidth(200);
+            column1.setMaxWidth(200);
+            column1.setPrefWidth(200);
             column1.setCellValueFactory(new PropertyValueFactory<>("referenceNo"));
             column1.setStyle("-fx-alignment: center-left;");
 
@@ -86,9 +92,9 @@ public class CashierController extends MenuControllerHandler implements Initiali
             column2.setStyle("-fx-alignment: center-left;");
 
             TableColumn<CRMDetails, String> column3 = new TableColumn<>("Amount");
-            column3.setMinWidth(100);
-            column3.setMaxWidth(100);
-            column3.setPrefWidth(100);
+            column3.setMinWidth(200);
+            column3.setMaxWidth(200);
+            column3.setPrefWidth(200);
             //column3.setCellValueFactory(new PropertyValueFactory<>("total"));
             Callback<TableColumn<CRMDetails, String>, TableCell<CRMDetails, String>> qtycellFactory
                     = //
@@ -134,8 +140,26 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 e.printStackTrace();
             }
 
-        }else{
+        }if(o instanceof Teller){
+            Teller teller = (Teller)  o;
+            HashMap<String, List<ItemSummary>> breakdown = teller.getDCRBreakDown();
+            ObservableList<ItemSummary> result = FXCollections.observableArrayList(breakdown.get("Breakdown"));
+            this.paymentTable.setItems(result);
 
+            TableColumn<ItemSummary, String> column1 = new TableColumn<>("Item Description");
+            column1.setCellValueFactory(new PropertyValueFactory<>("description"));
+            column1.setStyle("-fx-alignment: center-left;");
+
+            TableColumn<ItemSummary, String> column2 = new TableColumn<>("Total Amount");
+            column2.setMinWidth(200);
+            column2.setMaxWidth(200);
+            column2.setPrefWidth(200);
+            column2.setCellValueFactory(obj-> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getTotal())));
+            column2.setStyle("-fx-alignment: center-right;");
+
+
+            this.paymentTable.getColumns().add(column1);
+            this.paymentTable.getColumns().add(column2);
         }
 
         this.paymentTable.setPlaceholder(new Label("No consumer records was searched."));
