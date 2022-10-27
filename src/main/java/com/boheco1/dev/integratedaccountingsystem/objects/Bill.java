@@ -54,7 +54,7 @@ public class Bill {
     private double fbhcAmt;
     private String Form2306;
     private String Form2307;
-
+    private double balance;
     public Bill(){}
 
     public Bill(String billNo, LocalDate from, LocalDate to, LocalDate dueDate, double amountDue){
@@ -536,6 +536,14 @@ public class Bill {
 
     public void setPr(double pr) {
         this.pr = pr;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
     }
 }
 
