@@ -30,6 +30,7 @@ import java.util.List;
 public class POITest extends Application {
     public static void main(String[] args) {
         printOEBR();
+        //launch(args);
     }
 
 
@@ -281,14 +282,20 @@ public class POITest extends Application {
     }
 
     public static void printOEBR(){
-        CustomPrintHelper print = new CustomPrintHelper("OEBR", 8.5, 3.3);
+        CustomPrintHelper print = new CustomPrintHelper("OEBR", 18, 3);
         print.prepareOEBR(new PaidBill());
+        try {
+            print.print();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        /*
         print.setOnFailed(e->{
             System.out.println("Error!");
         });
         print.setOnSucceeded(e->{
             System.out.println("Successful");
         });
-        new Thread(print).start();
+        new Thread(print).start();*/
     }
 }

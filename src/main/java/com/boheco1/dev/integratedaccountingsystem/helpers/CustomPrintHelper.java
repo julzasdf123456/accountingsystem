@@ -10,8 +10,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 
-public class CustomPrintHelper extends Task {
-
+//public class CustomPrintHelper extends Task {
+public class CustomPrintHelper {
     private Node node;
     private Paper paper;
 
@@ -23,22 +23,31 @@ public class CustomPrintHelper extends Task {
     public CustomPrintHelper(String page, double width, double height){
         this.paper = PrintHelper.createPaper(page, width, height, Units.INCH);
     }
-
+    /*
     @Override
     protected Object call() throws Exception {
         print();
         return null;
-    }
+    }*/
 
     public void print() throws Exception{
-        //Printer printer = Printer.getDefaultPrinter();
+        Printer printer = Printer.getDefaultPrinter();
 
         PrinterJob job = PrinterJob.createPrinterJob();
-        Printer printer = job.getPrinter();
-        PageLayout layout = printer.createPageLayout(paper, PageOrientation.PORTRAIT, Printer.MarginType.EQUAL);
 
-        JobSettings jobSettings = job.getJobSettings();
-        jobSettings.setPageLayout(layout);
+        if (!printer.getName().contains("EPSON LQ-310"))
+            throw new Exception("Printer error! The default printer is not EPSON LQ-310!");
+
+        PageLayout layout = printer.createPageLayout(this.paper, PageOrientation.PORTRAIT,  10, 10, 0, 0);
+        job.getJobSettings().setPageLayout(layout);
+        Paper papers = layout.getPaper();
+
+        System.out.println("Paper width: "+papers.getWidth());
+        System.out.println("Paper height:" + papers.getHeight());
+        System.out.println("Printable width: "+layout.getPrintableWidth());
+        System.out.println("Printable height: "+layout.getPrintableHeight());
+        System.out.println("Left margin: "+layout.getLeftMargin());
+        System.out.println("Right margin: "+layout.getPrintableHeight());
 
         if (job != null) {
             boolean printed = job.printPage(node);
@@ -70,20 +79,29 @@ public class CustomPrintHelper extends Task {
         String receivedDate = "Received date";
 
         VBox container = new VBox();
-        container.setPadding(new Insets(25, 0, 0, 0));
-        container.setPrefWidth(612);
-        container.setPrefHeight(237.6);
+        container.setPadding(new Insets(50, 0, 0, 0));
+
+        double width = 580;
+        double height = 216;
+
+        container.setMinWidth(width);
+        container.setMinHeight(height);
+        container.setMaxWidth(width);
+        container.setMaxHeight(height);
+        container.setPrefWidth(width);
+        container.setPrefHeight(height);
 
         HBox copyContainer = new HBox();
 
         VBox left = new VBox();
         VBox right = new VBox();
 
-        HBox.setHgrow(left, Priority.ALWAYS);
-        HBox.setHgrow(right, Priority.ALWAYS);
-
-        left.setMaxWidth(Double.MAX_VALUE);
-        right.setMaxWidth(Double.MAX_VALUE);
+        left.setMinWidth(width/2);
+        right.setMinWidth(width/2);
+        left.setMaxWidth(width/2);
+        right.setMaxWidth(width/2);
+        left.setPrefWidth(width/2);
+        right.setPrefWidth(width/2);
 
         GridPane teller_grid = new GridPane();
         GridPane consumer_grid = new GridPane();
@@ -100,26 +118,28 @@ public class CustomPrintHelper extends Task {
         teller_grid.getColumnConstraints().addAll(column1,column2, column3);
         consumer_grid.getColumnConstraints().addAll(column1,column2);
 
-        teller_grid.setMaxWidth(Double.MAX_VALUE);
-        consumer_grid.setMaxWidth(Double.MAX_VALUE);
+        teller_grid.setMinWidth(width/2);
+        consumer_grid.setMinWidth(width/2);
+        teller_grid.setMaxWidth(width/2);
+        consumer_grid.setMaxWidth(width/2);
+        teller_grid.setPrefWidth(width/2);
+        consumer_grid.setPrefWidth(width/2);
 
         Label spacer1 = new Label(" ");
+        spacer1.setStyle("-fx-font-size: 10px");
         Label spacer2 = new Label(" ");
         Label spacer3 = new Label(" ");
         Label spacer4 = new Label(" ");
         Label spacer5 = new Label(" ");
         Label spacer6 = new Label(" ");
-        Label spacer7 = new Label(" ");
         Label spacer8 = new Label(" ");
+        spacer8.setStyle("-fx-font-size: 10px");
         Label spacer9 = new Label(" ");
         Label spacer10 = new Label(" ");
         Label spacer11 = new Label(" ");
         Label spacer12 = new Label(" ");
         Label spacer13 = new Label(" ");
-        Label spacer14 = new Label(" ");
 
-
-        Label surcharge_lbl = new Label("Surcharge");
 
         Label tel_meter_lbl = new Label(meter_no);
         Label tel_type_lbl = new Label(type);
@@ -130,6 +150,8 @@ public class CustomPrintHelper extends Task {
         Label tel_kwh_lbl = new Label(kwhUsed);
         Label tel_amount_lbl = new Label(amount);
 
+        Label tel_surcharge = new Label("Surcharge");
+
         Label tel_vat_lbl = new Label(vat);
         Label tel_surcharge_lbl = new Label(surcharge);
         Label tel_duedate_lbl = new Label(dueDate);
@@ -137,16 +159,17 @@ public class CustomPrintHelper extends Task {
         Label tel_teller_lbl = new Label(teller);
         Label tel_receivedDate_lbl = new Label(receivedDate);
 
-        // page.add(Node, colIndex, rowIndex, colSpan, rowSpan):
+        //grid.add(Node, colIndex, rowIndex, colSpan, rowSpan):
         teller_grid.add(tel_meter_lbl,0,0,2,1);
         teller_grid.add(tel_type_lbl, 2, 0,1,1);
+
         teller_grid.add(tel_consumer_lbl, 0, 1, 2,1);
         teller_grid.add(tel_bill_lbl, 2, 1, 1,1);
 
         teller_grid.add(tel_addr_lbl, 0, 2, 3,1);
 
-        teller_grid.add(spacer1, 1, 2, 3,1);
-        teller_grid.add(spacer2, 0, 3, 3,1);
+        teller_grid.add(spacer1, 0, 3, 3,1);
+        //teller_grid.add(spacer2, 0, 4, 3,1);
 
         teller_grid.add(tel_billmonth_lbl, 0, 4, 1,1);
         teller_grid.add(tel_kwh_lbl, 1, 4, 1,1);
@@ -158,17 +181,16 @@ public class CustomPrintHelper extends Task {
         teller_grid.add(spacer4, 0, 6, 3,1);
 
         teller_grid.add(spacer5, 0, 7, 1,1);
-        teller_grid.add(surcharge_lbl, 1, 7, 1,1);
+        teller_grid.add(tel_surcharge, 1, 7, 1,1);
         teller_grid.add(tel_surcharge_lbl, 2, 7, 1,1);
 
         teller_grid.add(tel_duedate_lbl, 0, 8, 2,1);
         teller_grid.add(tel_amountDue_lbl, 2, 8, 1,1);
 
         teller_grid.add(spacer6, 0, 9, 3,1);
-        teller_grid.add(spacer7, 0, 10, 3,1);
 
-        teller_grid.add(tel_teller_lbl, 0, 11, 2,1);
-        teller_grid.add(tel_receivedDate_lbl, 2, 11, 1,1);
+        teller_grid.add(tel_teller_lbl, 0, 10, 2,1);
+        teller_grid.add(tel_receivedDate_lbl, 2, 10, 1,1);
 
         Label con_meter_lbl = new Label(meter_no);
         Label con_type_lbl = new Label(type);
@@ -176,10 +198,11 @@ public class CustomPrintHelper extends Task {
         Label con_bill_lbl = new Label(billno);
         Label con_addr_lbl = new Label(address);
 
+        Label con_surcharge = new Label("Surcharge");
+
         Label con_billmonth_lbl = new Label(billmonth);
         Label con_kwh_lbl = new Label(kwhUsed);
         Label con_amount_lbl = new Label(amount);
-
         Label con_vat_lbl = new Label(vat);
         Label con_surcharge_lbl = new Label(surcharge);
         Label con_duedate_lbl = new Label(dueDate);
@@ -190,12 +213,14 @@ public class CustomPrintHelper extends Task {
 
         consumer_grid.add(con_meter_lbl, 0, 0, 2 , 1);
         consumer_grid.add(con_type_lbl, 2, 0, 1,1);
+
         consumer_grid.add(con_consumer_lbl, 0, 1, 2,1);
         consumer_grid.add(con_bill_lbl, 2, 1, 1,1);
+
         consumer_grid.add(con_addr_lbl, 0, 2, 3,1);
 
-        consumer_grid.add(spacer8, 1, 2, 3,1);
-        consumer_grid.add(spacer9, 0, 3, 3 ,1);
+        consumer_grid.add(spacer8, 0, 3, 3,1);
+        //consumer_grid.add(spacer9, 0, 4, 3 ,1);
 
         consumer_grid.add(con_billmonth_lbl, 0, 4, 1,1);
         consumer_grid.add(con_kwh_lbl, 1, 4, 1,1);
@@ -207,17 +232,16 @@ public class CustomPrintHelper extends Task {
         consumer_grid.add(spacer11, 0, 6, 3,1);
 
         consumer_grid.add(spacer12, 0, 7, 1,1);
-        consumer_grid.add(surcharge_lbl, 1, 7, 1,1);
+        consumer_grid.add(con_surcharge, 1, 7, 1,1);
         consumer_grid.add(con_surcharge_lbl, 2, 7, 1,1);
 
         consumer_grid.add(con_duedate_lbl, 0, 8, 2,1);
         consumer_grid.add(con_amountDue_lbl, 2, 8, 1,1);
 
-        consumer_grid.add(spacer13, 0, 9, 3,1);
-        consumer_grid.add(spacer14, 0, 10, 3,1);
+        consumer_grid.add(spacer13, 0, 9,3,1);
 
-        consumer_grid.add(con_teller_lbl, 0, 11, 2,1);
-        consumer_grid.add(con_receivedDate_lbl, 2, 11, 1,1);
+        consumer_grid.add(con_teller_lbl, 0, 10, 2,1);
+        consumer_grid.add(con_receivedDate_lbl, 2, 10, 1,1);
 
         left.getChildren().add(teller_grid);
         right.getChildren().add(consumer_grid);
