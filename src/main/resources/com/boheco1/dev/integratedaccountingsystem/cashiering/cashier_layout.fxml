@@ -1,62 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <AnchorPane prefHeight="818.0" prefWidth="1012.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.CashierController">
    <children>
       <VBox fx:id="anchorpane" alignment="TOP_RIGHT" layoutX="28.0" layoutY="28.0" prefHeight="731.0" prefWidth="680.0" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="16.0">
          <children>
-            <VBox prefHeight="105.0" prefWidth="512.0">
+            <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <JFXButton fx:id="search_btn" buttonType="RAISED" onAction="#search" styleClass="btn-info" text="Search">
-                     <graphic>
-                        <FontIcon fill="WHITE" iconLiteral="mdi2a-account-search" iconSize="20" />
-                     </graphic>
-                     <cursor>
-                        <Cursor fx:constant="HAND" />
-                     </cursor>
-                     <VBox.margin>
-                        <Insets bottom="16.0" />
-                     </VBox.margin>
-                  </JFXButton>
-                  <Label fx:id="consumer" maxWidth="1.7976931348623157E308" style="-fx-font-size: 24; -fx-font-weight: bold;" text="-" />
-                  <Label fx:id="address" maxWidth="1.7976931348623157E308" text="-" />
-                  <Label fx:id="purpose" maxWidth="1.7976931348623157E308" text="-" />
-               </children>
-            </VBox>
-            <TableView fx:id="paymentTable" prefHeight="401.0" prefWidth="512.0" VBox.vgrow="ALWAYS">
-               <VBox.margin>
-                  <Insets bottom="10.0" top="10.0" />
-               </VBox.margin>
-               <cursor>
-                  <Cursor fx:constant="DEFAULT" />
-               </cursor>
-               <columnResizePolicy>
-                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-               </columnResizePolicy>
-            </TableView>
-            <HBox alignment="CENTER_RIGHT">
-               <children>
-                  <JFXButton fx:id="print_btn" buttonType="RAISED" onAction="#print" styleClass="btn-sucess" text="Print">
-                     <graphic>
-                        <FontIcon fill="WHITE" iconLiteral="mdi2p-printer" iconSize="20" />
-                     </graphic>
-                     <cursor>
-                        <Cursor fx:constant="HAND" />
-                     </cursor>
+                  <VBox prefHeight="134.0" prefWidth="207.0">
+                     <children>
+                        <Label text="OR Number" />
+                        <JFXTextField fx:id="address1" alignment="CENTER" labelFloat="true" unFocusColor="#b5b5b5">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </JFXTextField>
+                     </children>
                      <HBox.margin>
                         <Insets right="16.0" />
                      </HBox.margin>
-                  </JFXButton>
-                  <Label fx:id="payable" prefHeight="44.0" prefWidth="264.0" style="-fx-font-size: 20; -fx-font-weight: bold;" styleClass="context-menu" text="Total: 0.00" />
+                  </VBox>
+                  <VBox prefHeight="124.0" prefWidth="350.0">
+                     <children>
+                        <Label text="Name">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </Label>
+                        <HBox>
+                           <children>
+                              <JFXTextField fx:id="name" editable="false" labelFloat="true" text=" " unFocusColor="#b5b5b5" HBox.hgrow="ALWAYS" />
+                              <JFXButton fx:id="search_btn" buttonType="RAISED" contentDisplay="CENTER" onAction="#search" styleClass="btn-info" text=" ">
+                                 <graphic>
+                                    <FontIcon fill="WHITE" iconLiteral="mdi2a-account-search" iconSize="20" />
+                                 </graphic>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </JFXButton>
+                           </children>
+                        </HBox>
+                        <Label text="Address">
+                           <VBox.margin>
+                              <Insets top="10.0" />
+                           </VBox.margin>
+                        </Label>
+                        <JFXTextField fx:id="address" editable="false" labelFloat="true" text=" " unFocusColor="#b5b5b5" />
+                     </children>
+                     <HBox.margin>
+                        <Insets right="16.0" />
+                     </HBox.margin>
+                  </VBox>
+                  <VBox prefHeight="124.0" prefWidth="350.0">
+                     <children>
+                        <Label text="Purpose">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </Label>
+                        <JFXTextField fx:id="purpose" editable="false" labelFloat="true" text=" " unFocusColor="#b5b5b5" />
+                        <Label text="Date">
+                           <VBox.margin>
+                              <Insets top="10.0" />
+                           </VBox.margin>
+                        </Label>
+                        <DatePicker fx:id="date" VBox.vgrow="NEVER" />
+                     </children>
+                  </VBox>
+               </children>
+               <VBox.margin>
+                  <Insets bottom="16.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox VBox.vgrow="ALWAYS">
+               <children>
+                  <VBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <TableView fx:id="paymentTable" prefHeight="401.0" prefWidth="512.0" VBox.vgrow="ALWAYS">
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
+                        </TableView>
+                        <HBox alignment="CENTER_RIGHT">
+                           <children>
+                              <JFXButton fx:id="print_btn" buttonType="RAISED" onAction="#print" styleClass="btn-sucess" text="Print">
+                                 <graphic>
+                                    <FontIcon fill="WHITE" iconLiteral="mdi2p-printer" iconSize="20" />
+                                 </graphic>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </JFXButton>
+                              <Label fx:id="total" prefHeight="44.0" prefWidth="264.0" style="-fx-font-size: 20; -fx-font-weight: bold;" styleClass="context-menu" text="Total: 0.00" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
                </children>
             </HBox>
          </children>

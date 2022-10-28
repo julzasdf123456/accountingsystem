@@ -8,6 +8,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.boheco1.dev.integratedaccountingsystem.tellering.PowerBillsPaymentController;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXTextField;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,6 +21,7 @@ import javafx.util.Callback;
 
 
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -33,7 +35,13 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private JFXButton print_btn;
 
     @FXML
-    private Label consumer, address, purpose, payable;
+    private JFXTextField name, address, purpose;
+
+    @FXML
+    private DatePicker date;
+
+    @FXML
+    private Label total;
 
     @FXML
     private TableView paymentTable;
@@ -45,10 +53,12 @@ public class CashierController extends MenuControllerHandler implements Initiali
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Utility.setParentController(this);
+        date.setValue(LocalDate.now());
     }
 
     @FXML
     private void print(ActionEvent event) {
+
         System.out.print("Print");
     }
 
@@ -60,16 +70,16 @@ public class CashierController extends MenuControllerHandler implements Initiali
     @Override
     public void receive(Object o) {
         this.paymentTable.getColumns().clear();
-        payable.setText("Total: 0");
+        total.setText("Total: 0");
         if (o instanceof CRMQueue) {
             this.consumerInfo = (CRMQueue) o;
-            this.consumer.setText(consumerInfo.getConsumerName());
+            this.name.setText(consumerInfo.getConsumerName());
             this.address.setText(consumerInfo.getConsumerAddress());
             this.purpose.setText(consumerInfo.getTransactionPurpose());
             setUpPaymentTable(consumerInfo);
         }else if (o instanceof Teller) {
             this.tellerInfo = (Teller) o;
-            this.consumer.setText(tellerInfo.getName());
+            this.name.setText(tellerInfo.getName());
             this.address.setText(tellerInfo.getAddress());
             this.purpose.setText(tellerInfo.getPhone());
             setUpPaymentTable(tellerInfo);
@@ -80,21 +90,15 @@ public class CashierController extends MenuControllerHandler implements Initiali
         paymentTable.getColumns().clear();
         if(o instanceof CRMQueue){
             CRMQueue crmQueue = (CRMQueue) o;
-            TableColumn<CRMDetails, String> column1 = new TableColumn<>("Reference No");
-            column1.setMinWidth(200);
-            column1.setMaxWidth(200);
-            column1.setPrefWidth(200);
-            column1.setCellValueFactory(new PropertyValueFactory<>("referenceNo"));
+
+            TableColumn<CRMDetails, String> column1 = new TableColumn<>("Particulars");
+            column1.setCellValueFactory(new PropertyValueFactory<>("particulars"));
             column1.setStyle("-fx-alignment: center-left;");
 
-            TableColumn<CRMDetails, String> column2 = new TableColumn<>("Particulars");
-            column2.setCellValueFactory(new PropertyValueFactory<>("particulars"));
-            column2.setStyle("-fx-alignment: center-left;");
-
-            TableColumn<CRMDetails, String> column3 = new TableColumn<>("Amount");
-            column3.setMinWidth(200);
-            column3.setMaxWidth(200);
-            column3.setPrefWidth(200);
+            TableColumn<CRMDetails, String> column2 = new TableColumn<>("Amount");
+            column2.setMinWidth(200);
+            column2.setMaxWidth(200);
+            column2.setPrefWidth(200);
             //column3.setCellValueFactory(new PropertyValueFactory<>("total"));
             Callback<TableColumn<CRMDetails, String>, TableCell<CRMDetails, String>> qtycellFactory
                     = //
@@ -119,23 +123,22 @@ public class CashierController extends MenuControllerHandler implements Initiali
                         }
                     };
 
-            column3.setCellFactory(qtycellFactory);
-            column3.setStyle("-fx-alignment: center-right;");
+            column2.setCellFactory(qtycellFactory);
+            column2.setStyle("-fx-alignment: center-right;");
 
             this.paymentTable.getColumns().add(column1);
             this.paymentTable.getColumns().add(column2);
-            this.paymentTable.getColumns().add(column3);
 
             ObservableList<CRMDetails> result = null;
 
             try {
                 result = FXCollections.observableArrayList(CRMDAO.getConsumerTransaction(crmQueue.getId()));
                 this.paymentTable.setItems(result);
-                double total = 0;
+                double calculate = 0;
                 for (CRMDetails c : result){
-                    total+=c.getTotal();
+                    calculate+=c.getTotal();
                 }
-                payable.setText("Total: "+String.format("%,.2f",total));
+                this.total.setText("Total: "+String.format("%,.2f",calculate));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -145,6 +148,9 @@ public class CashierController extends MenuControllerHandler implements Initiali
             HashMap<String, List<ItemSummary>> breakdown = teller.getDCRBreakDown();
             ObservableList<ItemSummary> result = FXCollections.observableArrayList(breakdown.get("Breakdown"));
             this.paymentTable.setItems(result);
+
+            List<ItemSummary> misc = breakdown.get("Misc");
+            total.setText("Total: "+Utility.formatDecimal(misc.get(1).getTotal()));
 
             TableColumn<ItemSummary, String> column1 = new TableColumn<>("Item Description");
             column1.setCellValueFactory(new PropertyValueFactory<>("description"));
