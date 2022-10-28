@@ -4,10 +4,13 @@ package com.boheco1.dev.integratedaccountingsystem.cashiering;
 import com.boheco1.dev.integratedaccountingsystem.dao.BillDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.CRMDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDetailDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.boheco1.dev.integratedaccountingsystem.tellering.PowerBillsPaymentController;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -21,7 +24,10 @@ import javafx.util.Callback;
 
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -35,7 +41,13 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private JFXButton print_btn;
 
     @FXML
-    private JFXTextField name, address, purpose;
+    private JFXTextField orNmber, name, address, purpose, source;
+
+    @FXML
+    private JFXTextArea remarks;
+
+    @FXML
+    private JFXComboBox office;
 
     @FXML
     private DatePicker date;
@@ -49,6 +61,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     private CRMQueue consumerInfo = null;
     private Teller tellerInfo = null;
+    private CRMQueue crmQueue;
+    private List<CRMDetails> crmDetails;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -58,8 +72,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     @FXML
     private void print(ActionEvent event) {
-
-        System.out.print("Print");
+        regularTransaction();
     }
 
     @FXML
@@ -130,9 +143,10 @@ public class CashierController extends MenuControllerHandler implements Initiali
             this.paymentTable.getColumns().add(column2);
 
             ObservableList<CRMDetails> result = null;
-
+            List<CRMDetails> crmDetails = null;
             try {
-                result = FXCollections.observableArrayList(CRMDAO.getConsumerTransaction(crmQueue.getId()));
+                crmDetails = CRMDAO.getConsumerTransaction(crmQueue.getId());
+                result = FXCollections.observableArrayList(crmDetails);
                 this.paymentTable.setItems(result);
                 double calculate = 0;
                 for (CRMDetails c : result){
@@ -142,7 +156,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
+            this.crmQueue = crmQueue;
+            this.crmDetails = crmDetails;
         }if(o instanceof Teller){
             Teller teller = (Teller)  o;
             HashMap<String, List<ItemSummary>> breakdown = teller.getDCRBreakDown();
@@ -169,6 +184,63 @@ public class CashierController extends MenuControllerHandler implements Initiali
         }
 
         this.paymentTable.setPlaceholder(new Label("No consumer records was searched."));
+    }
+
+    private void regularTransaction(){
+        TransactionHeader transactionHeader= new TransactionHeader();
+        int month = date.getValue().getMonthValue();
+        int year = date.getValue().getYear();
+
+        LocalDate period = LocalDate.of(year, month, 1);
+
+        transactionHeader.setPeriod(period);
+        transactionHeader.setTransactionNumber(orNmber.getText());
+        transactionHeader.setTransactionCode("ORMain");
+        transactionHeader.setOffice("Office_X");
+        transactionHeader.setSource("Consumer_ID");
+        //transactionHeader.setAccountID("For Teller");
+        //transactionHeader.setParticulars("N/A");
+        transactionHeader.setTransactionDate(date.getValue());
+        transactionHeader.setRemarks(remarks.getText());
+        //transactionHeader.setBank("N/A");
+        //transactionHeader.setReferenceNo("N/A");
+        //transactionHeader.setAmount(0);
+        transactionHeader.setEnteredBy(ActiveUser.getUser().getId());
+        transactionHeader.setDateEntered(LocalDateTime.now());
+
+        List<TransactionDetails> transactionDetailsList = new ArrayList<>();
+
+        for(CRMDetails cd : crmDetails){
+            TransactionDetails transactionDetails = new TransactionDetails();
+            transactionDetails.setPeriod(period);
+            transactionDetails.setTransactionNumber(orNmber.getText());
+            transactionDetails.setTransactionCode("ORMain");
+            transactionDetails.setTransactionDate(date.getValue());
+            transactionDetails.setAccountCode(cd.getGlCode());
+            //transactionDetails.setSequenceNumber(0);
+            transactionDetails.setDebit(cd.getTotal());
+            //transactionDetails.setCredit(0);
+            transactionDetails.setOrDate(date.getValue());
+            //transactionDetails.setBankID("N/A");
+            //transactionDetails.setNote("N/A");
+            transactionDetailsList.add(transactionDetails);
+        }
+
+        try {
+            String msg = TransactionHeaderDetailDAO.save(transactionHeader, transactionDetailsList);
+            if (msg.isEmpty()){
+                AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
+                        Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+            }else{
+                AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: "+msg,
+                        Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+            }
+        } catch (Exception e) {
+            AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: "+e.getMessage(),
+                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+            e.printStackTrace();
+        }
+
     }
 
 }

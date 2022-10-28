@@ -66,7 +66,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                                     int day = searchDate.getValue().getDayOfMonth();
                                     int year = searchDate.getValue().getYear();
 
-                                    HashMap<String, List<ItemSummary>> DCRBreakDown = BillDAO.getDCRBreakDown(year,month,day,"sol");
+                                    HashMap<String, List<ItemSummary>> DCRBreakDown = BillDAO.getDCRBreakDown(year,month,day,ActiveUser.getUser().getUserName());
                                     Teller teller = new Teller(employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), DCRBreakDown);
                                     resultInfo = teller;
                                     return null;
