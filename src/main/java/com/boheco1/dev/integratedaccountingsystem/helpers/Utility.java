@@ -11,6 +11,9 @@ import javafx.scene.layout.StackPane;
 import org.apache.commons.text.WordUtils;
 import pl.allegro.finance.tradukisto.MoneyConverters;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -251,6 +254,15 @@ public class Utility {
         System.out.println("After processing the checks and cash, remaining cash amount: "+cash);
         System.out.println("==================================================================================================================");
         return completed;
+    }
+
+    public static String getAccountCodeProperty() throws Exception {
+        File appData = new File("application.properties");
+        InputStream is = new FileInputStream("application.properties");
+        Properties props = new Properties();
+        props.load(is);
+
+        return props.getProperty("account_code");
     }
 
 }

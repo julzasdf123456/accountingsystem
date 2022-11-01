@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.BankRemittance;
 import com.boheco1.dev.integratedaccountingsystem.objects.TransactionDetails;
 
@@ -186,7 +187,7 @@ public class TransactionDetailsDAO {
             td.setCredit(getTotalDebit(period, transactionNumber));
             td.setSequenceNumber(999);
             //BR or BRSub
-            td.setAccountCode("12110201000");
+            td.setAccountCode(Utility.getAccountCodeProperty());
             TransactionDetailsDAO.add(td);
         }
     }

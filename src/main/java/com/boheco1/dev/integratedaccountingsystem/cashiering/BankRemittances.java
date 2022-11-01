@@ -27,6 +27,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -175,40 +176,20 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
 
         try {
             LocalDate tdate = transactionDate.getValue();
-            StringBuilder sb = new StringBuilder();
-            sb.append(tdate.getMonthValue()).append(tdate.getDayOfMonth()).append(tdate.getYear());
 
-            remittanceNo.setText(sb.toString());
+            String dateStr = tdate.format(DateTimeFormatter.ofPattern("MMddyy"));
+
+            remittanceNo.setText(dateStr);
 
             String transactionNumber = remittanceNo.getText();
             transactionHeader = TransactionHeaderDAO.get(transactionNumber, "BR");
 
-            int year = transactionDate.getValue().getYear();
-            int month = transactionDate.getValue().getMonthValue();
-            LocalDate period = LocalDate.of(year, month, 1);
-
-
-
             if(transactionHeader==null) {
-                transactionHeader = new TransactionHeader();
-                transactionHeader.setTransactionCode("BR");
-                transactionHeader.setTransactionNumber(remittanceNo.getText());
-                transactionHeader.setPeriod(period);
-                transactionHeader.setTransactionDate(transactionDate.getValue());
-
-                try {
-                    TransactionHeaderDAO.add(transactionHeader);
-                    AlertDialogBuilder.messgeDialog("New Transaction","A new transaction has been created for \"BR\" " + transactionNumber + ".",stackPane, AlertDialogBuilder.INFO_DIALOG);
-                    tableList.clear();
-                    computeTotals();
-                }catch(Exception ex) {
-                    ex.printStackTrace();
-                }
-                tableList.removeAll();
+                tableList.clear();
                 remittanceTable.refresh();
                 computeTotals();
             }else {
-                List<TransactionDetails> tds = TransactionDetailsDAO.get(period,sb.toString(),"BR");
+                List<TransactionDetails> tds = TransactionDetailsDAO.get(transactionHeader.getPeriod(),dateStr,"BR");
 
                 tableList.clear();
 
@@ -229,6 +210,27 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
 
     }
 
+    private void createTransactionHeader() {
+        int year = transactionDate.getValue().getYear();
+        int month = transactionDate.getValue().getMonthValue();
+        LocalDate period = LocalDate.of(year, month, 1);
+
+        transactionHeader = new TransactionHeader();
+        transactionHeader.setTransactionCode("BR");
+        transactionHeader.setTransactionNumber(remittanceNo.getText());
+        transactionHeader.setPeriod(period);
+        transactionHeader.setTransactionDate(transactionDate.getValue());
+
+        try {
+            TransactionHeaderDAO.add(transactionHeader);
+            AlertDialogBuilder.messgeDialog("New Transaction","A new transaction has been created for \"BR\" " + remittanceNo.getText() + ".",stackPane, AlertDialogBuilder.INFO_DIALOG);
+            tableList.clear();
+            computeTotals();
+        }catch(Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     @FXML
     public void onBankAccountsClick() {
         ModalBuilder.showModalFromXML(AddBankRemittance.class, "../cashiering/bank_accounts.fxml", Utility.getStackPane());
@@ -238,6 +240,9 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
     public void receive(Object o) {
         if(o instanceof BankRemittance){
             try {
+                if (transactionHeader == null) {
+                    createTransactionHeader();
+                }
                 BankRemittance br = (BankRemittance) o;
                 TransactionDetails td = new TransactionDetails();
                 td.setTransactionCode("BR");

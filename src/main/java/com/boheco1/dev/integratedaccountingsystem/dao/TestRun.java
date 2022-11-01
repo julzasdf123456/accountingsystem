@@ -14,10 +14,7 @@ import java.util.List;
 public class TestRun {
     public static void main(String[] args) {
         try {
-            List<ReleasedItems> released = MRTDao.searchReleasedItems("CROSS");
-            for(ReleasedItems r: released) {
-                System.out.println(r.getDescription() + ": " + r.getQuantity());
-            }
+            System.out.println(Utility.getAccountCodeProperty());
         }catch(Exception ex) {
             ex.printStackTrace();
         }
