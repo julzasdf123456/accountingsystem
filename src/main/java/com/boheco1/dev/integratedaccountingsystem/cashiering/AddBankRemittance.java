@@ -53,15 +53,19 @@ public class AddBankRemittance extends MenuControllerHandler implements Initiali
         }else if(amount.getText().isEmpty()) {
             AlertDialogBuilder.messgeDialog("Invalid Entry","Please enter a valid amount.",stackPane, AlertDialogBuilder.WARNING_DIALOG);
         }else {
-            BankRemittance bankRemittance = new BankRemittance();
-            bankRemittance.setOrDateFrom(orDateFrom.getValue());
-            bankRemittance.setBankAccount(bankAccount.getSelectionModel().getSelectedItem());
-            bankRemittance.setCheckNumber(checkNumber.getText());
-            bankRemittance.setAmount(Double.parseDouble(amount.getText()));
+            try {
+                BankRemittance bankRemittance = new BankRemittance();
+                bankRemittance.setOrDateFrom(orDateFrom.getValue());
+                bankRemittance.setBankAccount(bankAccount.getSelectionModel().getSelectedItem());
+                bankRemittance.setCheckNumber(checkNumber.getText());
+                bankRemittance.setAmount(Double.parseDouble(amount.getText()));
 
-            this.parentController.receive(bankRemittance);
+                this.parentController.receive(bankRemittance);
 
-            this.onClear();
+                this.onClear();
+            }catch(NumberFormatException ex) {
+                AlertDialogBuilder.messgeDialog("Invalid Entry","Please enter a valid amount.",stackPane, AlertDialogBuilder.WARNING_DIALOG);
+            }
         }
     }
 

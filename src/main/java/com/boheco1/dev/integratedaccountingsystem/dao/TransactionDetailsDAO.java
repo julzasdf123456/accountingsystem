@@ -72,6 +72,42 @@ public class TransactionDetailsDAO {
         ps.close();
     }
 
+    public static List<TransactionDetails> getDebitOnly(LocalDate period, String transactionNumber, String transactionCode) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM TransactionDetails WHERE period=? AND TransactionNumber=? " +
+                        "AND TransactionCode=? AND Debit>0 AND Credit=0");
+        ps.setDate(1, java.sql.Date.valueOf(period));
+        ps.setString(2, transactionNumber);
+        ps.setString(3, transactionCode);
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<TransactionDetails> tds = new ArrayList<>();
+
+        while(rs.next()) {
+            TransactionDetails td = new TransactionDetails();
+            td.setPeriod(rs.getDate("Period").toLocalDate());
+            td.setTransactionNumber(rs.getString("TransactionNumber"));
+            td.setTransactionCode(rs.getString("TransactionCode"));
+            td.setTransactionDate(rs.getDate("TransactionDate")!=null?rs.getDate("TransactionDate").toLocalDate():null);
+            td.setSequenceNumber(rs.getInt("AccountSequence"));
+            td.setAccountCode(rs.getString("AccountCode"));
+            td.setDebit(rs.getDouble("Debit"));
+            td.setCredit(rs.getDouble("Credit"));
+            td.setOrDate(rs.getDate("ORDate")!=null?rs.getDate("ORDate").toLocalDate():null);
+            td.setBankID(rs.getString("BankID"));
+            td.setNote(rs.getString("Note"));
+            td.setCheckNumber(rs.getString("CheckNumber"));
+            td.setParticulars(rs.getString("Particulars"));
+            tds.add(td);
+        }
+
+        rs.close();
+        ps.close();
+
+        return tds;
+    }
+
     public static TransactionDetails get(LocalDate period, String transactionNumber, String transactionCode, int accountSequence) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM TransactionDetails WHERE period=? AND TransactionNumber=? " +
@@ -159,7 +195,7 @@ public class TransactionDetailsDAO {
 
     public static double getTotalDebit(LocalDate period, String transactionNumber) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT SUM(td.Debit) FROM TransactionDetails td WHERE td.Period=? AND td.TransactionNumber=? AND td.TransactionCode='BR' AND td.Credit=0");
+                "SELECT SUM(td.Debit) FROM TransactionDetails td WHERE td.Period=? AND td.TransactionNumber=? AND td.Credit=0");
         ps.setDate(1, java.sql.Date.valueOf(period));
         ps.setString(2, transactionNumber);
         ResultSet rs = ps.executeQuery();
@@ -167,23 +203,25 @@ public class TransactionDetailsDAO {
         return rs.getDouble(1);
     }
 
-    public static void syncDebit(LocalDate period, String transactionNumber) throws Exception {
-        PreparedStatement psx = DB.getConnection().prepareStatement("SELECT * FROM TransactionDetails td WHERE td.Period=? AND td.TransactionNumber=? AND td.TransactionCode='BR' AND td.Debit=0");
+    public static void syncDebit(LocalDate period, String transactionNumber, String transactionCode) throws Exception {
+        PreparedStatement psx = DB.getConnection().prepareStatement("SELECT * FROM TransactionDetails td WHERE td.Period=? AND td.TransactionNumber=? AND td.TransactionCode=? AND td.Debit=0");
         psx.setDate(1, java.sql.Date.valueOf(period));
         psx.setString(2, transactionNumber);
+        psx.setString(3, transactionCode);
         ResultSet rs = psx.executeQuery();
 
         if(rs.next()) {
-            PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE TransactionDetails SET Credit=? WHERE Period=? AND TransactionNumber=? AND TransactionCode='BR' AND Debit=0 AND AccountSequence=999");
+            PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE TransactionDetails SET Credit=? WHERE Period=? AND TransactionNumber=? AND TransactionCode=? AND Debit=0 AND AccountSequence=999");
             ps.setDouble(1, getTotalDebit(period, transactionNumber));
             ps.setDate(2, java.sql.Date.valueOf(period));
             ps.setString(3, transactionNumber);
+            ps.setString(4, transactionCode);
             ps.executeUpdate();
         }else {
             TransactionDetails td = new TransactionDetails();
             td.setPeriod(period);
             td.setTransactionNumber(transactionNumber);
-            td.setTransactionCode("BR");
+            td.setTransactionCode(transactionCode);
             td.setCredit(getTotalDebit(period, transactionNumber));
             td.setSequenceNumber(999);
             //BR or BRSub

@@ -118,11 +118,11 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             AlertDialogBuilder.messgeDialog("Error!","You must first set the Date",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
             return;
-        }else if(orNumber.getText().isEmpty()) {
+        }else if(orNumber.getText()==null || orNumber.getText().isEmpty()) {
             AlertDialogBuilder.messgeDialog("Error!","You must first set the OR/AR Number",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
             return;
-        }else if(receivedFrom.getText().isEmpty()) {
+        }else if(receivedFrom.getText()==null || receivedFrom.getText().isEmpty()) {
             AlertDialogBuilder.messgeDialog("Error!","You must first set the Received From field.",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
             return;
@@ -150,8 +150,6 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             currentTransaction.setRemarks(paymentFor.getText());
             try {
                 TransactionHeaderDAO.add(currentTransaction);
-
-
             }catch(Exception ex) {
                 ex.printStackTrace();
                 AlertDialogBuilder.messgeDialog("Error!", ex.getMessage(),
@@ -174,7 +172,8 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
                     num++;
                 }
             }
-            AlertDialogBuilder.messgeDialog("Error!", (isNew ? "New AR transaction saved with " : "Current AR saved with ") + num + " new " + (num>1? " items." : "item"),
+            TransactionDetailsDAO.syncDebit(currentTransaction.getPeriod(), currentTransaction.getTransactionNumber(),"AR");
+            AlertDialogBuilder.messgeDialog("Saved!", (isNew ? "New AR transaction saved with " : "Current AR saved with ") + num + " new " + (num>1? " items." : "item"),
                     stackPane, AlertDialogBuilder.INFO_DIALOG);
         }catch(Exception ex) {
             ex.printStackTrace();
@@ -218,7 +217,11 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             @Override
             public void handle(ActionEvent actionEvent) {
                 try{
-                    TransactionDetailsDAO.delete(currentItem);
+                    if(currentItem.getTransactionNumber()!=null) {
+                        TransactionDetailsDAO.delete(currentItem);
+                        TransactionDetailsDAO.syncDebit(currentTransaction.getPeriod(), currentTransaction.getTransactionNumber(),"AR");
+                    }
+
                     transactionDetails.remove(currentItem);
                     currentItem = null;
                     recomputeTotal();
@@ -322,7 +325,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             orDate.setValue(currentTransaction.getTransactionDate());
 
             transactionDetails.clear();
-            transactionDetails.addAll(TransactionDetailsDAO.get(currentTransaction.getPeriod(), currentTransaction.getTransactionNumber(), "AR"));
+            transactionDetails.addAll(TransactionDetailsDAO.getDebitOnly(currentTransaction.getPeriod(), currentTransaction.getTransactionNumber(), "AR"));
             paymentFor.setEditable(false);
             receivedFrom.setEditable(false);
             recomputeTotal();
