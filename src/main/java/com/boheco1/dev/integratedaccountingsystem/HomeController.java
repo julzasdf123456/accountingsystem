@@ -139,10 +139,14 @@ public class HomeController implements Initializable {
             NavMenuHelper.addMenu(navMenuBox, allAccounts, homeStackPane);
         }
 
-        if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-billing")){
+        if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-cashiering")){
             NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Teller"), new FontIcon("mdi2c-contactless-payment-circle"), homeStackPane);
-            NavMenuHelper.addMenu(navMenuBox, power_bills_payment, homeStackPane);
-            NavMenuHelper.addMenu(navMenuBox, dcr, homeStackPane);
+
+            if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-billing"))
+                NavMenuHelper.addMenu(navMenuBox, power_bills_payment, homeStackPane);
+
+            if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering"))
+                NavMenuHelper.addMenu(navMenuBox, dcr, homeStackPane);
         }
 
         if (ActiveUser.getUser().can("manage-cashiering")){
@@ -191,10 +195,12 @@ public class HomeController implements Initializable {
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(allAccounts, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, allAccounts.getText(), contentPane, "all_accounts_layout.fxml", subToolbar, null, title);
         }
 
-        if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-billing")) {
+        if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-cashiering")) {
             //DrawerMenuHelper.setMenuButton(power_bills_payment, new FontIcon("mdi2c-cash-usd"), drawerMenus, power_bills_payment.getText());
-            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(power_bills_payment, new FontIcon("mdi2c-cash-usd"), drawerMenus, power_bills_payment.getText(), contentPane, "tellering/tellering_bills_payment.fxml", null, null, title);
-            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(dcr, new FontIcon("mdi2c-chart-bar"), drawerMenus, dcr.getText(), contentPane, "tellering/tellering_dcr.fxml", null, null, title);
+            if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-billing"))
+                DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(power_bills_payment, new FontIcon("mdi2c-cash-usd"), drawerMenus, power_bills_payment.getText(), contentPane, "tellering/tellering_bills_payment.fxml", null, null, title);
+            if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering"))
+                DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(dcr, new FontIcon("mdi2c-chart-bar"), drawerMenus, dcr.getText(), contentPane, "tellering/tellering_dcr.fxml", null, null, title);
         }
 
         if (ActiveUser.getUser().can("manage-cashiering")) {
