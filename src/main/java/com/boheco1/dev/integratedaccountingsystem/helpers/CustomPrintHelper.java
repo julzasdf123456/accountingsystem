@@ -63,19 +63,19 @@ public class CustomPrintHelper {
 
     public void prepareOEBR(PaidBill bill){
 
-        String meter_no = "Meter no:";
-        String type = "Type: RM";
-        String consumer = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxy";
-        String billno = "Bill Number";
-        String address = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxy";
-        String billmonth = "Bill Month";
-        String kwhUsed = "KWH Used";
-        String amount = "Bill Amount";
+        String meter_no = bill.getConsumer().getMeterNumber();
+        String type = "Type: "+bill.getConsumerType();
+        String consumer = bill.getConsumer().getConsumerName();
+        String billno = bill.getBillNo();
+        String address = bill.getConsumer().getConsumerAddress();
+        String billmonth = bill.getBillMonth();
+        String kwhUsed = bill.getPowerKWH()+"";
+        String amount = bill.getAmountDue()+"";
         String vat = "Vat";
-        String dueDate = "Due Date";
-        String surcharge = "Surcharge";
-        String amountDue = "Amount Due";
-        String teller = "Teller";
+        String dueDate = "Due Date: "+bill.getDueDate();
+        String surcharge = bill.getSurCharge()+"";
+        String amountDue = bill.getTotalAmount()+"";
+        String teller = bill.getTeller();
         String receivedDate = "Received date";
 
         VBox container = new VBox();

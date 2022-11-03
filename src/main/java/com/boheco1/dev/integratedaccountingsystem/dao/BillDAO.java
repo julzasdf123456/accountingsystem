@@ -22,6 +22,7 @@ public class BillDAO {
         conn.setAutoCommit(false);
 
         String sql = "INSERT INTO PaidBills (" +
+                "PostingDate, "+
                 "AccountNumber, " +
                 "BillNumber, " +
                 "ServicePeriodEnd, " +
@@ -44,14 +45,14 @@ public class BillDAO {
                 "Amount2307, " +
                 "CashAmount, " +
                 "CheckAmount) " +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ROUND(?, 2), ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2));";
+                " VALUES (SYSDATETIME(), ?, ?, ?, ?, ?, ?, ?, ROUND(?, 2), ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2));";
         String sql_check = "INSERT INTO CheckPayment (AccountNumber, ServicePeriodEnd, Bank, CheckNumber, Amount) VALUES(?, ?, ?, ?, ROUND(?, 2))";
         String sql_md = "UPDATE MDRefund SET Amount=ROUND(Amount-?, 2) WHERE AccountNumber=?";
 
         PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
         PreparedStatement ps_check = null;
         PreparedStatement ps_md = null;
-
+        int postingSequence = 1;
         try {
             PaidBill paid = (PaidBill) bill;
 
@@ -64,7 +65,7 @@ public class BillDAO {
             ps.setDouble(7, bill.getOtherCharges());
             ps.setDouble(8, bill.getTotalAmount());
             ps.setString(9, paid.getPaymentType());
-            ps.setInt(10, paid.getPostingSequence());
+            ps.setInt(10, postingSequence);
             ps.setString(11, paid.getTeller());
             ps.setDouble(12, bill.getDiscount());
             ps.setDouble(13, bill.getSurCharge());
@@ -99,6 +100,7 @@ public class BillDAO {
                 ps_md.executeUpdate();
             }
             conn.commit();
+            postingSequence++;
         }catch (SQLException ex){
             conn.rollback();
             throw new Exception(ex.getMessage());
@@ -175,8 +177,6 @@ public class BillDAO {
             double amount = getMDRefund(bill);
             bill.setMdRefund(amount);
             bills.add(bill);
-            PaidBill paidBill = (PaidBill) bill;
-            paidBill.setPostingSequence(i);
             i++;
         }
 

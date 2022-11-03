@@ -527,7 +527,16 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column3.setPrefWidth(100);
         column3.setMaxWidth(100);
         column3.setMinWidth(100);
-        column3.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getAmountDue())));
+        column3.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(
+                obj.getValue().getAmountDue() + obj.getValue().getSurChargeTax() + -
+                    (
+                        obj.getValue().getDiscount()
+                        + obj.getValue().getOtherAdjustment()
+                        + obj.getValue().getSlAdjustment()
+                        + obj.getValue().getCh2307()
+                        + obj.getValue().getCh2306()
+                    )
+        )));
         column3.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column4 = new TableColumn<>("Surcharge");
@@ -784,6 +793,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         PaymentConfirmationController controller = fxmlLoader.getController();
         controller.setPayments(bills, amount_due, cash, checks);
         controller.getConfirm_btn().setOnAction(action ->{
+            /*
             for (Bill b: bills){
                 try {
                     PaidBill paidBill = (PaidBill) b;
@@ -800,7 +810,8 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 } catch (Exception e) {
                     AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }
-            }
+            }*/
+            Utility.processor(bills, cash, checks);
         });
         dialog.show();
     }

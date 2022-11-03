@@ -432,6 +432,7 @@ public class Bill {
         double charges = this.getSurCharge() + this.getSurChargeTax() + this.getAmountDue();
         double deductions = this.getDiscount() + this.getMdRefund() + this.getKatas() + this.getCh2306() + this.getCh2307() + this.getSlAdjustment() + this.getOtherAdjustment();
         this.setTotalAmount(charges - deductions);
+        this.setBalance(this.getTotalAmount());
     }
 
     public double getScDiscount() {
