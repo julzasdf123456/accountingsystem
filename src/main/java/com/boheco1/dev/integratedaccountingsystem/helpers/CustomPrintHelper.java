@@ -10,27 +10,36 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 
-//public class CustomPrintHelper extends Task {
-public class CustomPrintHelper {
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+
+public class CustomPrintHelper extends Task {
+
     private Node node;
     private Paper paper;
+    private PaidBill bill;
 
     public CustomPrintHelper(Node node, String page, double width, double height){
         this.node = node;
         this.paper = PrintHelper.createPaper(page, width, height, Units.INCH);
     }
 
-    public CustomPrintHelper(String page, double width, double height){
+    public CustomPrintHelper(String page, double width, double height, PaidBill bill){
         this.paper = PrintHelper.createPaper(page, width, height, Units.INCH);
+        this.bill = bill;
     }
-    /*
+
     @Override
     protected Object call() throws Exception {
         print();
         return null;
-    }*/
+    }
 
     public void print() throws Exception{
+        prepareDocument();
+
         Printer printer = Printer.getDefaultPrinter();
 
         PrinterJob job = PrinterJob.createPrinterJob();
@@ -40,7 +49,7 @@ public class CustomPrintHelper {
 
         PageLayout layout = printer.createPageLayout(this.paper, PageOrientation.PORTRAIT,  10, 10, 0, 0);
         job.getJobSettings().setPageLayout(layout);
-        Paper papers = layout.getPaper();
+        /*Paper papers = layout.getPaper();
 
         System.out.println("Paper width: "+papers.getWidth());
         System.out.println("Paper height:" + papers.getHeight());
@@ -48,6 +57,7 @@ public class CustomPrintHelper {
         System.out.println("Printable height: "+layout.getPrintableHeight());
         System.out.println("Left margin: "+layout.getLeftMargin());
         System.out.println("Right margin: "+layout.getPrintableHeight());
+        */
 
         if (job != null) {
             boolean printed = job.printPage(node);
@@ -61,9 +71,9 @@ public class CustomPrintHelper {
         }
     }
 
-    public void prepareOEBR(PaidBill bill){
+    public void prepareDocument(){
 
-        String meter_no = bill.getConsumer().getMeterNumber();
+        String meter_no = bill.getConsumer().getAccountID();
         String type = "Type: "+bill.getConsumerType();
         String consumer = bill.getConsumer().getConsumerName();
         String billno = bill.getBillNo();
@@ -71,12 +81,34 @@ public class CustomPrintHelper {
         String billmonth = bill.getBillMonth();
         String kwhUsed = bill.getPowerKWH()+"";
         String amount = bill.getAmountDue()+"";
-        String vat = "Vat";
-        String dueDate = "Due Date: "+bill.getDueDate();
+        String vat = (bill.getVat() + bill.getSurChargeTax())+"";
+        String due = bill.getDueDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+        String dueDate = "Due Date: "+due;
         String surcharge = bill.getSurCharge()+"";
         String amountDue = bill.getTotalAmount()+"";
         String teller = bill.getTeller();
-        String receivedDate = "Received date";
+        DateFormat dateFormat2 = new SimpleDateFormat("MM/dd/yyyy hh:mm aa");
+        String receivedDate = dateFormat2.format(new Date()).toString();;
+
+        System.out.println("Meter: "+meter_no);
+        System.out.println(type);
+        System.out.println("Consumer: "+consumer);
+        System.out.println("Address: "+address);
+        System.out.println("Bill Number: "+billno);
+        System.out.println("Billing Month: "+billmonth);
+        System.out.println(dueDate);
+        System.out.println("KWH Used: "+kwhUsed);
+        System.out.println("Net Amount: "+amount);
+        System.out.println("VAT: "+vat);
+        System.out.println("Surcharge: "+surcharge);
+        System.out.println("Amount Due: "+amountDue);
+        System.out.println("Teller: "+teller);
+        System.out.println("Date Received: "+receivedDate);
+        System.out.println("Cash Amount: "+bill.getCashAmount());
+        System.out.println("Check Amount: "+bill.getCheckAmount());
+        System.out.println("=============================");
+        System.out.println("");
+
 
         VBox container = new VBox();
         container.setPadding(new Insets(50, 0, 0, 0));

@@ -16,10 +16,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.util.CellRangeAddress;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.sql.SQLException;
@@ -76,6 +80,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         this.view_btn.setOnAction(action ->{
             this.generateReport();
         });
+
         if (ActiveUser.getUser().can("manage-cashiering")) {
             this.teller_tf.setVisible(true);
             this.teller_tf.setOnAction(actionEvent -> {
@@ -83,6 +88,86 @@ public class DCRController extends MenuControllerHandler implements Initializabl
             });
         }else {
             this.teller_tf.setVisible(false);
+        }
+
+        this.print_dcr_btn.setOnAction(actionEvent -> {
+            this.generateExcel();
+        });
+    }
+    /**
+     * Generates DCR in excel format
+     * @return void
+     */
+    public void generateExcel(){
+        Stage stage = (Stage) Utility.getStackPane().getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Excel Files", "*.xlsx")
+        );
+        fileChooser.setInitialFileName("DCR_"+LocalDate.now()+".xlsx");
+        File selectedFile = fileChooser.showSaveDialog(stage);
+
+        if (selectedFile != null) {
+
+            // Create a background Task
+            Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    progressbar.setVisible(true);
+                    try (OutputStream fileOut = new FileOutputStream(selectedFile)) {
+                        boolean proceed = true;
+                        String teller;
+                        if (ActiveUser.getUser().can("manage-cashiering")) {
+                            teller = teller_tf.getText();
+                            if (teller.isEmpty()) {
+                                AlertDialogBuilder.messgeDialog("System Information", "Teller username is required! Please specify the teller!",
+                                        Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+                                proceed = false;
+                            }
+                        }else if (ActiveUser.getUser().can("manage-tellering")) {
+                            teller = ActiveUser.getUser().getUserName();
+                        }else {
+                            proceed = false;
+                        }
+                        if (proceed) {
+                            int month = date_pker.getValue().getMonthValue();
+                            int day = date_pker.getValue().getDayOfMonth();
+                            int year = date_pker.getValue().getYear();
+                            DCRController.generateDCR(fileOut, "Engel", "10/3/22",
+                                    BillDAO.getAllPaidBills(year, month, day, "engel"),
+                                    BillDAO.getDCRBreakDown(year, month, day, "engel"));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        AlertDialogBuilder.messgeDialog("System Warning", "Process failed due to: " + e.getMessage(),
+                                Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    }
+                    return null;
+                }
+            };
+
+            task.setOnSucceeded(wse -> {
+                progressbar.setVisible(false);
+                AlertDialogBuilder.messgeDialog("Daily Collection Report", "Daily Collection Report was successfully generated and saved on file!",
+                        Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                try{
+                    String path = selectedFile.getAbsolutePath();
+                    Process p = Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler "+path);
+                    p.waitFor();
+                }catch (Exception e){
+                    e.printStackTrace();
+                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request! Please try again!",
+                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }
+            });
+
+            task.setOnFailed(workerStateEvent -> {
+                progressbar.setVisible(false);
+                AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request! Please try again!",
+                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            });
+
+            new Thread(task).start();
         }
     }
 
@@ -310,7 +395,8 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         this.payments_table.getColumns().add(column2);
     }
 
-    public static void generateDCR(OutputStream fileOut, String teller, String posting, List<Bill> bills) throws Exception {
+    public static void generateDCR(OutputStream fileOut, String teller, String posting, List<Bill> bills, HashMap<String, List<ItemSummary>> breakdown) throws Exception {
+        double billTotal = 0, sysLossTotal = 0, ppdTotal = 0, surchargeTotal = 0, netAmtTotal = 0;
         ExcelBuilder doc = new ExcelBuilder(20);
 
         CellStyle style = doc.getWb().createCellStyle();
@@ -328,14 +414,13 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         style_right.setAlignment(HorizontalAlignment.RIGHT);
 
         doc.setTitle("Daily Collection Report");
-        //EmployeeInfo user = "engel";
 
-        String names[] = {"engel"};
-        String designations[] = {"Teller"};
+        EmployeeInfo user = ActiveUser.getUser().getEmployeeInfo();
+        String names[] = {user.getEmployeeFirstName()+" "+user.getEmployeeLastName(), "", "", ""};
+        String designations[] = {user.getDesignation(),"", "", ""};
+        String types[] = {"Prepared by", "", "", ""};
         doc.setNames(names);
         doc.setDesignations(designations);
-
-        String types[] = {"Prepared by"};
         doc.setTypes(types);
 
         doc.createHeader();
@@ -409,7 +494,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         bill_bal_cell.setCellValue("Bill Balance");
         bal_addr = new CellRangeAddress(row, row, 7, 8);
         sheet.addMergedRegion(bal_addr);
-        bill_bal_cell.setCellStyle(style);
+        bill_bal_cell.setCellStyle(style_center);
         doc.styleMergedCells(bal_addr);
 
 
@@ -425,28 +510,28 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         sys_loss_cell.setCellValue("Sys. Loss");
         sys_loss_addr = new CellRangeAddress(row, row, 11, 12);
         sheet.addMergedRegion(sys_loss_addr);
-        sys_loss_cell.setCellStyle(style);
+        sys_loss_cell.setCellStyle(style_center);
         doc.styleMergedCells(sys_loss_addr);
 
         bill_ppd_cell = dcr_table_head.createCell(13);
         bill_ppd_cell.setCellValue("PPD");
         ppd_addr = new CellRangeAddress(row, row, 13, 14);
         sheet.addMergedRegion(ppd_addr);
-        bill_ppd_cell.setCellStyle(style);
+        bill_ppd_cell.setCellStyle(style_center);
         doc.styleMergedCells(ppd_addr);
 
         bill_surcharge_cell = dcr_table_head.createCell(15);
         bill_surcharge_cell.setCellValue("Surcharge");
         surcharge_ddr = new CellRangeAddress(row, row, 15, 16);
         sheet.addMergedRegion(surcharge_ddr);
-        bill_surcharge_cell.setCellStyle(style);
+        bill_surcharge_cell.setCellStyle(style_center);
         doc.styleMergedCells(surcharge_ddr);
 
         bill_net_amt_cell = dcr_table_head.createCell(17);
         bill_net_amt_cell.setCellValue("Net-Amt.");
         net_ddr = new CellRangeAddress(row, row, 17, 18);
         sheet.addMergedRegion(net_ddr);
-        bill_net_amt_cell.setCellStyle(style);
+        bill_net_amt_cell.setCellStyle(style_center);
         doc.styleMergedCells(net_ddr);
 
 
@@ -527,7 +612,119 @@ public class DCRController extends MenuControllerHandler implements Initializabl
             time_cell = dcr_table_row_head.createCell(19);
             time_cell.setCellValue(((PaidBill) b).getPostingTime());
             doc.styleBorder(time_cell, 12, HorizontalAlignment.CENTER, false);
+
+            billTotal += b.getAmountDue(); sysLossTotal += b.getSlAdjustment(); ppdTotal += p.getPromptPayment(); surchargeTotal += b.getSurCharge(); netAmtTotal += b.getTotalAmount();
         }
+
+        List<ItemSummary> breakdownItems = breakdown.get("Breakdown");
+        List<ItemSummary> totalItems = breakdown.get("Misc");
+
+        int i = 1;
+        Row dcr_table_row_head;
+        row++;
+
+        for(ItemSummary s : breakdownItems) {
+
+            row++;
+
+            dcr_table_row_head = sheet.createRow(row);
+
+            bill_head_cell = dcr_table_row_head.createCell(0);
+            bill_head_cell.setCellValue(s.getDescription());
+            bill_addr = new CellRangeAddress(row, row, 0, 1);
+            sheet.addMergedRegion(bill_addr);
+            bill_head_cell.setCellStyle(style);
+            doc.styleMergedCells(bill_addr, false, false, false, false, false);
+
+            bill_acc_cell = dcr_table_row_head.createCell(2);
+            bill_acc_cell.setCellValue(Utility.formatDecimal(s.getTotal()));
+            acc_addr = new CellRangeAddress(row, row, 2, 3);
+            sheet.addMergedRegion(acc_addr);
+            bill_acc_cell.setCellStyle(style);
+            doc.styleMergedCells(acc_addr, false, false, false, false, false);
+
+            if (i == 1) {
+                bill_bal_cell = dcr_table_row_head.createCell(7);
+                bill_bal_cell.setCellValue(Utility.formatDecimal(billTotal));
+                bal_addr = new CellRangeAddress(row, row, 7, 8);
+                sheet.addMergedRegion(bal_addr);
+                bill_bal_cell.setCellStyle(style_right);
+                doc.styleMergedCells(bal_addr, false, false, false, false, false);
+
+                sys_loss_cell = dcr_table_row_head.createCell(11);
+                sys_loss_cell.setCellValue(Utility.formatDecimal(sysLossTotal));
+                sys_loss_addr = new CellRangeAddress(row, row, 11, 12);
+                sheet.addMergedRegion(sys_loss_addr);
+                sys_loss_cell.setCellStyle(style_right);
+                doc.styleMergedCells(sys_loss_addr, false, false, false, false, false);
+
+                bill_ppd_cell = dcr_table_row_head.createCell(13);
+                bill_ppd_cell.setCellValue(Utility.formatDecimal(ppdTotal));
+                ppd_addr = new CellRangeAddress(row, row, 13, 14);
+                sheet.addMergedRegion(ppd_addr);
+                bill_ppd_cell.setCellStyle(style_right);
+                doc.styleMergedCells(ppd_addr, false, false, false, false, false);
+
+                bill_surcharge_cell = dcr_table_row_head.createCell(15);
+                bill_surcharge_cell.setCellValue(Utility.formatDecimal(surchargeTotal));
+                surcharge_ddr = new CellRangeAddress(row, row, 15, 16);
+                sheet.addMergedRegion(surcharge_ddr);
+                bill_surcharge_cell.setCellStyle(style_right);
+                doc.styleMergedCells(surcharge_ddr, false, false, false, false, false);
+
+                bill_net_amt_cell = dcr_table_row_head.createCell(17);
+                bill_net_amt_cell.setCellValue(Utility.formatDecimal(netAmtTotal));
+                net_ddr = new CellRangeAddress(row, row, 17, 18);
+                sheet.addMergedRegion(net_ddr);
+                bill_net_amt_cell.setCellStyle(style_right);
+                doc.styleMergedCells(net_ddr, false, false, false, false, false);
+            }else if (i == 6){
+                bill_surcharge_cell = dcr_table_row_head.createCell(15);
+                bill_surcharge_cell.setCellValue("KWH Used");
+                surcharge_ddr = new CellRangeAddress(row, row, 15, 16);
+                sheet.addMergedRegion(surcharge_ddr);
+                bill_surcharge_cell.setCellStyle(style_right);
+                doc.styleMergedCells(surcharge_ddr, false, false, false, false, false);
+
+                bill_net_amt_cell = dcr_table_row_head.createCell(17);
+                bill_net_amt_cell.setCellValue(totalItems.get(0).getTotal());
+                net_ddr = new CellRangeAddress(row, row, 17, 18);
+                sheet.addMergedRegion(net_ddr);
+                bill_net_amt_cell.setCellStyle(style_right);
+                doc.styleMergedCells(net_ddr, false, false, false, false, false);
+            }
+            i++;
+        }
+
+        row++;
+
+        dcr_table_row_head = sheet.createRow(row);
+
+        bill_head_cell = dcr_table_row_head.createCell(0);
+        bill_head_cell.setCellValue("Total");
+        bill_addr = new CellRangeAddress(row, row, 0, 1);
+        sheet.addMergedRegion(bill_addr);
+        bill_head_cell.setCellStyle(style);
+        doc.styleMergedCells(bill_addr, false, false, false, false, false);
+
+        CellStyle style_bold = doc.getWb().createCellStyle();
+        Font font_bold = doc.getWb().createFont();
+        font_bold.setFontHeightInPoints((short) 11);
+        font_bold.setFontName("Arial");
+        font_bold.setBold(true);
+        style_bold.setFont(font_bold);
+
+        bill_acc_cell = dcr_table_row_head.createCell(2);
+        bill_acc_cell.setCellValue(Utility.formatDecimal(totalItems.get(1).getTotal()));
+        acc_addr = new CellRangeAddress(row, row, 2, 3);
+        sheet.addMergedRegion(acc_addr);
+        bill_acc_cell.setCellStyle(style_bold);
+        doc.styleMergedCells(acc_addr, false, false, false, false, false);
+
+        row++;
+
+        doc.createSignatorees(row);
+
         doc.save(fileOut);
     }
 }

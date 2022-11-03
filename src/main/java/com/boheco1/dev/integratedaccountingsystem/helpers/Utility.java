@@ -198,7 +198,7 @@ public class Utility {
         return String.format("%,.2f",val);
     }
 
-    public static List<Bill> processor(List<Bill> bills, double cash, List<Check> checks){
+    public static List<Bill> processor(List<Bill> bills, double cash, List<Check> checks, String teller){
 
         Queue<Bill> billQueue = new LinkedList<>(bills);
 
@@ -209,6 +209,7 @@ public class Utility {
         while (!billQueue.isEmpty()){
             System.out.println("==================================================================================================================");
             Bill b = billQueue.peek();
+            ((PaidBill) b).setTeller(teller);
             System.out.println("Cash Amount: "+cash);
             System.out.println("Bill No: "+b.getBillNo()+" Bill balance: "+b.getBalance());
             while (!checkQueue.isEmpty()){

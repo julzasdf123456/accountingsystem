@@ -25,6 +25,7 @@ import java.util.ResourceBundle;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.fxml.FXML;
+import javafx.print.Printer;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -793,25 +794,43 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         PaymentConfirmationController controller = fxmlLoader.getController();
         controller.setPayments(bills, amount_due, cash, checks);
         controller.getConfirm_btn().setOnAction(action ->{
-            /*
-            for (Bill b: bills){
+            //Get the default printer
+            Printer printer = Printer.getDefaultPrinter();
+            //Check if the default printer is not LQ-310 and prompt error, otherwise proceed to batch transaction and printing of oebr
+            if (!printer.getName().contains("EPSON LQ-310")) {
+                dialog.close();
+                AlertDialogBuilder.messgeDialog("System Error", "The default printer is not EPSON LQ-310! The default printer should be set to EPSON LQ-310!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            }else {
+                List<Bill> updated = Utility.processor(bills, cash, checks, ActiveUser.getUser().getUserName());
+                this.progressBar.setVisible(true);
                 try {
-                    PaidBill paidBill = (PaidBill) b;
-                    paidBill.setTeller(ActiveUser.getUser().getUserName());
-                    paidBill.setChecks(checks);
-                    double check_amount = Utility.getTotalAmount(this.checks);
-                    paidBill.setCashAmount(amount_due - check_amount);
-                    paidBill.setCheckAmount(check_amount);
-                    BillDAO.addPaidBill(b);
+                    BillDAO.addPaidBill(updated);
+                    for (Bill b : updated) {
+                        CustomPrintHelper print = new CustomPrintHelper("OEBR", 18, 3, (PaidBill) b);
+
+                        print.setOnFailed(e -> {
+                            System.out.println("Error when printing the OEBR!");
+                        });
+
+                        print.setOnSucceeded(e -> {
+                            System.out.println("Successful");
+                        });
+
+                        print.setOnRunning(e -> {
+                        });
+                        Thread t = new Thread(print);
+
+                        t.start();
+                    }
                     this.reset();
                     dialog.close();
-                } catch (SQLException ex){
+                } catch (SQLException ex) {
                     AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + ex.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 } catch (Exception e) {
                     AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }
-            }*/
-            Utility.processor(bills, cash, checks);
+                this.progressBar.setVisible(false);
+            }
         });
         dialog.show();
     }

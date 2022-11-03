@@ -52,7 +52,9 @@ public class BillDAO {
         PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
         PreparedStatement ps_check = null;
         PreparedStatement ps_md = null;
+
         int postingSequence = 1;
+
         try {
             PaidBill paid = (PaidBill) bill;
 
@@ -105,6 +107,114 @@ public class BillDAO {
             conn.rollback();
             throw new Exception(ex.getMessage());
         }
+
+        ps.close();
+        if (ps_check != null) ps_check.close();
+        if (ps_md != null) ps_md.close();
+        conn.setAutoCommit(true);
+    }
+
+    /**
+     * Insert as PaidDetails
+     * @param bills List of bills
+     * @return void
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void addPaidBill(List<Bill> bills) throws Exception{
+        Connection conn = DB.getConnection("Billing");
+        conn.setAutoCommit(false);
+
+        String sql = "INSERT INTO PaidBills (" +
+                "PostingDate, "+
+                "AccountNumber, " +
+                "BillNumber, " +
+                "ServicePeriodEnd, " +
+                "Power, " +
+                "Meter, " +
+                "PR, " +
+                "Others, " +
+                "NetAmount, " +
+                "PaymentType, " +
+                "PostingSequence, "+
+                "Teller, " +
+                "PromptPayment, " +
+                "Surcharge, " +
+                "SLAdjustment, " +
+                "OtherDeduction, " +
+                "MDRefund, " +
+                "Form2306, " +
+                "Form2307, " +
+                "Amount2306, " +
+                "Amount2307, " +
+                "CashAmount, " +
+                "CheckAmount) " +
+                " VALUES (SYSDATETIME(), ?, ?, ?, ?, ?, ?, ?, ROUND(?, 2), ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2));";
+
+        String sql_check = "INSERT INTO CheckPayment (AccountNumber, ServicePeriodEnd, Bank, CheckNumber, Amount) VALUES(?, ?, ?, ?, ROUND(?, 2))";
+
+        String sql_md = "UPDATE MDRefund SET Amount=ROUND(Amount-?, 2) WHERE AccountNumber=?";
+
+        PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
+        PreparedStatement ps_check = null;
+        PreparedStatement ps_md = null;
+
+        for (Bill bill : bills) {
+
+            int postingSequence = 1;
+
+            try {
+                PaidBill paid = (PaidBill) bill;
+
+                ps.setString(1, bill.getConsumer().getAccountID());
+                ps.setString(2, bill.getBillNo());
+                ps.setDate(3, Date.valueOf(bill.getServicePeriodEnd()));
+                ps.setDouble(4, bill.getPowerAmount());
+                ps.setDouble(5, bill.getVat());
+                ps.setDouble(6, bill.getTransformerRental());
+                ps.setDouble(7, bill.getOtherCharges());
+                ps.setDouble(8, bill.getTotalAmount());
+                ps.setString(9, paid.getPaymentType());
+                ps.setInt(10, postingSequence);
+                ps.setString(11, paid.getTeller());
+                ps.setDouble(12, bill.getDiscount());
+                ps.setDouble(13, bill.getSurCharge());
+                ps.setDouble(14, bill.getSlAdjustment());
+                ps.setDouble(15, bill.getOtherAdjustment());
+                ps.setDouble(16, bill.getMdRefund());
+                ps.setString(17, bill.getForm2306());
+                ps.setString(18, bill.getForm2307());
+                ps.setDouble(19, bill.getCh2306());
+                ps.setDouble(20, bill.getCh2307());
+                ps.setDouble(21, paid.getCashAmount());
+                ps.setDouble(22, paid.getCheckAmount());
+
+                ps.executeUpdate();
+
+                //Insert check payments
+                for (Check c : paid.getChecks()) {
+                    ps_check = DB.getConnection("Billing").prepareStatement(sql_check);
+                    ps_check.setString(1, paid.getConsumer().getAccountID());
+                    ps_check.setDate(2, Date.valueOf(paid.getServicePeriodEnd()));
+                    ps_check.setString(3, c.getBank());
+                    ps_check.setString(4, c.getCheckNo());
+                    ps_check.setDouble(5, c.getAmount());
+                    ps_check.executeUpdate();
+                }
+
+                //Update MDRefund amount in the MDRefund table
+                if (bill.getMdRefund() > 0) {
+                    ps_md = DB.getConnection("Billing").prepareStatement(sql_md);
+                    ps_md.setDouble(1, bill.getMdRefund());
+                    ps_md.setString(2, bill.getConsumer().getAccountID());
+                    ps_md.executeUpdate();
+                }
+                postingSequence++;
+            } catch (SQLException ex) {
+                conn.rollback();
+                throw new Exception(ex.getMessage());
+            }
+        }
+        conn.commit();
 
         ps.close();
         if (ps_check != null) ps_check.close();
