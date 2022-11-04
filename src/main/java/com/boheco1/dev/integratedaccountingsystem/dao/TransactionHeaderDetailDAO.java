@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.objects.CRMQueue;
 import com.boheco1.dev.integratedaccountingsystem.objects.TransactionDetails;
 import com.boheco1.dev.integratedaccountingsystem.objects.TransactionHeader;
 import com.microsoft.sqlserver.jdbc.SQLServerException;
@@ -9,7 +10,7 @@ import java.sql.*;
 import java.util.List;
 
 public class TransactionHeaderDetailDAO {
-    public static String save(TransactionHeader transactionHeader, List<TransactionDetails> tds) throws SQLException, ClassNotFoundException {
+    public static String save(CRMQueue crmQueue, TransactionHeader transactionHeader, List<TransactionDetails> tds) throws SQLException, ClassNotFoundException {
 
         DB.getConnection().setAutoCommit(false);
 
@@ -60,16 +61,33 @@ public class TransactionHeaderDetailDAO {
 
             ps2.addBatch();
         }
+
+        PreparedStatement ps3 = DB.getConnection().prepareStatement(
+                "Delete from CRMDetails where ReferenceNo = ?");
+        ps3.setString(1, crmQueue.getId());
+
+        PreparedStatement ps4 = DB.getConnection().prepareStatement(
+                "Delete from CRMQueue where id = ?");
+        ps4.setString(1, crmQueue.getId());
+
         String msg="";
         try {
             ps1.executeUpdate();
             ps2.executeBatch();
+            ps3.executeUpdate();
+            ps4.executeUpdate();
             DB.getConnection().setAutoCommit(true);
             ps1.close();
             ps2.close();
+            ps3.close();
+            ps4.close();
         } catch (Exception e){
             DB.getConnection().rollback();
             DB.getConnection().setAutoCommit(true);
+            ps1.close();
+            ps2.close();
+            ps3.close();
+            ps4.close();
             e.printStackTrace();
             msg = e.getMessage();
         }

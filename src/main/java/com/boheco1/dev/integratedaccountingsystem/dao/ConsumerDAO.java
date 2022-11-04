@@ -120,4 +120,39 @@ public class ConsumerDAO {
 
         return record;
     }
+
+    /**
+     * Retrieves a list of CRMQueue as a search result based on a search Key (on Accounting database, CRMQueue table)
+     * @param key The search key
+     * @return A list of CRMQueue that qualifies with the search key
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<CRMQueue> getConsumerRecordFromCRMList(String key) throws Exception  {
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM CRMQueue WHERE ConsumerName LIKE ? OR ConsumerAddress LIKE ? ");
+
+        ps.setString(1, '%'+ key+'%');
+        ps.setString(2, '%'+ key+'%');
+
+        ResultSet rs = ps.executeQuery();
+
+        List<CRMQueue> list = new ArrayList<>();
+        while(rs.next()) {
+            CRMQueue record = new CRMQueue(
+                    rs.getString("id"),
+                    rs.getString("ConsumerName"),
+                    rs.getString("ConsumerAddress"),
+                    rs.getString("TransactionPurpose"),
+                    rs.getString("Source"),
+                    rs.getString("SourceId"),
+                    rs.getDouble("SubTotal"),
+                    rs.getDouble("VAT"),
+                    rs.getDouble("Total"));
+            list.add(record);
+        }
+
+        rs.close();
+        ps.close();
+
+        return list;
+    }
 }

@@ -41,13 +41,11 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private JFXButton print_btn;
 
     @FXML
-    private JFXTextField orNmber, name, address, purpose, source;
+    private JFXTextField orNmber, name, address, purpose;
 
     @FXML
     private JFXTextArea remarks;
 
-    @FXML
-    private JFXComboBox office;
 
     @FXML
     private DatePicker date;
@@ -61,6 +59,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     private CRMQueue consumerInfo = null;
     private Teller tellerInfo = null;
+
     private CRMQueue crmQueue;
     private List<CRMDetails> crmDetails;
 
@@ -68,6 +67,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Utility.setParentController(this);
         date.setValue(LocalDate.now());
+        InputValidation.restrictNumbersOnly(orNmber);
     }
 
     @FXML
@@ -78,6 +78,17 @@ public class CashierController extends MenuControllerHandler implements Initiali
     @FXML
     private void search(ActionEvent event) {
         ModalBuilderForWareHouse.showModalFromXMLNoClose(CashierController.class, "../cashiering/cashiering_search_consumer.fxml", Utility.getStackPane());
+    }
+
+    private void resetField(){
+        orNmber.setText(""); name.setText(""); address.setText(""); purpose.setText(""); remarks.setText("");
+        date.setValue(LocalDate.now());
+        total.setText("Total: 0.00");
+        paymentTable.getColumns().clear();
+        crmQueue = null;
+        crmDetails = null;
+        consumerInfo = null;
+        tellerInfo = null;
     }
 
     @Override
@@ -93,8 +104,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
         }else if (o instanceof Teller) {
             this.tellerInfo = (Teller) o;
             this.name.setText(tellerInfo.getName());
-            this.address.setText(tellerInfo.getAddress());
-            this.purpose.setText(tellerInfo.getPhone());
+            this.address.setText("-");
+            this.purpose.setText("-");
             setUpPaymentTable(tellerInfo);
         }
     }
@@ -105,42 +116,29 @@ public class CashierController extends MenuControllerHandler implements Initiali
             CRMQueue crmQueue = (CRMQueue) o;
 
             TableColumn<CRMDetails, String> column1 = new TableColumn<>("Particulars");
+            column1.setMinWidth(200);
             column1.setCellValueFactory(new PropertyValueFactory<>("particulars"));
             column1.setStyle("-fx-alignment: center-left;");
 
-            TableColumn<CRMDetails, String> column2 = new TableColumn<>("Amount");
-            column2.setMinWidth(200);
-            column2.setMaxWidth(200);
-            column2.setPrefWidth(200);
-            //column3.setCellValueFactory(new PropertyValueFactory<>("total"));
-            Callback<TableColumn<CRMDetails, String>, TableCell<CRMDetails, String>> qtycellFactory
-                    = //
-                    new Callback<TableColumn<CRMDetails, String>, TableCell<CRMDetails, String>>() {
-                        @Override
-                        public TableCell call(final TableColumn<CRMDetails, String> param) {
-                            final TableCell<CRMDetails, String> cell = new TableCell<CRMDetails, String>() {
-                                @Override
-                                public void updateItem(String item, boolean empty) {
-                                    super.updateItem(item, empty);
-                                    if (empty) {
-                                        setGraphic(null);
-                                        setText(null);
-                                    } else {
-                                        CRMDetails crmDetails = getTableView().getItems().get(getIndex());
-                                        setGraphic(null);
-                                        setText(Utility.formatDecimal(crmDetails.getTotal()));
-                                    }
-                                }
-                            };
-                            return cell;
-                        }
-                    };
-
-            column2.setCellFactory(qtycellFactory);
+            TableColumn<CRMDetails, String> column2 = new TableColumn<>("Sub Total");
+            column2.setMinWidth(100);
+            column2.setCellValueFactory(obj-> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getSubTotal())));
             column2.setStyle("-fx-alignment: center-right;");
+
+            TableColumn<CRMDetails, String> column3 = new TableColumn<>("VAT");
+            column3.setMinWidth(100);
+            column3.setCellValueFactory(obj-> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getVAT())));
+            column3.setStyle("-fx-alignment: center-right;");
+
+            TableColumn<CRMDetails, String> column4 = new TableColumn<>("Total");
+            column4.setMinWidth(100);
+            column4.setCellValueFactory(obj-> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getTotal())));
+            column4.setStyle("-fx-alignment: center-right;");
 
             this.paymentTable.getColumns().add(column1);
             this.paymentTable.getColumns().add(column2);
+            this.paymentTable.getColumns().add(column3);
+            this.paymentTable.getColumns().add(column4);
 
             ObservableList<CRMDetails> result = null;
             List<CRMDetails> crmDetails = null;
@@ -168,13 +166,12 @@ public class CashierController extends MenuControllerHandler implements Initiali
             total.setText("Total: "+Utility.formatDecimal(misc.get(1).getTotal()));
 
             TableColumn<ItemSummary, String> column1 = new TableColumn<>("Item Description");
+            column1.setMinWidth(200);
             column1.setCellValueFactory(new PropertyValueFactory<>("description"));
             column1.setStyle("-fx-alignment: center-left;");
 
             TableColumn<ItemSummary, String> column2 = new TableColumn<>("Total Amount");
             column2.setMinWidth(200);
-            column2.setMaxWidth(200);
-            column2.setPrefWidth(200);
             column2.setCellValueFactory(obj-> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getTotal())));
             column2.setStyle("-fx-alignment: center-right;");
 
@@ -187,18 +184,32 @@ public class CashierController extends MenuControllerHandler implements Initiali
     }
 
     private void regularTransaction(){
-        TransactionHeader transactionHeader= new TransactionHeader();
+        if(consumerInfo == null && tellerInfo == null){
+            AlertDialogBuilder.messgeDialog("System Message", "Please select consumer or teller information.",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            return;
+        }
+
+        if(orNmber.getText().isEmpty()) {
+            AlertDialogBuilder.messgeDialog("System Message", "OR number is required.",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            return;
+        }
+
         int month = date.getValue().getMonthValue();
         int year = date.getValue().getYear();
-
         LocalDate period = LocalDate.of(year, month, 1);
 
+        TransactionHeader transactionHeader= new TransactionHeader();
         transactionHeader.setPeriod(period);
         transactionHeader.setTransactionNumber(orNmber.getText());
-        transactionHeader.setTransactionCode("ORMain");
-        transactionHeader.setOffice("Office_X");
-        transactionHeader.setSource("Consumer_ID");
-        //transactionHeader.setAccountID("For Teller");
+        if(Utility.OFFICE_PREFIX.equalsIgnoreCase("main"))
+            transactionHeader.setTransactionCode("OR");
+        else
+            transactionHeader.setTransactionCode("ORSub");
+        transactionHeader.setOffice(Utility.OFFICE_PREFIX);
+        transactionHeader.setSource(crmQueue.getSource());
+        transactionHeader.setAccountID(crmQueue.getSourseId());//CRM Source ID
         //transactionHeader.setParticulars("N/A");
         transactionHeader.setTransactionDate(date.getValue());
         transactionHeader.setRemarks(remarks.getText());
@@ -214,12 +225,16 @@ public class CashierController extends MenuControllerHandler implements Initiali
             TransactionDetails transactionDetails = new TransactionDetails();
             transactionDetails.setPeriod(period);
             transactionDetails.setTransactionNumber(orNmber.getText());
-            transactionDetails.setTransactionCode("ORMain");
+            if(Utility.OFFICE_PREFIX.equalsIgnoreCase("main"))
+                transactionDetails.setTransactionCode("OR");
+            else
+                transactionDetails.setTransactionCode("ORSub");
             transactionDetails.setTransactionDate(date.getValue());
-            transactionDetails.setAccountCode(cd.getGlCode());
+            transactionDetails.setAccountCode(cd.getGlCode());//GL Code or the account code of the particular
             //transactionDetails.setSequenceNumber(0);
-            transactionDetails.setDebit(cd.getTotal());
-            //transactionDetails.setCredit(0);
+            //transactionDetails.setDebit();
+            transactionDetails.setParticulars(cd.getParticulars());
+            transactionDetails.setCredit(cd.getTotal());
             transactionDetails.setOrDate(date.getValue());
             //transactionDetails.setBankID("N/A");
             //transactionDetails.setNote("N/A");
@@ -227,10 +242,11 @@ public class CashierController extends MenuControllerHandler implements Initiali
         }
 
         try {
-            String msg = TransactionHeaderDetailDAO.save(transactionHeader, transactionDetailsList);
+            String msg = TransactionHeaderDetailDAO.save(crmQueue, transactionHeader, transactionDetailsList);
             if (msg.isEmpty()){
                 AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
                         Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                resetField();
             }else{
                 AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: "+msg,
                         Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);

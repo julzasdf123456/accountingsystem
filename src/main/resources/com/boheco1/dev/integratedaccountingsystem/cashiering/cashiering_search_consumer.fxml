@@ -14,17 +14,17 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane prefHeight="438.0" prefWidth="698.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.SearchCashieringConsumerController">
+<StackPane prefHeight="325.0" prefWidth="628.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.SearchCashieringConsumerController">
     <children>
-        <AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="450.0" prefWidth="800.0" style="-fx-background-color: white;" stylesheets="@../style.css">
+        <AnchorPane fx:id="contentPane" maxHeight="1.7976931348623157E308" prefHeight="373.0" prefWidth="628.0" style="-fx-background-color: white;" stylesheets="@../style.css">
             <children>
-                <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="450.0" prefWidth="800.0">
+                <BorderPane maxHeight="1.7976931348623157E308" prefHeight="372.0" prefWidth="628.0">
                     <center>
                         <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="450.0" prefWidth="800.0" BorderPane.alignment="CENTER">
                             <children>
                                 <HBox prefHeight="59.0" prefWidth="800.0">
                                     <children>
-                                        <JFXTextField fx:id="searchTf" focusColor="#00ad8e" labelFloat="true" onAction="#search" prefHeight="37.0" prefWidth="824.0" promptText="Reference Number/Last Name/First Name/Address" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                        <JFXTextField fx:id="searchTf" focusColor="#00ad8e" labelFloat="true" onAction="#search" prefHeight="37.0" prefWidth="371.0" promptText="Reference Number/Last Name/First Name/Address" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5" HBox.hgrow="ALWAYS">
                                             <font>
                                                 <Font size="14.0" />
                                             </font>
@@ -32,7 +32,7 @@
                                                 <Insets />
                                             </HBox.margin>
                                         </JFXTextField>
-                                        <JFXButton buttonType="RAISED" onAction="#search" prefHeight="30.0" prefWidth="246.0" styleClass="btn-theme" text="Search" textFill="WHITE">
+                                        <JFXButton buttonType="RAISED" onAction="#search" prefHeight="37.0" prefWidth="97.0" styleClass="btn-theme" text="Search" textFill="WHITE" HBox.hgrow="NEVER">
                                             <effect>
                                                 <DropShadow />
                                             </effect>
@@ -55,15 +55,12 @@
                                     <VBox.margin>
                                         <Insets />
                                     </VBox.margin>
-                                    <columnResizePolicy>
-                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                    </columnResizePolicy>
                                 </TableView>
                             </children>
                         </VBox>
                     </center>
                     <top>
-                        <HBox alignment="CENTER_LEFT" prefHeight="36.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+                        <HBox alignment="CENTER_LEFT" prefHeight="62.0" prefWidth="677.0" BorderPane.alignment="CENTER">
                             <children>
                         <JFXToggleButton fx:id="toggleSearch" alignment="CENTER_LEFT" onAction="#toggleSearch" prefHeight="62.0" prefWidth="234.0" style="-fx-font-weight: bold; -fx-font-size: 18;" text="Search Consumer" />
                         <DatePicker fx:id="searchDate" />

@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.cashiering;
 import com.boheco1.dev.integratedaccountingsystem.dao.BillDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.ConsumerDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXDialog;
@@ -66,7 +67,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                                     int day = searchDate.getValue().getDayOfMonth();
                                     int year = searchDate.getValue().getYear();
 
-                                    HashMap<String, List<ItemSummary>> DCRBreakDown = BillDAO.getDCRBreakDown(year,month,day,ActiveUser.getUser().getUserName());
+                                    HashMap<String, List<ItemSummary>> DCRBreakDown = BillDAO.getDCRBreakDown(year,month,day, UserDAO.get(employeeInfo.getId()).getUserName());
                                     Teller teller = new Teller(employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), DCRBreakDown);
                                     resultInfo = teller;
                                     return null;
@@ -115,6 +116,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
             this.searchDate.setVisible(true);
             this.searchTf.setPromptText("Username/Last Name/First Name");
         }
+        search();
     }
 
     /**
@@ -126,7 +128,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
         String query = this.searchTf.getText();
         if(this.toggleSearch.isSelected()){
             try {
-                ObservableList<CRMQueue> result = FXCollections.observableArrayList(ConsumerDAO.getConsumerRecordFromCRM(query));
+                ObservableList<CRMQueue> result = FXCollections.observableArrayList(ConsumerDAO.getConsumerRecordFromCRMList(query));
                 this.searchResultTable.setItems(result);
                 createTable(result);
             } catch (Exception e) {
@@ -134,8 +136,6 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
             }
         }else{
             try {
-                List<EmployeeInfo> list = EmployeeDAO.getEmployeeInfo(query);
-
                 ObservableList<EmployeeInfo> result = FXCollections.observableArrayList(EmployeeDAO.getEmployeeInfo(query));
                 this.searchResultTable.setItems(result);
                 createTable(result);
@@ -156,16 +156,10 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
         searchResultTable.getColumns().clear();
         if(result.get(0) instanceof CRMQueue){
             TableColumn<CRMQueue, String> consumerCol = new TableColumn<>("Consumer");
-            consumerCol.setMinWidth(150);
-            consumerCol.setMaxWidth(150);
-            consumerCol.setPrefWidth(150);
             consumerCol.setCellValueFactory(new PropertyValueFactory<>("consumerName"));
             consumerCol.setStyle("-fx-alignment: center-left;");
 
             TableColumn<CRMQueue, String> addressCol = new TableColumn<>("Address");
-            addressCol.setMinWidth(200);
-            addressCol.setMaxWidth(200);
-            addressCol.setPrefWidth(200);
             addressCol.setCellValueFactory(new PropertyValueFactory<>("consumerAddress"));
             addressCol.setStyle("-fx-alignment: center-left;");
 
@@ -198,6 +192,6 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
             this.searchDate.setVisible(true);
             this.searchTf.setPromptText("Username/Last Name/First Name");
         }
-
+        search();
     }
 }
