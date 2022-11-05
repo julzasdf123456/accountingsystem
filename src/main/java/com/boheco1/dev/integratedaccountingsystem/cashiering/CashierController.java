@@ -1,30 +1,27 @@
 package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
 
-import com.boheco1.dev.integratedaccountingsystem.dao.BillDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.CRMDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDetailDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.boheco1.dev.integratedaccountingsystem.tellering.PowerBillsPaymentController;
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.Callback;
+import javafx.scene.paint.Paint;
 
 
 import java.net.URL;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -63,6 +60,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private CRMQueue crmQueue;
     private List<CRMDetails> crmDetails;
 
+    private double collectionFromTeller;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Utility.setParentController(this);
@@ -72,7 +70,32 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     @FXML
     private void print(ActionEvent event) {
-        regularTransaction();
+        if(consumerInfo == null && tellerInfo == null){
+            AlertDialogBuilder.messgeDialog("System Message", "Please select consumer or teller information.",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            return;
+        }
+
+        if(orNmber.getText().isEmpty()) {
+            AlertDialogBuilder.messgeDialog("System Message", "OR number is required.",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            return;
+        }
+        JFXButton accept = new JFXButton("Accept");
+        JFXDialog dialog = DialogBuilder.showConfirmDialog("Print OR","Confirm transaction.\n\n" +
+                        "OR#: " +orNmber.getText()+"\n" +
+                        ""+total.getText()
+                , accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
+        accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+        accept.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent __) {
+                nonePowerBills();
+                dialog.close();
+            }
+        });
+
+
     }
 
     @FXML
@@ -94,18 +117,25 @@ public class CashierController extends MenuControllerHandler implements Initiali
     @Override
     public void receive(Object o) {
         this.paymentTable.getColumns().clear();
-        total.setText("Total: 0");
+        total.setText("Total: 0.00");
+        consumerInfo = null;
+        tellerInfo = null;
+        if (o==null)
+            return;
+
         if (o instanceof CRMQueue) {
             this.consumerInfo = (CRMQueue) o;
             this.name.setText(consumerInfo.getConsumerName());
             this.address.setText(consumerInfo.getConsumerAddress());
             this.purpose.setText(consumerInfo.getTransactionPurpose());
+            tellerInfo = null;
             setUpPaymentTable(consumerInfo);
         }else if (o instanceof Teller) {
             this.tellerInfo = (Teller) o;
             this.name.setText(tellerInfo.getName());
             this.address.setText("-");
             this.purpose.setText("-");
+            consumerInfo = null;
             setUpPaymentTable(tellerInfo);
         }
     }
@@ -163,7 +193,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
             this.paymentTable.setItems(result);
 
             List<ItemSummary> misc = breakdown.get("Misc");
-            total.setText("Total: "+Utility.formatDecimal(misc.get(1).getTotal()));
+            collectionFromTeller = misc.get(1).getTotal();
+            total.setText("Total: "+Utility.formatDecimal(collectionFromTeller));
 
             TableColumn<ItemSummary, String> column1 = new TableColumn<>("Item Description");
             column1.setMinWidth(200);
@@ -175,7 +206,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
             column2.setCellValueFactory(obj-> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getTotal())));
             column2.setStyle("-fx-alignment: center-right;");
 
-
             this.paymentTable.getColumns().add(column1);
             this.paymentTable.getColumns().add(column2);
         }
@@ -183,19 +213,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         this.paymentTable.setPlaceholder(new Label("No consumer records was searched."));
     }
 
-    private void regularTransaction(){
-        if(consumerInfo == null && tellerInfo == null){
-            AlertDialogBuilder.messgeDialog("System Message", "Please select consumer or teller information.",
-                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            return;
-        }
-
-        if(orNmber.getText().isEmpty()) {
-            AlertDialogBuilder.messgeDialog("System Message", "OR number is required.",
-                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            return;
-        }
-
+    private void nonePowerBills(){
         int month = date.getValue().getMonthValue();
         int year = date.getValue().getYear();
         LocalDate period = LocalDate.of(year, month, 1);
@@ -208,38 +226,66 @@ public class CashierController extends MenuControllerHandler implements Initiali
         else
             transactionHeader.setTransactionCode("ORSub");
         transactionHeader.setOffice(Utility.OFFICE_PREFIX);
-        transactionHeader.setSource(crmQueue.getSource());
-        transactionHeader.setAccountID(crmQueue.getSourseId());//CRM Source ID
+        if(consumerInfo != null) {
+            transactionHeader.setSource(crmQueue.getSource());
+            transactionHeader.setAccountID(crmQueue.getSourseId());//CRM Source ID
+            transactionHeader.setTransactionDate(date.getValue());
+        }else if(tellerInfo != null) {
+            transactionHeader.setSource("PaidBills");
+            transactionHeader.setAccountID(tellerInfo.getId());//ID or Teller user ID
+            transactionHeader.setAmount(collectionFromTeller);
+            transactionHeader.setTransactionDate(tellerInfo.getDate());
+        }
         //transactionHeader.setParticulars("N/A");
-        transactionHeader.setTransactionDate(date.getValue());
+
         transactionHeader.setRemarks(remarks.getText());
         //transactionHeader.setBank("N/A");
         //transactionHeader.setReferenceNo("N/A");
-        //transactionHeader.setAmount(0);
+
         transactionHeader.setEnteredBy(ActiveUser.getUser().getId());
         transactionHeader.setDateEntered(LocalDateTime.now());
 
         List<TransactionDetails> transactionDetailsList = new ArrayList<>();
-
-        for(CRMDetails cd : crmDetails){
+        if(crmDetails != null) {
+            for (CRMDetails cd : crmDetails) {
+                TransactionDetails transactionDetails = new TransactionDetails();
+                transactionDetails.setPeriod(period);
+                transactionDetails.setTransactionNumber(orNmber.getText());
+                if (Utility.OFFICE_PREFIX.equalsIgnoreCase("main"))
+                    transactionDetails.setTransactionCode("OR");
+                else
+                    transactionDetails.setTransactionCode("ORSub");
+                transactionDetails.setTransactionDate(date.getValue());
+                transactionDetails.setAccountCode(cd.getGlCode());//GL Code or the account code of the particular
+                transactionDetails.setParticulars(cd.getParticulars());
+                transactionDetails.setCredit(cd.getTotal());
+                //transactionDetails.setSequenceNumber(0);
+                //transactionDetails.setDebit();
+                transactionDetails.setOrDate(date.getValue());
+                //transactionDetails.setBankID("N/A");
+                //transactionDetails.setNote("N/A");
+                transactionDetailsList.add(transactionDetails);
+            }
+        }/*else{
+            //clarify this part
             TransactionDetails transactionDetails = new TransactionDetails();
             transactionDetails.setPeriod(period);
             transactionDetails.setTransactionNumber(orNmber.getText());
-            if(Utility.OFFICE_PREFIX.equalsIgnoreCase("main"))
+            if (Utility.OFFICE_PREFIX.equalsIgnoreCase("main"))
                 transactionDetails.setTransactionCode("OR");
             else
                 transactionDetails.setTransactionCode("ORSub");
             transactionDetails.setTransactionDate(date.getValue());
-            transactionDetails.setAccountCode(cd.getGlCode());//GL Code or the account code of the particular
+            transactionDetails.setAccountCode(null);//GL Code or the account code of the particular
+            transactionDetails.setParticulars(null);
+            transactionDetails.setCredit(collectionFromTeller);
             //transactionDetails.setSequenceNumber(0);
             //transactionDetails.setDebit();
-            transactionDetails.setParticulars(cd.getParticulars());
-            transactionDetails.setCredit(cd.getTotal());
             transactionDetails.setOrDate(date.getValue());
             //transactionDetails.setBankID("N/A");
             //transactionDetails.setNote("N/A");
             transactionDetailsList.add(transactionDetails);
-        }
+        }*/
 
         try {
             String msg = TransactionHeaderDetailDAO.save(crmQueue, transactionHeader, transactionDetailsList);

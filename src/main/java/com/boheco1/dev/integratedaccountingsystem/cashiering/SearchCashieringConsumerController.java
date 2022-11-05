@@ -1,9 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
-import com.boheco1.dev.integratedaccountingsystem.dao.BillDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.ConsumerDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXDialog;
@@ -47,28 +44,27 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
     //private ObservableList<CRMQueue> result = null;
     private Object resultInfo = null;
     private ObjectTransaction parentController = null;
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
        // this.createTable();
         this.searchResultTable.setRowFactory(tv -> {
             TableRow row = new TableRow<>();
             row.setOnMouseClicked(event -> {
+
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     resultInfo = row.getItem();
                     if(resultInfo instanceof EmployeeInfo){
+                        EmployeeInfo employeeInfo = (EmployeeInfo) resultInfo;
                         try {
                             JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing request.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
                             Task<Void> task = new Task<>() {
                                 @Override
                                 protected Void call() throws Exception {
-                                    EmployeeInfo employeeInfo = (EmployeeInfo) resultInfo;
                                     int month = searchDate.getValue().getMonthValue();
                                     int day = searchDate.getValue().getDayOfMonth();
                                     int year = searchDate.getValue().getYear();
-
                                     HashMap<String, List<ItemSummary>> DCRBreakDown = BillDAO.getDCRBreakDown(year,month,day, UserDAO.get(employeeInfo.getId()).getUserName());
-                                    Teller teller = new Teller(employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), DCRBreakDown);
+                                    Teller teller = new Teller(employeeInfo.getId(), employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), searchDate.getValue(), DCRBreakDown);
                                     resultInfo = teller;
                                     return null;
                                 }
@@ -80,9 +76,20 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
 
                             task.setOnSucceeded(wse -> {
                                 dialog.close();
-                                AlertDialogBuilder.messgeDialog("System Message", "Task successful." ,
-                                        Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
-                                this.parentController.receive(resultInfo);
+                                try {
+                                    if(TransactionHeaderDAO.get(employeeInfo.getId(), searchDate.getValue()) == null){
+                                        AlertDialogBuilder.messgeDialog("System Message", "Task successful." ,
+                                                Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                                        this.parentController.receive(resultInfo);
+                                    }else {
+                                        AlertDialogBuilder.messgeDialog("System Message", "OR was already issued on this transaction." ,
+                                                Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                                        this.parentController.receive(null);
+                                    }
+
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             });
 
                             task.setOnFailed(wse -> {
@@ -96,6 +103,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                             e.printStackTrace();
                         }
                     }else{
+                        //return costumer info from CRMQueue
                         this.parentController.receive(resultInfo);
                     }
 
