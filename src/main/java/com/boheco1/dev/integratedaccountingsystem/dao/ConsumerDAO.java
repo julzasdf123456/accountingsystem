@@ -3,7 +3,6 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.CRMQueue;
 import com.boheco1.dev.integratedaccountingsystem.objects.ConsumerInfo;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -154,5 +153,23 @@ public class ConsumerDAO {
         ps.close();
 
         return list;
+    }
+
+    /**
+     * Updatethe TIN of an existing consumer
+     * @param consumer the ConsumerInfo to be updated
+     * @param tin the tin
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void updateTIN(ConsumerInfo consumer, String tin) throws Exception {
+        PreparedStatement ps = DB.getConnection("Billing").prepareStatement(
+                "UPDATE AccountMaster SET TINNo=? " +
+                        "WHERE AccountNumber=?");
+        ps.setString(1, tin);
+        ps.setString(2, consumer.getAccountID());
+
+        ps.executeUpdate();
+
+        ps.close();
     }
 }

@@ -6,7 +6,6 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -176,15 +175,14 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.fees_table.setRowFactory(tv -> {
             TableRow<Bill> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                if (event.getClickCount() == 1 && (! row.isEmpty()) ) {
                     ConsumerInfo consumer = row.getItem().getConsumer();
-                    this.setConsumerInfo(consumer);
-                }else if (event.getClickCount() == 1 && (! row.isEmpty()) ) {
                     this.setBillInfo(row.getItem());
+                    this.setConsumerInfo(consumer);
                 }
             });
 
-            if (ActiveUser.getUser().can("manage-tellering")) {
+            if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering")) {
                 final ContextMenu rowMenu = new ContextMenu();
 
 
@@ -247,7 +245,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 MenuItem itemAddSurcharge = new MenuItem("Add Surcharge Manually");
                 itemAddSurcharge.setOnAction(actionEvent -> {
                     try {
-                        showAuthenticate(row.getItem(), this.fees_table, this.total_payable_lbl);
+                        showWaiveForm(row.getItem(), this.fees_table, this.total_payable_lbl);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -262,11 +260,15 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     }
                 });
 
-                MenuItem item2306 = new MenuItem("2306");
+                MenuItem item2306 = new MenuItem("2307 5%");
                 item2306.setOnAction(actionEvent -> {
                     if (row.getItem().getConsumerType().equals("RM")) return;
                     try {
-                        this.showTIN(row.getItem(), "2306");
+                        if (row.getItem().getConsumer().getTINNo() == null || row.getItem().getConsumer().getTINNo().isEmpty() || row.getItem().getConsumer().getTINNo().equals("")) {
+                            this.showTIN(row.getItem(), "2306");
+                        }else{
+                            row.getItem().setForm2306(row.getItem().getConsumer().getTINNo());
+                        }
                         row.getItem().setCh2306(BillDAO.getForm2306(row.getItem()));
                         row.getItem().computeTotalAmount();
                         tv.refresh();
@@ -277,11 +279,15 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     }
                 });
 
-                MenuItem item2307 = new MenuItem("2307");
+                MenuItem item2307 = new MenuItem("2307 2%");
                 item2307.setOnAction(event -> {
                     if (row.getItem().getConsumerType().equals("RM")) return;
                     try {
-                        this.showTIN(row.getItem(), "2307");
+                        if (row.getItem().getConsumer().getTINNo() == null || row.getItem().getConsumer().getTINNo().isEmpty() || row.getItem().getConsumer().getTINNo().equals("")) {
+                            this.showTIN(row.getItem(), "2307");
+                        }else{
+                            row.getItem().setForm2306(row.getItem().getConsumer().getTINNo());
+                        }
                         row.getItem().setCh2307(BillDAO.getForm2307(row.getItem()));
                         row.getItem().computeTotalAmount();
                         tv.refresh();
@@ -878,19 +884,25 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         JFXTextField input = new JFXTextField();
         JFXDialog dialog = DialogBuilder.showInputDialog("TIN Entry for "+type,"Enter TIN:  ", "", input, accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
         accept.setOnAction(action -> {
-            try {
-                if (input.getText().length() == 0) {
-                    AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter TIN!",
-                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-                }else {
-                    if (type.equals("2306")){
-                        bill.setForm2306(input.getText());
-                    }else{
-                        bill.setForm2307(input.getText());
+            boolean repeat = true;
+            while (repeat) {
+                try {
+                    if (input.getText().length() == 0) {
+                        AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter TIN!",
+                                Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    } else {
+                        ConsumerDAO.updateTIN(bill.getConsumer(), input.getText());
+                        bill.getConsumer().setTINNo(input.getText());
+                        if (type.equals("2306")) {
+                            bill.setForm2306(input.getText());
+                        } else {
+                            bill.setForm2307(input.getText());
+                        }
+                        repeat = false;
                     }
+                } catch (Exception e) {
+                    AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }
-            } catch (Exception e) {
-                AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }
             dialog.close();
         });

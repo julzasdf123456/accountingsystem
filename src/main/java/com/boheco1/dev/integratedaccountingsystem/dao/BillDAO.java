@@ -101,6 +101,8 @@ public class BillDAO {
                 ps_md.setString(2, bill.getConsumer().getAccountID());
                 ps_md.executeUpdate();
             }
+
+            //Update KatasBalance in KatasData?
             conn.commit();
             postingSequence++;
         }catch (SQLException ex){
@@ -208,6 +210,8 @@ public class BillDAO {
                     ps_md.setString(2, bill.getConsumer().getAccountID());
                     ps_md.executeUpdate();
                 }
+
+                //Update KatasBalance in KatasData?
                 postingSequence++;
             } catch (SQLException ex) {
                 conn.rollback();
@@ -232,9 +236,10 @@ public class BillDAO {
     public static List<Bill> getConsumerBills(ConsumerInfo consumerInfo, boolean paid) throws Exception {
         String sql = "SELECT " +
                 "BillNumber, AccountNumber, ServicePeriodEnd, ServiceDateFrom, ServiceDateTo, DueDate, ISNULL(PR,0) AS PR, " +
-                "(SELECT PowerNew FROM BillsForDCRRevision a WHERE b.BillNumber = a.BillNumber) AS PowerNew, " +
-                "(SELECT KatasAmt FROM BillsForDCRRevision c WHERE b.BillNumber = c.BillNumber) AS KatasAmt, " +
+                "(SELECT PowerNew FROM BillsForDCRRevision a WHERE b.AccountNumber = a.AccountNumber AND b.ServicePeriodEnd = a.ServicePeriodEnd) AS PowerNew, " +
+                "(SELECT KatasBalance FROM KatasData c WHERE b.AccountNumber = c.AccountNumber AND b.ServicePeriodEnd = c.ServicePeriodEnd) AS KatasAmt, " +
                 "DATEDIFF(day, DueDate, getdate()) AS daysDelayed, ISNULL(NetAmount,0) AS NetAmount, ISNULL(ConsumerType,'RM') AS ConsumerType, ISNULL(PowerKWH,0) AS PowerKWH, " +
+                "ISNULL(withPenalty, 1) AS withPenalty, " +
                 "ISNULL(Item2, 0) AS VATandTaxes, ISNULL(PR,0) AS TransformerRental, ISNULL(Others,0) AS OthersCharges, ISNULL(ACRM_TAFPPCA,0) AS ACRM_TAFPPCA, ISNULL(DAA_GRAM,0) AS DAA_GRAM " +
                 "FROM Bills b " +
                 "WHERE BillNumber NOT IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ? " +
@@ -250,7 +255,6 @@ public class BillDAO {
         ResultSet rs = ps.executeQuery();
 
         List<Bill> bills = new ArrayList<>();
-        int i = 0;
         while(rs.next()) {
             String billNo = rs.getString("BillNumber");
 
@@ -264,6 +268,7 @@ public class BillDAO {
             Date date = rs.getDate("ServicePeriodEnd");
             LocalDate billMonth = date.toLocalDate();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM YYYY");
+            bill.setWithPenalty(rs.getBoolean("withPenalty"));
             bill.setBillMonth(formatter.format(billMonth));
             bill.setServicePeriodEnd(billMonth);
             bill.setConsumer(consumerInfo);
@@ -280,14 +285,19 @@ public class BillDAO {
             bill.setVat(rs.getDouble("VATandTaxes"));
             bill.setDaysDelayed(rs.getInt("daysDelayed"));
             bill.setAddCharges(bill.getPr()+bill.getOtherCharges());
-            bill.setSurCharge(bill.computeSurCharge());
-            bill.setSurChargeTax(bill.getSurCharge()*0.12);
+            //Disable surcharge computation when set in the Bills table withPenalty value of 1
+            if (bill.isWithPenalty()) {
+                bill.setSurCharge(bill.computeSurCharge());
+                bill.setSurChargeTax(bill.getSurCharge() * 0.12);
+            }else{
+                bill.setSurCharge(0);
+                bill.setSurChargeTax(0);
+            }
             bill.computeTotalAmount();
 
             double amount = getMDRefund(bill);
             bill.setMdRefund(amount);
             bills.add(bill);
-            i++;
         }
 
         rs.close();

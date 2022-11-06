@@ -142,7 +142,7 @@ public class HomeController implements Initializable {
         if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-cashiering")){
             NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Teller"), new FontIcon("mdi2c-contactless-payment-circle"), homeStackPane);
 
-            if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-billing"))
+            if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-cashiering"))
                 NavMenuHelper.addMenu(navMenuBox, power_bills_payment, homeStackPane);
 
             if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering"))
@@ -197,7 +197,7 @@ public class HomeController implements Initializable {
 
         if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-cashiering")) {
             //DrawerMenuHelper.setMenuButton(power_bills_payment, new FontIcon("mdi2c-cash-usd"), drawerMenus, power_bills_payment.getText());
-            if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-billing"))
+            if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering") || ActiveUser.getUser().can("manage-billing"))
                 DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(power_bills_payment, new FontIcon("mdi2c-cash-usd"), drawerMenus, power_bills_payment.getText(), contentPane, "tellering/tellering_bills_payment.fxml", null, null, title);
             if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering"))
                 DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(dcr, new FontIcon("mdi2c-chart-bar"), drawerMenus, dcr.getText(), contentPane, "tellering/tellering_dcr.fxml", null, null, title);
