@@ -22,6 +22,7 @@ import javafx.scene.paint.Paint;
 
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -64,7 +65,12 @@ public class CashierController extends MenuControllerHandler implements Initiali
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Utility.setParentController(this);
-        date.setValue(LocalDate.now());
+        try {
+            date.setValue(Utility.serverDate());
+        } catch (Exception e) {
+            date.setValue(LocalDate.now());
+            throw new RuntimeException(e);
+        }
         InputValidation.restrictNumbersOnly(orNmber);
     }
 
@@ -76,13 +82,16 @@ public class CashierController extends MenuControllerHandler implements Initiali
             return;
         }
 
+
+
         if(orNmber.getText().isEmpty()) {
             AlertDialogBuilder.messgeDialog("System Message", "OR number is required.",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
         }
         JFXButton accept = new JFXButton("Accept");
-        JFXDialog dialog = DialogBuilder.showConfirmDialog("Print OR","Confirm transaction.\n\n" +
+        JFXDialog dialog = DialogBuilder.showConfirmDialog("Print OR","Confirm transaction.\n" +
+                        "Date: " +date.getValue()+"\n"+
                         "OR#: " +orNmber.getText()+"\n" +
                         ""+total.getText()
                 , accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
@@ -129,18 +138,18 @@ public class CashierController extends MenuControllerHandler implements Initiali
             this.address.setText(consumerInfo.getConsumerAddress());
             this.purpose.setText(consumerInfo.getTransactionPurpose());
             tellerInfo = null;
-            setUpPaymentTable(consumerInfo);
+            initTable(consumerInfo);
         }else if (o instanceof Teller) {
             this.tellerInfo = (Teller) o;
             this.name.setText(tellerInfo.getName());
             this.address.setText("-");
             this.purpose.setText("-");
             consumerInfo = null;
-            setUpPaymentTable(tellerInfo);
+            initTable(tellerInfo);
         }
     }
 
-    private void setUpPaymentTable(Object o) {
+    private void initTable(Object o) {
         paymentTable.getColumns().clear();
         if(o instanceof CRMQueue){
             CRMQueue crmQueue = (CRMQueue) o;
@@ -237,11 +246,9 @@ public class CashierController extends MenuControllerHandler implements Initiali
             transactionHeader.setTransactionDate(tellerInfo.getDate());
         }
         //transactionHeader.setParticulars("N/A");
-
         transactionHeader.setRemarks(remarks.getText());
         //transactionHeader.setBank("N/A");
         //transactionHeader.setReferenceNo("N/A");
-
         transactionHeader.setEnteredBy(ActiveUser.getUser().getId());
         transactionHeader.setDateEntered(LocalDateTime.now());
 

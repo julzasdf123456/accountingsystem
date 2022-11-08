@@ -114,7 +114,13 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
         this.parentController = Utility.getParentController();
         this.searchTf.requestFocus();
         this.toggleSearch.setSelected(Utility.TOGGLE_SEARCH);
-        this.searchDate.setValue(LocalDate.now());
+        try {
+            this.searchDate.setValue(Utility.serverDate());
+        } catch (Exception e) {
+            this.searchDate.setValue(LocalDate.now());
+            throw new RuntimeException(e);
+        }
+
         if(this.toggleSearch.isSelected()) {
             this.toggleSearch.setText("Search Consumer");
             this.searchDate.setVisible(false);

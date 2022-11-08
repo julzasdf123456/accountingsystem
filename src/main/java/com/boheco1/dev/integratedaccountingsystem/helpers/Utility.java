@@ -16,6 +16,10 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.*;
 
 public class Utility {
@@ -264,6 +268,17 @@ public class Utility {
         props.load(is);
 
         return props.getProperty("account_code");
+    }
+
+    public static LocalDate serverDate() throws SQLException, ClassNotFoundException {
+        ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                        "SELECT SYSDATETIME() as serverDate");
+
+        if(rs.next()) {
+            return rs.getDate("serverDate").toLocalDate();
+        }else {
+            return LocalDate.now();
+        }
     }
 
 }
