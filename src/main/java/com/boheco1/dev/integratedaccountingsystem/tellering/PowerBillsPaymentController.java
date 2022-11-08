@@ -155,15 +155,53 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             try {
                 this.consumerInfo = ConsumerDAO.getConsumerRecord(no);
                 if (this.consumerInfo != null) {
-                    this.setConsumerInfo(this.consumerInfo);
-                    try {
-                        if (this.bills.size() == 0) this.bills = FXCollections.observableArrayList();
-                        this.bills.addAll(BillDAO.getConsumerBills(this.consumerInfo, false));
-                        this.setPayables();
-                        this.fees_table.setItems(this.bills);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    Task<Void> task = new Task<>() {
+                        @Override
+                        protected Void call() throws SQLException {
+                            try{
+                                if (bills.size() == 0) bills = FXCollections.observableArrayList();
+                                List<Bill> consumerBills = BillDAO.getConsumerBills(consumerInfo, false);
+                                if (consumerBills.size() > 0) {
+                                    for (Bill b : consumerBills){
+                                        if (!bills.contains(b)) {
+                                            bills.add(b);
+                                        }
+                                    }
+                                }
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                            return null;
+                        }
+                    };
+
+                    task.setOnRunning(wse -> {
+                        acct_no_tf.setDisable(true);
+                        progressBar.setVisible(true);
+                    });
+
+                    task.setOnSucceeded(wse -> {
+                        acct_no_tf.setDisable(false);
+                        setConsumerInfo(consumerInfo);
+                        fees_table.setItems(bills);
+                        setPayables();
+                        payment_tf.setDisable(false);
+                        payment_tf.requestFocus();
+                        transact_btn.setDisable(false);
+                        total_paid_tf.setDisable(false);
+                        InputHelper.restrictNumbersOnly(payment_tf);
+                        progressBar.setVisible(false);
+                    });
+
+                    task.setOnFailed(wse -> {
+                        //Do nothing
+                        acct_no_tf.setDisable(false);
+                        progressBar.setVisible(false);
+                    });
+
+                    new Thread(task).start();
+                }else{
+                    AlertDialogBuilder.messgeDialog("System Error", "No existing consumer account! Please refine search and try again!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -455,6 +493,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.transact_btn.setDisable(true);
         this.resetChecks();
         this.resetBillInfo();
+        this.acct_no_tf.requestFocus();
     }
     /**
      * Resets check details
@@ -517,9 +556,9 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Bill, String> column1 = new TableColumn<>("Billing Month");
-        column1.setPrefWidth(130);
-        column1.setMaxWidth(130);
-        column1.setMinWidth(130);
+        column1.setPrefWidth(140);
+        column1.setMaxWidth(140);
+        column1.setMinWidth(140);
         column1.setCellValueFactory(new PropertyValueFactory<>("billMonth"));
         column1.setStyle("-fx-alignment: center-left;");
 
@@ -535,14 +574,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column3.setMaxWidth(100);
         column3.setMinWidth(100);
         column3.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(
-                obj.getValue().getAmountDue() + obj.getValue().getSurChargeTax() + -
-                    (
-                        obj.getValue().getDiscount()
-                        + obj.getValue().getOtherAdjustment()
-                        + obj.getValue().getSlAdjustment()
-                        + obj.getValue().getCh2307()
-                        + obj.getValue().getCh2306()
-                    )
+                obj.getValue().getAmountDue()
         )));
         column3.setStyle("-fx-alignment: center-right;");
 

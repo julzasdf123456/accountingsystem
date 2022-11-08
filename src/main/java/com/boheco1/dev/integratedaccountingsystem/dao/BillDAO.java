@@ -241,12 +241,13 @@ public class BillDAO {
                 "DATEDIFF(day, DueDate, getdate()) AS daysDelayed, ISNULL(NetAmount,0) AS NetAmount, ISNULL(ConsumerType,'RM') AS ConsumerType, ISNULL(PowerKWH,0) AS PowerKWH, " +
                 "ISNULL(withPenalty, 1) AS withPenalty, " +
                 "ISNULL(Item2, 0) AS VATandTaxes, ISNULL(PR,0) AS TransformerRental, ISNULL(Others,0) AS OthersCharges, ISNULL(ACRM_TAFPPCA,0) AS ACRM_TAFPPCA, ISNULL(DAA_GRAM,0) AS DAA_GRAM " +
-                "FROM Bills b " +
-                "WHERE BillNumber NOT IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ? " +
-                "ORDER BY DueDate DESC";
-
+                "FROM Bills b ";
         if (paid)
-            sql = "SELECT * FROM BillsForDCRRevision WHERE BillNumber IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ? ORDER BY DueDate DESC";
+            sql += "WHERE BillNumber IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ? ";
+        else
+            sql += "WHERE BillNumber NOT IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ? ";
+
+        sql += "ORDER BY b.ServicePeriodEnd";
 
         PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
 

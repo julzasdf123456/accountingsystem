@@ -384,30 +384,37 @@ public class Bill {
                 //Exemption of penalties due to Odette
                 if (this.getServicePeriodEnd().isEqual(LocalDate.of(2021, 12, 1))) {
                     amount = 0;
-                //Penalty computation for Residential, BAPA, ECA
-                } else if (
-                        (this.consumerType.equals("RM") && (this.getServicePeriodEnd().isEqual(LocalDate.of(2014, 8, 1)) || this.getServicePeriodEnd().isAfter(LocalDate.of(2014, 8, 1)))
-                                || this.consumerType.equals("B")
-                                || this.consumerType.equals("E"))) {
-                    amount = penalty * 0.03;
-
+                //Penalty computation for BAPA/ECA
+                }else if (this.consumerType.equals("B") || this.consumerType.equals("E")) {
+                    //5% penalty if 30 days and above
+                    if (this.getDaysDelayed() >= 30) {
+                        amount = penalty * 0.05;
+                    //3% penalty if 30 days below
+                    } else {
+                        amount = penalty * 0.03;
+                    }
                     //Set minimum surcharge
                     if (amount <= 50) amount = 50;
-
+                //For Residential
+                } else if (this.consumerType.equals("RM") && (this.getServicePeriodEnd().isEqual(LocalDate.of(2014, 8, 1)) || this.getServicePeriodEnd().isAfter(LocalDate.of(2014, 8, 1)))) {
+                    amount = penalty * 0.03;
+                    //Set minimum surcharge
+                    if (amount <= 50) amount = 50;
                 //For Commercial or Industrial Types
                 } else {
-                    //If CS or CL below 1000kwh
-                    if (((this.consumerType.equals("CS") || this.consumerType.equals("CL")) && this.powerKWH < 1000)
-                            && (this.getServicePeriodEnd().isEqual(LocalDate.of(2017, 4, 1)) || this.getServicePeriodEnd().isAfter(LocalDate.of(2017, 4, 1)) )) {
-
+                    //If CL below 1000kwh
+                    if (this.consumerType.equals("CL") && this.powerKWH < 1000) {
                         amount = penalty * 0.03;
-
                         //Set minimum surcharge
                         if (amount <= 50) amount = 50;
-
+                    //If CS below 1000kwh
+                    }else if ((this.consumerType.equals("CS") && this.powerKWH < 1000)
+                            && (this.getServicePeriodEnd().isEqual(LocalDate.of(2017, 4, 1)) || this.getServicePeriodEnd().isAfter(LocalDate.of(2017, 4, 1)) )) {
+                        amount = penalty * 0.03;
+                        //Set minimum surcharge
+                        if (amount <= 50) amount = 50;
                     //If I, CL or CS 1000kwh and above
-                    }else if (this.consumerType.equals("I")
-                            || ((this.consumerType.equals("CS") || this.consumerType.equals("CL")) && this.powerKWH >= 1000)) {
+                    }else if (this.consumerType.equals("I") || ((this.consumerType.equals("CS") || this.consumerType.equals("CL")) && this.powerKWH >= 1000)) {
                         //No penalty if days delayed less than 6
                         if (this.getDaysDelayed() < 6) {
                             amount = 0;
