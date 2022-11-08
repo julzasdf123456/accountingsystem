@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.tellering;
 
+import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.objects.Bill;
 import com.jfoenix.controls.JFXButton;
@@ -36,9 +37,7 @@ public class WaiveChargesController extends MenuControllerHandler implements Ini
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.save_btn.setOnAction(actionEvent -> {
-
-        });
+        InputHelper.restrictNumbersOnly(surcharge_tf);
     }
 
     public void setData(TableView<Bill> table, Label total){
@@ -66,5 +65,13 @@ public class WaiveChargesController extends MenuControllerHandler implements Ini
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public TextField getSurcharge_tf() {
+        return surcharge_tf;
+    }
+
+    public void setSurcharge_tf(TextField surcharge_tf) {
+        this.surcharge_tf = surcharge_tf;
     }
 }

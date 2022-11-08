@@ -217,7 +217,7 @@
                                                                   <Insets left="16.0" />
                                                                </padding>
                                                             </Label>
-                                                            <Label text="Less KATAS" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                                            <Label text="LESS KATAS" GridPane.columnIndex="2" GridPane.rowIndex="2">
                                                                <GridPane.margin>
                                                                   <Insets left="16.0" />
                                                                </GridPane.margin>
@@ -236,28 +236,6 @@
                                                             <TextField fx:id="vat_tf" editable="false" focusTraversable="false" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                                                             <TextField fx:id="katas_tf" editable="false" focusTraversable="false" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                                                             <TextField fx:id="md_refund_tf" editable="false" focusTraversable="false" GridPane.columnIndex="3" GridPane.rowIndex="3" />
-                                                            <Label styleClass="bold" text="Bill Amount" GridPane.columnIndex="2" GridPane.rowIndex="4">
-                                                               <GridPane.margin>
-                                                                  <Insets left="16.0" />
-                                                               </GridPane.margin>
-                                                            </Label>
-                                                            <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.rowIndex="4">
-                                                               <children>
-                                                                  <Label styleClass="bold" text="₱">
-                                                                     <padding>
-                                                                        <Insets top="8.0" />
-                                                                     </padding>
-                                                                     <HBox.margin>
-                                                                        <Insets right="4.0" />
-                                                                     </HBox.margin>
-                                                                  </Label>
-                                                                  <Label fx:id="bill_amount_lbl" styleClass="bold" text="0.00" textAlignment="RIGHT">
-                                                                     <HBox.margin>
-                                                                        <Insets top="8.0" />
-                                                                     </HBox.margin>
-                                                                  </Label>
-                                                               </children>
-                                                            </HBox>
                                                          </children>
                                                       </GridPane>
                                                    </children>
