@@ -173,11 +173,7 @@
                      <children>
                         <VBox layoutY="8.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="8.0">
                            <children>
-                              <TableView fx:id="fees_table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
-                                 <columnResizePolicy>
-                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                 </columnResizePolicy>
-                              </TableView>
+                              <TableView fx:id="fees_table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
                               <VBox prefHeight="197.0" prefWidth="927.0">
                                  <children>
                                     <Separator prefWidth="200.0" />

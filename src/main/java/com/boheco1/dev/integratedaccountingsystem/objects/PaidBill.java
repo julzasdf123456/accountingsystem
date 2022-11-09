@@ -12,7 +12,7 @@ public class PaidBill extends Bill{
     private String paymentType;
     private int orNumber;
     private String teller;
-    private int dcrNumber;
+    private String dcrNumber;
     private Date postingDate;
     private String postingTime;
     private int postingSequence;
@@ -79,11 +79,11 @@ public class PaidBill extends Bill{
         this.teller = teller;
     }
 
-    public int getDcrNumber() {
+    public String getDcrNumber() {
         return dcrNumber;
     }
 
-    public void setDcrNumber(int dcrNumber) {
+    public void setDcrNumber(String dcrNumber) {
         this.dcrNumber = dcrNumber;
     }
 

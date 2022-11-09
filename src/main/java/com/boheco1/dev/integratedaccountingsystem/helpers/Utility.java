@@ -2,9 +2,6 @@ package com.boheco1.dev.integratedaccountingsystem.helpers;
 
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
@@ -16,7 +13,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -31,6 +27,7 @@ public class Utility {
     public static double TAX = 12;
     public static String STATION = "main"; //main or sub
     public static String OFFICE_PREFIX = "OSD";
+    public static String DB_BILLING = "Billing";
     public static int ROW_PER_PAGE = 20;
     public static String RELEASING = "releasing";
     public static String REJECTED = "rejected";
@@ -213,8 +210,20 @@ public class Utility {
         while (!billQueue.isEmpty()){
             System.out.println("==================================================================================================================");
             Bill b = billQueue.peek();
-            ((PaidBill) b).setTeller(teller);
             System.out.println("Cash Amount: "+cash);
+            try {
+                PaidBill pd = (PaidBill) b;
+                //If current user is a Teller
+                if (ActiveUser.getUser().getEmployeeInfo().getDesignation().equals("Teller")) {
+                    pd.setTeller(teller);
+                    pd.setPaymentType("SUB-OFFICE/STATION");
+                //Otherwise
+                }else{
+                    pd.setPaymentType("SIT-IN");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             System.out.println("Bill No: "+b.getBillNo()+" Bill balance: "+b.getBalance());
             while (!checkQueue.isEmpty()){
                 Check c = checkQueue.peek();

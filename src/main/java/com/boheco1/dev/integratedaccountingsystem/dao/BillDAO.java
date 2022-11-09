@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
 import java.sql.*;
@@ -18,7 +19,7 @@ public class BillDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static void addPaidBill(Bill bill) throws Exception{
-        Connection conn = DB.getConnection("Billing");
+        Connection conn = DB.getConnection(Utility.DB_BILLING);
         conn.setAutoCommit(false);
 
         String sql = "INSERT INTO PaidBills (" +
@@ -49,7 +50,7 @@ public class BillDAO {
         String sql_check = "INSERT INTO CheckPayment (AccountNumber, ServicePeriodEnd, Bank, CheckNumber, Amount) VALUES(?, ?, ?, ?, ROUND(?, 2))";
         String sql_md = "UPDATE MDRefund SET Amount=ROUND(Amount-?, 2) WHERE AccountNumber=?";
 
-        PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
         PreparedStatement ps_check = null;
         PreparedStatement ps_md = null;
 
@@ -85,21 +86,13 @@ public class BillDAO {
 
             //Insert check payments
             for (Check c: paid.getChecks()){
-                ps_check = DB.getConnection("Billing").prepareStatement(sql_check);
+                ps_check = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql_check);
                 ps_check.setString(1, paid.getConsumer().getAccountID());
                 ps_check.setDate(2, Date.valueOf(paid.getServicePeriodEnd()));
                 ps_check.setString(3, c.getBank());
                 ps_check.setString(4, c.getCheckNo());
                 ps_check.setDouble(5, c.getAmount());
                 ps_check.executeUpdate();
-            }
-
-            //Update MDRefund amount in the MDRefund table
-            if (bill.getMdRefund() > 0) {
-                ps_md = DB.getConnection("Billing").prepareStatement(sql_md);
-                ps_md.setDouble(1, bill.getMdRefund());
-                ps_md.setString(2, bill.getConsumer().getAccountID());
-                ps_md.executeUpdate();
             }
 
             //Update KatasBalance in KatasData?
@@ -123,7 +116,7 @@ public class BillDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static void addPaidBill(List<Bill> bills) throws Exception{
-        Connection conn = DB.getConnection("Billing");
+        Connection conn = DB.getConnection(Utility.DB_BILLING);
         conn.setAutoCommit(false);
 
         String sql = "INSERT INTO PaidBills (" +
@@ -154,9 +147,7 @@ public class BillDAO {
 
         String sql_check = "INSERT INTO CheckPayment (AccountNumber, ServicePeriodEnd, Bank, CheckNumber, Amount) VALUES(?, ?, ?, ?, ROUND(?, 2))";
 
-        String sql_md = "UPDATE MDRefund SET Amount=ROUND(Amount-?, 2) WHERE AccountNumber=?";
-
-        PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
         PreparedStatement ps_check = null;
         PreparedStatement ps_md = null;
 
@@ -194,21 +185,13 @@ public class BillDAO {
 
                 //Insert check payments
                 for (Check c : paid.getChecks()) {
-                    ps_check = DB.getConnection("Billing").prepareStatement(sql_check);
+                    ps_check = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql_check);
                     ps_check.setString(1, paid.getConsumer().getAccountID());
                     ps_check.setDate(2, Date.valueOf(paid.getServicePeriodEnd()));
                     ps_check.setString(3, c.getBank());
                     ps_check.setString(4, c.getCheckNo());
                     ps_check.setDouble(5, c.getAmount());
                     ps_check.executeUpdate();
-                }
-
-                //Update MDRefund amount in the MDRefund table
-                if (bill.getMdRefund() > 0) {
-                    ps_md = DB.getConnection("Billing").prepareStatement(sql_md);
-                    ps_md.setDouble(1, bill.getMdRefund());
-                    ps_md.setString(2, bill.getConsumer().getAccountID());
-                    ps_md.executeUpdate();
                 }
 
                 //Update KatasBalance in KatasData?
@@ -249,7 +232,7 @@ public class BillDAO {
 
         sql += "ORDER BY b.ServicePeriodEnd";
 
-        PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
 
         ps.setString(1, consumerInfo.getAccountID());
 
@@ -316,7 +299,7 @@ public class BillDAO {
     public static double getDiscount(Bill bill) throws Exception {
         String sql = "Select NetAmountLessCharges from BillsForDCRRevision where AccountNumber=? and ServicePeriodEnd=?";
 
-        PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
 
         ps.setString(1, bill.getConsumer().getAccountID());
         ps.setDate(2, Date.valueOf(bill.getServicePeriodEnd()));
@@ -344,7 +327,7 @@ public class BillDAO {
     public static double getForm2306(Bill bill) throws Exception {
         String sql = "Select Form2306 from BillsForDCRRevision where AccountNumber=? and ServicePeriodEnd=?";
 
-        PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
 
         ps.setString(1, bill.getConsumer().getAccountID());
         ps.setDate(2, Date.valueOf(bill.getServicePeriodEnd()));
@@ -372,7 +355,7 @@ public class BillDAO {
     public static double getForm2307(Bill bill) throws Exception {
         String sql = "Select Form2307 from BillsForDCRRevision where AccountNumber=? and ServicePeriodEnd=?";
 
-        PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
 
         ps.setString(1, bill.getConsumer().getAccountID());
         ps.setDate(2, Date.valueOf(bill.getServicePeriodEnd()));
@@ -401,7 +384,7 @@ public class BillDAO {
         String sql = "SELECT ISNULL (SUM(MDRefund), 0) AS total, " +
                 "ISNULL((SELECT Amount FROM MDRefund WHERE AccountNumber = ?),0) AS remaining " +
                 "FROM PaidBills WHERE AccountNumber = ?";
-        PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
 
         ps.setString(1, bill.getConsumer().getAccountID());
         ps.setString(2, bill.getConsumer().getAccountID());
@@ -430,7 +413,7 @@ public class BillDAO {
     public static List<Bill> getAllPaidBills(int year, int month, int day, String teller) throws Exception {
 
         String sql = "SELECT pbx.BillNumber, pbx.AccountNumber, pbx.ConsumerName, pbx.TotalAmount, pbx.ConsumerType, pbx.Period, pbx.GenerationVAT, pbx.TransmissionVAT, " +
-                "pbx.OthersVAT, pbx.DistributionVAT, pbx.SLVAT, pbx.Item3, pbx.Item2, pbx.SLAdjustment, pbx.PromptPayment, pbx.Surcharge, pbx.NetAmount, pbx.Teller, pbx.ORNumber, " +
+                "pbx.OthersVAT, pbx.DistributionVAT, pbx.SLVAT, pbx.Item3, pbx.Item2, pbx.SLAdjustment, pbx.PromptPayment, pbx.Surcharge, pbx.NetAmount, pbx.Teller, pbx.ORNumber, pbx.DCRNumber, pbx.ServicePeriodEnd, " +
                 "pbx.PostingDate, pbx.PostingSequence, pbx.CurrentBills, pbx.Within30Days, pbx.Over30Days, pbx.PR, pbx.Others, pbx.Powerkwh, pbx.KatasAMount, pbx.OtherDeduction, " +
                 "pbx.MDRefund, pbx.NetAmountLessMDRefund, pbx.SeniorCitizenDiscount, pbx.GroupTag, pbx.Amount2306, pbx.Amount2307, b.FBHCAmt AS FranchiseTax, x.Item16 AS BusinessTax, " +
                 "x.Item17 AS RealPropertyTax, b.DAA_VAT, b.ACRM_VAT, b.Item1 as GenVatFeb21, FORMAT(pbx.PostingDate,'hh:mm') as PostingTime, CashAmount, CheckAmount " +
@@ -444,7 +427,7 @@ public class BillDAO {
 
         sql += "ORDER BY pbx.PostingDate, pbx.PostingSequence";
 
-        PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
 
         if (teller != null)
             ps.setString(1, teller);
@@ -472,6 +455,15 @@ public class BillDAO {
             bill.setPr(rs.getDouble("PR"));
             bill.setOthers(rs.getDouble("Others"));
             bill.setPromptPayment(rs.getDouble("PromptPayment"));
+            bill.setOtherDeduction(rs.getDouble("OtherDeduction"));
+            bill.setDcrNumber(rs.getString("DCRNumber"));
+            bill.setPostingSequence(rs.getInt("PostingSequence"));
+            bill.setAmount2306(rs.getDouble("Amount2306"));
+            bill.setAmount2307(rs.getDouble("Amount2307"));
+            bill.setPostingDate(rs.getDate("PostingDate"));
+            bill.setPostingTime(rs.getString("PostingTime"));
+            bill.setCashAmount(rs.getDouble("CashAmount") == 0 ? rs.getDouble("NetAmount") : rs.getDouble("CashAmount"));
+            bill.setCheckAmount(rs.getDouble("CheckAmount"));
             Bill b = bill;
             b.setPeriod(rs.getString("Period"));
             b.setPowerKWH(rs.getDouble("Powerkwh"));
@@ -493,13 +485,7 @@ public class BillDAO {
             b.setMdRefund(rs.getDouble("MDRefund"));
             b.setSurCharge(rs.getDouble("Surcharge"));
             b.setSlAdjustment(rs.getDouble("SLAdjustment"));
-            bill.setOtherDeduction(rs.getDouble("OtherDeduction"));
-            bill.setAmount2306(rs.getDouble("Amount2306"));
-            bill.setAmount2307(rs.getDouble("Amount2307"));
-            bill.setPostingDate(rs.getDate("PostingDate"));
-            bill.setPostingTime(rs.getString("PostingTime"));
-            bill.setCashAmount(rs.getDouble("CashAmount") == 0 ? rs.getDouble("NetAmount") : rs.getDouble("CashAmount"));
-            bill.setCheckAmount(rs.getDouble("CheckAmount"));
+            b.setServicePeriodEnd(rs.getDate("ServicePeriodEnd").toLocalDate());
             bills.add(bill);
         }
 
@@ -584,7 +570,7 @@ public class BillDAO {
         if (teller != null)
             sql += " AND p.TELLER = ?";
 
-        PreparedStatement ps = DB.getConnection("Billing").prepareStatement(sql);
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
 
         if (teller != null)
             ps.setString(1, teller);
@@ -682,5 +668,36 @@ public class BillDAO {
         ps.close();
 
         return results;
+    }
+
+    /**
+     * OR Posting (batch update) the list of paid bill transactions (from a teller/collector in given date)
+     * @param bills The list of paid bills
+     * @param dcrNumber The OR Number/OR Number
+     * @return void
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void postBills(List<Bill> bills, String dcrNumber) throws Exception {
+
+        Connection conn = DB.getConnection(Utility.DB_BILLING);
+        conn.setAutoCommit(false);
+
+        String sql = "";
+
+        for (Bill bill : bills) {
+            sql += "UPDATE PaidBills SET DCRNumber = '"+dcrNumber+"', ORNumber = '"+dcrNumber+"' " +
+                    "WHERE AccountNumber = '"+bill.getConsumer().getAccountID()+"' AND ServicePeriodEnd = '"+bill.getServicePeriodEnd().toString()+"';";
+
+        }
+        PreparedStatement ps = conn.prepareStatement(sql);
+        try {
+            ps.executeUpdate();
+            conn.commit();
+        }catch (SQLException se){
+            se.printStackTrace();
+            conn.rollback();
+        }
+        ps.close();
+        conn.setAutoCommit(true);
     }
 }

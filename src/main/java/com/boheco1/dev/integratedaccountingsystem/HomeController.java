@@ -66,7 +66,7 @@ public class HomeController implements Initializable {
     public JFXButton journalEntries, budget;
 
     // BILLING
-    public JFXButton allAccounts;
+    public JFXButton allAccounts, orPosting;
 
     // TELLER
     public JFXButton power_bills_payment;
@@ -106,6 +106,7 @@ public class HomeController implements Initializable {
         signatoriesButton = new JFXButton("Signatories");
         budget = new JFXButton("Budget");
         allAccounts = new JFXButton("All Accounts");
+        orPosting = new JFXButton("OR Posting");
         warehouseDashboard = new JFXButton("Dashboard");
         fileMirs = new JFXButton("File MIRS");
         generateMct = new JFXButton("Generate MCT");
@@ -137,6 +138,7 @@ public class HomeController implements Initializable {
         if(ActiveUser.getUser().can("manage-billing")) {
             NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Billing"), new FontIcon("mdi2r-receipt"), homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, allAccounts, homeStackPane);
+            NavMenuHelper.addMenu(navMenuBox, orPosting, homeStackPane);
         }
 
         if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-cashiering")){
@@ -193,6 +195,7 @@ public class HomeController implements Initializable {
 
         if(ActiveUser.getUser().can("manage-billing")) {
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(allAccounts, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, allAccounts.getText(), contentPane, "all_accounts_layout.fxml", subToolbar, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(orPosting, new FontIcon("mdi2c-cash-usd"), drawerMenus, orPosting.getText(), contentPane, "billing/billing_or_posting.fxml", null, null, title);
         }
 
         if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-cashiering")) {

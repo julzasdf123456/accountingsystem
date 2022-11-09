@@ -131,7 +131,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
     private ObservableList<Bill> bills = FXCollections.observableArrayList();
     private ObservableList<Check> checks = FXCollections.observableArrayList();
-
+    private boolean isPaid = false;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -559,66 +559,66 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column2.setStyle("-fx-alignment: center;");
 
         TableColumn<Bill, String> column3 = new TableColumn<>("Bill Amount");
-        column3.setPrefWidth(110);
-        column3.setMaxWidth(110);
-        column3.setMinWidth(110);
+        column3.setPrefWidth(140);
+        column3.setMaxWidth(140);
+        column3.setMinWidth(140);
         column3.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(
                 obj.getValue().getAmountDue()
         )));
         column3.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column31 = new TableColumn<>("Pwr Amount");
-        column31.setPrefWidth(110);
-        column31.setMaxWidth(110);
-        column31.setMinWidth(110);
+        column31.setPrefWidth(140);
+        column31.setMaxWidth(140);
+        column31.setMinWidth(140);
         column31.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(
                 obj.getValue().getPowerAmount()
         )));
         column31.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column32 = new TableColumn<>("TSF");
-        column32.setPrefWidth(75);
-        column32.setMaxWidth(75);
-        column32.setMinWidth(75);
+        column32.setPrefWidth(100);
+        column32.setMaxWidth(100);
+        column32.setMinWidth(100);
         column32.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(
                 obj.getValue().getTransformerRental()
         )));
         column32.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column33 = new TableColumn<>("Others");
-        column33.setPrefWidth(75);
-        column33.setMaxWidth(75);
-        column33.setMinWidth(75);
+        column33.setPrefWidth(100);
+        column33.setMaxWidth(100);
+        column33.setMinWidth(100);
         column33.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(
                 obj.getValue().getOtherCharges()
         )));
         column33.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column4 = new TableColumn<>("Penalty");
-        column4.setPrefWidth(75);
-        column4.setMaxWidth(75);
-        column4.setMinWidth(75);
+        column4.setPrefWidth(100);
+        column4.setMaxWidth(100);
+        column4.setMinWidth(100);
         column4.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getSurCharge())));
         column4.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column41 = new TableColumn<>("PPD");
-        column41.setPrefWidth(75);
-        column41.setMaxWidth(75);
-        column41.setMinWidth(75);
+        column41.setPrefWidth(100);
+        column41.setMaxWidth(100);
+        column41.setMinWidth(100);
         column41.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getDiscount())));
         column41.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column42 = new TableColumn<>("SL Adj");
-        column42.setPrefWidth(75);
-        column42.setMaxWidth(75);
-        column42.setMinWidth(75);
+        column42.setPrefWidth(100);
+        column42.setMaxWidth(100);
+        column42.setMinWidth(100);
         column42.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getSlAdjustment())));
         column42.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column43 = new TableColumn<>("Other Adj");
-        column43.setPrefWidth(75);
-        column43.setMaxWidth(75);
-        column43.setMinWidth(75);
+        column43.setPrefWidth(100);
+        column43.setMaxWidth(100);
+        column43.setMinWidth(100);
         column43.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getOtherAdjustment())));
         column43.setStyle("-fx-alignment: center-right;");
 
@@ -630,9 +630,9 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column44.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column45 = new TableColumn<>("VAT");
-        column45.setPrefWidth(75);
-        column45.setMaxWidth(75);
-        column45.setMinWidth(75);
+        column45.setPrefWidth(100);
+        column45.setMaxWidth(100);
+        column45.setMinWidth(100);
         column45.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getVat() + obj.getValue().getSurChargeTax())));
         column45.setStyle("-fx-alignment: center-right;");
 
@@ -651,29 +651,32 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column47.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column5 = new TableColumn<>("2307 5%");
-        column5.setPrefWidth(75);
-        column5.setMaxWidth(75);
-        column5.setMinWidth(75);
+        column5.setPrefWidth(100);
+        column5.setMaxWidth(100);
+        column5.setMinWidth(100);
         column5.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal((obj.getValue().getCh2306()))));
-        column5.setStyle("-fx-alignment: center;");
+        column5.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column51 = new TableColumn<>("2307 2%");
-        column51.setPrefWidth(75);
-        column51.setMaxWidth(75);
-        column51.setMinWidth(75);
+        column51.setPrefWidth(100);
+        column51.setMaxWidth(100);
+        column51.setMinWidth(100);
         column51.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal((obj.getValue().getCh2307()))));
-        column51.setStyle("-fx-alignment: center;");
+        column51.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column52 = new TableColumn<>("TIN");
-        column52.setPrefWidth(75);
-        column52.setMaxWidth(75);
-        column52.setMinWidth(75);
+        column52.setPrefWidth(140);
+        column52.setMaxWidth(140);
+        column52.setMinWidth(140);
         column52.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumer().getTINNo()));
         column52.setStyle("-fx-alignment: center;");
 
         TableColumn<Bill, String> column7 = new TableColumn<>("Total Amount");
         column7.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getTotalAmount())));
         column7.setStyle("-fx-alignment: center-right;");
+        column7.setPrefWidth(140);
+        column7.setMaxWidth(140);
+        column7.setMinWidth(140);
 
         this.bills =  FXCollections.observableArrayList();
         this.fees_table.setFixedCellSize(35);
@@ -711,21 +714,22 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() throws SQLException {
-                consumerInfo = (ConsumerInfo) o;
-                try{
-                    if (bills.size() == 0) bills = FXCollections.observableArrayList();
-                    List<Bill> consumerBills = BillDAO.getConsumerBills(consumerInfo, false);
-                    if (consumerBills.size() > 0) {
-                        for (Bill b : consumerBills){
-                            if (!bills.contains(b)) {
-                                bills.add(b);
+                    isPaid = true;
+                    consumerInfo = (ConsumerInfo) o;
+                    try{
+                        if (bills.size() == 0) bills = FXCollections.observableArrayList();
+                        List<Bill> consumerBills = BillDAO.getConsumerBills(consumerInfo, false);
+                        if (consumerBills.size() > 0) {
+                            for (Bill b : consumerBills){
+                                if (!bills.contains(b)) {
+                                    bills.add(b);
+                                }
                             }
+                            isPaid = false;
                         }
+                    }catch (Exception e){
+                        e.printStackTrace();
                     }
-                    setBillInfo(bills);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
                     return null;
                 }
             };
@@ -735,14 +739,17 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             });
 
             task.setOnSucceeded(wse -> {
-                setConsumerInfo(consumerInfo);
-                fees_table.setItems(bills);
-                setPayables();
-                payment_tf.setDisable(false);
-                payment_tf.requestFocus();
-                transact_btn.setDisable(false);
-                total_paid_tf.setDisable(false);
-                InputHelper.restrictNumbersOnly(payment_tf);
+                if (!isPaid) setConsumerInfo(consumerInfo);
+                if (this.bills.size() > 0) {
+                    setBillInfo(bills);
+                    setPayables();
+                    fees_table.setItems(bills);
+                    payment_tf.setDisable(false);
+                    payment_tf.requestFocus();
+                    transact_btn.setDisable(false);
+                    total_paid_tf.setDisable(false);
+                    InputHelper.restrictNumbersOnly(payment_tf);
+                }
                 progressBar.setVisible(false);
             });
 

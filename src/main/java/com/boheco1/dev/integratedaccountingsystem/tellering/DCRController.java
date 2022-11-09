@@ -116,7 +116,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                     progressbar.setVisible(true);
                     try (OutputStream fileOut = new FileOutputStream(selectedFile)) {
                         boolean proceed = true;
-                        String teller;
+                        String teller = "";
                         if (ActiveUser.getUser().can("manage-cashiering")) {
                             teller = teller_tf.getText();
                             if (teller.isEmpty()) {
@@ -133,9 +133,9 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                             int month = date_pker.getValue().getMonthValue();
                             int day = date_pker.getValue().getDayOfMonth();
                             int year = date_pker.getValue().getYear();
-                            DCRController.generateDCR(fileOut, "Engel", "10/3/22",
-                                    BillDAO.getAllPaidBills(year, month, day, "engel"),
-                                    BillDAO.getDCRBreakDown(year, month, day, "engel"));
+                            DCRController.generateDCR(fileOut, teller, day+"/"+month+"/"+year,
+                                    BillDAO.getAllPaidBills(year, month, day, teller),
+                                    BillDAO.getDCRBreakDown(year, month, day, teller));
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
