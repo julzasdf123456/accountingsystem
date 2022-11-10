@@ -1,12 +1,11 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
 public class Teller {
-    private String id;
+    private String username;
     private String name;
     private String address;
     private String phone;
@@ -16,8 +15,8 @@ public class Teller {
     public Teller() {
     }
 
-    public Teller(String id, String name, String address, String phone, LocalDate date, HashMap<String, List<ItemSummary>> DCRBreakDown) {
-        this.id = id;
+    public Teller(String username, String name, String address, String phone, LocalDate date, HashMap<String, List<ItemSummary>> DCRBreakDown) {
+        this.username = username;
         this.name = name;
         this.address = address;
         this.phone = phone;
@@ -25,12 +24,12 @@ public class Teller {
         this.DCRBreakDown = DCRBreakDown;
     }
 
-    public String getId() {
-        return id;
+    public String getUsername() {
+        return username;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getName() {
