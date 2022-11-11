@@ -225,17 +225,21 @@ public class Utility {
                 e.printStackTrace();
             }
             System.out.println("Bill No: "+b.getBillNo()+" Bill balance: "+b.getBalance());
+            PaidBill p = (PaidBill) b;
+            if (p.getChecks() == null)
+                p.setChecks(new ArrayList<Check>());
             while (!checkQueue.isEmpty()){
                 Check c = checkQueue.peek();
                 System.out.print(" -> Check Number: "+c.getCheckNo()+" Amount: "+c.getAmount());
                 System.out.print(" Deducting check amount of "+c.getAmount()+" from "+b.getBalance()+"\n");
                 double balance = c.getAmount() - b.getBalance();
-                PaidBill p = (PaidBill) b;
+
                 if (balance > 0) {
                     System.out.println(" -> Bill balance is 0. Set current remaining check amount of "+ -balance +". Removed bill from queue and added to completed.");
                     c.setAmount(balance);
                     //Set bill check amount to bill total amount
                     p.setCheckAmount(b.getBalance());
+                    p.getChecks().add(c);
                     b.setBalance(0);
                     billQueue.remove();
                     completed.add(b);
@@ -243,6 +247,7 @@ public class Utility {
                 }else {
                     System.out.println(" -> Bill balance has balance of "+ -balance +". Removed check from queue and proceed to next check.");
                     p.setCheckAmount(p.getCheckAmount() + c.getAmount());
+                    p.getChecks().add(c);
                     checkQueue.remove();
                     b.setBalance(-balance);
                 }

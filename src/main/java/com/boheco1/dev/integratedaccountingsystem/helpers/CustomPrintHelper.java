@@ -41,15 +41,12 @@ public class CustomPrintHelper extends Task {
         prepareDocument();
 
         Printer printer = Printer.getDefaultPrinter();
-
+        System.out.println(printer.getName());
         PrinterJob job = PrinterJob.createPrinterJob();
-
-        if (!printer.getName().contains("EPSON LQ-310"))
-            throw new Exception("Printer error! The default printer is not EPSON LQ-310!");
 
         PageLayout layout = printer.createPageLayout(this.paper, PageOrientation.PORTRAIT,  10, 10, 0, 0);
         job.getJobSettings().setPageLayout(layout);
-        /*Paper papers = layout.getPaper();
+        Paper papers = layout.getPaper();
 
         System.out.println("Paper width: "+papers.getWidth());
         System.out.println("Paper height:" + papers.getHeight());
@@ -57,7 +54,6 @@ public class CustomPrintHelper extends Task {
         System.out.println("Printable height: "+layout.getPrintableHeight());
         System.out.println("Left margin: "+layout.getLeftMargin());
         System.out.println("Right margin: "+layout.getPrintableHeight());
-        */
 
         if (job != null) {
             boolean printed = job.printPage(node);
@@ -72,6 +68,23 @@ public class CustomPrintHelper extends Task {
     }
 
     public void prepareDocument(){
+
+       /*S String meter_no = "1231312";
+        String type = "Type: ";
+        String consumer = "Juan Dela Cruz";
+        String billno = "1234567890";
+        String address = "Clarin, Bohol";
+        String billmonth = "November 2022";
+        String kwhUsed = "123.5";
+        String amount = "1500";
+        String vat = "500";
+        String due = "12/9/2022";
+        String dueDate = "Due Date: "+due;
+        String surcharge = "50";
+        String amountDue = "1550";
+        String teller = "engel";
+        DateFormat dateFormat2 = new SimpleDateFormat("MM/dd/yyyy hh:mm aa");
+        String receivedDate = dateFormat2.format(new Date()).toString(); */
 
         String meter_no = bill.getConsumer().getAccountID();
         String type = "Type: "+bill.getConsumerType();
@@ -88,7 +101,7 @@ public class CustomPrintHelper extends Task {
         String amountDue = bill.getTotalAmount()+"";
         String teller = bill.getTeller();
         DateFormat dateFormat2 = new SimpleDateFormat("MM/dd/yyyy hh:mm aa");
-        String receivedDate = dateFormat2.format(new Date()).toString();;
+        String receivedDate = dateFormat2.format(new Date()).toString();
 
         System.out.println("Meter: "+meter_no);
         System.out.println(type);

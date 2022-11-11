@@ -907,10 +907,11 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         controller.getConfirm_btn().setOnAction(action ->{
             //Get the default printer
             Printer printer = Printer.getDefaultPrinter();
+            System.out.println(printer.getName());
             //Check if the default printer is not LQ-310 and prompt error, otherwise proceed to batch transaction and printing of oebr
-            if (!printer.getName().contains("EPSON LQ-310")) {
+            if (printer.getName().contains("PDF") || printer.getName().contains("Fax") || printer.getName().contains("XPS") || printer.getName().contains("OneNote")) {
                 dialog.close();
-                AlertDialogBuilder.messgeDialog("System Error", "The default printer is not EPSON LQ-310! The default printer should be set to EPSON LQ-310!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                AlertDialogBuilder.messgeDialog("System Error", "The default printer is not set! Please set the printer before printing!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }else {
                 List<Bill> updated = Utility.processor(bills, cash, checks, ActiveUser.getUser().getUserName());
                 this.progressBar.setVisible(true);
