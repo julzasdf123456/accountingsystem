@@ -44,10 +44,10 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     private DatePicker filingDate;
 
     @FXML
-    private JFXTextField applicant, address, prepared, checked, approved, items, quantity;
+    private JFXTextField applicant, prepared, checked, approved, items, quantity;
 
     @FXML
-    private JFXTextArea purpose, remarks;
+    private JFXTextArea address, purpose, remarks;
 
     @FXML
     private Label available, inStock, pending, countRow;

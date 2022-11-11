@@ -22,7 +22,6 @@ import javafx.scene.paint.Paint;
 
 
 import java.net.URL;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,6 +35,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private JFXButton search_btn;
 
     @FXML
+
     private JFXButton print_btn;
 
     @FXML
@@ -240,8 +240,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
             transactionHeader.setAccountID(crmQueue.getSourseId());//CRM Source ID
             transactionHeader.setTransactionDate(date.getValue());
         }else if(tellerInfo != null) {
-            transactionHeader.setSource("PaidBills");
-            transactionHeader.setAccountID(tellerInfo.getId());//ID or Teller user ID
+            transactionHeader.setSource("employee");
+            transactionHeader.setAccountID(tellerInfo.getUsername());
             transactionHeader.setAmount(collectionFromTeller);
             transactionHeader.setTransactionDate(tellerInfo.getDate());
         }
@@ -253,46 +253,35 @@ public class CashierController extends MenuControllerHandler implements Initiali
         transactionHeader.setDateEntered(LocalDateTime.now());
 
         List<TransactionDetails> transactionDetailsList = new ArrayList<>();
+
         if(crmDetails != null) {
+            int seq = 1;
             for (CRMDetails cd : crmDetails) {
                 TransactionDetails transactionDetails = new TransactionDetails();
                 transactionDetails.setPeriod(period);
                 transactionDetails.setTransactionNumber(orNmber.getText());
+
                 if (Utility.OFFICE_PREFIX.equalsIgnoreCase("main"))
                     transactionDetails.setTransactionCode("OR");
                 else
                     transactionDetails.setTransactionCode("ORSub");
+
                 transactionDetails.setTransactionDate(date.getValue());
                 transactionDetails.setAccountCode(cd.getGlCode());//GL Code or the account code of the particular
                 transactionDetails.setParticulars(cd.getParticulars());
-                transactionDetails.setCredit(cd.getTotal());
-                //transactionDetails.setSequenceNumber(0);
-                //transactionDetails.setDebit();
+                transactionDetails.setSequenceNumber(seq++);
+
+                if(cd.getTotal() > 0)
+                    transactionDetails.setCredit(cd.getTotal());
+                else
+                    transactionDetails.setDebit(cd.getTotal());
+
                 transactionDetails.setOrDate(date.getValue());
                 //transactionDetails.setBankID("N/A");
                 //transactionDetails.setNote("N/A");
                 transactionDetailsList.add(transactionDetails);
             }
-        }/*else{
-            //clarify this part
-            TransactionDetails transactionDetails = new TransactionDetails();
-            transactionDetails.setPeriod(period);
-            transactionDetails.setTransactionNumber(orNmber.getText());
-            if (Utility.OFFICE_PREFIX.equalsIgnoreCase("main"))
-                transactionDetails.setTransactionCode("OR");
-            else
-                transactionDetails.setTransactionCode("ORSub");
-            transactionDetails.setTransactionDate(date.getValue());
-            transactionDetails.setAccountCode(null);//GL Code or the account code of the particular
-            transactionDetails.setParticulars(null);
-            transactionDetails.setCredit(collectionFromTeller);
-            //transactionDetails.setSequenceNumber(0);
-            //transactionDetails.setDebit();
-            transactionDetails.setOrDate(date.getValue());
-            //transactionDetails.setBankID("N/A");
-            //transactionDetails.setNote("N/A");
-            transactionDetailsList.add(transactionDetails);
-        }*/
+        }
 
         try {
             String msg = TransactionHeaderDetailDAO.save(crmQueue, transactionHeader, transactionDetailsList);

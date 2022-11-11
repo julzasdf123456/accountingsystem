@@ -21,7 +21,7 @@
                     <VBox maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="274.0">
                         <children>
                   <Label text="Applicant" textFill="#8a8a8a" />
-                  <JFXTextField fx:id="applicant" layoutX="10.0" layoutY="243.0" style="-fx-background-color: #f5f5f5;" text="-">
+                  <JFXTextField fx:id="applicant" layoutX="10.0" layoutY="243.0" promptText="-" style="-fx-background-color: #f5f5f5;">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -30,14 +30,14 @@
                      </VBox.margin>
                   </JFXTextField>
                   <Label text="Address" textFill="#8a8a8a" />
-                  <JFXTextField fx:id="address" style="-fx-background-color: #f5f5f5;" text="-">
+                  <JFXTextArea fx:id="address" focusColor="#00ad8e" layoutX="10.0" layoutY="199.0" prefHeight="105.0" prefWidth="274.0" promptText="-" style="-fx-background-color: #f5f5f5;">
                      <font>
                         <Font size="14.0" />
                      </font>
                      <VBox.margin>
-                        <Insets bottom="16.0" />
+                        <Insets bottom="24.0" />
                      </VBox.margin>
-                  </JFXTextField>
+                  </JFXTextArea>
                   <HBox>
                      <children>
                         <Label text="Purpose/Description" textFill="#8a8a8a" />
