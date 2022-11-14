@@ -3,7 +3,6 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.CRMQueue;
 import com.boheco1.dev.integratedaccountingsystem.objects.ConsumerInfo;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -119,5 +118,58 @@ public class ConsumerDAO {
         ps.close();
 
         return record;
+    }
+
+    /**
+     * Retrieves a list of CRMQueue as a search result based on a search Key (on Accounting database, CRMQueue table)
+     * @param key The search key
+     * @return A list of CRMQueue that qualifies with the search key
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<CRMQueue> getConsumerRecordFromCRMList(String key) throws Exception  {
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM CRMQueue WHERE ConsumerName LIKE ? OR ConsumerAddress LIKE ? ");
+
+        ps.setString(1, '%'+ key+'%');
+        ps.setString(2, '%'+ key+'%');
+
+        ResultSet rs = ps.executeQuery();
+
+        List<CRMQueue> list = new ArrayList<>();
+        while(rs.next()) {
+            CRMQueue record = new CRMQueue(
+                    rs.getString("id"),
+                    rs.getString("ConsumerName"),
+                    rs.getString("ConsumerAddress"),
+                    rs.getString("TransactionPurpose"),
+                    rs.getString("Source"),
+                    rs.getString("SourceId"),
+                    rs.getDouble("SubTotal"),
+                    rs.getDouble("VAT"),
+                    rs.getDouble("Total"));
+            list.add(record);
+        }
+
+        rs.close();
+        ps.close();
+
+        return list;
+    }
+
+    /**
+     * Updatethe TIN of an existing consumer
+     * @param consumer the ConsumerInfo to be updated
+     * @param tin the tin
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void updateTIN(ConsumerInfo consumer, String tin) throws Exception {
+        PreparedStatement ps = DB.getConnection("Billing").prepareStatement(
+                "UPDATE AccountMaster SET TINNo=? " +
+                        "WHERE AccountNumber=?");
+        ps.setString(1, tin);
+        ps.setString(2, consumer.getAccountID());
+
+        ps.executeUpdate();
+
+        ps.close();
     }
 }

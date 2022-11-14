@@ -2,9 +2,6 @@ package com.boheco1.dev.integratedaccountingsystem.helpers;
 
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
@@ -16,6 +13,9 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.*;
 
 public class Utility {
@@ -27,6 +27,7 @@ public class Utility {
     public static double TAX = 12;
     public static String STATION = "main"; //main or sub
     public static String OFFICE_PREFIX = "OSD";
+    public static String DB_BILLING = "Billing";
     public static int ROW_PER_PAGE = 20;
     public static String RELEASING = "releasing";
     public static String REJECTED = "rejected";
@@ -198,7 +199,7 @@ public class Utility {
         return String.format("%,.2f",val);
     }
 
-    public static List<Bill> processor(List<Bill> bills, double cash, List<Check> checks){
+    public static List<Bill> processor(List<Bill> bills, double cash, List<Check> checks, String teller){
 
         Queue<Bill> billQueue = new LinkedList<>(bills);
 
@@ -210,18 +211,35 @@ public class Utility {
             System.out.println("==================================================================================================================");
             Bill b = billQueue.peek();
             System.out.println("Cash Amount: "+cash);
+            try {
+                PaidBill pd = (PaidBill) b;
+                //If current user is a Teller
+                if (ActiveUser.getUser().getEmployeeInfo().getDesignation().equals("Teller")) {
+                    pd.setTeller(teller);
+                    pd.setPaymentType("SUB-OFFICE/STATION");
+                //Otherwise
+                }else{
+                    pd.setPaymentType("SIT-IN");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             System.out.println("Bill No: "+b.getBillNo()+" Bill balance: "+b.getBalance());
+            PaidBill p = (PaidBill) b;
+            if (p.getChecks() == null)
+                p.setChecks(new ArrayList<Check>());
             while (!checkQueue.isEmpty()){
                 Check c = checkQueue.peek();
                 System.out.print(" -> Check Number: "+c.getCheckNo()+" Amount: "+c.getAmount());
                 System.out.print(" Deducting check amount of "+c.getAmount()+" from "+b.getBalance()+"\n");
                 double balance = c.getAmount() - b.getBalance();
-                PaidBill p = (PaidBill) b;
+
                 if (balance > 0) {
                     System.out.println(" -> Bill balance is 0. Set current remaining check amount of "+ -balance +". Removed bill from queue and added to completed.");
                     c.setAmount(balance);
                     //Set bill check amount to bill total amount
                     p.setCheckAmount(b.getBalance());
+                    p.getChecks().add(c);
                     b.setBalance(0);
                     billQueue.remove();
                     completed.add(b);
@@ -229,6 +247,7 @@ public class Utility {
                 }else {
                     System.out.println(" -> Bill balance has balance of "+ -balance +". Removed check from queue and proceed to next check.");
                     p.setCheckAmount(p.getCheckAmount() + c.getAmount());
+                    p.getChecks().add(c);
                     checkQueue.remove();
                     b.setBalance(-balance);
                 }
@@ -263,6 +282,17 @@ public class Utility {
         props.load(is);
 
         return props.getProperty("account_code");
+    }
+
+    public static LocalDate serverDate() throws SQLException, ClassNotFoundException {
+        ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                        "SELECT SYSDATETIME() as serverDate");
+
+        if(rs.next()) {
+            return rs.getDate("serverDate").toLocalDate();
+        }else {
+            return LocalDate.now();
+        }
     }
 
 }

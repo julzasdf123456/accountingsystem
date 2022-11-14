@@ -6,7 +6,6 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -25,15 +24,13 @@ import java.util.ResourceBundle;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.fxml.FXML;
+import javafx.print.Printer;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Paint;
-import javafx.util.Callback;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 public class PowerBillsPaymentController extends MenuControllerHandler implements Initializable, ObjectTransaction {
 
@@ -122,9 +119,6 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     private TextField md_refund_tf;
 
     @FXML
-    private Label bill_amount_lbl;
-
-    @FXML
     private JFXButton transact_btn;
 
     @FXML
@@ -137,7 +131,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
     private ObservableList<Bill> bills = FXCollections.observableArrayList();
     private ObservableList<Check> checks = FXCollections.observableArrayList();
-
+    private boolean isPaid = false;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -155,15 +149,53 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             try {
                 this.consumerInfo = ConsumerDAO.getConsumerRecord(no);
                 if (this.consumerInfo != null) {
-                    this.setConsumerInfo(this.consumerInfo);
-                    try {
-                        if (this.bills.size() == 0) this.bills = FXCollections.observableArrayList();
-                        this.bills.addAll(BillDAO.getConsumerBills(this.consumerInfo, false));
-                        this.setPayables();
-                        this.fees_table.setItems(this.bills);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    Task<Void> task = new Task<>() {
+                        @Override
+                        protected Void call() throws SQLException {
+                            try{
+                                if (bills.size() == 0) bills = FXCollections.observableArrayList();
+                                List<Bill> consumerBills = BillDAO.getConsumerBills(consumerInfo, false);
+                                if (consumerBills.size() > 0) {
+                                    for (Bill b : consumerBills){
+                                        if (!bills.contains(b)) {
+                                            bills.add(b);
+                                        }
+                                    }
+                                }
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                            return null;
+                        }
+                    };
+
+                    task.setOnRunning(wse -> {
+                        acct_no_tf.setDisable(true);
+                        progressBar.setVisible(true);
+                    });
+
+                    task.setOnSucceeded(wse -> {
+                        acct_no_tf.setDisable(false);
+                        setConsumerInfo(consumerInfo);
+                        fees_table.setItems(bills);
+                        setPayables();
+                        payment_tf.setDisable(false);
+                        payment_tf.requestFocus();
+                        transact_btn.setDisable(false);
+                        total_paid_tf.setDisable(false);
+                        InputHelper.restrictNumbersOnly(payment_tf);
+                        progressBar.setVisible(false);
+                    });
+
+                    task.setOnFailed(wse -> {
+                        //Do nothing
+                        acct_no_tf.setDisable(false);
+                        progressBar.setVisible(false);
+                    });
+
+                    new Thread(task).start();
+                }else{
+                    AlertDialogBuilder.messgeDialog("System Error", "No existing consumer account! Please refine search and try again!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -175,15 +207,14 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.fees_table.setRowFactory(tv -> {
             TableRow<Bill> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                if (event.getClickCount() == 1 && (! row.isEmpty()) ) {
                     ConsumerInfo consumer = row.getItem().getConsumer();
+                    this.setBillInfo(bills);
                     this.setConsumerInfo(consumer);
-                }else if (event.getClickCount() == 1 && (! row.isEmpty()) ) {
-                    this.setBillInfo(row.getItem());
                 }
             });
 
-            if (ActiveUser.getUser().can("manage-tellering")) {
+            if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering")) {
                 final ContextMenu rowMenu = new ContextMenu();
 
 
@@ -192,9 +223,10 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     this.fees_table.getItems().remove(row.getItem());
                     tv.refresh();
                     this.setPayables();
-                    this.resetBillInfo();
-                    if (this.fees_table.getItems().size() == 0)
+                    if (this.fees_table.getItems().size() == 0) {
                         this.reset();
+                        this.resetBillInfo();
+                    }
                 });
 
                 MenuItem itemAddPPD = new MenuItem("Less PPD");
@@ -215,7 +247,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                         row.getItem().setDiscount(ppd);
                         row.getItem().computeTotalAmount();
                         tv.refresh();
-                        this.setBillInfo(row.getItem());
+                        this.setBillInfo(bills);
                     }else{
                         AlertDialogBuilder.messgeDialog("System Error", "Only consumer types BAPA, ECA, I, CL, and CS with more than 1KWH can avail the 1% discount on or before due date!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                     }
@@ -226,7 +258,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     row.getItem().setDiscount(0);
                     row.getItem().computeTotalAmount();
                     tv.refresh();
-                    this.setBillInfo(row.getItem());
+                    this.setBillInfo(bills);
                     this.setPayables();
                 });
 
@@ -239,14 +271,14 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     row.getItem().setOtherAdjustment(0);
                     row.getItem().computeTotalAmount();
                     tv.refresh();
-                    this.setBillInfo(row.getItem());
+                    this.setBillInfo(bills);
                     this.setPayables();
                 });
 
                 MenuItem itemAddSurcharge = new MenuItem("Add Surcharge Manually");
                 itemAddSurcharge.setOnAction(actionEvent -> {
                     try {
-                        showAuthenticate(row.getItem(), this.fees_table, this.total_payable_lbl);
+                        showWaiveForm(row.getItem(), this.fees_table, this.total_payable_lbl);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -261,30 +293,38 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     }
                 });
 
-                MenuItem item2306 = new MenuItem("2306");
+                MenuItem item2306 = new MenuItem("2307 5%");
                 item2306.setOnAction(actionEvent -> {
                     if (row.getItem().getConsumerType().equals("RM")) return;
                     try {
-                        this.showTIN(row.getItem(), "2306");
+                        if (row.getItem().getConsumer().getTINNo() == null || row.getItem().getConsumer().getTINNo().isEmpty() || row.getItem().getConsumer().getTINNo().equals("")) {
+                            this.showTIN(row.getItem(), "2306");
+                        }else{
+                            row.getItem().setForm2306(row.getItem().getConsumer().getTINNo());
+                        }
                         row.getItem().setCh2306(BillDAO.getForm2306(row.getItem()));
                         row.getItem().computeTotalAmount();
                         tv.refresh();
-                        this.setBillInfo(row.getItem());
+                        this.setBillInfo(bills);
                         this.setPayables();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 });
 
-                MenuItem item2307 = new MenuItem("2307");
+                MenuItem item2307 = new MenuItem("2307 2%");
                 item2307.setOnAction(event -> {
                     if (row.getItem().getConsumerType().equals("RM")) return;
                     try {
-                        this.showTIN(row.getItem(), "2307");
+                        if (row.getItem().getConsumer().getTINNo() == null || row.getItem().getConsumer().getTINNo().isEmpty() || row.getItem().getConsumer().getTINNo().equals("")) {
+                            this.showTIN(row.getItem(), "2307");
+                        }else{
+                            row.getItem().setForm2306(row.getItem().getConsumer().getTINNo());
+                        }
                         row.getItem().setCh2307(BillDAO.getForm2307(row.getItem()));
                         row.getItem().computeTotalAmount();
                         tv.refresh();
-                        this.setBillInfo(row.getItem());
+                        this.setBillInfo(bills);
                         this.setPayables();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -295,7 +335,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 itemSLAdj.setOnAction(actionEvent -> {
                     this.showAdjustment(row.getItem(),"SL");
                     tv.refresh();
-                    this.setBillInfo(row.getItem());
+                    this.setBillInfo(bills);
                     this.setPayables();
                 });
 
@@ -304,7 +344,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     row.getItem().setSlAdjustment(0);
                     row.getItem().computeTotalAmount();
                     tv.refresh();
-                    this.setBillInfo(row.getItem());
+                    this.setBillInfo(bills);
                     this.setPayables();
                 });
 
@@ -312,7 +352,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 itemOthersAdj.setOnAction(actionEvent -> {
                     this.showAdjustment(row.getItem(),"Other");
                     tv.refresh();
-                    this.setBillInfo(row.getItem());
+                    this.setBillInfo(bills);
                     this.setPayables();
                 });
 
@@ -321,7 +361,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     row.getItem().setOtherAdjustment(0);
                     row.getItem().computeTotalAmount();
                     tv.refresh();
-                    this.setBillInfo(row.getItem());
+                    this.setBillInfo(bills);
                     this.setPayables();
                 });
 
@@ -448,6 +488,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.transact_btn.setDisable(true);
         this.resetChecks();
         this.resetBillInfo();
+        this.acct_no_tf.requestFocus();
     }
     /**
      * Resets check details
@@ -474,11 +515,6 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.katas_tf.setText("");
         this.vat_tf.setText("");
         this.md_refund_tf.setText("");
-        this.bill_amount_lbl.setText("0.00");
-        this.vat_tf.setText("");
-        this.add_charges_tf.setText("");
-        this.power_amt_tf.setText("");
-        this.katas_tf.setText("");
     }
     /**
      * Displays Advance Consumer Search UI
@@ -495,7 +531,6 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
      */
     public void createTable(){
         TableColumn<Bill, String> column0 = new TableColumn<>("Bill #");
-
         column0.setPrefWidth(110);
         column0.setMaxWidth(110);
         column0.setMinWidth(110);
@@ -510,9 +545,9 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Bill, String> column1 = new TableColumn<>("Billing Month");
-        column1.setPrefWidth(130);
-        column1.setMaxWidth(130);
-        column1.setMinWidth(130);
+        column1.setPrefWidth(140);
+        column1.setMaxWidth(140);
+        column1.setMinWidth(140);
         column1.setCellValueFactory(new PropertyValueFactory<>("billMonth"));
         column1.setStyle("-fx-alignment: center-left;");
 
@@ -523,72 +558,125 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column2.setCellValueFactory(new PropertyValueFactory<>("dueDate"));
         column2.setStyle("-fx-alignment: center;");
 
-        TableColumn<Bill, String> column3 = new TableColumn<>("Amount Due");
-        column3.setPrefWidth(100);
-        column3.setMaxWidth(100);
-        column3.setMinWidth(100);
-        column3.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getAmountDue())));
+        TableColumn<Bill, String> column3 = new TableColumn<>("Bill Amount");
+        column3.setPrefWidth(140);
+        column3.setMaxWidth(140);
+        column3.setMinWidth(140);
+        column3.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(
+                obj.getValue().getAmountDue()
+        )));
         column3.setStyle("-fx-alignment: center-right;");
 
-        TableColumn<Bill, String> column4 = new TableColumn<>("Surcharge");
+        TableColumn<Bill, String> column31 = new TableColumn<>("Pwr Amount");
+        column31.setPrefWidth(140);
+        column31.setMaxWidth(140);
+        column31.setMinWidth(140);
+        column31.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(
+                obj.getValue().getPowerAmount()
+        )));
+        column31.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> column32 = new TableColumn<>("TSF");
+        column32.setPrefWidth(100);
+        column32.setMaxWidth(100);
+        column32.setMinWidth(100);
+        column32.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(
+                obj.getValue().getTransformerRental()
+        )));
+        column32.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> column33 = new TableColumn<>("Others");
+        column33.setPrefWidth(100);
+        column33.setMaxWidth(100);
+        column33.setMinWidth(100);
+        column33.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(
+                obj.getValue().getOtherCharges()
+        )));
+        column33.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> column4 = new TableColumn<>("Penalty");
         column4.setPrefWidth(100);
         column4.setMaxWidth(100);
         column4.setMinWidth(100);
         column4.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getSurCharge())));
         column4.setStyle("-fx-alignment: center-right;");
 
-        TableColumn<Bill, String> column5 = new TableColumn<>("2306/07");
+        TableColumn<Bill, String> column41 = new TableColumn<>("PPD");
+        column41.setPrefWidth(100);
+        column41.setMaxWidth(100);
+        column41.setMinWidth(100);
+        column41.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getDiscount())));
+        column41.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> column42 = new TableColumn<>("SL Adj");
+        column42.setPrefWidth(100);
+        column42.setMaxWidth(100);
+        column42.setMinWidth(100);
+        column42.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getSlAdjustment())));
+        column42.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> column43 = new TableColumn<>("Other Adj");
+        column43.setPrefWidth(100);
+        column43.setMaxWidth(100);
+        column43.setMinWidth(100);
+        column43.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getOtherAdjustment())));
+        column43.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> column44 = new TableColumn<>("KWH");
+        column44.setPrefWidth(75);
+        column44.setMaxWidth(75);
+        column44.setMinWidth(75);
+        column44.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getPowerKWH())));
+        column44.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> column45 = new TableColumn<>("VAT");
+        column45.setPrefWidth(100);
+        column45.setMaxWidth(100);
+        column45.setMinWidth(100);
+        column45.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getVat() + obj.getValue().getSurChargeTax())));
+        column45.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> column46 = new TableColumn<>("KatasAMT");
+        column46.setPrefWidth(75);
+        column46.setMaxWidth(75);
+        column46.setMinWidth(75);
+        column46.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getKatas())));
+        column46.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> column47 = new TableColumn<>("MD Refund");
+        column47.setPrefWidth(75);
+        column47.setMaxWidth(75);
+        column47.setMinWidth(75);
+        column47.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getMdRefund())));
+        column47.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> column5 = new TableColumn<>("2307 5%");
         column5.setPrefWidth(100);
         column5.setMaxWidth(100);
         column5.setMinWidth(100);
-        column5.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal((obj.getValue().getCh2306()+obj.getValue().getCh2307()))));
-        column5.setStyle("-fx-alignment: center;");
+        column5.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal((obj.getValue().getCh2306()))));
+        column5.setStyle("-fx-alignment: center-right;");
 
-        TableColumn<Bill, String> columnWaive = new TableColumn<>("Waive");
-        Callback<TableColumn<Bill, String>, TableCell<Bill, String>> waiveBtn
-                = //
-                new Callback<TableColumn<Bill, String>, TableCell<Bill, String>>() {
-                    @Override
-                    public TableCell call(final TableColumn<Bill, String> param) {
-                        final TableCell<Bill, String> cell = new TableCell<Bill, String>() {
+        TableColumn<Bill, String> column51 = new TableColumn<>("2307 2%");
+        column51.setPrefWidth(100);
+        column51.setMaxWidth(100);
+        column51.setMinWidth(100);
+        column51.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal((obj.getValue().getCh2307()))));
+        column51.setStyle("-fx-alignment: center-right;");
 
-                            FontIcon icon = new FontIcon("mdi2c-close-circle");
-                            JFXButton btn = new JFXButton("", icon);
-
-                            @Override
-                            public void updateItem(String item, boolean empty) {
-                                super.updateItem(item, empty);
-                                icon.setIconSize(24);
-                                icon.setIconColor(Paint.valueOf(ColorPalette.INFO));
-                                if (empty) {
-                                    setGraphic(null);
-                                    setText(null);
-                                } else {
-                                    btn.setOnAction(event -> {
-                                        try {
-                                            Bill bill = getTableView().getItems().get(getIndex());
-                                            showAuthenticate(bill, fees_table, total_payable_lbl);
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                    });
-                                    setGraphic(btn);
-                                    setText(null);
-                                }
-                            }
-                        };
-                        return cell;
-                    }
-                };
-        columnWaive.setCellFactory(waiveBtn);
-        columnWaive.setPrefWidth(60);
-        columnWaive.setMaxWidth(60);
-        columnWaive.setMinWidth(60);
-        columnWaive.setStyle("-fx-alignment: center;");
+        TableColumn<Bill, String> column52 = new TableColumn<>("TIN");
+        column52.setPrefWidth(140);
+        column52.setMaxWidth(140);
+        column52.setMinWidth(140);
+        column52.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumer().getTINNo()));
+        column52.setStyle("-fx-alignment: center;");
 
         TableColumn<Bill, String> column7 = new TableColumn<>("Total Amount");
         column7.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getTotalAmount())));
         column7.setStyle("-fx-alignment: center-right;");
+        column7.setPrefWidth(140);
+        column7.setMaxWidth(140);
+        column7.setMinWidth(140);
 
         this.bills =  FXCollections.observableArrayList();
         this.fees_table.setFixedCellSize(35);
@@ -599,12 +687,20 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.fees_table.getColumns().add(column1);
         this.fees_table.getColumns().add(column2);
         this.fees_table.getColumns().add(column3);
+        this.fees_table.getColumns().add(column31);
+        this.fees_table.getColumns().add(column32);
+        this.fees_table.getColumns().add(column33);
         this.fees_table.getColumns().add(column4);
-
-        if (ActiveUser.getUser().can("manage-tellering"))
-            this.fees_table.getColumns().add(columnWaive);
-
+        this.fees_table.getColumns().add(column41);
+        this.fees_table.getColumns().add(column42);
+        this.fees_table.getColumns().add(column43);
+        this.fees_table.getColumns().add(column44);
+        this.fees_table.getColumns().add(column45);
+        this.fees_table.getColumns().add(column46);
+        this.fees_table.getColumns().add(column47);
         this.fees_table.getColumns().add(column5);
+        this.fees_table.getColumns().add(column51);
+        this.fees_table.getColumns().add(column52);
         this.fees_table.getColumns().add(column7);
     }
     /**
@@ -618,20 +714,22 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() throws SQLException {
-                consumerInfo = (ConsumerInfo) o;
-                try{
-                    if (bills.size() == 0) bills = FXCollections.observableArrayList();
-                    List<Bill> consumerBills = BillDAO.getConsumerBills(consumerInfo, false);
-                    if (consumerBills.size() > 0) {
-                        for (Bill b : consumerBills){
-                            if (!bills.contains(b)) {
-                                bills.add(b);
+                    isPaid = true;
+                    consumerInfo = (ConsumerInfo) o;
+                    try{
+                        if (bills.size() == 0) bills = FXCollections.observableArrayList();
+                        List<Bill> consumerBills = BillDAO.getConsumerBills(consumerInfo, false);
+                        if (consumerBills.size() > 0) {
+                            for (Bill b : consumerBills){
+                                if (!bills.contains(b)) {
+                                    bills.add(b);
+                                }
                             }
+                            isPaid = false;
                         }
+                    }catch (Exception e){
+                        e.printStackTrace();
                     }
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
                     return null;
                 }
             };
@@ -641,14 +739,17 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             });
 
             task.setOnSucceeded(wse -> {
-                setConsumerInfo(consumerInfo);
-                fees_table.setItems(bills);
-                setPayables();
-                payment_tf.setDisable(false);
-                payment_tf.requestFocus();
-                transact_btn.setDisable(false);
-                total_paid_tf.setDisable(false);
-                InputHelper.restrictNumbersOnly(payment_tf);
+                if (!isPaid) setConsumerInfo(consumerInfo);
+                if (this.bills.size() > 0) {
+                    setBillInfo(bills);
+                    setPayables();
+                    fees_table.setItems(bills);
+                    payment_tf.setDisable(false);
+                    payment_tf.requestFocus();
+                    transact_btn.setDisable(false);
+                    total_paid_tf.setDisable(false);
+                    InputHelper.restrictNumbersOnly(payment_tf);
+                }
                 progressBar.setVisible(false);
             });
 
@@ -675,24 +776,33 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.bapa_tf.setText(consumerInfo.getAccountType().equals("BAPA") ? "BAPA Registered" : "");
     }
     /**
-     * Sets Bill details to UI
-     * @param bill the bill reference
+     * Sets total bill details to UI
+     * @param current_bills the list of bills
      * @return void
      */
-    public void setBillInfo(Bill bill){
-        this.add_charges_tf.setText(Utility.formatDecimal(bill.getAddCharges()));
-        this.surcharge_tf.setText(Utility.formatDecimal(bill.getSurCharge()));
-        this.ppd_tf.setText(Utility.formatDecimal(bill.getDiscount()));
-        this.adj_tf.setText(Utility.formatDecimal(bill.getSlAdjustment()+bill.getOtherAdjustment()));
-        this.ch2306_2307_tf.setText(Utility.formatDecimal(bill.getCh2306()+bill.getCh2307()));
-        this.power_amt_tf.setText(Utility.formatDecimal(bill.getPowerAmount()));
-        this.katas_tf.setText(Utility.formatDecimal(bill.getKatas()));
-        this.md_refund_tf.setText(Utility.formatDecimal(bill.getMdRefund()));
-        this.bill_amount_lbl.setText(Utility.formatDecimal(bill.getTotalAmount()));
-        this.vat_tf.setText(Utility.formatDecimal(bill.getVat() + bill.getSurChargeTax()));
-        this.add_charges_tf.setText(Utility.formatDecimal(bill.getOtherCharges()+bill.getTransformerRental()));
-        this.power_amt_tf.setText(Utility.formatDecimal(bill.getPowerAmount()));
-        this.katas_tf.setText(Utility.formatDecimal(bill.getKatas()));
+    public void setBillInfo(List<Bill> current_bills){
+        double add_charge_sum = 0, surcharge_sum = 0, ppd_sum = 0, adj_sum = 0, ch06_07_sum=0, power_amt_sum = 0, md_refund_sum = 0,
+                vat_sum = 0, katas_sum = 0;
+        for(Bill b : current_bills){
+            add_charge_sum += b.getOtherCharges() + b.getTransformerRental();
+            surcharge_sum += b.getSurCharge();
+            ppd_sum += b.getDiscount();
+            adj_sum += b.getSlAdjustment() + b.getOtherAdjustment();
+            ch06_07_sum += b.getCh2306() + b.getCh2307();
+            power_amt_sum += b.getPowerAmount();
+            md_refund_sum += b.getMdRefund();
+            vat_sum += b.getVat() + b.getSurChargeTax();
+            katas_sum += b.getKatas();
+        }
+        this.surcharge_tf.setText(Utility.formatDecimal(surcharge_sum));
+        this.ppd_tf.setText(Utility.formatDecimal(ppd_sum));
+        this.adj_tf.setText(Utility.formatDecimal(adj_sum));
+        this.ch2306_2307_tf.setText(Utility.formatDecimal(ch06_07_sum));
+        this.power_amt_tf.setText(Utility.formatDecimal(power_amt_sum));
+        this.katas_tf.setText(Utility.formatDecimal(katas_sum));
+        this.md_refund_tf.setText(Utility.formatDecimal(md_refund_sum));
+        this.vat_tf.setText(Utility.formatDecimal(vat_sum));
+        this.add_charges_tf.setText(Utility.formatDecimal(add_charge_sum));
     }
     /**
      * Displays Add Check UI
@@ -728,18 +838,29 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     public void showWaiveForm(Bill bill, TableView table, Label total) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_waive_surcharge.fxml"));
         Parent parent = fxmlLoader.load();
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setBody(parent);
+        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
         WaiveChargesController waiveController = fxmlLoader.getController();
         waiveController.setBill(bill);
         waiveController.setData(table, total);
         waiveController.getSave_btn().setOnAction(actionEvent -> {
-            waiveController.save();
-            this.fees_table.refresh();
-            this.setBillInfo(bill);
-            this.setPayables();
+            double addon = 0;
+            try {
+                addon = Double.parseDouble(waiveController.getSurcharge_tf().getText());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            if (addon <= 0){
+                dialog.close();
+                AlertDialogBuilder.messgeDialog("System Error", "The surcharge cannot be 0!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            }else {
+                waiveController.save();
+                this.fees_table.refresh();
+                this.setBillInfo(bills);
+                this.setPayables();
+            }
         });
-        JFXDialogLayout dialogLayout = new JFXDialogLayout();
-        dialogLayout.setBody(parent);
-        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
         dialog.show();
     }
     /**
@@ -784,22 +905,43 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         PaymentConfirmationController controller = fxmlLoader.getController();
         controller.setPayments(bills, amount_due, cash, checks);
         controller.getConfirm_btn().setOnAction(action ->{
-            for (Bill b: bills){
+            //Get the default printer
+            Printer printer = Printer.getDefaultPrinter();
+            System.out.println(printer.getName());
+            //Check if the default printer is not LQ-310 and prompt error, otherwise proceed to batch transaction and printing of oebr
+            if (printer.getName().contains("PDF") || printer.getName().contains("Fax") || printer.getName().contains("XPS") || printer.getName().contains("OneNote")) {
+                dialog.close();
+                AlertDialogBuilder.messgeDialog("System Error", "The default printer is not set! Please set the printer before printing!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            }else {
+                List<Bill> updated = Utility.processor(bills, cash, checks, ActiveUser.getUser().getUserName());
+                this.progressBar.setVisible(true);
                 try {
-                    PaidBill paidBill = (PaidBill) b;
-                    paidBill.setTeller(ActiveUser.getUser().getUserName());
-                    paidBill.setChecks(checks);
-                    double check_amount = Utility.getTotalAmount(this.checks);
-                    paidBill.setCashAmount(amount_due - check_amount);
-                    paidBill.setCheckAmount(check_amount);
-                    BillDAO.addPaidBill(b);
+                    BillDAO.addPaidBill(updated);
+                    for (Bill b : updated) {
+                        CustomPrintHelper print = new CustomPrintHelper("OEBR", 18, 3, (PaidBill) b);
+
+                        print.setOnFailed(e -> {
+                            System.out.println("Error when printing the OEBR!");
+                        });
+
+                        print.setOnSucceeded(e -> {
+                            System.out.println("Successful");
+                        });
+
+                        print.setOnRunning(e -> {
+                        });
+                        Thread t = new Thread(print);
+
+                        t.start();
+                    }
                     this.reset();
                     dialog.close();
-                } catch (SQLException ex){
+                } catch (SQLException ex) {
                     AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + ex.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 } catch (Exception e) {
                     AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }
+                this.progressBar.setVisible(false);
             }
         });
         dialog.show();
@@ -828,7 +970,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                         }
                         bill.computeTotalAmount();
                         this.fees_table.refresh();
-                        this.setBillInfo(bill);
+                        this.setBillInfo(bills);
                         this.setPayables();
                     }
                 } catch (Exception e) {
@@ -848,19 +990,25 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         JFXTextField input = new JFXTextField();
         JFXDialog dialog = DialogBuilder.showInputDialog("TIN Entry for "+type,"Enter TIN:  ", "", input, accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
         accept.setOnAction(action -> {
-            try {
-                if (input.getText().length() == 0) {
-                    AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter TIN!",
-                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-                }else {
-                    if (type.equals("2306")){
-                        bill.setForm2306(input.getText());
-                    }else{
-                        bill.setForm2307(input.getText());
+            boolean repeat = true;
+            while (repeat) {
+                try {
+                    if (input.getText().length() == 0) {
+                        AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter TIN!",
+                                Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    } else {
+                        ConsumerDAO.updateTIN(bill.getConsumer(), input.getText());
+                        bill.getConsumer().setTINNo(input.getText());
+                        if (type.equals("2306")) {
+                            bill.setForm2306(input.getText());
+                        } else {
+                            bill.setForm2307(input.getText());
+                        }
+                        repeat = false;
                     }
+                } catch (Exception e) {
+                    AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }
-            } catch (Exception e) {
-                AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }
             dialog.close();
         });

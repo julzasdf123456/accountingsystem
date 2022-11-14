@@ -141,9 +141,53 @@ public class TransactionHeaderDAO {
         }
     }
 
+    public static TransactionHeader get(String accountID, LocalDate transactionDate) throws Exception {
+
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM TransactionHeader WHERE AccountID=? AND TransactionDate=?");
+        ps.setString(1, accountID);
+        ps.setDate(2, java.sql.Date.valueOf(transactionDate));
+
+        ResultSet rs = ps.executeQuery();
+
+        if(rs.next()){
+            TransactionHeader th = new TransactionHeader();
+            th.setPeriod(rs.getDate("Period").toLocalDate());
+            th.setTransactionNumber(rs.getString("TransactionNumber"));
+            th.setTransactionCode(rs.getString("TransactionCode"));
+            th.setAccountID(rs.getString("AccountID"));
+            th.setSource(rs.getString("Source"));
+            th.setParticulars(rs.getString("Particulars"));
+            th.setTransactionDate(rs.getDate("TransactionDate").toLocalDate());
+            th.setBank(rs.getString("Bank"));
+            th.setReferenceNo(rs.getString("ReferenceNo"));
+            th.setAmount(rs.getDouble("Amount"));
+            th.setEnteredBy(rs.getString("EnteredBy"));
+            th.setDateEntered( rs.getTimestamp("DateEntered") !=null ? rs.getTimestamp("DateEntered").toLocalDateTime() : null);
+            th.setDateLastModified(rs.getTimestamp("DateLastModified") !=null ? rs.getTimestamp("DateLastModified").toLocalDateTime() : null);
+            th.setUpdatedBy(rs.getString("UpdatedBy"));
+            th.setRemarks(rs.getString("Remarks"));
+
+            return th;
+        }
+
+        return null;
+
+    }
+
     public static int getNextARNumber() throws Exception {
         ResultSet rs = DB.getConnection().createStatement().executeQuery(
                 "SELECT TransactionNumber FROM TransactionHeader WHERE TransactionCode='AR' ORDER BY TransactionDate DESC, TransactionNumber DESC");
+        if(rs.next()) {
+            return rs.getInt("TransactionNumber")+1;
+        }else {
+            return 0;
+        }
+    }
+
+    public static int getNextORNumber() throws Exception {
+        ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                "SELECT TransactionNumber FROM TransactionHeader WHERE TransactionCode='OR' OR TransactionCode='ORSub' ORDER BY TransactionDate DESC, TransactionNumber DESC");
         if(rs.next()) {
             return rs.getInt("TransactionNumber")+1;
         }else {

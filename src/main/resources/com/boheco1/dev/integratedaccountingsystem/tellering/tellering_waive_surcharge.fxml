@@ -32,7 +32,7 @@
                         <Label text="Bill Number" />
                         <Label text="Billing Month" GridPane.columnIndex="1" />
                         <Label text="Surcharge" GridPane.columnIndex="2" />
-                        <TextField fx:id="billno_tf" GridPane.rowIndex="1" />
+                        <TextField fx:id="billno_tf" editable="false" GridPane.rowIndex="1" />
                         <TextField fx:id="billing_month_tf" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <TextField fx:id="surcharge_tf" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                      </children>

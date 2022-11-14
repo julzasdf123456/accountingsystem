@@ -46,6 +46,7 @@ public class LoginController implements Initializable {
                 properties.setProperty("db_pass", DB.db_pass);
                 properties.setProperty("station", Utility.STATION);
                 properties.setProperty("office", Utility.OFFICE_PREFIX);
+                properties.setProperty("db_billing", Utility.DB_BILLING);
                 properties.store(new FileOutputStream("application.properties"), LocalDate.now().toString());
             }
             InputStream is = new FileInputStream("application.properties");
@@ -60,6 +61,7 @@ public class LoginController implements Initializable {
             DB.db_user = properties.getProperty("db_user");
             DB.host = properties.getProperty("host");
             DB.db_pass = properties.getProperty("db_pass");
+            DB.db_billing = properties.getProperty("db_billing");
             Utility.STATION = properties.getProperty("station");
             Utility.OFFICE_PREFIX = properties.getProperty("office");
         } catch (Exception e) {
@@ -104,6 +106,7 @@ public class LoginController implements Initializable {
         properties.setProperty("host", DB.host);
         properties.setProperty("db_user", DB.db_user);
         properties.setProperty("db_pass", DB.db_pass);
+        properties.setProperty("db_billing", Utility.DB_BILLING);
         properties.setProperty("station", Utility.STATION);
         properties.setProperty("office", Utility.OFFICE_PREFIX);
         properties.store(new FileOutputStream("application.properties"), LocalDate.now().toString());

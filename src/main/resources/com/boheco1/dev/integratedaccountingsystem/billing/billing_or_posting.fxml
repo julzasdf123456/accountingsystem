@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="514.0" prefWidth="1024.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.billing.ORPostingController">
+   <children>
+      <BorderPane layoutX="13.0" layoutY="68.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="16.0">
+         <center>
+            <AnchorPane BorderPane.alignment="CENTER">
+               <children>
+                  <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <TableView fx:id="paid_bills_table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                           <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </TableView>
+                     </children>
+                     <padding>
+                        <Insets top="8.0" />
+                     </padding>
+                  </VBox>
+               </children>
+               <BorderPane.margin>
+                  <Insets top="8.0" />
+               </BorderPane.margin>
+            </AnchorPane>
+         </center>
+         <bottom>
+            <VBox BorderPane.alignment="CENTER">
+               <children>
+                  <Separator prefWidth="200.0" />
+                  <HBox prefWidth="769.0">
+                     <children>
+                        <Pane prefHeight="18.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Pane>
+                        <ProgressBar fx:id="progressbar" prefWidth="200.0" visible="false" />
+                     </children>
+                     <padding>
+                        <Insets bottom="8.0" top="8.0" />
+                     </padding>
+                  </HBox>
+               </children>
+            </VBox>
+         </bottom>
+         <top>
+            <HBox prefHeight="128.0" prefWidth="992.0" BorderPane.alignment="CENTER">
+               <children>
+                  <VBox prefHeight="200.0" prefWidth="436.0">
+                     <children>
+                        <HBox prefHeight="40.0" prefWidth="655.0">
+                           <children>
+                              <DatePicker fx:id="date_pker" minWidth="204.0" prefWidth="204.0">
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </DatePicker>
+                              <JFXTextField fx:id="teller_tf" focusColor="#00ad8e" labelFloat="true" minWidth="125.0" prefHeight="30.0" prefWidth="125.0" promptText="Collector" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXButton fx:id="view_btn" alignment="CENTER" contentDisplay="CENTER" styleClass="btn-info" text=" ">
+                                 <graphic>
+                                    <FontIcon iconColor="WHITE" iconLiteral="mdi2e-eye" />
+                                 </graphic>
+                              </JFXButton>
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="40.0">
+                           <children>
+                              <JFXTextField fx:id="dcr_or_tf" disable="true" focusColor="#00ad8e" labelFloat="true" minWidth="204.0" prefHeight="30.0" prefWidth="204.0" promptText="DCR/OR Number" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                              <HBox prefHeight="100.0" prefWidth="97.0" />
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="8.0" top="16.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox prefHeight="40.0">
+                           <children>
+                              <Label prefHeight="25.0" prefWidth="135.0" text="No. of Bills:">
+                                 <HBox.margin>
+                                    <Insets right="16.0" top="8.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <Label fx:id="no_bills_lbl" alignment="CENTER_RIGHT" prefHeight="25.0" prefWidth="54.0" styleClass="bold" text=" " textAlignment="RIGHT">
+                                 <HBox.margin>
+                                    <Insets top="8.0" />
+                                 </HBox.margin>
+                              </Label>
+                           </children>
+                           <VBox.margin>
+                              <Insets top="8.0" />
+                           </VBox.margin>
+                        </HBox>
+                     </children>
+                  </VBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </HBox>
+                  <VBox prefHeight="200.0" prefWidth="334.0">
+                     <children>
+                        <HBox prefHeight="40.0" prefWidth="200.0">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                           <children>
+                              <Label prefHeight="25.0" prefWidth="125.0" text="Gross Amount">
+                                 <HBox.margin>
+                                    <Insets right="8.0" top="8.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <TextField fx:id="gross_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" prefWidth="200.0">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </TextField>
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="40.0" prefWidth="200.0">
+                           <VBox.margin>
+                              <Insets bottom="8.0" top="8.0" />
+                           </VBox.margin>
+                           <children>
+                              <Label prefWidth="125.0" text="MD Refund">
+                                 <HBox.margin>
+                                    <Insets right="8.0" top="8.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <TextField fx:id="md_ref_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" prefWidth="200.0">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </TextField>
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="40.0" prefWidth="200.0">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                           <children>
+                              <Label prefWidth="125.0" styleClass="bold" text="NET AMOUNT">
+                                 <HBox.margin>
+                                    <Insets right="8.0" top="8.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <TextField fx:id="net_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" prefWidth="200.0">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </TextField>
+                           </children>
+                        </HBox>
+                     </children>
+                     <HBox.margin>
+                        <Insets right="16.0" />
+                     </HBox.margin>
+                  </VBox>
+                  <JFXButton fx:id="transact_btn" buttonType="RAISED" disable="true" maxWidth="1.7976931348623157E308" minWidth="110.0" prefHeight="37.0" prefWidth="110.0" style="-fx-background-color: #009688;" styleClass="btn-theme" text="Post OR" textFill="WHITE">
+                     <graphic>
+                        <FontIcon iconColor="WHITE" iconLiteral="mdi2c-content-save" iconSize="18" />
+                     </graphic>
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                     <font>
+                        <Font name="System Bold" size="16.0" />
+                     </font>
+                  </JFXButton>
+               </children>
+            </HBox>
+         </top>
+      </BorderPane>
+   </children>
+</AnchorPane>
