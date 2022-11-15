@@ -11,10 +11,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.text.TextAlignment;
 
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Locale;
 
 public class CustomPrintHelper extends Task {
@@ -105,7 +106,15 @@ public class CustomPrintHelper extends Task {
         String amount = Utility.formatDecimal(bill.getTotalAmount() - bill.getSurCharge() - surVat);
         String teller = bill.getTeller();
         DateFormat dateFormat2 = new SimpleDateFormat("MM/dd/yy hh:mm aa");
-        String receivedDate = dateFormat2.format(new Date()).toString();
+        LocalDate serverDate = LocalDate.now();
+        try {
+            serverDate = Utility.serverDate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        String receivedDate = dateFormat2.format(java.sql.Date.valueOf(serverDate)).toString();
 
         System.out.println("Meter: "+meter_no);
         System.out.println(type);

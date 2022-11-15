@@ -412,11 +412,12 @@ public class BillDAO {
      */
     public static List<Bill> getAllPaidBills(int year, int month, int day, String teller) throws Exception {
 
-        String sql = "SELECT pbx.BillNumber, pbx.AccountNumber, pbx.ConsumerName, pbx.TotalAmount, pbx.ConsumerType, pbx.Period, pbx.GenerationVAT, pbx.TransmissionVAT, " +
+        String sql = "SELECT pbx.BillNumber, pbx.AccountNumber, pbx.ConsumerName, pbx.TotalAmount, pbx.ConsumerType, pbx.Period, pbx.GenerationVAT, pbx.TransmissionVAT, b.DueDate, pbx.Teller, " +
+                "(SELECT ConsumerAddress FROM AccountMaster am WHERE am.AccountNumber = pbx.AccountNumber) AS ConsumerAddress, " +
                 "pbx.OthersVAT, pbx.DistributionVAT, pbx.SLVAT, pbx.Item3, pbx.Item2, pbx.SLAdjustment, pbx.PromptPayment, pbx.Surcharge, pbx.NetAmount, pbx.Teller, pbx.ORNumber, pbx.DCRNumber, pbx.ServicePeriodEnd, " +
                 "pbx.PostingDate, pbx.PostingSequence, pbx.CurrentBills, pbx.Within30Days, pbx.Over30Days, pbx.PR, pbx.Others, pbx.Powerkwh, pbx.KatasAMount, pbx.OtherDeduction, " +
                 "pbx.MDRefund, pbx.NetAmountLessMDRefund, pbx.SeniorCitizenDiscount, pbx.GroupTag, pbx.Amount2306, pbx.Amount2307, b.FBHCAmt AS FranchiseTax, x.Item16 AS BusinessTax, " +
-                "x.Item17 AS RealPropertyTax, b.DAA_VAT, b.ACRM_VAT, b.Item1 as GenVatFeb21, FORMAT(pbx.PostingDate,'hh:mm') as PostingTime, CashAmount, CheckAmount " +
+                "x.Item17 AS RealPropertyTax, b.DAA_VAT, b.ACRM_VAT, b.Item1 as GenVatFeb21, FORMAT(pbx.PostingDate,'hh:mm') as PostingTime, CashAmount, CheckAmount, ISNULL(withPenalty, 1) AS withPenalty " +
                 "FROM PaidBillsWithRoute pbx INNER JOIN Bills b ON pbx.AccountNumber=b.AccountNumber AND pbx.ServicePeriodEnd=b.ServicePeriodEnd " +
                 "INNER JOIN PaidBills p ON p.AccountNumber=b.AccountNumber AND p.ServicePeriodEnd=b.ServicePeriodEnd " +
                 "INNER JOIN BillsExtension x ON  pbx.AccountNumber=x.AccountNumber AND pbx.ServicePeriodEnd=x.ServicePeriodEnd " +
@@ -441,12 +442,20 @@ public class BillDAO {
             ConsumerInfo consumerInfo = new ConsumerInfo(
                     accountNo,
                     rs.getString("ConsumerName"),
-                   "",
+                    rs.getString("ConsumerAddress"),
                    "",
                     "",
                     ""
             );
             PaidBill bill = new PaidBill();
+            Date date = rs.getDate("ServicePeriodEnd");
+            LocalDate billMonth = date.toLocalDate();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM YYYY");
+            bill.setWithPenalty(rs.getBoolean("withPenalty"));
+            bill.setBillMonth(formatter.format(billMonth));
+            bill.setVat(rs.getDouble("Item2"));
+            bill.setDueDate(rs.getDate("DueDate").toLocalDate());
+            bill.setTeller(rs.getString("Teller"));
             bill.setConsumerType(rs.getString("ConsumerType"));
             bill.setConsumer(consumerInfo);
             bill.setBillNo(rs.getString("BillNumber"));
@@ -484,6 +493,7 @@ public class BillDAO {
             b.setArTran(b.getTransmissionVat());
             b.setMdRefund(rs.getDouble("MDRefund"));
             b.setSurCharge(rs.getDouble("Surcharge"));
+            if (b.getSurCharge() > 0) b.setSurChargeTax((b.getSurCharge()*0.12));
             b.setSlAdjustment(rs.getDouble("SLAdjustment"));
             b.setServicePeriodEnd(rs.getDate("ServicePeriodEnd").toLocalDate());
             bills.add(bill);
