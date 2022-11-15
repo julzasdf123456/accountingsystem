@@ -226,6 +226,8 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     if (this.fees_table.getItems().size() == 0) {
                         this.reset();
                         this.resetBillInfo();
+                    }else{
+                        this.setBillInfo(this.bills);
                     }
                 });
 
@@ -907,7 +909,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         controller.getConfirm_btn().setOnAction(action ->{
             //Get the default printer
             Printer printer = Printer.getDefaultPrinter();
-            System.out.println(printer.getName());
+
             //Check if the default printer is not LQ-310 and prompt error, otherwise proceed to batch transaction and printing of oebr
             if (printer.getName().contains("PDF") || printer.getName().contains("Fax") || printer.getName().contains("XPS") || printer.getName().contains("OneNote")) {
                 dialog.close();
@@ -920,6 +922,8 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     for (Bill b : updated) {
                         CustomPrintHelper print = new CustomPrintHelper("OEBR", 18, 3, (PaidBill) b);
 
+                        print.prepareDocument();
+
                         print.setOnFailed(e -> {
                             System.out.println("Error when printing the OEBR!");
                         });
@@ -930,6 +934,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
                         print.setOnRunning(e -> {
                         });
+
                         Thread t = new Thread(print);
 
                         t.start();

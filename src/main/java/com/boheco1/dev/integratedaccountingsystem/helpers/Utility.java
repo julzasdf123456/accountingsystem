@@ -213,9 +213,9 @@ public class Utility {
             System.out.println("Cash Amount: "+cash);
             try {
                 PaidBill pd = (PaidBill) b;
+                pd.setTeller(teller);
                 //If current user is a Teller
                 if (ActiveUser.getUser().getEmployeeInfo().getDesignation().equals("Teller")) {
-                    pd.setTeller(teller);
                     pd.setPaymentType("SUB-OFFICE/STATION");
                 //Otherwise
                 }else{
