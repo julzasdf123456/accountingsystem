@@ -58,6 +58,30 @@ public class EmployeeDAO {
         }
     }
 
+    public static EmployeeInfo getByDesignation(String id) throws Exception {
+        PreparedStatement cs = DB.getConnection().prepareStatement(
+                "SELECT * FROM EmployeeInfo WHERE Designation=?");
+        cs.setString(1, id);
+        ResultSet rs = cs.executeQuery();
+
+        if(rs.next()) {
+            return new EmployeeInfo(
+                    rs.getString("EmployeeID"),
+                    rs.getString("EmployeeFirstName"),
+                    rs.getString("EmployeeMidName"),
+                    rs.getString("EmployeeLastName"),
+                    rs.getString("EmployeeSuffix"),
+                    rs.getString("Address"),
+                    rs.getString("Phone"),
+                    rs.getString("Designation"),
+                    rs.getString("SignatoryLevel"),
+                    rs.getString("DepartmentID")
+            );
+        }else {
+            return null;
+        }
+    }
+
     public static List<EmployeeInfo> getAll(Connection conn) throws Exception
     {
         PreparedStatement ps = conn.prepareStatement(

@@ -3,6 +3,7 @@
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -12,35 +13,48 @@
 
 <AnchorPane fx:id="anchorPane" prefHeight="694.0" prefWidth="1027.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.ViewAllMCTController">
    <children>
-      <VBox layoutY="-5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox alignment="TOP_CENTER" layoutY="-5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <HBox>
                <children>
-                  <HBox alignment="CENTER_LEFT" prefHeight="48.0" prefWidth="416.0" HBox.hgrow="ALWAYS">
+                  <HBox alignment="BOTTOM_LEFT" prefHeight="48.0" prefWidth="416.0" HBox.hgrow="ALWAYS">
                      <children>
-                        <JFXTextField fx:id="search_box" focusColor="#00ad8e" labelFloat="true" onAction="#searchMCT" prefWidth="236.0" promptText="Search">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </JFXTextField>
-                        <JFXButton fx:id="prinitMCTBtn" buttonType="RAISED" contentDisplay="CENTER" onAction="#printMCT" styleClass="btn-theme" text=" ">
+                        <VBox>
+                           <children>
+                              <Label text="Search" />
+                              <JFXTextField fx:id="search_box" focusColor="#00ad8e" labelFloat="true" onAction="#searchMCT" prefWidth="236.0">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </JFXTextField>
+                           </children>
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </VBox>
+                        <VBox>
+                           <children>
+                              <Label text="Issued By" />
+                              <JFXTextField fx:id="issuedBy" prefHeight="37.0" prefWidth="250.0" />
+                           </children>
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </VBox>
+                        <VBox>
+                           <children>
+                              <Label text="Received by" />
+                              <JFXTextField fx:id="receivedBy" labelFloat="true" prefHeight="37.0" prefWidth="250.0" />
+                           </children>
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </VBox>
+                        <JFXButton fx:id="prinitMCTBtn" buttonType="RAISED" onAction="#printMCT" prefWidth="148.0" styleClass="btn-theme" text="Print MCT" textFill="WHITE">
                            <graphic>
                               <FontIcon iconColor="WHITE" iconLiteral="mdi2p-printer" iconSize="20" />
                            </graphic>
-                           <HBox.margin>
-                              <Insets left="24.0" right="50.0" />
-                           </HBox.margin>
                         </JFXButton>
-                        <JFXTextField fx:id="issuedBy" labelFloat="true" prefHeight="37.0" prefWidth="250.0" promptText="Issued By">
-                           <HBox.margin>
-                              <Insets left="16.0" right="16.0" />
-                           </HBox.margin>
-                        </JFXTextField>
-                        <JFXTextField fx:id="receivedBy" labelFloat="true" layoutX="312.0" layoutY="16.0" prefHeight="37.0" prefWidth="250.0" promptText="Received by">
-                           <HBox.margin>
-                              <Insets left="16.0" right="16.0" />
-                           </HBox.margin>
-                        </JFXTextField>
                      </children>
                   </HBox>
                </children>

@@ -9,12 +9,13 @@ import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
 
 public class ModalBuilderForWareHouse {
+    private static JFXDialog dialog;
     public static void showModalFromXML(Class parentClass, String xml, StackPane stackPane) {
         try {
             Parent parent = FXMLLoader.load(parentClass.getResource(xml));
             JFXDialogLayout dialogLayout = new JFXDialogLayout();
             dialogLayout.setBody(parent);
-            JFXDialog dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+            dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.BOTTOM);
             dialog.setOnDialogClosed(e ->
                     Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(CriticalStockController.class, "../warehouse_dashboard_controller.fxml")));
             dialog.show();
@@ -28,7 +29,7 @@ public class ModalBuilderForWareHouse {
             Parent parent = FXMLLoader.load(parentClass.getResource(xml));
             JFXDialogLayout dialogLayout = new JFXDialogLayout();
             dialogLayout.setBody(parent);
-            JFXDialog dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+            dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.BOTTOM);
             dialog.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -40,7 +41,7 @@ public class ModalBuilderForWareHouse {
             Parent parent = FXMLLoader.load(parentClass.getResource(xml));
             JFXDialogLayout dialogLayout = new JFXDialogLayout();
             dialogLayout.setBody(parent);
-            JFXDialog dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+            dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.BOTTOM);
             dialog.setOnDialogClosed(e ->
                     Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(CriticalStockController.class, fxml)));
             dialog.show();
@@ -54,7 +55,7 @@ public class ModalBuilderForWareHouse {
             Parent parent = FXMLLoader.load(parentClass.getResource(xml));
             JFXDialogLayout dialogLayout = new JFXDialogLayout();
             dialogLayout.setBody(parent);
-            JFXDialog dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+            dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.BOTTOM);
             JFXButton cancel = new JFXButton("Cancel");
             cancel.setOnAction(actionEvent -> dialog.close());
             dialogLayout.setActions(action, cancel);
@@ -71,7 +72,7 @@ public class ModalBuilderForWareHouse {
             Parent parent = FXMLLoader.load(parentClass.getResource(xml));
             JFXDialogLayout dialogLayout = new JFXDialogLayout();
             dialogLayout.setBody(parent);
-            JFXDialog dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+            dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.BOTTOM);
             JFXButton cancel = new JFXButton("Cancel");
             cancel.setOnAction(actionEvent -> dialog.close());
             dialogLayout.setActions(action, cancel);
@@ -82,4 +83,8 @@ public class ModalBuilderForWareHouse {
             e.printStackTrace();
         }
     }
+    public static void MODAL_CLOSE(){
+        dialog.close();
+    }
+
 }

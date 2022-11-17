@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXComboBox?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import com.jfoenix.controls.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<AnchorPane fx:id="anchorPane" prefHeight="694.0" prefWidth="1027.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.UserMyMIRSController">
+<AnchorPane fx:id="anchorPane" prefHeight="694.0" prefWidth="1027.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.UserMyMIRSController">
    <children>
       <VBox layoutY="-5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -15,7 +13,7 @@
                <children>
                   <HBox alignment="CENTER_LEFT" prefHeight="48.0" prefWidth="416.0" HBox.hgrow="ALWAYS">
                      <children>
-                        <JFXComboBox fx:id="myMIRSStatus" labelFloat="true" onAction="#viewMyMIRSByStatus" prefHeight="37.0" prefWidth="167.0" promptText="Satus" />
+                        <JFXComboBox fx:id="myMIRSStatus" labelFloat="true" onAction="#viewMyMIRSByStatus" prefHeight="37.0" prefWidth="167.0" promptText="Status" />
                      </children>
                   </HBox>
                </children>

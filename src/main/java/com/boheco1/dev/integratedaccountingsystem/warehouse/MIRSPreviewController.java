@@ -111,21 +111,33 @@ public class MIRSPreviewController implements Initializable {
         quantityCol.setPrefWidth(50);
         quantityCol.setMaxWidth(50);
         quantityCol.setMinWidth(50);
-        quantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
+        quantityCol.setCellValueFactory(obj-> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getQuantity())));
 
         TableColumn<ReleasedItemDetails, String> remainingCol = new TableColumn<>("Rem");
         remainingCol.setStyle("-fx-alignment: center;");
         remainingCol.setPrefWidth(50);
         remainingCol.setMaxWidth(50);
         remainingCol.setMinWidth(50);
-        remainingCol.setCellValueFactory(new PropertyValueFactory<>("Remaining"));
+        remainingCol.setCellValueFactory(obj-> {
+            try {
+                return new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getRemaining()));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         TableColumn<ReleasedItemDetails, String> actualCol = new TableColumn<>("Act");
         actualCol.setStyle("-fx-alignment: center;");
         actualCol.setPrefWidth(50);
         actualCol.setMaxWidth(50);
         actualCol.setMinWidth(50);
-        actualCol.setCellValueFactory(new PropertyValueFactory<>("ActualReleased"));
+        actualCol.setCellValueFactory(obj-> {
+            try {
+                return new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getActualReleased()));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         TableColumn<ReleasedItemDetails, String> statusCol = new TableColumn<>("Status");
         statusCol.setStyle("-fx-alignment: center;");
@@ -206,12 +218,12 @@ public class MIRSPreviewController implements Initializable {
             return null;
         });
 
-        TableColumn<Releasing, Integer> quantityCol = new TableColumn<>("Qty");
+        TableColumn<Releasing, String> quantityCol = new TableColumn<>("Qty");
         quantityCol.setStyle("-fx-alignment: center;");
         quantityCol.setPrefWidth(50);
         quantityCol.setMaxWidth(50);
         quantityCol.setMinWidth(50);
-        quantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
+        quantityCol.setCellValueFactory(obj-> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getQuantity())));
 
         TableColumn<Releasing, String> dateCol = new TableColumn<>("Date");
         dateCol.setStyle("-fx-alignment: center;");
@@ -294,9 +306,10 @@ public class MIRSPreviewController implements Initializable {
 
                     //table content
                     for(MIRSItem mirsItem : MirsDAO.getItems(mirs)){
-                        pdf.createCell(mirsItem.getStockID(), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
-                        pdf.createCell(StockDAO.get(mirsItem.getStockID()).getDescription().toUpperCase(), 4, 11, Font.NORMAL, Element.ALIGN_LEFT);
-                        pdf.createCell(""+mirsItem.getQuantity(), 1, 10, Font.NORMAL, Element.ALIGN_CENTER);
+                        Stock stock = StockDAO.get(mirsItem.getStockID());
+                        pdf.createCell(stock.getNeaCode(), 1, 11, Font.NORMAL, Element.ALIGN_CENTER);
+                        pdf.createCell(stock.getDescription().toUpperCase(), 4, 11, Font.NORMAL, Element.ALIGN_LEFT);
+                        pdf.createCell(Utility.formatDecimal(mirsItem.getQuantity()), 1, 10, Font.NORMAL, Element.ALIGN_CENTER);
                     }
                     pdf.createCell(1,columns.length);
 
