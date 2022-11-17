@@ -30,10 +30,10 @@ import java.util.ResourceBundle;
 public class ViewStockController implements Initializable {
 
     @FXML
-    private JFXTextField stockName, serialNumber, brand, model, quantity, unit, price, neaCode, threshold, localCode, accountCode;
+    private JFXTextField stockName, serialNumber, brand, model, quantity, unit, price, neaCode, threshold, localCode, accountCode, comments;
 
     @FXML
-    private JFXTextArea description, comments, local_desc;
+    private JFXTextArea description, local_desc;
 
     @FXML
     private DatePicker manuDate, valDate;
