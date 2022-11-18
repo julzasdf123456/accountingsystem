@@ -187,6 +187,7 @@ public class MIRSApprovalController implements Initializable {
                     e.printStackTrace();
                 }
                 dialog.close();
+                ModalBuilderForWareHouse.MODAL_CLOSE();
             }
         });
     }

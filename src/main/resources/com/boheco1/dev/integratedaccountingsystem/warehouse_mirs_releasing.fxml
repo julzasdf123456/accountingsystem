@@ -117,14 +117,23 @@
                            <children>
                               <VBox HBox.hgrow="ALWAYS">
                                  <children>
-                                    <Label text="Requested MIRS Item(s)" />
+                                    <HBox alignment="CENTER_LEFT">
+                                       <children>
+                                          <Label text="Requested MIRS Item(s)" />
+                                          <JFXButton fx:id="checkAllBtn" onAction="#checkAll" prefHeight="37.0" prefWidth="114.0" styleClass="btn-sucess" text="Check All">
+                                             <HBox.margin>
+                                                <Insets left="16.0" />
+                                             </HBox.margin>
+                                          </JFXButton>
+                                       </children>
+                                    </HBox>
                                     <TableView fx:id="requestedItemTable" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                        <columnResizePolicy>
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                        </columnResizePolicy></TableView>
                                  </children>
                               </VBox>
-                              <VBox alignment="CENTER" maxWidth="-Infinity" prefWidth="120.0" HBox.hgrow="ALWAYS">
+                              <VBox alignment="CENTER" maxWidth="-Infinity" prefHeight="524.0" prefWidth="112.0" HBox.hgrow="ALWAYS">
                                  <children>
                                     <JFXButton fx:id="addSelectedBtn" buttonType="RAISED" contentDisplay="RIGHT" maxWidth="1.7976931348623157E308" onAction="#add" styleClass="btn-info" text="  Add " VBox.vgrow="ALWAYS">
                                        <VBox.margin>

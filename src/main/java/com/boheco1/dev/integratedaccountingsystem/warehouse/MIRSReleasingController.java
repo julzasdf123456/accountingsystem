@@ -25,6 +25,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
@@ -32,6 +33,7 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import javax.swing.*;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
@@ -48,7 +50,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
     private JFXTextField stockItem, quantity;
 
     @FXML
-    private JFXButton addAllQtyBtn, addPartialQtyBtn, removeItemBtn, detailstemBtn;
+    private JFXButton addAllQtyBtn, addPartialQtyBtn, removeItemBtn, detailstemBtn, checkAllBtn;
 
     //@FXML
     //private JFXListView<MIRSItem> requestedList, releasingList;
@@ -117,14 +119,50 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
 
         TableColumn<MIRSItem, String> reqDescriptionCol = new TableColumn<>("Description");
         reqDescriptionCol.setStyle("-fx-alignment: center-left;");
-        reqDescriptionCol.setCellValueFactory(cellData -> {
+        Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> reqDescriptioncellFactory
+                = //
+                new Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>>() {
+                    @Override
+                    public TableCell call(final TableColumn<MIRSItem, String> param) {
+                        final TableCell<MIRSItem, String> cell = new TableCell<MIRSItem, String>() {
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    try {
+                                        MIRSItem mirsItem = getTableView().getItems().get(getIndex());
+                                        Text text = new Text(mirsItem.getParticulars());
+                                        text.setStyle("" +
+                                                "-fx-fill: #212121; " +
+                                                "-fx-text-alignment: center-left;" +
+                                                "-fx-text-wrap: true;");
+                                        //setStyle("-fx-background-color: #f7e1df; -fx-text-alignment: center-left;");
+                                        text.wrappingWidthProperty().bind(getTableColumn().widthProperty().subtract(35));
+                                        setPrefHeight(text.getLayoutBounds().getHeight()+10);
+                                        setMinHeight(text.getLayoutBounds().getHeight()+10);
+                                        setGraphic(text);
+                                        setText(null);
+                                    } catch (Exception e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+        reqDescriptionCol.setCellFactory(reqDescriptioncellFactory);
+        /*reqDescriptionCol.setCellValueFactory(cellData -> {
             try {
                 return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getDescription());
             } catch (Exception e) {
                 e.printStackTrace();
             }
             return null;
-        });
+        });*/
 
         TableColumn<MIRSItem, String> reqQuantityCol = new TableColumn<>("Qty");
         reqQuantityCol.setStyle("-fx-alignment: center;");
@@ -170,14 +208,50 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
     private void initializeReleasingTable() throws Exception {
         TableColumn<MIRSItem, String> relDescriptionCol = new TableColumn<>("Description");
         relDescriptionCol.setStyle("-fx-alignment: center-left;");
-        relDescriptionCol.setCellValueFactory(cellData -> {
+        Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> relDescriptioncellFactory
+                = //
+                new Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>>() {
+                    @Override
+                    public TableCell call(final TableColumn<MIRSItem, String> param) {
+                        final TableCell<MIRSItem, String> cell = new TableCell<MIRSItem, String>() {
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    try {
+                                        MIRSItem mirsItem = getTableView().getItems().get(getIndex());
+                                        Text text = new Text(mirsItem.getParticulars());
+                                        text.setStyle("" +
+                                                "-fx-fill: #212121; " +
+                                                "-fx-text-alignment: center-left;" +
+                                                "-fx-text-wrap: true;");
+                                        //setStyle("-fx-background-color: #f7e1df; -fx-text-alignment: center-left;");
+                                        text.wrappingWidthProperty().bind(getTableColumn().widthProperty().subtract(35));
+                                        setPrefHeight(text.getLayoutBounds().getHeight()+10);
+                                        setMinHeight(text.getLayoutBounds().getHeight()+10);
+                                        setGraphic(text);
+                                        setText(null);
+                                    } catch (Exception e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+        relDescriptionCol.setCellFactory(relDescriptioncellFactory);
+        /*relDescriptionCol.setCellValueFactory(cellData -> {
             try {
                 return new SimpleStringProperty(Objects.requireNonNull(StockDAO.get(cellData.getValue().getStockID())).getDescription());
             } catch (Exception e) {
                 e.printStackTrace();
             }
             return null;
-        });
+        });*/
 
         TableColumn<MIRSItem, String> relQuantityCol = new TableColumn<>("Qty");
         relQuantityCol.setStyle("-fx-alignment: center;");
@@ -362,8 +436,25 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
         releasingItemTable.setItems(releasingItem);
     }
 
+
     @FXML
-    void mirsDetails(MouseEvent event) throws Exception {
+    private void checkAll(ActionEvent event) {
+        if(checkAllBtn.getText().equals("Check All")){
+            checkAllBtn.setText("Uncheck All");
+        }else if(checkAllBtn.getText().equals("Uncheck All")){
+            checkAllBtn.setText("Check All");
+        }
+        for(MIRSItem m : requestedMirsItem){
+            if(m.getParticulars().toLowerCase().contains("current") ||
+                    m.getParticulars().toLowerCase().contains("fuse"))
+                continue;
+            m.setSelected(!m.isSelected());
+        }
+        requestedItemTable.refresh();
+    }
+
+    @FXML
+    private void mirsDetails(MouseEvent event) throws Exception {
 
         String details = "";
 

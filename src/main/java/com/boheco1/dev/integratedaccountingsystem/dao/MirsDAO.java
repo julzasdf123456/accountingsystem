@@ -314,7 +314,7 @@ public class MirsDAO {
         ArrayList<MIRSItem> items = new ArrayList();
 
         while(rs.next()) {
-            items.add(new MIRSItem(
+            MIRSItem mirsItem = new MIRSItem(
                     rs.getString("id"),
                     rs.getString("MIRSID"),
                     rs.getString("StockID"),
@@ -324,7 +324,11 @@ public class MirsDAO {
                     rs.getTimestamp("CreatedAt").toLocalDateTime(),
                     rs.getTimestamp("UpdatedAt").toLocalDateTime(),
                     rs.getBoolean("IsAdditional")
-            ));
+            );
+            mirsItem.setParticulars(rs.getString("Description"));
+            System.out.println(mirsItem.getParticulars());
+            items.add(mirsItem);
+
         }
 
         rs.close();

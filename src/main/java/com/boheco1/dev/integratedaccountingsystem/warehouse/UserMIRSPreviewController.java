@@ -171,7 +171,7 @@ public class UserMIRSPreviewController implements Initializable {
                         rejectBtn.setDisable(true);
 
                         Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "user_task_approval_mirs.fxml"));
-
+                        ModalBuilderForWareHouse.MODAL_CLOSE();
                 }catch (Exception e) {
                     e.printStackTrace();
                     AlertDialogBuilder.messgeDialog("Error on UserTaskApprovalController", e.getMessage(),

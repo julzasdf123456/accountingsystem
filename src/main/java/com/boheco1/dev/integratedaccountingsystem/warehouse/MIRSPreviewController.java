@@ -241,7 +241,7 @@ public class MIRSPreviewController implements Initializable {
 
         releasedTable.getColumns().add(dateCol);
         releasedTable.getColumns().add(quantityCol);
-        releasedTable.getColumns().add(stockIdCol);
+        //releasedTable.getColumns().add(stockIdCol);
         releasedTable.getColumns().add(descriptionCol);
         releasedTable.setPlaceholder(new Label("No item Added"));
         releasedTable.getItems().setAll(observableList);
@@ -335,6 +335,7 @@ public class MIRSPreviewController implements Initializable {
                     pdf.createCell(EmployeeDAO.getOne(signatories.get(1).getUserID(), DB.getConnection()).getDesignation(), 2, 9, Font.NORMAL, Element.ALIGN_CENTER,Rectangle.NO_BORDER);
 
                     pdf.generate();
+                    ModalBuilderForWareHouse.MODAL_CLOSE();
                 }
 
 
