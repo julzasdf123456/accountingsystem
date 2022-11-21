@@ -4,111 +4,83 @@ import com.boheco1.dev.integratedaccountingsystem.HomeController;
 import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Rectangle;
 import com.jfoenix.controls.*;
-import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Paint;
-import javafx.scene.text.FontWeight;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 
-import java.io.File;
 import java.net.URL;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class GenerateMCTController extends MenuControllerHandler implements Initializable {
 
     @FXML
-    private JFXTextField description,newAddress, searchMirs, mctNumber;
+    private JFXTextField searchMirs, mctNumber;
 
     @FXML
-    private JFXTextArea particulars;
+    private JFXTextArea purpose, applicant, newAddress, remarks;
 
     @FXML
-    private Label requisitioner, mirsNumber, date, applicant, signatories;
-
-    @FXML
-    private JFXListView<UnchargedItemDetails> unchargedItemDetailsListView, forMctItemListView;
+    private TableView forMCTable;
 
     @FXML
     private JFXButton addAllQtyBtn, addPartialQtyBtn, removeItemBtn;
 
     private HashMap<String, List<UnchargedItemDetails>> collectionOfUnchargeReleasedItem;
 
+    private ObservableList<UnchargedItemDetails> unchargedItemDetailsObservableList;
+    private List<UnchargedItemDetails> unchargedItemDetailsList;
+
     private MIRS searchResult;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        unchargedItemDetailsListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        forMctItemListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         bindMirsAutocomplete(searchMirs);
-        loadAllChargedItems(false);
+        loadAllUnchargedItems();
+        initializeTable();
     }
 
-    @FXML
-    private void addItemToListView(ActionEvent event) throws Exception {
-        ObservableList<UnchargedItemDetails> selectedItems = FXCollections.observableArrayList(unchargedItemDetailsListView.getSelectionModel().getSelectedItems());
-        if(selectedItems.size() == 0){
-            AlertDialogBuilder.messgeDialog("System Message", "No item(s) selected, please try again.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-        }else{
-            for (UnchargedItemDetails selected : selectedItems) {
-                unchargedItemDetailsListView.getItems().remove(selected);
-                forMctItemListView.getItems().add(selected);
-            }
-        }
-        unchargedItemDetailsListView.getSelectionModel().clearSelection();
-        forMctItemListView.getSelectionModel().clearSelection();
+    private void initializeTable() {
+
+        TableColumn<UnchargedItemDetails, String> desCol = new TableColumn<>("Description");
+        desCol.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getDescription()));
+
+        TableColumn<UnchargedItemDetails, String> qtyCol = new TableColumn<>("QTY");
+        qtyCol.setStyle("-fx-alignment: center;");
+        qtyCol.setPrefWidth(50);
+        qtyCol.setMaxWidth(50);
+        qtyCol.setMinWidth(50);
+        qtyCol.setCellValueFactory(obj-> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getQuantity())));
+
+        forMCTable.getColumns().add(desCol);
+        forMCTable.getColumns().add(qtyCol);
+
+
+        forMCTable.setPlaceholder(new Label("No item Added"));
+
     }
 
-    @FXML
-    private void removeItemFromListView(ActionEvent event) {
-        ObservableList<UnchargedItemDetails> selectedItems = FXCollections.observableArrayList(forMctItemListView.getSelectionModel().getSelectedItems());
-        if(selectedItems.size() == 0){
-            AlertDialogBuilder.messgeDialog("System Message", "No item(s) selected, please try again.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-        }else{
-            for (UnchargedItemDetails selected : selectedItems) {
-                unchargedItemDetailsListView.getItems().add(selected);
-                forMctItemListView.getItems().remove(selected);
-            }
-        }
-        unchargedItemDetailsListView.getSelectionModel().clearSelection();
-        forMctItemListView.getSelectionModel().clearSelection();
-    }
 
     @FXML
     private void saveMCT(ActionEvent event) {
-            try {
-            if(forMctItemListView.getItems().size() == 0) {
-                AlertDialogBuilder.messgeDialog("System Message", "No available item(s) listed for releasing.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-                return;
-            }
-
+        try {
             if (mctNumber.getText().isEmpty()){
                 AlertDialogBuilder.messgeDialog("System Message", "MCT number is required.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-                return;
-            }else if (description.getText().isEmpty()){
-                AlertDialogBuilder.messgeDialog("System Message", "MCT description is required.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
                 return;
             }else if (newAddress.getText().isEmpty()){
                 AlertDialogBuilder.messgeDialog("System Message", "MCT address is required.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
                 return;
-            }else if (particulars.getText().isEmpty()){
+            }else if (purpose.getText().isEmpty()){
                 AlertDialogBuilder.messgeDialog("System Message", "MCT particulars is required.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
                 return;
             }
@@ -122,14 +94,14 @@ public class GenerateMCTController extends MenuControllerHandler implements Init
 
                         MCT mct = new MCT();
                         mct.setMctNo(mctNumber.getText());
-                        mct.setParticulars(particulars.getText());
+                        mct.setParticulars(purpose.getText());
                         mct.setAddress(newAddress.getText());
                         //not really MIRS number but the MCT description, by default Mirst number serve as description
-                        mct.setMirsNo(description.getText());
+                        mct.setMirsNo(searchResult.getId());
                         mct.setWorkOrderNo(searchResult.getWorkOrderNo());
 
                         List<Releasing> list = new ArrayList<>();
-                        for (UnchargedItemDetails item : forMctItemListView.getItems()) {
+                        for (UnchargedItemDetails item : unchargedItemDetailsList) {
                             Releasing r = new Releasing();
                             r.setId(item.getId());
                             r.setQuantity(item.getQuantity());
@@ -139,14 +111,14 @@ public class GenerateMCTController extends MenuControllerHandler implements Init
                             list.add(r);
                         }
 
-                        MCTDao.create(mct,list);
-
-
-                        //loadAllUnchargeItems();
-
-                        //reload the class
-                        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "warehouse_mct_generate.fxml"));
-                        AlertDialogBuilder.messgeDialog("System Message", "MCT successfully generated.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+                        String result = MCTDao.create(mct,list);
+                        if(result == null){
+                            Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(HomeController.class, "warehouse_mct_generate.fxml"));
+                            AlertDialogBuilder.messgeDialog("System Message", "MCT successfully generated.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+                            loadAllUnchargedItems();
+                        } else{
+                            AlertDialogBuilder.messgeDialog("System Message", "Error encountered: "+result, Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                        }
 
                     }catch (Exception e){
                         e.printStackTrace();
@@ -162,14 +134,13 @@ public class GenerateMCTController extends MenuControllerHandler implements Init
 
     @FXML
     void genMctNum(ActionEvent event) {
-        mctNumber.setText(NumberGenerator.mctNumber(mctNumber.getText()));
+
     }
 
     private void setFieldData(MIRS mirs) throws Exception {
 
-        unchargedItemDetailsListView.getItems().clear();
-        List<UnchargedItemDetails> collection = collectionOfUnchargeReleasedItem.get(mirs.getId());
-        if (collection != null) {
+        unchargedItemDetailsList = collectionOfUnchargeReleasedItem.get(mirs.getId());
+        if (unchargedItemDetailsList != null) {
             List<MIRSSignatory> mirsSignatoryList = MIRSSignatoryDAO.get(mirs);
 
             String signatures = "";
@@ -177,37 +148,28 @@ public class GenerateMCTController extends MenuControllerHandler implements Init
                 signatures+=EmployeeDAO.getOne(sig.getUserID(),DB.getConnection()).getFullName();
                 signatures+="\n";
             }
-            signatories.setText(signatures);
-            mirsNumber.setText(""+mirs.getId());
-
-            if(forMctItemListView.getItems().size() >0){
-                description.setText(description.getText()+"/"+mirs.getId());
-            }else{
-                description.setText(mirs.getId());
-            }
-
-            date.setText(""+mirs.getDateFiled());
             applicant.setText(mirs.getApplicant());
-            requisitioner.setText(mirs.getRequisitioner().getFullName());
-
             newAddress.setText(mirs.getAddress());
-            particulars.setText(mirs.getPurpose());
+            purpose.setText(mirs.getPurpose());
+            remarks.setText(mirs.getDetails());
 
-            unchargedItemDetailsListView.getItems().addAll(collection);
+            unchargedItemDetailsObservableList =  FXCollections.observableArrayList(unchargedItemDetailsList);
+            forMCTable.getItems().setAll(unchargedItemDetailsObservableList);
+            forMCTable.refresh();
+            //unchargedItemDetailsListView.getItems().addAll(collection);
 
-            //remove items that are already added to the list for MCT
-            unchargedItemDetailsListView.getItems().removeAll(forMctItemListView.getItems());
+
+            mctNumber.setText(NumberGenerator.mctNumber());
+
         }else{
             AlertDialogBuilder.messgeDialog("System Message", "All items under MIRS: " +mirs.getId() +" are either not yet released or already issued with an MCT number.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
         }
     }
 
-    private void loadAllChargedItems(boolean loadAll){
+    private void loadAllUnchargedItems(){
         collectionOfUnchargeReleasedItem = new HashMap<>();
         try {
             List<UnchargedMIRSReleases> mirsItemReleasesList = MirsDAO.getUnchargedMIRSReleases();
-            if(loadAll)
-                mirsItemReleasesList = MirsDAO.getChargedMIRSReleases();
 
             for(UnchargedMIRSReleases un : mirsItemReleasesList){
                 collectionOfUnchargeReleasedItem.put(un.getMirs().getId(),un.getReleases());

@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.NumberGenerator;
 import com.boheco1.dev.integratedaccountingsystem.objects.MCT;
 import com.boheco1.dev.integratedaccountingsystem.objects.MCTReleasings;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
@@ -14,8 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MCTDao {
-    public static void create(MCT mct, List<Releasing> releasings) throws Exception {
+    public static String create(MCT mct, List<Releasing> releasings) throws Exception {
 
+        String error = null;
         Connection conn = DB.getConnection();
 
         conn.setAutoCommit(false);
@@ -23,39 +25,40 @@ public class MCTDao {
         PreparedStatement ps1 = conn.prepareStatement(
                 "INSERT INTO MCT (mct_no, particulars, address, MIRSNo, createdAt, WorkOrderNo) " +
                         "VALUES (?,?,?,?,GETDATE(),?)");
+        ps1.setString(1, mct.getMctNo());
+        ps1.setString(2, mct.getParticulars());
+        ps1.setString(3, mct.getAddress());
+        ps1.setString(4, mct.getMirsNo());
+        ps1.setString(5, mct.getWorkOrderNo());
 
         PreparedStatement ps2 = conn.prepareStatement(
                 "UPDATE Releasing SET mct_no=? WHERE id=?");
-
-        try {
-
-            ps1.setString(1, mct.getMctNo());
-            ps1.setString(2, mct.getParticulars());
-            ps1.setString(3, mct.getAddress());
-            ps1.setString(4, mct.getMirsNo());
-            ps1.setString(5, mct.getWorkOrderNo());
-
-            ps1.executeUpdate();
-
-            for(Releasing releasing: releasings) {
-                if(releasing.getMctNo()!=null) {
-                    throw new SQLException("Releasing with StockID:" + releasing.getStockID()
-                            + " on MIRS# " + releasing.getMirsID()
-                            + " is already included in MCT# " + releasing.getMctNo());
-                }
-                ps2.setString(1, mct.getMctNo());
-                ps2.setString(2, releasing.getId());
-                ps2.executeUpdate();
-            }
-
-            conn.commit();
-            conn.setAutoCommit(true);
-        }catch(SQLException ex) {
-            ex.printStackTrace();
-            conn.rollback();
+        for(Releasing releasing: releasings) {
+            ps2.setString(1, mct.getMctNo());
+            ps2.setString(2, releasing.getId());
+            ps2.addBatch();
         }
 
-        ps1.close();
+        try {
+            ps1.executeUpdate();
+            ps2.executeUpdate();
+            conn.setAutoCommit(true);
+
+            ps1.close();
+            ps2.close();
+            return error;
+        }catch(SQLException ex) {
+            ps1.close();
+            ps2.close();
+            conn.rollback();
+            conn.setAutoCommit(true);
+            ex.printStackTrace();
+            if(ex.getMessage().contains("duplicate key value")){
+                mct.setMctNo(NumberGenerator.mctNumber());
+                create(mct, releasings);
+            }
+            return ex.getMessage();
+        }
     }
 
     public static void update(MCT mct) throws Exception {

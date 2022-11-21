@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 import com.boheco1.dev.integratedaccountingsystem.dao.MirsDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
+import com.boheco1.dev.integratedaccountingsystem.helpers.ModalBuilderForWareHouse;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.ItemizedMirsItem;
 import com.boheco1.dev.integratedaccountingsystem.objects.MIRSItem;
@@ -171,6 +172,7 @@ public class MIRSItemItemizedController implements Initializable {
         clearBtn.setDisable(true);
         addBtn.setDisable(true);
         removeBtn.setDisable(true);
+        ModalBuilderForWareHouse.MODAL_CLOSE();
     }
 
     @FXML

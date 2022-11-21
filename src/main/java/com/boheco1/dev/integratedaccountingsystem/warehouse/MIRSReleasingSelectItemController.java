@@ -127,6 +127,7 @@ public class MIRSReleasingSelectItemController implements Initializable {
                     brand.valueProperty().set(null);
                     maxItem = 0;
                     sendBtn.setDisable(this.mirsItem.getQuantity() == 0);
+                    ModalBuilderForWareHouse.MODAL_CLOSE();
                 }
 
             }
