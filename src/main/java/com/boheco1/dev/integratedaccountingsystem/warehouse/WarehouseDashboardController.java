@@ -184,7 +184,8 @@ public class  WarehouseDashboardController extends MenuControllerHandler impleme
                     ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_approval.fxml",Utility.getStackPane());
                 }else if(display_lbl.getText().equals(RELEASES)){
                     Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(MIRSReleasingController.class, "../warehouse_mirs_releasing.fxml"));
-
+                    options.setVisible(false);
+                    reports.setVisible(false);
                     //ModalBuilderForWareHouse.showModalFromXML(WarehouseDashboardController.class, "../warehouse_mirs_releasing.fxml",Utility.getStackPane());
                 }
             } catch (Exception e) {
