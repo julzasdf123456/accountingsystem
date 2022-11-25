@@ -45,10 +45,10 @@ public class WaiveConfirmationController extends MenuControllerHandler implement
         if (!user.isEmpty() && !pass.isEmpty()){
             try {
                 User cashier = UserDAO.login(user, pass, DB.getConnection());
-                if (cashier.getEmployeeInfo().getDesignation().equals("Cashier"))
+                if (cashier.getEmployeeInfo().getDesignation().equals("Cashier") || cashier.getEmployeeInfo().getDesignation().equals("Finance Head"))
                     return true;
                 else
-                    this.status_lbl.setText("Needs Cashier permission!");
+                    this.status_lbl.setText("Needs Cashier/Finance Head permission!");
             } catch (Exception e) {
                 this.status_lbl.setText(e.getMessage());
             }

@@ -710,4 +710,16 @@ public class BillDAO {
         ps.close();
         conn.setAutoCommit(true);
     }
+    /**
+     * Cancel a PaidBill from Paid Bills
+     * @param bill The Paid bill
+     * @return void
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void cancelBill(PaidBill bill) throws Exception {
+        String sql = "DELETE FROM PaidBills WHERE AccountNumber = '"+bill.getConsumer().getAccountID()+"' AND ServicePeriodEnd = '"+bill.getServicePeriodEnd().toString()+"';";
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
+        ps.executeUpdate();
+        ps.close();
+    }
 }
