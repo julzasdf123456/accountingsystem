@@ -289,7 +289,41 @@ public class BillDAO {
 
         return bills;
     }
+    /**
+     * Retrieves all bills of customer based on Account Number (on Billing database)
+     * @param consumerInfo The consumer account number
+     * @return A list of Bill (paid or unpaid)
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<BillStanding> getConsumerBills(ConsumerInfo consumerInfo) throws Exception {
+        List<BillStanding> bills = new ArrayList<>();
+        String sql = "SELECT ServicePeriodEnd, BillNumber, ConsumerType, DCRNumber, PaymentStatus, " +
+                "(SELECT Teller FROM PaidBills a WHERE a.AccountNumber=c.AccountNumber AND a.ServicePeriodEnd = c.ServicePeriodEnd) AS Teller, " +
+                "(SELECT PostingDate FROM PaidBills a WHERE a.AccountNumber=c.AccountNumber AND a.ServicePeriodEnd = c.ServicePeriodEnd) AS DatePaid, " +
+                "(SELECT NetAmount FROM PaidBills a WHERE a.AccountNumber=c.AccountNumber AND a.ServicePeriodEnd = c.ServicePeriodEnd) AS PaidAmount, " +
+                "NetAmount as BillAmount " +
+                "FROM ConsumerBillsStanding c WHERE AccountNumber = ? ORDER BY ServicePeriodEnd DESC";
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
 
+        ps.setString(1, consumerInfo.getAccountID());
+        ResultSet rs = ps.executeQuery();
+        while(rs.next()) {
+            BillStanding b = new BillStanding();
+            b.setServicePeriodEnd(rs.getDate("ServicePeriodEnd").toLocalDate());
+            b.setBillNo(rs.getString("BillNumber"));
+            b.setConsumerType(rs.getString("ConsumerType"));
+            b.setDcrNumber(rs.getString("DCRNumber"));
+            b.setStatus(rs.getString("PaymentStatus"));
+            b.setTeller(rs.getString("Teller"));
+            b.setPostingDate(rs.getDate("DatePaid"));
+            b.setTotalAmount(rs.getDouble("PaidAmount"));
+            b.setAmountDue(rs.getDouble("BillAmount"));
+            bills.add(b);
+        }
+        rs.close();
+        ps.close();
+        return bills;
+    }
     /**
      * Retrieves the discounted amount of a bill
      * @param bill The current bill
