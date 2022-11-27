@@ -77,7 +77,7 @@ public class ViewConsumerBillsController extends MenuControllerHandler implement
     private TableView<BillStanding> consumerBills_table;
 
     @FXML
-    private Label unpaidBills_lbl;
+    private Label unpaidBills_lbl, unpaidBills_amount_lbl;
 
     @FXML
     private ProgressBar progressBar;
@@ -123,15 +123,18 @@ public class ViewConsumerBillsController extends MenuControllerHandler implement
                         if (this.bills.size() > 0) {
                             fees_table.setItems(bills);
                             int count = 0;
+                            double amount = 0;
                             for (BillStanding b: bills) {
                                 if (b.getStatus().equals("UNPAID")) {
                                     count++;
+                                    amount += b.getAmountDue();
                                 }else{
                                     paidbills.add(b);
                                 }
                             }
                             consumerBills_table.setItems(paidbills);
                             this.unpaidBills_lbl.setText(count+"");
+                            this.unpaidBills_amount_lbl.setText(Utility.formatDecimal(amount));
                         }
                         progressBar.setVisible(false);
                     });
@@ -182,6 +185,7 @@ public class ViewConsumerBillsController extends MenuControllerHandler implement
         this.consumerBills_table.setItems(this.bills);
         this.acct_no_tf.requestFocus();
         this.unpaidBills_lbl.setText("0");
+        this.unpaidBills_amount_lbl.setText("0");
     }
 
     /**
@@ -212,6 +216,12 @@ public class ViewConsumerBillsController extends MenuControllerHandler implement
         column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getBillNo()));
         column0.setStyle("-fx-alignment: center-left;");
 
+        TableColumn<BillStanding, String> column01 = new TableColumn<>("Due Date");
+        column01.setPrefWidth(110);
+        column01.setMaxWidth(110);
+        column01.setMinWidth(110);
+        column01.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getDueDate() == null ? "" : obj.getValue().getDueDate().toString()));
+        column01.setStyle("-fx-alignment: center;");
 
 
         TableColumn<BillStanding, String> column1 = new TableColumn<>("Type");
@@ -238,10 +248,11 @@ public class ViewConsumerBillsController extends MenuControllerHandler implement
 
         this.bills =  FXCollections.observableArrayList();
         this.fees_table.setFixedCellSize(35);
-        this.fees_table.setPlaceholder(new Label("No bills display! Search or input the account number!"));
+        this.fees_table.setPlaceholder(new Label("No bills to display! Search or input the account number!"));
 
         this.fees_table.getColumns().add(column);
         this.fees_table.getColumns().add(column0);
+        this.fees_table.getColumns().add(column01);
         this.fees_table.getColumns().add(column1);
         this.fees_table.getColumns().add(column2);
         this.fees_table.getColumns().add(column3);
@@ -291,11 +302,11 @@ public class ViewConsumerBillsController extends MenuControllerHandler implement
         column3.setStyle("-fx-alignment: center-right;");
 
         TableColumn<BillStanding, String> column4 = new TableColumn<>("OR Number");
-        column4.setPrefWidth(140);
-        column4.setMaxWidth(140);
-        column4.setMinWidth(140);
+        column4.setPrefWidth(110);
+        column4.setMaxWidth(110);
+        column4.setMinWidth(110);
         column4.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getDcrNumber()));
-        column4.setStyle("-fx-alignment: center-right;");
+        column4.setStyle("-fx-alignment: center;");
 
         this.bills =  FXCollections.observableArrayList();
         this.consumerBills_table.setFixedCellSize(35);
@@ -340,15 +351,18 @@ public class ViewConsumerBillsController extends MenuControllerHandler implement
                 if (this.bills.size() > 0) {
                     fees_table.setItems(bills);
                     int count = 0;
+                    double amount = 0;
                     for (BillStanding b: bills) {
                         if (b.getStatus().equals("UNPAID")) {
                             count++;
+                            amount += b.getAmountDue();
                         }else{
                             paidbills.add(b);
                         }
                     }
                     consumerBills_table.setItems(paidbills);
                     this.unpaidBills_lbl.setText(count+"");
+                    this.unpaidBills_amount_lbl.setText(Utility.formatDecimal(amount));
                 }
                 progressBar.setVisible(false);
             });

@@ -297,7 +297,7 @@ public class BillDAO {
      */
     public static List<BillStanding> getConsumerBills(ConsumerInfo consumerInfo) throws Exception {
         List<BillStanding> bills = new ArrayList<>();
-        String sql = "SELECT ServicePeriodEnd, BillNumber, ConsumerType, DCRNumber, PaymentStatus, " +
+        String sql = "SELECT ServicePeriodEnd, BillNumber, ConsumerType, DCRNumber, PaymentStatus, DueDate, " +
                 "(SELECT Teller FROM PaidBills a WHERE a.AccountNumber=c.AccountNumber AND a.ServicePeriodEnd = c.ServicePeriodEnd) AS Teller, " +
                 "(SELECT PostingDate FROM PaidBills a WHERE a.AccountNumber=c.AccountNumber AND a.ServicePeriodEnd = c.ServicePeriodEnd) AS DatePaid, " +
                 "(SELECT NetAmount FROM PaidBills a WHERE a.AccountNumber=c.AccountNumber AND a.ServicePeriodEnd = c.ServicePeriodEnd) AS PaidAmount, " +
@@ -310,6 +310,7 @@ public class BillDAO {
         while(rs.next()) {
             BillStanding b = new BillStanding();
             b.setServicePeriodEnd(rs.getDate("ServicePeriodEnd").toLocalDate());
+            b.setDueDate(rs.getDate("DueDate").toLocalDate());
             b.setBillNo(rs.getString("BillNumber"));
             b.setConsumerType(rs.getString("ConsumerType"));
             b.setDcrNumber(rs.getString("DCRNumber"));
