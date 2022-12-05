@@ -1594,7 +1594,7 @@ public class StockDAO {
     public static List<SlimStock> getByDescription(String description) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT id, StockName, Brand, Model, Description, Price, Unit, Quantity FROM Stocks " +
-                        "WHERE Description=? and Quantity > 0 ORDER BY Brand");
+                        "WHERE Description=? and Quantity > 0 and PRICE > 0 ORDER BY Brand");
 
         ps.setString(1, description);
 

@@ -65,13 +65,16 @@ public class MIRSReleasingSelectItemController implements Initializable {
 
             parentController = Utility.getParentController();
             for (SlimStock slimStock : items){
-                String key = slimStock.getId();
-                double value = 0;
-                if (selected_items.containsKey(key)){
-                    value = selected_items.get(key);
-                    slimStock.setQuantity(slimStock.getQuantity()-value);
+                System.out.println(slimStock.getBrand()+":"+slimStock.getPrice());
+                if(slimStock.getBrand()!=null) {
+                    String key = slimStock.getId();
+                    double value = 0;
+                    if (selected_items.containsKey(key)) {
+                        value = selected_items.get(key);
+                        slimStock.setQuantity(slimStock.getQuantity() - value);
+                    }
+                    brand.getItems().add(slimStock);
                 }
-                brand.getItems().add(slimStock);
             }
 
         } catch (Exception e) {
@@ -92,11 +95,12 @@ public class MIRSReleasingSelectItemController implements Initializable {
 
 
                 if(q > mirsItem.getQuantity()) {//check quantity of current item
-                    AlertDialogBuilder.messgeDialog("System Message", "Maximum allowed quantity is: " + mirsItem.getQuantity(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    AlertDialogBuilder.messgeDialog("System Message", "Maximum allowed quantity is: " + Utility.formatDecimal(mirsItem.getQuantity()), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }else if(q > maxItem ){
                     AlertDialogBuilder.messgeDialog("System Message", "Insufficient stock, please try again.", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }else{
                     MIRSItem mirsItem = new MIRSItem();
+                    mirsItem.setParticulars(this.mirsItem.getParticulars());
                     mirsItem.setId(this.mirsItem.getId());
                     mirsItem.setMirsID(this.mirsItem.getMirsID());
                     mirsItem.setStockID(this.brand.getSelectionModel().getSelectedItem().getId());
@@ -145,7 +149,7 @@ public class MIRSReleasingSelectItemController implements Initializable {
             currentSelection = items.get(brand.getSelectionModel().getSelectedIndex());
             price.setText(String.format("%,.2f", currentSelection.getPrice()));
             description.setText(currentSelection.getDescription());
-            qty.setPromptText("Max. value " + currentSelection.getQuantity());
+            qty.setPromptText("Max. value " + Utility.formatDecimal(mirsItem.getQuantity()));
             maxItem = currentSelection.getQuantity();
             qty.setText("");
             qty.setDisable(maxItem <= 0);

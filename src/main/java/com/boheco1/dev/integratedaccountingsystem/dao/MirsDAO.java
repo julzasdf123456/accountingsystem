@@ -1054,13 +1054,18 @@ public class MirsDAO {
 
     }
 
-    public static List<ItemizedMirsItem> getItemizedMirsItemDetails(String mirsId) throws Exception {
-        PreparedStatement ps = DB.getConnection().prepareStatement(
+    public static List<ItemizedMirsItem> getItemizedMirsItemDetails(String stockId, String mirsId) throws Exception {
+        /*PreparedStatement ps = DB.getConnection().prepareStatement(
                 "select i.id, i.StockID as stockID, MIRSItemID, serial, brand, remarks " +
                         "from itemizedMirsItem i inner join mirsitems mi on i.MIRSItemID = mi.id " +
                         "where mi.MIRSID = ? and i.stockID in (select id from stocks " +
                         "where description = (select top 1 description from stocks a inner join mirsitems b on a.id=b.StockID where mirsid = ? ))");
         ps.setString(1, mirsId);
+        ps.setString(2, mirsId);*/
+
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "select * from itemizedMirsItem where stockID = ? and mirsID=?");
+        ps.setString(1, stockId);
         ps.setString(2, mirsId);
 
         ResultSet rs = ps.executeQuery();

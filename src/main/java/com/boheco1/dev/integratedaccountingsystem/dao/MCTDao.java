@@ -41,7 +41,7 @@ public class MCTDao {
 
         try {
             ps1.executeUpdate();
-            ps2.executeUpdate();
+            ps2.executeBatch();
             conn.setAutoCommit(true);
 
             ps1.close();

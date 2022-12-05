@@ -77,9 +77,6 @@ public class GenerateMCTController extends MenuControllerHandler implements Init
             if (mctNumber.getText().isEmpty()){
                 AlertDialogBuilder.messgeDialog("System Message", "MCT number is required.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
                 return;
-            }else if (newAddress.getText().isEmpty()){
-                AlertDialogBuilder.messgeDialog("System Message", "MCT address is required.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-                return;
             }else if (purpose.getText().isEmpty()){
                 AlertDialogBuilder.messgeDialog("System Message", "MCT particulars is required.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
                 return;

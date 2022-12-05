@@ -179,7 +179,8 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                 double total=0;
                 HashMap<String, Double> acctCodeSummary = new HashMap<String, Double>();
                 for (Releasing items : fromReleasing) {
-                    List<ItemizedMirsItem> details = MirsDAO.getItemizedMirsItemDetails(items.getMirsID());
+                    System.out.println("ItemizedMirsItem: " + items.getMirsID());
+                    List<ItemizedMirsItem> details = MirsDAO.getItemizedMirsItemDetails(items.getStockID(), items.getMirsID());
                     String additionalDescription = "";
                     for(ItemizedMirsItem i : details){
                         if(i.getStockID().equals(items.getStockID())){
@@ -192,7 +193,7 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                         itemCode = stock.getNeaCode();
                     else
                         itemCode = stock.getLocalCode();
-                    String[] val = {stock.getAcctgCode(), itemCode,stock.getDescription()+additionalDescription, String.format("%,.2f", items.getPrice()), String.format("%,.2f", (items.getPrice() * items.getQuantity())), stock.getUnit(), "" + items.getQuantity()};
+                    String[] val = {stock.getAcctgCode(), itemCode,stock.getDescription()+additionalDescription, String.format("%,.2f", items.getPrice()), String.format("%,.2f", (items.getPrice() * items.getQuantity())), stock.getUnit(), "" + Utility.formatDecimal(items.getQuantity())};
                     total += items.getPrice() * items.getQuantity();
                     rows.add(val);
 

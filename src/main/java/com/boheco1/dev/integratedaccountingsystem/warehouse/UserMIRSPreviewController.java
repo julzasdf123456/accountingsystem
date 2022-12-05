@@ -88,21 +88,7 @@ public class UserMIRSPreviewController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         ObservableList<ReleasedItemDetails> observableList = FXCollections.observableArrayList(mirsItemList);
-        TableColumn<ReleasedItemDetails, String> stockIdCol = new TableColumn<>("Stock Id");
-        stockIdCol.setStyle("-fx-alignment: center;");
-        stockIdCol.setPrefWidth(200);
-        stockIdCol.setMaxWidth(200);
-        stockIdCol.setMinWidth(200);
-        stockIdCol.setCellValueFactory(cellData -> {
-            try {
-                return new SimpleStringProperty(Objects.requireNonNull(cellData.getValue().getStockID()));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        });
 
         TableColumn<ReleasedItemDetails, String> descriptionCol = new TableColumn<>("Description");
         descriptionCol.setCellValueFactory(cellData -> {
@@ -121,13 +107,8 @@ public class UserMIRSPreviewController implements Initializable {
 
         TableColumn<ReleasedItemDetails, String> quantityCol = new TableColumn<>("Qty");
         quantityCol.setStyle("-fx-alignment: center;");
-        quantityCol.setPrefWidth(50);
-        quantityCol.setMaxWidth(50);
-        quantityCol.setMinWidth(50);
-        quantityCol.setCellValueFactory(new PropertyValueFactory<>("Quantity"));
+        quantityCol.setCellValueFactory(obj-> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getQuantity())));
 
-
-        requestedTable.getColumns().add(stockIdCol);
         requestedTable.getColumns().add(descriptionCol);
         requestedTable.getColumns().add(quantityCol);
         requestedTable.setPlaceholder(new Label("No item Added"));

@@ -258,32 +258,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
         relQuantityCol.setPrefWidth(50);
         relQuantityCol.setMaxWidth(50);
         relQuantityCol.setMinWidth(50);
-        //relQuantityCol.setCellValueFactory((new PropertyValueFactory<>("Quantity")));
-        Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> qtycellFactory
-                = //
-                new Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>>() {
-                    @Override
-                    public TableCell call(final TableColumn<MIRSItem, String> param) {
-                        final TableCell<MIRSItem, String> cell = new TableCell<MIRSItem, String>() {
-                            @Override
-                            public void updateItem(String item, boolean empty) {
-                                super.updateItem(item, empty);
-                                if (empty) {
-                                    setGraphic(null);
-                                    setText(null);
-                                } else {
-                                    MIRSItem mirsItem = getTableView().getItems().get(getIndex());
-                                    setGraphic(null);
-                                    setText(Utility.formatDecimal(mirsItem.getQuantity()));
-
-                                }
-                            }
-                        };
-                        return cell;
-                    }
-                };
-
-        relQuantityCol.setCellFactory(qtycellFactory);
+        relQuantityCol.setCellValueFactory(obj-> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getQuantity())));
 
         TableColumn<MIRSItem, String> relBrandCol = new TableColumn<>("Brand");
         relBrandCol.setStyle("-fx-alignment: center;");
