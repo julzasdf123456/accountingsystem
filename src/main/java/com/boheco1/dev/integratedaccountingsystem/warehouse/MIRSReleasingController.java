@@ -22,6 +22,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -735,7 +736,8 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                         Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
                         NotificationsDAO.create(torequisitioner);
                         releasingItem.clear();
-                        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(MIRSReleasingController.class, "../warehouse_dashboard_controller.fxml"));
+                        Utility.setActiveMIRS(mirs);
+                        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(MIRSReleasingController.class, "../warehouse_mirs_releasing.fxml"));
                         AlertDialogBuilder.messgeDialog("System Message", "MIRS items released.", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
                     }else{
                         AlertDialogBuilder.messgeDialog("System Message", "Sorry an error was encountered during saving, please try again.",
@@ -843,5 +845,11 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
         }else{
 
         }
+    }
+
+    @Override
+    public void setSubMenus(FlowPane flowPane) {
+        flowPane.getChildren().removeAll();
+        flowPane.getChildren().setAll(new ArrayList<>());
     }
 }

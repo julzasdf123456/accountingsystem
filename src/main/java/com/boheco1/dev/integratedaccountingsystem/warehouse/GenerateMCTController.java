@@ -16,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.FlowPane;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
@@ -132,6 +133,12 @@ public class GenerateMCTController extends MenuControllerHandler implements Init
     @FXML
     void genMctNum(ActionEvent event) {
 
+    }
+
+    @Override
+    public void setSubMenus(FlowPane flowPane) {
+        flowPane.getChildren().removeAll();
+        flowPane.getChildren().setAll(new ArrayList<>());
     }
 
     private void setFieldData(MIRS mirs) throws Exception {

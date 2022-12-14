@@ -128,6 +128,13 @@ public class UserMIRSPreviewController implements Initializable {
     }
 
     private void action(String status){
+        if(status.equals(Utility.REJECTED) && comment.getText().isEmpty()){
+            AlertDialogBuilder.messgeDialog("System Message", "Please provide reason or comment for rejecting this MIRS.",
+                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+            return;
+        }
+
+
         JFXButton accept = new JFXButton("Proceed");
         JFXDialog MIRSapprovalDialog = DialogBuilder.showConfirmDialog("MIRS Approval","Confirm action on MIRS application.", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
         accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
@@ -135,12 +142,20 @@ public class UserMIRSPreviewController implements Initializable {
             @Override
             public void handle(ActionEvent __) {
                 try {
+
                         MIRSSignatory temp = new MIRSSignatory();
                         temp.setMirsID(mirs.getId());
                         temp.setUserID(ActiveUser.getUser().getId());
                         temp.setStatus(status);
                         temp.setComments(comment.getText());
                         MIRSSignatoryDAO.updateStatus(temp);
+                        String message = "";
+                        if(status.equals(Utility.REJECTED))
+                            message = " reason is "+comment.getText();
+
+                        mirs.setDetails(mirs.getDetails()+"\n"+
+                                status+" by "+ActiveUser.getUser().getFullName()+ message);
+                        MirsDAO.update(mirs);
 
                         String notif_details = "MIRS ("+mirs.getId()+") was "+status+".";
                         Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());

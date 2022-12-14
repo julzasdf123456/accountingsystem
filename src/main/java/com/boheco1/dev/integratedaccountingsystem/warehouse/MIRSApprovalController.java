@@ -3,10 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialogLayout;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -39,7 +36,10 @@ public class MIRSApprovalController implements Initializable {
     private HBox btnHolder;
 
     @FXML
-    private Label purpose, requisitioner, itemCounter, mirsNumber, date, address, applicant, signatories, details;
+    private Label purpose, requisitioner, itemCounter, mirsNumber, date, address, applicant, signatories;
+
+    @FXML
+    private JFXTextArea details;
 
     @FXML
     private TableView<MIRSItem> mirsItemTable;
@@ -214,7 +214,8 @@ public class MIRSApprovalController implements Initializable {
                             }else{
                                 try {
                                     mirs.setStatus(Utility.REJECTED);
-                                    mirs.setDetails(details.getText());
+                                    mirs.setDetails(details.getText()+"\n"+
+                                            "rejected by the Warehouse personnel because "+remarks.getText());
                                     MirsDAO.update(mirs);
                                     String notif_details = "MIRS ("+mirs.getId()+") was rejected.";
                                     Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
@@ -226,6 +227,7 @@ public class MIRSApprovalController implements Initializable {
                                 }
                             }
                             dialogMCTNumber.close();
+                            ModalBuilderForWareHouse.MODAL_CLOSE();
                         }
                     });
 
@@ -233,6 +235,7 @@ public class MIRSApprovalController implements Initializable {
                     e.printStackTrace();
                 }
                 dialog.close();
+
             }
         });
     }
