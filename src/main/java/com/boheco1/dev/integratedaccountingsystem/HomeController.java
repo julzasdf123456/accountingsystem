@@ -71,6 +71,7 @@ public class HomeController implements Initializable {
     // TELLER
     public JFXButton power_bills_payment;
     public JFXButton dcr;
+    public JFXButton viewBills;
 
     //CASHIER
     public JFXButton issue_or, bankRemittance, acknowledgement_receipts;
@@ -123,6 +124,7 @@ public class HomeController implements Initializable {
 
         power_bills_payment = new JFXButton("Power Bills Payment");
         dcr = new JFXButton("Daily Collection Report");
+        viewBills = new JFXButton("View Consumer Bills");
         bankRemittance = new JFXButton("Bank Remittance");
         acknowledgement_receipts = new JFXButton("Ack Receipts");
 
@@ -149,6 +151,7 @@ public class HomeController implements Initializable {
 
             if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering"))
                 NavMenuHelper.addMenu(navMenuBox, dcr, homeStackPane);
+            NavMenuHelper.addMenu(navMenuBox, viewBills, homeStackPane);
         }
 
         if (ActiveUser.getUser().can("manage-cashiering")){
@@ -204,6 +207,7 @@ public class HomeController implements Initializable {
                 DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(power_bills_payment, new FontIcon("mdi2c-cash-usd"), drawerMenus, power_bills_payment.getText(), contentPane, "tellering/tellering_bills_payment.fxml", null, null, title);
             if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering"))
                 DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(dcr, new FontIcon("mdi2c-chart-bar"), drawerMenus, dcr.getText(), contentPane, "tellering/tellering_dcr.fxml", null, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(viewBills, new FontIcon("mdi2c-cash-usd"), drawerMenus, viewBills.getText(), contentPane, "tellering/tellering_consumer_bills.fxml", null, null, title);
         }
 
         if (ActiveUser.getUser().can("manage-cashiering")) {

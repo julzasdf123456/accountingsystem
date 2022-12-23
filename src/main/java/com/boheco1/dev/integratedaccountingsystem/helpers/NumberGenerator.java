@@ -7,13 +7,13 @@ import java.sql.ResultSet;
 public class NumberGenerator {
     public static String mrNumber() {
         try {
-            String year = Utility.CURRENT_YEAR();
+            int year = Utility.serverDate().getYear();
 
             ResultSet rs = DB.getConnection().createStatement().executeQuery(
                     "SELECT id FROM MR WHERE id LIKE '" + year + "%' ORDER BY id DESC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;");
 
             if(!rs.next()) {
-                return year + "-0001";
+                return year + "-00001";
             }
 
             String lastId = rs.getString("id");
@@ -28,13 +28,13 @@ public class NumberGenerator {
 
     public static String mirsNumber() {
         try {
-            String year = Utility.CURRENT_YEAR();
+            int year = Utility.serverDate().getYear();
 
             ResultSet rs = DB.getConnection().createStatement().executeQuery(
                     "SELECT id FROM MIRS WHERE id LIKE '%" + year + "%' ORDER BY id DESC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;");
 
             if(!rs.next()) {
-                return year + "-0001";
+                return year + "-00001";
             }
 
             String lastId = rs.getString("id");
@@ -47,20 +47,20 @@ public class NumberGenerator {
         }
     }
 
-    public static String mctNumber(String townCode) {
+    public static String mctNumber() {
         try {
-            String year = Utility.CURRENT_YEAR();
+            int year = Utility.serverDate().getYear();
 
             ResultSet rs = DB.getConnection().createStatement().executeQuery(
-                    "SELECT mct_no FROM MCT WHERE mct_no LIKE '" + year + "-" + townCode + "-%' ORDER BY createdAt DESC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;");
+                    "SELECT mct_no FROM MCT WHERE mct_no LIKE '" + year + "-%' ORDER BY createdAt DESC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;");
 
             if(!rs.next()) {
-                return year + "-" + townCode + "-0001";
+                return year +  "-00001";
             }
 
             String lastId = rs.getString("mct_no");
 
-            return year + "-" + townCode + "-" + incrementStringID(lastId);
+            return year + "-" + incrementStringID(lastId);
 
         }catch(Exception ex) {
             ex.printStackTrace();
@@ -73,6 +73,6 @@ public class NumberGenerator {
     private static String incrementStringID(String id) throws NumberFormatException {
         int serial = Integer.parseInt(id.substring(id.lastIndexOf("-")+1));
         serial++;
-        return StringUtils.leftPad(String.valueOf(serial), 4, "0");
+        return StringUtils.leftPad(String.valueOf(serial), 5, "0");
     }
 }

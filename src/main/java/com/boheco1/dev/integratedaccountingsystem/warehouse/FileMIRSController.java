@@ -31,6 +31,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -44,10 +45,10 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     private DatePicker filingDate;
 
     @FXML
-    private JFXTextField applicant, prepared, checked, approved, items, quantity;
+    private JFXTextField prepared, checked, approved, items, quantity;
 
     @FXML
-    private JFXTextArea address, purpose, remarks;
+    private JFXTextArea applicant, address, purpose, remarks;
 
     @FXML
     private Label available, inStock, pending, countRow;
@@ -68,7 +69,12 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //forQtyUpdate = new HashMap<>();
 
-        filingDate.setValue(LocalDate.now());
+        try {
+            filingDate.setValue(Utility.serverDate());
+        } catch (Exception e) {
+            e.printStackTrace();
+            filingDate.setValue(LocalDate.now());
+        }
         bindItemSearchAutocomplete(items);
         bindEmployeeInfoAutocomplete(prepared);
         bindEmployeeInfoAutocomplete(checked);
@@ -453,6 +459,11 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                                 "-fx-background-color: #f7e1df; " +
                                                 "-fx-text-fill: #212121;" +
                                                 "-fx-alignment: center-left;");
+                                    } else if(mirsItem.getRemarks().contains(Utility.INSUFFICIENT_STOCK)) {
+                                        setStyle("" +
+                                                "-fx-background-color: #fae4c3; " +
+                                                "-fx-text-fill: #212121;" +
+                                                "-fx-alignment: center-left;");
                                     }else{
                                         setStyle("-fx-background-color: transparent; -fx-alignment: center-left;");
                                     }
@@ -487,23 +498,16 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
 
 
                                     Text text = new Text(mirsItem.getParticulars());
-                                    //set font color RED if item is added to table using the available stock not the requested quantity
-                                    if (mirsItem.getRemarks().equals(Utility.ADDED)) {
-                                        setStyle("-fx-background-color: transparent; -fx-alignment: center-left; ");
-                                        setText(mirsItem.getParticulars());
-                                        setGraphic(null);
-                                    }else{
-                                        text.setStyle("" +
-                                                "-fx-fill: #212121; " +
-                                                "-fx-text-alignment: center-left;" +
-                                                "-fx-text-wrap: true;");
-                                        //setStyle("-fx-background-color: #f7e1df; -fx-text-alignment: center-left;");
-                                        text.wrappingWidthProperty().bind(getTableColumn().widthProperty().subtract(35));
-                                        setPrefHeight(text.getLayoutBounds().getHeight()+10);
-                                        setMinHeight(text.getLayoutBounds().getHeight()+10);
-                                        setGraphic(text);
-                                        setText(null);
-                                    }
+                                    text.setStyle("" +
+                                            "-fx-fill: #212121; " +
+                                            "-fx-text-alignment: center-left;" +
+                                            "-fx-text-wrap: true;");
+                                    //setStyle("-fx-background-color: #f7e1df; -fx-text-alignment: center-left;");
+                                    text.wrappingWidthProperty().bind(getTableColumn().widthProperty().subtract(35));
+                                    setPrefHeight(text.getLayoutBounds().getHeight()+10);
+                                    setMinHeight(text.getLayoutBounds().getHeight()+10);
+                                    setGraphic(text);
+                                    setText(null);
 
                                 }
                             }
@@ -544,11 +548,19 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                     MIRSItem mirsItem = getTableView().getItems().get(getIndex());
                                     //set font color RED if item is added to table using the available stock not the requested quantity
                                     if (mirsItem.getQuantity() > 0){
-                                        setStyle("-fx-background-color: transparent; -fx-alignment: center;");
+                                        System.out.println(mirsItem.getRemarks());
+                                        if(mirsItem.getRemarks().contains(Utility.INSUFFICIENT_STOCK)) {
+                                            setStyle("" +
+                                                    "-fx-background-color: #fae4c3; " +
+                                                    "-fx-text-fill: #212121;" +
+                                                    "-fx-alignment: center;");
+                                        }else {
+                                            setStyle("-fx-background-color: transparent; -fx-alignment: center;");
+                                        }
                                     }else{
-                                        setStyle("" +
-                                                "-fx-background-color: #f7e1df; " +
-                                                "-fx-text-fill: #212121; -fx-alignment: center;");
+                                            setStyle("" +
+                                                    "-fx-background-color: #f7e1df; " +
+                                                    "-fx-text-fill: #212121; -fx-alignment: center;");
                                     }
 
                                     setGraphic(null);
@@ -754,6 +766,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                     AlertDialogBuilder.messgeDialog("System Warning", "Insufficient stock.",
                             Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                     items.setText("");
+                    pending.setText("Pending: "+ Utility.formatDecimal(StockDAO.countPendingRequest(stockToBeAdded)));
                 }else{
 
                     quantity.requestFocus();

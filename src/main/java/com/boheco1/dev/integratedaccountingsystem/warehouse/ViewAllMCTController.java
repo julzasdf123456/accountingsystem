@@ -39,6 +39,15 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initializeMirsTable();
+
+        try {
+            issuedByEmployee = EmployeeDAO.getByDesignation("HEAD, Warehousing");
+            if(issuedByEmployee!=null)
+                issuedBy.setText(issuedByEmployee.getFullName());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         bindEmployeeInfoAutocomplete(issuedBy);
         bindEmployeeInfoAutocomplete(receivedBy);
         populateTable("");
@@ -134,6 +143,7 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
     public void print(File selectedFile, MCT mct, List<Releasing> fromReleasing){
         Platform.runLater(() -> {
             try {
+                MIRS mirs = MirsDAO.getMIRS(mct.getMirsNo());
                 float[] columns = {1f,.8f,3f,.8f,.8f,.5f,.5f};
                 PrintPDF pdf = new PrintPDF(selectedFile, columns);
 
@@ -169,7 +179,8 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                 double total=0;
                 HashMap<String, Double> acctCodeSummary = new HashMap<String, Double>();
                 for (Releasing items : fromReleasing) {
-                    List<ItemizedMirsItem> details = MirsDAO.getItemizedMirsItemDetails(items.getMirsID());
+                    System.out.println("ItemizedMirsItem: " + items.getMirsID());
+                    List<ItemizedMirsItem> details = MirsDAO.getItemizedMirsItemDetails(items.getStockID(), items.getMirsID());
                     String additionalDescription = "";
                     for(ItemizedMirsItem i : details){
                         if(i.getStockID().equals(items.getStockID())){
@@ -182,7 +193,7 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                         itemCode = stock.getNeaCode();
                     else
                         itemCode = stock.getLocalCode();
-                    String[] val = {stock.getAcctgCode(), itemCode,stock.getDescription()+additionalDescription, String.format("%,.2f", items.getPrice()), String.format("%,.2f", (items.getPrice() * items.getQuantity())), stock.getUnit(), "" + items.getQuantity()};
+                    String[] val = {stock.getAcctgCode(), itemCode,stock.getDescription()+additionalDescription, String.format("%,.2f", items.getPrice()), String.format("%,.2f", (items.getPrice() * items.getQuantity())), stock.getUnit(), "" + Utility.formatDecimal(items.getQuantity())};
                     total += items.getPrice() * items.getQuantity();
                     rows.add(val);
 
@@ -204,6 +215,8 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                     pdf.createCell(acctCode.getKey(), 1, 10, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
                     pdf.createCell(String.format("%,.2f", acctCode.getValue()), 6, 10, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
                 }
+                assert mirs != null;
+                pdf.createCell("Remarks: "+mirs.getDetails(),columns.length, 11, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);
 
                 //create signatories
                 pdf.createCell(2,columns.length);
@@ -214,12 +227,17 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                 pdf.createCell(
                         issuedByEmployee.getEmployeeFirstName().toUpperCase()+" " +
                                 issuedByEmployee.getEmployeeMidName().toUpperCase().charAt(0)+". " +
-                                issuedByEmployee.getEmployeeLastName().toUpperCase()+"\n"+issuedByEmployee.getDesignation(),3, 11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+                                issuedByEmployee.getEmployeeLastName().toUpperCase(),3, 11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
 
                 pdf.createCell(
                         receivedByEmployee.getEmployeeFirstName().toUpperCase()+" " +
                                 receivedByEmployee.getEmployeeMidName().toUpperCase().charAt(0)+". " +
-                                receivedByEmployee.getEmployeeLastName().toUpperCase()+"\n"+receivedByEmployee.getDesignation(),4, 11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+                                receivedByEmployee.getEmployeeLastName().toUpperCase(),4, 11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+
+                pdf.createCell(issuedByEmployee.getDesignation(),3, 8, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+
+                pdf.createCell(receivedByEmployee.getDesignation(),4, 8, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+
 
                 pdf.generate();
             }catch (Exception e){

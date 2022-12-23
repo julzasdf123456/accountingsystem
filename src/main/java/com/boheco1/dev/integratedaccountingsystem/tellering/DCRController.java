@@ -1,19 +1,21 @@
 package com.boheco1.dev.integratedaccountingsystem.tellering;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.BillDAO;
-import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
-import com.boheco1.dev.integratedaccountingsystem.helpers.ExcelBuilder;
-import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
-import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTextField;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
@@ -24,6 +26,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.sql.SQLException;
@@ -77,6 +80,52 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         this.createDCRTransactionsTable();
         this.createDCRSummary();
         this.createDCRBreakDown();
+
+        this.dcr_power_table.setRowFactory(tv -> {
+            TableRow<Bill> row = new TableRow<>();
+            if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering")) {
+                final ContextMenu rowMenu = new ContextMenu();
+
+                MenuItem printBill = new MenuItem("Print OEBR");
+                printBill.setOnAction(actionEvent -> {
+                    CustomPrintHelper print = new CustomPrintHelper("OEBR", 18, 3, (PaidBill) row.getItem());
+
+                    print.prepareDocument();
+
+                    print.setOnFailed(e -> {
+                        AlertDialogBuilder.messgeDialog("System Error", "Error when printing the OEBR!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    });
+
+                    print.setOnSucceeded(e -> {
+                        System.out.println("Successful");
+                    });
+
+                    print.setOnRunning(e -> {
+                    });
+
+                    Thread t = new Thread(print);
+
+                    t.start();
+                });
+
+                MenuItem cancelBill = new MenuItem("Cancel Payment");
+                cancelBill.setOnAction(actionEvent -> {
+                    try {
+                        showAuthenticate((PaidBill) row.getItem());
+                    } catch (Exception e) {
+                        AlertDialogBuilder.messgeDialog("System Error", "Error when cancelling the paid bill! "+e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    }
+                });
+
+                rowMenu.getItems().addAll(printBill, new SeparatorMenuItem(), cancelBill);
+
+                row.contextMenuProperty().bind(
+                        Bindings.when(row.emptyProperty())
+                                .then((ContextMenu) null)
+                                .otherwise(rowMenu));
+            }
+            return row;
+        });
         this.view_btn.setOnAction(action ->{
             this.generateReport();
         });
@@ -726,5 +775,33 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         doc.createSignatorees(row);
 
         doc.save(fileOut);
+    }
+
+    /**
+     * Displays Authenticate Form UI
+     * @param bill the bill object reference
+     * @return void
+     */
+    public void showAuthenticate(PaidBill bill) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_authenticate.fxml"));
+        Parent parent = fxmlLoader.load();
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setHeading(new Label("MANAGER AUTHENTICATION"));
+        dialogLayout.setBody(parent);
+        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+        WaiveConfirmationController waiveController = fxmlLoader.getController();
+        waiveController.getAuthenticate_btn().setOnAction(actionEvent -> {
+            boolean ok = waiveController.login();
+            if (ok) {
+                try {
+                    BillDAO.cancelBill(bill);
+                } catch (Exception e) {
+                    AlertDialogBuilder.messgeDialog("System Error", "Process failed! "+e.getMessage(),
+                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }
+                dialog.close();
+            }
+        });
+        dialog.show();
     }
 }

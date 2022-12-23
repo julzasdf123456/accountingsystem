@@ -7,7 +7,7 @@
     -fx-padding: 8;
 }
 
-.jfx-text-field, .jfx-password-field, .jfx-textarea-field {
+.jfx-text-field, .jfx-password-field, .jfx-text-area {
     -jfx-focus-color: #00AD8E;
     -jfx-unfocus-color: #757575;
 }
@@ -17,7 +17,7 @@
     -fx-font-size: 16px;
 }
 
-.jfx-text-field, .jfx-password-field, .jfx-textarea-field {
+.jfx-text-field, .jfx-password-field, .jfx-text-area {
     -fx-background-color :  #f5f5f5
 }
 .system-title {

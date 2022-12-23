@@ -76,8 +76,8 @@ public class ReleasingDAO {
 
         //get all itemized from the global variable itemizedMirsItems
         for (ItemizedMirsItem i : Utility.getItemizedMirsItems().values()){
-            query+="INSERT INTO itemizedMirsItem (id, MIRSItemID, stockID, brand, serial, remarks) " +
-                    "VALUES ('"+i.getId()+"','"+i.getMirsItemID()+"','"+i.getStockID()+"','"+i.getBrand()+"','"+i.getSerial()+"','"+i.getRemarks()+"');\n";
+            query+="INSERT INTO itemizedMirsItem (id, MIRSItemID, stockID, brand, serial, remarks, mirsID) " +
+                    "VALUES ('"+i.getId()+"','"+i.getMirsItemID()+"','"+i.getStockID()+"','"+i.getBrand()+"','"+i.getSerial()+"','"+i.getRemarks()+"','"+mirs.getId()+"');\n";
         }
 
         query+="UPDATE MIRS SET " +

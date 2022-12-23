@@ -289,7 +289,42 @@ public class BillDAO {
 
         return bills;
     }
+    /**
+     * Retrieves all bills of customer based on Account Number (on Billing database)
+     * @param consumerInfo The consumer account number
+     * @return A list of Bill (paid or unpaid)
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<BillStanding> getConsumerBills(ConsumerInfo consumerInfo) throws Exception {
+        List<BillStanding> bills = new ArrayList<>();
+        String sql = "SELECT ServicePeriodEnd, BillNumber, ConsumerType, DCRNumber, PaymentStatus, DueDate, " +
+                "(SELECT Teller FROM PaidBills a WHERE a.AccountNumber=c.AccountNumber AND a.ServicePeriodEnd = c.ServicePeriodEnd) AS Teller, " +
+                "(SELECT PostingDate FROM PaidBills a WHERE a.AccountNumber=c.AccountNumber AND a.ServicePeriodEnd = c.ServicePeriodEnd) AS DatePaid, " +
+                "(SELECT NetAmount FROM PaidBills a WHERE a.AccountNumber=c.AccountNumber AND a.ServicePeriodEnd = c.ServicePeriodEnd) AS PaidAmount, " +
+                "NetAmount as BillAmount " +
+                "FROM ConsumerBillsStanding c WHERE AccountNumber = ? ORDER BY ServicePeriodEnd DESC";
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
 
+        ps.setString(1, consumerInfo.getAccountID());
+        ResultSet rs = ps.executeQuery();
+        while(rs.next()) {
+            BillStanding b = new BillStanding();
+            b.setServicePeriodEnd(rs.getDate("ServicePeriodEnd").toLocalDate());
+            b.setDueDate(rs.getDate("DueDate").toLocalDate());
+            b.setBillNo(rs.getString("BillNumber"));
+            b.setConsumerType(rs.getString("ConsumerType"));
+            b.setDcrNumber(rs.getString("DCRNumber"));
+            b.setStatus(rs.getString("PaymentStatus"));
+            b.setTeller(rs.getString("Teller"));
+            b.setPostingDate(rs.getDate("DatePaid"));
+            b.setTotalAmount(rs.getDouble("PaidAmount"));
+            b.setAmountDue(rs.getDouble("BillAmount"));
+            bills.add(b);
+        }
+        rs.close();
+        ps.close();
+        return bills;
+    }
     /**
      * Retrieves the discounted amount of a bill
      * @param bill The current bill
@@ -412,11 +447,12 @@ public class BillDAO {
      */
     public static List<Bill> getAllPaidBills(int year, int month, int day, String teller) throws Exception {
 
-        String sql = "SELECT pbx.BillNumber, pbx.AccountNumber, pbx.ConsumerName, pbx.TotalAmount, pbx.ConsumerType, pbx.Period, pbx.GenerationVAT, pbx.TransmissionVAT, " +
+        String sql = "SELECT pbx.BillNumber, pbx.AccountNumber, pbx.ConsumerName, pbx.TotalAmount, pbx.ConsumerType, pbx.Period, pbx.GenerationVAT, pbx.TransmissionVAT, b.DueDate, pbx.Teller, " +
+                "(SELECT ConsumerAddress FROM AccountMaster am WHERE am.AccountNumber = pbx.AccountNumber) AS ConsumerAddress, " +
                 "pbx.OthersVAT, pbx.DistributionVAT, pbx.SLVAT, pbx.Item3, pbx.Item2, pbx.SLAdjustment, pbx.PromptPayment, pbx.Surcharge, pbx.NetAmount, pbx.Teller, pbx.ORNumber, pbx.DCRNumber, pbx.ServicePeriodEnd, " +
                 "pbx.PostingDate, pbx.PostingSequence, pbx.CurrentBills, pbx.Within30Days, pbx.Over30Days, pbx.PR, pbx.Others, pbx.Powerkwh, pbx.KatasAMount, pbx.OtherDeduction, " +
                 "pbx.MDRefund, pbx.NetAmountLessMDRefund, pbx.SeniorCitizenDiscount, pbx.GroupTag, pbx.Amount2306, pbx.Amount2307, b.FBHCAmt AS FranchiseTax, x.Item16 AS BusinessTax, " +
-                "x.Item17 AS RealPropertyTax, b.DAA_VAT, b.ACRM_VAT, b.Item1 as GenVatFeb21, FORMAT(pbx.PostingDate,'hh:mm') as PostingTime, CashAmount, CheckAmount " +
+                "x.Item17 AS RealPropertyTax, b.DAA_VAT, b.ACRM_VAT, b.Item1 as GenVatFeb21, FORMAT(pbx.PostingDate,'hh:mm') as PostingTime, CashAmount, CheckAmount, ISNULL(withPenalty, 1) AS withPenalty " +
                 "FROM PaidBillsWithRoute pbx INNER JOIN Bills b ON pbx.AccountNumber=b.AccountNumber AND pbx.ServicePeriodEnd=b.ServicePeriodEnd " +
                 "INNER JOIN PaidBills p ON p.AccountNumber=b.AccountNumber AND p.ServicePeriodEnd=b.ServicePeriodEnd " +
                 "INNER JOIN BillsExtension x ON  pbx.AccountNumber=x.AccountNumber AND pbx.ServicePeriodEnd=x.ServicePeriodEnd " +
@@ -441,12 +477,20 @@ public class BillDAO {
             ConsumerInfo consumerInfo = new ConsumerInfo(
                     accountNo,
                     rs.getString("ConsumerName"),
-                   "",
+                    rs.getString("ConsumerAddress"),
                    "",
                     "",
                     ""
             );
             PaidBill bill = new PaidBill();
+            Date date = rs.getDate("ServicePeriodEnd");
+            LocalDate billMonth = date.toLocalDate();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM YYYY");
+            bill.setWithPenalty(rs.getBoolean("withPenalty"));
+            bill.setBillMonth(formatter.format(billMonth));
+            bill.setVat(rs.getDouble("Item2"));
+            bill.setDueDate(rs.getDate("DueDate").toLocalDate());
+            bill.setTeller(rs.getString("Teller"));
             bill.setConsumerType(rs.getString("ConsumerType"));
             bill.setConsumer(consumerInfo);
             bill.setBillNo(rs.getString("BillNumber"));
@@ -484,6 +528,7 @@ public class BillDAO {
             b.setArTran(b.getTransmissionVat());
             b.setMdRefund(rs.getDouble("MDRefund"));
             b.setSurCharge(rs.getDouble("Surcharge"));
+            if (b.getSurCharge() > 0) b.setSurChargeTax((b.getSurCharge()*0.12));
             b.setSlAdjustment(rs.getDouble("SLAdjustment"));
             b.setServicePeriodEnd(rs.getDate("ServicePeriodEnd").toLocalDate());
             bills.add(bill);
@@ -699,5 +744,17 @@ public class BillDAO {
         }
         ps.close();
         conn.setAutoCommit(true);
+    }
+    /**
+     * Cancel a PaidBill from Paid Bills
+     * @param bill The Paid bill
+     * @return void
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void cancelBill(PaidBill bill) throws Exception {
+        String sql = "DELETE FROM PaidBills WHERE AccountNumber = '"+bill.getConsumer().getAccountID()+"' AND ServicePeriodEnd = '"+bill.getServicePeriodEnd().toString()+"';";
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
+        ps.executeUpdate();
+        ps.close();
     }
 }

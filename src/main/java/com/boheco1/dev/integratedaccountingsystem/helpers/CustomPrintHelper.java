@@ -9,11 +9,14 @@ import javafx.print.*;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
+import javafx.scene.text.TextAlignment;
 
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
+import java.util.Locale;
 
 public class CustomPrintHelper extends Task {
 
@@ -38,7 +41,6 @@ public class CustomPrintHelper extends Task {
     }
 
     public void print() throws Exception{
-        prepareDocument();
 
         Printer printer = Printer.getDefaultPrinter();
         System.out.println(printer.getName());
@@ -69,22 +71,23 @@ public class CustomPrintHelper extends Task {
 
     public void prepareDocument(){
 
-       /*S String meter_no = "1231312";
-        String type = "Type: ";
+       /*
+        String meter_no = "12345677";
+        String type = "Type: RM";
         String consumer = "Juan Dela Cruz";
-        String billno = "1234567890";
-        String address = "Clarin, Bohol";
+        String billno = "02-023- 2323";
+        String address = "Tubigon Bohol";
         String billmonth = "November 2022";
-        String kwhUsed = "123.5";
+        String kwhUsed = "158";
         String amount = "1500";
-        String vat = "500";
-        String due = "12/9/2022";
+        String vat = "300";
+        String due = LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
         String dueDate = "Due Date: "+due;
         String surcharge = "50";
-        String amountDue = "1550";
+        String amountDue = "600";
         String teller = "engel";
-        DateFormat dateFormat2 = new SimpleDateFormat("MM/dd/yyyy hh:mm aa");
-        String receivedDate = dateFormat2.format(new Date()).toString(); */
+        DateFormat dateFormat2 = new SimpleDateFormat("MM/dd/yy hh:mm aa");
+        String receivedDate = dateFormat2.format(new Date()).toString();*/
 
         String meter_no = bill.getConsumer().getAccountID();
         String type = "Type: "+bill.getConsumerType();
@@ -93,15 +96,25 @@ public class CustomPrintHelper extends Task {
         String address = bill.getConsumer().getConsumerAddress();
         String billmonth = bill.getBillMonth();
         String kwhUsed = bill.getPowerKWH()+"";
-        String amount = bill.getAmountDue()+"";
-        String vat = (bill.getVat() + bill.getSurChargeTax())+"";
+        double surVat = bill.getVat() + bill.getSurChargeTax();
+        String vat = Utility.formatDecimal(surVat);
         String due = bill.getDueDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
         String dueDate = "Due Date: "+due;
-        String surcharge = bill.getSurCharge()+"";
-        String amountDue = bill.getTotalAmount()+"";
+        String surcharge = Utility.formatDecimal(bill.getSurCharge());
+        String amountDue = Utility.formatDecimal(bill.getTotalAmount());
+        //Bill amount is total amount less the sum of vat, surcharge and surchargeVat
+        String amount = Utility.formatDecimal(bill.getTotalAmount() - bill.getSurCharge() - surVat);
         String teller = bill.getTeller();
-        DateFormat dateFormat2 = new SimpleDateFormat("MM/dd/yyyy hh:mm aa");
-        String receivedDate = dateFormat2.format(new Date()).toString();
+        DateFormat dateFormat2 = new SimpleDateFormat("MM/dd/yy hh:mm aa");
+        LocalDate serverDate = LocalDate.now();
+        try {
+            serverDate = Utility.serverDate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        String receivedDate = dateFormat2.format(java.sql.Date.valueOf(serverDate)).toString();
 
         System.out.println("Meter: "+meter_no);
         System.out.println(type);
@@ -124,7 +137,7 @@ public class CustomPrintHelper extends Task {
 
 
         VBox container = new VBox();
-        container.setPadding(new Insets(50, 0, 0, 0));
+        container.setPadding(new Insets(38, 0, 0, 0));
 
         double width = 580;
         double height = 216;
@@ -171,20 +184,23 @@ public class CustomPrintHelper extends Task {
         consumer_grid.setPrefWidth(width/2);
 
         Label spacer1 = new Label(" ");
-        spacer1.setStyle("-fx-font-size: 10px");
-        Label spacer2 = new Label(" ");
+        spacer1.setStyle("-fx-font-size: 12px");
+        //Label spacer2 = new Label(" ");
         Label spacer3 = new Label(" ");
         Label spacer4 = new Label(" ");
+        spacer4.setStyle("-fx-font-size: 5px");
         Label spacer5 = new Label(" ");
         Label spacer6 = new Label(" ");
+        spacer6.setStyle("-fx-font-size: 10px");
         Label spacer8 = new Label(" ");
-        spacer8.setStyle("-fx-font-size: 10px");
-        Label spacer9 = new Label(" ");
+        spacer8.setStyle("-fx-font-size: 12px");
+        //Label spacer9 = new Label(" ");
         Label spacer10 = new Label(" ");
         Label spacer11 = new Label(" ");
+        spacer11.setStyle("-fx-font-size: 5px");
         Label spacer12 = new Label(" ");
         Label spacer13 = new Label(" ");
-
+        spacer13.setStyle("-fx-font-size: 10px");
 
         Label tel_meter_lbl = new Label(meter_no);
         Label tel_type_lbl = new Label(type);
@@ -195,14 +211,15 @@ public class CustomPrintHelper extends Task {
         Label tel_kwh_lbl = new Label(kwhUsed);
         Label tel_amount_lbl = new Label(amount);
 
-        Label tel_surcharge = new Label("Surcharge");
+        Label tel_surcharge = new Label("             Surcharge");
 
         Label tel_vat_lbl = new Label(vat);
         Label tel_surcharge_lbl = new Label(surcharge);
         Label tel_duedate_lbl = new Label(dueDate);
         Label tel_amountDue_lbl = new Label(amountDue);
-        Label tel_teller_lbl = new Label(teller);
-        Label tel_receivedDate_lbl = new Label(receivedDate);
+        Label tel_teller_lbl = new Label("                     "+teller);
+        tel_addr_lbl.setTextAlignment(TextAlignment.CENTER);
+        Label tel_receivedDate_lbl = new Label("  "+receivedDate.toUpperCase(Locale.ROOT));
 
         //grid.add(Node, colIndex, rowIndex, colSpan, rowSpan):
         teller_grid.add(tel_meter_lbl,0,0,2,1);
@@ -243,7 +260,7 @@ public class CustomPrintHelper extends Task {
         Label con_bill_lbl = new Label(billno);
         Label con_addr_lbl = new Label(address);
 
-        Label con_surcharge = new Label("Surcharge");
+        Label con_surcharge = new Label("                   Surcharge");
 
         Label con_billmonth_lbl = new Label(billmonth);
         Label con_kwh_lbl = new Label(kwhUsed);
@@ -252,8 +269,9 @@ public class CustomPrintHelper extends Task {
         Label con_surcharge_lbl = new Label(surcharge);
         Label con_duedate_lbl = new Label(dueDate);
         Label con_amountDue_lbl = new Label(amountDue);
-        Label con_teller_lbl = new Label(teller);
-        Label con_receivedDate_lbl = new Label(receivedDate);
+        Label con_teller_lbl = new Label("                     "+teller);
+        con_teller_lbl.setTextAlignment(TextAlignment.CENTER);
+        Label con_receivedDate_lbl = new Label("  "+receivedDate.toUpperCase(Locale.ROOT));
 
 
         consumer_grid.add(con_meter_lbl, 0, 0, 2 , 1);
@@ -296,5 +314,13 @@ public class CustomPrintHelper extends Task {
         container.getChildren().add(copyContainer);
         container.setStyle("-fx-font-size: 9px");
         this.node = container;
+    }
+
+    public Node getNode() {
+        return node;
+    }
+
+    public void setNode(Node node) {
+        this.node = node;
     }
 }
