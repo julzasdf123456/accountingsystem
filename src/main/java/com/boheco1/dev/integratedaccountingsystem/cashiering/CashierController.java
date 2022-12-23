@@ -109,7 +109,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     @FXML
     private void search(ActionEvent event) {
-        ModalBuilderForWareHouse.showModalFromXMLNoClose(CashierController.class, "../cashiering/cashiering_search_consumer.fxml", Utility.getStackPane());
+        ModalBuilder.showModalFromXMLNoClose(CashierController.class, "../cashiering/cashiering_search_consumer.fxml", Utility.getStackPane());
     }
 
     private void resetField(){
@@ -147,6 +147,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             consumerInfo = null;
             initTable(tellerInfo);
         }
+        ModalBuilder.MODAL_CLOSE();
     }
 
     private void initTable(Object o) {
