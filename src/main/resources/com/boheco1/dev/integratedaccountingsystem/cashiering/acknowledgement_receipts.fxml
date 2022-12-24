@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="669.0" prefWidth="1079.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.AcknowledgementReceipt">
+<AnchorPane prefHeight="669.0" prefWidth="1314.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.AcknowledgementReceipt">
    <children>
       <VBox layoutX="24.0" layoutY="142.0" prefHeight="278.0" prefWidth="304.0" spacing="5.0" AnchorPane.leftAnchor="24.0">
          <children>
@@ -95,5 +95,6 @@
             <Font size="24.0" />
          </font>
       </Label>
+      <JFXButton fx:id="printButton" layoutX="1199.0" layoutY="25.0" onAction="#onPrint" prefHeight="38.0" prefWidth="89.0" styleClass="btn-theme" text="Print" textFill="WHITE" AnchorPane.rightAnchor="25.400000000000006" AnchorPane.topAnchor="25.0" />
    </children>
 </AnchorPane>

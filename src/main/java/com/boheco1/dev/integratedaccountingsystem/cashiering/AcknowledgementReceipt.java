@@ -14,11 +14,22 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.print.*;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import org.apache.poi.ss.formula.functions.Column;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,12 +54,17 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
     TableView breakdownTable;
     JFXDialog modal;
 
+    @FXML
+    JFXButton printButton;
+
     private StackPane stackPane;
 
     private TransactionHeader currentTransaction;
     private TransactionDetails currentItem;
 
     private ObservableList<TransactionDetails> transactionDetails;
+
+    private float total;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -95,7 +111,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
     }
 
     private void recomputeTotal() {
-        double total = 0;
+        total = 0;
         for(TransactionDetails td: transactionDetails) {
             total += td.getDebit();
         }
@@ -344,4 +360,51 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             modal.close();
         }
     }
+
+    public void onPrint() {
+        System.out.println("Commence printing...");
+        PrinterJob printJob = PrinterJob.createPrinterJob();
+        Printer printer = printJob.getPrinter();
+        PageLayout layout = printer.createPageLayout(Paper.NA_LETTER, PageOrientation.PORTRAIT, Printer.MarginType.HARDWARE_MINIMUM);
+
+        JobSettings jobSettings = printJob.getJobSettings();
+        jobSettings.setPageLayout(layout);
+
+        boolean printed = printJob.printPage( buildPrintableNode() );
+
+        if(printed) {
+            printJob.endJob();
+        }else {
+            System.out.println("Unable to create print job.");
+        }
+    }
+
+    private Node buildPrintableNode() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ar_print.fxml"));
+            Parent root = loader.load();
+
+            ArPrint cnt = loader.getController();
+
+            String receivedFrom = currentTransaction.getParticulars();
+
+            String[] pmtFor = new String[transactionDetails.size()];
+            double[] amount = new double[transactionDetails.size()];
+
+            for(int i=0; i<transactionDetails.size(); i++) {
+                TransactionDetails td = transactionDetails.get(i);
+                pmtFor[i] = td.getParticulars();
+                amount[i] = td.getDebit();
+            }
+
+            cnt.setData(receivedFrom, Utility.doubleAmountToWords(total), total, pmtFor, amount );
+
+            return root;
+        }catch(IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+
 }
