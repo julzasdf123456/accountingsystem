@@ -7,6 +7,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.ConsumerInfo;
 import com.jfoenix.controls.JFXTextField;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -17,6 +18,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 public class SearchConsumerController extends MenuControllerHandler implements Initializable {
@@ -59,6 +61,28 @@ public class SearchConsumerController extends MenuControllerHandler implements I
         });
         this.parentController = Utility.getParentController();
         this.query_tf.requestFocus();
+        this.query_tf.setOnKeyReleased(keyEvent -> {
+            Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() throws SQLException {
+                    if (keyEvent.getCode().isLetterKey() && query_tf.getText().length() > 2) {
+                        String query = query_tf.getText();
+                        try {
+                            consumers = FXCollections.observableArrayList(ConsumerDAO.getConsumerRecords(query));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    return null;
+                }
+            };
+
+            task.setOnSucceeded(wse -> {
+                consumersTable.setItems(consumers);
+            });
+
+            new Thread(task).start();
+        });
     }
 
     /**

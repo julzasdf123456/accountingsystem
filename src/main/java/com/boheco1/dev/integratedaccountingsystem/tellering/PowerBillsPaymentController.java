@@ -175,6 +175,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     });
 
                     task.setOnSucceeded(wse -> {
+                        setBillInfo(bills);
                         acct_no_tf.setDisable(false);
                         setConsumerInfo(consumerInfo);
                         fees_table.setItems(bills);

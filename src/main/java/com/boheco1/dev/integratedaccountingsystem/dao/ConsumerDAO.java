@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.CRMQueue;
 import com.boheco1.dev.integratedaccountingsystem.objects.ConsumerInfo;
 import java.sql.PreparedStatement;
@@ -17,7 +18,7 @@ public class ConsumerDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static List<ConsumerInfo> getConsumerRecords(String key) throws Exception  {
-        PreparedStatement ps = DB.getConnection("Billing").prepareStatement(
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(
                 "SELECT TOP 10 * FROM AccountMaster WHERE ConsumerName LIKE ? OR AccountNumber LIKE ? " +
                         "ORDER BY ConsumerName");
         ps.setString(1, '%'+ key+'%');
@@ -56,7 +57,7 @@ public class ConsumerDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static ConsumerInfo getConsumerRecord(String accountNo) throws Exception {
-        PreparedStatement ps = DB.getConnection("Billing").prepareStatement("SELECT * FROM AccountMaster WHERE AccountNumber = ?");
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement("SELECT * FROM AccountMaster WHERE AccountNumber = ?");
 
         ps.setString(1, accountNo);
 
@@ -162,7 +163,7 @@ public class ConsumerDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static void updateTIN(ConsumerInfo consumer, String tin) throws Exception {
-        PreparedStatement ps = DB.getConnection("Billing").prepareStatement(
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(
                 "UPDATE AccountMaster SET TINNo=? " +
                         "WHERE AccountNumber=?");
         ps.setString(1, tin);
