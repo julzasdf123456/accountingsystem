@@ -137,6 +137,9 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
         if (ActiveUser.getUser().can("manage-billing"))
             sidebar_vbox.setVisible(false);
+        
+        if (ActiveUser.getUser().can("manage-tellering"))
+            sidebar_vbox.setVisible(true);
 
         this.transact_btn.setDisable(true);
 

@@ -15,6 +15,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Paint;
+import javafx.util.StringConverter;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -60,6 +61,8 @@ public class ORPostingController extends MenuControllerHandler implements Initia
 
     private ObservableList<Bill> bills = FXCollections.observableArrayList();
 
+    private String teller;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.date_pker.setValue(LocalDate.now());
@@ -71,6 +74,12 @@ public class ORPostingController extends MenuControllerHandler implements Initia
         this.teller_tf.setOnAction(actionEvent -> {
             this.searchCollections();
         });
+
+        if (ActiveUser.getUser().can("manage-tellering"))
+            this.teller_tf.setVisible(false);
+
+        if (ActiveUser.getUser().can("manage-tellering") && ActiveUser.getUser().can("manage-billing"))
+            this.teller_tf.setVisible(true);
 
         this.transact_btn.setOnAction(actionEvent -> {
             String dcrNo = dcr_or_tf.getText();
@@ -114,14 +123,46 @@ public class ORPostingController extends MenuControllerHandler implements Initia
                 dialog.show();
             }
         });
+
+        this.date_pker.setConverter(new StringConverter<LocalDate>() {
+            String pattern = "MM/dd/yyyy";
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(pattern);
+
+            {
+                date_pker.setPromptText(pattern.toLowerCase());
+            }
+
+            @Override public String toString(LocalDate date) {
+                if (date != null) {
+                    return dateFormatter.format(date);
+                } else {
+                    return "";
+                }
+            }
+
+            @Override public LocalDate fromString(String string) {
+                if (string != null && !string.isEmpty()) {
+                    return LocalDate.parse(string, dateFormatter);
+                } else {
+                    return null;
+                }
+            }
+        });
     }
     /**
      * Perform paid bills transaction look up
      * @return void
      */
     public void searchCollections(){
-        String teller = teller_tf.getText();
-        if (teller.isEmpty() || teller.equals("") || teller == null){
+        teller = teller_tf.getText();
+
+        if (ActiveUser.getUser().can("manage-tellering"))
+            teller = ActiveUser.getUser().getUserName();
+
+        if (ActiveUser.getUser().can("manage-tellering") && ActiveUser.getUser().can("manage-billing"))
+            teller = teller_tf.getText();
+
+        if (ActiveUser.getUser().can("manage-billing") && (teller.isEmpty() || teller.equals("") || teller == null)){
             AlertDialogBuilder.messgeDialog("System Error", "Collector username is required! Please input it and try again!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }else {
             Task<Void> task = new Task<>() {
@@ -154,7 +195,8 @@ public class ORPostingController extends MenuControllerHandler implements Initia
                 double netAmount = 0, grossAmount = 0, mdRefund = 0;
                 int count = 0;
                 for(Bill b : this.bills){
-                    if (!((PaidBill) b).getDcrNumber().equals("") && ((PaidBill) b).getDcrNumber() != null && !((PaidBill) b).getDcrNumber().isEmpty())
+                    PaidBill pd = (PaidBill) b;
+                    if (pd.getDcrNumber() != null && !pd.getDcrNumber().isEmpty())
                         count++;
                     netAmount += b.getTotalAmount();
                     mdRefund += b.getMdRefund();

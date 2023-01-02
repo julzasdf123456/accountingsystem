@@ -137,10 +137,12 @@ public class HomeController implements Initializable {
             NavMenuHelper.addMenu(navMenuBox, budget, homeStackPane);
         }
 
-        if(ActiveUser.getUser().can("manage-billing")) {
+        if(ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-tellering")) {
             NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Billing"), new FontIcon("mdi2r-receipt"), homeStackPane);
-            NavMenuHelper.addMenu(navMenuBox, allAccounts, homeStackPane);
-            NavMenuHelper.addMenu(navMenuBox, orPosting, homeStackPane);
+            if (ActiveUser.getUser().can("manage-billing"))
+                NavMenuHelper.addMenu(navMenuBox, allAccounts, homeStackPane);
+            if (ActiveUser.getUser().can("manage-tellering"))
+                NavMenuHelper.addMenu(navMenuBox, orPosting, homeStackPane);
         }
 
         if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-cashiering")){
@@ -196,9 +198,11 @@ public class HomeController implements Initializable {
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(budget, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, budget.getText(), contentPane, "budget_layout.fxml", subToolbar, null, "manage-budget", homeStackPane, title);
         }
 
-        if(ActiveUser.getUser().can("manage-billing")) {
-            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(allAccounts, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, allAccounts.getText(), contentPane, "all_accounts_layout.fxml", subToolbar, null, title);
-            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(orPosting, new FontIcon("mdi2c-cash-usd"), drawerMenus, orPosting.getText(), contentPane, "billing/billing_or_posting.fxml", null, null, title);
+        if(ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-tellering")) {
+            if (ActiveUser.getUser().can("manage-billing"))
+                DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(allAccounts, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, allAccounts.getText(), contentPane, "all_accounts_layout.fxml", subToolbar, null, title);
+            if (ActiveUser.getUser().can("manage-tellering"))
+             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(orPosting, new FontIcon("mdi2c-cash-usd"), drawerMenus, orPosting.getText(), contentPane, "billing/billing_or_posting.fxml", null, null, title);
         }
 
         if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-cashiering")) {
