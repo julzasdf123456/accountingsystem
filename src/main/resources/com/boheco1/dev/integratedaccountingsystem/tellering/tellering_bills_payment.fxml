@@ -152,7 +152,7 @@
                                     <Insets />
                                  </HBox.margin>
                               </JFXButton>
-                              <JFXButton buttonType="RAISED" focusTraversable="false" maxWidth="1.7976931348623157E308" onAction="#reset" prefHeight="37.0" prefWidth="63.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Reset" textFill="WHITE">
+                              <JFXButton buttonType="RAISED" focusTraversable="false" maxWidth="1.7976931348623157E308" onAction="#reset" prefHeight="37.0" prefWidth="63.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Clear" textFill="WHITE">
                                  <effect>
                                     <DropShadow />
                                  </effect>
@@ -208,30 +208,36 @@
                                                                   <Insets left="16.0" />
                                                                </GridPane.margin>
                                                             </Label>
-                                                            <Label text="V A T" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                                            <Label text="V A T" GridPane.columnIndex="2" GridPane.rowIndex="2">
                                                                <padding>
                                                                   <Insets left="16.0" />
                                                                </padding>
                                                             </Label>
-                                                            <Label text="LESS KATAS" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                                            <Label text="LESS KATAS" GridPane.columnIndex="2" GridPane.rowIndex="3">
                                                                <GridPane.margin>
                                                                   <Insets left="16.0" />
                                                                </GridPane.margin>
                                                             </Label>
-                                                            <Label text="LESS MD Refund" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                                            <Label text="LESS MD Refund" GridPane.columnIndex="2" GridPane.rowIndex="4">
                                                                <GridPane.margin>
                                                                   <Insets left="16.0" />
                                                                </GridPane.margin>
                                                             </Label>
-                                                            <TextField fx:id="add_charges_tf" editable="false" focusTraversable="false" GridPane.columnIndex="1" />
-                                                            <TextField fx:id="surcharge_tf" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                            <TextField fx:id="ppd_tf" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                            <TextField fx:id="adj_tf" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                                            <TextField fx:id="ch2306_2307_tf" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                                            <TextField fx:id="power_amt_tf" editable="false" focusTraversable="false" GridPane.columnIndex="3" />
-                                                            <TextField fx:id="vat_tf" editable="false" focusTraversable="false" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                                                            <TextField fx:id="katas_tf" editable="false" focusTraversable="false" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-                                                            <TextField fx:id="md_refund_tf" editable="false" focusTraversable="false" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                                            <TextField fx:id="add_charges_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" GridPane.columnIndex="1" />
+                                                            <TextField fx:id="surcharge_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                            <TextField fx:id="ppd_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                            <TextField fx:id="adj_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                            <TextField fx:id="ch2306_2307_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                            <TextField fx:id="power_amt_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" GridPane.columnIndex="3" />
+                                                            <TextField fx:id="vat_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                                                            <TextField fx:id="katas_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                                            <TextField fx:id="md_refund_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                                                            <TextField fx:id="daa_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                                            <Label text="DAA &amp; ACRM" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                                               <padding>
+                                                                  <Insets left="16.0" />
+                                                               </padding>
+                                                            </Label>
                                                          </children>
                                                       </GridPane>
                                                    </children>
@@ -296,7 +302,7 @@
                         <HBox prefHeight="40.0" prefWidth="200.0">
                            <children>
                               <Label minWidth="110.0" prefHeight="37.0" prefWidth="110.0" text="Cash" />
-                              <TextField fx:id="payment_tf" alignment="CENTER_RIGHT" disable="true" minWidth="165.0" prefHeight="37.0" prefWidth="233.0" text="0.00" />
+                              <TextField fx:id="payment_tf" alignment="CENTER_RIGHT" disable="true" minWidth="165.0" prefHeight="37.0" prefWidth="233.0" />
                            </children>
                            <VBox.margin>
                               <Insets top="8.0" />
@@ -356,7 +362,7 @@
                         <HBox prefHeight="40.0" prefWidth="200.0">
                            <children>
                               <HBox prefHeight="40.0" HBox.hgrow="ALWAYS" />
-                              <JFXButton fx:id="transact_btn" buttonType="RAISED" maxWidth="1.7976931348623157E308" minWidth="165.0" prefHeight="37.0" prefWidth="165.0" style="-fx-background-color: #009688;" styleClass="btn-theme" text="Transact" textFill="WHITE">
+                              <JFXButton fx:id="transact_btn" buttonType="RAISED" focusTraversable="false" maxWidth="1.7976931348623157E308" minWidth="165.0" prefHeight="37.0" prefWidth="165.0" style="-fx-background-color: #009688;" styleClass="btn-theme" text="Transact" textFill="WHITE">
                                  <graphic>
                                     <FontIcon iconColor="WHITE" iconLiteral="mdi2c-content-save" iconSize="18" />
                                  </graphic>

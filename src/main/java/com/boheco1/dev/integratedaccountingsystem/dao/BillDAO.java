@@ -151,9 +151,9 @@ public class BillDAO {
         PreparedStatement ps_check = null;
         PreparedStatement ps_md = null;
 
-        for (Bill bill : bills) {
+        int postingSequence = 1;
 
-            int postingSequence = 1;
+        for (Bill bill : bills) {
 
             try {
                 PaidBill paid = (PaidBill) bill;
@@ -190,12 +190,12 @@ public class BillDAO {
                     ps_check.setDate(2, Date.valueOf(paid.getServicePeriodEnd()));
                     ps_check.setString(3, c.getBank());
                     ps_check.setString(4, c.getCheckNo());
-                    ps_check.setDouble(5, c.getAmount());
+                    ps_check.setDouble(5, c.getOriginalAmount());
                     ps_check.executeUpdate();
                 }
 
                 //Update KatasBalance in KatasData?
-                postingSequence++;
+                postingSequence += 1;
             } catch (SQLException ex) {
                 conn.rollback();
                 throw new Exception(ex.getMessage());

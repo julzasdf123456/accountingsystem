@@ -4,6 +4,7 @@ public class Check {
     private String bank;
     private String checkNo;
     private double amount;
+    private double originalAmount;
 
     public Check() {}
 
@@ -11,6 +12,7 @@ public class Check {
         this.bank = bank;
         this.checkNo = check;
         this.amount = amount;
+        this.originalAmount = amount;
     }
 
     public String getBank() {
@@ -39,5 +41,13 @@ public class Check {
 
     public String toString(){
         return this.bank+", check no: "+this.checkNo+", ₱ "+this.amount;
+    }
+
+    public double getOriginalAmount() {
+        return originalAmount;
+    }
+
+    public void setOriginalAmount(double originalAmount) {
+        this.originalAmount = originalAmount;
     }
 }

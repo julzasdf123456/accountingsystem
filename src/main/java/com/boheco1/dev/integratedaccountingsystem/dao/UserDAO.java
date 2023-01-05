@@ -38,6 +38,28 @@ public class UserDAO {
         return user;
     }
 
+    public static User authenticate(String userName, String password, Connection cxn) throws Exception {
+        PreparedStatement cs = cxn.prepareStatement("SELECT * FROM users WHERE username=? AND password=?");
+        cs.setString(1, userName);
+        cs.setString(2, Hash.hash(password));
+        ResultSet rs = cs.executeQuery();
+        if(!rs.next()) {
+            throw new Exception("Invalid user credentials");
+        }
+
+        User user = new User(
+                rs.getString("id"),
+                rs.getString("username")
+        );
+
+        user.setPermissions(getPermissions(user, cxn));
+
+        rs.close();
+        cs.close();
+
+        return user;
+    }
+
     public static User getUserByUserName(String username, Connection conn) throws SQLException {
         PreparedStatement cs = conn.prepareStatement("SELECT * FROM users WHERE username=?");
         cs.setString(1, username);

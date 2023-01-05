@@ -49,6 +49,7 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
         this.cash_tf.setOnKeyTyped(type -> {
             this.setFigures();
         });
+        this.confirm_btn.requestFocus();
     }
 
     /**
@@ -62,7 +63,7 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
 
     public void setFigures(){
         try {
-            this.cash = Double.parseDouble(this.cash_tf.getText());
+            this.cash = Double.parseDouble(this.cash_tf.getText().replace(",",""));
             this.check_amount = 0;
             if (this.checks.size() > 0) {
                 for (Check c : this.checks) {

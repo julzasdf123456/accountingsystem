@@ -20,6 +20,7 @@ import javafx.scene.layout.AnchorPane;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
+import java.util.Timer;
 
 public class SearchConsumerController extends MenuControllerHandler implements Initializable {
 
@@ -37,7 +38,9 @@ public class SearchConsumerController extends MenuControllerHandler implements I
     private ObservableList<ConsumerInfo> consumers = null;
     private ConsumerInfo consumerInfo = null;
     private ObjectTransaction parentController = null;
-
+    private Task<Void> task;
+    private boolean searching = false;
+    private Timer timer;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.createTable();
@@ -61,11 +64,17 @@ public class SearchConsumerController extends MenuControllerHandler implements I
         });
         this.parentController = Utility.getParentController();
         this.query_tf.requestFocus();
+
         this.query_tf.setOnKeyReleased(keyEvent -> {
-            Task<Void> task = new Task<>() {
+            task = new Task<>() {
                 @Override
                 protected Void call() throws SQLException {
-                    if (keyEvent.getCode().isLetterKey() && query_tf.getText().length() > 2) {
+                    if (query_tf.getText().length() > 2) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         String query = query_tf.getText();
                         try {
                             consumers = FXCollections.observableArrayList(ConsumerDAO.getConsumerRecords(query));
@@ -81,7 +90,8 @@ public class SearchConsumerController extends MenuControllerHandler implements I
                 consumersTable.setItems(consumers);
             });
 
-            new Thread(task).start();
+            if (task != null && !task.isRunning())
+                new Thread(task).start();
         });
     }
 
