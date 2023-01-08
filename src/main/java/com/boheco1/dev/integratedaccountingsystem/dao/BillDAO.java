@@ -112,10 +112,13 @@ public class BillDAO {
     /**
      * Insert as PaidDetails
      * @param bills List of bills
+     * @param change change to deposit
+     * @param deposit deposit change
+     * @param account account to deposit
      * @return void
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static void addPaidBill(List<Bill> bills) throws Exception{
+    public static void addPaidBill(List<Bill> bills, double change, boolean deposit, String account) throws Exception{
         Connection conn = DB.getConnection(Utility.DB_BILLING);
         conn.setAutoCommit(false);
 
@@ -147,11 +150,35 @@ public class BillDAO {
 
         String sql_check = "INSERT INTO CheckPayment (AccountNumber, ServicePeriodEnd, Bank, CheckNumber, Amount) VALUES(?, ?, ?, ?, ROUND(?, 2))";
 
+        String sql_deposit = "INSERT INTO AddCharges (AccountNumber, ";
+        boolean depUpdate = false;
+        HashMap<String, Double> deposits = verifyDeposit(account);
+
+        if (deposits == null){
+            sql_deposit += "QCAmount, QCMonths) VALUES (?, ?, ?)";
+        }else{
+            depUpdate = true;
+            sql_deposit = "UPDATE AddCharges SET ";
+            if (deposits.get("QCAmount") != 0){
+                if (deposits.get("EPAmount") == 0){
+                    sql_deposit += "EPAmount = ?, EPMonths = ? ";
+                }else{
+                    if (deposits.get("PCAmount") == 0){
+                        sql_deposit += "PCAmount = ?, PCMonths = ? ";
+                    }else{
+                        sql_deposit += "QCAmount = QCAmount + ?, QCMonths = QCMonths + ? ";
+                    }
+                }
+            }
+            sql_deposit += "WHERE AccountNumber = ?";
+        }
         PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
         PreparedStatement ps_check = null;
         PreparedStatement ps_md = null;
+        PreparedStatement ps_dep = null;
 
         int postingSequence = 1;
+        int count = 1;
 
         for (Bill bill : bills) {
 
@@ -194,9 +221,25 @@ public class BillDAO {
                     ps_check.executeUpdate();
                 }
 
+                if (deposit && count == 1){
+                    ps_dep = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql_deposit);
+                    if (!depUpdate) {
+                        ps_dep.setString(1, account);
+                        ps_dep.setDouble(2, -change);
+                        ps_dep.setInt(3, 1);
+                    }else{
+                        ps_dep.setDouble(1, -change);
+                        ps_dep.setInt(2, 1);
+                        ps_dep.setString(3, account);
+                    }
+                    ps_dep.executeUpdate();
+                }
+
                 //Update KatasBalance in KatasData?
                 postingSequence += 1;
+                count += 1;
             } catch (SQLException ex) {
+                ex.printStackTrace();
                 conn.rollback();
                 throw new Exception(ex.getMessage());
             }
@@ -206,6 +249,7 @@ public class BillDAO {
         ps.close();
         if (ps_check != null) ps_check.close();
         if (ps_md != null) ps_md.close();
+        if (ps_dep != null) ps_dep.close();
         conn.setAutoCommit(true);
     }
 
@@ -756,5 +800,37 @@ public class BillDAO {
         PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
         ps.executeUpdate();
         ps.close();
+    }
+
+    /**
+     * Check if a deposit is made from AddCharges table
+     * @param accountNumber The account
+     * @return HashMap
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static HashMap verifyDeposit(String accountNumber) {
+        HashMap<String, Double> result = null;
+        try {
+
+            String sql = "SELECT ISNULL(QCAmount, 0) AS QCAmount, ISNULL(QCMonths, 0) AS QCMonths, ISNULL(EPAmount, 0) AS EPAmount, ISNULL(EPMonths, 0) AS EPMonths, ISNULL(PCAmount, 0) AS PCAmount, ISNULL(PCMonths, 0) AS PCMonths " +
+                    "FROM AddCharges WHERE AccountNumber = '" + accountNumber + "';";
+            PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                result = new HashMap();
+                result.put("QCAmount", rs.getDouble("QCAmount"));
+                result.put("QCMonths", rs.getDouble("QCMonths"));
+                result.put("EPAmount", rs.getDouble("EPAmount"));
+                result.put("EPMonths", rs.getDouble("EPMonths"));
+                result.put("PCAmount", rs.getDouble("PCAmount"));
+                result.put("PCMonths", rs.getDouble("PCMonths"));
+            }
+            ps.close();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 }

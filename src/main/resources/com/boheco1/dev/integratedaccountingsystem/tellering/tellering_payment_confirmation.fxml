@@ -2,6 +2,8 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import java.lang.String?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -14,9 +16,9 @@
 
 <StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.tellering.PaymentConfirmationController">
    <children>
-      <AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="286.0" prefWidth="450.0" style="-fx-background-color: white;" stylesheets="@../style.css">
+      <AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="300.0" prefWidth="450.0" style="-fx-background-color: white;" stylesheets="@../style.css">
          <children>
-            <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="286.0" prefWidth="450.0">
+            <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="300.0" prefWidth="450.0">
                <top>
                   <VBox BorderPane.alignment="TOP_LEFT">
                      <children>
@@ -37,6 +39,7 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
                         <Label styleClass="bold" text="CASH AMOUNT" />
@@ -47,17 +50,19 @@
                         <TextField fx:id="cash_tf" alignment="CENTER_RIGHT" styleClass="bold" GridPane.columnIndex="1" />
                         <TextField fx:id="check_tf" alignment="CENTER_RIGHT" disable="true" editable="false" focusTraversable="false" styleClass="bold" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <TextField fx:id="total_amount_paid_tf" alignment="CENTER_RIGHT" disable="true" editable="false" focusTraversable="false" styleClass="bold" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <TextField fx:id="total_amount_due_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <TextField fx:id="total_amount_due_tf" alignment="CENTER_RIGHT" disable="true" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
                            <styleClass>
                               <String fx:value="bold" />
                               <String fx:value="red" />
                            </styleClass></TextField>
-                        <TextField fx:id="change_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                        <TextField fx:id="change_tf" alignment="CENTER_RIGHT" disable="true" editable="false" focusTraversable="false" GridPane.columnIndex="1" GridPane.rowIndex="4">
                            <styleClass>
                               <String fx:value="bold" />
                               <String fx:value="blue" />
                            </styleClass></TextField>
-                        <JFXButton fx:id="confirm_btn" buttonType="RAISED" onAction="#confirm" prefHeight="37.0" prefWidth="264.0" styleClass="btn-theme" text="CONFIRM" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <JFXButton fx:id="confirm_btn" buttonType="RAISED" onAction="#confirm" prefHeight="37.0" prefWidth="264.0" styleClass="btn-theme" text="CONFIRM" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <CheckBox fx:id="deposit_cb" mnemonicParsing="false" text="Deposit Change" GridPane.rowIndex="5" />
+                        <ComboBox fx:id="account_list" prefHeight="25.0" prefWidth="264.0" promptText="Select Account" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                      </children>
                   </GridPane>
                </center>

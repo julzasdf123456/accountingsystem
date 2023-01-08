@@ -64,6 +64,7 @@ public class LoginController implements Initializable {
             DB.db_billing = properties.getProperty("db_billing");
             Utility.STATION = properties.getProperty("station");
             Utility.OFFICE_PREFIX = properties.getProperty("office");
+            Utility.DB_BILLING = properties.getProperty("db_billing");
         } catch (Exception e) {
             e.printStackTrace();
             AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), loginStackPane, AlertDialogBuilder.DANGER_DIALOG);

@@ -135,7 +135,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     private ObservableList<Bill> bills = FXCollections.observableArrayList();
     private ObservableList<Check> checks = FXCollections.observableArrayList();
     private boolean isPaid = false;
-
+    private double toDeposit;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -252,10 +252,16 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 AlertDialogBuilder.messgeDialog("Partial Payment Warning", "The total payment does not exceed the total payable amount! Please check the amount!",
                         Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }else {
+                double cash = 0;
+                try {
+                    cash = Double.parseDouble(this.payment_tf.getText().replace(",", ""));
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
                 this.showConfirmation(
                         this.bills,
                         totalBills,
-                        Double.parseDouble(this.payment_tf.getText().replace(",","")),
+                        cash,
                         this.checks);
             }
         } catch (IOException e) {
@@ -289,14 +295,22 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     }
 
     public double computeTotalPayments(){
-        double total = 0;
-        try {
-            double cash = Double.parseDouble(this.payment_tf.getText());
-            double amount = Utility.getTotalAmount(this.checks);
-            total = cash + amount;
-        }catch (Exception e){
+        double total = 0, cash = 0, amount = 0;
 
+        try {
+            cash = Double.parseDouble(this.payment_tf.getText());
+        }catch (Exception e){
+            e.printStackTrace();
         }
+
+        try {
+            amount = Utility.getTotalAmount(this.checks);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        total = cash + amount;
+
         return total;
     }
 
@@ -762,39 +776,22 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         JFXDialog dialogConfirm = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
         PaymentConfirmationController controller = fxmlLoader.getController();
         controller.setPayments(bills, amount_due, cash, checks);
+        controller.setBills(bills);
+
+        toDeposit = 0;
+
+        try{
+            toDeposit = Double.parseDouble(controller.getChange_tf().getText().replace(",",""));
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+
         controller.getCash_tf().setOnAction(actionEvent -> {
-            List<Bill> updated = Utility.processor(bills, cash, checks, ActiveUser.getUser().getUserName());
-            this.progressBar.setVisible(true);
-            try {
-                BillDAO.addPaidBill(updated);
-                for (Bill b : updated) {
-                    CustomPrintHelper print = new CustomPrintHelper("OEBR", 18, 3, (PaidBill) b);
-
-                    print.prepareDocument();
-
-                    print.setOnFailed(e -> {
-                        System.out.println("Error when printing the OEBR!");
-                    });
-
-                    print.setOnSucceeded(e -> {
-                        System.out.println("Successful");
-                    });
-
-                    print.setOnRunning(e -> {
-                    });
-
-                    Thread t = new Thread(print);
-
-                    t.start();
-                }
-                this.reset();
-                dialogConfirm.close();
-            } catch (SQLException ex) {
-                AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + ex.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            } catch (Exception e) {
-                AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            }
-            this.progressBar.setVisible(false);
+            Object selection = controller.getAccount_list().getSelectionModel().getSelectedItem();
+            String accNo = "";
+            if (selection != null)
+                accNo = selection.toString();
+            this.transact(bills, cash, checks, dialogConfirm, controller.checkDeposit(), toDeposit, accNo);
         });
 
         controller.getConfirm_btn().setOnAction(action ->{
@@ -806,38 +803,11 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 dialog.close();
                 AlertDialogBuilder.messgeDialog("System Error", "The default printer is not set! Please set the printer before printing!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }else {*/
-                List<Bill> updated = Utility.processor(bills, cash, checks, ActiveUser.getUser().getUserName());
-                this.progressBar.setVisible(true);
-                try {
-                    BillDAO.addPaidBill(updated);
-                    for (Bill b : updated) {
-                        CustomPrintHelper print = new CustomPrintHelper("OEBR", 18, 3, (PaidBill) b);
-
-                        print.prepareDocument();
-
-                        print.setOnFailed(e -> {
-                            System.out.println("Error when printing the OEBR!");
-                        });
-
-                        print.setOnSucceeded(e -> {
-                            System.out.println("Successful");
-                        });
-
-                        print.setOnRunning(e -> {
-                        });
-
-                        Thread t = new Thread(print);
-
-                        t.start();
-                    }
-                    this.reset();
-                    dialogConfirm.close();
-                } catch (SQLException ex) {
-                    AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + ex.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-                } catch (Exception e) {
-                    AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-                }
-                this.progressBar.setVisible(false);
+                Object selection = controller.getAccount_list().getSelectionModel().getSelectedItem();
+                String accNo = "";
+                if (selection != null)
+                    accNo = selection.toString();
+                this.transact(bills, cash, checks, dialogConfirm, controller.checkDeposit(), toDeposit, accNo);
             //}
         });
         dialogConfirm.show();
@@ -912,6 +882,10 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         dialog.show();
     }
 
+    /**
+     * Displays menu items when table is clicked
+     * @return void
+     */
     public void setMenuActions(){
         this.fees_table.setRowFactory(tv -> {
             TableRow<Bill> row = new TableRow<>();
@@ -1085,5 +1059,46 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             }
             return row;
         });
+    }
+
+    /**
+     * Transacts powerbills payment
+     * @return void
+     */
+    public void transact(List<Bill> bills, double cash, List<Check> checks, JFXDialog dialog, boolean deposit, double change, String account){
+        List<Bill> updated = Utility.processor(bills, cash, checks, ActiveUser.getUser().getUserName());
+
+        this.progressBar.setVisible(true);
+
+        try {
+            BillDAO.addPaidBill(updated, change, deposit, account);
+            for (Bill b : updated) {
+                CustomPrintHelper print = new CustomPrintHelper("OEBR", 18, 3, (PaidBill) b);
+
+                print.prepareDocument();
+
+                print.setOnFailed(e -> {
+                    System.out.println("Error when printing the OEBR!");
+                });
+
+                print.setOnSucceeded(e -> {
+                    System.out.println("Successful");
+                });
+
+                print.setOnRunning(e -> {
+                });
+
+                Thread t = new Thread(print);
+
+                t.start();
+            }
+            this.reset();
+            dialog.close();
+        } catch (SQLException ex) {
+            AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + ex.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        } catch (Exception e) {
+            AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }
+        this.progressBar.setVisible(false);
     }
 }

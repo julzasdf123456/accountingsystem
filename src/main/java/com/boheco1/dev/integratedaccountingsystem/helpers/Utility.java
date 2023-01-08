@@ -27,7 +27,7 @@ public class Utility {
     public static double TAX = 12;
     public static String STATION = "main"; //main or sub
     public static String OFFICE_PREFIX = "OSD";
-    public static String DB_BILLING = "Billing";
+    public static String DB_BILLING = "BillingBackup";
     public static int ROW_PER_PAGE = 20;
     public static String RELEASING = "releasing";
     public static String REJECTED = "rejected";
@@ -165,7 +165,7 @@ public class Utility {
                 amount += bill.getTotalAmount();
             }else if (e instanceof Check){
                 Check check = (Check) e;
-                amount += check.getAmount();
+                amount += check.getOriginalAmount();
             }
         }
         amount = round(amount,2);

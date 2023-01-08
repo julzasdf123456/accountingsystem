@@ -16,7 +16,7 @@ public class DB {
     public static String db_user = "app_user";
     public static String db_pass = "Boheco_2021";
     public static String db_name = "Accounting";
-    public static String db_billing = "Billing";
+    public static String db_billing = "BillingBackup";
 
     //Default connection for Accounting DB
     public static Connection getConnection() throws SQLException, ClassNotFoundException {

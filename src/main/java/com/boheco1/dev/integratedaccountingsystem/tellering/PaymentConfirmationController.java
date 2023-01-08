@@ -6,12 +6,17 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.Bill;
 import com.boheco1.dev.integratedaccountingsystem.objects.Check;
 import com.jfoenix.controls.JFXButton;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -37,6 +42,12 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
     private TextField change_tf;
 
     @FXML
+    private CheckBox deposit_cb;
+
+    @FXML
+    private ComboBox account_list;
+
+    @FXML
     private JFXButton confirm_btn;
     private List<Bill> bills;
     private List<Check> checks;
@@ -50,6 +61,23 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
             this.setFigures();
         });
         this.confirm_btn.requestFocus();
+        this.deposit_cb.setOnMouseClicked(action ->{
+            if (deposit_cb.isSelected()){
+                if (account_list.getSelectionModel().getSelectedItem() == null){
+                    this.confirm_btn.setDisable(true);
+                }else{
+                    this.confirm_btn.setDisable(false);
+                }
+                this.account_list.setVisible(true);
+            }else{
+                this.confirm_btn.setDisable(false);
+                this.account_list.setVisible(false);
+            }
+        });
+
+        this.account_list.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+            this.confirm_btn.setDisable(false);
+        });
     }
 
     /**
@@ -59,6 +87,16 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
     @FXML
     public void confirm(){
 
+    }
+
+    public void setBills(List<Bill> bills){
+        ObservableList<String> accounts = FXCollections.observableArrayList(new ArrayList<>());
+        for(Bill b : bills){
+            String acc = b.getConsumer().getAccountID();
+            if (!accounts.contains(acc))
+                accounts.add(b.getConsumer().getAccountID());
+        }
+        this.account_list.setItems(accounts);
     }
 
     public void setFigures(){
@@ -108,4 +146,14 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
     }
 
     public TextField getCash_tf(){return cash_tf;}
+
+    public TextField getChange_tf(){return change_tf;}
+
+    public ComboBox getAccount_list(){return account_list;}
+
+    public boolean checkDeposit(){
+        return deposit_cb.isSelected();
+    }
+
+
 }
