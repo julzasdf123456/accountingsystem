@@ -311,7 +311,7 @@
                         <HBox prefHeight="40.0" prefWidth="200.0">
                            <children>
                               <Label minWidth="110.0" prefHeight="37.0" prefWidth="110.0" text="Check" />
-                              <JFXButton fx:id="add_check_btn" buttonType="RAISED" focusTraversable="false" maxWidth="1.7976931348623157E308" prefHeight="37.0" prefWidth="100.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Add" textFill="WHITE">
+                              <JFXButton fx:id="add_check_btn" buttonType="RAISED" disable="true" focusTraversable="false" maxWidth="1.7976931348623157E308" prefHeight="37.0" prefWidth="100.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Add" textFill="WHITE">
                                  <effect>
                                     <DropShadow />
                                  </effect>

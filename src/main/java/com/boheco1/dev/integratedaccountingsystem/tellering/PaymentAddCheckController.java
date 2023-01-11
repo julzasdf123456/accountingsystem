@@ -41,6 +41,8 @@ public class PaymentAddCheckController extends MenuControllerHandler implements 
 
     public TextField getAmount_tf(){return amount_tf;}
 
+    public TextField getBank_tf(){return bank_tf;}
+
     public Check getCheck(){
         Check check = null;
         String bank = this.bank_tf.getText();

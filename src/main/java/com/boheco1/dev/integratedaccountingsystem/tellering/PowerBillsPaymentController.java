@@ -185,6 +185,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     task.setOnSucceeded(wse -> {
                         setBillInfo(bills);
                         acct_no_tf.setDisable(false);
+                        add_check_btn.setDisable(false);
                         acct_no_tf.setText("");
                         setConsumerInfo(consumerInfo);
                         fees_table.setItems(bills);
@@ -346,12 +347,13 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.resetBillInfo();
         this.daa_tf.setText("");
         this.acct_no_tf.requestFocus();
+        this.add_check_btn.setDisable(true);
     }
     /**
      * Resets check details
      * @return void
      */
-    public void resetChecks(){
+    public void resetChecks() {
         if (this.checks == null || this.checks.size() == 0) return;
         double amount = Utility.getTotalAmount(this.checks);
         double current_total = Double.parseDouble(this.total_paid_tf.getText().replace(",","")) - amount;
@@ -614,7 +616,10 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     payment_tf.requestFocus();
                     transact_btn.setDisable(false);
                     total_paid_tf.setDisable(false);
+                    add_check_btn.setDisable(false);
                     InputHelper.restrictNumbersOnly(payment_tf);
+                }else{
+                    add_check_btn.setDisable(true);
                 }
                 progressBar.setVisible(false);
             });
@@ -682,6 +687,10 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_add_check.fxml"));
         Parent parent = fxmlLoader.load();
         PaymentAddCheckController addCheckController = fxmlLoader.getController();
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setBody(parent);
+        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+
         addCheckController.getAmount_tf().setOnAction(actionEvent -> {
             Check check = addCheckController.getCheck();
             if (check != null){
@@ -691,6 +700,14 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 this.checks_lv.setItems(this.checks);
                 double amount = Double.parseDouble(this.total_paid_tf.getText().replace(",",""));
                 this.total_paid_tf.setText(Utility.formatDecimal(amount+check.getAmount()));
+                dialog.close();
+            }
+        });
+
+        addCheckController.getAmount_tf().setOnKeyReleased(event -> {
+            if (event.getCode() == KeyCode.ESCAPE){
+                dialog.close();
+                payment_tf.requestFocus();
             }
         });
 
@@ -703,11 +720,11 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 this.checks_lv.setItems(this.checks);
                 double amount = Double.parseDouble(this.total_paid_tf.getText().replace(",",""));
                 this.total_paid_tf.setText(Utility.formatDecimal(amount+check.getAmount()));
+                dialog.close();
             }
         });
-        JFXDialogLayout dialogLayout = new JFXDialogLayout();
-        dialogLayout.setBody(parent);
-        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+        dialog.setOnDialogOpened((event) -> { addCheckController.getBank_tf().requestFocus(); });
+        dialog.setOnDialogClosed((event) -> { payment_tf.requestFocus(); });
         dialog.show();
     }
     /**
