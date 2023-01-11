@@ -113,7 +113,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                 MenuItem cancelBill = new MenuItem("Cancel Payment");
                 cancelBill.setOnAction(actionEvent -> {
                     try {
-                        showAuthenticate((PaidBill) row.getItem());
+                        showAuthenticate((PaidBill) row.getItem(), row.getIndex());
                     } catch (Exception e) {
                         AlertDialogBuilder.messgeDialog("System Error", "Error when cancelling the paid bill! "+e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                     }
@@ -807,9 +807,10 @@ public class DCRController extends MenuControllerHandler implements Initializabl
     /**
      * Displays Authenticate Form UI
      * @param bill the bill object reference
+     * @param index the bill object reference table index
      * @return void
      */
-    public void showAuthenticate(PaidBill bill) throws IOException {
+    public void showAuthenticate(PaidBill bill, int index) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_authenticate.fxml"));
         Parent parent = fxmlLoader.load();
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
@@ -822,6 +823,8 @@ public class DCRController extends MenuControllerHandler implements Initializabl
             if (ok) {
                 try {
                     BillDAO.cancelBill(bill);
+                    this.dcr_power_table.getItems().remove(index);
+                    this.dcr_power_table.refresh();
                 } catch (Exception e) {
                     AlertDialogBuilder.messgeDialog("System Error", "Process failed! "+e.getMessage(),
                             Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);

@@ -111,14 +111,14 @@
                         </HBox>
                         <HBox prefHeight="40.0">
                            <children>
-                              <Label prefHeight="25.0" prefWidth="135.0" text="No. of Bills:">
+                              <Label prefHeight="30.0" prefWidth="135.0" text="No. of Bills:">
                                  <HBox.margin>
-                                    <Insets right="16.0" top="8.0" />
+                                    <Insets right="16.0" />
                                  </HBox.margin>
                               </Label>
-                              <Label fx:id="no_bills_lbl" alignment="CENTER_RIGHT" prefHeight="25.0" prefWidth="54.0" styleClass="bold" text=" " textAlignment="RIGHT">
+                              <Label fx:id="no_bills_lbl" alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="54.0" styleClass="bold" text=" " textAlignment="RIGHT">
                                  <HBox.margin>
-                                    <Insets top="8.0" />
+                                    <Insets />
                                  </HBox.margin>
                               </Label>
                            </children>
@@ -140,9 +140,9 @@
                               <Insets />
                            </VBox.margin>
                            <children>
-                              <Label prefHeight="25.0" prefWidth="125.0" text="Gross Amount">
+                              <Label prefHeight="30.0" prefWidth="125.0" text="Gross Amount">
                                  <HBox.margin>
-                                    <Insets right="8.0" top="8.0" />
+                                    <Insets right="8.0" />
                                  </HBox.margin>
                               </Label>
                               <TextField fx:id="gross_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" prefWidth="200.0">
@@ -157,9 +157,9 @@
                               <Insets bottom="8.0" top="8.0" />
                            </VBox.margin>
                            <children>
-                              <Label prefWidth="125.0" text="MD Refund">
+                              <Label prefHeight="30.0" prefWidth="125.0" text="MD Refund">
                                  <HBox.margin>
-                                    <Insets right="8.0" top="8.0" />
+                                    <Insets right="8.0" />
                                  </HBox.margin>
                               </Label>
                               <TextField fx:id="md_ref_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" prefWidth="200.0">
@@ -174,9 +174,9 @@
                               <Insets />
                            </VBox.margin>
                            <children>
-                              <Label prefWidth="125.0" styleClass="bold" text="NET AMOUNT">
+                              <Label prefHeight="30.0" prefWidth="125.0" styleClass="bold" text="NET AMOUNT">
                                  <HBox.margin>
-                                    <Insets right="8.0" top="8.0" />
+                                    <Insets right="8.0" />
                                  </HBox.margin>
                               </Label>
                               <TextField fx:id="net_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" prefWidth="200.0">

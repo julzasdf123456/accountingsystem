@@ -28,6 +28,7 @@ import javafx.print.Printer;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -194,7 +195,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                         total_paid_tf.setDisable(false);
                         InputHelper.restrictNumbersOnly(payment_tf);
                         progressBar.setVisible(false);
-                        payment_tf.requestFocus();
+                        acct_no_tf.requestFocus();
                     });
 
                     task.setOnFailed(wse -> {
@@ -276,7 +277,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     public void setPayments(){
         try {
             double total = this.computeTotalPayments();
-            this.total_paid_tf.setText(Utility.formatDecimal(total));
+            this.total_paid_tf.setText(total+"");
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -288,7 +289,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     public void setPayables(){
         try {
             double total = Utility.getTotalAmount(this.bills);
-            this.total_payable_lbl.setText(Utility.formatDecimal(total));
+            this.total_payable_lbl.setText(total+"");
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -311,7 +312,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
         total = cash + amount;
 
-        return total;
+        return Utility.round(total, 2);
     }
 
     /**
@@ -681,6 +682,18 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_add_check.fxml"));
         Parent parent = fxmlLoader.load();
         PaymentAddCheckController addCheckController = fxmlLoader.getController();
+        addCheckController.getAmount_tf().setOnAction(actionEvent -> {
+            Check check = addCheckController.getCheck();
+            if (check != null){
+                if (this.checks == null || this.checks.size() == 0)
+                    this.checks = FXCollections.observableArrayList();
+                this.checks.add(check);
+                this.checks_lv.setItems(this.checks);
+                double amount = Double.parseDouble(this.total_paid_tf.getText().replace(",",""));
+                this.total_paid_tf.setText(Utility.formatDecimal(amount+check.getAmount()));
+            }
+        });
+
         addCheckController.getAdd_btn().setOnAction(actionEvent -> {
             Check check = addCheckController.getCheck();
             if (check != null){
@@ -793,7 +806,10 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 accNo = selection.toString();
             this.transact(bills, cash, checks, dialogConfirm, controller.checkDeposit(), toDeposit, accNo);
         });
-
+        controller.getCash_tf().setOnKeyReleased(event ->{
+            if (event.getCode() == KeyCode.ESCAPE)
+                dialogConfirm.close();
+        });
         controller.getConfirm_btn().setOnAction(action ->{
             //Get the default printer
             //Printer printer = Printer.getDefaultPrinter();
@@ -810,6 +826,8 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 this.transact(bills, cash, checks, dialogConfirm, controller.checkDeposit(), toDeposit, accNo);
             //}
         });
+        dialogConfirm.setOnDialogOpened((event) -> { controller.getCash_tf().requestFocus(); });
+        dialogConfirm.setOnDialogClosed((event) -> { payment_tf.requestFocus(); });
         dialogConfirm.show();
     }
 

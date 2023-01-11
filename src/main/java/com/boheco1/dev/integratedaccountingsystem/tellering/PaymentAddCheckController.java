@@ -39,6 +39,8 @@ public class PaymentAddCheckController extends MenuControllerHandler implements 
         return add_btn;
     }
 
+    public TextField getAmount_tf(){return amount_tf;}
+
     public Check getCheck(){
         Check check = null;
         String bank = this.bank_tf.getText();

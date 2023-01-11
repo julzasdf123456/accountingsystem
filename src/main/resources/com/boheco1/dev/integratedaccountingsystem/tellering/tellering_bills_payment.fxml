@@ -52,7 +52,7 @@
                         </HBox>
                         <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
-                              <JFXTextField fx:id="con_name_tf" editable="false" focusColor="#00ad8e" focusTraversable="false" labelFloat="true" minWidth="250.0" prefHeight="37.0" prefWidth="250.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="con_name_tf" editable="false" focusColor="#00ad8e" focusTraversable="false" labelFloat="true" minWidth="250.0" prefHeight="30.0" prefWidth="250.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -85,7 +85,7 @@
                                  </HBox.margin>
                               </JFXTextField>
                               <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                              <JFXTextField fx:id="acct_no_tf" focusColor="#00ad8e" labelFloat="true" minWidth="220.0" prefHeight="37.0" prefWidth="220.0" promptText="Account Number" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="acct_no_tf" focusColor="#00ad8e" labelFloat="true" minWidth="220.0" prefHeight="30.0" prefWidth="220.0" promptText="Account Number" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>

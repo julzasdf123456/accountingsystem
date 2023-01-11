@@ -155,19 +155,29 @@ public class BillDAO {
         HashMap<String, Double> deposits = verifyDeposit(account);
 
         if (deposits == null){
-            sql_deposit += "QCAmount, QCMonths) VALUES (?, ?, ?)";
+            sql_deposit += "QCLoanAmount, QCMonths) VALUES (?, ?, ?)";
         }else{
             depUpdate = true;
             sql_deposit = "UPDATE AddCharges SET ";
-            if (deposits.get("QCAmount") != 0){
-                if (deposits.get("EPAmount") == 0){
-                    sql_deposit += "EPAmount = ?, EPMonths = ? ";
-                }else{
-                    if (deposits.get("PCAmount") == 0){
-                        sql_deposit += "PCAmount = ?, PCMonths = ? ";
-                    }else{
-                        sql_deposit += "QCAmount = QCAmount + ?, QCMonths = QCMonths + ? ";
+            /*
+            if (deposits.get("QCLoanAmount") != 0) {
+                if (deposits.get("QCAmount") != 0) {
+                    if (deposits.get("EPAmount") == 0) {
+                        sql_deposit += "EPAmount = ?, EPMonths = ? ";
+                    } else {
+                        if (deposits.get("PCAmount") == 0) {
+                            sql_deposit += "PCAmount = ?, PCMonths = ? ";
+                        } else {
+                            sql_deposit += "QCLoanAmount = QCLoanAmount + ?, QCMonths = QCMonths + ? ";
+                        }
                     }
+                }
+            }*/
+            if (deposits.get("QCLoanAmount") != 0) {
+                if (deposits.get("QCAmount") != 0) {
+                    sql_deposit += "QCLoanAmount = QCLoanAmount + ?, QCMonths = ISNULL(QCMonths,0) + ? ";
+                }else{
+                    sql_deposit += "QCAmount = ?, QCMonths = ? ";
                 }
             }
             sql_deposit += "WHERE AccountNumber = ?";
@@ -812,13 +822,14 @@ public class BillDAO {
         HashMap<String, Double> result = null;
         try {
 
-            String sql = "SELECT ISNULL(QCAmount, 0) AS QCAmount, ISNULL(QCMonths, 0) AS QCMonths, ISNULL(EPAmount, 0) AS EPAmount, ISNULL(EPMonths, 0) AS EPMonths, ISNULL(PCAmount, 0) AS PCAmount, ISNULL(PCMonths, 0) AS PCMonths " +
+            String sql = "SELECT ISNULL(QCLoanAmount, 0) AS QCLoanAmount, ISNULL(QCAmount, 0) AS QCAmount, ISNULL(QCMonths, 0) AS QCMonths, ISNULL(EPAmount, 0) AS EPAmount, ISNULL(EPMonths, 0) AS EPMonths, ISNULL(PCAmount, 0) AS PCAmount, ISNULL(PCMonths, 0) AS PCMonths " +
                     "FROM AddCharges WHERE AccountNumber = '" + accountNumber + "';";
             PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 result = new HashMap();
+                result.put("QCLoanAmount", rs.getDouble("QCLoanAmount"));
                 result.put("QCAmount", rs.getDouble("QCAmount"));
                 result.put("QCMonths", rs.getDouble("QCMonths"));
                 result.put("EPAmount", rs.getDouble("EPAmount"));
