@@ -27,8 +27,6 @@ import javafx.util.StringConverter;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.util.CellRangeAddress;
-
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,10 +37,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class DCRController extends MenuControllerHandler implements Initializable {
 
@@ -187,6 +182,8 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                 }
             }
         });
+        this.setDate();
+        this.generateReport();
     }
     /**
      * Generates DCR in excel format
@@ -227,7 +224,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                             int month = date_pker.getValue().getMonthValue();
                             int day = date_pker.getValue().getDayOfMonth();
                             int year = date_pker.getValue().getYear();
-                            DCRController.generateDCR(fileOut, teller, day+"/"+month+"/"+year,
+                            DCRController.generateDCR(fileOut, teller, month+"/"+day+"/"+year,
                                     BillDAO.getAllPaidBills(year, month, day, teller),
                                     BillDAO.getDCRBreakDown(year, month, day, teller));
                         }
@@ -379,7 +376,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                 dcr_total.setText("0");
                 dcr_breakdown_table.setItems(FXCollections.observableArrayList());
                 dcr_power_table.setItems(FXCollections.observableArrayList());
-                AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request! Please try again!",
+                AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request! "+wse.getSource().getException().getMessage(),
                         Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             });
 
@@ -394,16 +391,16 @@ public class DCRController extends MenuControllerHandler implements Initializabl
     public void createDCRTransactionsTable(){
         TableColumn<Bill, String> column0 = new TableColumn<>("Bill #");
 
-        column0.setPrefWidth(110);
-        column0.setMaxWidth(110);
-        column0.setMinWidth(110);
+        column0.setPrefWidth(100);
+        column0.setMaxWidth(100);
+        column0.setMinWidth(100);
         column0.setCellValueFactory(new PropertyValueFactory<>("billNo"));
         column0.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Bill, String> column = new TableColumn<>("Account #");
-        column.setPrefWidth(110);
-        column.setMaxWidth(110);
-        column.setMinWidth(110);
+        column.setPrefWidth(100);
+        column.setMaxWidth(100);
+        column.setMinWidth(100);
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumer().getAccountID()));
         column.setStyle("-fx-alignment: center-left;");
 
@@ -412,16 +409,16 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Bill, String> column2 = new TableColumn<>("Bill Balance");
-        column2.setPrefWidth(120);
-        column2.setMaxWidth(120);
-        column2.setMinWidth(120);
+        column2.setPrefWidth(100);
+        column2.setMaxWidth(100);
+        column2.setMinWidth(100);
         column2.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getAmountDue())));
         column2.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column3 = new TableColumn<>("Type");
-        column3.setPrefWidth(75);
-        column3.setMaxWidth(75);
-        column3.setMinWidth(75);
+        column3.setPrefWidth(50);
+        column3.setMaxWidth(50);
+        column3.setMinWidth(50);
         column3.setCellValueFactory(new PropertyValueFactory<>("consumerType"));
         column3.setStyle("-fx-alignment: center;");
 
@@ -433,30 +430,30 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         column31.setStyle("-fx-alignment: center;");
 
         TableColumn<Bill, String> column4 = new TableColumn<>("Sys. Loss");
-        column4.setPrefWidth(100);
-        column4.setMaxWidth(100);
-        column4.setMinWidth(100);
+        column4.setPrefWidth(75);
+        column4.setMaxWidth(75);
+        column4.setMinWidth(75);
         column4.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getSlAdjustment())));
         column4.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column5 = new TableColumn<>("PPD");
-        column5.setPrefWidth(100);
-        column5.setMaxWidth(100);
-        column5.setMinWidth(100);
+        column5.setPrefWidth(75);
+        column5.setMaxWidth(75);
+        column5.setMinWidth(75);
         column5.setCellValueFactory(obj -> new SimpleStringProperty((Utility.formatDecimal(((PaidBill)obj.getValue()).getPromptPayment()))));
         column5.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column6 = new TableColumn<>("Surcharge");
-        column6.setPrefWidth(100);
-        column6.setMaxWidth(100);
-        column6.setMinWidth(100);
+        column6.setPrefWidth(75);
+        column6.setMaxWidth(75);
+        column6.setMinWidth(75);
         column6.setCellValueFactory(obj -> new SimpleStringProperty((Utility.formatDecimal(obj.getValue().getSurCharge()))));
         column6.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column7 = new TableColumn<>("Net-Amt.");
-        column7.setPrefWidth(125);
-        column7.setMaxWidth(125);
-        column7.setMinWidth(125);
+        column7.setPrefWidth(100);
+        column7.setMaxWidth(100);
+        column7.setMinWidth(100);
         column7.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getTotalAmount())));
         column7.setStyle("-fx-alignment: center-right;");
 
@@ -464,9 +461,9 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         column8.setCellValueFactory(obj -> new SimpleStringProperty(
                 ((PaidBill) obj.getValue()).getPostingTime()+""
         ));
-        column8.setPrefWidth(75);
-        column8.setMaxWidth(75);
-        column8.setMinWidth(75);
+        column8.setPrefWidth(65);
+        column8.setMaxWidth(65);
+        column8.setMinWidth(65);
         column8.setStyle("-fx-alignment: center;");
 
         this.bills =  FXCollections.observableArrayList();
@@ -898,5 +895,15 @@ public class DCRController extends MenuControllerHandler implements Initializabl
             }
         });
         dialog.show();
+    }
+
+    public void setDate(){
+        java.util.Date date= new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int month = cal.get(Calendar.MONTH)+1;
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        int year = cal.get(Calendar.YEAR);
+        this.date_pker.getEditor().setText(month+"/"+day+"/"+year);
     }
 }

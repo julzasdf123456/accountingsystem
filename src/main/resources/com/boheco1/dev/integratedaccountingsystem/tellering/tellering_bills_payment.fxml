@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -173,10 +174,13 @@
                      <children>
                         <VBox layoutY="8.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="8.0">
                            <children>
-                              <TableView fx:id="fees_table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                              <ScrollPane id="bills" fx:id="sp" fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
+                                 <content>
+                                    <TableView fx:id="fees_table" prefHeight="200.0" prefWidth="200.0" />
+                                 </content>
+                              </ScrollPane>
                               <VBox prefHeight="197.0" prefWidth="927.0">
                                  <children>
-                                    <Separator prefWidth="200.0" />
                                     <HBox prefHeight="115.0" prefWidth="927.0" VBox.vgrow="ALWAYS">
                                        <children>
                                           <HBox prefHeight="100.0" prefWidth="631.0" HBox.hgrow="ALWAYS">
