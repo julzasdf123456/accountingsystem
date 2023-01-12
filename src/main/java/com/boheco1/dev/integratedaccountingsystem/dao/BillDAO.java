@@ -150,7 +150,7 @@ public class BillDAO {
 
         String sql_check = "INSERT INTO CheckPayment (AccountNumber, ServicePeriodEnd, Bank, CheckNumber, Amount) VALUES(?, ?, ?, ?, ROUND(?, 2))";
 
-        String sql_deposit = "INSERT INTO AddCharges (AccountNumber, ";
+        String sql_deposit = "INSERT INTO OtherCharges (AccountNumber, ";
         boolean depUpdate = false;
         HashMap<String, Double> deposits = verifyDeposit(account);
 
@@ -158,7 +158,7 @@ public class BillDAO {
             sql_deposit += "QCLoanAmount, QCMonths) VALUES (?, ?, ?)";
         }else{
             depUpdate = true;
-            sql_deposit = "UPDATE AddCharges SET ";
+            sql_deposit = "UPDATE OtherCharges SET ";
             /*
             if (deposits.get("QCLoanAmount") != 0) {
                 if (deposits.get("QCAmount") != 0) {
@@ -330,6 +330,21 @@ public class BillDAO {
             }else{
                 bill.setSurCharge(0);
                 bill.setSurChargeTax(0);
+            }
+            //Automatic PPD for BAPA, ECA, I, CL, CS with 1000kwh within due date payment
+            if ((bill.getConsumerType().equals("B")
+                    || bill.getConsumerType().equals("E")
+                    || bill.getConsumerType().equals("I")
+                    || bill.getConsumerType().equals("CL")
+                    || (bill.getConsumerType().equals("CS") && bill.getPowerKWH() >= 1000))
+                    && bill.getDaysDelayed() <= 0) {
+                double ppd = 0;
+                try {
+                    ppd = BillDAO.getDiscount(bill);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                bill.setDiscount(ppd);
             }
             bill.computeTotalAmount();
 
@@ -823,7 +838,7 @@ public class BillDAO {
         try {
 
             String sql = "SELECT ISNULL(QCLoanAmount, 0) AS QCLoanAmount, ISNULL(QCAmount, 0) AS QCAmount, ISNULL(QCMonths, 0) AS QCMonths, ISNULL(EPAmount, 0) AS EPAmount, ISNULL(EPMonths, 0) AS EPMonths, ISNULL(PCAmount, 0) AS PCAmount, ISNULL(PCMonths, 0) AS PCMonths " +
-                    "FROM AddCharges WHERE AccountNumber = '" + accountNumber + "';";
+                    "FROM OtherCharges WHERE AccountNumber = '" + accountNumber + "';";
             PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
 

@@ -958,16 +958,31 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                             || row.getItem().getConsumerType().equals("CL")
                             || (row.getItem().getConsumerType().equals("CS") && row.getItem().getPowerKWH() >= 1000))
                             && row.getItem().getDaysDelayed() <= 0) {
-                        double ppd = 0;
-                        try {
-                            ppd = BillDAO.getDiscount(row.getItem());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        row.getItem().setDiscount(ppd);
-                        row.getItem().computeTotalAmount();
-                        tv.refresh();
-                        this.setBillInfo(bills);
+                        JFXButton ppdBtn = new JFXButton("Add PPD");
+                        JFXTextField input = new JFXTextField();
+                        InputValidation.restrictNumbersOnly(input);
+                        JFXDialog dialog = DialogBuilder.showInputDialog("Less PPD","Enter Discount Amount:  ", "0.00", input, ppdBtn, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+                        ppdBtn.setOnAction(action-> {
+                            if (input.getText().length() == 0) {
+                                AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid amount!",
+                                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                            } else {
+                                double amount = 0;
+                                try {
+                                    amount = Double.parseDouble(input.getText());
+                                } catch (Exception e) {
+
+                                }
+                                row.getItem().setDiscount(amount);
+                                row.getItem().computeTotalAmount();
+                                tv.refresh();
+                                this.setBillInfo(bills);
+                                this.setPayables();
+                            }
+                            dialog.close();
+                        });
+                        dialog.setOnDialogOpened((event) -> { input.requestFocus(); });
+                        dialog.show();
                     }else{
                         AlertDialogBuilder.messgeDialog("System Error", "Only consumer types BAPA, ECA, I, CL, and CS with more than 1KWH can avail the 1% discount on or before due date!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                     }
