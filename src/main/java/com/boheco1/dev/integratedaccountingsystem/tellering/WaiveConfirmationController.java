@@ -58,4 +58,8 @@ public class WaiveConfirmationController extends MenuControllerHandler implement
     public JFXButton getAuthenticate_btn() {
         return authenticate_btn;
     }
+
+    public TextField getUsername_tf(){ return this.username_tf; }
+
+    public PasswordField getPassword_tf(){return this.password_tf; }
 }

@@ -73,10 +73,11 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
                 this.confirm_btn.setDisable(false);
                 this.account_list.setVisible(false);
             }
+            setFigures();
         });
 
         this.account_list.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
-            this.confirm_btn.setDisable(false);
+            setFigures();
         });
     }
 
@@ -100,8 +101,11 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
     }
 
     public void setFigures(){
+        String cash = this.cash_tf.getText();
+        if (cash.contains(","))
+            cash = cash.replace(",","");
         try {
-            this.cash = Double.parseDouble(this.cash_tf.getText().replace(",",""));
+            this.cash = Double.parseDouble(cash);
             this.check_amount = 0;
             if (this.checks.size() > 0) {
                 for (Check c : this.checks) {

@@ -207,6 +207,8 @@ public class Utility {
 
         List<Bill> completed = new ArrayList<>();
 
+        double checkAmount = 0;
+
         while (!billQueue.isEmpty()){
             System.out.println("==================================================================================================================");
             Bill b = billQueue.peek();
@@ -233,36 +235,52 @@ public class Utility {
                 System.out.print(" -> Check Number: "+c.getCheckNo()+" Amount: "+c.getAmount());
                 System.out.print(" Deducting check amount of "+c.getAmount()+" from "+b.getBalance()+"\n");
                 double balance = c.getAmount() - b.getBalance();
-
+                p.getChecks().add(c);
+                //If check amount greater than bill balance
                 if (balance > 0) {
-                    System.out.println(" -> Bill balance is 0. Set current remaining check amount of "+ -balance +". Removed bill from queue and added to completed.");
+                    System.out.println(" -> Bill balance is 0. Set current remaining check amount of "+ -balance +". Removed bill from queue and added to completed. proceed to next check.");
                     c.setAmount(balance);
+                    checkAmount = balance;
                     //Set bill check amount to bill total amount
-                    p.setCheckAmount(b.getBalance());
-                    p.getChecks().add(c);
+                    p.setCheckAmount(p.getCheckAmount() + b.getBalance());
                     b.setBalance(0);
                     billQueue.remove();
                     completed.add(b);
                     break;
-                }else {
+                //If check amount < bill balance
+                }else if (balance < 0){
                     System.out.println(" -> Bill balance has balance of "+ -balance +". Removed check from queue and proceed to next check.");
                     p.setCheckAmount(p.getCheckAmount() + c.getAmount());
-                    p.getChecks().add(c);
+                    c.setAmount(0);
+                    checkAmount = 0;
                     checkQueue.remove();
                     b.setBalance(-balance);
+                //If check amount = bill balance
+                }else{
+                    System.out.println(" -> Bill balance is 0. Removed check from queue and proceed to next bill.");
+                    p.setCheckAmount(p.getCheckAmount() + b.getBalance());
+                    b.setBalance(0);
+                    c.setAmount(0);
+                    checkAmount = 0;
+                    billQueue.remove();
+                    checkQueue.remove();
+                    completed.add(b);
+                    break;
                 }
             }
-            System.out.println(" -> No check in queue. Processing cash amount.");
-            System.out.println(" -> Bill balance has balance of "+ b.getBalance() +". Proceed to next.");
-            //If bill has balance and cash is less than balance
+            System.out.println("No check in queue. Processing cash amount.");
+            System.out.println("Bill balance has balance of "+ b.getBalance() +". Proceed to next.");
+
+            /*If bill has balance and cash is less than balance
             if (b.getBalance() > 0 && cash < b.getBalance()) {
                 System.out.println(" -> Deducting cash amount: "+cash+" from "+ b.getBalance() +". Proceed to next.");
                 b.setBalance(cash);
-                cash = 0;
+                cash = 0;*/
+
             //If bill has balance and cash is greater than balance,
-            }else if (b.getBalance() > 0 && cash > b.getBalance()) {
-                System.out.println(" -> Deducting bill remaining balance " + b.getBalance() + " from cash amount: "+ cash +". Proceed to next.");
-                ((PaidBill) b).setCashAmount(b.getBalance());
+            if (b.getBalance() > 0 && cash >= b.getBalance()) {
+                System.out.println("Deducting bill remaining balance " + b.getBalance() + " from cash amount: "+ cash +". Proceed to next.");
+                p.setCashAmount(b.getBalance());
                 cash = cash - b.getBalance();
                 b.setBalance(0);
                 completed.add(b);
@@ -270,8 +288,12 @@ public class Utility {
             }
         }
         System.out.println("==================================================================================================================");
-        System.out.println("After processing the checks and cash, remaining cash amount: "+cash);
+        System.out.println("After processing the checks and cash, remaining cash amount: "+cash+", check amount: "+checkAmount);
         System.out.println("==================================================================================================================");
+        for(Bill cb: completed){
+            PaidBill p = (PaidBill) cb;
+            System.out.println("BILL: "+p.getBillNo()+" Bill Amount: "+ p.getTotalAmount() +" != "+p.getCashAmount()+"+"+p.getCheckAmount());
+        }
         return completed;
     }
 
