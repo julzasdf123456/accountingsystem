@@ -199,7 +199,7 @@ public class Utility {
         return String.format("%,.2f",val);
     }
 
-    public static List<Bill> processor(List<Bill> bills, double cash, List<Check> checks, String teller){
+    public static List<Bill> processor(List<Bill> bills, double cash, List<Check> checks, String teller) throws Exception{
 
         Queue<Bill> billQueue = new LinkedList<>(bills);
 
@@ -209,48 +209,48 @@ public class Utility {
 
         double checkAmount = 0;
 
-        while (!billQueue.isEmpty()){
+        while (!billQueue.isEmpty()) {
             System.out.println("==================================================================================================================");
             Bill b = billQueue.peek();
-            System.out.println("Cash Amount: "+cash);
+            System.out.println("Cash Amount: " + cash);
             try {
                 PaidBill pd = (PaidBill) b;
                 pd.setTeller(teller);
                 //If current user is a Teller
                 if (ActiveUser.getUser().getEmployeeInfo().getDesignation().equals("Teller")) {
                     pd.setPaymentType("SUB-OFFICE/STATION");
-                //Otherwise
-                }else{
+                    //Otherwise
+                } else {
                     pd.setPaymentType("SIT-IN");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            System.out.println("Bill No: "+b.getBillNo()+" Bill balance: "+b.getBalance());
+            System.out.println("Bill No: " + b.getBillNo() + " Bill balance: " + b.getBalance());
             PaidBill p = (PaidBill) b;
             if (p.getChecks() == null)
                 p.setChecks(new ArrayList<Check>());
-            while (!checkQueue.isEmpty()){
+            while (!checkQueue.isEmpty()) {
                 Check c = checkQueue.peek();
-                System.out.print(" -> Check Number: "+c.getCheckNo()+" Amount: "+c.getAmount());
-                System.out.print(" Deducting check amount of "+c.getAmount()+" from "+b.getBalance()+"\n");
-                double balance = c.getAmount() - b.getBalance();
+                System.out.print(" -> Check Number: " + c.getCheckNo() + " Amount: " + c.getAmount());
+                System.out.print(" Deducting check amount of " + c.getAmount() + " from " + b.getBalance() + "\n");
+                double balance = Utility.round(c.getAmount() - b.getBalance(), 2);
                 p.getChecks().add(c);
                 //If check amount greater than bill balance
                 if (balance > 0) {
-                    System.out.println(" -> Bill balance is 0. Set current remaining check amount of "+ -balance +". Removed bill from queue and added to completed. proceed to next check.");
+                    System.out.println(" -> Bill balance is 0. Set current remaining check amount of " + -balance + ". Removed bill from queue and added to completed. proceed to next check.");
                     c.setAmount(balance);
                     checkAmount = balance;
                     //Set bill check amount to bill total amount
-                    p.setCheckAmount(p.getCheckAmount() + b.getBalance());
+                    p.setCheckAmount(Utility.round(p.getCheckAmount() + b.getBalance(), 2));
                     b.setBalance(0);
                     billQueue.remove();
                     completed.add(b);
                     break;
-                //If check amount < bill balance
-                }else if (balance < 0){
-                    System.out.println(" -> Bill balance has balance of "+ -balance +". Removed check from queue and proceed to next check.");
-                    p.setCheckAmount(p.getCheckAmount() + c.getAmount());
+                    //If check amount < bill balance
+                } else if (balance < 0) {
+                    System.out.println(" -> Bill balance has balance of " + -balance + ". Removed check from queue and proceed to next check.");
+                    p.setCheckAmount(Utility.round(p.getCheckAmount() + c.getAmount(), 2));
                     c.setAmount(0);
                     checkAmount = 0;
                     checkQueue.remove();
@@ -258,7 +258,7 @@ public class Utility {
                 //If check amount = bill balance
                 }else{
                     System.out.println(" -> Bill balance is 0. Removed check from queue and proceed to next bill.");
-                    p.setCheckAmount(p.getCheckAmount() + b.getBalance());
+                    p.setCheckAmount(Utility.round(p.getCheckAmount() + b.getBalance(), 2));
                     b.setBalance(0);
                     c.setAmount(0);
                     checkAmount = 0;
@@ -269,7 +269,7 @@ public class Utility {
                 }
             }
             System.out.println("No check in queue. Processing cash amount.");
-            System.out.println("Bill balance has balance of "+ b.getBalance() +". Proceed to next.");
+            System.out.println("Bill balance has balance of " + b.getBalance() + ". Proceed to next.");
 
             /*If bill has balance and cash is less than balance
             if (b.getBalance() > 0 && cash < b.getBalance()) {
@@ -278,13 +278,15 @@ public class Utility {
                 cash = 0;*/
 
             //If bill has balance and cash is greater than balance,
-            if (b.getBalance() > 0 && cash >= b.getBalance()) {
+            if (b.getBalance() >= 0 && cash >= b.getBalance()) {
                 System.out.println("Deducting bill remaining balance " + b.getBalance() + " from cash amount: "+ cash +". Proceed to next.");
                 p.setCashAmount(b.getBalance());
                 cash = cash - b.getBalance();
                 b.setBalance(0);
                 completed.add(b);
                 billQueue.remove();
+            }else{
+                throw new Exception("Computation error: Bill Total: "+ Utility.round(p.getTotalAmount(),2) +", Cash Amount: "+p.getCashAmount()+", Check Amount: "+p.getCheckAmount());
             }
         }
         System.out.println("==================================================================================================================");
@@ -292,7 +294,7 @@ public class Utility {
         System.out.println("==================================================================================================================");
         for(Bill cb: completed){
             PaidBill p = (PaidBill) cb;
-            System.out.println("BILL: "+p.getBillNo()+" Bill Amount: "+ p.getTotalAmount() +" != "+p.getCashAmount()+"+"+p.getCheckAmount());
+            System.out.println("BILL: "+p.getBillNo()+" Bill Amount: "+ Utility.round(p.getTotalAmount(), 2) +" != "+p.getCashAmount()+"+"+p.getCheckAmount());
         }
         return completed;
     }

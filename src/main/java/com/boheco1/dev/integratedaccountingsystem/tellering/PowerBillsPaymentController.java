@@ -1181,11 +1181,10 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
      * @return void
      */
     public void transact(List<Bill> bills, double cash, List<Check> checks, JFXDialog dialog, boolean deposit, double change, String account){
-        List<Bill> updated = Utility.processor(bills, cash, checks, ActiveUser.getUser().getUserName());
-
         this.progressBar.setVisible(true);
 
         try {
+            List<Bill> updated = Utility.processor(bills, cash, checks, ActiveUser.getUser().getUserName());
             BillDAO.addPaidBill(updated, change, deposit, account);
             for (Bill b : updated) {
                 CustomPrintHelper print = new CustomPrintHelper("OEBR", 18, 3, (PaidBill) b);
