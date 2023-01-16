@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 
@@ -137,9 +138,17 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     private ObservableList<Check> checks = FXCollections.observableArrayList();
     private boolean isPaid = false;
     private double toDeposit, cash = 0;
+    private JFXDialog dialogConfirm = null;
+    private EventHandler<ActionEvent> confirmEvent;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        confirmEvent = new EventHandler<>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                confirmPayment();
+            }
+        };
 
         if (ActiveUser.getUser().can("manage-billing"))
             sidebar_vbox.setVisible(false);
@@ -223,9 +232,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             this.setPayments();
         });
 
-        this.payment_tf.setOnAction(actionEvent -> {
-            this.confirmPayment();
-        });
+        this.payment_tf.addEventHandler(ActionEvent.ACTION, confirmEvent);
 
         this.add_check_btn.setOnAction(action -> {
             try {
@@ -247,7 +254,6 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
     public void confirmPayment(){
         try {
-
             double totalBills = Utility.getTotalAmount(this.bills);
             double totalPayments = this.computeTotalPayments();
 
@@ -826,12 +832,13 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
      * @return void
      */
     public void showConfirmation(List<Bill> bills, double amount_due, List<Check> checks) throws IOException {
+        payment_tf.removeEventHandler(ActionEvent.ACTION, confirmEvent);
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_payment_confirmation.fxml"));
         Parent parent = fxmlLoader.load();
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
         dialogLayout.setHeading(new Label("PAYMENT CONFIRMATION"));
         dialogLayout.setBody(parent);
-        JFXDialog dialogConfirm = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+        dialogConfirm = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM, true);
         PaymentConfirmationController controller = fxmlLoader.getController();
         controller.setPayments(bills, amount_due, cash, checks);
         controller.setBills(bills);
@@ -890,7 +897,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             //}
         });
         dialogConfirm.setOnDialogOpened((event) -> { controller.getCash_tf().requestFocus(); });
-        dialogConfirm.setOnDialogClosed((event) -> { payment_tf.requestFocus(); });
+        dialogConfirm.setOnDialogClosed((event) -> { payment_tf.requestFocus(); payment_tf.addEventHandler(ActionEvent.ACTION, confirmEvent); });
         dialogConfirm.show();
     }
 
@@ -1001,12 +1008,17 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 MenuItem itemAddPPD = new MenuItem("Less PPD");
                 itemAddPPD.setOnAction(actionEvent -> {
                     //Only I, CL, CS with >= 1kwh, B, E, AND DAYS BEFORE DUE DATE
-                    if ((row.getItem().getConsumerType().equals("B")
-                            || row.getItem().getConsumerType().equals("E")
-                            || row.getItem().getConsumerType().equals("I")
-                            || row.getItem().getConsumerType().equals("CL")
-                            || (row.getItem().getConsumerType().equals("CS") && row.getItem().getPowerKWH() >= 1000))
-                            && row.getItem().getDaysDelayed() <= 0) {
+                    if (
+                            (row.getItem().getConsumerType().equals("B")
+                             || row.getItem().getConsumerType().equals("E")
+                             ||
+                            ((row.getItem().getConsumerType().equals("I")
+                             || row.getItem().getConsumerType().equals("CL")
+                             || row.getItem().getConsumerType().equals("CS"))
+                             && row.getItem().getPowerKWH() >= 1000)
+                            )
+                       && row.getItem().getDaysDelayed() <= 0
+                      ) {
                         JFXButton ppdBtn = new JFXButton("Add PPD");
                         JFXTextField input = new JFXTextField();
                         InputValidation.restrictNumbersOnly(input);
@@ -1034,7 +1046,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                         dialog.setOnDialogClosed((event) -> {this.payment_tf.requestFocus(); });
                         dialog.show();
                     }else{
-                        AlertDialogBuilder.messgeDialog("System Error", "Only consumer types BAPA, ECA, I, CL, and CS with more than 1KWH can avail the 1% discount on or before due date!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                        AlertDialogBuilder.messgeDialog("System Error", "Only consumer types: BAPA, ECA, and I, CL, CS with more than 1KWH can avail the 1% discount on or before due date!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                         this.payment_tf.requestFocus();
                     }
                 });
