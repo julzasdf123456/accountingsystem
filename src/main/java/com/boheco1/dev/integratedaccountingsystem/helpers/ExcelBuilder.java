@@ -41,6 +41,24 @@ public class ExcelBuilder {
     }
 
     /**
+     * Constructor for the ExcelBuilder with fixed predefined column widths
+     * @param wide the number of cells (width)
+     **/
+    public ExcelBuilder(int wide, int[] widths, double left, double right){
+        this.wb = new XSSFWorkbook();
+        this.sheet = this.wb.createSheet("Sheet");
+        this.header = header;
+        this.address = address;
+        this.title = title;
+        this.wide = wide;
+        for (int i = 0; i < widths.length; i++){
+            this.sheet.setColumnWidth(i, widths[i]*256);
+        }
+        this.sheet.setMargin(Sheet.RightMargin, right);
+        this.sheet.setMargin(Sheet.LeftMargin, left);
+    }
+
+    /**
      * Default Constructor for the ExcelBuilder
      * @param header string for the header
      * @param address string for the address
@@ -145,6 +163,7 @@ public class ExcelBuilder {
         Font font = wb.createFont();
         font.setFontHeightInPoints((short)fontSize);
         font.setFontName("Arial");
+        style.setFont(font);
         style.setAlignment(alignment);
 
         if (wrap)

@@ -473,11 +473,15 @@ public class DCRController extends MenuControllerHandler implements Initializabl
 
     public static void generateDCR(OutputStream fileOut, String teller, String posting, List<Bill> bills, HashMap<String, List<ItemSummary>> breakdown) throws Exception {
         double billTotal = 0, sysLossTotal = 0, ppdTotal = 0, surchargeTotal = 0, netAmtTotal = 0;
-        ExcelBuilder doc = new ExcelBuilder(20);
+        int widths[] = {7, 4, 7, 4, 8,
+                        8, 5, 5, 4, 4,
+                        7, 5, 4, 3, 3,
+                        5, 4, 5, 4, 4,};
+        ExcelBuilder doc = new ExcelBuilder(20, widths, 0.25, 0.25);
 
         CellStyle style = doc.getWb().createCellStyle();
         Font font = doc.getWb().createFont();
-        font.setFontHeightInPoints((short) 11);
+        font.setFontHeightInPoints((short) 10);
         font.setFontName("Arial");
         style.setFont(font);
 
@@ -550,70 +554,69 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         bill_addr = new CellRangeAddress(row, row, 0, 1);
         sheet.addMergedRegion(bill_addr);
         bill_head_cell.setCellStyle(style);
-        doc.styleMergedCells(bill_addr);
+        doc.styleMergedCells(bill_addr, false, false, false, true, false);
 
         bill_acc_cell = dcr_table_head.createCell(2);
         bill_acc_cell.setCellValue("Account #");
         acc_addr = new CellRangeAddress(row, row, 2, 3);
         sheet.addMergedRegion(acc_addr);
         bill_acc_cell.setCellStyle(style);
-        doc.styleMergedCells(acc_addr);
+        doc.styleMergedCells(acc_addr, false, false, false, true, false);
 
         bill_cust_cell = dcr_table_head.createCell(4);
         bill_cust_cell.setCellValue("Consumer Name");
         cons_addr = new CellRangeAddress(row, row, 4, 6);
         sheet.addMergedRegion(cons_addr);
         bill_cust_cell.setCellStyle(style);
-        doc.styleMergedCells(cons_addr);
+        doc.styleMergedCells(cons_addr, false, false, false, true, false);
 
         bill_bal_cell = dcr_table_head.createCell(7);
-        bill_bal_cell.setCellValue("Bill Balance");
+        bill_bal_cell.setCellValue("Bill Bal.");
         bal_addr = new CellRangeAddress(row, row, 7, 8);
         sheet.addMergedRegion(bal_addr);
         bill_bal_cell.setCellStyle(style_center);
-        doc.styleMergedCells(bal_addr);
+        doc.styleMergedCells(bal_addr, false, false, false, true, false);
 
 
         bill_type_cell = dcr_table_head.createCell(9);
         bill_type_cell.setCellValue("Type");
-        doc.styleBorder(bill_type_cell, 12, HorizontalAlignment.CENTER, false);
+        doc.styleBorder(bill_type_cell, 10, HorizontalAlignment.CENTER, false, false, false, true, false);
 
         bill_month_cell = dcr_table_head.createCell(10);
         bill_month_cell.setCellValue("Month");
-        doc.styleBorder(bill_month_cell, 12, HorizontalAlignment.CENTER, false);
+        doc.styleBorder(bill_month_cell, 10, HorizontalAlignment.CENTER, false, false, false, true, false);
 
         sys_loss_cell = dcr_table_head.createCell(11);
         sys_loss_cell.setCellValue("Sys. Loss");
         sys_loss_addr = new CellRangeAddress(row, row, 11, 12);
         sheet.addMergedRegion(sys_loss_addr);
         sys_loss_cell.setCellStyle(style_center);
-        doc.styleMergedCells(sys_loss_addr);
+        doc.styleMergedCells(sys_loss_addr, false, false, false, true, false);
 
         bill_ppd_cell = dcr_table_head.createCell(13);
         bill_ppd_cell.setCellValue("PPD");
         ppd_addr = new CellRangeAddress(row, row, 13, 14);
         sheet.addMergedRegion(ppd_addr);
         bill_ppd_cell.setCellStyle(style_center);
-        doc.styleMergedCells(ppd_addr);
+        doc.styleMergedCells(ppd_addr, false, false, false, true, false);
 
         bill_surcharge_cell = dcr_table_head.createCell(15);
         bill_surcharge_cell.setCellValue("Surcharge");
         surcharge_ddr = new CellRangeAddress(row, row, 15, 16);
         sheet.addMergedRegion(surcharge_ddr);
         bill_surcharge_cell.setCellStyle(style_center);
-        doc.styleMergedCells(surcharge_ddr);
+        doc.styleMergedCells(surcharge_ddr, false, false, false, true, false);
 
         bill_net_amt_cell = dcr_table_head.createCell(17);
         bill_net_amt_cell.setCellValue("Net-Amt.");
         net_ddr = new CellRangeAddress(row, row, 17, 18);
         sheet.addMergedRegion(net_ddr);
         bill_net_amt_cell.setCellStyle(style_center);
-        doc.styleMergedCells(net_ddr);
-
+        doc.styleMergedCells(net_ddr, false, false, false, true, false);
 
         time_cell = dcr_table_head.createCell(19);
         time_cell.setCellValue("Time");
-        doc.styleBorder(time_cell, 12, HorizontalAlignment.CENTER, false);
+        doc.styleBorder(time_cell, 8, HorizontalAlignment.CENTER, false, false, false, true, false);
 
         for (Bill b: bills) {
             row++;
@@ -624,44 +627,40 @@ public class DCRController extends MenuControllerHandler implements Initializabl
             bill_addr = new CellRangeAddress(row, row, 0, 1);
             sheet.addMergedRegion(bill_addr);
             bill_head_cell.setCellStyle(style);
-            doc.styleMergedCells(bill_addr);
 
             bill_acc_cell = dcr_table_row_head.createCell(2);
             bill_acc_cell.setCellValue(b.getConsumer().getAccountID());
             acc_addr = new CellRangeAddress(row, row, 2, 3);
             sheet.addMergedRegion(acc_addr);
             bill_acc_cell.setCellStyle(style);
-            doc.styleMergedCells(acc_addr);
 
             bill_cust_cell = dcr_table_row_head.createCell(4);
             bill_cust_cell.setCellValue(b.getConsumer().getConsumerName());
             cons_addr = new CellRangeAddress(row, row, 4, 6);
             sheet.addMergedRegion(cons_addr);
             bill_cust_cell.setCellStyle(style);
-            doc.styleMergedCells(cons_addr);
 
             bill_bal_cell = dcr_table_row_head.createCell(7);
             bill_bal_cell.setCellValue(Utility.formatDecimal(b.getAmountDue()));
             bal_addr = new CellRangeAddress(row, row, 7, 8);
             sheet.addMergedRegion(bal_addr);
             bill_bal_cell.setCellStyle(style_right);
-            doc.styleMergedCells(bal_addr);
-
 
             bill_type_cell = dcr_table_row_head.createCell(9);
             bill_type_cell.setCellValue(b.getConsumerType());
-            doc.styleBorder(bill_type_cell, 12, HorizontalAlignment.CENTER, false);
+            bill_type_cell.setCellStyle(style_center);
+            doc.styleBorder(bill_type_cell, 10, HorizontalAlignment.CENTER, false, false, false, false, false);
 
             bill_month_cell = dcr_table_row_head.createCell(10);
-            bill_month_cell.setCellValue(b.getBillMonth());
-            doc.styleBorder(bill_month_cell, 12, HorizontalAlignment.CENTER, false);
+            String[] m = b.getBillMonth().split(" ");
+            bill_month_cell.setCellValue(m[0].substring(0,3)+" "+m[1].substring(2,4));
+            doc.styleBorder(bill_month_cell, 10, HorizontalAlignment.CENTER, false, false, false, false, false);
 
             sys_loss_cell = dcr_table_row_head.createCell(11);
             sys_loss_cell.setCellValue(b.getSlAdjustment());
             sys_loss_addr = new CellRangeAddress(row, row, 11, 12);
             sheet.addMergedRegion(sys_loss_addr);
             sys_loss_cell.setCellStyle(style_right);
-            doc.styleMergedCells(sys_loss_addr);
 
             PaidBill p = (PaidBill) b;
             bill_ppd_cell = dcr_table_row_head.createCell(13);
@@ -669,25 +668,23 @@ public class DCRController extends MenuControllerHandler implements Initializabl
             ppd_addr = new CellRangeAddress(row, row, 13, 14);
             sheet.addMergedRegion(ppd_addr);
             bill_ppd_cell.setCellStyle(style_right);
-            doc.styleMergedCells(ppd_addr);
 
             bill_surcharge_cell = dcr_table_row_head.createCell(15);
             bill_surcharge_cell.setCellValue(b.getSurCharge());
             surcharge_ddr = new CellRangeAddress(row, row, 15, 16);
             sheet.addMergedRegion(surcharge_ddr);
             bill_surcharge_cell.setCellStyle(style_right);
-            doc.styleMergedCells(surcharge_ddr);
 
             bill_net_amt_cell = dcr_table_row_head.createCell(17);
             bill_net_amt_cell.setCellValue(b.getTotalAmount());
             net_ddr = new CellRangeAddress(row, row, 17, 18);
             sheet.addMergedRegion(net_ddr);
             bill_net_amt_cell.setCellStyle(style_right);
-            doc.styleMergedCells(net_ddr);
 
             time_cell = dcr_table_row_head.createCell(19);
             time_cell.setCellValue(((PaidBill) b).getPostingTime());
-            doc.styleBorder(time_cell, 12, HorizontalAlignment.CENTER, false);
+            time_cell.setCellStyle(style_center);
+            doc.styleBorder(time_cell, 8, HorizontalAlignment.CENTER, false, false, false, false, false);
 
             billTotal += b.getAmountDue(); sysLossTotal += b.getSlAdjustment(); ppdTotal += p.getPromptPayment(); surchargeTotal += b.getSurCharge(); netAmtTotal += b.getTotalAmount();
         }
@@ -695,9 +692,19 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         List<ItemSummary> breakdownItems = breakdown.get("Breakdown");
         List<ItemSummary> totalItems = breakdown.get("Misc");
 
+        row++;
+        Row dcr_table_row_space = sheet.createRow(row);
+        Cell sp_cell = null;
+
+        for (int sp = 0; sp < 20; sp++){
+            sp_cell = dcr_table_row_space.createCell(sp);
+            sp_cell.setCellValue("");
+            sp_cell.setCellStyle(style_center);
+            doc.styleBorder(sp_cell, 8, HorizontalAlignment.CENTER, false, true, false, false, false);
+        }
+
         int i = 1;
         Row dcr_table_row_head;
-        row++;
 
         for(ItemSummary s : breakdownItems) {
 
@@ -755,18 +762,18 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                 bill_net_amt_cell.setCellStyle(style_right);
                 doc.styleMergedCells(net_ddr, false, false, false, false, false);
             }else if (i == 6){
-                bill_surcharge_cell = dcr_table_row_head.createCell(15);
+                bill_surcharge_cell = dcr_table_row_head.createCell(14);
                 bill_surcharge_cell.setCellValue("KWH Used");
-                surcharge_ddr = new CellRangeAddress(row, row, 15, 16);
+                surcharge_ddr = new CellRangeAddress(row, row, 14, 16);
                 sheet.addMergedRegion(surcharge_ddr);
-                bill_surcharge_cell.setCellStyle(style_right);
+                bill_surcharge_cell.setCellStyle(style_center);
                 doc.styleMergedCells(surcharge_ddr, false, false, false, false, false);
 
                 bill_net_amt_cell = dcr_table_row_head.createCell(17);
                 bill_net_amt_cell.setCellValue(totalItems.get(0).getTotal());
                 net_ddr = new CellRangeAddress(row, row, 17, 18);
                 sheet.addMergedRegion(net_ddr);
-                bill_net_amt_cell.setCellStyle(style_right);
+                bill_net_amt_cell.setCellStyle(style_center);
                 doc.styleMergedCells(net_ddr, false, false, false, false, false);
             }
             i++;
@@ -774,13 +781,19 @@ public class DCRController extends MenuControllerHandler implements Initializabl
 
         row++;
 
+        CellStyle styleT = doc.getWb().createCellStyle();
+        Font fontT = doc.getWb().createFont();
+        fontT.setFontHeightInPoints((short) 11);
+        fontT.setFontName("Arial");
+        styleT.setFont(fontT);
+
         dcr_table_row_head = sheet.createRow(row);
 
         bill_head_cell = dcr_table_row_head.createCell(0);
         bill_head_cell.setCellValue("Total");
         bill_addr = new CellRangeAddress(row, row, 0, 1);
         sheet.addMergedRegion(bill_addr);
-        bill_head_cell.setCellStyle(style);
+        bill_head_cell.setCellStyle(styleT);
         doc.styleMergedCells(bill_addr, false, false, false, false, false);
 
         CellStyle style_bold = doc.getWb().createCellStyle();
@@ -797,6 +810,9 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         bill_acc_cell.setCellStyle(style_bold);
         doc.styleMergedCells(acc_addr, false, false, false, false, false);
 
+        row++;
+        row++;
+        row++;
         row++;
 
         doc.createSignatorees(row);
