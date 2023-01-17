@@ -443,7 +443,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<ItemSummary, String> column2 = new TableColumn<>("Total Amount");
-        column2.setCellValueFactory(obj-> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getTotal())));
+        column2.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getTotalView()));
         column2.setStyle("-fx-alignment: center-right;");
 
         this.dcrItems =  FXCollections.observableArrayList();
@@ -720,7 +720,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
             doc.styleMergedCells(bill_addr, false, false, false, false, false);
 
             bill_acc_cell = dcr_table_row_head.createCell(2);
-            bill_acc_cell.setCellValue(Utility.formatDecimal(s.getTotal()));
+            bill_acc_cell.setCellValue(s.getTotalView());
             acc_addr = new CellRangeAddress(row, row, 2, 3);
             sheet.addMergedRegion(acc_addr);
             bill_acc_cell.setCellStyle(style);

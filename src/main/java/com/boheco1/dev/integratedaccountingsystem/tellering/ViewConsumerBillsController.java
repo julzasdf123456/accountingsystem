@@ -89,7 +89,7 @@ public class ViewConsumerBillsController extends MenuControllerHandler implement
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        this.progressBar.setVisible(false);
         this.view_account_tf.setOnAction(actionEvent -> {
             //connect to CRM
         });
