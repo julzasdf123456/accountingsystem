@@ -12,12 +12,15 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
@@ -25,6 +28,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.util.CellRangeAddress;
 
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -132,6 +136,20 @@ public class DCRController extends MenuControllerHandler implements Initializabl
             this.generateReport();
         });
 
+        EventHandler<ActionEvent> event = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e)
+            {
+                generateReport();
+            }
+        };
+
+        this.date_pker.getEditor().setOnKeyReleased(e ->{
+            if (e.getCode() == KeyCode.ENTER)
+                this.generateReport();
+        });
+
+        this.date_pker.addEventHandler(ActionEvent.ACTION, event);
+
         if (ActiveUser.getUser().can("manage-cashiering")) {
             this.teller_tf.setVisible(true);
             this.teller_tf.setOnAction(actionEvent -> {
@@ -146,7 +164,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         });
 
         this.date_pker.setConverter(new StringConverter<LocalDate>() {
-            String pattern = "MM/dd/yyyy";
+            String pattern = "M/d/yyyy";
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(pattern);
 
             {
@@ -274,11 +292,39 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                     cashAmount = 0;
                     checkAmount = 0;
 
-                    try {
-                        month = date_pker.getValue().getMonthValue();
-                        day = date_pker.getValue().getDayOfMonth();
-                        year = date_pker.getValue().getYear();
+                    String currentDate[] = date_pker.getEditor().getText().split("/");
 
+                    if (currentDate.length != 3) {
+                        AlertDialogBuilder.messgeDialog("System Error", "Invalid date format!",
+                                Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                        return null;
+                    }else{
+                        try{
+                            month = Integer.parseInt(currentDate[0]);
+                            day = Integer.parseInt(currentDate[1]);
+                            year = Integer.parseInt(currentDate[2]);
+                            if (!(month >= 1 && month <= 12)) {
+                                AlertDialogBuilder.messgeDialog("System Error", "The correct month value should be from 1 - 12!",
+                                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                return null;
+                            }else if (!(day >= 1 && day <= 31)){
+                                AlertDialogBuilder.messgeDialog("System Error", "The correct day value should be from 1 - 31!",
+                                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                return null;
+                            }else if (year < 1000) {
+                                AlertDialogBuilder.messgeDialog("System Error", "The correct year value should be follow the format 1XXX!",
+                                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                return null;
+                            }
+                            date_pker.setValue(LocalDate.of(year, month,day));
+                        }catch (Exception e){
+                            AlertDialogBuilder.messgeDialog("System Error", "Invalid date format!",
+                                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                            return null;
+                        }
+                    }
+
+                    try {
                         bills = FXCollections.observableArrayList(BillDAO.getAllPaidBills(year, month, day, teller));
                         HashMap<String, List<ItemSummary>> breakdown = BillDAO.getDCRBreakDown(year, month, day, teller);
                         dcrItems = FXCollections.observableArrayList(breakdown.get("Breakdown"));
@@ -299,6 +345,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
             };
 
             task.setOnRunning(wse -> {
+                date_pker.setDisable(true);
                 bills = FXCollections.observableArrayList();
                 dcrItems = FXCollections.observableArrayList();
                 dcrPayments = FXCollections.observableArrayList();
@@ -312,6 +359,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
             });
 
             task.setOnSucceeded(wse -> {
+                date_pker.setDisable(false);
                 view_btn.setDisable(false);
                 dcr_power_table.setItems(bills);
                 dcr_breakdown_table.setItems(dcrItems);
@@ -323,6 +371,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
             });
 
             task.setOnFailed(wse -> {
+                date_pker.setDisable(false);
                 dcr_transNo_lbl.setText("0");
                 view_btn.setDisable(false);
                 progressbar.setVisible(false);

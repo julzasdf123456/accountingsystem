@@ -10,10 +10,13 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Paint;
 import javafx.util.StringConverter;
 
@@ -124,8 +127,22 @@ public class ORPostingController extends MenuControllerHandler implements Initia
             }
         });
 
+        EventHandler<ActionEvent> event = new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e)
+            {
+                searchCollections();
+            }
+        };
+
+        this.date_pker.addEventHandler(ActionEvent.ACTION, event);
+
+        this.date_pker.getEditor().setOnKeyReleased(e ->{
+            if (e.getCode() == KeyCode.ENTER)
+                this.searchCollections();
+        });
+
         this.date_pker.setConverter(new StringConverter<LocalDate>() {
-            String pattern = "MM/dd/yyyy";
+            String pattern = "M/d/yyyy";
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(pattern);
 
             {
@@ -165,12 +182,44 @@ public class ORPostingController extends MenuControllerHandler implements Initia
         if (ActiveUser.getUser().can("manage-billing") && (teller.isEmpty() || teller.equals("") || teller == null)){
             AlertDialogBuilder.messgeDialog("System Error", "Collector username is required! Please input it and try again!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }else {
+
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() throws SQLException {
-                    int month = date_pker.getValue().getMonthValue();
-                    int day = date_pker.getValue().getDayOfMonth();
-                    int year = date_pker.getValue().getYear();
+                    int day = 0, year = 0, month = 0;
+
+                    String currentDate[] = date_pker.getEditor().getText().split("/");
+
+                    if (currentDate.length != 3) {
+                        AlertDialogBuilder.messgeDialog("System Error", "Invalid date format!",
+                                Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                        return null;
+                    }else{
+                        try{
+                            month = Integer.parseInt(currentDate[0]);
+                            day = Integer.parseInt(currentDate[1]);
+                            year = Integer.parseInt(currentDate[2]);
+                            if (!(month >= 1 && month <= 12)) {
+                                AlertDialogBuilder.messgeDialog("System Error", "The correct month value should be from 1 - 12!",
+                                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                return null;
+                            }else if (!(day >= 1 && day <= 31)){
+                                AlertDialogBuilder.messgeDialog("System Error", "The correct day value should be from 1 - 31!",
+                                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                return null;
+                            }else if (year < 1000) {
+                                AlertDialogBuilder.messgeDialog("System Error", "The correct year value should be follow the format 1XXX!",
+                                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                return null;
+                            }
+                            date_pker.setValue(LocalDate.of(year, month,day));
+                        }catch (Exception e){
+                            AlertDialogBuilder.messgeDialog("System Error", "Invalid date format!",
+                                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                            return null;
+                        }
+                    }
+
                     try {
                         List<Bill> paidBills = BillDAO.getAllPaidBills(year, month, day, teller);
                         bills = FXCollections.observableArrayList(paidBills);
@@ -184,11 +233,13 @@ public class ORPostingController extends MenuControllerHandler implements Initia
 
             task.setOnRunning(wse -> {
                 reset();
+                date_pker.setDisable(true);
                 view_btn.setDisable(true);
                 progressbar.setVisible(true);
             });
 
             task.setOnSucceeded(wse -> {
+                this.date_pker.setDisable(false);
                 this.view_btn.setDisable(false);
                 this.transact_btn.setDisable(true);
                 this.paid_bills_table.setItems(bills);
@@ -222,6 +273,7 @@ public class ORPostingController extends MenuControllerHandler implements Initia
 
             task.setOnFailed(wse -> {
                 reset();
+                this.date_pker.setDisable(false);
             });
 
             new Thread(task).start();
