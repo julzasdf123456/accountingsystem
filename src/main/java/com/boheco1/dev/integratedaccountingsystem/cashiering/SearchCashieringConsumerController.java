@@ -14,6 +14,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
@@ -47,6 +50,8 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
        // this.createTable();
+
+
         this.searchResultTable.setRowFactory(tv -> {
             TableRow row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -78,15 +83,20 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                             task.setOnSucceeded(wse -> {
                                 dialog.close();
                                 try {
-                                    if(TransactionHeaderDAO.get(employeeInfo.getId(), searchDate.getValue()) == null){
+                                    TransactionHeader transactionHeader = TransactionHeaderDAO.get(UserDAO.get(employeeInfo.getId()).getUserName(), searchDate.getValue());
+                                    if(transactionHeader == null){
                                         AlertDialogBuilder.messgeDialog("System Message", "Task successful." ,
                                                 Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
-                                        this.parentController.receive(resultInfo);
                                     }else {
                                         AlertDialogBuilder.messgeDialog("System Message", "OR was already issued on this transaction." ,
                                                 Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-                                        this.parentController.receive(null);
+
                                     }
+                                    HashMap<String, Object> result = new HashMap<>();
+                                    result.put("SearchResult", resultInfo);
+                                    result.put("TransactionHeader", transactionHeader);
+                                    result.put("SearchDate", searchDate.getValue());
+                                    this.parentController.receive(result);
 
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -112,6 +122,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
             });
             return row ;
         });
+
         this.parentController = Utility.getParentController();
         this.searchTf.requestFocus();
         this.toggleSearch.setSelected(Utility.TOGGLE_SEARCH);
@@ -131,7 +142,12 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
             this.searchDate.setVisible(true);
             this.searchTf.setPromptText("Username/Last Name/First Name");
         }
-        search();
+
+        searchDate.getEditor().setOnKeyReleased(e ->{
+            if (e.getCode() == KeyCode.ENTER)
+                search();
+        });
+
     }
 
     /**
@@ -202,11 +218,13 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
             this.toggleSearch.setText("Search Consumer");
             this.searchDate.setVisible(false);
             this.searchTf.setPromptText("Reference Number/Last Name/First Name/Address");
+            search();
         }else {
             this.toggleSearch.setText("Search Teller");
             this.searchDate.setVisible(true);
             this.searchTf.setPromptText("Username/Last Name/First Name");
+            searchResultTable.getItems().clear();
         }
-        search();
+
     }
 }

@@ -18,6 +18,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Paint;
 
 
@@ -54,7 +56,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
     @FXML
     private TableView paymentTable;
 
-
     private CRMQueue consumerInfo = null;
     private Teller tellerInfo = null;
 
@@ -75,39 +76,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
     }
 
     @FXML
-    private void print(ActionEvent event) {
-        if(consumerInfo == null && tellerInfo == null){
-            AlertDialogBuilder.messgeDialog("System Message", "Please select consumer or teller information.",
-                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            return;
-        }
-
-
-
-        if(orNmber.getText().isEmpty()) {
-            AlertDialogBuilder.messgeDialog("System Message", "OR number is required.",
-                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            return;
-        }
-        JFXButton accept = new JFXButton("Accept");
-        JFXDialog dialog = DialogBuilder.showConfirmDialog("Print OR","Confirm transaction.\n" +
-                        "Date: " +date.getValue()+"\n"+
-                        "OR#: " +orNmber.getText()+"\n" +
-                        ""+total.getText()
-                , accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
-        accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
-        accept.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent __) {
-                nonePowerBills();
-                dialog.close();
-            }
-        });
-
-
-    }
-
-    @FXML
     private void search(ActionEvent event) {
         ModalBuilder.showModalFromXMLNoClose(CashierController.class, "../cashiering/cashiering_search_consumer.fxml", Utility.getStackPane());
     }
@@ -115,6 +83,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private void resetField(){
         orNmber.setText(""); name.setText(""); address.setText(""); purpose.setText(""); remarks.setText("");
         date.setValue(LocalDate.now());
+        this.paymentTable.getColumns().clear();
+        print_btn.setVisible(true);
         total.setText("Total: 0.00");
         paymentTable.getColumns().clear();
         crmQueue = null;
@@ -125,12 +95,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     @Override
     public void receive(Object o) {
-        this.paymentTable.getColumns().clear();
-        total.setText("Total: 0.00");
-        consumerInfo = null;
-        tellerInfo = null;
-        if (o==null)
-            return;
+        resetField();
 
         if (o instanceof CRMQueue) {
             this.consumerInfo = (CRMQueue) o;
@@ -139,11 +104,24 @@ public class CashierController extends MenuControllerHandler implements Initiali
             this.purpose.setText(consumerInfo.getTransactionPurpose());
             tellerInfo = null;
             initTable(consumerInfo);
-        }else if (o instanceof Teller) {
-            this.tellerInfo = (Teller) o;
+        }else if (o instanceof  HashMap) {
+            TransactionHeader transactionHeader = (TransactionHeader) ((HashMap<?, ?>) o).get("TransactionHeader");
+            LocalDate localDate = (LocalDate) ((HashMap<?, ?>) o).get("SearchDate");
+            this.tellerInfo = (Teller) ((HashMap<?, ?>) o).get("SearchResult");
             this.name.setText(tellerInfo.getName());
+            this.date.setValue(localDate);
+
+            if(transactionHeader != null){
+                this.date.setValue(transactionHeader.getTransactionDate());
+                this.orNmber.setText(transactionHeader.getTransactionNumber());
+                this.remarks.setText(transactionHeader.getRemarks());
+                print_btn.setVisible(false);
+            }
+
             this.address.setText("-");
             this.purpose.setText("-");
+            address.setDisable(true);
+            purpose.setDisable(true);
             consumerInfo = null;
             initTable(tellerInfo);
         }
@@ -213,7 +191,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
             TableColumn<ItemSummary, String> column2 = new TableColumn<>("Total Amount");
             column2.setMinWidth(200);
-            column2.setCellValueFactory(obj-> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getTotal())));
+            column2.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getTotalView()));
             column2.setStyle("-fx-alignment: center-right;");
 
             this.paymentTable.getColumns().add(column1);
@@ -221,6 +199,45 @@ public class CashierController extends MenuControllerHandler implements Initiali
         }
 
         this.paymentTable.setPlaceholder(new Label("No consumer records was searched."));
+    }
+
+    @FXML
+    private void printWhenEntered(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER)
+            printing();
+    }
+
+    @FXML
+    private void printOR(ActionEvent event) {
+        printing();
+    }
+
+    private void printing() {
+        if(consumerInfo == null && tellerInfo == null){
+            AlertDialogBuilder.messgeDialog("System Message", "Please select consumer or teller information.",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            return;
+        }
+
+        if(orNmber.getText().isEmpty()) {
+            AlertDialogBuilder.messgeDialog("System Message", "OR number is required.",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            return;
+        }
+        JFXButton accept = new JFXButton("Accept");
+        JFXDialog dialog = DialogBuilder.showConfirmDialog("Print OR","Confirm transaction.\n" +
+                        "Date: " +date.getValue()+"\n"+
+                        "OR#: " +orNmber.getText()+"\n" +
+                        ""+total.getText()
+                , accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
+        accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+        accept.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent __) {
+                nonePowerBills();
+                dialog.close();
+            }
+        });
     }
 
     private void nonePowerBills(){

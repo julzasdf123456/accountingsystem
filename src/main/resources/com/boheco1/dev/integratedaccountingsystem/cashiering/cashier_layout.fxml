@@ -86,9 +86,9 @@
                         <Insets top="16.0" />
                      </VBox.margin>
                   </HBox>
-                  <JFXTextField fx:id="orNmber" alignment="CENTER" labelFloat="true" unFocusColor="#b5b5b5">
+                  <JFXTextField fx:id="orNmber" alignment="CENTER" labelFloat="true" onKeyReleased="#printWhenEntered" style="-fx-font-size: 30; -fx-font-family: bold;" unFocusColor="#b5b5b5">
                      <font>
-                        <Font size="24.0" />
+                        <Font size="39.0" />
                      </font>
                      <VBox.margin>
                         <Insets bottom="16.0" />
@@ -104,7 +104,7 @@
                         <Insets bottom="16.0" top="16.0" />
                      </VBox.margin>
                   </Label>
-                  <JFXButton fx:id="print_btn" buttonType="RAISED" onAction="#print" prefHeight="37.0" prefWidth="119.0" styleClass="btn-sucess" text="Print">
+                  <JFXButton fx:id="print_btn" buttonType="RAISED" onAction="#printOR" prefHeight="37.0" prefWidth="119.0" styleClass="btn-sucess" text="Print">
                      <graphic>
                         <FontIcon fill="WHITE" iconLiteral="mdi2p-printer" iconSize="20" />
                      </graphic>
