@@ -413,10 +413,12 @@ public class Bill {
                         amount = penalty * 0.03;
                         //Set minimum surcharge
                         if (amount <= 50) amount = 50;
-                    //If I, CL or CS 1000kwh and above
-                    }else if (this.consumerType.equals("I") || ((this.consumerType.equals("CS") || this.consumerType.equals("CL")) && this.powerKWH >= 1000)) {
-                        //No penalty if days delayed less than 6
-                        if (this.getDaysDelayed() < 6) {
+                    //If I, (CL or CS 1000kwh and above)
+                    }else if (this.consumerType.equals("I") ||
+                            ((this.consumerType.equals("CS") || this.consumerType.equals("CL")) && this.powerKWH >= 1000)
+                    ) {
+                        //No penalty if days delayed less than equal to 5
+                        if (this.getDaysDelayed() <= 5) {
                             amount = 0;
                         //5% penalty if 30 days and above
                         } else if (this.getDaysDelayed() >= 30) {

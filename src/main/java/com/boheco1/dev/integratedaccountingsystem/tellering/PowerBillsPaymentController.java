@@ -857,16 +857,16 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         }
 
         controller.getCash_tf().setOnAction(actionEvent -> {
-            Object selection = controller.getAccount_list().getSelectionModel().getSelectedItem();
-            String accNo = "";
-            if (selection != null)
-                accNo = selection.toString();
+            Object obj = controller.getAccount_list().getSelectionModel().getSelectedItem();
+            PaidBill selection = null;
+            if (obj != null)
+                selection = (PaidBill) obj;
             try{
                 cash = Double.parseDouble(controller.getCash_tf().getText().replace(",",""));
             }catch (Exception e){
 
             }
-            this.transact(bills, cash, checks, dialogConfirm, controller.checkDeposit(), toDeposit, accNo);
+            this.transact(bills, cash, checks, dialogConfirm, controller.checkDeposit(), toDeposit, selection);
         });
 
         controller.getCash_tf().setOnKeyReleased(event ->{
@@ -889,16 +889,16 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 dialog.close();
                 AlertDialogBuilder.messgeDialog("System Error", "The default printer is not set! Please set the printer before printing!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }else {*/
-                Object selection = controller.getAccount_list().getSelectionModel().getSelectedItem();
-                String accNo = "";
-                if (selection != null)
-                    accNo = selection.toString();
-                try{
-                    cash = Double.parseDouble(controller.getCash_tf().getText().replace(",",""));
-                }catch (Exception e){
+            Object obj = controller.getAccount_list().getSelectionModel().getSelectedItem();
+            PaidBill selection = null;
+            if (obj != null)
+                selection = (PaidBill) obj;
+            try{
+                cash = Double.parseDouble(controller.getCash_tf().getText().replace(",",""));
+            }catch (Exception e){
 
-                }
-                this.transact(bills, cash, checks, dialogConfirm, controller.checkDeposit(), toDeposit, accNo);
+            }
+            this.transact(bills, cash, checks, dialogConfirm, controller.checkDeposit(), toDeposit, selection);
             //}
         });
         dialogConfirm.setOnDialogOpened((event) -> { controller.getCash_tf().requestFocus(); });
@@ -1012,15 +1012,12 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
                 MenuItem itemAddPPD = new MenuItem("Less PPD");
                 itemAddPPD.setOnAction(actionEvent -> {
-                    //Only I, CL, CS with >= 1kwh, B, E, AND DAYS BEFORE DUE DATE
+                    //Only CL & CS with >= 1kwh, I, B, E, AND DAYS BEFORE DUE DATE
                     if (
                             (row.getItem().getConsumerType().equals("B")
                              || row.getItem().getConsumerType().equals("E")
-                             ||
-                            ((row.getItem().getConsumerType().equals("I")
-                             || row.getItem().getConsumerType().equals("CL")
-                             || row.getItem().getConsumerType().equals("CS"))
-                             && row.getItem().getPowerKWH() >= 1000)
+                             || row.getItem().getConsumerType().equals("I")
+                             || ((row.getItem().getConsumerType().equals("CL") || row.getItem().getConsumerType().equals("CS")) && row.getItem().getPowerKWH() >= 1000)
                             )
                        && row.getItem().getDaysDelayed() <= 0
                       ) {
@@ -1197,7 +1194,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
      * Transacts powerbills payment
      * @return void
      */
-    public void transact(List<Bill> bills, double cash, List<Check> checks, JFXDialog dialog, boolean deposit, double change, String account){
+    public void transact(List<Bill> bills, double cash, List<Check> checks, JFXDialog dialog, boolean deposit, double change, PaidBill account){
         this.progressBar.setVisible(true);
 
         try {
@@ -1226,7 +1223,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             this.reset();
             dialog.close();
         } catch (SQLException ex) {
-            AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + ex.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            AlertDialogBuilder.messgeDialog("System Error", "SQL Problem encountered: " + ex.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         } catch (Exception e) {
             AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }

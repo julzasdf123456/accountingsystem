@@ -5,6 +5,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.ObjectTransaction;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.Bill;
 import com.boheco1.dev.integratedaccountingsystem.objects.Check;
+import com.boheco1.dev.integratedaccountingsystem.objects.PaidBill;
 import com.jfoenix.controls.JFXButton;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -91,11 +92,11 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
     }
 
     public void setBills(List<Bill> bills){
-        ObservableList<String> accounts = FXCollections.observableArrayList(new ArrayList<>());
+        ObservableList<PaidBill> accounts = FXCollections.observableArrayList(new ArrayList<>());
         for(Bill b : bills){
-            String acc = b.getConsumer().getAccountID();
-            if (!accounts.contains(acc))
-                accounts.add(b.getConsumer().getAccountID());
+            PaidBill p = (PaidBill) b;
+            if (!accounts.contains(p))
+                accounts.add(p);
         }
         this.account_list.setItems(accounts);
     }

@@ -2,6 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem.objects;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class PaidBill extends Bill{
@@ -23,6 +24,7 @@ public class PaidBill extends Bill{
     private double Amount2307;
     private double cashAmount;
     private double checkAmount;
+    private double deposit;
     private List<Check> checks;
 
     public PaidBill(){}
@@ -174,4 +176,29 @@ public class PaidBill extends Bill{
     public void setPostingTime(String postingTime) {
         this.postingTime = postingTime;
     }
+
+    public double getDeposit() {
+        return deposit;
+    }
+
+    public void setDeposit(double deposit) {
+        this.deposit = deposit;
+    }
+
+    @Override
+    public String toString() {
+        return "Account: "+ getConsumer().getAccountID() + " - Billing: " + getServicePeriodEnd().format(DateTimeFormatter.ofPattern("M/d/yyyy"));
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if (o instanceof Bill){
+            Bill bill = (Bill) o;
+            if (bill.getBillNo().equals(this.getBillNo())
+                    && bill.getConsumer().getAccountID().equals(this.getConsumer().getAccountID()))
+                return true;
+        }
+        return false;
+    }
+
 }
