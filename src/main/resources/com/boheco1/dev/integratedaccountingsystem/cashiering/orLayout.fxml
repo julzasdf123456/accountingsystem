@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+
+<AnchorPane prefHeight="380.0" prefWidth="581.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.ORLayoutController">
+   <children>
+      <Pane fx:id="printArea" layoutX="40.0" layoutY="62.0" prefHeight="235.0" prefWidth="576.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label layoutX="14.0" layoutY="89.0" style="-fx-font-size: 10;" text="Juan Dela Cruz" />
+            <Label layoutX="220.0" layoutY="353.0" style="-fx-font-size: 10;" text="Cashier" />
+            <Label layoutX="26.0" layoutY="59.0" style="-fx-font-size: 10;" text="01/01/2023" />
+            <Label layoutX="324.0" layoutY="59.0" style="-fx-font-size: 10;" text="01/01/2023" />
+            <Label alignment="CENTER_RIGHT" layoutX="177.0" layoutY="89.0" prefHeight="15.0" prefWidth="82.0" style="-fx-font-size: 10;" text="999,999,999,999" />
+            <Label alignment="TOP_LEFT" layoutX="14.0" layoutY="104.0" prefHeight="45.0" prefWidth="163.0" style="-fx-font-size: 10;" text="The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog" wrapText="true" />
+            <Label layoutX="310.0" layoutY="89.0" style="-fx-font-size: 10;" text="Juan Dela Cruz" />
+            <Label alignment="CENTER_RIGHT" layoutX="473.0" layoutY="89.0" prefHeight="15.0" prefWidth="82.0" style="-fx-font-size: 10;" text="999,999,999,999" />
+            <Label alignment="TOP_LEFT" layoutX="310.0" layoutY="104.0" prefHeight="45.0" prefWidth="163.0" style="-fx-font-size: 10;" text="The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog" wrapText="true" />
+            <Label layoutX="513.0" layoutY="353.0" style="-fx-font-size: 10;" text="Cashier" />
+            <Label alignment="CENTER" layoutX="215.0" layoutY="67.0" prefHeight="15.0" prefWidth="51.0" style="-fx-font-size: 10;" text="0000000" />
+            <Label alignment="CENTER" layoutX="517.0" layoutY="67.0" prefHeight="15.0" prefWidth="51.0" style="-fx-font-size: 10;" text="0000000" />
+            <Label alignment="TOP_LEFT" layoutX="4.0" layoutY="170.0" prefHeight="167.0" prefWidth="58.0" style="-fx-font-size: 7;" text="Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference" wrapText="true" />
+            <Label alignment="TOP_LEFT" layoutX="74.0" layoutY="170.0" prefHeight="167.0" prefWidth="82.0" style="-fx-font-size: 7;" text="System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment" wrapText="true" />
+            <Label alignment="TOP_LEFT" layoutX="208.0" layoutY="170.0" prefHeight="167.0" prefWidth="65.0" style="-fx-font-size: 7;" text="99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 " textAlignment="RIGHT" wrapText="true" />
+            <Label alignment="TOP_LEFT" layoutX="310.0" layoutY="170.0" prefHeight="167.0" prefWidth="58.0" style="-fx-font-size: 7;" text="Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference" wrapText="true" />
+            <Label alignment="TOP_LEFT" layoutX="375.0" layoutY="170.0" prefHeight="167.0" prefWidth="82.0" style="-fx-font-size: 7;" text="System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment" wrapText="true" />
+            <Label alignment="TOP_LEFT" layoutX="510.0" layoutY="170.0" prefHeight="167.0" prefWidth="65.0" style="-fx-font-size: 7;" text="99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 " textAlignment="RIGHT" wrapText="true" />
+         </children>
+      </Pane>
+   </children>
+</AnchorPane>

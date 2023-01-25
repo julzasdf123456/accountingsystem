@@ -77,7 +77,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     @FXML
     private void search(ActionEvent event) {
-        ModalBuilder.showModalFromXMLNoClose(CashierController.class, "../cashiering/cashiering_search_consumer.fxml", Utility.getStackPane());
+        //ModalBuilder.showModalFromXMLNoClose(CashierController.class, "../cashiering/cashiering_search_consumer.fxml", Utility.getStackPane());
+        ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
     }
 
     private void resetField(){
