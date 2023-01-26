@@ -68,10 +68,16 @@ public class BillDAO {
             sql_deposit = "UPDATE OtherCharges SET ";
             if (deposits.get("QCLoanAmount") != 0) {
                 if (deposits.get("QCAmount") != 0) {
-                    sql_deposit += "QCLoanAmount = QCLoanAmount + ?, QCMonths = ISNULL(QCMonths,0) + ? ";
+                    if (deposits.get("EPAmount") != 0) {
+                        sql_deposit += "PCAmount = ?, PCMonths = ? ";
+                    }else{
+                        sql_deposit += "EPAmount = ?, EPMonths = ? ";
+                    }
                 }else{
                     sql_deposit += "QCAmount = ?, QCMonths = ? ";
                 }
+            }else{
+                sql_deposit += "QCLoanAmount = ?, QCMonths = ? ";
             }
             sql_deposit += "WHERE AccountNumber = ?";
         }
@@ -744,7 +750,7 @@ public class BillDAO {
         HashMap<String, Double> result = null;
         try {
 
-            String sql = "SELECT ISNULL(QCLoanAmount, 0) AS QCLoanAmount, ISNULL(QCAmount, 0) AS QCAmount, ISNULL(QCMonths, 0) AS QCMonths, ISNULL(EPAmount, 0) AS EPAmount, ISNULL(EPMonths, 0) AS EPMonths, ISNULL(PCAmount, 0) AS PCAmount, ISNULL(PCMonths, 0) AS PCMonths " +
+            String sql = "SELECT AccountNumber, ISNULL(QCLoanAmount, 0) AS QCLoanAmount, ISNULL(QCAmount, 0) AS QCAmount, ISNULL(QCMonths, 0) AS QCMonths, ISNULL(EPAmount, 0) AS EPAmount, ISNULL(EPMonths, 0) AS EPMonths, ISNULL(PCAmount, 0) AS PCAmount, ISNULL(PCMonths, 0) AS PCMonths " +
                     "FROM OtherCharges WHERE AccountNumber = '" + accountNumber + "';";
             PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
             ResultSet rs = ps.executeQuery();

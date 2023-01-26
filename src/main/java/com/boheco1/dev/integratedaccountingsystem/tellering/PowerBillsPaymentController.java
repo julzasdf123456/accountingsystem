@@ -858,9 +858,15 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
         controller.getCash_tf().setOnAction(actionEvent -> {
             Object obj = controller.getAccount_list().getSelectionModel().getSelectedItem();
+
+            if (obj == null && controller.checkDeposit()) {
+                controller.getStatus_label().setText("Deposit checkbox is enabled. Select an account to proceed!");
+                return;
+            }else{
+                controller.getStatus_label().setText("");
+            }
             PaidBill selection = null;
-            if (obj != null)
-                selection = (PaidBill) obj;
+            if (obj != null) selection = (PaidBill) obj;
             try{
                 cash = Double.parseDouble(controller.getCash_tf().getText().replace(",",""));
             }catch (Exception e){
@@ -890,9 +896,16 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 AlertDialogBuilder.messgeDialog("System Error", "The default printer is not set! Please set the printer before printing!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }else {*/
             Object obj = controller.getAccount_list().getSelectionModel().getSelectedItem();
+
+            if (obj == null && controller.checkDeposit()) {
+                controller.getStatus_label().setText("Deposit checkbox is enabled. Select an account to proceed!");
+                return;
+            }else{
+                controller.getStatus_label().setText("");
+            }
+
             PaidBill selection = null;
-            if (obj != null)
-                selection = (PaidBill) obj;
+            if (obj != null) selection = (PaidBill) obj;
             try{
                 cash = Double.parseDouble(controller.getCash_tf().getText().replace(",",""));
             }catch (Exception e){
