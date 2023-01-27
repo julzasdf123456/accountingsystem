@@ -1,10 +1,12 @@
 package com.boheco1.dev.integratedaccountingsystem.tellering;
 
+import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ObjectTransaction;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.Bill;
 import com.boheco1.dev.integratedaccountingsystem.objects.Check;
+import com.boheco1.dev.integratedaccountingsystem.objects.PaidBill;
 import com.jfoenix.controls.JFXButton;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 
@@ -45,6 +48,9 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
     private CheckBox deposit_cb;
 
     @FXML
+    private Label status_label;
+
+    @FXML
     private ComboBox account_list;
 
     @FXML
@@ -63,18 +69,14 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
         this.confirm_btn.requestFocus();
         this.deposit_cb.setOnMouseClicked(action ->{
             if (deposit_cb.isSelected()){
-                if (account_list.getSelectionModel().getSelectedItem() == null){
-                    this.confirm_btn.setDisable(true);
-                }else{
-                    this.confirm_btn.setDisable(false);
-                }
                 this.account_list.setVisible(true);
             }else{
-                this.confirm_btn.setDisable(false);
                 this.account_list.setVisible(false);
             }
+            account_list.getSelectionModel().clearSelection();
             setFigures();
         });
+        InputHelper.restrictNumbersOnly(cash_tf);
 
         this.account_list.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
             setFigures();
@@ -91,19 +93,17 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
     }
 
     public void setBills(List<Bill> bills){
-        ObservableList<String> accounts = FXCollections.observableArrayList(new ArrayList<>());
+        ObservableList<PaidBill> accounts = FXCollections.observableArrayList(new ArrayList<>());
         for(Bill b : bills){
-            String acc = b.getConsumer().getAccountID();
-            if (!accounts.contains(acc))
-                accounts.add(b.getConsumer().getAccountID());
+            PaidBill p = (PaidBill) b;
+            if (!accounts.contains(p))
+                accounts.add(p);
         }
         this.account_list.setItems(accounts);
     }
 
     public void setFigures(){
         String cash = this.cash_tf.getText();
-        if (cash.contains(","))
-            cash = cash.replace(",","");
         try {
             this.cash = Double.parseDouble(cash);
             this.check_amount = 0;
@@ -115,8 +115,8 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
             this.total_payments = Utility.round(this.cash + this.check_amount, 2);
             this.change = Utility.round(this.total_payments - this.amount_due, 2);
 
-            this.change_tf.setText(Utility.formatDecimal(this.change));
-            this.total_amount_paid_tf.setText(Utility.formatDecimal(this.total_payments));
+            this.change_tf.setText(this.change+"");
+            this.total_amount_paid_tf.setText(this.total_payments+"");
 
             if (this.change < 0)
                 this.confirm_btn.setDisable(true);
@@ -140,11 +140,11 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
         this.total_payments = Utility.round(this.cash + this.check_amount, 2);
         this.change = Utility.round(this.total_payments - this.amount_due, 2);
 
-        this.cash_tf.setText(Utility.formatDecimal(this.cash));
-        this.check_tf.setText(Utility.formatDecimal(this.check_amount));
-        this.total_amount_paid_tf.setText(Utility.formatDecimal(this.total_payments));
-        this.total_amount_due_tf.setText(Utility.formatDecimal(this.amount_due));
-        this.change_tf.setText(Utility.formatDecimal(this.change));
+        this.cash_tf.setText(this.cash+"");
+        this.check_tf.setText(this.check_amount+"");
+        this.total_amount_paid_tf.setText(this.total_payments+"");
+        this.total_amount_due_tf.setText(this.amount_due+"");
+        this.change_tf.setText(this.change+"");
     }
 
     public JFXButton getConfirm_btn() {
@@ -161,5 +161,5 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
         return deposit_cb.isSelected();
     }
 
-
+    public Label getStatus_label(){return status_label;}
 }

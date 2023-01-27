@@ -17,11 +17,11 @@ public class BillDAO {
      * @param bills List of bills
      * @param change change to deposit
      * @param deposit deposit change
-     * @param account account to deposit
+     * @param account paidbill account to deposit
      * @return void
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static void addPaidBill(List<Bill> bills, double change, boolean deposit, String account) throws Exception{
+    public static void addPaidBill(List<Bill> bills, double change, boolean deposit, PaidBill account) throws Exception{
         Connection conn = DB.getConnection(Utility.DB_BILLING);
         conn.setAutoCommit(false);
 
@@ -47,15 +47,19 @@ public class BillDAO {
                 "Form2307, " +
                 "Amount2306, " +
                 "Amount2307, " +
+                "DepositAmount, " +
                 "CashAmount, " +
                 "CheckAmount) " +
-                " VALUES (SYSDATETIME(), ?, ?, ?, ?, ?, ?, ?, ROUND(?, 2), ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2));";
+                " VALUES (SYSDATETIME(), ?, ?, ?, ?, ?, ?, ?, ROUND(?, 2), ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2));";
 
         String sql_check = "INSERT INTO CheckPayment (AccountNumber, ServicePeriodEnd, Bank, CheckNumber, Amount) VALUES(?, ?, ?, ?, ROUND(?, 2))";
         String sql_md = "UPDATE MDRefund SET Amount=ROUND(Amount-?, 2) WHERE AccountNumber=?";
         String sql_deposit = "INSERT INTO OtherCharges (AccountNumber, ";
         boolean depUpdate = false;
-        HashMap<String, Double> deposits = verifyDeposit(account);
+        String id = "";
+        if (account != null)
+            id = account.getConsumer().getAccountID();
+        HashMap<String, Double> deposits = verifyDeposit(id);
 
         if (deposits == null){
             sql_deposit += "QCLoanAmount, QCMonths) VALUES (?, ?, ?)";
@@ -64,10 +68,16 @@ public class BillDAO {
             sql_deposit = "UPDATE OtherCharges SET ";
             if (deposits.get("QCLoanAmount") != 0) {
                 if (deposits.get("QCAmount") != 0) {
-                    sql_deposit += "QCLoanAmount = QCLoanAmount + ?, QCMonths = ISNULL(QCMonths,0) + ? ";
+                    if (deposits.get("EPAmount") != 0) {
+                        sql_deposit += "PCAmount = ?, PCMonths = ? ";
+                    }else{
+                        sql_deposit += "EPAmount = ?, EPMonths = ? ";
+                    }
                 }else{
                     sql_deposit += "QCAmount = ?, QCMonths = ? ";
                 }
+            }else{
+                sql_deposit += "QCLoanAmount = ?, QCMonths = ? ";
             }
             sql_deposit += "WHERE AccountNumber = ?";
         }
@@ -104,8 +114,14 @@ public class BillDAO {
                 ps.setString(18, bill.getForm2307());
                 ps.setDouble(19, bill.getCh2306());
                 ps.setDouble(20, bill.getCh2307());
-                ps.setDouble(21, paid.getCashAmount());
-                ps.setDouble(22, paid.getCheckAmount());
+
+                if (deposit && paid.equals(account))
+                    ps.setDouble(21, change);
+                else
+                    ps.setDouble(21, 0);
+
+                ps.setDouble(22, paid.getCashAmount());
+                ps.setDouble(23, paid.getCheckAmount());
 
                 ps.executeUpdate();
 
@@ -131,13 +147,13 @@ public class BillDAO {
                 if (deposit && count == 1){
                     ps_dep = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql_deposit);
                     if (!depUpdate) {
-                        ps_dep.setString(1, account);
+                        ps_dep.setString(1, account.getConsumer().getAccountID());
                         ps_dep.setDouble(2, -change);
                         ps_dep.setInt(3, 1);
                     }else{
                         ps_dep.setDouble(1, -change);
                         ps_dep.setInt(2, 1);
-                        ps_dep.setString(3, account);
+                        ps_dep.setString(3, account.getConsumer().getAccountID());
                     }
                     ps_dep.executeUpdate();
                 }
@@ -232,8 +248,7 @@ public class BillDAO {
             if ((bill.getConsumerType().equals("B")
                     || bill.getConsumerType().equals("E")
                     || bill.getConsumerType().equals("I")
-                    || bill.getConsumerType().equals("CL")
-                    || (bill.getConsumerType().equals("CS") && bill.getPowerKWH() >= 1000))
+                    || ( (bill.getConsumerType().equals("CL") || bill.getConsumerType().equals("CS")) && bill.getPowerKWH() >= 1000) )
                     && bill.getDaysDelayed() <= 0) {
                 double ppd = 0;
                 try {
@@ -418,7 +433,7 @@ public class BillDAO {
                 "pbx.OthersVAT, pbx.DistributionVAT, pbx.SLVAT, pbx.Item3, pbx.Item2, pbx.SLAdjustment, pbx.PromptPayment, pbx.Surcharge, pbx.NetAmount, pbx.Teller, pbx.ORNumber, pbx.DCRNumber, pbx.ServicePeriodEnd, " +
                 "pbx.PostingDate, pbx.PostingSequence, pbx.CurrentBills, pbx.Within30Days, pbx.Over30Days, pbx.PR, pbx.Others, pbx.Powerkwh, pbx.KatasAMount, pbx.OtherDeduction, " +
                 "pbx.MDRefund, pbx.NetAmountLessMDRefund, pbx.SeniorCitizenDiscount, pbx.GroupTag, pbx.Amount2306, pbx.Amount2307, b.FBHCAmt AS FranchiseTax, x.Item16 AS BusinessTax, " +
-                "x.Item17 AS RealPropertyTax, b.DAA_VAT, b.ACRM_VAT, b.Item1 as GenVatFeb21, FORMAT(pbx.PostingDate,'hh:mm') as PostingTime, ISNULL(CashAmount, -1) AS CashAmount, CheckAmount, ISNULL(withPenalty, 1) AS withPenalty " +
+                "x.Item17 AS RealPropertyTax, b.DAA_VAT, b.ACRM_VAT, b.Item1 as GenVatFeb21, FORMAT(pbx.PostingDate,'hh:mm') as PostingTime, ISNULL(CashAmount, -1) AS CashAmount, ISNULL(CheckAmount, 0) AS CheckAmount, ISNULL(DepositAmount, 0) AS DepositAmount, ISNULL(withPenalty, 1) AS withPenalty " +
                 "FROM PaidBillsWithRoute pbx INNER JOIN Bills b ON pbx.AccountNumber=b.AccountNumber AND pbx.ServicePeriodEnd=b.ServicePeriodEnd " +
                 "INNER JOIN PaidBills p ON p.AccountNumber=b.AccountNumber AND p.ServicePeriodEnd=b.ServicePeriodEnd " +
                 "INNER JOIN BillsExtension x ON  pbx.AccountNumber=x.AccountNumber AND pbx.ServicePeriodEnd=x.ServicePeriodEnd " +
@@ -474,6 +489,7 @@ public class BillDAO {
             bill.setPostingTime(rs.getString("PostingTime"));
             bill.setCashAmount(rs.getDouble("CashAmount") == -1 ? rs.getDouble("TotalAmount") : rs.getDouble("CashAmount"));
             bill.setCheckAmount(rs.getDouble("CheckAmount"));
+            bill.setDeposit(rs.getDouble("DepositAmount"));
             Bill b = bill;
             b.setPeriod(rs.getString("Period"));
             b.setPowerKWH(rs.getDouble("Powerkwh"));
@@ -734,7 +750,7 @@ public class BillDAO {
         HashMap<String, Double> result = null;
         try {
 
-            String sql = "SELECT ISNULL(QCLoanAmount, 0) AS QCLoanAmount, ISNULL(QCAmount, 0) AS QCAmount, ISNULL(QCMonths, 0) AS QCMonths, ISNULL(EPAmount, 0) AS EPAmount, ISNULL(EPMonths, 0) AS EPMonths, ISNULL(PCAmount, 0) AS PCAmount, ISNULL(PCMonths, 0) AS PCMonths " +
+            String sql = "SELECT AccountNumber, ISNULL(QCLoanAmount, 0) AS QCLoanAmount, ISNULL(QCAmount, 0) AS QCAmount, ISNULL(QCMonths, 0) AS QCMonths, ISNULL(EPAmount, 0) AS EPAmount, ISNULL(EPMonths, 0) AS EPMonths, ISNULL(PCAmount, 0) AS PCAmount, ISNULL(PCMonths, 0) AS PCMonths " +
                     "FROM OtherCharges WHERE AccountNumber = '" + accountNumber + "';";
             PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
             ResultSet rs = ps.executeQuery();

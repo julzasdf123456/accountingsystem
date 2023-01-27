@@ -13,6 +13,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.tellering.PaymentConfirmationController">
    <children>
@@ -20,9 +21,12 @@
          <children>
             <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="300.0" prefWidth="450.0">
                <top>
-                  <VBox BorderPane.alignment="TOP_LEFT">
+                  <VBox alignment="TOP_CENTER" BorderPane.alignment="TOP_LEFT">
                      <children>
-                        <Label textFill="RED" />
+                        <Label fx:id="status_label" styleClass="bold" textFill="RED">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font></Label>
                      </children>
                   </VBox>
                </top>
