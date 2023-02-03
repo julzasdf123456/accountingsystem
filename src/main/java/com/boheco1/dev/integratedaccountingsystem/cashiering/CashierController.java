@@ -77,8 +77,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     @FXML
     private void search(ActionEvent event) {
-        //ModalBuilder.showModalFromXMLNoClose(CashierController.class, "../cashiering/cashiering_search_consumer.fxml", Utility.getStackPane());
-        ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
+        ModalBuilder.showModalFromXMLNoClose(CashierController.class, "../cashiering/cashiering_search_consumer.fxml", Utility.getStackPane());
     }
 
     private void resetField(){
@@ -214,6 +213,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
     }
 
     private void printing() {
+
+
         if(consumerInfo == null && tellerInfo == null){
             AlertDialogBuilder.messgeDialog("System Message", "Please select consumer or teller information.",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
@@ -307,6 +308,13 @@ public class CashierController extends MenuControllerHandler implements Initiali
             if (msg.isEmpty()){
                 AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
                         Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+
+                tellerInfo.setOrNumber(orNmber.getText());
+                tellerInfo.setIssuedTo(tellerInfo.getUsername());
+                Utility.setGlobalTeller(tellerInfo);
+                ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
+                ModalBuilder.MODAL_CLOSE();
+
                 resetField();
             }else{
                 AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: "+msg,

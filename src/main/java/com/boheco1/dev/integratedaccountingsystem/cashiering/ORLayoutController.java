@@ -1,9 +1,13 @@
 package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.ModalBuilder;
+import com.boheco1.dev.integratedaccountingsystem.helpers.ObjectTransaction;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.sun.javafx.print.PrintHelper;
 import com.sun.javafx.print.Units;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -19,26 +23,69 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 
 
-public class ORLayoutController implements Initializable {
+public class ORLayoutController implements Initializable, ObjectTransaction {
     @FXML
     private Pane printArea;
     private Node node;
+
+    @FXML
+    private Label cusName1, cusName2, cashier1, cashier2, date1, date2, inWord1, inWord2, orNum1, orNum2, ref1, ref2, desc1, desc2, amount1, amount2, totalAmount1, totalAmount2;
+
+    private Teller tellerInfo = null;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        /*prepareDocument();
-        try {
-            print();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }*/
         //Anchor pane Size for OR
         //Width 581
         //height 380
+
+        String pattern = "M/d/yyyy";
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(pattern);
+        tellerInfo = Utility.getGlobalTeller();
+        HashMap<String, List<ItemSummary>> breakdown = tellerInfo.getDCRBreakDown();
+        List<ItemSummary> result = breakdown.get("Breakdown");
+
+        List<ItemSummary> misc = breakdown.get("Misc");
+        double collectionFromTeller = Double.parseDouble(String.format("%.2f",misc.get(1).getTotal()));
+
+
+        String description = "", amount = "";
+        for (ItemSummary a: result) {
+            description+=a.getDescription()+"\n";
+            amount+=a.getTotalView()+"\n";
+        }
+        date1.setText(tellerInfo.getDate().format(dateFormatter));
+        date2.setText(tellerInfo.getDate().format(dateFormatter));
+        cusName1.setText(tellerInfo.getIssuedTo());
+        cusName2.setText(tellerInfo.getIssuedTo());
+        orNum1.setText(tellerInfo.getOrNumber());
+        orNum2.setText(tellerInfo.getOrNumber());
+        inWord1.setText(Utility.doubleAmountToWords(collectionFromTeller).replaceAll("£",""));
+        inWord2.setText(Utility.doubleAmountToWords(collectionFromTeller).replaceAll("£",""));
+        totalAmount1.setText(Utility.formatDecimal(collectionFromTeller));
+        totalAmount2.setText(Utility.formatDecimal(collectionFromTeller));
+        ref1.setText("");
+        ref2.setText("");
+        desc1.setText(description);
+        desc2.setText(description);
+        amount1.setText(amount);
+        amount2.setText(amount);
+
+        try {
+            EmployeeInfo employeeInfo = ActiveUser.getUser().getEmployeeInfo();
+            cashier1.setText(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
+            cashier2.setText(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         Node node = printArea;
         Paper paper = PrintHelper.createPaper("OR", 18, 6, Units.INCH);
         Printer printer = Printer.getDefaultPrinter();
@@ -346,4 +393,8 @@ public class ORLayoutController implements Initializable {
         this.node = container;
     }
 
+    @Override
+    public void receive(Object o) {
+
+    }
 }

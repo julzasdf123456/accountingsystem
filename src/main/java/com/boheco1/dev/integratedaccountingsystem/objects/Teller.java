@@ -10,6 +10,8 @@ public class Teller {
     private String address;
     private String phone;
     private LocalDate date;
+    private String orNumber;
+    private String issuedTo;
     private HashMap<String, List<ItemSummary>> DCRBreakDown;
 
     public Teller() {
@@ -70,5 +72,21 @@ public class Teller {
 
     public void setDCRBreakDown(HashMap<String, List<ItemSummary>> DCRBreakDown) {
         this.DCRBreakDown = DCRBreakDown;
+    }
+
+    public String getOrNumber() {
+        return orNumber;
+    }
+
+    public void setOrNumber(String orNumber) {
+        this.orNumber = orNumber;
+    }
+
+    public String getIssuedTo() {
+        return issuedTo;
+    }
+
+    public void setIssuedTo(String issuedTo) {
+        this.issuedTo = issuedTo;
     }
 }

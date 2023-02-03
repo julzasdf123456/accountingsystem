@@ -68,6 +68,8 @@ public class Utility {
 
     private static ObjectTransaction parentController;
 
+    private static Teller globalTeller;
+
     public static MIRS getActiveMIRS() {
         return activeMIRS;
     }
@@ -321,4 +323,11 @@ public class Utility {
         }
     }
 
+    public static Teller getGlobalTeller() {
+        return globalTeller;
+    }
+
+    public static void setGlobalTeller(Teller globalTeller) {
+        Utility.globalTeller = globalTeller;
+    }
 }
