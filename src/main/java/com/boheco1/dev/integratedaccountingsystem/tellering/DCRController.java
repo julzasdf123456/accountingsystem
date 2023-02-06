@@ -89,19 +89,19 @@ public class DCRController extends MenuControllerHandler implements Initializabl
 
                 MenuItem printBill = new MenuItem("Print OEBR");
                 printBill.setOnAction(actionEvent -> {
-                    CustomPrintHelper print = new CustomPrintHelper("OEBR", 18, 3, (PaidBill) row.getItem());
 
-                    print.prepareDocument();
+                    PrintOEBR print = new PrintOEBR((PaidBill) row.getItem());
 
                     print.setOnFailed(e -> {
-                        AlertDialogBuilder.messgeDialog("System Error", "Error when printing the OEBR!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                        AlertDialogBuilder.messgeDialog("System Error", "Print error due to: " + print.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                     });
 
                     print.setOnSucceeded(e -> {
-                        System.out.println("Successful");
+                        System.out.println("Printing was successful.");
                     });
 
                     print.setOnRunning(e -> {
+
                     });
 
                     Thread t = new Thread(print);
