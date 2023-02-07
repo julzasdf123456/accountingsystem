@@ -84,7 +84,7 @@ public class PrintOEBR extends Task {
      */
     private void prepareOEBR(){
         //Placeholder for elements per line
-        String data = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n".replace("x", " ");
+        String data = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n".replace("x", " ");
 
         //Print data
         String id = bill.getConsumer().getAccountID();
@@ -92,8 +92,8 @@ public class PrintOEBR extends Task {
         String type = "Type: "+bill.getConsumerType();
         String consumer = bill.getConsumer().getConsumerName();
 
-        if (consumer.length() > 22)
-            consumer = consumer.substring(0, 23);
+        if (consumer.length() > 24)
+            consumer = consumer.substring(0, 25);
 
         String billno = bill.getBillNo();
         String address = bill.getConsumer().getConsumerAddress();
@@ -109,6 +109,8 @@ public class PrintOEBR extends Task {
         String due = bill.getDueDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
         String dueDate = "Due Date: "+due;
         String surcharge = Utility.formatDecimal(bill.getSurCharge());
+        if (surcharge.equals("50"))
+            surcharge = "50.00";
         String amountDue = Utility.formatDecimal(bill.getTotalAmount());
         //Bill amount is total amount less the sum of vat, surcharge and surchargeVat
         String amount = Utility.formatDecimal(bill.getTotalAmount() - bill.getSurCharge() - surVat);
@@ -144,22 +146,23 @@ public class PrintOEBR extends Task {
         };
 
         //Position of elements per line
+        int adj = 2; //printing adjusted to two characters to the right
         int[][] layout = {
                 {0},
                 {0},
                 {0},
-                {0, 24, 39, 65},
-                {0, 24, 39, 65},
-                {0, 39},
+                {1, 24+adj, 40, 65+adj},
+                {1, 24+adj, 40, 65+adj},
+                {1, 40},
                 {0},
                 {0},
-                {0, 13, 24, 40, 55, 66},
-                {24 + (amount.length() - vat.length()), 66 + (amount.length() - vat.length())},
+                {1, 13+adj, 24+adj+ (amountDue.length() - amount.length()), 40, 55+adj, 66+adj+ (amountDue.length() - amount.length())},
+                {24+adj + (amountDue.length() - vat.length()), 66+adj + (amountDue.length() - vat.length())},
                 {0},
-                {12, 24 + (amountDue.length() - surcharge.length()), 54, 66 + (amountDue.length() - surcharge.length())},
-                {0, 24, 39, 66},
+                {12, 24+adj + (amountDue.length() - surcharge.length()), 54, 66+adj + (amountDue.length() - surcharge.length())},
+                {1, 24+adj, 40, 66+adj},
                 {0},
-                {5, 18, 44, 58}
+                {5+adj+2, 18+adj+2, 44+adj+2, 58+adj+2}
         };
 
         //Generate print data
