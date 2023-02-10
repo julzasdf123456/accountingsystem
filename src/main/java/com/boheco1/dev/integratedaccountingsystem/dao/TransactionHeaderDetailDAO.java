@@ -2,11 +2,13 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.CRMQueue;
+import com.boheco1.dev.integratedaccountingsystem.objects.MIRS;
 import com.boheco1.dev.integratedaccountingsystem.objects.TransactionDetails;
 import com.boheco1.dev.integratedaccountingsystem.objects.TransactionHeader;
 import com.microsoft.sqlserver.jdbc.SQLServerException;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.List;
 
 public class TransactionHeaderDetailDAO {
@@ -109,5 +111,22 @@ public class TransactionHeaderDetailDAO {
             msg = e.getMessage();
         }
         return msg;
+    }
+    public static boolean doneOR(LocalDate period, String teller) throws SQLException, ClassNotFoundException {
+        boolean found = false;
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM TransactionHeader WHERE Period = ? and AccountID = ?");
+        ps.setDate(1, Date.valueOf(period));
+        ps.setString(2, teller);
+
+        ResultSet rs = ps.executeQuery();
+
+        if(rs.next())
+            found = true;
+
+        rs.close();
+        ps.close();
+
+        return found;
     }
 }

@@ -88,7 +88,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                                         AlertDialogBuilder.messgeDialog("System Message", "Task successful." ,
                                                 Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
                                     }else {
-                                        AlertDialogBuilder.messgeDialog("System Message", "OR was already issued on this transaction." ,
+                                        AlertDialogBuilder.messgeDialog("System Message", "Transaction has already been processed and assigned with an OR number." ,
                                                 Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
 
                                     }

@@ -15,7 +15,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane prefHeight="672.0" prefWidth="1012.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.CashierController">
+<AnchorPane prefHeight="741.0" prefWidth="1012.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.CashierController">
    <children>
       <HBox layoutX="16.0" layoutY="16.0" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="16.0">
          <children>
@@ -104,7 +104,7 @@
                         <Insets bottom="16.0" top="16.0" />
                      </VBox.margin>
                   </Label>
-                  <JFXButton fx:id="print_btn" buttonType="RAISED" onAction="#printOR" prefHeight="37.0" prefWidth="119.0" styleClass="btn-sucess" text="Print">
+                  <JFXButton fx:id="print_btn" buttonType="RAISED" onAction="#printOR" prefHeight="37.0" prefWidth="115.0" styleClass="btn-sucess" text="Print">
                      <graphic>
                         <FontIcon fill="WHITE" iconLiteral="mdi2p-printer" iconSize="20" />
                      </graphic>
@@ -117,8 +117,48 @@
                   <Insets right="16.0" />
                </HBox.margin>
             </VBox>
-            <VBox HBox.hgrow="ALWAYS">
+            <VBox alignment="TOP_RIGHT" HBox.hgrow="ALWAYS">
                <children>
+                  <VBox maxWidth="-Infinity" prefHeight="95.0" prefWidth="513.0">
+                     <children>
+                        <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Add Refund">
+                           <font>
+                              <Font name="System Bold" size="22.0" />
+                           </font>
+                        </Label>
+                        <Separator prefWidth="200.0" />
+                        <HBox alignment="CENTER" prefHeight="77.0" prefWidth="513.0">
+                           <children>
+                              <JFXTextField fx:id="energyBill" labelFloat="true" prefHeight="30.0" prefWidth="124.0" promptText="Energy Bil">
+                                 <HBox.margin>
+                                    <Insets left="5.0" right="5.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXTextField fx:id="vat" labelFloat="true" prefHeight="30.0" prefWidth="124.0" promptText="VAT">
+                                 <HBox.margin>
+                                    <Insets left="5.0" right="5.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXTextField fx:id="surcharge" labelFloat="true" prefHeight="30.0" prefWidth="124.0" promptText="Surcharge ">
+                                 <HBox.margin>
+                                    <Insets left="5.0" right="5.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXButton fx:id="refund_btn" alignment="CENTER" buttonType="RAISED" onAction="#refund" prefHeight="29.0" prefWidth="96.0" styleClass="btn-warning" text="Refund" textFill="WHITE">
+                                 <graphic>
+                                    <FontIcon fill="WHITE" iconLiteral="mdi2c-cash-refund" iconSize="20" />
+                                 </graphic>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                                 <HBox.margin>
+                                    <Insets left="5.0" right="5.0" />
+                                 </HBox.margin>
+                              </JFXButton>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
                   <TableView fx:id="paymentTable" maxWidth="1.7976931348623157E308" prefHeight="401.0" prefWidth="512.0" VBox.vgrow="ALWAYS">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />

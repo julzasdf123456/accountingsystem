@@ -24,6 +24,7 @@ import javafx.scene.paint.Paint;
 
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private JFXButton print_btn;
 
     @FXML
-    private JFXTextField orNmber, name, address, purpose;
+    private JFXTextField orNmber, name, address, purpose, energyBill, vat, surcharge;
 
     @FXML
     private JFXTextArea remarks;
@@ -63,6 +64,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private List<CRMDetails> crmDetails;
 
     private double collectionFromTeller;
+
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Utility.setParentController(this);
@@ -73,6 +76,9 @@ public class CashierController extends MenuControllerHandler implements Initiali
             throw new RuntimeException(e);
         }
         InputValidation.restrictNumbersOnly(orNmber);
+        InputValidation.restrictNumbersOnly(energyBill);
+        InputValidation.restrictNumbersOnly(vat);
+        InputValidation.restrictNumbersOnly(surcharge);
     }
 
     @FXML
@@ -208,8 +214,48 @@ public class CashierController extends MenuControllerHandler implements Initiali
     }
 
     @FXML
-    private void printOR(ActionEvent event) {
+    private void printOR(ActionEvent event) throws SQLException, ClassNotFoundException {
         printing();
+    }
+
+    @FXML
+    void refund(ActionEvent event) {
+        ObservableList<ItemSummary> result = paymentTable.getItems();
+
+        if(result==null) return;
+
+        JFXButton accept = new JFXButton("Accept");
+        JFXDialog dialog = DialogBuilder.showConfirmDialog("Issue refund:","Confirm transaction.\n" +
+                        "Energy Bill: " +energyBill.getText()+"\n"+
+                        "VAT: " +vat.getText()+"\n" +
+                        "Surcharge: "+surcharge.getText()
+                , accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
+        accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+        accept.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent __) {
+                for(ItemSummary item : result){
+                    if(item.getDescription().equals("Energy")){
+                        item.setTotal(item.getTotal() - Double.parseDouble(energyBill.getText().replaceAll(",","")));
+                        item.setTotalView(Utility.formatDecimal(item.getTotal()));
+                    }
+                    if(item.getDescription().equals("Evat")){
+                        item.setTotal(item.getTotal() - Double.parseDouble(vat.getText().replaceAll(",","")));
+                        item.setTotalView(Utility.formatDecimal(item.getTotal()));
+                    }
+                    if(item.getDescription().equals("Surcharge")){
+                        item.setTotal(item.getTotal() - Double.parseDouble(surcharge.getText().replaceAll(",","")));
+                        item.setTotalView(Utility.formatDecimal(item.getTotal()));
+                    }
+                }
+                energyBill.setText("");
+                vat.setText("");
+                surcharge.setText("");
+
+                paymentTable.refresh();
+                dialog.close();
+            }
+        });
     }
 
     private void printing() {
@@ -301,13 +347,41 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 //transactionDetails.setNote("N/A");
                 transactionDetailsList.add(transactionDetails);
             }
+        }else if(tellerInfo != null) {
+            int seq = 1;
+            ObservableList<ItemSummary> temp = paymentTable.getItems();
+            for (ItemSummary itemSummary : temp) {
+                TransactionDetails transactionDetails = new TransactionDetails();
+                transactionDetails.setPeriod(period);
+                transactionDetails.setTransactionNumber(orNmber.getText());
+
+                if (Utility.OFFICE_PREFIX.equalsIgnoreCase("main"))
+                    transactionDetails.setTransactionCode("OR");
+                else
+                    transactionDetails.setTransactionCode("ORSub");
+
+                transactionDetails.setTransactionDate(date.getValue());
+                transactionDetails.setAccountCode(tellerInfo.getUsername());
+                transactionDetails.setParticulars(itemSummary.getDescription());
+                transactionDetails.setSequenceNumber(seq++);
+
+                if(itemSummary.getTotal() > 0)
+                    transactionDetails.setCredit(itemSummary.getTotal());
+                else
+                    transactionDetails.setDebit(itemSummary.getTotal());
+
+                transactionDetails.setOrDate(date.getValue());
+                //transactionDetails.setBankID("N/A");
+                //transactionDetails.setNote("N/A");
+                transactionDetailsList.add(transactionDetails);
+            }
         }
 
         try {
             String msg = TransactionHeaderDetailDAO.save(crmQueue, transactionHeader, transactionDetailsList);
             if (msg.isEmpty()){
-                AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
-                        Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+               // AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
+               //         Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
 
                 tellerInfo.setOrNumber(orNmber.getText());
                 tellerInfo.setIssuedTo(tellerInfo.getUsername());
