@@ -15,7 +15,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -25,7 +24,6 @@ import java.util.ResourceBundle;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.fxml.FXML;
-import javafx.print.Printer;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -1214,19 +1212,19 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             List<Bill> updated = Utility.processor(bills, cash, checks, ActiveUser.getUser().getUserName());
             BillDAO.addPaidBill(updated, change, deposit, account);
             for (Bill b : updated) {
-                CustomPrintHelper print = new CustomPrintHelper("OEBR", 18, 3, (PaidBill) b);
 
-                print.prepareDocument();
+                PrintOEBR print = new PrintOEBR((PaidBill) b);
 
                 print.setOnFailed(e -> {
-                    System.out.println("Error when printing the OEBR!");
+                    AlertDialogBuilder.messgeDialog("System Error", "Print error due to: " + print.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 });
 
                 print.setOnSucceeded(e -> {
-                    System.out.println("Successful");
+                    System.out.println("Printing was successful.");
                 });
 
                 print.setOnRunning(e -> {
+
                 });
 
                 Thread t = new Thread(print);
