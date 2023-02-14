@@ -7,6 +7,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import org.apache.commons.text.WordUtils;
 import pl.allegro.finance.tradukisto.MoneyConverters;
+import pl.allegro.finance.tradukisto.ValueConverters;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -184,15 +185,33 @@ public class Utility {
 
     public static String doubleAmountToWords(double amount) {
 
-//        ValueConverters converters = ValueConverters.ENGLISH_INTEGER;
-
-        MoneyConverters converters = MoneyConverters.ENGLISH_BANKING_MONEY_VALUE;
-
         StringBuffer words = new StringBuffer();
-        words.append(converters.asWords(BigDecimal.valueOf(amount)));
-        words.append(" pesos");
+        ValueConverters converters = ValueConverters.ENGLISH_INTEGER;
 
-        return WordUtils.capitalizeFully(words.toString(), new char[]{' ','_'});
+//        MoneyConverters converters = MoneyConverters.ENGLISH_BANKING_MONEY_VALUE;
+//        words.append(converters.asWords(BigDecimal.valueOf(amount)));
+        int amountInt = (int)Math.floor(amount);
+        int rem = (int)((amount - amountInt) * 100);
+
+        words.append(converters.asWords(amountInt));
+
+        words.append(" & " + rem + "/100 pesos");
+
+//        return WordUtils.capitalizeFully(words.toString(), new char[]{' ','_'});
+        return capitalize(words.toString());
+    }
+
+    public static String capitalize(String str) {
+        StringBuffer output = new StringBuffer();
+        for(int i=0; i<str.length(); i++) {
+            char c = str.charAt(i);
+            if(i==0 || str.charAt(i-1)==' ')
+                output.append(Character.toUpperCase(c));
+            else
+                output.append(c);
+        }
+
+        return output.toString();
     }
 
     public static String formatDecimal(double val){

@@ -77,11 +77,10 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
                 orNumber.setText(nextARNumber+"");
             }
 
-            accountDescription.setItems(FXCollections.observableList(ParticularsAccountDAO.getAll()));
+            accountDescription.setItems(FXCollections.observableList(ParticularsAccountDAO.getByType("AR")));
             transactionDetails = FXCollections.observableList(new ArrayList<>());
             renderTable();
             breakdownTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
 
 
         }catch(Exception ex) {
@@ -259,8 +258,15 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
     }
 
     public void onAmountEntry() {
+        String entry = amount.getText();
+
+        if(entry.isEmpty()) {
+            amountInWords.setText(null);
+            return;
+        }
+
         try {
-            double amt = Double.parseDouble(amount.getText());
+            double amt = Double.parseDouble(entry);
             amountInWords.setText(Utility.doubleAmountToWords(amt));
         }catch(Exception ex) {
             ex.printStackTrace();
