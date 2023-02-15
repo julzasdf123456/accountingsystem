@@ -192,7 +192,23 @@ public class Utility {
         words.append(converters.asWords(BigDecimal.valueOf(amount)));
         words.append(" pesos");
 
-        return WordUtils.capitalizeFully(words.toString(), new char[]{' ','_'});
+        return capitalize(words.toString());
+    }
+
+    public static String capitalize(String str) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for(int i=0; i<str.length(); i++) {
+            char c = str.charAt(i);
+
+            if(i==0 || str.charAt(i-1)==' ') {
+                stringBuilder.append(Character.toUpperCase(c));
+            }else {
+                stringBuilder.append(c);
+            }
+        }
+
+        return stringBuilder.toString();
     }
 
     public static String formatDecimal(double val){

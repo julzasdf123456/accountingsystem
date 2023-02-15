@@ -9,6 +9,8 @@ import com.boheco1.dev.integratedaccountingsystem.objects.ParticularsAccount;
 import com.boheco1.dev.integratedaccountingsystem.objects.TransactionDetails;
 import com.boheco1.dev.integratedaccountingsystem.objects.TransactionHeader;
 import com.jfoenix.controls.*;
+import com.sun.javafx.print.PrintHelper;
+import com.sun.javafx.print.Units;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -365,7 +367,19 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         System.out.println("Commence printing...");
         PrinterJob printJob = PrinterJob.createPrinterJob();
         Printer printer = printJob.getPrinter();
-        PageLayout layout = printer.createPageLayout(Paper.NA_LETTER, PageOrientation.PORTRAIT, Printer.MarginType.HARDWARE_MINIMUM);
+
+        Paper arsize = PrintHelper.createPaper("8.5x11", 8.5,8.5,Units.INCH);
+
+        Paper letter = Paper.NA_LETTER;
+
+        Paper a4 = Paper.A4;
+
+        PageLayout layout = printer.createPageLayout(letter, PageOrientation.PORTRAIT, Printer.MarginType.HARDWARE_MINIMUM);
+
+        System.out.println(letter.getWidth() + "x" + letter.getHeight() + " ");
+        System.out.println("Printable: " + layout.getPrintableWidth() + "x" + layout.getPrintableHeight());
+
+        printJob.setPrinter(printer);
 
         JobSettings jobSettings = printJob.getJobSettings();
         jobSettings.setPageLayout(layout);

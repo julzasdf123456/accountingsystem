@@ -26,7 +26,7 @@ public class ArPrint {
 
         for(int i=0; i<paymentFor.length; i++) {
             paymentForBuff.append(paymentFor[i] + "\n");
-            amountBuff.append(amount[i] + "\n");
+            amountBuff.append(String.format("%.2f",amount[i]) + "\n");
         }
 
         paymentFor1.setText(paymentForBuff.toString());
