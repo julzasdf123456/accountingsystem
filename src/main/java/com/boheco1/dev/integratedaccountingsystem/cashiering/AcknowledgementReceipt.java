@@ -262,7 +262,14 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
     public void onAmountEntry() {
         try {
-            double amt = Double.parseDouble(amount.getText());
+            String entry = amount.getText();
+
+            if(entry.isEmpty()) {
+                amountInWords.setText(null);
+                return;
+            }
+
+            double amt = Double.parseDouble(entry);
             amountInWords.setText(Utility.doubleAmountToWords(amt));
         }catch(Exception ex) {
             ex.printStackTrace();

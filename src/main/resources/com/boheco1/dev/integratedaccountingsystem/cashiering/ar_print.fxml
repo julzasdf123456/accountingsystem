@@ -7,28 +7,20 @@
 
 <AnchorPane prefHeight="218.0" prefWidth="612.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.ArPrint">
    <children>
-      <Text fx:id="receivedFrom1" layoutX="48.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Benjie Basio Lenteria">
+      <Text fx:id="receivedFrom1" layoutX="48.0" layoutY="65.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Benjie Basio Lenteria">
          <font>
             <Font size="9.0" />
          </font></Text>
-      <Text fx:id="totalStr1" layoutX="48.0" layoutY="78.0" strokeType="OUTSIDE" strokeWidth="0.0" text="One thousand five hundred">
+      <Text fx:id="receivedFrom2" layoutX="355.0" layoutY="64.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Benjie Basio Lenteria">
          <font>
             <Font size="9.0" />
          </font></Text>
-      <Text fx:id="receivedFrom2" layoutX="351.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Benjie Basio Lenteria">
-         <font>
-            <Font size="9.0" />
-         </font></Text>
-      <Text fx:id="totalStr2" layoutX="351.0" layoutY="78.0" strokeType="OUTSIDE" strokeWidth="0.0" text="One thousand five hundred">
-         <font>
-            <Font size="9.0" />
-         </font></Text>
-      <Label fx:id="paymentFor1" alignment="TOP_LEFT" layoutX="24.0" layoutY="97.0" prefHeight="53.0" prefWidth="126.0" text="Something" wrapText="true">
+      <Label fx:id="paymentFor1" alignment="TOP_LEFT" layoutX="24.0" layoutY="106.0" prefHeight="42.0" prefWidth="126.0" text="Something" wrapText="true">
          <font>
             <Font size="9.0" />
          </font>
       </Label>
-      <Label fx:id="amount1" alignment="TOP_RIGHT" layoutX="200.0" layoutY="96.0" prefHeight="54.0" prefWidth="66.0" text="Something&#10;another&#10;" textAlignment="RIGHT" wrapText="true">
+      <Label fx:id="amount1" alignment="TOP_RIGHT" layoutX="200.0" layoutY="105.0" prefHeight="42.0" prefWidth="66.0" text="Something&#10;another&#10;" textAlignment="RIGHT" wrapText="true">
          <font>
             <Font size="9.0" />
          </font>
@@ -38,12 +30,12 @@
             <Font size="9.0" />
          </font>
       </Text>
-      <Label fx:id="paymentFor2" alignment="TOP_LEFT" layoutX="334.0" layoutY="96.0" prefHeight="54.0" prefWidth="126.0" text="Something" wrapText="true">
+      <Label fx:id="paymentFor2" alignment="TOP_LEFT" layoutX="334.0" layoutY="105.0" prefHeight="42.0" prefWidth="126.0" text="Something" wrapText="true">
          <font>
             <Font size="9.0" />
          </font>
       </Label>
-      <Label fx:id="amount2" alignment="TOP_RIGHT" layoutX="505.0" layoutY="96.0" prefHeight="54.0" prefWidth="66.0" text="Something&#10;another&#10;" textAlignment="RIGHT" wrapText="true">
+      <Label fx:id="amount2" alignment="TOP_RIGHT" layoutX="505.0" layoutY="104.0" prefHeight="42.0" prefWidth="66.0" text="Something&#10;another&#10;" textAlignment="RIGHT" wrapText="true">
          <font>
             <Font size="9.0" />
          </font>
@@ -53,5 +45,15 @@
             <Font size="9.0" />
          </font>
       </Text>
+      <Label fx:id="totalStr1" alignment="TOP_LEFT" layoutX="48.0" layoutY="66.0" lineSpacing="0.8" prefHeight="24.0" prefWidth="218.0" text="Eighty-eight Thousand Eight Hundred Eighty-eight 0/100 Pesos" textOverrun="CENTER_ELLIPSIS" wrapText="true">
+         <font>
+            <Font size="8.0" />
+         </font>
+      </Label>
+      <Label fx:id="totalStr2" alignment="TOP_LEFT" layoutX="355.0" layoutY="65.0" prefHeight="24.0" prefWidth="218.0" text="Eighty-eight Thousand Eight Hundred Eighty-eight 0/100 Pesos" textOverrun="CENTER_ELLIPSIS" wrapText="true">
+         <font>
+            <Font size="8.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>
