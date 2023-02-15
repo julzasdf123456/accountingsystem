@@ -41,7 +41,7 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
         initializeMirsTable();
 
         try {
-            issuedByEmployee = EmployeeDAO.getByDesignation("HEAD, Warehousing");
+            issuedByEmployee = EmployeeDAO.getByDesignation("HEAD, WAREHOUSING SECTION");
             if(issuedByEmployee!=null)
                 issuedBy.setText(issuedByEmployee.getFullName());
         } catch (Exception e) {

@@ -116,6 +116,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
             this.tellerInfo = (Teller) ((HashMap<?, ?>) o).get("SearchResult");
             this.name.setText(tellerInfo.getName());
             this.date.setValue(localDate);
+            this.address.setText(tellerInfo.getAddress());
+            this.purpose.setText("for DCR OR");
 
             if(transactionHeader != null){
                 this.date.setValue(transactionHeader.getTransactionDate());
@@ -123,9 +125,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 this.remarks.setText(transactionHeader.getRemarks());
                 print_btn.setVisible(false);
             }
-
-            this.address.setText("-");
-            this.purpose.setText("-");
             address.setDisable(true);
             purpose.setDisable(true);
             consumerInfo = null;
@@ -304,10 +303,12 @@ public class CashierController extends MenuControllerHandler implements Initiali
         if(consumerInfo != null) {
             transactionHeader.setSource(crmQueue.getSource());
             transactionHeader.setAccountID(crmQueue.getSourseId());//CRM Source ID
+            transactionHeader.setEnteredBy(ActiveUser.getUser().getUserName());
             transactionHeader.setTransactionDate(date.getValue());
         }else if(tellerInfo != null) {
             transactionHeader.setSource("employee");
-            transactionHeader.setAccountID(tellerInfo.getUsername());
+            transactionHeader.setEnteredBy(tellerInfo.getUsername());
+            transactionHeader.setAccountID(ActiveUser.getUser().getId());
             transactionHeader.setAmount(collectionFromTeller);
             transactionHeader.setTransactionDate(tellerInfo.getDate());
         }
@@ -315,7 +316,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         transactionHeader.setRemarks(remarks.getText());
         //transactionHeader.setBank("N/A");
         //transactionHeader.setReferenceNo("N/A");
-        transactionHeader.setEnteredBy(ActiveUser.getUser().getId());
+
         transactionHeader.setDateEntered(LocalDateTime.now());
 
         List<TransactionDetails> transactionDetailsList = new ArrayList<>();
