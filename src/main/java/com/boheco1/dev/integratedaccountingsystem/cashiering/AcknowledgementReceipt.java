@@ -79,7 +79,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
                 orNumber.setText(nextARNumber+"");
             }
 
-            accountDescription.setItems(FXCollections.observableList(ParticularsAccountDAO.getAll()));
+            accountDescription.setItems(FXCollections.observableList(ParticularsAccountDAO.getByType("AR")));
             transactionDetails = FXCollections.observableList(new ArrayList<>());
             renderTable();
             breakdownTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
