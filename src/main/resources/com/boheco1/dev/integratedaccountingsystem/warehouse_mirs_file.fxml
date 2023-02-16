@@ -132,7 +132,7 @@
                                                 <Font size="14.0" />
                                              </font>
                                           </JFXTextField>
-                                          <JFXTextField fx:id="quantity" alignment="CENTER" labelFloat="true" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" onAction="#addItemToTable" prefWidth="83.0" promptText="Qty" style="-fx-background-color: #f5f5f5;" styleClass="jfx-text-field">
+                                          <JFXTextField fx:id="quantity" alignment="CENTER" labelFloat="true" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" onAction="#addItemToTable" prefHeight="37.0" prefWidth="83.0" promptText="Qty" style="-fx-background-color: #f5f5f5;" styleClass="jfx-text-field">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>

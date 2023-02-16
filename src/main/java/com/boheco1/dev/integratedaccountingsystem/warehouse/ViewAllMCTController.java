@@ -229,9 +229,16 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                                 issuedByEmployee.getEmployeeMidName().toUpperCase().charAt(0)+". " +
                                 issuedByEmployee.getEmployeeLastName().toUpperCase(),3, 11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
 
+                String mname = receivedByEmployee.getEmployeeMidName().toUpperCase();
+                String character;
+                if(mname.isEmpty()){
+                    character = " ";
+                }else {
+                    character = mname.charAt(0)+". ";
+                }
                 pdf.createCell(
                         receivedByEmployee.getEmployeeFirstName().toUpperCase()+" " +
-                                receivedByEmployee.getEmployeeMidName().toUpperCase().charAt(0)+". " +
+                                character +
                                 receivedByEmployee.getEmployeeLastName().toUpperCase(),4, 11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
 
                 pdf.createCell(issuedByEmployee.getDesignation(),3, 8, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);

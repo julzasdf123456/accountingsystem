@@ -248,6 +248,8 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         messageLog = "";
         Stage stage = (Stage) Utility.getStackPane().getScene().getWindow();
         FileChooser fileChooser = new FileChooser();
+        if(Utility.MIRS_PATH.length() > 3)
+            fileChooser.setInitialDirectory(new File(Utility.MIRS_PATH));
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("CSV Files", "*.csv")
         );
