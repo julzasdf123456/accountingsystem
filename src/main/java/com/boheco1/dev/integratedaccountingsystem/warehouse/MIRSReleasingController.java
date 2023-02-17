@@ -422,7 +422,8 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
         }
         for(MIRSItem m : requestedMirsItem){
             if(m.getParticulars().toLowerCase().contains("current") ||
-                    m.getParticulars().toLowerCase().contains("fuse"))
+                    m.getParticulars().toLowerCase().contains("fuse")||
+                    m.getParticulars().toLowerCase().contains("Pole"))
                 continue;
             m.setSelected(!m.isSelected());
         }

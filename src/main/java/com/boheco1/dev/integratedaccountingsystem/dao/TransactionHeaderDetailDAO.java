@@ -112,21 +112,5 @@ public class TransactionHeaderDetailDAO {
         }
         return msg;
     }
-    public static boolean doneOR(LocalDate period, String teller) throws SQLException, ClassNotFoundException {
-        boolean found = false;
-        PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM TransactionHeader WHERE Period = ? and AccountID = ?");
-        ps.setDate(1, Date.valueOf(period));
-        ps.setString(2, teller);
 
-        ResultSet rs = ps.executeQuery();
-
-        if(rs.next())
-            found = true;
-
-        rs.close();
-        ps.close();
-
-        return found;
-    }
 }

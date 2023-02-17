@@ -38,6 +38,8 @@ public class Utility {
     public static String PENDING = "pending";
     public static String APPROVED = "approved";
     public static String UNAVAILABLE = "unavailable";
+    public static String MIRS_PATH;
+    public static int OR_NUMBER;
 
     public static String MR_FILED = "filed";
     public static String MR_RECOMMENDING = "recommended";

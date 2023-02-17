@@ -2,6 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
 
 import com.boheco1.dev.integratedaccountingsystem.dao.CRMDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDetailDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
@@ -79,6 +80,13 @@ public class CashierController extends MenuControllerHandler implements Initiali
         InputValidation.restrictNumbersOnly(energyBill);
         InputValidation.restrictNumbersOnly(vat);
         InputValidation.restrictNumbersOnly(surcharge);
+
+        if(Utility.OR_NUMBER != 0) {
+            orNmber.setText(""+Utility.OR_NUMBER);
+        }
+
+
+
     }
 
     @FXML
@@ -87,7 +95,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
     }
 
     private void resetField(){
-        orNmber.setText(""); name.setText(""); address.setText(""); purpose.setText(""); remarks.setText("");
+        name.setText(""); address.setText(""); purpose.setText(""); remarks.setText("");
         date.setValue(LocalDate.now());
         this.paymentTable.getColumns().clear();
         print_btn.setVisible(true);
@@ -116,6 +124,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
             this.tellerInfo = (Teller) ((HashMap<?, ?>) o).get("SearchResult");
             this.name.setText(tellerInfo.getName());
             this.date.setValue(localDate);
+            this.address.setText(tellerInfo.getAddress());
+            this.purpose.setText("for DCR OR");
 
             if(transactionHeader != null){
                 this.date.setValue(transactionHeader.getTransactionDate());
@@ -123,11 +133,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 this.remarks.setText(transactionHeader.getRemarks());
                 print_btn.setVisible(false);
             }
-
-            this.address.setText("-");
-            this.purpose.setText("-");
-            address.setDisable(true);
-            purpose.setDisable(true);
+            address.setEditable(false);
+            purpose.setEditable(false);
             consumerInfo = null;
             initTable(tellerInfo);
         }
@@ -208,7 +215,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
     }
 
     @FXML
-    private void printWhenEntered(KeyEvent event) {
+    private void printWhenEntered(KeyEvent event) throws SQLException, ClassNotFoundException {
         if (event.getCode() == KeyCode.ENTER)
             printing();
     }
@@ -258,7 +265,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
         });
     }
 
-    private void printing() {
+    private void printing() throws SQLException, ClassNotFoundException {
+
 
 
         if(consumerInfo == null && tellerInfo == null){
@@ -272,6 +280,13 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
         }
+
+        if(TransactionHeaderDAO.isAvailable(orNmber.getText())){
+            AlertDialogBuilder.messgeDialog("System Message", "OR number is already used.",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            return;
+        }
+
         JFXButton accept = new JFXButton("Accept");
         JFXDialog dialog = DialogBuilder.showConfirmDialog("Print OR","Confirm transaction.\n" +
                         "Date: " +date.getValue()+"\n"+
@@ -304,10 +319,12 @@ public class CashierController extends MenuControllerHandler implements Initiali
         if(consumerInfo != null) {
             transactionHeader.setSource(crmQueue.getSource());
             transactionHeader.setAccountID(crmQueue.getSourseId());//CRM Source ID
+            transactionHeader.setEnteredBy(ActiveUser.getUser().getUserName());
             transactionHeader.setTransactionDate(date.getValue());
         }else if(tellerInfo != null) {
             transactionHeader.setSource("employee");
-            transactionHeader.setAccountID(tellerInfo.getUsername());
+            transactionHeader.setEnteredBy(tellerInfo.getUsername());
+            transactionHeader.setAccountID(ActiveUser.getUser().getId());
             transactionHeader.setAmount(collectionFromTeller);
             transactionHeader.setTransactionDate(tellerInfo.getDate());
         }
@@ -315,7 +332,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         transactionHeader.setRemarks(remarks.getText());
         //transactionHeader.setBank("N/A");
         //transactionHeader.setReferenceNo("N/A");
-        transactionHeader.setEnteredBy(ActiveUser.getUser().getId());
+
         transactionHeader.setDateEntered(LocalDateTime.now());
 
         List<TransactionDetails> transactionDetailsList = new ArrayList<>();
@@ -380,8 +397,11 @@ public class CashierController extends MenuControllerHandler implements Initiali
         try {
             String msg = TransactionHeaderDetailDAO.save(crmQueue, transactionHeader, transactionDetailsList);
             if (msg.isEmpty()){
-               // AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
-               //         Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
+                        Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+
+                Utility.OR_NUMBER = Integer.parseInt(orNmber.getText())+1;
+
 
                 tellerInfo.setOrNumber(orNmber.getText());
                 tellerInfo.setIssuedTo(tellerInfo.getUsername());
@@ -390,6 +410,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 ModalBuilder.MODAL_CLOSE();
 
                 resetField();
+                orNmber.setText(""+Utility.OR_NUMBER);
             }else{
                 AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: "+msg,
                         Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);

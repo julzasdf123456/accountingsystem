@@ -3,8 +3,10 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.TransactionHeader;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -141,11 +143,11 @@ public class TransactionHeaderDAO {
         }
     }
 
-    public static TransactionHeader get(String accountID, LocalDate transactionDate) throws Exception {
+    public static TransactionHeader get(String enteredBy, LocalDate transactionDate) throws Exception {
 
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM TransactionHeader WHERE AccountID=? AND TransactionDate=?");
-        ps.setString(1, accountID);
+                "SELECT * FROM TransactionHeader WHERE EnteredBy=? AND TransactionDate=?");
+        ps.setString(1, enteredBy);
         ps.setDate(2, java.sql.Date.valueOf(transactionDate));
 
         ResultSet rs = ps.executeQuery();
@@ -193,6 +195,23 @@ public class TransactionHeaderDAO {
         }else {
             return 0;
         }
+    }
+
+    public static boolean isAvailable(String or_num) throws SQLException, ClassNotFoundException {
+        boolean found = false;
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM TransactionHeader WHERE TransactionNumber = ?");
+        ps.setString(1, or_num);
+
+        ResultSet rs = ps.executeQuery();
+
+        if(rs.next())
+            found = true;
+
+        rs.close();
+        ps.close();
+
+        return found;
     }
 
 }
