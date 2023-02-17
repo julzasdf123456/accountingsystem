@@ -7,6 +7,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import org.apache.commons.text.WordUtils;
 import pl.allegro.finance.tradukisto.MoneyConverters;
+import pl.allegro.finance.tradukisto.ValueConverters;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -184,13 +185,15 @@ public class Utility {
 
     public static String doubleAmountToWords(double amount) {
 
-//        ValueConverters converters = ValueConverters.ENGLISH_INTEGER;
+        ValueConverters converters = ValueConverters.ENGLISH_INTEGER;
 
-        MoneyConverters converters = MoneyConverters.ENGLISH_BANKING_MONEY_VALUE;
+        int amountInt = (int)amount;
+
+        int rems = (int)((amount - amountInt)*100);
 
         StringBuffer words = new StringBuffer();
-        words.append(converters.asWords(BigDecimal.valueOf(amount)));
-        words.append(" pesos");
+        words.append(converters.asWords(amountInt));
+        words.append(" AND " + rems + "/100 pesos");
 
         return capitalize(words.toString());
     }
@@ -200,12 +203,7 @@ public class Utility {
 
         for(int i=0; i<str.length(); i++) {
             char c = str.charAt(i);
-
-            if(i==0 || str.charAt(i-1)==' ') {
-                stringBuilder.append(Character.toUpperCase(c));
-            }else {
-                stringBuilder.append(c);
-            }
+            stringBuilder.append(Character.toUpperCase(c));
         }
 
         return stringBuilder.toString();
