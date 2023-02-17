@@ -5,8 +5,6 @@ import com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
-import org.apache.commons.text.WordUtils;
-import pl.allegro.finance.tradukisto.MoneyConverters;
 import pl.allegro.finance.tradukisto.ValueConverters;
 
 import java.io.File;
