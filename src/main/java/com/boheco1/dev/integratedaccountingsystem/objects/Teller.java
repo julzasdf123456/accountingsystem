@@ -1,5 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import javafx.collections.ObservableList;
+
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +15,8 @@ public class Teller {
     private String orNumber;
     private String issuedTo;
     private HashMap<String, List<ItemSummary>> DCRBreakDown;
+
+    private ObservableList<ItemSummary> orBreakDown;
 
     public Teller() {
     }
@@ -88,5 +92,13 @@ public class Teller {
 
     public void setIssuedTo(String issuedTo) {
         this.issuedTo = issuedTo;
+    }
+
+    public ObservableList<ItemSummary> getOrBreakDown() {
+        return orBreakDown;
+    }
+
+    public void setOrBreakDown(ObservableList<ItemSummary> orBreakDown) {
+        this.orBreakDown = orBreakDown;
     }
 }

@@ -36,9 +36,9 @@ public class ORLayoutController implements Initializable, ObjectTransaction {
     private Node node;
 
     @FXML
-    private Label cusName1, cusName2, cashier1, cashier2, date1, date2, inWord1, inWord2, orNum1, orNum2, ref1, ref2, desc1, desc2, amount1, amount2, totalAmount1, totalAmount2;
+    private Label cusName1, cusName2, address1, address2, cashier1, cashier2, date1, date2, inWord1, inWord2, orNum1, orNum2, ref1, ref2, desc1, desc2, amount1, amount2, totalAmount1, totalAmount2, totalAmount3, totalAmount4;
 
-    private Teller tellerInfo = null;
+    private ORContent orContent = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -48,29 +48,44 @@ public class ORLayoutController implements Initializable, ObjectTransaction {
 
         String pattern = "M/d/yyyy";
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(pattern);
-        tellerInfo = Utility.getGlobalTeller();
-        HashMap<String, List<ItemSummary>> breakdown = tellerInfo.getDCRBreakDown();
-        List<ItemSummary> result = breakdown.get("Breakdown");
+        orContent = Utility.getOrContent();
+        //HashMap<String, List<ItemSummary>> breakdown = tellerInfo.getDCRBreakDown();
+        //List<ItemSummary> result = breakdown.get("Breakdown");
 
-        List<ItemSummary> misc = breakdown.get("Misc");
-        double collectionFromTeller = Double.parseDouble(String.format("%.2f",misc.get(1).getTotal()));
+        //List<ItemSummary> misc = breakdown.get("Misc");
+        //double collectionFromTeller = Double.parseDouble(String.format("%.2f",misc.get(1).getTotal()));
 
 
         String description = "", amount = "";
-        for (ItemSummary a: result) {
-            description+=a.getDescription()+"\n";
-            amount+=a.getTotalView()+"\n";
+        if(orContent.getTellerCollection()!=null){
+            for (ItemSummary a : orContent.getTellerCollection()) {
+                if (a.getTotal() > 0) {
+                    description += a.getDescription() + "\n";
+                    amount += Utility.formatDecimal(a.getTotal()) + "\n";
+                }
+            }
+        }else if(orContent.getCustomerCollection() != null) {
+            for (CRMDetails a : orContent.getCustomerCollection()) {
+                if (a.getTotal() > 0) {
+                    description += a.getParticulars() + "\n";
+                    amount += Utility.formatDecimal(a.getTotal()) + "\n";
+                }
+            }
         }
-        date1.setText(tellerInfo.getDate().format(dateFormatter));
-        date2.setText(tellerInfo.getDate().format(dateFormatter));
-        cusName1.setText(tellerInfo.getIssuedTo());
-        cusName2.setText(tellerInfo.getIssuedTo());
-        orNum1.setText(tellerInfo.getOrNumber());
-        orNum2.setText(tellerInfo.getOrNumber());
-        inWord1.setText(Utility.doubleAmountToWords(collectionFromTeller).replaceAll("£",""));
-        inWord2.setText(Utility.doubleAmountToWords(collectionFromTeller).replaceAll("£",""));
-        totalAmount1.setText(Utility.formatDecimal(collectionFromTeller));
-        totalAmount2.setText(Utility.formatDecimal(collectionFromTeller));
+        date1.setText(orContent.getDate().format(dateFormatter));
+        date2.setText(orContent.getDate().format(dateFormatter));
+        cusName1.setText(orContent.getIssuedTo());
+        cusName2.setText(orContent.getIssuedTo());
+        address1.setText(orContent.getAddress());
+        address2.setText(orContent.getAddress());
+        orNum1.setText(orContent.getOrNumber());
+        orNum2.setText(orContent.getOrNumber());
+        inWord1.setText(Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£",""));
+        inWord2.setText(Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£",""));
+        totalAmount1.setText(Utility.formatDecimal(orContent.getTotal()));
+        totalAmount2.setText(Utility.formatDecimal(orContent.getTotal()));
+        totalAmount3.setText(Utility.formatDecimal(orContent.getTotal()));
+        totalAmount4.setText(Utility.formatDecimal(orContent.getTotal()));
         ref1.setText("");
         ref2.setText("");
         desc1.setText(description);
@@ -80,8 +95,10 @@ public class ORLayoutController implements Initializable, ObjectTransaction {
 
         try {
             EmployeeInfo employeeInfo = ActiveUser.getUser().getEmployeeInfo();
-            cashier1.setText(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
-            cashier2.setText(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
+            //cashier1.setText(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
+            //cashier2.setText(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
+            cashier1.setText(orContent.getIssuedBy());
+            cashier2.setText(orContent.getIssuedBy());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

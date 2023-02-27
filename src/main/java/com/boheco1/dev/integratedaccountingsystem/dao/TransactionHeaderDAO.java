@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class TransactionHeaderDAO {
     public static void add(TransactionHeader transactionHeader) throws Exception {
@@ -197,11 +198,13 @@ public class TransactionHeaderDAO {
         }
     }
 
-    public static boolean isAvailable(String or_num) throws SQLException, ClassNotFoundException {
+    public static boolean isAvailable(LocalDate period, String or_num, String office) throws SQLException, ClassNotFoundException {
         boolean found = false;
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM TransactionHeader WHERE TransactionNumber = ?");
-        ps.setString(1, or_num);
+                "SELECT * FROM TransactionHeader WHERE Period = ? AND TransactionNumber = ? AND TransactionCode = ?");
+        ps.setDate(1, Date.valueOf(period));
+        ps.setString(2, or_num);
+        ps.setString(3, office);
 
         ResultSet rs = ps.executeQuery();
 

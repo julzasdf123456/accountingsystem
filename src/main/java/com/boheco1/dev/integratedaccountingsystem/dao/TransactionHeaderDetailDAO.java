@@ -82,7 +82,7 @@ public class TransactionHeaderDetailDAO {
 
         String msg="";
         try {
-            ps1.executeUpdate();
+            /*ps1.executeUpdate();
             if(ps2 != null)//is null if save teller transaction
                 ps2.executeBatch();
             if(ps3 != null) {//check only ps3 since ps3 and ps4 are in the same code block
@@ -96,7 +96,7 @@ public class TransactionHeaderDetailDAO {
             if(ps3 != null) {
                 ps3.close();
                 ps4.close();
-            }
+            }*/
         } catch (Exception e){
             DB.getConnection().rollback();
             DB.getConnection().setAutoCommit(true);
