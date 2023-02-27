@@ -6,6 +6,7 @@ import com.jfoenix.controls.JFXButton;
 import java.time.LocalDate;
 
 public class BankRemittance {
+    private LocalDate period;
     private LocalDate orDateFrom;
     private LocalDate orDateTo;
     private String checkNumber;
@@ -14,7 +15,8 @@ public class BankRemittance {
     private TransactionDetails transactionDetails;
 
 
-    public BankRemittance(LocalDate orDateFrom, LocalDate orDateTo, String checkNumber, double amount, BankAccount bankAccount) {
+    public BankRemittance(LocalDate period, LocalDate orDateFrom, LocalDate orDateTo, String checkNumber, double amount, BankAccount bankAccount) {
+        this.period = period;
         this.orDateFrom = orDateFrom;
         this.orDateTo = orDateTo;
         this.checkNumber = checkNumber;
@@ -23,12 +25,22 @@ public class BankRemittance {
     }
 
     public BankRemittance() {
+        this.period = null;
         this.orDateFrom = null;
         this.orDateTo = null;
         this.bankAccount = null;
         this.checkNumber = "";
         this.amount = 0.0;
     }
+
+    public LocalDate getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(LocalDate period) {
+        this.period = period;
+    }
+
     public LocalDate getOrDateFrom() {
         return orDateFrom;
     }
