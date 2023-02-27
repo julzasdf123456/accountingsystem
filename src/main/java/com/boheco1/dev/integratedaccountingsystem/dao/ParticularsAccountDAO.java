@@ -26,9 +26,10 @@ public class ParticularsAccountDAO {
     }
 
     public static List<ParticularsAccount> getByType(String type) throws Exception {
-        ResultSet rs = DB.getConnection().createStatement().executeQuery("SELECT * FROM ParticularsAccount " +
-                "WHERE type='" + type + "' " +
-                "ORDER BY Particulars");
+        ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                "SELECT * FROM ParticularsAccount " +
+                        "WHERE type LIKE '%" + type + "%' " +
+                        "ORDER BY Particulars");
 
         ArrayList<ParticularsAccount> pas = new ArrayList<>();
 

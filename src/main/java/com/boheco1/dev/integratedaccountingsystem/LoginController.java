@@ -65,6 +65,7 @@ public class LoginController implements Initializable {
             Utility.STATION = properties.getProperty("station");
             Utility.OFFICE_PREFIX = properties.getProperty("office");
             Utility.DB_BILLING = properties.getProperty("db_billing");
+            Utility.MIRS_PATH = properties.getProperty("mirs_path");
         } catch (Exception e) {
             e.printStackTrace();
             AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), loginStackPane, AlertDialogBuilder.DANGER_DIALOG);

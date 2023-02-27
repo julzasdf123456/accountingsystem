@@ -5,8 +5,6 @@ import com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
-import org.apache.commons.text.WordUtils;
-import pl.allegro.finance.tradukisto.MoneyConverters;
 import pl.allegro.finance.tradukisto.ValueConverters;
 
 import java.io.File;
@@ -38,6 +36,8 @@ public class Utility {
     public static String PENDING = "pending";
     public static String APPROVED = "approved";
     public static String UNAVAILABLE = "unavailable";
+    public static String MIRS_PATH;
+    public static int OR_NUMBER;
 
     public static String MR_FILED = "filed";
     public static String MR_RECOMMENDING = "recommended";
@@ -69,7 +69,7 @@ public class Utility {
 
     private static ObjectTransaction parentController;
 
-    private static Teller globalTeller;
+    private static ORContent orContent;
 
     public static MIRS getActiveMIRS() {
         return activeMIRS;
@@ -185,33 +185,28 @@ public class Utility {
 
     public static String doubleAmountToWords(double amount) {
 
-        StringBuffer words = new StringBuffer();
         ValueConverters converters = ValueConverters.ENGLISH_INTEGER;
 
-//        MoneyConverters converters = MoneyConverters.ENGLISH_BANKING_MONEY_VALUE;
-//        words.append(converters.asWords(BigDecimal.valueOf(amount)));
-        int amountInt = (int)Math.floor(amount);
-        int rem = (int)((amount - amountInt) * 100);
+        int amountInt = (int)amount;
 
+        int rems = (int)((amount - amountInt)*100);
+
+        StringBuffer words = new StringBuffer();
         words.append(converters.asWords(amountInt));
+        words.append(" AND " + rems + "/100 pesos");
 
-        words.append(" & " + rem + "/100 pesos");
-
-//        return WordUtils.capitalizeFully(words.toString(), new char[]{' ','_'});
         return capitalize(words.toString());
     }
 
     public static String capitalize(String str) {
-        StringBuffer output = new StringBuffer();
+        StringBuilder stringBuilder = new StringBuilder();
+
         for(int i=0; i<str.length(); i++) {
             char c = str.charAt(i);
-            if(i==0 || str.charAt(i-1)==' ')
-                output.append(Character.toUpperCase(c));
-            else
-                output.append(c);
+            stringBuilder.append(Character.toUpperCase(c));
         }
 
-        return output.toString();
+        return stringBuilder.toString();
     }
 
     public static String formatDecimal(double val){
@@ -342,11 +337,12 @@ public class Utility {
         }
     }
 
-    public static Teller getGlobalTeller() {
-        return globalTeller;
+    public static ORContent getOrContent() {
+        return orContent;
     }
 
-    public static void setGlobalTeller(Teller globalTeller) {
-        Utility.globalTeller = globalTeller;
+    public static void setOrContent(ORContent orContent) {
+        Utility.orContent = orContent;
     }
+
 }

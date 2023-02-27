@@ -8,10 +8,10 @@ import javafx.scene.text.Text;
 
 public class ArPrint {
     @FXML
-    Text receivedFrom1, receivedFrom2, total1, total2, totalStr1, totalStr2;
+    Text receivedFrom1, receivedFrom2, total1, total2;
 
     @FXML
-    Label paymentFor1, amount1, paymentFor2, amount2;
+    Label paymentFor1, amount1, paymentFor2, amount2, totalStr1, totalStr2;
 
     public void setData(String receivedFrom, String amountStr, float total, String[] paymentFor, double[] amount){
         receivedFrom1.setText(receivedFrom);
@@ -26,7 +26,7 @@ public class ArPrint {
 
         for(int i=0; i<paymentFor.length; i++) {
             paymentForBuff.append(paymentFor[i] + "\n");
-            amountBuff.append(amount[i] + "\n");
+            amountBuff.append(String.format("%,.2f",amount[i]) + "\n");
         }
 
         paymentFor1.setText(paymentForBuff.toString());

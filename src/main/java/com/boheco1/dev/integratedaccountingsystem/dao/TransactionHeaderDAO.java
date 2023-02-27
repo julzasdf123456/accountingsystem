@@ -1,13 +1,17 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 import com.boheco1.dev.integratedaccountingsystem.objects.TransactionHeader;
+import com.boheco1.dev.integratedaccountingsystem.objects.User;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class TransactionHeaderDAO {
     public static void add(TransactionHeader transactionHeader) throws Exception {
@@ -72,6 +76,24 @@ public class TransactionHeaderDAO {
         }
 
         return tas;
+    }
+
+    public static void updateTransaction(String transactionNumber, String transactionCode, LocalDate period) throws Exception {
+        User activeUser = ActiveUser.getUser();
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE TransactionHeader SET DateLastModified=?, UpdatedBy=? " +
+                        "WHERE TransactionNumber=? AND TransactionCode=? AND Period=?"
+        );
+
+        ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+        ps.setString(2, activeUser.getUserName());
+        ps.setString(3, transactionNumber);
+        ps.setString(4, transactionCode);
+        ps.setDate(5, java.sql.Date.valueOf(period));
+
+        ps.executeUpdate();
+
+        ps.close();
     }
 
     public static TransactionHeader get(String transactionNumber, String transactionCode) throws Exception {
@@ -141,11 +163,11 @@ public class TransactionHeaderDAO {
         }
     }
 
-    public static TransactionHeader get(String accountID, LocalDate transactionDate) throws Exception {
+    public static TransactionHeader get(String enteredBy, LocalDate transactionDate) throws Exception {
 
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM TransactionHeader WHERE AccountID=? AND TransactionDate=?");
-        ps.setString(1, accountID);
+                "SELECT * FROM TransactionHeader WHERE EnteredBy=? AND TransactionDate=?");
+        ps.setString(1, enteredBy);
         ps.setDate(2, java.sql.Date.valueOf(transactionDate));
 
         ResultSet rs = ps.executeQuery();
@@ -193,6 +215,25 @@ public class TransactionHeaderDAO {
         }else {
             return 0;
         }
+    }
+
+    public static boolean isAvailable(LocalDate period, String or_num, String office) throws SQLException, ClassNotFoundException {
+        boolean found = false;
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM TransactionHeader WHERE Period = ? AND TransactionNumber = ? AND TransactionCode = ?");
+        ps.setDate(1, Date.valueOf(period));
+        ps.setString(2, or_num);
+        ps.setString(3, office);
+
+        ResultSet rs = ps.executeQuery();
+
+        if(rs.next())
+            found = true;
+
+        rs.close();
+        ps.close();
+
+        return found;
     }
 
 }

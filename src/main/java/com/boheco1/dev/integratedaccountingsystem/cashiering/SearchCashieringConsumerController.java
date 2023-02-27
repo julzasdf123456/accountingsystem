@@ -15,14 +15,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Text;
-import javafx.util.Callback;
 
 import java.net.URL;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -137,6 +132,18 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
             this.toggleSearch.setText("Search Consumer");
             this.searchDate.setVisible(false);
             this.searchTf.setPromptText("Reference Number/Last Name/First Name/Address");
+
+            ObservableList<CRMQueue> result = null;
+            try {
+                result = FXCollections.observableArrayList(ConsumerDAO.getConsumerRecordFromCRMList());
+                this.searchResultTable.setItems(result);
+                createTable(result);
+            } catch (Exception e) {
+                AlertDialogBuilder.messgeDialog("Consumer Record from CRM", e.getMessage(),
+                        Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                throw new RuntimeException(e);
+
+            }
         }else {
             this.toggleSearch.setText("Search Teller");
             this.searchDate.setVisible(true);

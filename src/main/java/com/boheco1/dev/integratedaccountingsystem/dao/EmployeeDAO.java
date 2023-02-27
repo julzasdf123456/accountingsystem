@@ -142,7 +142,7 @@ public class EmployeeDAO {
      */
     public static List<EmployeeInfo> getEmployeeInfo(String key) throws Exception  {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "Select EmployeeID, EmployeeFirstName, EmployeeMidName, EmployeeLastName, Designation FROM EmployeeInfo " +
+                "Select EmployeeID, EmployeeFirstName, EmployeeMidName, EmployeeLastName, Designation, Address FROM EmployeeInfo " +
                         "WHERE (EmployeeFirstName LIKE ? OR EmployeeMidName LIKE ? OR EmployeeLastName LIKE ? ) " +
                         "ORDER BY EmployeeLastName");
         ps.setString(1, '%'+ key+'%');
@@ -159,6 +159,7 @@ public class EmployeeDAO {
             employeeInfo.setEmployeeMidName(rs.getString("EmployeeMidName"));
             employeeInfo.setEmployeeLastName(rs.getString("EmployeeLastName"));
             employeeInfo.setDesignation(rs.getString("Designation"));
+            employeeInfo.setEmployeeAddress(rs.getString("Address"));
             list.add(employeeInfo);
         }
 

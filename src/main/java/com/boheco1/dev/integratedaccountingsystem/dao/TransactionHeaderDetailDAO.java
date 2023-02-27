@@ -82,7 +82,7 @@ public class TransactionHeaderDetailDAO {
 
         String msg="";
         try {
-            ps1.executeUpdate();
+            /*ps1.executeUpdate();
             if(ps2 != null)//is null if save teller transaction
                 ps2.executeBatch();
             if(ps3 != null) {//check only ps3 since ps3 and ps4 are in the same code block
@@ -96,7 +96,7 @@ public class TransactionHeaderDetailDAO {
             if(ps3 != null) {
                 ps3.close();
                 ps4.close();
-            }
+            }*/
         } catch (Exception e){
             DB.getConnection().rollback();
             DB.getConnection().setAutoCommit(true);
@@ -112,21 +112,5 @@ public class TransactionHeaderDetailDAO {
         }
         return msg;
     }
-    public static boolean doneOR(LocalDate period, String teller) throws SQLException, ClassNotFoundException {
-        boolean found = false;
-        PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM TransactionHeader WHERE Period = ? and AccountID = ?");
-        ps.setDate(1, Date.valueOf(period));
-        ps.setString(2, teller);
 
-        ResultSet rs = ps.executeQuery();
-
-        if(rs.next())
-            found = true;
-
-        rs.close();
-        ps.close();
-
-        return found;
-    }
 }
