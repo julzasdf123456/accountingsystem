@@ -5,10 +5,7 @@ import com.boheco1.dev.integratedaccountingsystem.dao.BankAccountDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionDetailsDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
-import com.boheco1.dev.integratedaccountingsystem.objects.BankRemittance;
-import com.boheco1.dev.integratedaccountingsystem.objects.TransactionDetails;
-import com.boheco1.dev.integratedaccountingsystem.objects.TransactionHeader;
-import com.boheco1.dev.integratedaccountingsystem.objects.User;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -27,6 +24,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -216,12 +214,14 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
         LocalDate period = LocalDate.of(year, month, 1);
 
         transactionHeader = new TransactionHeader();
-        transactionHeader.setTransactionCode("BR");
         transactionHeader.setTransactionNumber(remittanceNo.getText());
         transactionHeader.setPeriod(period);
         transactionHeader.setTransactionDate(transactionDate.getValue());
+        transactionHeader.setEnteredBy(ActiveUser.getUser().getUserName());
+        transactionHeader.setDateEntered(LocalDateTime.now());
 
         try {
+            transactionHeader.setTransactionCode(TransactionHeader.getTransactionCodeProperty());
             TransactionHeaderDAO.add(transactionHeader);
             AlertDialogBuilder.messgeDialog("New Transaction","A new transaction has been created for \"BR\" " + remittanceNo.getText() + ".",stackPane, AlertDialogBuilder.INFO_DIALOG);
             tableList.clear();
@@ -245,7 +245,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
                 }
                 BankRemittance br = (BankRemittance) o;
                 TransactionDetails td = new TransactionDetails();
-                td.setTransactionCode("BR");
+                td.setTransactionCode(transactionHeader.getTransactionCode());
                 td.setTransactionNumber(transactionHeader.getTransactionNumber());
                 td.setPeriod(transactionHeader.getPeriod());
                 td.setOrDate(br.getOrDateFrom());
@@ -254,9 +254,10 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
                 td.setDebit(br.getAmount());
                 td.setSequenceNumber(TransactionDetailsDAO.getNextSequenceNumber(td.getPeriod(), td.getTransactionNumber()));
                 td.setCheckNumber(br.getCheckNumber());
+                td.setTransactionDate(transactionHeader.getTransactionDate());
 
                 TransactionDetailsDAO.add(td);
-                TransactionDetailsDAO.syncDebit(td.getPeriod(), td.getTransactionNumber(),"BR");
+                TransactionDetailsDAO.syncDebit(td.getPeriod(), td.getTransactionNumber(),transactionHeader.getTransactionCode());
                 tableList.add((BankRemittance) o);
                 computeTotals();
             }catch(Exception ex) {

@@ -1,7 +1,10 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Properties;
 
 public class TransactionHeader {
     private LocalDate period;
@@ -148,5 +151,13 @@ public class TransactionHeader {
 
     public void setRemarks(String remarks) {
         this.remarks = remarks;
+    }
+
+    public static String getTransactionCodeProperty() throws Exception{
+        Properties props = new Properties();
+        InputStream is = new FileInputStream("application.properties");
+        props.load(is);
+
+        return props.getProperty("station").equalsIgnoreCase("main") ? "BR" : "BRSub";
     }
 }

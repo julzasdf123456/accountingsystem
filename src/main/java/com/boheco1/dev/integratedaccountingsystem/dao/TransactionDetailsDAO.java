@@ -4,6 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.BankRemittance;
 import com.boheco1.dev.integratedaccountingsystem.objects.TransactionDetails;
+import com.boheco1.dev.integratedaccountingsystem.objects.TransactionHeader;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -218,12 +219,14 @@ public class TransactionDetailsDAO {
             ps.setString(4, transactionCode);
             ps.executeUpdate();
         }else {
+            TransactionHeader th = TransactionHeaderDAO.get(transactionNumber, transactionCode);
             TransactionDetails td = new TransactionDetails();
             td.setPeriod(period);
             td.setTransactionNumber(transactionNumber);
             td.setTransactionCode(transactionCode);
             td.setCredit(getTotalDebit(period, transactionNumber));
             td.setSequenceNumber(999);
+            td.setTransactionDate(th.getTransactionDate());
             //BR or BRSub
             td.setAccountCode(Utility.getAccountCodeProperty());
             TransactionDetailsDAO.add(td);
