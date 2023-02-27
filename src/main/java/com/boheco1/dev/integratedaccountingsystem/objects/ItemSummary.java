@@ -10,6 +10,10 @@ public class ItemSummary {
     private String description;
     private double total;
     private String totalView;
+
+    private double VAT;
+    private double subTotal;
+
     public ItemSummary(){}
 
     public ItemSummary(String desc, double total){
@@ -54,5 +58,21 @@ public class ItemSummary {
 
     public void setTotalView(String totalView) {
         this.totalView = totalView;
+    }
+
+    public double getVAT() {
+        return VAT;
+    }
+
+    public void setVAT(double VAT) {
+        this.VAT = VAT;
+    }
+
+    public double getSubTotal() {
+        return subTotal;
+    }
+
+    public void setSubTotal(double subTotal) {
+        this.subTotal = subTotal;
     }
 }

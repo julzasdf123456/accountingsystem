@@ -69,7 +69,7 @@ public class Utility {
 
     private static ObjectTransaction parentController;
 
-    private static Teller globalTeller;
+    private static ORContent orContent;
 
     public static MIRS getActiveMIRS() {
         return activeMIRS;
@@ -337,11 +337,12 @@ public class Utility {
         }
     }
 
-    public static Teller getGlobalTeller() {
-        return globalTeller;
+    public static ORContent getOrContent() {
+        return orContent;
     }
 
-    public static void setGlobalTeller(Teller globalTeller) {
-        Utility.globalTeller = globalTeller;
+    public static void setOrContent(ORContent orContent) {
+        Utility.orContent = orContent;
     }
+
 }

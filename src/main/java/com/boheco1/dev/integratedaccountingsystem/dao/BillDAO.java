@@ -639,6 +639,7 @@ public class BillDAO {
             ItemSummary energyItem = new ItemSummary("Energy", energy);
             ItemSummary trItem = new ItemSummary("TSF/TR", tr);
             ItemSummary othersItem = new ItemSummary("Others", others);
+            ItemSummary energyBillsOthers = new ItemSummary("Energy Bills Others", others+otherDeduction);
             ItemSummary surChargeItem = new ItemSummary("Surcharge", surcharge);
             ItemSummary evatItem = new ItemSummary("Evat", evat);
             ItemSummary slAdjItem = new ItemSummary("S/L Adjustments", slAdj);
@@ -656,6 +657,7 @@ public class BillDAO {
             dcrBreakdown.add(energyItem);
             dcrBreakdown.add(trItem);
             dcrBreakdown.add(othersItem);
+            dcrBreakdown.add(energyBillsOthers);
             dcrBreakdown.add(surChargeItem);
             dcrBreakdown.add(evatItem);
             dcrBreakdown.add(slAdjItem);
