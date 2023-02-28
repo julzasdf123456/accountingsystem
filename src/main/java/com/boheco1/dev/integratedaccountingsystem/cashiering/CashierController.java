@@ -255,11 +255,19 @@ public class CashierController extends MenuControllerHandler implements Initiali
     }
     @FXML
     private void removePrepayment(ActionEvent event) {
-        ItemSummary items = (ItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1);
-        String[] pre = items.getDescription().split("-");
-        if(pre[0].equals("Energy Prepayment")){
-            paymentTable.getItems().remove(paymentTable.getItems().size()-1);
-            paymentTable.refresh();
+        int count = paymentTable.getItems().size();
+        if(count >= 1) {
+            try{
+                if(tellerInfo==null) return;
+                ItemSummary items = (ItemSummary) paymentTable.getItems().get(count - 1);
+                String[] pre = items.getDescription().split("-");
+                if (pre[0].equals("Energy Prepayment")) {
+                    paymentTable.getItems().remove(paymentTable.getItems().size() - 1);
+                    paymentTable.refresh();
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
     @FXML
@@ -275,10 +283,12 @@ public class CashierController extends MenuControllerHandler implements Initiali
     }
 
     @FXML
-    void refund(ActionEvent event) {
+    void refund(ActionEvent events) {
         ObservableList<ItemSummary> result = paymentTable.getItems();
 
         if(result==null) return;
+        if(energyBill.getText().isEmpty() && vat.getText().isEmpty() && surcharge.getText().isEmpty()) return;
+        if(tellerInfo==null) return;
 
         JFXButton accept = new JFXButton("Accept");
         JFXDialog dialog = DialogBuilder.showConfirmDialog("Issue refund:","Confirm transaction.\n" +
@@ -286,22 +296,33 @@ public class CashierController extends MenuControllerHandler implements Initiali
                         "VAT: " +vat.getText()+"\n" +
                         "Surcharge: "+surcharge.getText()
                 , accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
+        dialog.setOnDialogOpened((event) -> { accept.requestFocus(); });
         accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+
         accept.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent __) {
                 for(ItemSummary item : result){
-                    if(item.getDescription().equals("Energy")){
-                        item.setTotal(item.getTotal() - Double.parseDouble(energyBill.getText().replaceAll(",","")));
-                        item.setTotalView(Utility.formatDecimal(item.getTotal()));
-                    }
-                    if(item.getDescription().equals("Evat")){
-                        item.setTotal(item.getTotal() - Double.parseDouble(vat.getText().replaceAll(",","")));
-                        item.setTotalView(Utility.formatDecimal(item.getTotal()));
-                    }
-                    if(item.getDescription().equals("Surcharge")){
-                        item.setTotal(item.getTotal() - Double.parseDouble(surcharge.getText().replaceAll(",","")));
-                        item.setTotalView(Utility.formatDecimal(item.getTotal()));
+                    switch (item.getDescription()) {
+                        case "Energy":
+                            if (!energyBill.getText().isEmpty()) {
+                                item.setTotal(item.getTotal() - Double.parseDouble(energyBill.getText().replaceAll(",", "")));
+                                item.setTotalView(Utility.formatDecimal(item.getTotal()));
+                            }
+                            break;
+                        case "Evat":
+                            if (!vat.getText().isEmpty()) {
+                                item.setTotal(item.getTotal() - Double.parseDouble(vat.getText().replaceAll(",", "")));
+                                item.setTotalView(Utility.formatDecimal(item.getTotal()));
+                            }
+
+                            break;
+                        case "Surcharge":
+                            if (!surcharge.getText().isEmpty()) {
+                                item.setTotal(item.getTotal() - Double.parseDouble(surcharge.getText().replaceAll(",", "")));
+                                item.setTotalView(Utility.formatDecimal(item.getTotal()));
+                            }
+                            break;
                     }
                 }
                 energyBill.setText("");
@@ -333,6 +354,14 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
         }
+
+        if(!(Double.parseDouble(total.getText().replaceAll(",","")) > 0)){
+            AlertDialogBuilder.messgeDialog("System Message", "Total amount is zero (0), cannot process transaction.",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            return;
+        }
+
+
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws SQLException {
@@ -351,7 +380,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             JFXDialog dialog = DialogBuilder.showConfirmDialog("Print OR","Confirm transaction.\n" +
                             "Date: " +date.getValue()+"\n"+
                             "OR#: " +orNmber.getText()+"\n" +
-                            ""+total.getText()
+                            "Total: "+total.getText()
                     , accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
             dialog.setOnDialogOpened((event) -> { accept.requestFocus(); });
             accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
