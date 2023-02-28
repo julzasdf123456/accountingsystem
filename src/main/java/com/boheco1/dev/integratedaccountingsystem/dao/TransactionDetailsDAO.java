@@ -235,15 +235,17 @@ public class TransactionDetailsDAO {
 
     public static void delete(TransactionDetails td) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement("DELETE FROM TransactionDetails " +
-                "WHERE Period=? AND TransactionNumber=? AND TransactionCode=? AND AccountSequence=? AND Debit=? AND Particulars=?");
+                "WHERE Period=? AND TransactionNumber=? AND TransactionCode=? AND AccountSequence=? AND Debit=?");
+
         ps.setDate(1, java.sql.Date.valueOf(td.getPeriod()));
         ps.setString(2, td.getTransactionNumber());
         ps.setString(3, td.getTransactionCode());
         ps.setInt(4, td.getSequenceNumber());
         ps.setDouble(5, td.getDebit());
-        ps.setString(6, td.getParticulars());
 
         ps.executeUpdate();
+
         ps.close();
+
     }
 }

@@ -1,13 +1,14 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 import com.boheco1.dev.integratedaccountingsystem.objects.TransactionHeader;
+import com.boheco1.dev.integratedaccountingsystem.objects.User;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -75,6 +76,24 @@ public class TransactionHeaderDAO {
         }
 
         return tas;
+    }
+
+    public static void updateTransaction(String transactionNumber, String transactionCode, LocalDate period) throws Exception {
+        User activeUser = ActiveUser.getUser();
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE TransactionHeader SET DateLastModified=?, UpdatedBy=? " +
+                        "WHERE TransactionNumber=? AND TransactionCode=? AND Period=?"
+        );
+
+        ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+        ps.setString(2, activeUser.getUserName());
+        ps.setString(3, transactionNumber);
+        ps.setString(4, transactionCode);
+        ps.setDate(5, java.sql.Date.valueOf(period));
+
+        ps.executeUpdate();
+
+        ps.close();
     }
 
     public static TransactionHeader get(String transactionNumber, String transactionCode) throws Exception {

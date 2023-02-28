@@ -134,6 +134,8 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
             tableList.remove(bankRemittance);
             remittanceTable.refresh();
             computeTotals();
+
+            TransactionHeaderDAO.updateTransaction(td.getTransactionNumber(), td.getTransactionCode(), td.getPeriod());
         }catch(Exception ex) {
             ex.printStackTrace();
         }
@@ -193,7 +195,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
 
                 for(TransactionDetails td: tds) {
                     if(td.getSequenceNumber()==999) continue;
-                    BankRemittance br = new BankRemittance(td.getOrDate(),null,td.getCheckNumber(), td.getDebit(), BankAccountDAO.get(td.getBankID()));
+                    BankRemittance br = new BankRemittance(td.getPeriod(), td.getOrDate(),null,td.getCheckNumber(), td.getDebit(), BankAccountDAO.get(td.getBankID()));
                     br.setTransactionDetails(td);
                     tableList.add(br);
                 }
@@ -242,6 +244,8 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
             try {
                 if (transactionHeader == null) {
                     createTransactionHeader();
+                }else {
+                    TransactionHeaderDAO.updateTransaction(transactionHeader.getTransactionNumber(), transactionHeader.getTransactionCode(), transactionHeader.getPeriod());
                 }
                 BankRemittance br = (BankRemittance) o;
                 TransactionDetails td = new TransactionDetails();
