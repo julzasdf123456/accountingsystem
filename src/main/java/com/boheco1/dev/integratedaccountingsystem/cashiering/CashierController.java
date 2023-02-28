@@ -13,6 +13,7 @@ import com.jfoenix.controls.JFXTextField;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -100,7 +101,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         name.setText(""); address.setText(""); purpose.setText(""); remarks.setText("");
         date.setValue(LocalDate.now());
         this.paymentTable.getColumns().clear();
-        print_btn.setVisible(true);
+        print_btn.setDisable(false);
         total.setText("");
         paymentTable.getColumns().clear();
         crmQueue = null;
@@ -135,7 +136,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 this.date.setValue(transactionHeader.getTransactionDate());
                 this.orNmber.setText(transactionHeader.getTransactionNumber());
                 this.remarks.setText(transactionHeader.getRemarks());
-                print_btn.setVisible(false);
+                print_btn.setDisable(true);
             }
             address.setEditable(false);
             purpose.setEditable(false);
@@ -262,14 +263,15 @@ public class CashierController extends MenuControllerHandler implements Initiali
         }
     }
     @FXML
-    private void printWhenEntered(KeyEvent event) throws SQLException, ClassNotFoundException {
-        if (event.getCode() == KeyCode.ENTER)
+    private void printWhenEntered(ActionEvent  event) throws SQLException, ClassNotFoundException {
+        if(!print_btn.isDisable())
             printing();
     }
 
     @FXML
     private void printOR(ActionEvent event) throws SQLException, ClassNotFoundException {
-        printing();
+        if(!print_btn.isDisable())
+            printing();
     }
 
     @FXML
@@ -313,7 +315,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
     }
 
     private void printing() throws SQLException, ClassNotFoundException {
-
         if(paymentTable.getItems().isEmpty()){
             AlertDialogBuilder.messgeDialog("System Message", "No item breakdown found",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
@@ -332,27 +333,55 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
         }
-
-        JFXButton accept = new JFXButton("Accept");
-        JFXDialog dialog = DialogBuilder.showConfirmDialog("Print OR","Confirm transaction.\n" +
-                        "Date: " +date.getValue()+"\n"+
-                        "OR#: " +orNmber.getText()+"\n" +
-                        ""+total.getText()
-                , accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
-        accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
-        accept.setOnAction(new EventHandler<ActionEvent>() {
+        Task<Void> task = new Task<>() {
             @Override
-            public void handle(ActionEvent __) {
-                try {
-                    nonePowerBills();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
+            protected Void call() throws SQLException {
+                try{
+
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
-                dialog.close();
+                return null;
             }
+        };
+
+        task.setOnRunning(wse -> {
+            print_btn.setDisable(true);
+            JFXButton accept = new JFXButton("Accept");
+            JFXDialog dialog = DialogBuilder.showConfirmDialog("Print OR","Confirm transaction.\n" +
+                            "Date: " +date.getValue()+"\n"+
+                            "OR#: " +orNmber.getText()+"\n" +
+                            ""+total.getText()
+                    , accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
+            dialog.setOnDialogOpened((event) -> { accept.requestFocus(); });
+            accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+            accept.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent __) {
+                    try {
+                        nonePowerBills();
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    } catch (ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                    dialog.close();
+                }
+            });
+
         });
+
+
+        task.setOnSucceeded(wse -> {
+            print_btn.setDisable(false);
+        });
+
+        task.setOnFailed(wse -> {
+            print_btn.setDisable(false);
+        });
+
+        new Thread(task).start();
+
     }
 
     private void nonePowerBills() throws SQLException, ClassNotFoundException {
