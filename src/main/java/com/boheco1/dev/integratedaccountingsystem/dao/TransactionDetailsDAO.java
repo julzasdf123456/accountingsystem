@@ -18,8 +18,8 @@ public class TransactionDetailsDAO {
                 "INSERT INTO TransactionDetails (" +
                         "Period, TransactionNumber, TransactionCode, TransactionDate, " +
                         "AccountSequence, AccountCode, Debit, Credit, ORDate, " +
-                        "BankID, Note, CheckNumber, Particulars) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                        "BankID, Note, CheckNumber, Particulars, DepositedDate) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         ps.setDate(1, java.sql.Date.valueOf(td.getPeriod()));
         ps.setString(2, td.getTransactionNumber());
         ps.setString(3, td.getTransactionCode());
@@ -33,6 +33,7 @@ public class TransactionDetailsDAO {
         ps.setString(11, td.getNote());
         ps.setString(12, td.getCheckNumber());
         ps.setString(13,td.getParticulars());
+        ps.setDate(14, td.getDepositedDate()==null ? null : java.sql.Date.valueOf(td.getDepositedDate()));
 
         ps.executeUpdate();
 
@@ -100,6 +101,7 @@ public class TransactionDetailsDAO {
             td.setNote(rs.getString("Note"));
             td.setCheckNumber(rs.getString("CheckNumber"));
             td.setParticulars(rs.getString("Particulars"));
+            td.setDepositedDate(rs.getDate("DepositedDate").toLocalDate());
             tds.add(td);
         }
 
@@ -135,6 +137,7 @@ public class TransactionDetailsDAO {
             td.setNote(rs.getString("Note"));
             td.setCheckNumber(rs.getString("CheckNumber"));
             td.setParticulars(rs.getString("Particulars"));
+            td.setDepositedDate(rs.getDate("DepositedDate").toLocalDate());
 
             rs.close();
             ps.close();
@@ -174,6 +177,7 @@ public class TransactionDetailsDAO {
             td.setNote(rs.getString("Note"));
             td.setCheckNumber(rs.getString("CheckNumber"));
             td.setParticulars(rs.getString("Particulars"));
+            td.setDepositedDate(rs.getDate("DepositedDate")==null ? null : rs.getDate("DepositedDate").toLocalDate());
             tds.add(td);
         }
 

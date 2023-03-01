@@ -42,8 +42,17 @@ public class TransactionHeaderDAO {
         ps.close();
     }
 
-    public static void update(TransactionHeader th) throws Exception {
+    public static void updateRemarks(TransactionHeader th, String remarks) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE TransactionHeader SET remarks=? " +
+                        "WHERE TransactionNumber=? AND TransactionCode=? AND Period=?"
+        );
+        ps.setString(1, remarks);
+        ps.setString(2, th.getTransactionNumber());
+        ps.setString(3, th.getTransactionCode());
+        ps.setDate(4, java.sql.Date.valueOf(th.getPeriod()));
 
+        ps.executeUpdate();
     }
 
     public static List<TransactionHeader> searchByPayee(String nameOfPayee) throws Exception {

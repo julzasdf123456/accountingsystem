@@ -22,7 +22,7 @@ import java.util.ResourceBundle;
 public class AddBankRemittance extends MenuControllerHandler implements Initializable {
 
     @FXML DatePicker orDateFrom;
-//    @FXML DatePicker orDateTo;
+    @FXML DatePicker depositedDate;
     @FXML JFXComboBox<BankAccount> bankAccount;
     @FXML JFXTextField accountNumber;
     @FXML JFXTextField checkNumber;
@@ -59,6 +59,8 @@ public class AddBankRemittance extends MenuControllerHandler implements Initiali
                 bankRemittance.setBankAccount(bankAccount.getSelectionModel().getSelectedItem());
                 bankRemittance.setCheckNumber(checkNumber.getText());
                 bankRemittance.setAmount(Double.parseDouble(amount.getText()));
+                bankRemittance.setAccountCode(bankAccount.getSelectionModel().getSelectedItem().getAccountCode());
+                bankRemittance.setDepositedDate(depositedDate.getValue());
 
                 this.parentController.receive(bankRemittance);
 
