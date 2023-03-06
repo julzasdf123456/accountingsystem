@@ -31,21 +31,18 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class BankRemittances extends MenuControllerHandler implements Initializable, ObjectTransaction {
-
     @FXML
     TableView<BankRemittance> remittanceTable;
-
     @FXML
     TextField remittanceNo;
-
     @FXML Label totalCheckAmount;
     @FXML Label totalCashAmount;
     @FXML Label totalAmount;
     @FXML DatePicker transactionDate;
     @FXML JFXButton addEntryBtn;
+    @FXML JFXButton bulkEntryBtn;
     @FXML JFXButton generateReportBtn;
     @FXML StackPane stackPane;
-
     @FXML TextField remarksField;
 
     ObservableList<BankRemittance> tableList;
@@ -53,7 +50,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
     private TransactionHeader transactionHeader;
 
     private void renderTable() {
-        TableColumn orDateFromColumn = new TableColumn<BankRemittance, LocalDate>("OR Date From");
+        TableColumn orDateFromColumn = new TableColumn<BankRemittance, LocalDate>("OR Date");
         orDateFromColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, LocalDate>("orDateFrom"));
 
         TableColumn descriptionColumn = new TableColumn<BankRemittance, String>("Bank Account Description");
@@ -177,7 +174,12 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
 
     @FXML
     public void onAddEntry() {
-        ModalBuilder.showModalFromXML(AddBankRemittance.class, "../cashiering/add_bank_remittance.fxml", Utility.getStackPane());
+        ModalBuilder.showModalFromXML(AddBankRemittance.class, "add_bank_remittance.fxml", Utility.getStackPane());
+    }
+
+    @FXML
+    public void onBulkEntry() {
+        ModalBuilder.showModalFromXML(BrBulkEntry.class, "br_bulk_entry.fxml", Utility.getStackPane());
     }
 
     public void enableAddEntry() {
@@ -218,6 +220,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
             }
 
             addEntryBtn.setDisable(false);
+            bulkEntryBtn.setDisable(false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -272,13 +275,26 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
     @Override
     public void receive(Object o) {
         if(o instanceof BankRemittance){
-            try {
-                if (transactionHeader == null) {
-                    createTransactionHeader();
-                }else {
-                    TransactionHeaderDAO.updateTransaction(transactionHeader.getTransactionNumber(), transactionHeader.getTransactionCode(), transactionHeader.getPeriod());
-                }
-                BankRemittance br = (BankRemittance) o;
+            receiveOne(o);
+            return;
+        }
+
+        if(o instanceof List) {
+            receiveMultiple(o);
+        }
+    }
+
+    private void receiveMultiple(Object o) {
+        try {
+            if(transactionHeader == null) {
+                createTransactionHeader();
+            }else {
+                TransactionHeaderDAO.updateTransaction(transactionHeader.getTransactionNumber(), transactionHeader.getTransactionCode(), transactionHeader.getPeriod());
+            }
+
+            ArrayList<BankRemittance> brs = (ArrayList<BankRemittance>) o;
+            List<TransactionDetails> tds = new ArrayList<>();
+            for(BankRemittance br: brs) {
                 TransactionDetails td = new TransactionDetails();
                 td.setTransactionCode(transactionHeader.getTransactionCode());
                 td.setTransactionNumber(transactionHeader.getTransactionNumber());
@@ -292,21 +308,56 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
                 td.setTransactionDate(transactionHeader.getTransactionDate());
                 td.setDepositedDate(br.getDepositedDate());
 
-                TransactionDetailsDAO.add(td);
-                TransactionDetailsDAO.syncDebit(td.getPeriod(), td.getTransactionNumber(),transactionHeader.getTransactionCode());
-                tableList.add((BankRemittance) o);
-                computeTotals();
-            }catch(Exception ex) {
-                ex.printStackTrace();
+                tableList.add(br);
+                tds.add(td);
             }
 
+            TransactionDetailsDAO.add(tds);
+            TransactionDetailsDAO.syncDebit(transactionHeader.getPeriod(), transactionHeader.getTransactionNumber(),transactionHeader.getTransactionCode());
 
+            computeTotals();
+        }catch(Exception ex) {
+            ex.printStackTrace();
+            AlertDialogBuilder.messgeDialog("Update Error",ex.getMessage(),stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }
+    }
+
+    private void receiveOne(Object o) {
+        try {
+            if (transactionHeader == null) {
+                createTransactionHeader();
+            }else {
+                TransactionHeaderDAO.updateTransaction(transactionHeader.getTransactionNumber(), transactionHeader.getTransactionCode(), transactionHeader.getPeriod());
+            }
+            BankRemittance br = (BankRemittance) o;
+            TransactionDetails td = new TransactionDetails();
+            td.setTransactionCode(transactionHeader.getTransactionCode());
+            td.setTransactionNumber(transactionHeader.getTransactionNumber());
+            td.setPeriod(transactionHeader.getPeriod());
+            td.setOrDate(br.getOrDateFrom());
+            td.setBankID(br.getBankAccount().getId());
+            td.setAccountCode(br.getBankAccount().getAccountCode());
+            td.setDebit(br.getAmount());
+            td.setSequenceNumber(TransactionDetailsDAO.getNextSequenceNumber(td.getPeriod(), td.getTransactionNumber()));
+            td.setCheckNumber(br.getCheckNumber());
+            td.setTransactionDate(transactionHeader.getTransactionDate());
+            td.setDepositedDate(br.getDepositedDate());
+
+            TransactionDetailsDAO.add(td);
+            TransactionDetailsDAO.syncDebit(td.getPeriod(), td.getTransactionNumber(),transactionHeader.getTransactionCode());
+            tableList.add((BankRemittance) o);
+            computeTotals();
+        }catch(Exception ex) {
+            ex.printStackTrace();
+            AlertDialogBuilder.messgeDialog("Update Error",ex.getMessage(),stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }
     }
 
     @FXML
     public void onGenerateReport() {
-        AlertDialogBuilder.messgeDialog("Coming Soon","This feature is yet to be implemented.",stackPane, AlertDialogBuilder.INFO_DIALOG);
+        //AlertDialogBuilder.messgeDialog("Coming Soon","This feature is yet to be implemented.",stackPane, AlertDialogBuilder.INFO_DIALOG);
+
+
     }
 
 }

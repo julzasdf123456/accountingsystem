@@ -59,7 +59,7 @@ public class TransactionDetailsDAO {
             ps.setString(6, td.getAccountCode());
             ps.setDouble(7, td.getDebit());
             ps.setDouble(8, td.getCredit());
-            ps.setDate(9, java.sql.Date.valueOf(td.getOrDate()));
+            ps.setDate(9, td.getOrDate()==null?null:java.sql.Date.valueOf(td.getOrDate()));
             ps.setString(10, td.getBankID());
             ps.setString(11, td.getNote());
             ps.setString(12, td.getCheckNumber());
