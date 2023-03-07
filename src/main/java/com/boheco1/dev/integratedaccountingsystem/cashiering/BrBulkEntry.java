@@ -61,6 +61,8 @@ public class BrBulkEntry extends MenuControllerHandler implements Initializable 
                 br.setDepositedDate(LocalDate.parse(elements[1], DateTimeFormatter.ofPattern("MM/dd/yyyy")));
                 br.setAmount(Double.parseDouble(elements[4].replace(",","")));
 
+                System.out.println(br.getDepositedDate());
+
                 remittances.add(br);
             }
             Utility.getParentController().receive(remittances);

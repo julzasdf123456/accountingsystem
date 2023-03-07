@@ -20,8 +20,16 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
+import javafx.stage.FileChooser;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.*;
+import org.apache.poi.xssf.usermodel.extensions.XSSFCellBorder;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import javax.swing.*;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,6 +52,8 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
     @FXML JFXButton generateReportBtn;
     @FXML StackPane stackPane;
     @FXML TextField remarksField;
+
+    private double totalCollection;
 
     ObservableList<BankRemittance> tableList;
 
@@ -160,6 +170,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
         totalCheckAmount.setText(String.format("₱ %,.2f", check));
         totalCashAmount.setText(String.format("₱ %,.2f", cash));
         totalAmount.setText(String.format("₱ %,.2f", check+cash));
+        totalCollection = check+cash;
     }
 
     @Override
@@ -170,6 +181,8 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
         Utility.setParentController(this);
 
         this.stackPane = Utility.getStackPane();
+
+        totalCollection = 0;
     }
 
     @FXML
@@ -356,8 +369,124 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
     @FXML
     public void onGenerateReport() {
         //AlertDialogBuilder.messgeDialog("Coming Soon","This feature is yet to be implemented.",stackPane, AlertDialogBuilder.INFO_DIALOG);
+        XSSFWorkbook book = new XSSFWorkbook();
+        XSSFSheet sheet = book.createSheet();
+
+        Font font = book.createFont();
+        font.setBold(true);
+
+        CellStyle dateHeaderStyle = book.createCellStyle();
+        dateHeaderStyle.setDataFormat(book.getCreationHelper().createDataFormat().getFormat("MMM dd, yyyy"));
+        dateHeaderStyle.setAlignment(HorizontalAlignment.CENTER);
+        dateHeaderStyle.setBorderLeft(BorderStyle.HAIR);
+        dateHeaderStyle.setBorderRight(BorderStyle.HAIR);
+        dateHeaderStyle.setBorderTop(BorderStyle.HAIR);
+        dateHeaderStyle.setBorderBottom(BorderStyle.HAIR);
+
+        CellStyle stringHeaderStyle = book.createCellStyle();
+        stringHeaderStyle.setAlignment(HorizontalAlignment.CENTER);
+        stringHeaderStyle.setBorderLeft(BorderStyle.HAIR);
+        stringHeaderStyle.setBorderRight(BorderStyle.HAIR);
+        stringHeaderStyle.setBorderTop(BorderStyle.HAIR);
+        stringHeaderStyle.setBorderBottom(BorderStyle.HAIR);
+        stringHeaderStyle.setFont(font);
+
+        CellStyle stringStyle = book.createCellStyle();
+        stringStyle.setAlignment(HorizontalAlignment.LEFT);
+        stringStyle.setBorderLeft(BorderStyle.HAIR);
+        stringStyle.setBorderRight(BorderStyle.HAIR);
+        stringStyle.setBorderTop(BorderStyle.HAIR);
+        stringStyle.setBorderBottom(BorderStyle.HAIR);
+
+        CellStyle doubleBoldStyle = book.createCellStyle();
+        doubleBoldStyle.setAlignment(HorizontalAlignment.RIGHT);
+        doubleBoldStyle.setBorderLeft(BorderStyle.HAIR);
+        doubleBoldStyle.setBorderRight(BorderStyle.HAIR);
+        doubleBoldStyle.setBorderTop(BorderStyle.HAIR);
+        doubleBoldStyle.setBorderBottom(BorderStyle.HAIR);
+        doubleBoldStyle.setFont(font);
+        doubleBoldStyle.setDataFormat((short)4);
+
+        CellStyle doubleStyle = book.createCellStyle();
+        doubleStyle.setAlignment(HorizontalAlignment.RIGHT);
+        doubleStyle.setBorderLeft(BorderStyle.HAIR);
+        doubleStyle.setBorderRight(BorderStyle.HAIR);
+        doubleStyle.setBorderTop(BorderStyle.HAIR);
+        doubleStyle.setBorderBottom(BorderStyle.HAIR);
+        doubleStyle.setDataFormat((short)4);
+
+        sheet.createRow(0).createCell(0).setCellValue("Bank Remittance Report");
+        sheet.setColumnWidth(0, 30*256);
+        sheet.setColumnWidth(1, 20*256);
+        sheet.setColumnWidth(2, 17*256);
+        sheet.setColumnWidth(3, 2*256);
+        sheet.setColumnWidth(4, 17*256);
+        sheet.setColumnWidth(5, 17*256);
+
+        createCells(sheet, 3, new Object[] {
+                "22-275","ACCT.NO.","DATE","","", "AMOUNT"
+        }, new CellStyle[] {
+                stringHeaderStyle, stringHeaderStyle, stringHeaderStyle, stringHeaderStyle, stringHeaderStyle, stringHeaderStyle
+        });
+
+        createCells(sheet, 4, new Object[] {
+                transactionHeader.getTransactionDate(), "","DEPOSITED","","",""
+        }, new CellStyle[] {
+                dateHeaderStyle, stringHeaderStyle, stringHeaderStyle, stringHeaderStyle, stringHeaderStyle, stringHeaderStyle
+        });
+
+        createCells(sheet, 5, new Object[] {
+                "COLLECTION","","","","",new Double(totalCollection)
+        }, new CellStyle[]{
+                stringHeaderStyle, stringHeaderStyle, stringHeaderStyle, stringHeaderStyle, stringHeaderStyle, doubleBoldStyle
+        });
+
+        int rowNum=6;
+        for(BankRemittance br: tableList) {
+            createCells(sheet, rowNum++, new Object[] {
+                    br.getBankAccount().getBankDescription(),
+                    br.getBankAccount().getBankAccountNumber(),
+                    br.getDepositedDate(),
+                    "","",
+                    br.getAmount()
+            }, new CellStyle[] {
+                    stringStyle, stringStyle, dateHeaderStyle, stringStyle, stringStyle, doubleStyle
+            });
+        }
+
+        createCells(sheet, rowNum+2, new Object[]{
+                "","","","","",new Double(totalCollection)
+        }, new CellStyle[]{
+                stringStyle, stringStyle, stringStyle, stringStyle, stringStyle, doubleBoldStyle
+        });
+
+        FileChooser fs = new FileChooser();
 
 
+        try {
+            File file = fs.showSaveDialog(null);
+
+            FileOutputStream os = new FileOutputStream(file);
+
+            book.write(os);
+
+            os.close();
+
+        }catch(Exception ex) {
+            ex.printStackTrace();
+            AlertDialogBuilder.messgeDialog("Update Error",ex.getMessage(),stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }
+    }
+
+    private void createCells(XSSFSheet sheet, int rowNum, Object[] data, CellStyle[] styles) {
+        XSSFRow row = sheet.createRow(rowNum);
+        for(int i=0; i<data.length; i++) {
+            XSSFCell cell = row.createCell(i);
+            if(data[i] instanceof String) cell.setCellValue(String.valueOf(data[i]));
+            if(data[i] instanceof LocalDate) cell.setCellValue((LocalDate)data[i]);
+            if(data[i] instanceof Double) cell.setCellValue((Double)data[i]);
+            cell.setCellStyle(styles[i]);
+        }
     }
 
 }
