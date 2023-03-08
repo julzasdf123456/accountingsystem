@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXTextArea?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
@@ -19,7 +20,7 @@
    <children>
       <HBox layoutX="16.0" layoutY="16.0" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="16.0">
          <children>
-            <VBox alignment="TOP_CENTER" prefHeight="709.0" prefWidth="267.0">
+            <VBox maxWidth="1.7976931348623157E308" prefHeight="709.0" prefWidth="267.0">
                <children>
                   <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Transaction Info" VBox.vgrow="ALWAYS">
                      <font>
@@ -30,6 +31,20 @@
                      </VBox.margin>
                   </Label>
                   <Separator prefWidth="200.0" />
+                  <HBox>
+                     <children>
+                        <Label maxWidth="1.7976931348623157E308" text="Date" />
+                        <Label maxWidth="1.7976931348623157E308" text="*" textFill="RED" />
+                     </children>
+                     <VBox.margin>
+                        <Insets top="16.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <DatePicker fx:id="date" prefHeight="30.0" prefWidth="187.0" VBox.vgrow="ALWAYS">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </DatePicker>
                   <Label maxWidth="1.7976931348623157E308" text="Name">
                      <VBox.margin>
                         <Insets top="16.0" />
@@ -65,18 +80,30 @@
                   <JFXTextField fx:id="purpose" editable="false" labelFloat="true" text=" " unFocusColor="#b5b5b5" />
                   <HBox>
                      <children>
-                        <Label maxWidth="1.7976931348623157E308" text="Date" />
+                        <Label maxWidth="1.7976931348623157E308" text="Payment Mode" />
                         <Label maxWidth="1.7976931348623157E308" text="*" textFill="RED" />
                      </children>
                      <VBox.margin>
                         <Insets top="16.0" />
                      </VBox.margin>
                   </HBox>
-                  <DatePicker fx:id="date" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                  <JFXComboBox fx:id="paymentMode" focusColor="#009688" maxWidth="1.7976931348623157E308" onAction="#selectPaymentMode" />
+                  <HBox>
+                     <children>
+                        <Label maxWidth="1.7976931348623157E308" text="Bank" />
+                        <Label maxWidth="1.7976931348623157E308" text="*" textFill="RED" />
+                     </children>
                      <VBox.margin>
-                        <Insets />
+                        <Insets top="16.0" />
                      </VBox.margin>
-                  </DatePicker>
+                  </HBox>
+                  <JFXComboBox fx:id="bankInfo" focusColor="#009688" maxWidth="1.7976931348623157E308" />
+                  <Label maxWidth="1.7976931348623157E308" text="TIN No.">
+                     <VBox.margin>
+                        <Insets top="16.0" />
+                     </VBox.margin>
+                  </Label>
+                  <JFXTextField fx:id="tinNo" labelFloat="true" text=" " unFocusColor="#b5b5b5" />
                   <HBox>
                      <children>
                         <Label maxWidth="1.7976931348623157E308" text="OR Number" />
@@ -86,7 +113,7 @@
                         <Insets top="16.0" />
                      </VBox.margin>
                   </HBox>
-                  <JFXTextField fx:id="orNmber" alignment="CENTER" labelFloat="true" onAction="#printWhenEntered" style="-fx-font-size: 30; -fx-font-family: bold;" unFocusColor="#b5b5b5">
+                  <JFXTextField fx:id="orNmber" alignment="CENTER" labelFloat="true" onAction="#printWhenEntered" prefHeight="46.0" prefWidth="267.0" style="-fx-font-size: 30; -fx-font-family: bold;" unFocusColor="#b5b5b5">
                      <font>
                         <Font size="39.0" />
                      </font>
@@ -94,8 +121,6 @@
                         <Insets bottom="16.0" />
                      </VBox.margin>
                   </JFXTextField>
-                  <Label layoutX="10.0" layoutY="131.0" maxWidth="1.7976931348623157E308" text="Remarks" VBox.vgrow="ALWAYS" />
-                  <JFXTextArea fx:id="remarks" prefHeight="84.0" prefWidth="307.0" />
                   <HBox styleClass="context-menu">
                      <children>
                         <Label fx:id="total1" maxWidth="1.7976931348623157E308" prefHeight="44.0" prefWidth="132.0" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Total:">
@@ -113,13 +138,16 @@
                         <Insets bottom="20.0" />
                      </VBox.margin>
                   </HBox>
-                  <JFXButton fx:id="print_btn" buttonType="RAISED" onAction="#printOR" prefHeight="37.0" prefWidth="115.0" styleClass="btn-sucess" text="Print">
+                  <JFXButton fx:id="print_btn" buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#printOR" prefHeight="37.0" prefWidth="115.0" styleClass="btn-sucess" text="Print">
                      <graphic>
                         <FontIcon fill="WHITE" iconLiteral="mdi2p-printer" iconSize="20" />
                      </graphic>
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
+                     <VBox.margin>
+                        <Insets left="50.0" right="50.0" />
+                     </VBox.margin>
                   </JFXButton>
                </children>
                <HBox.margin>
@@ -215,6 +243,8 @@
                         <Cursor fx:constant="DEFAULT" />
                      </cursor>
                   </TableView>
+                  <Label maxWidth="1.7976931348623157E308" text="Remarks" />
+                  <JFXTextArea fx:id="remarks" prefHeight="84.0" prefWidth="307.0" />
                </children>
             </VBox>
          </children>

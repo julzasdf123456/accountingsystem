@@ -1,15 +1,13 @@
 package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
 
+import com.boheco1.dev.integratedaccountingsystem.dao.BankAccountDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.CRMDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDetailDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXTextArea;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -40,6 +38,10 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private JFXButton search_btn;
 
     @FXML
+    private JFXComboBox<String> paymentMode;
+    @FXML
+    private JFXComboBox<BankAccount> bankInfo;
+    @FXML
 
     private JFXButton print_btn;
 
@@ -49,6 +51,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
     @FXML
     private JFXTextArea remarks;
 
+    @FXML
+    private JFXTextField tinNo;
 
     @FXML
     private DatePicker date;
@@ -83,13 +87,36 @@ public class CashierController extends MenuControllerHandler implements Initiali
         InputValidation.restrictNumbersOnly(surcharge);
         InputValidation.restrictNumbersOnly(prepayment);
         InputValidation.restrictNumbersOnly(accNum);
+        InputValidation.restrictNumbersOnly(tinNo);
 
         if(Utility.OR_NUMBER != 0) {
             orNmber.setText(""+Utility.OR_NUMBER);
         }
 
+        bankInfo.setDisable(true);
+        try {
+            List<BankAccount> bankAccounts = BankAccountDAO.getAll();
+            bankInfo.getItems().addAll(bankAccounts);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        paymentMode.getItems().add("CASH ON HAND");
+        paymentMode.getItems().add("CASH ON BANK");
+        paymentMode.getItems().add("CHEQUES");
+    }
 
 
+    @FXML
+    private void selectPaymentMode(ActionEvent event) {
+        String payMode = paymentMode.getSelectionModel().getSelectedItem();
+        if(payMode == null)return;
+        if (payMode.equals("CASH ON HAND") || payMode.equals("CHEQUES")) {
+            bankInfo.setDisable(true);
+            bankInfo.getSelectionModel().clearSelection();
+        } else {
+            bankInfo.setDisable(false);
+        }
     }
 
     @FXML
@@ -110,6 +137,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
         tellerInfo = null;
         accNum.setText("");
         prepayment.setText("");
+        tinNo.setText("");
+        paymentMode.getSelectionModel().clearSelection();
     }
 
     @Override
@@ -361,6 +390,12 @@ public class CashierController extends MenuControllerHandler implements Initiali
             return;
         }
 
+        if(paymentMode.getSelectionModel().getSelectedItem()==null){
+            AlertDialogBuilder.messgeDialog("System Message", "Please select Payment Mode and try again.",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            return;
+        }
+
 
         Task<Void> task = new Task<>() {
             @Override
@@ -378,6 +413,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             print_btn.setDisable(true);
             JFXButton accept = new JFXButton("Accept");
             JFXDialog dialog = DialogBuilder.showConfirmDialog("Print OR","Confirm transaction.\n" +
+                            "Payment Mode: " +paymentMode.getSelectionModel().getSelectedItem()+"\n"+
                             "Date: " +date.getValue()+"\n"+
                             "OR#: " +orNmber.getText()+"\n" +
                             "Total: "+total.getText()
@@ -392,6 +428,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     } catch (SQLException e) {
                         throw new RuntimeException(e);
                     } catch (ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                     dialog.close();
@@ -413,7 +451,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     }
 
-    private void nonePowerBills() throws SQLException, ClassNotFoundException {
+    private void nonePowerBills() throws Exception {
         int month = date.getValue().getMonthValue();
         int year = date.getValue().getYear();
         LocalDate period = LocalDate.of(year, month, 1);
@@ -421,10 +459,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         TransactionHeader transactionHeader= new TransactionHeader();
         transactionHeader.setPeriod(period);
         transactionHeader.setTransactionNumber(orNmber.getText());
-        if(Utility.OFFICE_PREFIX.equalsIgnoreCase("main"))
-            transactionHeader.setTransactionCode("OR");
-        else
-            transactionHeader.setTransactionCode("ORSub");
+        transactionHeader.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
         transactionHeader.setOffice(Utility.OFFICE_PREFIX);
         if(consumerInfo != null) {
             transactionHeader.setSource(crmQueue.getSource());
@@ -439,7 +474,9 @@ public class CashierController extends MenuControllerHandler implements Initiali
             transactionHeader.setTransactionDate(tellerInfo.getDate());
         }
         //transactionHeader.setParticulars("N/A");
+        transactionHeader.setTinNo(tinNo.getText());
         transactionHeader.setRemarks(remarks.getText());
+
         //transactionHeader.setBank("N/A");
         //transactionHeader.setReferenceNo("N/A");
 
@@ -453,12 +490,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 TransactionDetails transactionDetails = new TransactionDetails();
                 transactionDetails.setPeriod(period);
                 transactionDetails.setTransactionNumber(orNmber.getText());
-
-                if (Utility.OFFICE_PREFIX.equalsIgnoreCase("main"))
-                    transactionDetails.setTransactionCode("OR");
-                else
-                    transactionDetails.setTransactionCode("ORSub");
-
+                transactionDetails.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
                 transactionDetails.setTransactionDate(date.getValue());
                 transactionDetails.setAccountCode(cd.getGlCode());//GL Code or the account code of the particular
                 transactionDetails.setParticulars(cd.getParticulars());
@@ -486,29 +518,35 @@ public class CashierController extends MenuControllerHandler implements Initiali
                         itemSummary.getDescription().equals("2307 (5%)"))
                     continue;
 
-                TransactionDetails transactionDetails = new TransactionDetails();
-                transactionDetails.setPeriod(period);
-                transactionDetails.setTransactionNumber(orNmber.getText());
+                if(itemSummary.getTotal()>0) {
+                    TransactionDetails transactionDetails = new TransactionDetails();
+                    transactionDetails.setPeriod(period);
+                    transactionDetails.setTransactionNumber(orNmber.getText());
 
-                if (Utility.OFFICE_PREFIX.equalsIgnoreCase("main"))
-                    transactionDetails.setTransactionCode("OR");
-                else
-                    transactionDetails.setTransactionCode("ORSub");
+                    transactionDetails.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
 
-                transactionDetails.setTransactionDate(date.getValue());
-                transactionDetails.setAccountCode(tellerInfo.getUsername());
-                transactionDetails.setParticulars(itemSummary.getDescription());
-                transactionDetails.setSequenceNumber(seq++);
+                    transactionDetails.setTransactionDate(date.getValue());
+                    String payMode = paymentMode.getSelectionModel().getSelectedItem();
 
-                if(itemSummary.getTotal() > 0)
-                    transactionDetails.setCredit(itemSummary.getTotal());
-                else
-                    transactionDetails.setDebit(itemSummary.getTotal());
+                    if (payMode.equals("CASH ON HAND") || payMode.equals("CHEQUES")) {
+                        transactionDetails.setAccountCode(TransactionHeader.getAccountCodeProperty());
+                    } else {
+                        transactionDetails.setAccountCode(bankInfo.getSelectionModel().getSelectedItem().getAccountCode());
+                    }
 
-                transactionDetails.setOrDate(date.getValue());
-                //transactionDetails.setBankID("N/A");
-                //transactionDetails.setNote("N/A");
-                transactionDetailsList.add(transactionDetails);
+                    transactionDetails.setParticulars(itemSummary.getDescription());
+                    transactionDetails.setSequenceNumber(seq++);
+
+                    if (itemSummary.getTotal() > 0)
+                        transactionDetails.setCredit(itemSummary.getTotal());
+                    else
+                        transactionDetails.setDebit(itemSummary.getTotal());
+
+                    transactionDetails.setOrDate(date.getValue());
+                    //transactionDetails.setBankID("N/A");
+                    //transactionDetails.setNote("N/A");
+                    transactionDetailsList.add(transactionDetails);
+                }
             }
         }
 

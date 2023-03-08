@@ -23,6 +23,8 @@ public class TransactionHeader {
     private String updatedBy;//refers to user ID of the updating user
     private String remarks;
 
+    private String tinNo;
+
     private String office; //refers to OfficeID in Offices table
 
     public String getOffice() {
@@ -153,11 +155,33 @@ public class TransactionHeader {
         this.remarks = remarks;
     }
 
+    public String getTinNo() {
+        return tinNo;
+    }
+
+    public void setTinNo(String tinNo) {
+        this.tinNo = tinNo;
+    }
+
     public static String getTransactionCodeProperty() throws Exception{
         Properties props = new Properties();
         InputStream is = new FileInputStream("application.properties");
         props.load(is);
 
         return props.getProperty("station").equalsIgnoreCase("main") ? "BR" : "BRSub";
+    }
+    public static String getORTransactionCodeProperty() throws Exception{
+        Properties props = new Properties();
+        InputStream is = new FileInputStream("application.properties");
+        props.load(is);
+
+        return props.getProperty("station").equalsIgnoreCase("main") ? "OR" : "ORSub";
+    }
+    public static String getAccountCodeProperty() throws Exception{
+        Properties props = new Properties();
+        InputStream is = new FileInputStream("application.properties");
+        props.load(is);
+
+        return props.getProperty("account_code");
     }
 }
