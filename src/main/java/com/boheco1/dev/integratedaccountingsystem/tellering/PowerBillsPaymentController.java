@@ -130,9 +130,6 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     @FXML
     private ProgressBar progressBar;
 
-    @FXML
-    private ScrollPane sp;
-
     private ConsumerInfo consumerInfo = null;
 
     private ObservableList<Bill> bills = FXCollections.observableArrayList();
@@ -250,8 +247,6 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.transact_btn.setOnAction(actionEvent -> {
             this.confirmPayment();
         });
-        sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        sp.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         Utility.setParentController(this);
     }
 

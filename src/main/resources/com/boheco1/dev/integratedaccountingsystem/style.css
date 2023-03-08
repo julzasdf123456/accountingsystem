@@ -86,34 +86,11 @@
     -fx-background-radius: 5em;
 }
 
-#bills  {
-   -fx-background-color: #FFFFFF;
-}
-
-#bills > .viewport {
-   -fx-background-color: #F0F0F0;
-}
-
-#bills:horizontal, #bills:vertical{
-    -fx-background-color: #00AD8E;
-}
-
-#bills.increment-button, #bills.decrement-button {
-    -fx-background-color: #00AD8E;
-    -fx-border-color: #00AD8E;
-}
-
-#bills:horizontal .track,
-#bills:vertical .track{
-    -fx-background-color: #00AD8E;
-    -fx-border-color: #00AD8E;
-    -fx-background-radius: 5em;
-}
-
-#bills:horizontal .thumb,
-#bills:vertical .thumb {
-    -fx-background-color: #00AD8E;
-    -fx-background-radius: 5em;
+.datatable .scroll-bar:horizontal .thumb,
+.datatable .scroll-bar:vertical .thumb {
+    -fx-background-color: #EAEAEA;
+    -fx-border-color: #AAAAAA;
+    -fx-border-radius: 5em;
 }
 
 // NAV MENU
