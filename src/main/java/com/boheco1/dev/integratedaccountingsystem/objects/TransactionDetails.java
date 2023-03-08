@@ -17,6 +17,17 @@ public class TransactionDetails {
     private String note;
     private String checkNumber;
     private String particulars;
+
+    private LocalDate depositedDate;
+
+    public LocalDate getDepositedDate() {
+        return depositedDate;
+    }
+
+    public void setDepositedDate(LocalDate depositedDate) {
+        this.depositedDate = depositedDate;
+    }
+
     public String getParticulars() {
         return particulars;
     }

@@ -12,16 +12,21 @@ public class BankRemittance {
     private String checkNumber;
     private double amount;
     private BankAccount bankAccount;
+    private LocalDate depositedDate;
+
+    private String accountCode;
+
     private TransactionDetails transactionDetails;
 
 
-    public BankRemittance(LocalDate period, LocalDate orDateFrom, LocalDate orDateTo, String checkNumber, double amount, BankAccount bankAccount) {
+    public BankRemittance(LocalDate period, LocalDate orDateFrom, LocalDate orDateTo, String checkNumber, double amount, BankAccount bankAccount, String accountCode) {
         this.period = period;
         this.orDateFrom = orDateFrom;
         this.orDateTo = orDateTo;
         this.checkNumber = checkNumber;
         this.amount = amount;
         this.bankAccount = bankAccount;
+        this.accountCode = accountCode;
     }
 
     public BankRemittance() {
@@ -31,6 +36,22 @@ public class BankRemittance {
         this.bankAccount = null;
         this.checkNumber = "";
         this.amount = 0.0;
+    }
+
+    public String getAccountCode() {
+        return accountCode;
+    }
+
+    public void setAccountCode(String accountCode) {
+        this.accountCode = accountCode;
+    }
+
+    public LocalDate getDepositedDate() {
+        return depositedDate;
+    }
+
+    public void setDepositedDate(LocalDate depositedDate) {
+        this.depositedDate = depositedDate;
     }
 
     public LocalDate getPeriod() {

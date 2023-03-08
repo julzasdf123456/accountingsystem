@@ -28,6 +28,7 @@
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -39,47 +40,49 @@
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <Label text="Bank Description" GridPane.rowIndex="1">
+                  <Label text="Bank Description" GridPane.rowIndex="2">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <Label text="Account Number" GridPane.rowIndex="2">
+                  <Label text="Account Number" GridPane.rowIndex="3">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <Label text="Check Number" GridPane.rowIndex="3">
+                  <Label text="Check Number" GridPane.rowIndex="4">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <Label text="Amount" GridPane.rowIndex="4">
+                  <Label text="Amount" GridPane.rowIndex="5">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="accountNumber" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                  <JFXTextField fx:id="accountNumber" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </JFXTextField>
-                  <JFXTextField fx:id="checkNumber" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                  <JFXTextField fx:id="checkNumber" GridPane.columnIndex="1" GridPane.rowIndex="4">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </JFXTextField>
-                  <JFXTextField fx:id="amount" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                  <JFXTextField fx:id="amount" GridPane.columnIndex="1" GridPane.rowIndex="5">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </JFXTextField>
                   <DatePicker fx:id="orDateFrom" GridPane.columnIndex="1" />
-                  <JFXComboBox fx:id="bankAccount" onAction="#onSelectBankAccount" prefHeight="38.0" prefWidth="238.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <JFXComboBox fx:id="bankAccount" onAction="#onSelectBankAccount" prefHeight="38.0" prefWidth="238.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Label text="Deposited Date" GridPane.rowIndex="1" />
+                  <DatePicker fx:id="depositedDate" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                </children>
             </GridPane>
             <JFXButton layoutX="237.0" layoutY="437.0" onAction="#onAddEntry" styleClass="btn-sucess" stylesheets="@../style.css" text="Add Entry" />
-            <JFXButton layoutX="341.0" layoutY="437.0" onAction="#onClear" prefHeight="37.0" prefWidth="114.0" styleClass="btn-info" stylesheets="@../style.css" text="Clear" />
+            <JFXButton layoutX="341.0" layoutY="437.0" onAction="#onClear" prefHeight="30.0" prefWidth="114.0" styleClass="btn-info" stylesheets="@../style.css" text="Clear" />
          </children>
       </AnchorPane>
    </children>

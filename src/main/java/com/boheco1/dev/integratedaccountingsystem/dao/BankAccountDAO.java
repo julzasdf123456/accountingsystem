@@ -77,4 +77,19 @@ public class BankAccountDAO
         ps.executeUpdate();
         ps.close();
     }
+
+    public static BankAccount getByAcctNo(String accountNoStr) throws Exception {
+        ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                "SELECT * FROM BankAccounts WHERE BankAccountNumber='" + accountNoStr + "'");
+        if(rs.next()){
+            return new BankAccount(
+                    rs.getString("BankID"),
+                    rs.getString("BankAccountNumber"),
+                    rs.getString("BankDescription"),
+                    rs.getString("AccountCode")
+            );
+        }else{
+            return null;
+        }
+    }
 }

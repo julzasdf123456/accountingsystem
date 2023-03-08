@@ -18,8 +18,8 @@ public class TransactionDetailsDAO {
                 "INSERT INTO TransactionDetails (" +
                         "Period, TransactionNumber, TransactionCode, TransactionDate, " +
                         "AccountSequence, AccountCode, Debit, Credit, ORDate, " +
-                        "BankID, Note, CheckNumber, Particulars) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                        "BankID, Note, CheckNumber, Particulars, DepositedDate) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         ps.setDate(1, java.sql.Date.valueOf(td.getPeriod()));
         ps.setString(2, td.getTransactionNumber());
         ps.setString(3, td.getTransactionCode());
@@ -33,6 +33,7 @@ public class TransactionDetailsDAO {
         ps.setString(11, td.getNote());
         ps.setString(12, td.getCheckNumber());
         ps.setString(13,td.getParticulars());
+        ps.setDate(14, td.getDepositedDate()==null ? null : java.sql.Date.valueOf(td.getDepositedDate()));
 
         ps.executeUpdate();
 
@@ -44,8 +45,8 @@ public class TransactionDetailsDAO {
                 "INSERT INTO TransactionDetails (" +
                         "Period, TransactionNumber, TransactionCode, TransactionDate, " +
                         "AccountSequence, AccountCode, Debit, Credit, ORDate, " +
-                        "BankID, Note, CheckNumber, Particulars) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                        "BankID, Note, CheckNumber, Particulars, DepositedDate) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
         DB.getConnection().setAutoCommit(false);
 
@@ -58,11 +59,12 @@ public class TransactionDetailsDAO {
             ps.setString(6, td.getAccountCode());
             ps.setDouble(7, td.getDebit());
             ps.setDouble(8, td.getCredit());
-            ps.setDate(9, java.sql.Date.valueOf(td.getOrDate()));
+            ps.setDate(9, td.getOrDate()==null?null:java.sql.Date.valueOf(td.getOrDate()));
             ps.setString(10, td.getBankID());
             ps.setString(11, td.getNote());
             ps.setString(12, td.getCheckNumber());
             ps.setString(13,td.getParticulars());
+            ps.setDate(14, td.getDepositedDate()==null ? null : java.sql.Date.valueOf(td.getDepositedDate()));
 
             ps.addBatch();
         }
@@ -100,6 +102,7 @@ public class TransactionDetailsDAO {
             td.setNote(rs.getString("Note"));
             td.setCheckNumber(rs.getString("CheckNumber"));
             td.setParticulars(rs.getString("Particulars"));
+            td.setDepositedDate(rs.getDate("DepositedDate").toLocalDate());
             tds.add(td);
         }
 
@@ -135,6 +138,7 @@ public class TransactionDetailsDAO {
             td.setNote(rs.getString("Note"));
             td.setCheckNumber(rs.getString("CheckNumber"));
             td.setParticulars(rs.getString("Particulars"));
+            td.setDepositedDate(rs.getDate("DepositedDate").toLocalDate());
 
             rs.close();
             ps.close();
@@ -174,6 +178,7 @@ public class TransactionDetailsDAO {
             td.setNote(rs.getString("Note"));
             td.setCheckNumber(rs.getString("CheckNumber"));
             td.setParticulars(rs.getString("Particulars"));
+            td.setDepositedDate(rs.getDate("DepositedDate")==null ? null : rs.getDate("DepositedDate").toLocalDate());
             tds.add(td);
         }
 

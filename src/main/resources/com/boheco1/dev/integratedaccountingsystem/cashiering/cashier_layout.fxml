@@ -86,7 +86,7 @@
                         <Insets top="16.0" />
                      </VBox.margin>
                   </HBox>
-                  <JFXTextField fx:id="orNmber" alignment="CENTER" labelFloat="true" onKeyReleased="#printWhenEntered" style="-fx-font-size: 30; -fx-font-family: bold;" unFocusColor="#b5b5b5">
+                  <JFXTextField fx:id="orNmber" alignment="CENTER" labelFloat="true" onAction="#printWhenEntered" style="-fx-font-size: 30; -fx-font-family: bold;" unFocusColor="#b5b5b5">
                      <font>
                         <Font size="39.0" />
                      </font>
