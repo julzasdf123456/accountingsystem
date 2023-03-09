@@ -21,6 +21,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Paint;
+import javafx.util.Callback;
 
 
 import java.net.URL;
@@ -37,22 +38,22 @@ public class CashierController extends MenuControllerHandler implements Initiali
     @FXML
     private JFXButton search_btn;
 
-    @FXML
-    private JFXComboBox<String> paymentMode;
-    @FXML
-    private JFXComboBox<BankAccount> bankInfo;
+   // @FXML
+   // private JFXComboBox<String> paymentMode;
+   // @FXML
+   // private JFXComboBox<BankAccount> bankInfo;
     @FXML
 
-    private JFXButton print_btn;
+    private JFXButton submitBtn;
 
     @FXML
-    private JFXTextField orNmber, name, address, purpose, energyBill, vat, surcharge, prepayment, accNum;
+    private JFXTextField name, address, purpose, energyBill, vat, surcharge, prepayment, accNum;
 
-    @FXML
-    private JFXTextArea remarks;
+    //@FXML
+    //private JFXTextArea remarks;
 
-    @FXML
-    private JFXTextField tinNo;
+    //@FXML
+    //private JFXTextField tinNo;
 
     @FXML
     private DatePicker date;
@@ -71,7 +72,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     private double collectionFromTeller;
 
-
+    public static String catchError = "";
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Utility.setParentController(this);
@@ -81,13 +82,15 @@ public class CashierController extends MenuControllerHandler implements Initiali
             date.setValue(LocalDate.now());
             throw new RuntimeException(e);
         }
-        InputValidation.restrictNumbersOnly(orNmber);
+
         InputValidation.restrictNumbersOnly(energyBill);
         InputValidation.restrictNumbersOnly(vat);
         InputValidation.restrictNumbersOnly(surcharge);
         InputValidation.restrictNumbersOnly(prepayment);
         InputValidation.restrictNumbersOnly(accNum);
-        InputValidation.restrictNumbersOnly(tinNo);
+
+        /*InputValidation.restrictNumbersOnly(tinNo);
+        InputValidation.restrictNumbersOnly(orNmber);
 
         if(Utility.OR_NUMBER != 0) {
             orNmber.setText(""+Utility.OR_NUMBER);
@@ -104,10 +107,11 @@ public class CashierController extends MenuControllerHandler implements Initiali
         paymentMode.getItems().add("CASH ON HAND");
         paymentMode.getItems().add("CASH ON BANK");
         paymentMode.getItems().add("CHEQUES");
+        paymentMode.getSelectionModel().selectFirst();*/
     }
 
 
-    @FXML
+    /*@FXML
     private void selectPaymentMode(ActionEvent event) {
         String payMode = paymentMode.getSelectionModel().getSelectedItem();
         if(payMode == null)return;
@@ -117,7 +121,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         } else {
             bankInfo.setDisable(false);
         }
-    }
+    }*/
 
     @FXML
     private void search(ActionEvent event) {
@@ -125,10 +129,10 @@ public class CashierController extends MenuControllerHandler implements Initiali
     }
 
     private void resetField(){
-        name.setText(""); address.setText(""); purpose.setText(""); remarks.setText("");
+        name.setText(""); address.setText(""); purpose.setText("");// remarks.setText("");
         date.setValue(LocalDate.now());
         this.paymentTable.getColumns().clear();
-        print_btn.setDisable(false);
+        submitBtn.setDisable(false);
         total.setText("");
         paymentTable.getColumns().clear();
         crmQueue = null;
@@ -137,15 +141,14 @@ public class CashierController extends MenuControllerHandler implements Initiali
         tellerInfo = null;
         accNum.setText("");
         prepayment.setText("");
-        tinNo.setText("");
-        paymentMode.getSelectionModel().clearSelection();
+        //tinNo.setText("");
+        //paymentMode.getSelectionModel().clearSelection();
     }
 
     @Override
     public void receive(Object o) {
-        resetField();
-
         if (o instanceof CRMQueue) {
+            resetField();
             this.consumerInfo = (CRMQueue) o;
             this.name.setText(consumerInfo.getConsumerName());
             this.address.setText(consumerInfo.getConsumerAddress());
@@ -153,6 +156,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             tellerInfo = null;
             initTable(consumerInfo);
         }else if (o instanceof  HashMap) {
+            resetField();
             TransactionHeader transactionHeader = (TransactionHeader) ((HashMap<?, ?>) o).get("TransactionHeader");
             LocalDate localDate = (LocalDate) ((HashMap<?, ?>) o).get("SearchDate");
             this.tellerInfo = (Teller) ((HashMap<?, ?>) o).get("SearchResult");
@@ -163,14 +167,22 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
             if(transactionHeader != null){
                 this.date.setValue(transactionHeader.getTransactionDate());
-                this.orNmber.setText(transactionHeader.getTransactionNumber());
-                this.remarks.setText(transactionHeader.getRemarks());
-                print_btn.setDisable(true);
+                //this.orNmber.setText(transactionHeader.getTransactionNumber());
+                //this.remarks.setText(transactionHeader.getRemarks());
+                submitBtn.setDisable(true);
             }
             address.setEditable(false);
             purpose.setEditable(false);
             consumerInfo = null;
             initTable(tellerInfo);
+        }else if (o instanceof OROtherInfo) {
+            try{
+                OROtherInfo orOtherInfo = (OROtherInfo)o;
+                nonePowerBills(orOtherInfo);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
         }
         ModalBuilder.MODAL_CLOSE();
     }
@@ -223,9 +235,9 @@ public class CashierController extends MenuControllerHandler implements Initiali
             this.crmDetails = crmDetails;
         }if(o instanceof Teller){
             Teller teller = (Teller)  o;
-            HashMap<String, List<ItemSummary>> breakdown = teller.getDCRBreakDown();
-            ObservableList<ItemSummary> result = FXCollections.observableArrayList(breakdown.get("Breakdown"));
-            ObservableList<ItemSummary> forOR = FXCollections.observableArrayList();
+            List<ORItemSummary> orItemSummaries = teller.getOrItemSummaries();
+            ObservableList<ORItemSummary> result = FXCollections.observableArrayList(orItemSummaries);
+            /*ObservableList<ItemSummary> forOR = FXCollections.observableArrayList();
             for (ItemSummary itemSummary : result){
                 if(itemSummary.getDescription().equals("Others") ||
                         itemSummary.getDescription().equals("Other Deductions") ||
@@ -237,26 +249,73 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
                 forOR.add(itemSummary);
 
+            }*/
+
+            for (ORItemSummary orItemSummary : result){
+                if(orItemSummary.getDescription().equals("Grand Total")){
+                    collectionFromTeller = orItemSummary.getAmount();
+                    total.setText(""+Utility.formatDecimal(collectionFromTeller));
+                    break;
+                }
             }
 
-            this.paymentTable.setItems(forOR);
+            this.paymentTable.setItems(result);
 
-            List<ItemSummary> misc = breakdown.get("Misc");
-            collectionFromTeller = misc.get(1).getTotal();
-            total.setText(""+Utility.formatDecimal(collectionFromTeller));
+            //List<ItemSummary> misc = breakdown.get("Misc");
+            //collectionFromTeller = misc.get(1).getTotal();
+            //total.setText(""+Utility.formatDecimal(collectionFromTeller));
 
-            TableColumn<ItemSummary, String> column1 = new TableColumn<>("Item Description");
-            column1.setMinWidth(200);
-            column1.setCellValueFactory(new PropertyValueFactory<>("description"));
+            TableColumn<ORItemSummary, String> column0 = new TableColumn<>("Account Code");
+
+            column0.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getAccountCode()));
+            column0.setStyle("-fx-alignment: center-left;");
+
+            TableColumn<ORItemSummary, String> column1 = new TableColumn<>("Item Description");
+            column1.setMinWidth(220);
+            //column1.setCellValueFactory(new PropertyValueFactory<>("description"));
             column1.setStyle("-fx-alignment: center-left;");
+            Callback<TableColumn<ORItemSummary, String>, TableCell<ORItemSummary, String>> removeZeroValue
+                    = //
+                    new Callback<TableColumn<ORItemSummary, String>, TableCell<ORItemSummary, String>>() {
+                        @Override
+                        public TableCell call(final TableColumn<ORItemSummary, String> param) {
+                            final TableCell<ORItemSummary, String> cell = new TableCell<ORItemSummary, String>() {
+                                @Override
+                                public void updateItem(String item, boolean empty) {
+                                    super.updateItem(item, empty);
+                                    if (empty) {
+                                        setGraphic(null);
+                                        setText(null);
+                                    } else {
+                                        ORItemSummary orItemSummary = getTableView().getItems().get(getIndex());
+                                        if(orItemSummary.getAmount() == 0){
+                                            getTableView().getItems().remove(getTableView().getItems().get(getIndex()));
+                                        }
+                                            setText(orItemSummary.getDescription());
 
-            TableColumn<ItemSummary, String> column2 = new TableColumn<>("Total Amount");
-            column2.setMinWidth(200);
+                                    }
+                                }
+                            };
+                            return cell;
+                        }
+                    };
+            column1.setCellFactory(removeZeroValue);
+
+            TableColumn<ORItemSummary, String> column2 = new TableColumn<>("Total Amount");
+
             column2.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getTotalView()));
             column2.setStyle("-fx-alignment: center-right;");
 
+
+
+
+            this.paymentTable.getColumns().add(column0);
             this.paymentTable.getColumns().add(column1);
             this.paymentTable.getColumns().add(column2);
+            //remove the last item Grand total
+            paymentTable.getItems().remove(paymentTable.getItems().size()-1);
+
+            paymentTable.refresh();
         }
 
         this.paymentTable.setPlaceholder(new Label("No consumer records was searched."));
@@ -274,7 +333,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     if(pre[0].equals("Energy Prepayment")){
                         ((ItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setTotal(amount);
                         ((ItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setTotalView(Utility.formatDecimal(amount));
-                        System.out.println("mana");
                     }else{
                         paymentTable.getItems().add(new ItemSummary("Energy Prepayment-"+accNum.getText(),Double.parseDouble(prepayment.getText())));
                     }
@@ -301,14 +359,14 @@ public class CashierController extends MenuControllerHandler implements Initiali
     }
     @FXML
     private void printWhenEntered(ActionEvent  event) throws SQLException, ClassNotFoundException {
-        if(!print_btn.isDisable())
-            printing();
+        if(!submitBtn.isDisable())
+            checkInputs();
     }
 
     @FXML
-    private void printOR(ActionEvent event) throws SQLException, ClassNotFoundException {
-        if(!print_btn.isDisable())
-            printing();
+    private void submitForConfirmation(ActionEvent event) throws SQLException, ClassNotFoundException {
+        if(!submitBtn.isDisable())
+            checkInputs();
     }
 
     @FXML
@@ -333,13 +391,13 @@ public class CashierController extends MenuControllerHandler implements Initiali
             public void handle(ActionEvent __) {
                 for(ItemSummary item : result){
                     switch (item.getDescription()) {
-                        case "Energy":
+                        case "Energy Bill":
                             if (!energyBill.getText().isEmpty()) {
                                 item.setTotal(item.getTotal() - Double.parseDouble(energyBill.getText().replaceAll(",", "")));
                                 item.setTotalView(Utility.formatDecimal(item.getTotal()));
                             }
                             break;
-                        case "Evat":
+                        case "EVAT":
                             if (!vat.getText().isEmpty()) {
                                 item.setTotal(item.getTotal() - Double.parseDouble(vat.getText().replaceAll(",", "")));
                                 item.setTotalView(Utility.formatDecimal(item.getTotal()));
@@ -364,7 +422,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         });
     }
 
-    private void printing() throws SQLException, ClassNotFoundException {
+    private void checkInputs() throws SQLException, ClassNotFoundException {
         if(paymentTable.getItems().isEmpty()){
             AlertDialogBuilder.messgeDialog("System Message", "No item breakdown found",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
@@ -378,14 +436,16 @@ public class CashierController extends MenuControllerHandler implements Initiali
             return;
         }
 
-        if(orNmber.getText().isEmpty()) {
-            AlertDialogBuilder.messgeDialog("System Message", "OR number is required.",
-                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            return;
-        }
+
 
         if(!(Double.parseDouble(total.getText().replaceAll(",","")) > 0)){
             AlertDialogBuilder.messgeDialog("System Message", "Total amount is zero (0), cannot process transaction.",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            return;
+        }
+        ModalBuilder.showModalFromXMLNoClose(CashierConfirmOR.class, "../cashiering/cashier_confirm_or.fxml", Utility.getStackPane());
+        /*if(orNmber.getText().isEmpty()) {
+            AlertDialogBuilder.messgeDialog("System Message", "OR number is required.",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
         }
@@ -395,6 +455,15 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
         }
+
+        if(bankInfo.getSelectionModel().getSelectedItem()==null){
+            AlertDialogBuilder.messgeDialog("System Message", "Please select bank and try again.",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            return;
+        }
+
+
+
 
 
         Task<Void> task = new Task<>() {
@@ -447,18 +516,24 @@ public class CashierController extends MenuControllerHandler implements Initiali
             print_btn.setDisable(false);
         });
 
-        new Thread(task).start();
+        new Thread(task).start();*/
 
     }
 
-    private void nonePowerBills() throws Exception {
+    private void nonePowerBills(OROtherInfo orOtherInfo) throws Exception {
+        String orNumber = orOtherInfo.getOrNumber();
+        String tinNo = orOtherInfo.getTin();
+        String remarks = orOtherInfo.getRemarks();
+        String paymentMode = orOtherInfo.getPaymentMode();
+        String bankAccountCode = orOtherInfo.getBankAccountCode();
+
         int month = date.getValue().getMonthValue();
         int year = date.getValue().getYear();
         LocalDate period = LocalDate.of(year, month, 1);
 
         TransactionHeader transactionHeader= new TransactionHeader();
         transactionHeader.setPeriod(period);
-        transactionHeader.setTransactionNumber(orNmber.getText());
+        transactionHeader.setTransactionNumber(orNumber);
         transactionHeader.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
         transactionHeader.setOffice(Utility.OFFICE_PREFIX);
         if(consumerInfo != null) {
@@ -474,8 +549,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
             transactionHeader.setTransactionDate(tellerInfo.getDate());
         }
         //transactionHeader.setParticulars("N/A");
-        transactionHeader.setTinNo(tinNo.getText());
-        transactionHeader.setRemarks(remarks.getText());
+        transactionHeader.setTinNo(tinNo);
+        transactionHeader.setRemarks(remarks);
 
         //transactionHeader.setBank("N/A");
         //transactionHeader.setReferenceNo("N/A");
@@ -489,7 +564,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             for (CRMDetails cd : crmDetails) {
                 TransactionDetails transactionDetails = new TransactionDetails();
                 transactionDetails.setPeriod(period);
-                transactionDetails.setTransactionNumber(orNmber.getText());
+                transactionDetails.setTransactionNumber(orNumber);
                 transactionDetails.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
                 transactionDetails.setTransactionDate(date.getValue());
                 transactionDetails.setAccountCode(cd.getGlCode());//GL Code or the account code of the particular
@@ -508,39 +583,37 @@ public class CashierController extends MenuControllerHandler implements Initiali
             }
         }else if(tellerInfo != null) {
             int seq = 1;
-            ObservableList<ItemSummary> temp = paymentTable.getItems();
-            for (ItemSummary itemSummary : temp) {
-                if(itemSummary.getDescription().equals("Others") ||
-                        itemSummary.getDescription().equals("Other Deductions") ||
-                        itemSummary.getDescription().equals("Katas Ng VAT") ||
-                        itemSummary.getDescription().equals("MD Refund") ||
-                        itemSummary.getDescription().equals("SC Discount") ||
-                        itemSummary.getDescription().equals("2307 (5%)"))
-                    continue;
+            ObservableList<ORItemSummary> temp = paymentTable.getItems();
+            for (ORItemSummary orItemSummary : temp) {
+                /*if(orItemSummary.getDescription().equals("Energy Bill - Others") ||
+                        orItemSummary.getDescription().equals("Sinking Fund - Katas ng VAT") ||
+                        orItemSummary.getDescription().equals("Meter Deposit-Main") ||
+                        orItemSummary.getDescription().equals("Senior Citizen Discount") ||
+                        orItemSummary.getDescription().equals("EVAT 2307 (5%)"))
+                    continue;*/
 
-                if(itemSummary.getTotal()>0) {
+                if(orItemSummary.getAmount()>0) {
                     TransactionDetails transactionDetails = new TransactionDetails();
                     transactionDetails.setPeriod(period);
-                    transactionDetails.setTransactionNumber(orNmber.getText());
+                    transactionDetails.setTransactionNumber(orNumber);
 
                     transactionDetails.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
 
                     transactionDetails.setTransactionDate(date.getValue());
-                    String payMode = paymentMode.getSelectionModel().getSelectedItem();
 
-                    if (payMode.equals("CASH ON HAND") || payMode.equals("CHEQUES")) {
+                    if (paymentMode.equals("CASH ON HAND") || paymentMode.equals("CHEQUES")) {
                         transactionDetails.setAccountCode(TransactionHeader.getAccountCodeProperty());
                     } else {
-                        transactionDetails.setAccountCode(bankInfo.getSelectionModel().getSelectedItem().getAccountCode());
+                        transactionDetails.setAccountCode(bankAccountCode);
                     }
 
-                    transactionDetails.setParticulars(itemSummary.getDescription());
+                    transactionDetails.setParticulars(orItemSummary.getDescription());
                     transactionDetails.setSequenceNumber(seq++);
 
-                    if (itemSummary.getTotal() > 0)
-                        transactionDetails.setCredit(itemSummary.getTotal());
+                    if (orItemSummary.getAmount() > 0)
+                        transactionDetails.setCredit(orItemSummary.getAmount());
                     else
-                        transactionDetails.setDebit(itemSummary.getTotal());
+                        transactionDetails.setDebit(orItemSummary.getAmount());
 
                     transactionDetails.setOrDate(date.getValue());
                     //transactionDetails.setBankID("N/A");
@@ -556,28 +629,53 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
         }
+        /*JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing request.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+
+                return null;
+            }
+        };
+
+        task.setOnRunning(wse -> {
+            dialog.show();
+        });
+
+
+        task.setOnSucceeded(wse -> {
+            try {
+                TransactionHeaderDetailDAO.commitSaveToDB();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            dialog.close();
+        });
+
+        task.setOnFailed(wse -> {
+            dialog.close();
+            AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: sss"+Utility.ERROR_MSG,
+                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+        });
+
+        new Thread(task).start();*/
 
         try {
             String msg = TransactionHeaderDetailDAO.save(crmQueue, transactionHeader, transactionDetailsList);
             if (msg.isEmpty()){
+                System.out.println("Hello:" + msg);
                 AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
                         Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
 
-                Utility.OR_NUMBER = Integer.parseInt(orNmber.getText())+1;
+                Utility.OR_NUMBER = Integer.parseInt(orNumber)+1;
 
-                /*
-                    private String address;
-                    private LocalDate date;
-                    private String orNumber;
-                    private String issuedTo;
-                    private String issuedBy;
-                    private double total;
-                    private ObservableList<ItemSummary> breakdown;
-                 */
                 ORContent orContent = new ORContent();
                 orContent.setAddress(address.getText());
                 orContent.setDate(date.getValue());
-                orContent.setOrNumber(orNmber.getText());
+                orContent.setOrNumber(orNumber);
                 orContent.setIssuedTo(name.getText());
                 EmployeeInfo employeeInfo = ActiveUser.getUser().getEmployeeInfo();
                 orContent.setIssuedBy(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
@@ -591,18 +689,19 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 Utility.setOrContent(orContent);
 
                 ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
-                ModalBuilder.MODAL_CLOSE();
+
 
                 resetField();
-                orNmber.setText(""+Utility.OR_NUMBER);
+                //orNumber.setText(""+Utility.OR_NUMBER);
             }else{
-                AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: "+msg,
+                AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: Hello"+msg,
                         Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
             }
         } catch (Exception e) {
-            AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: "+e.getMessage(),
+            AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: x"+e.getMessage(),
                     Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
             e.printStackTrace();
+            catchError = "nonePowerBills() method"+e.getMessage();
         }
 
     }

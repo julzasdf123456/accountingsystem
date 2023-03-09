@@ -12,11 +12,15 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class TransactionHeaderDetailDAO {
+    private static PreparedStatement ps1;
+    private static PreparedStatement ps2;
+    private static PreparedStatement ps3 = null;
+    private static PreparedStatement ps4 = null;
     public static String save(CRMQueue crmQueue, TransactionHeader transactionHeader, List<TransactionDetails> tds) throws SQLException, ClassNotFoundException {
 
         DB.getConnection().setAutoCommit(false);
 
-        PreparedStatement ps1 = DB.getConnection().prepareStatement(
+        ps1 = DB.getConnection().prepareStatement(
                 "INSERT INTO TransactionHeader " +
                         "(Period, TransactionNumber, TransactionCode, " +
                         "AccountID, Source, Particulars, TransactionDate, " +
@@ -40,7 +44,7 @@ public class TransactionHeaderDetailDAO {
         ps1.setString(13, transactionHeader.getRemarks());
         ps1.setString(14, transactionHeader.getTinNo());
 
-        PreparedStatement ps2 =null;
+        ps2 =null;
         if(tds!=null && !tds.isEmpty()) {
             ps2 = DB.getConnection().prepareStatement(
                     "INSERT INTO TransactionDetails (" +
@@ -67,8 +71,7 @@ public class TransactionHeaderDetailDAO {
                 ps2.addBatch();
             }
         }
-        PreparedStatement ps3 = null;
-        PreparedStatement ps4 = null;
+
         if(crmQueue!=null){//it will be null if transaction is for teller
             ps3 = DB.getConnection().prepareStatement(
                     "Delete from CRMDetails where ReferenceNo = ?");
@@ -90,14 +93,7 @@ public class TransactionHeaderDetailDAO {
                 ps3.executeUpdate();
                 ps4.executeUpdate();
             }
-            DB.getConnection().setAutoCommit(true);
-            ps1.close();
-            if(ps2 != null) //is null if save teller transaction
-                ps2.close();
-            if(ps3 != null) {
-                ps3.close();
-                ps4.close();
-            }
+
         } catch (Exception e){
             DB.getConnection().rollback();
             DB.getConnection().setAutoCommit(true);
@@ -112,6 +108,17 @@ public class TransactionHeaderDetailDAO {
             msg = e.getMessage();
         }
         return msg;
+    }
+
+    public static void commitSaveToDB() throws SQLException, ClassNotFoundException {
+        DB.getConnection().setAutoCommit(true);
+        ps1.close();
+        if(ps2 != null) //is null if save teller transaction
+            ps2.close();
+        if(ps3 != null) {
+            ps3.close();
+            ps4.close();
+        }
     }
 
 }

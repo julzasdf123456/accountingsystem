@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXComboBox?>
-<?import com.jfoenix.controls.JFXTextArea?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
@@ -16,7 +14,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane prefHeight="741.0" prefWidth="1095.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.CashierController">
+<AnchorPane prefHeight="607.0" prefWidth="1095.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.CashierController">
    <children>
       <HBox layoutX="16.0" layoutY="16.0" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="16.0">
          <children>
@@ -78,49 +76,6 @@
                      </VBox.margin>
                   </Label>
                   <JFXTextField fx:id="purpose" editable="false" labelFloat="true" text=" " unFocusColor="#b5b5b5" />
-                  <HBox>
-                     <children>
-                        <Label maxWidth="1.7976931348623157E308" text="Payment Mode" />
-                        <Label maxWidth="1.7976931348623157E308" text="*" textFill="RED" />
-                     </children>
-                     <VBox.margin>
-                        <Insets top="16.0" />
-                     </VBox.margin>
-                  </HBox>
-                  <JFXComboBox fx:id="paymentMode" focusColor="#009688" maxWidth="1.7976931348623157E308" onAction="#selectPaymentMode" />
-                  <HBox>
-                     <children>
-                        <Label maxWidth="1.7976931348623157E308" text="Bank" />
-                        <Label maxWidth="1.7976931348623157E308" text="*" textFill="RED" />
-                     </children>
-                     <VBox.margin>
-                        <Insets top="16.0" />
-                     </VBox.margin>
-                  </HBox>
-                  <JFXComboBox fx:id="bankInfo" focusColor="#009688" maxWidth="1.7976931348623157E308" />
-                  <Label maxWidth="1.7976931348623157E308" text="TIN No.">
-                     <VBox.margin>
-                        <Insets top="16.0" />
-                     </VBox.margin>
-                  </Label>
-                  <JFXTextField fx:id="tinNo" labelFloat="true" text=" " unFocusColor="#b5b5b5" />
-                  <HBox>
-                     <children>
-                        <Label maxWidth="1.7976931348623157E308" text="OR Number" />
-                        <Label maxWidth="1.7976931348623157E308" text="*" textFill="RED" />
-                     </children>
-                     <VBox.margin>
-                        <Insets top="16.0" />
-                     </VBox.margin>
-                  </HBox>
-                  <JFXTextField fx:id="orNmber" alignment="CENTER" labelFloat="true" onAction="#printWhenEntered" prefHeight="46.0" prefWidth="267.0" style="-fx-font-size: 30; -fx-font-family: bold;" unFocusColor="#b5b5b5">
-                     <font>
-                        <Font size="39.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets bottom="16.0" />
-                     </VBox.margin>
-                  </JFXTextField>
                   <HBox styleClass="context-menu">
                      <children>
                         <Label fx:id="total1" maxWidth="1.7976931348623157E308" prefHeight="44.0" prefWidth="132.0" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Total:">
@@ -135,13 +90,10 @@
                         </Label>
                      </children>
                      <VBox.margin>
-                        <Insets bottom="20.0" />
+                        <Insets bottom="20.0" top="20.0" />
                      </VBox.margin>
                   </HBox>
-                  <JFXButton fx:id="print_btn" buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#printOR" prefHeight="37.0" prefWidth="115.0" styleClass="btn-sucess" text="Print">
-                     <graphic>
-                        <FontIcon fill="WHITE" iconLiteral="mdi2p-printer" iconSize="20" />
-                     </graphic>
+                  <JFXButton fx:id="submitBtn" buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#submitForConfirmation" prefHeight="31.0" prefWidth="120.0" styleClass="btn-sucess" text="Submit">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
@@ -203,7 +155,7 @@
                               <Separator prefWidth="200.0" />
                               <HBox alignment="CENTER" prefHeight="77.0" prefWidth="513.0">
                                  <children>
-                                    <JFXTextField fx:id="energyBill" labelFloat="true" prefHeight="30.0" prefWidth="124.0" promptText="Energy Bil">
+                                    <JFXTextField fx:id="energyBill" labelFloat="true" prefHeight="30.0" prefWidth="124.0" promptText="Energy Bill">
                                        <HBox.margin>
                                           <Insets left="5.0" right="5.0" />
                                        </HBox.margin>
@@ -243,8 +195,6 @@
                         <Cursor fx:constant="DEFAULT" />
                      </cursor>
                   </TableView>
-                  <Label maxWidth="1.7976931348623157E308" text="Remarks" />
-                  <JFXTextArea fx:id="remarks" prefHeight="84.0" prefWidth="307.0" />
                </children>
             </VBox>
          </children>

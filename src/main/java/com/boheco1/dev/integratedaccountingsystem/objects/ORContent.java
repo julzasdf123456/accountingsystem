@@ -13,7 +13,7 @@ public class ORContent {
     private String issuedTo;
     private String issuedBy;
     private double total;
-    private ObservableList<ItemSummary> tellerCollection;
+    private ObservableList<ORItemSummary> tellerCollection;
     private ObservableList<CRMDetails> customerCollection;
 
     public ORContent() {    }
@@ -75,11 +75,11 @@ public class ORContent {
         this.total = total;
     }
 
-    public ObservableList<ItemSummary> getTellerCollection() {
+    public ObservableList<ORItemSummary> getTellerCollection() {
         return tellerCollection;
     }
 
-    public void setTellerCollection(ObservableList<ItemSummary> tellerCollection) {
+    public void setTellerCollection(ObservableList<ORItemSummary> tellerCollection) {
         this.tellerCollection = tellerCollection;
     }
 

@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDetailDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ModalBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ObjectTransaction;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
@@ -45,62 +46,64 @@ public class ORLayoutController implements Initializable, ObjectTransaction {
         //Anchor pane Size for OR
         //Width 581
         //height 380
-
-        String pattern = "M/d/yyyy";
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(pattern);
-        orContent = Utility.getOrContent();
-        //HashMap<String, List<ItemSummary>> breakdown = tellerInfo.getDCRBreakDown();
-        //List<ItemSummary> result = breakdown.get("Breakdown");
-
-        //List<ItemSummary> misc = breakdown.get("Misc");
-        //double collectionFromTeller = Double.parseDouble(String.format("%.2f",misc.get(1).getTotal()));
-
-
-        String description = "", amount = "";
-        if(orContent.getTellerCollection()!=null){
-            for (ItemSummary a : orContent.getTellerCollection()) {
-                if (a.getTotal() > 0) {
-                    description += a.getDescription() + "\n";
-                    amount += Utility.formatDecimal(a.getTotal()) + "\n";
-                }
-            }
-        }else if(orContent.getCustomerCollection() != null) {
-            for (CRMDetails a : orContent.getCustomerCollection()) {
-                if (a.getTotal() > 0) {
-                    description += a.getParticulars() + "\n";
-                    amount += Utility.formatDecimal(a.getTotal()) + "\n";
-                }
-            }
-        }
-        date1.setText(orContent.getDate().format(dateFormatter));
-        date2.setText(orContent.getDate().format(dateFormatter));
-        cusName1.setText(orContent.getIssuedTo());
-        cusName2.setText(orContent.getIssuedTo());
-        address1.setText(orContent.getAddress());
-        address2.setText(orContent.getAddress());
-        orNum1.setText(orContent.getOrNumber());
-        orNum2.setText(orContent.getOrNumber());
-        inWord1.setText(Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£",""));
-        inWord2.setText(Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£",""));
-        totalAmount1.setText(Utility.formatDecimal(orContent.getTotal()));
-        totalAmount2.setText(Utility.formatDecimal(orContent.getTotal()));
-        totalAmount3.setText(Utility.formatDecimal(orContent.getTotal()));
-        totalAmount4.setText(Utility.formatDecimal(orContent.getTotal()));
-        ref1.setText("");
-        ref2.setText("");
-        desc1.setText(description);
-        desc2.setText(description);
-        amount1.setText(amount);
-        amount2.setText(amount);
-
         try {
+            String pattern = "M/d/yyyy";
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(pattern);
+            orContent = Utility.getOrContent();
+            //HashMap<String, List<ItemSummary>> breakdown = tellerInfo.getDCRBreakDown();
+            //List<ItemSummary> result = breakdown.get("Breakdown");
+
+            //List<ItemSummary> misc = breakdown.get("Misc");
+            //double collectionFromTeller = Double.parseDouble(String.format("%.2f",misc.get(1).getTotal()));
+
+
+            String description = "", amount = "";
+            if(orContent.getTellerCollection()!=null){
+                for (ORItemSummary a : orContent.getTellerCollection()) {
+                    if (a.getAmount() > 0) {
+                        description += a.getDescription() + "\n";
+                        amount += Utility.formatDecimal(a.getAmount()) + "\n";
+                    }
+                }
+            }else if(orContent.getCustomerCollection() != null) {
+                for (CRMDetails a : orContent.getCustomerCollection()) {
+                    if (a.getTotal() > 0) {
+                        description += a.getParticulars() + "\n";
+                        amount += Utility.formatDecimal(a.getTotal()) + "\n";
+                    }
+                }
+            }
+            date1.setText(orContent.getDate().format(dateFormatter));
+            date2.setText(orContent.getDate().format(dateFormatter));
+            cusName1.setText(orContent.getIssuedTo());
+            cusName2.setText(orContent.getIssuedTo());
+            address1.setText(orContent.getAddress());
+            address2.setText(orContent.getAddress());
+            orNum1.setText(orContent.getOrNumber());
+            orNum2.setText(orContent.getOrNumber());
+            inWord1.setText(Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£",""));
+            inWord2.setText(Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£",""));
+            totalAmount1.setText(Utility.formatDecimal(orContent.getTotal()));
+            totalAmount2.setText(Utility.formatDecimal(orContent.getTotal()));
+            totalAmount3.setText(Utility.formatDecimal(orContent.getTotal()));
+            totalAmount4.setText(Utility.formatDecimal(orContent.getTotal()));
+            ref1.setText("");
+            ref2.setText("");
+            desc1.setText(description);
+            desc2.setText(description);
+            amount1.setText(amount);
+            amount2.setText(amount);
+
+
             EmployeeInfo employeeInfo = ActiveUser.getUser().getEmployeeInfo();
             //cashier1.setText(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
             //cashier2.setText(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
             cashier1.setText(orContent.getIssuedBy());
             cashier2.setText(orContent.getIssuedBy());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+
+            Utility.ERROR_MSG = "OR Layout Class "+e.getMessage();
+            e.printStackTrace();
         }
 
         Node node = printArea;
@@ -114,6 +117,14 @@ public class ORLayoutController implements Initializable, ObjectTransaction {
             if (success) {
                 System.out.println("PRINTING FINISHED");
                 job.endJob();
+                try {
+                    TransactionHeaderDetailDAO.commitSaveToDB();
+                    ModalBuilder.MODAL_CLOSE();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
