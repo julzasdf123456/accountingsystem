@@ -461,7 +461,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
         });
 
         FileChooser fs = new FileChooser();
-
+        fs.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel File","*.xlsx"));
 
         try {
             File file = fs.showSaveDialog(null);
