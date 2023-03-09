@@ -140,7 +140,7 @@
                                     <Separator prefWidth="200.0" />
                                     <HBox>
                                        <children>
-                                          <Label text="No. of rows : " />
+                                          <Label text="No. of stubs : " />
                                           <Label fx:id="dcr_transNo_lbl" styleClass="bold" text="0">
                                              <HBox.margin>
                                                 <Insets left="16.0" />

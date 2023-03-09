@@ -14,7 +14,7 @@
 
 .jfx-text-field, .jfx-password-field, .jfx-text-area, .text-area, .check-box, .jfx-check-box, .text-field,
 .label, .jfx-password-field, .jfx-combo-box, .date-picker, .jfx-button, .tab, .list-view{
-    -fx-font-size: 14px;
+    -fx-font-size: 13px;
 }
 
 .jfx-text-field, .jfx-password-field, .jfx-text-area {
@@ -44,7 +44,7 @@
 
 .menu-item .label {
     -fx-padding: 5;
-    -fx-text-fill: "#757575";
+    -fx-text-fill: "#000000";
 }
 
 .menu-item:focused {
@@ -240,4 +240,8 @@
 
 .blue {
 -fx-text-fill: #6002EE;
+}
+
+.label-fix {
+
 }

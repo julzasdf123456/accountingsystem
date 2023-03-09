@@ -57,9 +57,10 @@ public class ConsumerDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static ConsumerInfo getConsumerRecord(String accountNo) throws Exception {
-        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement("SELECT * FROM AccountMaster WHERE AccountNumber = ?");
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement("SELECT * FROM AccountMaster WHERE AccountNumber = ? OR MeterNumber = ?");
 
         ps.setString(1, accountNo);
+        ps.setString(2, accountNo);
 
         ResultSet rs = ps.executeQuery();
 
