@@ -93,6 +93,7 @@ public class CashierDAO {
 
         ResultSet rs = ps.executeQuery();
 
+        List<ORItemSummary> tempORItems = new ArrayList<>();
         List<ORItemSummary> orItems = new ArrayList<>();
 
         while(rs.next()) {
@@ -136,23 +137,29 @@ public class CashierDAO {
             ORItemSummary arVATGenItem = new ORItemSummary("12410310000","AR VAT - GenCo - Gen", arGen);
             ORItemSummary totalItem = new ORItemSummary("Grand Total", total);
 
-            orItems.add(energyItem);
-            orItems.add(trItem);
+
+            tempORItems.add(trItem);
             //orItems.add(othersItem);
-            orItems.add(energyBillsOthers);
-            orItems.add(surChargeItem);
-            orItems.add(evatItem);
-            orItems.add(slAdjItem);
-            orItems.add(ppdItem);
+            tempORItems.add(energyBillsOthers);
+            tempORItems.add(surChargeItem);
+            tempORItems.add(evatItem);
+            tempORItems.add(slAdjItem);
+            tempORItems.add(ppdItem);
             //orItems.add(katasvatItem);
             //orItems.add(otherDeductionsItem);
             //orItems.add(mdRefundItem);
             //orItems.add(scDiscountItem);
-            orItems.add(ch2306Item);
-            orItems.add(ch2307Item);
-            orItems.add(arVATTransItem);
-            orItems.add(arVATGenItem);
-            orItems.add(totalItem);
+            tempORItems.add(ch2306Item);
+            tempORItems.add(ch2307Item);
+            tempORItems.add(arVATTransItem);
+            tempORItems.add(arVATGenItem);
+            tempORItems.add(totalItem);
+
+
+            for(ORItemSummary or : tempORItems){
+                if(or.getAmount()>0)
+                    orItems.add(or);
+            }
         }
 
         rs.close();

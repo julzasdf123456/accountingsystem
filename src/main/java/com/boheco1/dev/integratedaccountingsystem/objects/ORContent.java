@@ -5,6 +5,7 @@ import javafx.beans.binding.ObjectExpression;
 import javafx.collections.ObservableList;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class ORContent {
     private String address;
@@ -15,6 +16,16 @@ public class ORContent {
     private double total;
     private ObservableList<ORItemSummary> tellerCollection;
     private ObservableList<CRMDetails> customerCollection;
+
+    private CRMQueue crmQueue;
+    private TransactionHeader transactionHeader;
+    private List<TransactionDetails> tds;
+
+    public ORContent(CRMQueue crmQueue, TransactionHeader transactionHeader, List<TransactionDetails> tds) {
+        this.crmQueue = crmQueue;
+        this.transactionHeader = transactionHeader;
+        this.tds = tds;
+    }
 
     public ORContent() {    }
 
@@ -98,5 +109,29 @@ public class ORContent {
             setCustomerCollection(observableList);
         }
 
+    }
+
+    public CRMQueue getCrmQueue() {
+        return crmQueue;
+    }
+
+    public void setCrmQueue(CRMQueue crmQueue) {
+        this.crmQueue = crmQueue;
+    }
+
+    public TransactionHeader getTransactionHeader() {
+        return transactionHeader;
+    }
+
+    public void setTransactionHeader(TransactionHeader transactionHeader) {
+        this.transactionHeader = transactionHeader;
+    }
+
+    public List<TransactionDetails> getTds() {
+        return tds;
+    }
+
+    public void setTds(List<TransactionDetails> tds) {
+        this.tds = tds;
     }
 }

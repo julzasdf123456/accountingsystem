@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.cashiering;
 import com.boheco1.dev.integratedaccountingsystem.dao.BankAccountDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.InputValidation;
+import com.boheco1.dev.integratedaccountingsystem.helpers.ModalBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.BankAccount;
 import com.boheco1.dev.integratedaccountingsystem.objects.OROtherInfo;
@@ -106,6 +107,8 @@ public class CashierConfirmOR implements Initializable {
                     orNumber.getText(),
                     remarks.getText());
         }
+        ModalBuilder.MODAL_CLOSE();
         Utility.getParentController().receive(orOtherInfo);
+
     }
 }

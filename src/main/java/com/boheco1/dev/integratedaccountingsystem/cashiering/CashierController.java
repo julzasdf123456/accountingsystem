@@ -72,7 +72,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     private double collectionFromTeller;
 
-    public static String catchError = "";
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Utility.setParentController(this);
@@ -182,7 +181,11 @@ public class CashierController extends MenuControllerHandler implements Initiali
             }catch (Exception e){
                 e.printStackTrace();
             }
-
+        }else if (o instanceof Boolean) {
+            boolean b = (Boolean) o;
+            if(b){
+                resetField();
+            }
         }
         ModalBuilder.MODAL_CLOSE();
     }
@@ -272,8 +275,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
             TableColumn<ORItemSummary, String> column1 = new TableColumn<>("Item Description");
             column1.setMinWidth(220);
-            //column1.setCellValueFactory(new PropertyValueFactory<>("description"));
-            column1.setStyle("-fx-alignment: center-left;");
+            column1.setCellValueFactory(new PropertyValueFactory<>("description"));
+            /*column1.setStyle("-fx-alignment: center-left;");
             Callback<TableColumn<ORItemSummary, String>, TableCell<ORItemSummary, String>> removeZeroValue
                     = //
                     new Callback<TableColumn<ORItemSummary, String>, TableCell<ORItemSummary, String>>() {
@@ -294,20 +297,18 @@ public class CashierController extends MenuControllerHandler implements Initiali
                                             setText(orItemSummary.getDescription());
 
                                     }
+                                    paymentTable.refresh();
                                 }
                             };
                             return cell;
                         }
                     };
-            column1.setCellFactory(removeZeroValue);
+            column1.setCellFactory(removeZeroValue);*/
 
             TableColumn<ORItemSummary, String> column2 = new TableColumn<>("Total Amount");
 
             column2.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getTotalView()));
             column2.setStyle("-fx-alignment: center-right;");
-
-
-
 
             this.paymentTable.getColumns().add(column0);
             this.paymentTable.getColumns().add(column1);
@@ -324,17 +325,30 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     @FXML
     private void addPrepayment(ActionEvent event) {
+        ObservableList<ORItemSummary> result = paymentTable.getItems();
+        boolean found = false;
+        for(ORItemSummary search : result){
+            if(search.getDescription().equals("Energy Bills - Others") && search.getAmount()>0){
+                found = true;
+                break;
+            }
+        }
+        if(!found) {
+            AlertDialogBuilder.messgeDialog("Transaction Error", "Cannot add prepayment, since other deduction is zero",
+                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+            return;
+        }
         if (tellerInfo != null) {
             if(!accNum.getText().isEmpty() && !prepayment.getText().isEmpty()){
                 double amount = Double.parseDouble(prepayment.getText());
-                ItemSummary items = (ItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1);
+                ORItemSummary items = (ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1);
                 String[] pre = items.getDescription().split("-");
 
                     if(pre[0].equals("Energy Prepayment")){
-                        ((ItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setTotal(amount);
-                        ((ItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setTotalView(Utility.formatDecimal(amount));
+                        ((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setAmount(amount);
+                        ((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setTotalView(Utility.formatDecimal(amount));
                     }else{
-                        paymentTable.getItems().add(new ItemSummary("Energy Prepayment-"+accNum.getText(),Double.parseDouble(prepayment.getText())));
+                        paymentTable.getItems().add(new ORItemSummary("Energy Prepayment-"+accNum.getText(),Double.parseDouble(prepayment.getText())));
                     }
             }
             paymentTable.refresh();
@@ -371,7 +385,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     @FXML
     void refund(ActionEvent events) {
-        ObservableList<ItemSummary> result = paymentTable.getItems();
+        ObservableList<ORItemSummary> result = paymentTable.getItems();
 
         if(result==null) return;
         if(energyBill.getText().isEmpty() && vat.getText().isEmpty() && surcharge.getText().isEmpty()) return;
@@ -389,25 +403,25 @@ public class CashierController extends MenuControllerHandler implements Initiali
         accept.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent __) {
-                for(ItemSummary item : result){
+                for(ORItemSummary item : result){
                     switch (item.getDescription()) {
                         case "Energy Bill":
                             if (!energyBill.getText().isEmpty()) {
-                                item.setTotal(item.getTotal() - Double.parseDouble(energyBill.getText().replaceAll(",", "")));
-                                item.setTotalView(Utility.formatDecimal(item.getTotal()));
+                                item.setAmount(item.getAmount() - Double.parseDouble(energyBill.getText().replaceAll(",", "")));
+                                item.setTotalView(Utility.formatDecimal(item.getAmount()));
                             }
                             break;
                         case "EVAT":
                             if (!vat.getText().isEmpty()) {
-                                item.setTotal(item.getTotal() - Double.parseDouble(vat.getText().replaceAll(",", "")));
-                                item.setTotalView(Utility.formatDecimal(item.getTotal()));
+                                item.setAmount(item.getAmount() - Double.parseDouble(vat.getText().replaceAll(",", "")));
+                                item.setTotalView(Utility.formatDecimal(item.getAmount()));
                             }
 
                             break;
                         case "Surcharge":
                             if (!surcharge.getText().isEmpty()) {
-                                item.setTotal(item.getTotal() - Double.parseDouble(surcharge.getText().replaceAll(",", "")));
-                                item.setTotalView(Utility.formatDecimal(item.getTotal()));
+                                item.setAmount(item.getAmount() - Double.parseDouble(surcharge.getText().replaceAll(",", "")));
+                                item.setTotalView(Utility.formatDecimal(item.getAmount()));
                             }
                             break;
                     }
@@ -602,7 +616,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     transactionDetails.setTransactionDate(date.getValue());
 
                     if (paymentMode.equals("CASH ON HAND") || paymentMode.equals("CHEQUES")) {
-                        transactionDetails.setAccountCode(TransactionHeader.getAccountCodeProperty());
+                        transactionDetails.setAccountCode(orItemSummary.getAccountCode());
                     } else {
                         transactionDetails.setAccountCode(bankAccountCode);
                     }
@@ -629,13 +643,34 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
         }
+
+        ORContent orContent = new ORContent(crmQueue, transactionHeader, transactionDetailsList);
+        orContent.setAddress(address.getText());
+        orContent.setDate(date.getValue());
+        orContent.setOrNumber(orNumber);
+        orContent.setIssuedTo(name.getText());
+        EmployeeInfo employeeInfo = ActiveUser.getUser().getEmployeeInfo();
+        orContent.setIssuedBy(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
+        orContent.setTotal(Double.parseDouble(total.getText().replaceAll(",","")));
+        if(consumerInfo!=null){
+            orContent.setCustomerCollection(paymentTable.getItems());
+        }else{
+            orContent.setTellerCollection(paymentTable.getItems());
+        }
+        //orContent.setBreakdown(paymentTable.getItems());
+        Utility.setOrContent(orContent);
+        //ModalBuilder.MODAL_CLOSE();//close the CashierConfirmOR dialog, before opening ORLayoutController
+        ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
+
         /*JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing request.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
 
-        Task<Void> task = new Task<>() {
+        Task<String> task = new Task<>() {
             @Override
-            protected Void call() {
+            protected String call() {
 
-                return null;
+                ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
+
+                return Utility.ERROR_MSG;
             }
         };
 
@@ -643,16 +678,18 @@ public class CashierController extends MenuControllerHandler implements Initiali
             dialog.show();
         });
 
-
         task.setOnSucceeded(wse -> {
-            try {
-                TransactionHeaderDetailDAO.commitSaveToDB();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
             dialog.close();
+            if(Utility.ERROR_MSG == null){
+                AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
+                        Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                resetField();
+            }else{
+                AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: sss"+Utility.ERROR_MSG,
+                        Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+            }
+            System.out.println(Utility.ERROR_MSG);
+
         });
 
         task.setOnFailed(wse -> {
@@ -662,47 +699,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
         });
 
         new Thread(task).start();*/
-
-        try {
-            String msg = TransactionHeaderDetailDAO.save(crmQueue, transactionHeader, transactionDetailsList);
-            if (msg.isEmpty()){
-                System.out.println("Hello:" + msg);
-                AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
-                        Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
-
-                Utility.OR_NUMBER = Integer.parseInt(orNumber)+1;
-
-                ORContent orContent = new ORContent();
-                orContent.setAddress(address.getText());
-                orContent.setDate(date.getValue());
-                orContent.setOrNumber(orNumber);
-                orContent.setIssuedTo(name.getText());
-                EmployeeInfo employeeInfo = ActiveUser.getUser().getEmployeeInfo();
-                orContent.setIssuedBy(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
-                orContent.setTotal(Double.parseDouble(total.getText().replaceAll(",","")));
-                if(consumerInfo!=null){
-                    orContent.setCustomerCollection(paymentTable.getItems());
-                }else{
-                    orContent.setTellerCollection(paymentTable.getItems());
-                }
-                //orContent.setBreakdown(paymentTable.getItems());
-                Utility.setOrContent(orContent);
-
-                ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
-
-
-                resetField();
-                //orNumber.setText(""+Utility.OR_NUMBER);
-            }else{
-                AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: Hello"+msg,
-                        Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-            }
-        } catch (Exception e) {
-            AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: x"+e.getMessage(),
-                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-            e.printStackTrace();
-            catchError = "nonePowerBills() method"+e.getMessage();
-        }
 
     }
 
