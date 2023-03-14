@@ -1,5 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+
 public class Check {
     private String bank;
     private String checkNo;
@@ -40,7 +42,7 @@ public class Check {
     }
 
     public String toString(){
-        return this.bank+", check no: "+this.checkNo+", ₱ "+this.amount;
+        return this.bank+", check no: "+ this.checkNo+", ₱ "+ Utility.formatDecimal(this.amount);
     }
 
     public double getOriginalAmount() {

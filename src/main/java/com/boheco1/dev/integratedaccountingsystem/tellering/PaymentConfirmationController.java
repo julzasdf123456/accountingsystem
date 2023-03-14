@@ -105,7 +105,7 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
     public void setFigures(){
         String cash = this.cash_tf.getText();
         try {
-            this.cash = Double.parseDouble(cash);
+            this.cash = Double.parseDouble(cash.replace(",",""));
             this.check_amount = 0;
             if (this.checks.size() > 0) {
                 for (Check c : this.checks) {
@@ -115,8 +115,8 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
             this.total_payments = Utility.round(this.cash + this.check_amount, 2);
             this.change = Utility.round(this.total_payments - this.amount_due, 2);
 
-            this.change_tf.setText(this.change+"");
-            this.total_amount_paid_tf.setText(this.total_payments+"");
+            this.change_tf.setText(Utility.formatDecimal(this.change));
+            this.total_amount_paid_tf.setText(Utility.formatDecimal(this.total_payments));
 
             if (this.change < 0)
                 this.confirm_btn.setDisable(true);
@@ -140,11 +140,11 @@ public class PaymentConfirmationController extends MenuControllerHandler impleme
         this.total_payments = Utility.round(this.cash + this.check_amount, 2);
         this.change = Utility.round(this.total_payments - this.amount_due, 2);
 
-        this.cash_tf.setText(this.cash+"");
-        this.check_tf.setText(this.check_amount+"");
-        this.total_amount_paid_tf.setText(this.total_payments+"");
-        this.total_amount_due_tf.setText(this.amount_due+"");
-        this.change_tf.setText(this.change+"");
+        this.cash_tf.setText(Utility.formatDecimal(this.cash));
+        this.check_tf.setText(Utility.formatDecimal(this.check_amount));
+        this.total_amount_paid_tf.setText(Utility.formatDecimal(this.total_payments));
+        this.total_amount_due_tf.setText(Utility.formatDecimal(this.amount_due));
+        this.change_tf.setText(Utility.formatDecimal(this.change));
     }
 
     public JFXButton getConfirm_btn() {
