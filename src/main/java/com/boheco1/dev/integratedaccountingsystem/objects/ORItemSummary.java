@@ -17,7 +17,7 @@ public class ORItemSummary {
         this.description = description;
         this.amount = amount;
 
-        String[] ars = {"Systems Loss Adjustment", "Prompt payment discount", "Sinking Fund - Katas ng VAT", "Energy Bill - Others", "Meter Deposit-Main", "Senior Citizen Discount", "Prepayments - Others 2307 (2%)", "EVAT 2307 (5%)"};
+        String[] ars = {"Systems Loss Adjustment", "Prompt payment discount", "Sinking Fund - Katas ng VAT", "Other Deduction", "Meter Deposit-Main", "Senior Citizen Discount", "Prepayments - Others 2307 (2%)", "EVAT 2307 (5%)"};
         List<String> negVal = Arrays.asList(ars);
 
         if (negVal.contains(description)) {

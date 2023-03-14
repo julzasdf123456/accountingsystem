@@ -66,7 +66,7 @@ public class CashierDAO {
                 "SUM(ISNULL(p.MDRefund, 0)) AS MDRefund, "+
                 "SUM(ISNULL(p.PowerKWH, 0)) AS PowerKWH, "+
                 "SUM(ISNULL(p.NetAmount,0)) AS AmountPaid, "+
-                "SUM(ISNULL(pb.cashAmount, -1)) AS CashAmount, "+
+                "SUM(ISNULL(pb.cashAmount, p.NetAmount)) AS CashAmount, "+
                 "SUM(ISNULL(pb.checkAmount, 0)) AS CheckAmount, "+
                 "SUM(ISNULL(p.SeniorCitizenDiscount,0)) AS SeniorCitizenDiscount, "+
                 "SUM(ISNULL(b.NetAmount,0)) AS AmountDue, "+
@@ -81,10 +81,7 @@ public class CashierDAO {
                 "INNER JOIN BillsExtension x ON b.AccountNumber=x.AccountNumber AND b.ServicePeriodEnd=x.ServicePeriodEnd "+
                 "INNER JOIN PaidBillsWithRoute p ON b.AccountNumber=p.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd "+
                 "INNER JOIN PaidBills pb ON b.AccountNumber=pb.AccountNumber AND b.ServicePeriodEnd=pb.ServicePeriodEnd "+
-                "WHERE p.PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND p.PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59'";
-
-        if (teller != null)
-            sql += " AND p.TELLER = ?";
+                "WHERE p.PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND p.PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59' AND p.TELLER = ?";
 
         PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
 
@@ -97,12 +94,11 @@ public class CashierDAO {
         List<ORItemSummary> orItems = new ArrayList<>();
 
         while(rs.next()) {
-            double kwh = rs.getDouble("PowerKWH");
             double energy = rs.getDouble("Energy");
             double tr = rs.getDouble("TransformerRental");
             double others = rs.getDouble("Others");
             double surcharge = rs.getDouble("Surcharge");
-
+            double evat = rs.getDouble("Evat");
             double slAdj = rs.getDouble("SLAdj");
             double ppD = rs.getDouble("PPD");
             double katasNgVAT = rs.getDouble("KatasNgVAT");
@@ -111,44 +107,43 @@ public class CashierDAO {
             double scDiscount = rs.getDouble("SeniorCitizenDiscount");
             double amount2307 = rs.getDouble("Amount2307");
             double amount2306 = rs.getDouble("Amount2306");
-
             double arTrans = rs.getDouble("ARVATTrans");
             double arGen = rs.getDouble("ARVATGen");
 
-            double evat = rs.getDouble("Evat");
+
 
             double total = (energy + tr + others + surcharge + evat) + (-slAdj - ppD - katasNgVAT - otherDeduction - mdRefund - scDiscount - amount2307 - amount2306) + arTrans + arGen;
 
             ORItemSummary energyItem = new ORItemSummary("12410101000","Energy Bill", energy);
             ORItemSummary trItem = new ORItemSummary("43040300000","Transformer rental", tr);
-            //ORItemSummary othersItem = new ORItemSummary("124101010001","Energy Bill - Others", others);
-            ORItemSummary energyBillsOthers = new ORItemSummary("124101010001","Energy Bills - Others", others+otherDeduction);
+            ORItemSummary othersItem = new ORItemSummary("124101010001","Others", others);
+            //ORItemSummary energyBillsOthers = new ORItemSummary("124101010001","Energy Bills - Others", others+otherDeduction);
             ORItemSummary surChargeItem = new ORItemSummary("43040500000","Surcharge", surcharge);
             ORItemSummary evatItem = new ORItemSummary("22420414001","EVAT", evat);
             ORItemSummary slAdjItem = new ORItemSummary("56150304000","Systems Loss Adjustment", slAdj);
             ORItemSummary ppdItem = new ORItemSummary("51350210000","Prompt payment discount", ppD);
-            //ORItemSummary katasvatItem = new ORItemSummary("11310806000","Sinking Fund - Katas ng VAT", katasNgVAT);
-            //ORItemSummary otherDeductionsItem = new ORItemSummary("124101010001","Energy Bill - Others", otherDeduction);
-            //ORItemSummary mdRefundItem = new ORItemSummary("21720112002","Meter Deposit-Main", mdRefund);
-            //ORItemSummary scDiscountItem = new ORItemSummary("12410101000","Senior Citizen Discount", scDiscount);
+            ORItemSummary katasvatItem = new ORItemSummary("11310806000","Sinking Fund - Katas ng VAT", katasNgVAT);
+            ORItemSummary otherDeductionsItem = new ORItemSummary("124101010001","Other Deduction", 0);
+            ORItemSummary mdRefundItem = new ORItemSummary("21720112002","Meter Deposit-Main", mdRefund);
+            ORItemSummary scDiscountItem = new ORItemSummary("12410101000","Senior Citizen Discount", scDiscount);
             ORItemSummary ch2307Item = new ORItemSummary("22420414002","EVAT 2307 (5%)", amount2307);
             ORItemSummary ch2306Item = new ORItemSummary("12910111002","Prepayments - Others 2307 (2%)", amount2306);
             ORItemSummary arVATTransItem = new ORItemSummary("12410311000","AR VAT - Transco", arTrans);
             ORItemSummary arVATGenItem = new ORItemSummary("12410310000","AR VAT - GenCo - Gen", arGen);
             ORItemSummary totalItem = new ORItemSummary("Grand Total", total);
 
-
+            tempORItems.add(energyItem);
             tempORItems.add(trItem);
-            //orItems.add(othersItem);
-            tempORItems.add(energyBillsOthers);
+            tempORItems.add(othersItem);
+            //tempORItems.add(energyBillsOthers);
             tempORItems.add(surChargeItem);
             tempORItems.add(evatItem);
             tempORItems.add(slAdjItem);
             tempORItems.add(ppdItem);
-            //orItems.add(katasvatItem);
-            //orItems.add(otherDeductionsItem);
-            //orItems.add(mdRefundItem);
-            //orItems.add(scDiscountItem);
+            tempORItems.add(katasvatItem);
+            tempORItems.add(otherDeductionsItem);
+            tempORItems.add(mdRefundItem);
+            tempORItems.add(scDiscountItem);
             tempORItems.add(ch2306Item);
             tempORItems.add(ch2307Item);
             tempORItems.add(arVATTransItem);

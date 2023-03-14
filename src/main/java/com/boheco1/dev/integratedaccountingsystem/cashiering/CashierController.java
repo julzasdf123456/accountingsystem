@@ -328,13 +328,13 @@ public class CashierController extends MenuControllerHandler implements Initiali
         ObservableList<ORItemSummary> result = paymentTable.getItems();
         boolean found = false;
         for(ORItemSummary search : result){
-            if(search.getDescription().equals("Energy Bills - Others") && search.getAmount()>0){
+            if(search.getDescription().equals("Other Deduction") && search.getAmount()>0){
                 found = true;
                 break;
             }
         }
         if(!found) {
-            AlertDialogBuilder.messgeDialog("Transaction Error", "Cannot add prepayment, since other deduction is zero",
+            AlertDialogBuilder.messgeDialog("Transaction Error", "Cannot add prepayment, since other deduction is zero.",
                     Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
             return;
         }
@@ -360,7 +360,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         if(count >= 1) {
             try{
                 if(tellerInfo==null) return;
-                ItemSummary items = (ItemSummary) paymentTable.getItems().get(count - 1);
+                ORItemSummary items = (ORItemSummary) paymentTable.getItems().get(count - 1);
                 String[] pre = items.getDescription().split("-");
                 if (pre[0].equals("Energy Prepayment")) {
                     paymentTable.getItems().remove(paymentTable.getItems().size() - 1);

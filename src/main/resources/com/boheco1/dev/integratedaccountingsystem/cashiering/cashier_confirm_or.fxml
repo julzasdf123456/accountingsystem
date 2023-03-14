@@ -48,7 +48,7 @@
                         <Insets right="10.0" />
                      </HBox.margin>
                   </Label>
-                  <JFXTextField fx:id="tinNo" labelFloat="true" text=" " unFocusColor="#b5b5b5" HBox.hgrow="ALWAYS" />
+                  <JFXTextField fx:id="tinNo" labelFloat="true" prefHeight="29.0" prefWidth="177.0" unFocusColor="#b5b5b5" HBox.hgrow="ALWAYS" />
                </children>
                <VBox.margin>
                   <Insets bottom="10.0" top="10.0" />

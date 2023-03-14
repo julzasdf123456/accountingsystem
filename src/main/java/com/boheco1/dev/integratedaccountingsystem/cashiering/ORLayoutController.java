@@ -103,14 +103,16 @@ public class ORLayoutController implements Initializable {
 
             String description = "", amount = "";
             if(orContent.getTellerCollection()!=null){
-                for (ORItemSummary a : orContent.getTellerCollection()) {
+                ObservableList<ORItemSummary> items = orContent.getTellerCollection();
+                for (ORItemSummary a : items) {
                     if (a.getAmount() > 0) {
                         description += a.getDescription() + "\n";
                         amount += Utility.formatDecimal(a.getAmount()) + "\n";
                     }
                 }
             }else if(orContent.getCustomerCollection() != null) {
-                for (CRMDetails a : orContent.getCustomerCollection()) {
+                ObservableList<CRMDetails> items = orContent.getCustomerCollection();
+                for (CRMDetails a : items) {
                     if (a.getTotal() > 0) {
                         description += a.getParticulars() + "\n";
                         amount += Utility.formatDecimal(a.getTotal()) + "\n";
