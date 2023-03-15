@@ -223,6 +223,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
                     if(td.getSequenceNumber()==999) continue;
                     BankRemittance br = new BankRemittance(td.getPeriod(), td.getOrDate(),null,td.getCheckNumber(), td.getDebit(), BankAccountDAO.get(td.getBankID()), td.getAccountCode());
                     br.setTransactionDetails(td);
+                    br.setDepositedDate(td.getDepositedDate());
                     tableList.add(br);
                 }
                 remittanceTable.refresh();
