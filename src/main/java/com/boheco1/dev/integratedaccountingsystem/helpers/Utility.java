@@ -189,9 +189,9 @@ public class Utility {
 
         ValueConverters converters = ValueConverters.ENGLISH_INTEGER;
 
-        int amountInt = (int)amount;
+        int amountInt = (int)Math.floor(amount);
 
-        int rems = (int)((amount - amountInt)*100);
+        int rems = (int)Math.round(((amount - amountInt))*100);
 
         StringBuffer words = new StringBuffer();
         words.append(converters.asWords(amountInt));
