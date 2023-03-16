@@ -14,20 +14,20 @@ public class Teller {
     private LocalDate date;
     private String orNumber;
     private String issuedTo;
-    private HashMap<String, List<ItemSummary>> DCRBreakDown;
+    private List<ORItemSummary> orItemSummaries;
 
     private ObservableList<ItemSummary> orBreakDown;
 
     public Teller() {
     }
 
-    public Teller(String username, String name, String address, String phone, LocalDate date, HashMap<String, List<ItemSummary>> DCRBreakDown) {
+    public Teller(String username, String name, String address, String phone, LocalDate date, List<ORItemSummary> orItemSummaries) {
         this.username = username;
         this.name = name;
         this.address = address;
         this.phone = phone;
         this.date=date;
-        this.DCRBreakDown = DCRBreakDown;
+        this.orItemSummaries = orItemSummaries;
     }
 
     public String getUsername() {
@@ -70,12 +70,12 @@ public class Teller {
         this.date = date;
     }
 
-    public HashMap<String, List<ItemSummary>> getDCRBreakDown() {
-        return DCRBreakDown;
+    public List<ORItemSummary> getOrItemSummaries() {
+        return orItemSummaries;
     }
 
-    public void setDCRBreakDown(HashMap<String, List<ItemSummary>> DCRBreakDown) {
-        this.DCRBreakDown = DCRBreakDown;
+    public void setOrItemSummaries(List<ORItemSummary> orItemSummaries) {
+        this.orItemSummaries = orItemSummaries;
     }
 
     public String getOrNumber() {

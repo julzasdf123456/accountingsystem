@@ -51,7 +51,7 @@
                               <Insets top="8.0" />
                            </padding>
                         </HBox>
-                        <TableView fx:id="consumersTable" prefHeight="394.0" prefWidth="800.0">
+                        <TableView fx:id="consumersTable" prefHeight="394.0" prefWidth="800.0" styleClass="datatable">
                            <VBox.margin>
                               <Insets />
                            </VBox.margin>

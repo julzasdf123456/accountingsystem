@@ -39,6 +39,8 @@ public class Utility {
     public static String MIRS_PATH;
     public static int OR_NUMBER;
 
+    public static String ERROR_MSG="";
+
     public static String MR_FILED = "filed";
     public static String MR_RECOMMENDING = "recommended";
     public static String MR_APPROVED = "approved";

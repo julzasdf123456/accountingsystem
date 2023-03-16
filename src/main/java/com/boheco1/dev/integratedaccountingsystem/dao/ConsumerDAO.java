@@ -19,7 +19,7 @@ public class ConsumerDAO {
      */
     public static List<ConsumerInfo> getConsumerRecords(String key) throws Exception  {
         PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(
-                "SELECT TOP 10 * FROM AccountMaster WHERE ConsumerName LIKE ? OR AccountNumber LIKE ? " +
+                "SELECT TOP 50 * FROM AccountMaster WHERE ConsumerName LIKE ? OR AccountNumber LIKE ? " +
                         "ORDER BY ConsumerName");
         ps.setString(1, '%'+ key+'%');
         ps.setString(2, '%'+ key+'%');
@@ -57,9 +57,10 @@ public class ConsumerDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static ConsumerInfo getConsumerRecord(String accountNo) throws Exception {
-        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement("SELECT * FROM AccountMaster WHERE AccountNumber = ?");
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement("SELECT * FROM AccountMaster WHERE AccountNumber = ? OR MeterNumber = ?");
 
         ps.setString(1, accountNo);
+        ps.setString(2, accountNo);
 
         ResultSet rs = ps.executeQuery();
 

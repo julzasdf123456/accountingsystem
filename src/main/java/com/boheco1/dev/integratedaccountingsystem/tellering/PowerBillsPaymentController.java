@@ -130,9 +130,6 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     @FXML
     private ProgressBar progressBar;
 
-    @FXML
-    private ScrollPane sp;
-
     private ConsumerInfo consumerInfo = null;
 
     private ObservableList<Bill> bills = FXCollections.observableArrayList();
@@ -141,6 +138,9 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     private double toDeposit, cash = 0;
     private JFXDialog dialogConfirm = null;
     private EventHandler<ActionEvent> confirmEvent;
+
+    @FXML
+    private Label billsNo_lbl;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -250,8 +250,6 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.transact_btn.setOnAction(actionEvent -> {
             this.confirmPayment();
         });
-        sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        sp.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         Utility.setParentController(this);
     }
 
@@ -281,7 +279,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     public void setPayments(){
         try {
             double total = this.computeTotalPayments();
-            this.total_paid_tf.setText(total+"");
+            this.total_paid_tf.setText(Utility.formatDecimal(total));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -293,7 +291,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     public void setPayables(){
         try {
             double total = Utility.getTotalAmount(this.bills);
-            this.total_payable_lbl.setText(total+"");
+            this.total_payable_lbl.setText(Utility.formatDecimal(total));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -303,7 +301,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         double total = 0, amount = 0;
 
         try {
-            cash = Double.parseDouble(this.payment_tf.getText());
+            cash = Double.parseDouble(this.payment_tf.getText().replace(",",""));
         }catch (Exception e){
 
         }
@@ -352,6 +350,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.daa_tf.setText("");
         this.acct_no_tf.requestFocus();
         this.add_check_btn.setDisable(true);
+        this.billsNo_lbl.setText("0");
     }
     /**
      * Resets check details
@@ -574,6 +573,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.fees_table.getColumns().add(column51);
         this.fees_table.getColumns().add(column52);
         this.fees_table.getColumns().add(column7);
+        this.fees_table.setFixedCellSize(27.0);
     }
     /**
      * Receives ConsumerInfo object from dialog
@@ -625,6 +625,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 }else{
                     add_check_btn.setDisable(true);
                 }
+                billsNo_lbl.setText(bills.size()+"");
                 progressBar.setVisible(false);
             });
 
@@ -702,7 +703,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     this.checks = FXCollections.observableArrayList();
                 this.checks.add(check);
                 this.checks_lv.setItems(this.checks);
-                this.total_paid_tf.setText(this.computeTotalPayments()+"");
+                this.total_paid_tf.setText(Utility.formatDecimal(this.computeTotalPayments()));
                 dialog.close();
             }
         });
@@ -721,7 +722,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     this.checks = FXCollections.observableArrayList();
                 this.checks.add(check);
                 this.checks_lv.setItems(this.checks);
-                this.total_paid_tf.setText(this.computeTotalPayments()+"");
+                this.total_paid_tf.setText(Utility.formatDecimal(this.computeTotalPayments()));
                 dialog.close();
             }
         });
@@ -1019,6 +1020,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                         this.payment_tf.requestFocus();
                         this.setBillInfo(this.bills);
                     }
+                    this.billsNo_lbl.setText(bills.size()+"");
                 });
 
                 MenuItem itemAddPPD = new MenuItem("Less PPD");

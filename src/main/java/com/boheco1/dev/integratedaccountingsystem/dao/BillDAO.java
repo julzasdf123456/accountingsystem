@@ -433,7 +433,7 @@ public class BillDAO {
                 "pbx.OthersVAT, pbx.DistributionVAT, pbx.SLVAT, pbx.Item3, pbx.Item2, pbx.SLAdjustment, pbx.PromptPayment, pbx.Surcharge, pbx.NetAmount, pbx.Teller, pbx.ORNumber, pbx.DCRNumber, pbx.ServicePeriodEnd, " +
                 "pbx.PostingDate, pbx.PostingSequence, pbx.CurrentBills, pbx.Within30Days, pbx.Over30Days, pbx.PR, pbx.Others, pbx.Powerkwh, pbx.KatasAMount, pbx.OtherDeduction, " +
                 "pbx.MDRefund, pbx.NetAmountLessMDRefund, pbx.SeniorCitizenDiscount, pbx.GroupTag, pbx.Amount2306, pbx.Amount2307, b.FBHCAmt AS FranchiseTax, x.Item16 AS BusinessTax, " +
-                "x.Item17 AS RealPropertyTax, b.DAA_VAT, b.ACRM_VAT, b.Item1 as GenVatFeb21, FORMAT(pbx.PostingDate,'hh:mm') as PostingTime, ISNULL(CashAmount, -1) AS CashAmount, ISNULL(CheckAmount, 0) AS CheckAmount, ISNULL(DepositAmount, 0) AS DepositAmount, ISNULL(withPenalty, 1) AS withPenalty " +
+                "x.Item17 AS RealPropertyTax, b.DAA_VAT, b.ACRM_VAT, b.Item1 as GenVatFeb21, FORMAT(pbx.PostingDate,'hh:mm') as PostingTime, ISNULL(CashAmount, pbx.NetAmount) AS CashAmount, ISNULL(CheckAmount, 0) AS CheckAmount, ISNULL(DepositAmount, 0) AS DepositAmount, ISNULL(withPenalty, 1) AS withPenalty " +
                 "FROM PaidBillsWithRoute pbx INNER JOIN Bills b ON pbx.AccountNumber=b.AccountNumber AND pbx.ServicePeriodEnd=b.ServicePeriodEnd " +
                 "INNER JOIN PaidBills p ON p.AccountNumber=b.AccountNumber AND p.ServicePeriodEnd=b.ServicePeriodEnd " +
                 "INNER JOIN BillsExtension x ON  pbx.AccountNumber=x.AccountNumber AND pbx.ServicePeriodEnd=x.ServicePeriodEnd " +
@@ -487,7 +487,7 @@ public class BillDAO {
             bill.setAmount2307(rs.getDouble("Amount2307"));
             bill.setPostingDate(rs.getDate("PostingDate"));
             bill.setPostingTime(rs.getString("PostingTime"));
-            bill.setCashAmount(rs.getDouble("CashAmount") == -1 ? rs.getDouble("TotalAmount") : rs.getDouble("CashAmount"));
+            bill.setCashAmount(rs.getDouble("CashAmount"));
             bill.setCheckAmount(rs.getDouble("CheckAmount"));
             bill.setDeposit(rs.getDouble("DepositAmount"));
             Bill b = bill;
@@ -577,7 +577,7 @@ public class BillDAO {
         "SUM(ISNULL(p.MDRefund, 0)) AS MDRefund, "+
         "SUM(ISNULL(p.PowerKWH, 0)) AS PowerKWH, "+
         "SUM(ISNULL(p.NetAmount,0)) AS AmountPaid, "+
-        "SUM(ISNULL(pb.cashAmount, -1)) AS CashAmount, "+
+        "SUM(ISNULL(pb.cashAmount, p.NetAmount)) AS CashAmount, "+
         "SUM(ISNULL(pb.checkAmount, 0)) AS CheckAmount, "+
         "SUM(ISNULL(p.SeniorCitizenDiscount,0)) AS SeniorCitizenDiscount, "+
         "SUM(ISNULL(b.NetAmount,0)) AS AmountDue, "+
@@ -632,14 +632,13 @@ public class BillDAO {
             double total = (energy + tr + others + surcharge + evat) + (-slAdj - ppD - katasNgVAT - otherDeduction - mdRefund - scDiscount - amount2307 - amount2306) + arTrans + arGen;
             double totalPaid = rs.getDouble("AmountPaid");
             double amountDue = rs.getDouble("AmountDue");
-            double totalCash = rs.getDouble("CashAmount") == -1 ? totalPaid : rs.getDouble("CashAmount");
+            double totalCash = rs.getDouble("CashAmount");
             double totalCheck = rs.getDouble("CheckAmount");
             double totalPayments = totalCash + totalCheck;
 
             ItemSummary energyItem = new ItemSummary("Energy", energy);
             ItemSummary trItem = new ItemSummary("TSF/TR", tr);
             ItemSummary othersItem = new ItemSummary("Others", others);
-            ItemSummary energyBillsOthers = new ItemSummary("Energy Bills Others", others+otherDeduction);
             ItemSummary surChargeItem = new ItemSummary("Surcharge", surcharge);
             ItemSummary evatItem = new ItemSummary("Evat", evat);
             ItemSummary slAdjItem = new ItemSummary("S/L Adjustments", slAdj);
@@ -657,7 +656,6 @@ public class BillDAO {
             dcrBreakdown.add(energyItem);
             dcrBreakdown.add(trItem);
             dcrBreakdown.add(othersItem);
-            dcrBreakdown.add(energyBillsOthers);
             dcrBreakdown.add(surChargeItem);
             dcrBreakdown.add(evatItem);
             dcrBreakdown.add(slAdjItem);

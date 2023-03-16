@@ -144,14 +144,11 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         });
 
         this.date_pker.addEventHandler(ActionEvent.ACTION, event);
-
-        if (ActiveUser.getUser().can("manage-cashiering")) {
-            this.teller_tf.setVisible(true);
+        this.teller_tf.setVisible(true);
+        if (ActiveUser.getUser().can("manage-cashiering") || ActiveUser.getUser().can("manage-tellering") ) {
             this.teller_tf.setOnAction(actionEvent -> {
                 this.generateReport();
             });
-        }else {
-            this.teller_tf.setVisible(false);
         }
 
         this.print_dcr_btn.setOnAction(actionEvent -> {
@@ -217,6 +214,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                             }
                         }else if (ActiveUser.getUser().can("manage-tellering")) {
                             teller = ActiveUser.getUser().getUserName();
+                            if (!teller_tf.getText().isEmpty()) teller = teller_tf.getText();
                         }else {
                             proceed = false;
                         }
@@ -275,6 +273,9 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                         Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
                 proceed = false;
             }
+        }else if (ActiveUser.getUser().can("manage-tellering")) {
+            teller = ActiveUser.getUser().getUserName();
+            if (!teller_tf.getText().isEmpty()) teller = teller_tf.getText();
         }
         if (proceed) {
             Task<Void> task = new Task<>() {
