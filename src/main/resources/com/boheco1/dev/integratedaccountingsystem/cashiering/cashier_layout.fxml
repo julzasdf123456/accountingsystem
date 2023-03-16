@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXTextArea?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
@@ -10,17 +12,18 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane prefHeight="607.0" prefWidth="1095.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.CashierController">
+<AnchorPane prefHeight="696.0" prefWidth="1138.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.CashierController">
    <children>
-      <HBox layoutX="16.0" layoutY="16.0" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="16.0">
+      <HBox layoutX="16.0" layoutY="16.0" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="16.0" AnchorPane.topAnchor="16.0">
          <children>
-            <VBox maxWidth="1.7976931348623157E308" prefHeight="709.0" prefWidth="267.0">
+            <VBox maxWidth="-Infinity" prefHeight="709.0" prefWidth="267.0">
                <children>
-                  <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Transaction Info" VBox.vgrow="ALWAYS">
+                  <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 15; -fx-font-weight: bold;" text="Search Transaction" VBox.vgrow="ALWAYS">
                      <font>
                         <Font name="System Bold" size="22.0" />
                      </font>
@@ -31,8 +34,10 @@
                   <Separator prefWidth="200.0" />
                   <HBox>
                      <children>
-                        <Label maxWidth="1.7976931348623157E308" text="Date" />
-                        <Label maxWidth="1.7976931348623157E308" text="*" textFill="RED" />
+                        <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 12;" text="Date">
+                           <font>
+                              <Font size="10.0" />
+                           </font></Label>
                      </children>
                      <VBox.margin>
                         <Insets top="16.0" />
@@ -43,10 +48,13 @@
                         <Insets />
                      </VBox.margin>
                   </DatePicker>
-                  <Label maxWidth="1.7976931348623157E308" text="Name">
+                  <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 12;" text="Name">
                      <VBox.margin>
                         <Insets top="16.0" />
                      </VBox.margin>
+                     <font>
+                        <Font size="10.0" />
+                     </font>
                   </Label>
                   <HBox>
                      <children>
@@ -64,16 +72,22 @@
                         </JFXButton>
                      </children>
                   </HBox>
-                  <Label maxWidth="1.7976931348623157E308" text="Address">
+                  <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 12;" text="Address">
                      <VBox.margin>
                         <Insets top="16.0" />
                      </VBox.margin>
+                     <font>
+                        <Font size="10.0" />
+                     </font>
                   </Label>
                   <JFXTextField fx:id="address" editable="false" labelFloat="true" text=" " unFocusColor="#b5b5b5" />
-                  <Label maxWidth="1.7976931348623157E308" text="Purpose">
+                  <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 12;" text="Purpose">
                      <VBox.margin>
                         <Insets top="16.0" />
                      </VBox.margin>
+                     <font>
+                        <Font size="10.0" />
+                     </font>
                   </Label>
                   <JFXTextField fx:id="purpose" editable="false" labelFloat="true" text=" " unFocusColor="#b5b5b5" />
                   <HBox styleClass="context-menu">
@@ -93,108 +107,130 @@
                         <Insets bottom="20.0" top="20.0" />
                      </VBox.margin>
                   </HBox>
-                  <JFXButton fx:id="submitBtn" buttonType="RAISED" maxWidth="1.7976931348623157E308" onAction="#submitForConfirmation" prefHeight="31.0" prefWidth="120.0" styleClass="btn-sucess" text="Submit">
-                     <cursor>
-                        <Cursor fx:constant="HAND" />
-                     </cursor>
-                     <VBox.margin>
-                        <Insets left="50.0" right="50.0" />
-                     </VBox.margin>
-                  </JFXButton>
                </children>
                <HBox.margin>
-                  <Insets right="16.0" />
+                  <Insets />
                </HBox.margin>
             </VBox>
-            <VBox alignment="TOP_RIGHT" HBox.hgrow="ALWAYS">
+            <VBox prefHeight="664.0" prefWidth="556.0" HBox.hgrow="ALWAYS">
                <children>
-                  <HBox alignment="TOP_RIGHT" prefHeight="107.0" prefWidth="740.0">
-                     <children>
-                        <VBox prefHeight="107.0" prefWidth="241.0">
-                           <children>
-                              <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Prepayment">
-                                 <font>
-                                    <Font name="System Bold" size="22.0" />
-                                 </font>
-                              </Label>
-                              <Separator prefWidth="200.0" />
-                              <HBox>
-                                 <children>
-                                    <JFXTextField fx:id="accNum" labelFloat="true" onAction="#addPrepayment" prefHeight="30.0" prefWidth="184.0" promptText="Account Number">
-                                       <HBox.margin>
-                                          <Insets left="5.0" right="5.0" />
-                                       </HBox.margin>
-                                    </JFXTextField>
-                                    <JFXTextField fx:id="prepayment" labelFloat="true" onAction="#addPrepayment" promptText="Amount">
-                                       <HBox.margin>
-                                          <Insets left="5.0" right="5.0" />
-                                       </HBox.margin>
-                                    </JFXTextField>
-                                    <JFXButton buttonType="RAISED" contentDisplay="CENTER" onAction="#removePrepayment" prefHeight="11.0" prefWidth="0.0" styleClass="btn-danger" text=" ">
-                                       <graphic>
-                                          <FontIcon iconColor="WHITE" iconLiteral="mdi2c-close-circle" />
-                                       </graphic>
-                                    </JFXButton>
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets top="23.0" />
-                                 </VBox.margin>
-                              </HBox>
-                           </children>
-                           <HBox.margin>
-                              <Insets right="10.0" />
-                           </HBox.margin>
-                        </VBox>
-                        <VBox maxWidth="-Infinity" prefHeight="95.0" prefWidth="513.0">
-                           <children>
-                              <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Add Refund">
-                                 <font>
-                                    <Font name="System Bold" size="22.0" />
-                                 </font>
-                              </Label>
-                              <Separator prefWidth="200.0" />
-                              <HBox alignment="CENTER" prefHeight="77.0" prefWidth="513.0">
-                                 <children>
-                                    <JFXTextField fx:id="energyBill" labelFloat="true" prefHeight="30.0" prefWidth="124.0" promptText="Energy Bill">
-                                       <HBox.margin>
-                                          <Insets left="5.0" right="5.0" />
-                                       </HBox.margin>
-                                    </JFXTextField>
-                                    <JFXTextField fx:id="vat" labelFloat="true" prefHeight="30.0" prefWidth="124.0" promptText="VAT">
-                                       <HBox.margin>
-                                          <Insets left="5.0" right="5.0" />
-                                       </HBox.margin>
-                                    </JFXTextField>
-                                    <JFXTextField fx:id="surcharge" labelFloat="true" prefHeight="30.0" prefWidth="124.0" promptText="Surcharge ">
-                                       <HBox.margin>
-                                          <Insets left="5.0" right="5.0" />
-                                       </HBox.margin>
-                                    </JFXTextField>
-                                    <JFXButton fx:id="refund_btn" alignment="CENTER" buttonType="RAISED" onAction="#refund" prefHeight="29.0" prefWidth="96.0" styleClass="btn-warning" text="Refund" textFill="WHITE">
-                                       <graphic>
-                                          <FontIcon fill="WHITE" iconLiteral="mdi2c-cash-refund" iconSize="20" />
-                                       </graphic>
-                                       <cursor>
-                                          <Cursor fx:constant="HAND" />
-                                       </cursor>
-                                       <HBox.margin>
-                                          <Insets left="5.0" right="5.0" />
-                                       </HBox.margin>
-                                    </JFXButton>
-                                 </children>
-                              </HBox>
-                           </children>
-                           <HBox.margin>
-                              <Insets left="10.0" />
-                           </HBox.margin>
-                        </VBox>
-                     </children>
-                  </HBox>
-                  <TableView fx:id="paymentTable" maxWidth="1.7976931348623157E308" prefHeight="401.0" prefWidth="512.0" VBox.vgrow="ALWAYS">
+                  <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 15; -fx-font-weight: bold;" text="OR Info">
+                     <font>
+                        <Font name="System Bold" size="22.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </Label>
+                  <Separator prefWidth="200.0" />
+                  <TableView fx:id="paymentTable" maxWidth="1.7976931348623157E308" prefHeight="433.0" prefWidth="614.0" VBox.vgrow="NEVER">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor>
+                     <VBox.margin>
+                        <Insets top="8.0" />
+                     </VBox.margin>
                   </TableView>
+                  <Pane prefHeight="237.0" prefWidth="614.0" VBox.vgrow="ALWAYS">
+                     <children>
+                        <VBox layoutX="15.0" layoutY="14.0">
+                           <children>
+                              <JFXComboBox fx:id="paymentMode" focusColor="#009688" onAction="#selectPaymentMode" prefHeight="29.0" prefWidth="181.0" promptText="Payment Mode" />
+                              <JFXComboBox fx:id="bankInfo" focusColor="#009688" prefHeight="29.0" prefWidth="181.0" promptText="Bank">
+                                 <VBox.margin>
+                                    <Insets bottom="8.0" top="8.0" />
+                                 </VBox.margin>
+                              </JFXComboBox>
+                              <JFXTextField fx:id="tinNo" labelFloat="true" maxWidth="-Infinity" prefHeight="29.0" prefWidth="181.0" promptText="TIN Number">
+                                 <VBox.margin>
+                                    <Insets bottom="8.0" top="8.0" />
+                                 </VBox.margin>
+                              </JFXTextField>
+                           </children>
+                        </VBox>
+                        <JFXTextField fx:id="orNumber" alignment="CENTER" layoutX="207.0" layoutY="51.0" maxWidth="-Infinity" prefHeight="74.0" prefWidth="329.0" promptText="OR Number" style="-fx-font-size: 25; -fx-font-weight: bold;" />
+                        <JFXButton fx:id="submitBtn" buttonType="RAISED" layoutX="228.0" layoutY="144.0" maxWidth="-Infinity" onAction="#submitForConfirmation" prefHeight="31.0" prefWidth="100.0" styleClass="btn-sucess" text="Submit">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </JFXButton>
+                        <JFXTextField fx:id="businessStyle" labelFloat="true" layoutX="208.0" layoutY="14.0" maxWidth="-Infinity" prefHeight="29.0" prefWidth="329.0" promptText="Business Style" />
+                     </children>
+                  </Pane>
+               </children>
+               <HBox.margin>
+                  <Insets left="16.0" right="16.0" />
+               </HBox.margin>
+            </VBox>
+            <VBox maxWidth="-Infinity" prefHeight="575.0" prefWidth="193.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <VBox alignment="CENTER">
+                     <children>
+                        <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 15; -fx-font-weight: bold;" text="Prepayment">
+                           <font>
+                              <Font name="System Bold" size="22.0" />
+                           </font>
+                        </Label>
+                        <Separator prefWidth="200.0" />
+                        <JFXTextField fx:id="accNum" labelFloat="true" onAction="#addPrepayment" prefHeight="30.0" prefWidth="184.0" promptText="Account Number">
+                           <VBox.margin>
+                              <Insets bottom="10.0" top="10.0" />
+                           </VBox.margin>
+                        </JFXTextField>
+                        <JFXTextField fx:id="prepayment" labelFloat="true" onAction="#addPrepayment" promptText="Amount">
+                           <VBox.margin>
+                              <Insets bottom="10.0" top="10.0" />
+                           </VBox.margin>
+                        </JFXTextField>
+                        <JFXButton buttonType="RAISED" contentDisplay="CENTER" onAction="#removePrepayment" prefHeight="29.0" prefWidth="74.0" styleClass="btn-danger" text="Cancel " textFill="WHITE">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </JFXButton>
+                     </children>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER">
+                     <children>
+                        <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Add Refund">
+                           <font>
+                              <Font name="System Bold" size="22.0" />
+                           </font>
+                        </Label>
+                        <Separator prefWidth="200.0" />
+                        <JFXTextField fx:id="energyBill" labelFloat="true" prefHeight="30.0" prefWidth="124.0" promptText="Energy Bill">
+                           <VBox.margin>
+                              <Insets bottom="10.0" top="10.0" />
+                           </VBox.margin>
+                        </JFXTextField>
+                        <JFXTextField fx:id="vat" labelFloat="true" prefHeight="30.0" prefWidth="124.0" promptText="VAT">
+                           <VBox.margin>
+                              <Insets bottom="10.0" top="10.0" />
+                           </VBox.margin>
+                        </JFXTextField>
+                        <JFXTextField fx:id="surcharge" labelFloat="true" prefHeight="30.0" prefWidth="124.0" promptText="Surcharge ">
+                           <VBox.margin>
+                              <Insets bottom="10.0" top="10.0" />
+                           </VBox.margin>
+                        </JFXTextField>
+                        <JFXButton fx:id="refund_btn" alignment="CENTER" buttonType="RAISED" onAction="#addRefund" prefHeight="29.0" prefWidth="74.0" styleClass="btn-warning" text="Refund" textFill="WHITE">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </JFXButton>
+                     </children>
+                     <VBox.margin>
+                        <Insets top="15.0" />
+                     </VBox.margin>
+                  </VBox>
+                  <Label text="Remarks">
+                     <VBox.margin>
+                        <Insets top="50.0" />
+                     </VBox.margin>
+                  </Label>
+                  <JFXTextArea fx:id="remarks" />
                </children>
             </VBox>
          </children>

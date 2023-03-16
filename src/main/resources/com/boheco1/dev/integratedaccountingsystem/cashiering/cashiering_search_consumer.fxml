@@ -1,74 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane prefHeight="325.0" prefWidth="628.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.SearchCashieringConsumerController">
-    <children>
-        <AnchorPane fx:id="contentPane" maxHeight="1.7976931348623157E308" prefHeight="373.0" prefWidth="628.0" style="-fx-background-color: white;" stylesheets="@../style.css">
-            <children>
-                <BorderPane maxHeight="1.7976931348623157E308" prefHeight="372.0" prefWidth="628.0">
-                    <center>
-                        <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="450.0" prefWidth="800.0" BorderPane.alignment="CENTER">
-                            <children>
-                                <HBox prefHeight="59.0" prefWidth="800.0">
-                                    <children>
-                                        <JFXTextField fx:id="searchTf" focusColor="#00ad8e" labelFloat="true" onAction="#search" prefHeight="37.0" prefWidth="371.0" promptText="Reference Number/Last Name/First Name/Address" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5" HBox.hgrow="ALWAYS">
-                                            <font>
-                                                <Font size="14.0" />
-                                            </font>
-                                            <HBox.margin>
-                                                <Insets />
-                                            </HBox.margin>
-                                        </JFXTextField>
-                                        <JFXButton buttonType="RAISED" onAction="#search" prefHeight="37.0" prefWidth="97.0" styleClass="btn-theme" text="Search" textFill="WHITE" HBox.hgrow="NEVER">
-                                            <effect>
-                                                <DropShadow />
-                                            </effect>
-                                            <font>
-                                                <Font name="System Bold" size="14.0" />
-                                            </font>
-                                            <HBox.margin>
-                                                <Insets left="16.0" />
-                                            </HBox.margin>
-                                        </JFXButton>
-                                    </children>
-                                    <VBox.margin>
-                                        <Insets bottom="8.0" />
-                                    </VBox.margin>
-                                    <padding>
-                                        <Insets top="12.0" />
-                                    </padding>
-                                </HBox>
-                                <TableView fx:id="searchResultTable" prefHeight="394.0" prefWidth="800.0">
-                                    <VBox.margin>
-                                        <Insets />
-                                    </VBox.margin>
-                                </TableView>
-                            </children>
-                        </VBox>
-                    </center>
-                    <top>
-                        <HBox alignment="CENTER_LEFT" prefHeight="62.0" prefWidth="677.0" BorderPane.alignment="CENTER">
-                            <children>
-                        <JFXToggleButton fx:id="toggleSearch" alignment="CENTER_LEFT" onAction="#toggleSearch" prefHeight="62.0" prefWidth="234.0" style="-fx-font-weight: bold; -fx-font-size: 18;" text="Search Consumer" />
-                        <DatePicker fx:id="searchDate" />
-                            </children>
-                        </HBox>
-                    </top>
-                </BorderPane>
-            </children>
-        </AnchorPane>
-    </children>
-</StackPane>
+
+  <AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="127.0" prefWidth="284.0" style="-fx-background-color: white;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.SearchCashieringConsumerController">
+      <children>
+      <VBox layoutX="-0.5">
+         <children>
+            <HBox alignment="CENTER_LEFT">
+               <children>
+                  <JFXToggleButton fx:id="toggleSearch" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" onAction="#toggleSearch" prefHeight="6.0" prefWidth="189.0" style="-fx-font-weight: bold; -fx-font-size: 14;" text="Search Consumer" />
+                  <DatePicker fx:id="searchDate" prefHeight="29.0" prefWidth="159.0" />
+               </children>
+            </HBox>
+                    <HBox alignment="CENTER_LEFT" maxWidth="-Infinity" prefHeight="39.0" prefWidth="470.0">
+                        <children>
+                            <JFXTextField fx:id="searchTf" focusColor="#00ad8e" labelFloat="true" maxWidth="-Infinity" onAction="#search" prefHeight="29.0" prefWidth="296.0" promptText="Reference Number/Last Name/First Name/Address" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5" HBox.hgrow="ALWAYS">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                                <HBox.margin>
+                                    <Insets />
+                                </HBox.margin>
+                            </JFXTextField>
+                        </children>
+               <padding>
+                  <Insets bottom="5.0" top="5.0" />
+               </padding>
+                    </HBox>
+                    <TableView fx:id="searchResultTable" maxWidth="-Infinity" prefHeight="222.0" prefWidth="470.0" />
+         </children>
+      </VBox>
+      </children>
+  </AnchorPane>

@@ -35,25 +35,21 @@ import java.util.ResourceBundle;
 
 public class CashierController extends MenuControllerHandler implements Initializable, ObjectTransaction {
 
-    @FXML
-    private JFXButton search_btn;
 
-   // @FXML
-   // private JFXComboBox<String> paymentMode;
-   // @FXML
-   // private JFXComboBox<BankAccount> bankInfo;
     @FXML
-
     private JFXButton submitBtn;
 
     @FXML
-    private JFXTextField name, address, purpose, energyBill, vat, surcharge, prepayment, accNum;
+    private JFXTextField name, address, purpose, energyBill, vat, surcharge, prepayment, accNum, tinNo, orNumber, businessStyle;
 
-    //@FXML
-    //private JFXTextArea remarks;
 
-    //@FXML
-    //private JFXTextField tinNo;
+    @FXML
+    private JFXComboBox<String> paymentMode;
+    @FXML
+    private JFXComboBox<BankAccount> bankInfo;
+
+    @FXML
+    private JFXTextArea remarks;
 
     @FXML
     private DatePicker date;
@@ -88,14 +84,16 @@ public class CashierController extends MenuControllerHandler implements Initiali
         InputValidation.restrictNumbersOnly(prepayment);
         InputValidation.restrictNumbersOnly(accNum);
 
-        /*InputValidation.restrictNumbersOnly(tinNo);
-        InputValidation.restrictNumbersOnly(orNmber);
-
+        InputValidation.restrictNumbersOnly(tinNo);
+        InputValidation.restrictNumbersOnly(orNumber);
         if(Utility.OR_NUMBER != 0) {
-            orNmber.setText(""+Utility.OR_NUMBER);
+            orNumber.setText(""+Utility.OR_NUMBER);
         }
 
-        bankInfo.setDisable(true);
+        paymentMode.getItems().add("CASH ON HAND");
+        paymentMode.getItems().add("CASH IN BANK");
+        paymentMode.getItems().add("CHEQUES");
+
         try {
             List<BankAccount> bankAccounts = BankAccountDAO.getAll();
             bankInfo.getItems().addAll(bankAccounts);
@@ -103,14 +101,16 @@ public class CashierController extends MenuControllerHandler implements Initiali
             throw new RuntimeException(e);
         }
 
-        paymentMode.getItems().add("CASH ON HAND");
-        paymentMode.getItems().add("CASH ON BANK");
-        paymentMode.getItems().add("CHEQUES");
-        paymentMode.getSelectionModel().selectFirst();*/
+        paymentMode.getSelectionModel().selectFirst();
+        bankInfo.setDisable(true);
     }
 
+    @FXML
+    private void search(ActionEvent event) {
+        ModalBuilder.showModalFromXMLNoClose(CashierController.class, "../cashiering/cashiering_search_consumer.fxml", Utility.getStackPane());
+    }
 
-    /*@FXML
+    @FXML
     private void selectPaymentMode(ActionEvent event) {
         String payMode = paymentMode.getSelectionModel().getSelectedItem();
         if(payMode == null)return;
@@ -120,13 +120,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         } else {
             bankInfo.setDisable(false);
         }
-    }*/
-
-    @FXML
-    private void search(ActionEvent event) {
-        ModalBuilder.showModalFromXMLNoClose(CashierController.class, "../cashiering/cashiering_search_consumer.fxml", Utility.getStackPane());
     }
-
     private void resetField(){
         name.setText(""); address.setText(""); purpose.setText("");// remarks.setText("");
         date.setValue(LocalDate.now());
@@ -140,10 +134,12 @@ public class CashierController extends MenuControllerHandler implements Initiali
         tellerInfo = null;
         accNum.setText("");
         prepayment.setText("");
-        //tinNo.setText("");
-        //paymentMode.getSelectionModel().clearSelection();
+        tinNo.setText("");
+        paymentMode.getSelectionModel().selectFirst();
+        bankInfo.getSelectionModel().clearSelection();
+        remarks.setText("");
+        businessStyle.setText("");
     }
-
     @Override
     public void receive(Object o) {
         if (o instanceof CRMQueue) {
@@ -166,30 +162,24 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
             if(transactionHeader != null){
                 this.date.setValue(transactionHeader.getTransactionDate());
-                //this.orNmber.setText(transactionHeader.getTransactionNumber());
-                //this.remarks.setText(transactionHeader.getRemarks());
+                this.orNumber.setText(transactionHeader.getTransactionNumber());
+                this.remarks.setText(transactionHeader.getRemarks());
                 submitBtn.setDisable(true);
             }
             address.setEditable(false);
             purpose.setEditable(false);
             consumerInfo = null;
             initTable(tellerInfo);
-        }else if (o instanceof OROtherInfo) {
-            try{
-                OROtherInfo orOtherInfo = (OROtherInfo)o;
-                nonePowerBills(orOtherInfo);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
         }else if (o instanceof Boolean) {
+            //Receive from ORLayoutController
             boolean b = (Boolean) o;
             if(b){
                 resetField();
+                orNumber.setText(""+Utility.OR_NUMBER);
             }
         }
         ModalBuilder.MODAL_CLOSE();
     }
-
     private void initTable(Object o) {
         paymentTable.getColumns().clear();
         if(o instanceof CRMQueue){
@@ -240,20 +230,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
             Teller teller = (Teller)  o;
             List<ORItemSummary> orItemSummaries = teller.getOrItemSummaries();
             ObservableList<ORItemSummary> result = FXCollections.observableArrayList(orItemSummaries);
-            /*ObservableList<ItemSummary> forOR = FXCollections.observableArrayList();
-            for (ItemSummary itemSummary : result){
-                if(itemSummary.getDescription().equals("Others") ||
-                        itemSummary.getDescription().equals("Other Deductions") ||
-                        itemSummary.getDescription().equals("Katas Ng VAT") ||
-                        itemSummary.getDescription().equals("MD Refund") ||
-                        itemSummary.getDescription().equals("SC Discount") ||
-                        itemSummary.getDescription().equals("2307 (5%)"))
-                    continue;
-
-                forOR.add(itemSummary);
-
-            }*/
-
             for (ORItemSummary orItemSummary : result){
                 if(orItemSummary.getDescription().equals("Grand Total")){
                     collectionFromTeller = orItemSummary.getAmount();
@@ -264,10 +240,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
             this.paymentTable.setItems(result);
 
-            //List<ItemSummary> misc = breakdown.get("Misc");
-            //collectionFromTeller = misc.get(1).getTotal();
-            //total.setText(""+Utility.formatDecimal(collectionFromTeller));
-
             TableColumn<ORItemSummary, String> column0 = new TableColumn<>("Account Code");
 
             column0.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getAccountCode()));
@@ -276,37 +248,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
             TableColumn<ORItemSummary, String> column1 = new TableColumn<>("Item Description");
             column1.setMinWidth(220);
             column1.setCellValueFactory(new PropertyValueFactory<>("description"));
-            /*column1.setStyle("-fx-alignment: center-left;");
-            Callback<TableColumn<ORItemSummary, String>, TableCell<ORItemSummary, String>> removeZeroValue
-                    = //
-                    new Callback<TableColumn<ORItemSummary, String>, TableCell<ORItemSummary, String>>() {
-                        @Override
-                        public TableCell call(final TableColumn<ORItemSummary, String> param) {
-                            final TableCell<ORItemSummary, String> cell = new TableCell<ORItemSummary, String>() {
-                                @Override
-                                public void updateItem(String item, boolean empty) {
-                                    super.updateItem(item, empty);
-                                    if (empty) {
-                                        setGraphic(null);
-                                        setText(null);
-                                    } else {
-                                        ORItemSummary orItemSummary = getTableView().getItems().get(getIndex());
-                                        if(orItemSummary.getAmount() == 0){
-                                            getTableView().getItems().remove(getTableView().getItems().get(getIndex()));
-                                        }
-                                            setText(orItemSummary.getDescription());
-
-                                    }
-                                    paymentTable.refresh();
-                                }
-                            };
-                            return cell;
-                        }
-                    };
-            column1.setCellFactory(removeZeroValue);*/
 
             TableColumn<ORItemSummary, String> column2 = new TableColumn<>("Total Amount");
-
             column2.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getTotalView()));
             column2.setStyle("-fx-alignment: center-right;");
 
@@ -321,8 +264,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
         this.paymentTable.setPlaceholder(new Label("No consumer records was searched."));
     }
-
-
     @FXML
     private void addPrepayment(ActionEvent event) {
         ObservableList<ORItemSummary> result = paymentTable.getItems();
@@ -371,20 +312,9 @@ public class CashierController extends MenuControllerHandler implements Initiali
             }
         }
     }
-    @FXML
-    private void printWhenEntered(ActionEvent  event) throws SQLException, ClassNotFoundException {
-        if(!submitBtn.isDisable())
-            checkInputs();
-    }
 
     @FXML
-    private void submitForConfirmation(ActionEvent event) throws SQLException, ClassNotFoundException {
-        if(!submitBtn.isDisable())
-            checkInputs();
-    }
-
-    @FXML
-    void refund(ActionEvent events) {
+    private void addRefund(ActionEvent events) {
         ObservableList<ORItemSummary> result = paymentTable.getItems();
 
         if(result==null) return;
@@ -436,7 +366,10 @@ public class CashierController extends MenuControllerHandler implements Initiali
         });
     }
 
-    private void checkInputs() throws SQLException, ClassNotFoundException {
+    @FXML
+    private void submitForConfirmation(ActionEvent event) throws Exception {
+        //if(!submitBtn.isDisable())
+            //checkInputs();
         if(paymentTable.getItems().isEmpty()){
             AlertDialogBuilder.messgeDialog("System Message", "No item breakdown found",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
@@ -457,8 +390,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
         }
-        ModalBuilder.showModalFromXMLNoClose(CashierConfirmOR.class, "../cashiering/cashier_confirm_or.fxml", Utility.getStackPane());
-        /*if(orNmber.getText().isEmpty()) {
+
+        if(orNumber.getText().isEmpty()) {
             AlertDialogBuilder.messgeDialog("System Message", "OR number is required.",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
@@ -470,69 +403,33 @@ public class CashierController extends MenuControllerHandler implements Initiali
             return;
         }
 
-        if(bankInfo.getSelectionModel().getSelectedItem()==null){
-            AlertDialogBuilder.messgeDialog("System Message", "Please select bank and try again.",
-                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            return;
+        if(paymentMode.getSelectionModel().getSelectedItem().equals("CASH IN BANK")) {
+            if (bankInfo.getSelectionModel().getSelectedItem() == null) {
+                AlertDialogBuilder.messgeDialog("System Message", "Please select bank and try again.",
+                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                return;
+            }
         }
 
-
-
-
-
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws SQLException {
-                try{
-
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        };
-
-        task.setOnRunning(wse -> {
-            print_btn.setDisable(true);
-            JFXButton accept = new JFXButton("Accept");
-            JFXDialog dialog = DialogBuilder.showConfirmDialog("Print OR","Confirm transaction.\n" +
-                            "Payment Mode: " +paymentMode.getSelectionModel().getSelectedItem()+"\n"+
-                            "Date: " +date.getValue()+"\n"+
-                            "OR#: " +orNmber.getText()+"\n" +
-                            "Total: "+total.getText()
-                    , accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
-            dialog.setOnDialogOpened((event) -> { accept.requestFocus(); });
-            accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
-            accept.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent __) {
-                    try {
-                        nonePowerBills();
-                    } catch (SQLException e) {
-                        throw new RuntimeException(e);
-                    } catch (ClassNotFoundException e) {
-                        throw new RuntimeException(e);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                    dialog.close();
-                }
-            });
-
-        });
-
-
-        task.setOnSucceeded(wse -> {
-            print_btn.setDisable(false);
-        });
-
-        task.setOnFailed(wse -> {
-            print_btn.setDisable(false);
-        });
-
-        new Thread(task).start();*/
-
+        OROtherInfo orOtherInfo;
+        if(paymentMode.getSelectionModel().getSelectedItem().equals("CASH IN BANK")) {
+            orOtherInfo = new OROtherInfo(
+                    paymentMode.getSelectionModel().getSelectedItem(),
+                    bankInfo.getSelectionModel().getSelectedItem().getAccountCode(),
+                    tinNo.getText(),
+                    orNumber.getText(),
+                    remarks.getText());
+        }else{
+            orOtherInfo = new OROtherInfo(
+                    paymentMode.getSelectionModel().getSelectedItem(),
+                    tinNo.getText(),
+                    orNumber.getText(),
+                    remarks.getText());
+        }
+        nonePowerBills(orOtherInfo);
     }
+
+    @FXML
 
     private void nonePowerBills(OROtherInfo orOtherInfo) throws Exception {
         String orNumber = orOtherInfo.getOrNumber();
@@ -599,13 +496,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
             int seq = 1;
             ObservableList<ORItemSummary> temp = paymentTable.getItems();
             for (ORItemSummary orItemSummary : temp) {
-                /*if(orItemSummary.getDescription().equals("Energy Bill - Others") ||
-                        orItemSummary.getDescription().equals("Sinking Fund - Katas ng VAT") ||
-                        orItemSummary.getDescription().equals("Meter Deposit-Main") ||
-                        orItemSummary.getDescription().equals("Senior Citizen Discount") ||
-                        orItemSummary.getDescription().equals("EVAT 2307 (5%)"))
-                    continue;*/
-
                 if(orItemSummary.getAmount()>0) {
                     TransactionDetails transactionDetails = new TransactionDetails();
                     transactionDetails.setPeriod(period);
@@ -657,48 +547,9 @@ public class CashierController extends MenuControllerHandler implements Initiali
         }else{
             orContent.setTellerCollection(paymentTable.getItems());
         }
-        //orContent.setBreakdown(paymentTable.getItems());
+
         Utility.setOrContent(orContent);
-        //ModalBuilder.MODAL_CLOSE();//close the CashierConfirmOR dialog, before opening ORLayoutController
         ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
-
-        /*JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing request.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
-
-        Task<String> task = new Task<>() {
-            @Override
-            protected String call() {
-
-                ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
-
-                return Utility.ERROR_MSG;
-            }
-        };
-
-        task.setOnRunning(wse -> {
-            dialog.show();
-        });
-
-        task.setOnSucceeded(wse -> {
-            dialog.close();
-            if(Utility.ERROR_MSG == null){
-                AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
-                        Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
-                resetField();
-            }else{
-                AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: sss"+Utility.ERROR_MSG,
-                        Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-            }
-            System.out.println(Utility.ERROR_MSG);
-
-        });
-
-        task.setOnFailed(wse -> {
-            dialog.close();
-            AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: sss"+Utility.ERROR_MSG,
-                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-        });
-
-        new Thread(task).start();*/
 
     }
 

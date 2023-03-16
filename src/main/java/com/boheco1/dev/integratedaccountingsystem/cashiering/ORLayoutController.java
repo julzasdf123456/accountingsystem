@@ -6,6 +6,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXDialog;
 import com.sun.javafx.print.PrintHelper;
 import com.sun.javafx.print.Units;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -45,16 +46,16 @@ public class ORLayoutController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         parentController = Utility.getParentController();
-
+        try {
+            initField();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing request.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
-                try {
-                    printSaveOR();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                printSaveOR();
                 return null;
             }
         };
@@ -68,7 +69,7 @@ public class ORLayoutController implements Initializable {
             if(Utility.ERROR_MSG == null){
                 AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
                         Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
-                Utility.OR_NUMBER = Integer.parseInt(orContent.getOrNumber());
+                Utility.OR_NUMBER = Integer.parseInt(orContent.getOrNumber())+1;
                 parentController.receive(true);
             }else {
                 AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: "+Utility.ERROR_MSG,
@@ -81,16 +82,17 @@ public class ORLayoutController implements Initializable {
             dialog.close();
             AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: "+Utility.ERROR_MSG,
                     Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+            ModalBuilder.MODAL_CLOSE();
         });
 
         new Thread(task).start();
     }
 
-    private void printSaveOR() throws Exception {
+    private void initField() throws Exception {
         //Anchor pane Size for OR
         //Width 581
         //height 380
-        try {
+        try{
             String pattern = "M/d/yyyy";
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(pattern);
             orContent = Utility.getOrContent();
@@ -101,13 +103,36 @@ public class ORLayoutController implements Initializable {
             //double collectionFromTeller = Double.parseDouble(String.format("%.2f",misc.get(1).getTotal()));
 
 
+
+
             String description = "", amount = "";
             if(orContent.getTellerCollection()!=null){
                 ObservableList<ORItemSummary> items = orContent.getTellerCollection();
+                double energyBillsOthers = 0;
+                for (ORItemSummary a : items) {
+                    if(a.getDescription().equals("Others") || a.getDescription().equals("Other Deduction")){
+                        energyBillsOthers+=a.getAmount();
+                    }
+                }
+
+
                 for (ORItemSummary a : items) {
                     if (a.getAmount() > 0) {
+                        if(a.getDescription().equals("Others") || a.getDescription().equals("Other Deduction"))
+                            continue;
+
+                        if(a.getDescription().equals("Surcharge")){
+                            if(energyBillsOthers>0){
+                                description +="Energy Bills - Others\n";
+                                amount += Utility.formatDecimal(energyBillsOthers)+ "\n";
+                            }
+                        }
+
                         description += a.getDescription() + "\n";
-                        amount += Utility.formatDecimal(a.getAmount()) + "\n";
+                        if(a.getTotalView().contains("("))
+                            amount += "-"+Utility.formatDecimal(a.getAmount()) + "\n";
+                        else
+                            amount += Utility.formatDecimal(a.getAmount()) + "\n";
                     }
                 }
             }else if(orContent.getCustomerCollection() != null) {
@@ -146,7 +171,15 @@ public class ORLayoutController implements Initializable {
             //cashier2.setText(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
             cashier1.setText(orContent.getIssuedBy());
             cashier2.setText(orContent.getIssuedBy());
+        } catch (Exception e) {
+            Utility.ERROR_MSG = "OR Layout Class "+e.getMessage();
+            e.printStackTrace();
+        }
+    }
 
+    private void printSaveOR(){
+        try{
+            ModalBuilder.MODAL_CLOSE();
             TransactionHeaderDetailDAO.save(orContent.getCrmQueue(), orContent.getTransactionHeader(), orContent.getTds());
             if(Utility.ERROR_MSG == null){//error message from TransactionHeaderDAO
                 Node node = printArea;
@@ -167,7 +200,6 @@ public class ORLayoutController implements Initializable {
             Utility.ERROR_MSG = "OR Layout Class "+e.getMessage();
             e.printStackTrace();
         }
-        ModalBuilder.MODAL_CLOSE();
     }
 
 }
