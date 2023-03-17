@@ -29,10 +29,12 @@ public class ItemSummary {
             else
                 this.setTotalView(" ");
         }else{
-            if (this.total != 0)
-                this.setTotalView(Utility.formatDecimal(this.total)+"");
-            else
+            if (this.total == 0)
                 this.setTotalView(" ");
+            else if (this.total > 0)
+                this.setTotalView(Utility.formatDecimal(this.total));
+            else
+                this.setTotalView("("+Utility.formatDecimal(this.total*-1)+")");
         }
     }
 
