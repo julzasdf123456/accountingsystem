@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.helpers;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
 
@@ -27,6 +28,7 @@ public class ModalBuilder {
             Parent parent = FXMLLoader.load(parentClass.getResource(xml));
             JFXDialogLayout dialogLayout = new JFXDialogLayout();
             dialogLayout.setBody(parent);
+            dialogLayout.setPadding(new Insets(-40,-15,-40,-15));// top, left, bottom, right
             dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.BOTTOM);
             dialog.show();
         } catch (Exception e) {

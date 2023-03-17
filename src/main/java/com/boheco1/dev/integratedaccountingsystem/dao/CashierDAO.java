@@ -123,7 +123,7 @@ public class CashierDAO {
             ORItemSummary slAdjItem = new ORItemSummary("56150304000","Systems Loss Adjustment", slAdj);
             ORItemSummary ppdItem = new ORItemSummary("51350210000","Prompt payment discount", ppD);
             ORItemSummary katasvatItem = new ORItemSummary("11310806000","Sinking Fund - Katas ng VAT", katasNgVAT);
-            ORItemSummary otherDeductionsItem = new ORItemSummary("124101010001","Other Deduction", 0);
+            ORItemSummary otherDeductionsItem = new ORItemSummary("124101010001","Other Deduction", otherDeduction);
             ORItemSummary mdRefundItem = new ORItemSummary("21720112002","Meter Deposit-Main", mdRefund);
             ORItemSummary scDiscountItem = new ORItemSummary("12410101000","Senior Citizen Discount", scDiscount);
             ORItemSummary ch2307Item = new ORItemSummary("22420414002","EVAT 2307 (5%)", amount2307);
