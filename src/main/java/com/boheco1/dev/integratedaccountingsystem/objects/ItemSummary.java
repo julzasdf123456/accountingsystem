@@ -25,7 +25,7 @@ public class ItemSummary {
 
         if (negVal.contains(desc)) {
             if (this.total != 0)
-                this.setTotalView("("+Utility.formatDecimal(this.total)+")");
+                this.setTotalView("("+Utility.formatDecimal(Math.abs(this.total))+")");
             else
                 this.setTotalView(" ");
         }else{
