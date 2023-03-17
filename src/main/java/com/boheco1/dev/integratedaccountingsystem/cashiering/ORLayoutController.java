@@ -122,7 +122,7 @@ public class ORLayoutController implements Initializable {
                             continue;
 
                         if(a.getDescription().equals("Surcharge")){
-                            if(energyBillsOthers>0){
+                            if(energyBillsOthers!=0){
                                 description +="Energy Bills - Others\n";
                                 amount += Utility.formatDecimal(energyBillsOthers)+ "\n";
                             }

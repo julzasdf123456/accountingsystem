@@ -22,14 +22,16 @@ public class ORItemSummary {
 
         if (negVal.contains(description)) {
             if (this.amount != 0)
-                this.setTotalView("("+ Utility.formatDecimal(this.amount)+")");
+                this.setTotalView("("+Utility.formatDecimal(Math.abs(this.amount))+")");
             else
                 this.setTotalView(" ");
         }else{
-            if (this.amount != 0)
-                this.setTotalView(Utility.formatDecimal(this.amount)+"");
-            else
+            if (this.amount == 0)
                 this.setTotalView(" ");
+            else if (this.amount > 0)
+                this.setTotalView(Utility.formatDecimal(this.amount));
+            else
+                this.setTotalView("("+Utility.formatDecimal(Math.abs(this.amount))+")");
         }
 
     }

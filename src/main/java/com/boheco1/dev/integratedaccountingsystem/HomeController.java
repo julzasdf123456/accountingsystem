@@ -74,9 +74,9 @@ public class HomeController implements Initializable {
     public JFXButton viewBills;
 
     //CASHIER
-    public JFXButton issue_or, bankRemittance, acknowledgement_receipts;
+    public JFXButton supplier_or, consumer_teller_or, bankRemittance, acknowledgement_receipts;
     // WAREHOUSE
-    public JFXButton warehouseDashboard, fileMirs, generateMct, mrT, stocks, receiving, addMR;
+    public JFXButton warehouseDashboard, fileMirs, generateMct, mrT, stocks, receiving, addMR, supplier;
 
     // ADMINISTRATIVE
     public JFXButton employees, users, signatoriesButton;
@@ -113,6 +113,7 @@ public class HomeController implements Initializable {
         generateMct = new JFXButton("Generate MCT");
         mrT = new JFXButton("Material Return");
         stocks = new JFXButton("Stock Entry");
+
         employees = new JFXButton("Employees");
         users = new JFXButton("Users");
         myAccount = new JFXButton("My Account");
@@ -128,7 +129,9 @@ public class HomeController implements Initializable {
         bankRemittance = new JFXButton("Bank Remittance");
         acknowledgement_receipts = new JFXButton("Ack Receipts");
 
-        issue_or = new JFXButton("Issue O.R");
+        consumer_teller_or = new JFXButton("Consumer/Teller O.R");
+        supplier_or = new JFXButton("Supplier O.R");
+        supplier = new JFXButton("Supplier");
 
         // ADD ALL ITEMS TO NAV SEQUENTIALLY
         if(ActiveUser.getUser().can("manage-finance")) {
@@ -158,7 +161,8 @@ public class HomeController implements Initializable {
 
         if (ActiveUser.getUser().can("manage-cashiering")){
             NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Cashier"), new FontIcon("mdi2c-cash-register"), homeStackPane);
-            NavMenuHelper.addMenu(navMenuBox, issue_or, homeStackPane);
+            NavMenuHelper.addMenu(navMenuBox, consumer_teller_or, homeStackPane);
+            NavMenuHelper.addMenu(navMenuBox, supplier_or, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, bankRemittance, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, acknowledgement_receipts, homeStackPane);
         }
@@ -179,6 +183,10 @@ public class HomeController implements Initializable {
             NavMenuHelper.addMenu(navMenuBox, addMR, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, stocks, homeStackPane);
         }
+        if(ActiveUser.getUser().can("manage-supplier")) {
+            NavMenuHelper.addMenu(navMenuBox, supplier, homeStackPane);
+        }
+
         if (ActiveUser.getUser().can("manage-employees")) {
             NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Administrator"), new FontIcon("mdi2s-security"), homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, employees, homeStackPane);
@@ -215,12 +223,12 @@ public class HomeController implements Initializable {
         }
 
         if (ActiveUser.getUser().can("manage-cashiering")) {
-            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(issue_or, new FontIcon("mdi2f-file"), drawerMenus, issue_or.getText(), contentPane, "cashiering/cashier_layout.fxml", null, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(consumer_teller_or, new FontIcon("mdi2f-file"), drawerMenus, consumer_teller_or.getText(), contentPane, "cashiering/cashier_layout.fxml", null, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(bankRemittance, new FontIcon("mdi2c-chart-bar"), drawerMenus, bankRemittance.getText(), contentPane, "cashiering/bank_remittances.fxml", null, null, title);
         }
 
         if (ActiveUser.getUser().can("manage-cashiering")) {
-            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(issue_or, new FontIcon("mdi2f-file"), drawerMenus, issue_or.getText(), contentPane, "cashiering/cashier_layout.fxml", null, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(supplier_or, new FontIcon("mdi2f-file"), drawerMenus, supplier_or.getText(), contentPane, "cashiering/supplier_or_layout.fxml", null, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(acknowledgement_receipts, new FontIcon("mdi2f-file"), drawerMenus, "Acknowledgement Receipts", contentPane, "cashiering/acknowledgement_receipts.fxml", null, null, title);
         }
 
@@ -239,6 +247,9 @@ public class HomeController implements Initializable {
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(addMR, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "MR Entry", contentPane, "warehouse_mr_entry.fxml", subToolbar, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(stocks, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Stock Entry", contentPane, "warehouse_stock_entry.fxml", subToolbar, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(receiving, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Receiving Entry", contentPane, "warehouse_receiving_entry.fxml", subToolbar, null, title);
+        }
+        if (ActiveUser.getUser().can("manage-supplier")) {
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(supplier, new FontIcon("mdi2f-file-document-edit"), drawerMenus, "Supplier", contentPane, "supplier/supplier_layout.fxml", null, null, title);
         }
         // USERS
         if (ActiveUser.getUser().can("manage-employees")) {
