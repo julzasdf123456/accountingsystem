@@ -17,6 +17,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.layout.StackPane;
 
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 
 public class AddBankRemittance extends MenuControllerHandler implements Initializable {
@@ -40,6 +41,11 @@ public class AddBankRemittance extends MenuControllerHandler implements Initiali
             bankAccountsList.add(0,null);
 
             bankAccount.setItems(bankAccountsList);
+
+            LocalDate date = LocalDate.now();
+
+            orDateFrom.setValue(date);
+
         }catch(Exception ex) {
             ex.printStackTrace();
         }
@@ -74,11 +80,16 @@ public class AddBankRemittance extends MenuControllerHandler implements Initiali
     public void onSelectBankAccount() {
         if(bankAccount.getSelectionModel().getSelectedIndex()==0) return;
         accountNumber.setText(bankAccount.getSelectionModel().getSelectedItem().getBankAccountNumber());
-        checkNumber.requestFocus();
+//        checkNumber.requestFocus();
+        amount.requestFocus();
+    }
+
+    public void onCheckNumberEntry() {
+        amount.requestFocus();
     }
 
     public void onClear() {
-        orDateFrom.setValue(null);
+//        orDateFrom.setValue(null);
         bankAccount.getSelectionModel().clearSelection();
         accountNumber.setText(null);
         checkNumber.setText(null);

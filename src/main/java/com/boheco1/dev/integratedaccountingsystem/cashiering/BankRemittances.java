@@ -75,6 +75,9 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
         TableColumn checkNumberColumn = new TableColumn<BankRemittance, String>("Check Number");
         checkNumberColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, String>("checkNumber"));
 
+        TableColumn depositedDateColumn = new TableColumn<BankRemittance, String>("Deposited Date");
+        depositedDateColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, String>("depositedDateStr"));
+
         TableColumn amountColumn = new TableColumn<BankRemittance, String>("Amount");
         amountColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, Double>("formattedAmount"));
         amountColumn.setStyle( "-fx-alignment: CENTER-RIGHT;");
@@ -119,6 +122,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
         remittanceTable.getColumns().add(accountNoColumn);
         remittanceTable.getColumns().add(accountCodeColumn);
         remittanceTable.getColumns().add(checkNumberColumn);
+        remittanceTable.getColumns().add(depositedDateColumn);
         remittanceTable.getColumns().add(amountColumn);
         remittanceTable.getColumns().add(actionCol);
 
@@ -358,6 +362,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
             td.setDepositedDate(br.getDepositedDate());
 
             TransactionDetailsDAO.add(td);
+            br.setTransactionDetails(td);
             TransactionDetailsDAO.syncDebit(td.getPeriod(), td.getTransactionNumber(),transactionHeader.getTransactionCode());
             tableList.add((BankRemittance) o);
             computeTotals();
