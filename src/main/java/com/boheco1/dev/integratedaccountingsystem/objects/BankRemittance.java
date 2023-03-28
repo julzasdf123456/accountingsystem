@@ -4,6 +4,7 @@ package com.boheco1.dev.integratedaccountingsystem.objects;
 import com.jfoenix.controls.JFXButton;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class BankRemittance {
     private LocalDate period;
@@ -52,6 +53,11 @@ public class BankRemittance {
 
     public void setDepositedDate(LocalDate depositedDate) {
         this.depositedDate = depositedDate;
+    }
+
+    public String getDepositedDateStr() {
+        if(this.depositedDate == null) return "";
+        return this.depositedDate.format(DateTimeFormatter.ofPattern("MMM-dd-yyy"));
     }
 
     public LocalDate getPeriod() {
