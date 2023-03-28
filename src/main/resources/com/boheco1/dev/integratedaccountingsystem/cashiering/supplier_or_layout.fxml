@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextArea?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="564.0" prefWidth="822.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.SupplierORController">
+   <children>
+      <VBox alignment="TOP_CENTER" layoutX="15.0" layoutY="15.0" prefHeight="393.0" prefWidth="215.0" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="15.0">
+         <children>
+            <DatePicker fx:id="date" prefHeight="34.0" prefWidth="171.0">
+               <VBox.margin>
+                  <Insets top="16.0" />
+               </VBox.margin>
+            </DatePicker>
+            <JFXTextField fx:id="searchSupplier" prefHeight="25.0" prefWidth="215.0" promptText="Search">
+               <VBox.margin>
+                  <Insets bottom="5.0" top="16.0" />
+               </VBox.margin>
+            </JFXTextField>
+            <JFXTextArea fx:id="supplierInfo" editable="false" prefHeight="175.0" prefWidth="215.0" promptText="Address/TIN">
+               <VBox.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </VBox.margin>
+            </JFXTextArea>
+            <JFXTextField fx:id="orNumber" alignment="CENTER" prefHeight="25.0" prefWidth="215.0" promptText="OR Number" style="-fx-font-size: 25; -fx-font-weight: bold;">
+               <VBox.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </VBox.margin>
+            </JFXTextField>
+            <JFXButton onAction="#printOR" prefHeight="29.0" prefWidth="89.0" styleClass="btn-info" text="Print">
+               <VBox.margin>
+                  <Insets top="16.0" />
+               </VBox.margin>
+            </JFXButton>
+         </children>
+      </VBox>
+      <TableView fx:id="itemTable" layoutX="233.0" layoutY="115.0" prefHeight="434.0" prefWidth="566.0" stylesheets="@../style.css" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="241.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="115.0" />
+      <VBox layoutX="241.0" layoutY="23.0" prefHeight="74.0" prefWidth="485.0" AnchorPane.leftAnchor="241.0" AnchorPane.topAnchor="15.0">
+         <children>
+            <Label style="-fx-font-size: 14; -fx-font-weight: bold;" text="OR Content" />
+            <Separator prefWidth="200.0" />
+            <HBox prefHeight="44.0" prefWidth="485.0">
+               <children>
+                  <JFXTextField fx:id="particular" labelFloat="true" maxWidth="-Infinity" onAction="#getParticular" prefHeight="25.0" prefWidth="379.0" promptText="Particular">
+                     <HBox.margin>
+                        <Insets right="3.0" top="6.0" />
+                     </HBox.margin>
+                  </JFXTextField>
+                  <JFXTextField fx:id="amount" labelFloat="true" maxWidth="-Infinity" onAction="#getAmount" prefHeight="25.0" prefWidth="126.0" promptText="Amount">
+                     <HBox.margin>
+                        <Insets left="3.0" top="6.0" />
+                     </HBox.margin>
+                  </JFXTextField>
+               </children>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+      <Label fx:id="totalDisplay" layoutX="286.0" layoutY="89.0" style="-fx-font-size: 16;" text="0" AnchorPane.leftAnchor="286.0" AnchorPane.topAnchor="89.0" />
+      <Label layoutX="246.0" layoutY="89.0" style="-fx-font-size: 16;" text="Total:" AnchorPane.leftAnchor="246.0" AnchorPane.topAnchor="89.0" />
+   </children>
+</AnchorPane>

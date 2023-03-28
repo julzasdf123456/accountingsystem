@@ -38,7 +38,7 @@ public class ORLayoutController implements Initializable {
     private Node node;
 
     @FXML
-    private Label cusName1, cusName2, address1, address2, cashier1, cashier2, date1, date2, inWord1, inWord2, orNum1, orNum2, ref1, ref2, desc1, desc2, amount1, amount2, totalAmount1, totalAmount2, totalAmount3, totalAmount4;
+    private Label cusName1, cusName2, cashier1, cashier2, date1, date2, description1, description2, orNum1, orNum2, ref1, ref2, desc1, desc2, amount1, amount2, totalAmount1, totalAmount2, totalAmount3, totalAmount4;
 
     private ORContent orContent = null;
 
@@ -143,19 +143,25 @@ public class ORLayoutController implements Initializable {
                         amount += Utility.formatDecimal(a.getTotal()) + "\n";
                     }
                 }
+            }else if(orContent.getSupplierItems() != null){
+                ObservableList<ORItemSummary> items = orContent.getSupplierItems();
+                for (ORItemSummary a : items) {
+                    description += a.getDescription() + "\n";
+                    amount += a.getTotalView() + "\n";
+                }
             }
             date1.setText(orContent.getDate().format(dateFormatter));
             date2.setText(orContent.getDate().format(dateFormatter));
             cusName1.setText(orContent.getIssuedTo());
             cusName2.setText(orContent.getIssuedTo());
-            address1.setText(orContent.getAddress());
-            address2.setText(orContent.getAddress());
+            description1.setText(orContent.getAddress());
+            description2.setText(orContent.getAddress());
             orNum1.setText(orContent.getOrNumber());
             orNum2.setText(orContent.getOrNumber());
-            inWord1.setText(Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£",""));
-            inWord2.setText(Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£",""));
-            totalAmount1.setText(Utility.formatDecimal(orContent.getTotal()));
-            totalAmount2.setText(Utility.formatDecimal(orContent.getTotal()));
+            description1.setText(description1.getText()+"\n"+Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£",""));
+            description2.setText(description2.getText()+"\n"+Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£",""));
+            totalAmount1.setText(amount);
+            totalAmount2.setText(amount);
             totalAmount3.setText(Utility.formatDecimal(orContent.getTotal()));
             totalAmount4.setText(Utility.formatDecimal(orContent.getTotal()));
             ref1.setText("");
@@ -179,7 +185,7 @@ public class ORLayoutController implements Initializable {
 
     private void printSaveOR(){
         try{
-            ModalBuilder.MODAL_CLOSE();
+
             TransactionHeaderDetailDAO.save(orContent.getCrmQueue(), orContent.getTransactionHeader(), orContent.getTds());
             if(Utility.ERROR_MSG == null){//error message from TransactionHeaderDAO
                 Node node = printArea;

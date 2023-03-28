@@ -12,6 +12,13 @@ public class ORItemSummary {
 
     private String totalView;
 
+    public ORItemSummary() {    }
+    public ORItemSummary(String description) {
+        this.description=description;
+        totalView = "";
+    }
+
+
     public ORItemSummary(String accountCode, String description, double amount) {
         this.accountCode = accountCode;
         this.description = description;

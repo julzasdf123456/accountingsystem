@@ -15,11 +15,18 @@ public class ORContent {
     private String issuedBy;
     private double total;
     private ObservableList<ORItemSummary> tellerCollection;
+
+    private ObservableList<ORItemSummary> supplierItems;
     private ObservableList<CRMDetails> customerCollection;
 
     private CRMQueue crmQueue;
     private TransactionHeader transactionHeader;
     private List<TransactionDetails> tds;
+
+    public ORContent(TransactionHeader transactionHeader, List<TransactionDetails> tds) {
+        this.transactionHeader = transactionHeader;
+        this.tds = tds;
+    }
 
     public ORContent(CRMQueue crmQueue, TransactionHeader transactionHeader, List<TransactionDetails> tds) {
         this.crmQueue = crmQueue;
@@ -100,6 +107,14 @@ public class ORContent {
 
     public void setCustomerCollection(ObservableList<CRMDetails> customerCollection) {
         this.customerCollection = customerCollection;
+    }
+
+    public ObservableList<ORItemSummary> getSupplierItems() {
+        return supplierItems;
+    }
+
+    public void setSupplierItems(ObservableList<ORItemSummary> supplierItems) {
+        this.supplierItems = supplierItems;
     }
 
     public void setBreakdown(ObservableList observableList){

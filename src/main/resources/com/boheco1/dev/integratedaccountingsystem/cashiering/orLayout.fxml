@@ -8,18 +8,16 @@
    <children>
       <Pane fx:id="printArea" layoutX="40.0" layoutY="62.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="380.0" prefWidth="581.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label fx:id="cusName1" layoutX="14.0" layoutY="89.0" style="-fx-font-size: 10;" text="Juan Dela Cruz" />
+            <Label fx:id="cusName1" layoutX="14.0" layoutY="82.0" style="-fx-font-size: 9;" text="Juan Dela Cruz" />
             <Label fx:id="cashier1" alignment="CENTER" layoutX="187.0" layoutY="353.0" prefHeight="15.0" prefWidth="98.0" style="-fx-font-size: 10;" text="BBBBBBBBBBBBBBB" />
             <Label fx:id="date1" layoutX="26.0" layoutY="59.0" style="-fx-font-size: 10;" text="01/01/2023" />
             <Label fx:id="date2" layoutX="324.0" layoutY="59.0" style="-fx-font-size: 10;" text="01/01/2023" />
-            <Label fx:id="totalAmount1" alignment="CENTER_RIGHT" layoutX="174.0" layoutY="98.0" prefHeight="15.0" prefWidth="82.0" style="-fx-font-size: 10;" text="999,999,999,999" />
-            <Label fx:id="inWord1" alignment="TOP_LEFT" layoutX="13.0" layoutY="116.0" prefHeight="33.0" prefWidth="261.0" style="-fx-font-size: 9;" text="The quick brown fox jumps over the lazy dog." wrapText="true" />
-            <Label fx:id="cusName2" layoutX="310.0" layoutY="89.0" style="-fx-font-size: 10;" text="Juan Dela Cruz" />
-            <Label fx:id="totalAmount2" alignment="CENTER_RIGHT" layoutX="473.0" layoutY="98.0" prefHeight="15.0" prefWidth="82.0" style="-fx-font-size: 10;" text="999,999,999,999" />
-            <Label fx:id="inWord2" alignment="TOP_LEFT" layoutX="310.0" layoutY="116.0" prefHeight="33.0" prefWidth="261.0" style="-fx-font-size: 9;" text="The quick brown fox jumps over the lazy dog." wrapText="true" />
+            <Label fx:id="totalAmount1" alignment="CENTER_RIGHT" layoutX="176.0" layoutY="133.0" prefHeight="15.0" prefWidth="82.0" style="-fx-font-size: 10;" text="999,999,999,999" />
+            <Label fx:id="cusName2" layoutX="310.0" layoutY="82.0" style="-fx-font-size: 9;" text="Juan Dela Cruz" />
+            <Label fx:id="totalAmount2" alignment="CENTER_RIGHT" layoutX="476.0" layoutY="133.0" prefHeight="15.0" prefWidth="82.0" style="-fx-font-size: 10;" text="999,999,999,999" />
             <Label fx:id="cashier2" alignment="CENTER" layoutX="473.0" layoutY="353.0" prefHeight="15.0" prefWidth="98.0" style="-fx-font-size: 10;" text="BBBBBBBBBBBBBBB" />
-            <Label fx:id="orNum1" alignment="CENTER" layoutX="215.0" layoutY="67.0" prefHeight="15.0" prefWidth="51.0" style="-fx-font-size: 10;" text="0000000" />
-            <Label fx:id="orNum2" alignment="CENTER" layoutX="517.0" layoutY="67.0" prefHeight="15.0" prefWidth="51.0" style="-fx-font-size: 10;" text="0000000" />
+            <Label fx:id="orNum1" alignment="CENTER" layoutX="211.0" layoutY="59.0" prefHeight="15.0" prefWidth="51.0" style="-fx-font-size: 10;" text="0000000" />
+            <Label fx:id="orNum2" alignment="CENTER" layoutX="517.0" layoutY="59.0" prefHeight="15.0" prefWidth="51.0" style="-fx-font-size: 10;" text="0000000" />
             <Label fx:id="ref1" alignment="TOP_LEFT" layoutX="4.0" layoutY="177.0" prefHeight="167.0" prefWidth="58.0" style="-fx-font-size: 7;" text="Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference Reference" wrapText="true" />
             <Label fx:id="desc1" alignment="TOP_LEFT" layoutX="69.0" layoutY="177.0" prefHeight="167.0" prefWidth="135.0" style="-fx-font-size: 9;" text="System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment System Loss Adjustment " wrapText="true" />
             <Label fx:id="amount1" alignment="TOP_LEFT" layoutX="217.0" layoutY="177.0" prefHeight="167.0" prefWidth="65.0" style="-fx-font-size: 9;" text="99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 " textAlignment="RIGHT" wrapText="true" />
@@ -28,8 +26,8 @@
             <Label fx:id="amount2" alignment="TOP_LEFT" layoutX="517.0" layoutY="177.0" prefHeight="167.0" prefWidth="65.0" style="-fx-font-size: 9;" text="99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 99,999,999.00 " textAlignment="RIGHT" wrapText="true" />
             <Label fx:id="totalAmount3" alignment="CENTER" layoutX="187.0" layoutY="337.0" prefHeight="15.0" prefWidth="98.0" style="-fx-font-size: 10;" text="99999999999" />
             <Label fx:id="totalAmount4" alignment="CENTER" layoutX="473.0" layoutY="337.0" prefHeight="15.0" prefWidth="98.0" style="-fx-font-size: 10;" text="99999999999" />
-            <Label fx:id="address1" layoutX="14.0" layoutY="102.0" style="-fx-font-size: 10;" text="Address" />
-            <Label fx:id="address2" layoutX="310.0" layoutY="102.0" style="-fx-font-size: 10;" text="Address" />
+            <Label fx:id="description1" alignment="TOP_LEFT" layoutX="14.0" layoutY="95.0" prefHeight="53.0" prefWidth="254.0" style="-fx-font-size: 8;" text="Address" />
+            <Label fx:id="description2" alignment="TOP_LEFT" layoutX="310.0" layoutY="95.0" prefHeight="53.0" prefWidth="254.0" style="-fx-font-size: 8;" text="Address" />
          </children>
       </Pane>
    </children>
