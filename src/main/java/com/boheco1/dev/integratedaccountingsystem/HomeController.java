@@ -230,8 +230,8 @@ public class HomeController implements Initializable {
         }
 
         if (ActiveUser.getUser().can("manage-cashiering")) {
-            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(supplier_or, new FontIcon("mdi2f-file"), drawerMenus, supplier_or.getText(), contentPane, "cashiering/supplier_or_layout.fxml", null, null, title);
-            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(bulk_or, new FontIcon("mdi2f-file"), drawerMenus, bulk_or.getText(), contentPane, "cashiering/bulk_or_layout.fxml", null, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(supplier_or, new FontIcon("mdi2t-truck-outline"), drawerMenus, supplier_or.getText(), contentPane, "cashiering/supplier_or_layout.fxml", null, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(bulk_or, new FontIcon("mdi2f-file-upload-outline"), drawerMenus, bulk_or.getText(), contentPane, "cashiering/or_bulk_layout.fxml", null, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(acknowledgement_receipts, new FontIcon("mdi2f-file"), drawerMenus, "Acknowledgement Receipts", contentPane, "cashiering/acknowledgement_receipts.fxml", null, null, title);
         }
 

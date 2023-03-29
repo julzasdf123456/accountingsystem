@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+
+
+<AnchorPane prefHeight="434.0" prefWidth="1009.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.BulkOrController">
+   <children>
+      <StackPane fx:id="stackPane" prefHeight="19.0" prefWidth="24.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <HBox alignment="CENTER_LEFT" layoutX="27.0" layoutY="26.0" prefHeight="29.0" prefWidth="594.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="16.0">
+         <children>
+            <JFXTextField fx:id="uploadedFile" prefHeight="29.0" prefWidth="222.0" promptText="Excel File">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </JFXTextField>
+            <JFXButton onAction="#browseFile" styleClass="btn-info" text="Browse">
+               <HBox.margin>
+                  <Insets left="5.0" right="15.0" />
+               </HBox.margin>
+            </JFXButton>
+            <JFXComboBox fx:id="workSheet" focusColor="#00675b" prefHeight="29.0" prefWidth="139.0" promptText="Work Sheet">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </JFXComboBox>
+            <JFXButton buttonType="RAISED" onAction="#displayTable" prefHeight="29.0" styleClass="btn-info" text="Display">
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin>
+            </JFXButton>
+            <Label fx:id="rowCount" text="Row: ">
+               <HBox.margin>
+                  <Insets left="16.0" right="16.0" />
+               </HBox.margin>
+            </Label>
+            <Label fx:id="totalAmount" layoutX="516.0" layoutY="15.0" text="Total:" />
+            <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+               <children>
+                  <JFXButton buttonType="RAISED" onAction="#printOR" prefHeight="29.0" prefWidth="56.0" styleClass="btn-info" text="Print" />
+               </children>
+            </HBox>
+         </children>
+      </HBox>
+      <TableView fx:id="tableView" layoutX="16.0" layoutY="61.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="61.0" />
+   </children>
+</AnchorPane>

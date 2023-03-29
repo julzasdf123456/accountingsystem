@@ -56,9 +56,12 @@ public class Utility {
 
     public static String NOTIF_READ = "READ";
     public static String NOTIF_UNREAD = "UNREAD";
+
+    public static String FILE_PATH = "";
     private static AnchorPane contentPane;
     private static MIRS activeMIRS;
     private static HashMap<String, ItemizedMirsItem> itemizedMirsItems = new HashMap<>();
+
 
     private static StackPane stackPane;
 
