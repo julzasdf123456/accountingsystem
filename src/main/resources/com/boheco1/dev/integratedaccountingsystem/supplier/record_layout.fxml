@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXRadioButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="416.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.supplier.AddSupplierController">
+   <children>
+      <StackPane fx:id="stackPane" style="-fx-background-color: #FFFFFF;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label text="Company Name" />
+                  <JFXTextField fx:id="company_tf" style="-fx-background-color: #f5f5f5;">
+                     <VBox.margin>
+                        <Insets bottom="8.0" />
+                     </VBox.margin>
+                  </JFXTextField>
+                  <Label text="Company Address" />
+                  <TextArea fx:id="address_tf" prefHeight="80.0" prefWidth="600.0">
+                     <VBox.margin>
+                        <Insets bottom="8.0" />
+                     </VBox.margin>
+                  </TextArea>
+                  <HBox prefHeight="11.0" prefWidth="650.0">
+                     <children>
+                        <Label maxWidth="200.0" minWidth="200.0" prefWidth="200.0" text="Nature of Company" />
+                        <Label maxWidth="200.0" minWidth="200.0" prefWidth="200.0" text="Tax Type" />
+                        <Label maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="TIN" />
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="27.0" prefWidth="200.0">
+                     <children>
+                        <JFXComboBox fx:id="nature_cb" prefWidth="184.0" style="-fx-background-color: #f5f5f5;">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </JFXComboBox>
+                        <HBox maxWidth="184.0" minWidth="184.0" prefWidth="184.0">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                           <children>
+                              <JFXRadioButton fx:id="vat_rb" maxWidth="72.0" minWidth="72.0" prefWidth="72.0" text="VAT">
+                                 <HBox.margin>
+                                    <Insets top="5.0" />
+                                 </HBox.margin>
+                              </JFXRadioButton>
+                              <JFXRadioButton fx:id="non_rb" prefHeight="17.0" prefWidth="120.0" text="NON-VAT">
+                                 <HBox.margin>
+                                    <Insets top="5.0" />
+                                 </HBox.margin>
+                              </JFXRadioButton>
+                           </children>
+                        </HBox>
+                        <JFXTextField fx:id="tin_tf" prefWidth="200.0" style="-fx-background-color: #f5f5f5;">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </JFXTextField>
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="8.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox>
+                     <children>
+                        <Label prefWidth="384.0" text="Contact Person">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </Label>
+                        <Label prefWidth="92.0" text="Fax">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </Label>
+                        <Label prefWidth="92.0" text="Zipcode" />
+                     </children>
+                  </HBox>
+                  <HBox>
+                     <children>
+                        <JFXTextField fx:id="contact_tf" maxWidth="384.0" minWidth="384.0" prefWidth="384.0" style="-fx-background-color: #f5f5f5;">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </JFXTextField>
+                        <JFXTextField fx:id="fax_tf" maxWidth="92.0" minWidth="92.0" prefWidth="92.0" style="-fx-background-color: #f5f5f5;">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </JFXTextField>
+                        <JFXTextField fx:id="zip_tf" maxWidth="92.0" minWidth="92.0" prefWidth="92.0" style="-fx-background-color: #f5f5f5;" />
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="8.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox>
+                     <children>
+                        <Label prefWidth="200.0" text="Email Address" />
+                        <Label prefWidth="200.0" text="Phone Number" />
+                        <Label prefWidth="200.0" text="Mobile Number" />
+                     </children>
+                  </HBox>
+                  <HBox>
+                     <children>
+                        <JFXTextField fx:id="email_tf" prefWidth="184.0" style="-fx-background-color: #f5f5f5;">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </JFXTextField>
+                        <JFXTextField fx:id="phone_tf" prefWidth="184.0" style="-fx-background-color: #f5f5f5;">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </JFXTextField>
+                        <JFXTextField fx:id="mobile_tf" prefWidth="200.0" style="-fx-background-color: #f5f5f5;" />
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="8.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <Label text="Notes" />
+                  <HBox>
+                     <children>
+                        <TextArea fx:id="notes_tf" prefHeight="50.0" prefWidth="600.0" />
+                     </children>
+                     <padding>
+                        <Insets bottom="8.0" />
+                     </padding>
+                  </HBox>
+                  <HBox fillHeight="false" prefHeight="26.0" prefWidth="600.0">
+                     <children>
+                        <HBox prefHeight="93.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                        <JFXButton fx:id="reset_btn" prefWidth="75.0" stylesheets="@../style.css" text="Reset">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </JFXButton>
+                        <JFXButton fx:id="save_btn" buttonType="RAISED" prefWidth="75.0" styleClass="btn-theme" stylesheets="@../style.css" text="Save" textFill="WHITE" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </StackPane>
+   </children>
+</AnchorPane>

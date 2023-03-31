@@ -2,6 +2,8 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
+import com.boheco1.dev.integratedaccountingsystem.objects.Stock;
 import com.boheco1.dev.integratedaccountingsystem.objects.SupplierInfo;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -143,5 +145,67 @@ public class SupplierDAO {
         ps.close();
 
         return supplierInfos;
+    }
+    /**
+     * Search supplier record based on key and status
+     * @param key the supplier key (name or address)
+     * @param status the supplier status
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static List<SupplierInfo> search(String key, String status) throws Exception {
+
+        if (status.equals("Active"))
+            status = "";
+
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM SupplierInfo si " +
+                        "WHERE si.CompanyName LIKE ? AND si.Status = ? " +
+                        "ORDER BY CompanyName OFFSET 0 ROWS " +
+                        "FETCH NEXT 10 ROWS ONLY");
+
+        ps.setString(1, "%" + key + "%");
+        ps.setString(2, status);
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<SupplierInfo> supplierInfos = new ArrayList<>();
+
+        while(rs.next()) {
+            supplierInfos.add(new SupplierInfo(
+                    rs.getString("SupplierID"),
+                    rs.getString("AccountID"),
+                    rs.getString("CompanyName"),
+                    rs.getString("CompanyAddress"),
+                    rs.getString("TINNo"),
+                    rs.getString("ContactPerson"),
+                    rs.getString("ZipCode"),
+                    rs.getString("PhoneNo"),
+                    rs.getString("MobileNo"),
+                    rs.getString("EmailAddress"),
+                    rs.getString("FaxNo"),
+                    rs.getString("TaxType"),
+                    rs.getString("SupplierNature"),
+                    rs.getString("Notes"),
+                    rs.getString("Status")
+            ));
+        }
+        rs.close();
+        ps.close();
+
+        return supplierInfos;
+    }
+
+    /**
+     * Tags a supplier as trashed
+     * @param supplier the supplier to be trashed
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void trash(SupplierInfo supplier) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE SupplierInfo SET Status=? WHERE SupplierId=?");
+        ps.setString(1, "Trashed");
+        ps.setString(2, supplier.getSupplierID());
+        ps.executeUpdate();
+        ps.close();
     }
 }
