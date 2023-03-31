@@ -1,14 +1,21 @@
 package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
-import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
-import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
-import com.boheco1.dev.integratedaccountingsystem.objects.IEOP;
-import com.boheco1.dev.integratedaccountingsystem.objects.NIHE;
-import com.boheco1.dev.integratedaccountingsystem.objects.ORItemSummary;
+import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.MirsDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDetailDAO;
+import com.boheco1.dev.integratedaccountingsystem.helpers.*;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Rectangle;
 import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXTextField;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -30,6 +37,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -52,10 +63,12 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
     private HSSFSheet sheet;
     private ObservableList<IEOP> ieopObservableList;
     private ObservableList<NIHE> niheObservableList;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         niheObservableList =  FXCollections.observableArrayList();
         ieopObservableList =  FXCollections.observableArrayList();
+        samplePrintOR();
     }
 
     private void resetController(){
@@ -79,27 +92,49 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
         );
 
         selectedFile = fileChooser.showOpenDialog(stage);
-
         if (selectedFile != null) {
-            try {
-                resetController();
-                this.uploadedFile.setText(selectedFile.getName());
-                Utility.FILE_PATH = selectedFile.getParent();
+            JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing request.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+            Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() {
+                    try {
+                        resetController();
+                        uploadedFile.setText(selectedFile.getName());
+                        Utility.FILE_PATH = selectedFile.getParent();
 
-                FileInputStream excelFile = new FileInputStream(new File(selectedFile.getAbsolutePath()));
-                wb = new HSSFWorkbook(excelFile);
-                for(int i=0;i<wb.getNumberOfSheets();i++){
-                    workSheet.getItems().add(wb.getSheetName(i));
+                        FileInputStream excelFile = new FileInputStream(new File(selectedFile.getAbsolutePath()));
+                        wb = new HSSFWorkbook(excelFile);
+                        for(int i=0;i<wb.getNumberOfSheets();i++){
+                            workSheet.getItems().add(wb.getSheetName(i));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        AlertDialogBuilder.messgeDialog("System Error", "Error encounter while loading excel file: "+e.getMessage(),
+                                Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                    }
+                    return null;
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            };
+            task.setOnRunning(wse -> {
+                dialog.show();
+            });
+            task.setOnSucceeded(wse -> {
+                dialog.close();
+            });
+            task.setOnFailed(wse -> {
+                dialog.close();
+            });
+            new Thread(task).start();
         }
     }
 
     @FXML
-    private void printOR(ActionEvent event) {
+    private void printOR(ActionEvent event) throws Exception {
+        if(uploadedFile.getText().toLowerCase().contains("iemop")) {
+            saveTransactionInfoForIEOP();
+        }else if(uploadedFile.getText().toLowerCase().contains("nihe")){
 
+        }
     }
 
     @FXML
@@ -192,7 +227,6 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
         column5.setStyle("-fx-alignment: center-right;");
         column5.setCellValueFactory(new PropertyValueFactory<>("amountView"));
 
-
         tableView.getColumns().clear();
         tableView.getColumns().add(column1);
         tableView.getColumns().add(column2);
@@ -221,5 +255,122 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
         }
         totalAmount.setText("Total: "+Utility.formatDecimal(total));
         tableView.setItems(niheObservableList);
+    }
+
+    private void saveTransactionInfoForIEOP() throws Exception {
+
+        List<BatchTransactionInfo> batchTransactionInfo = new ArrayList<>();
+        for(IEOP ieop : ieopObservableList){
+            int month = ieop.getOrDate().getMonthValue();
+            int year = ieop.getOrDate().getYear();
+            LocalDate period = LocalDate.of(year, month, 1);
+
+            TransactionHeader transactionHeader= new TransactionHeader();
+            transactionHeader.setPeriod(period);
+            transactionHeader.setTransactionNumber(ieop.getOrNumber());
+            transactionHeader.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
+            transactionHeader.setOffice(Utility.OFFICE_PREFIX);
+            transactionHeader.setSource("iemop");
+            transactionHeader.setParticulars(ieop.getConsumerName());
+            transactionHeader.setEnteredBy(ActiveUser.getUser().getUserName());
+            transactionHeader.setAccountID(ActiveUser.getUser().getId());
+            transactionHeader.setAmount(ieop.getNetCash());
+            transactionHeader.setTransactionDate(Utility.serverDate());
+            transactionHeader.setDateEntered(LocalDateTime.now());
+
+            TransactionDetails transactionDetailsSales = new TransactionDetails();
+            transactionDetailsSales.setPeriod(period);
+            transactionDetailsSales.setTransactionNumber(ieop.getOrNumber());
+            transactionDetailsSales.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
+            transactionDetailsSales.setTransactionDate(Utility.serverDate());
+            transactionDetailsSales.setOrDate(ieop.getOrDate());
+            transactionDetailsSales.setParticulars("sales");
+            transactionDetailsSales.setSequenceNumber(1);
+            if(ieop.getSales() > 0)
+                transactionDetailsSales.setCredit(ieop.getSales());
+            else
+                transactionDetailsSales.setDebit(ieop.getSales());
+
+            TransactionDetails transactionDetailsWTAX = new TransactionDetails();
+            transactionDetailsWTAX.setPeriod(period);
+            transactionDetailsWTAX.setTransactionNumber(ieop.getOrNumber());
+            transactionDetailsWTAX.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
+            transactionDetailsWTAX.setTransactionDate(Utility.serverDate());
+            transactionDetailsWTAX.setOrDate(ieop.getOrDate());
+            transactionDetailsWTAX.setParticulars("wtax");
+            transactionDetailsWTAX.setSequenceNumber(2);
+            if(ieop.getWtax() > 0)
+                transactionDetailsWTAX.setCredit(ieop.getWtax());
+            else
+                transactionDetailsWTAX.setDebit(ieop.getWtax());
+
+            BatchTransactionInfo batch = new BatchTransactionInfo();
+            batch.setTransactionHeader(transactionHeader);
+            batch.add(transactionDetailsSales);
+            batch.add(transactionDetailsWTAX);
+
+            batchTransactionInfo.add(batch);
+        }
+
+        JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing request.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws SQLException, ClassNotFoundException {
+                TransactionHeaderDetailDAO.save(batchTransactionInfo);
+                return null;
+            }
+        };
+
+        task.setOnRunning(wse -> {
+            dialog.show();
+        });
+
+        task.setOnSucceeded(wse -> {
+            dialog.close();
+            if(Utility.ERROR_MSG == null){
+                AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
+                        Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+            }else {
+                AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: "+Utility.ERROR_MSG,
+                        Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+            }
+        });
+
+        task.setOnFailed(wse -> {
+            dialog.close();
+            AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: "+Utility.ERROR_MSG,
+                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+        });
+
+        new Thread(task).start();
+
+    }
+
+    private void samplePrintOR(){
+        Platform.runLater(() -> {
+            try {
+                Stage stage = (Stage) Utility.getContentPane().getScene().getWindow();
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.getExtensionFilters().addAll(
+                        new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
+                );
+                fileChooser.setInitialFileName(uploadedFile.getText()+"_OR_.pdf");
+                File selectedFile = fileChooser.showSaveDialog(stage);
+                if (selectedFile != null) {
+                    float[] columns = {2.3f,1f,.5f,2.2f,1f};
+                    PrintPDF pdf = new PrintPDF(selectedFile, columns);
+
+                    for(int x=1;x<500;x++)
+                        pdf.createCell(" ", 2, 9, Font.NORMAL, Element.ALIGN_CENTER);
+
+                    pdf.generateForOR();
+                }
+
+
+            }catch (Exception e){
+                e.printStackTrace();
+                AlertDialogBuilder.messgeDialog("System Error", "An error occurred while generating the pdf due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            }
+        });
     }
 }

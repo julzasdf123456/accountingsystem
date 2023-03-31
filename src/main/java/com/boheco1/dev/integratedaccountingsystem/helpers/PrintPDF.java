@@ -41,6 +41,25 @@ public class PrintPDF {
         this.footerText = footerText;
     }
 
+    public void generateForOR() throws Exception{
+        document = new Document(new Rectangle(612f, 396f),5,5,40,5);
+       // Paragraph preface = new Paragraph();
+        PdfWriter.getInstance(document, new FileOutputStream(pdf));
+        document.open();
+        table.getDefaultCell().setFixedHeight(100);
+        table.setWidthPercentage(100);
+
+        table.setHorizontalAlignment(PdfPTable.ALIGN_LEFT);
+
+       // preface.setAlignment(1);
+       // preface.add(table);
+//
+        document.add(table);
+        document.setMarginMirroring(true);
+        document.close();
+
+        displayOutput(pdf);
+    }
 
     public void generateLandscape() throws Exception{
         document = new Document(PageSize.LETTER.rotate(),30f,30f,30f,30f);
