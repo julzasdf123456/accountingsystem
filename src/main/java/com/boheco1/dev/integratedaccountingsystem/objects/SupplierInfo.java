@@ -50,6 +50,37 @@ public class SupplierInfo {
         this.status=status;
     }
 
+    public SupplierInfo(
+            String supplierID,
+            String companyName,
+            String companyAddress,
+            String TINNo,
+            String contactPerson,
+            String zipCode,
+            String phoneNo,
+            String mobileNo,
+            String emailAddress,
+            String faxNo,
+            String taxType,
+            String supplierNature,
+            String notes,
+            String status) {
+        this.supplierID=supplierID;
+        this.companyName = companyName;
+        this.companyAddress = companyAddress;
+        this.TINNo = TINNo;
+        this.contactPerson = contactPerson;
+        this.zipCode = zipCode;
+        this.phoneNo = phoneNo;
+        this.mobileNo = mobileNo;
+        this.emailAddress = emailAddress;
+        this.faxNo = faxNo;
+        this.taxType = taxType;
+        this.supplierNature=supplierNature;
+        this.notes=notes;
+        this.status=status;
+    }
+
     public String getSupplierNature() {
         return supplierNature;
     }

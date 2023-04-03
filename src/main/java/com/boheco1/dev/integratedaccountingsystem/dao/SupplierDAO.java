@@ -154,7 +154,7 @@ public class SupplierDAO {
      */
     public static List<SupplierInfo> search(String key, String status) throws Exception {
 
-        if (status.equals("Active"))
+        if (!status.equals("Trashed"))
             status = "";
 
         PreparedStatement ps = DB.getConnection().prepareStatement(
@@ -204,6 +204,20 @@ public class SupplierDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "UPDATE SupplierInfo SET Status=? WHERE SupplierId=?");
         ps.setString(1, "Trashed");
+        ps.setString(2, supplier.getSupplierID());
+        ps.executeUpdate();
+        ps.close();
+    }
+
+    /**
+     * Activate a supplier record
+     * @param supplier the supplier to recover
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void recover(SupplierInfo supplier) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE SupplierInfo SET Status=? WHERE SupplierId=?");
+        ps.setString(1, "");
         ps.setString(2, supplier.getSupplierID());
         ps.executeUpdate();
         ps.close();

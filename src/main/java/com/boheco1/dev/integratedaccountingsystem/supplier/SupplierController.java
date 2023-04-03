@@ -161,25 +161,39 @@ public class SupplierController extends MenuControllerHandler implements Initial
                         }
                         trashButton.setOnAction(trashEvent -> {
                             JFXDialogLayout dialogLayout = new JFXDialogLayout();
-                            dialogLayout.setHeading(new Text("Confirm Trash Record"));
-                            Label label = new Label("Do you want to put the selected supplier record to recycle bin?");
+                            String title = "Confirm Trash Record";
+                            String msg = "Do you want to put the selected supplier record to recycle bin?";
+                            String btnlabel = "Trash";
+                            String success = "Process was successfully completed!";
+                            if (item.getStatus().equals("Trashed")) {
+                                title = "Confirm Recover Record";
+                                msg = "Do you want to activate the selected supplier record?";
+                                btnlabel = "Recover";
+                            }
+
+                            dialogLayout.setHeading(new Text(title));
+                            Label label = new Label(msg);
                             label.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 12));
                             label.setWrapText(true);
                             label.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
                             dialogLayout.setBody(label);
                             dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.CENTER);
-                            JFXButton trash = new JFXButton("Trash");
+                            JFXButton trash = new JFXButton(btnlabel);
                             trash.setStyle("-fx-background-color: " + ColorPalette.DANGER);
                             trash.setTextFill(Paint.valueOf("#FFFFFF"));
                             trash.setMinWidth(75);
                             trash.setOnAction(event -> {
                                 try {
                                     suppliersTable.getItems().remove(item);
-                                    SupplierDAO.trash(SupplierDAO.get(item.getSupplierID()));
-                                    AlertDialogBuilder.messgeDialog("System Information", "Supplier Record was put to trash!", stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
+                                    if (item.getStatus().equals("Trashed")) {
+                                        SupplierDAO.recover(SupplierDAO.get(item.getSupplierID()));
+                                    }else{
+                                        SupplierDAO.trash(SupplierDAO.get(item.getSupplierID()));
+                                    }
+                                    AlertDialogBuilder.messgeDialog("System Information", success, stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
                                     dialog.close();
                                 } catch (Exception e) {
-                                    AlertDialogBuilder.messgeDialog("System Error", "Failed to put record to trash due to: " + e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                                    AlertDialogBuilder.messgeDialog("System Error", "Process Failed due to: " + e.getMessage(), stackPane, AlertDialogBuilder.DANGER_DIALOG);
                                 }
                             });
                             JFXButton cancel = new JFXButton("Cancel");
@@ -197,8 +211,10 @@ public class SupplierController extends MenuControllerHandler implements Initial
                         HBox filler = new HBox();
                         hBox.setHgrow(filler, Priority.ALWAYS);
                         hBox.setSpacing(1);
-                        hBox.getChildren().add(viewButton);
-                        hBox.getChildren().add(filler);
+                        if (!item.getStatus().equals("Trashed")) {
+                            hBox.getChildren().add(viewButton);
+                            hBox.getChildren().add(filler);
+                        }
                         hBox.getChildren().add(trashButton);
 
                         setGraphic(hBox);
