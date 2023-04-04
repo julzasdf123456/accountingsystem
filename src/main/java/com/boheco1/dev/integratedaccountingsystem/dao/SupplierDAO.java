@@ -42,6 +42,37 @@ public class SupplierDAO {
 
         ps.close();
     }
+    /**
+     * Update supplier record
+     * @param supplier the supplier object
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void edit(SupplierInfo supplier) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "Update SupplierInfo SET CompanyName = ?, CompanyAddress = ?, " +
+                        "TINNo = ?, ContactPerson = ?, ZipCode = ?, PhoneNo = ?, MobileNo = ?, EmailAddress = ?, " +
+                        "FaxNo = ?, TaxType = ?, SupplierNature = ?, Notes = ?, Status = ? " +
+                        "WHERE SupplierID = ?");
+
+        ps.setString(1, supplier.getCompanyName());
+        ps.setString(2, supplier.getCompanyAddress());
+        ps.setString(3, supplier.getTINNo());
+        ps.setString(4, supplier.getContactPerson());
+        ps.setString(5, supplier.getZipCode());
+        ps.setString(6, supplier.getPhoneNo());
+        ps.setString(7, supplier.getMobileNo());
+        ps.setString(8, supplier.getEmailAddress());
+        ps.setString(9, supplier.getFaxNo());
+        ps.setString(10, supplier.getTaxType());
+        ps.setString(11, supplier.getSupplierNature());
+        ps.setString(12, supplier.getNotes());
+        ps.setString(13, supplier.getStatus());
+        ps.setString(14, supplier.getSupplierID());
+
+        ps.executeUpdate();
+
+        ps.close();
+    }
 
     public static SupplierInfo get(String supplierID) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(

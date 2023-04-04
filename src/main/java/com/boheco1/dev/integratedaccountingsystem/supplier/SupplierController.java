@@ -98,32 +98,32 @@ public class SupplierController extends MenuControllerHandler implements Initial
      */
     public void createTable(){
         TableColumn<SupplierInfo, String> column1 = new TableColumn<>("Company Name");
-        column1.setMinWidth(300);
-        column1.setMaxWidth(300);
-        column1.setPrefWidth(300);
+        column1.setMinWidth(275);
+        column1.setMaxWidth(275);
+        column1.setPrefWidth(275);
         column1.setCellValueFactory(new PropertyValueFactory<>("companyName"));
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<SupplierInfo, String> column2 = new TableColumn<>("Company Address");
-        column2.setMinWidth(400);
-        column2.setMaxWidth(40);
-        column2.setPrefWidth(400);
+        column2.setMinWidth(375);
+        column2.setMaxWidth(375);
+        column2.setPrefWidth(375);
         column2.setCellValueFactory(new PropertyValueFactory<>("companyAddress"));
         column2.setStyle("-fx-alignment: center-left;");
 
         TableColumn<SupplierInfo, String> column3 = new TableColumn<>("Supplier Nature");
-        column3.setMinWidth(150);
-        column3.setMaxWidth(150);
-        column3.setPrefWidth(150);
+        column3.setMinWidth(275);
+        column3.setMaxWidth(275);
+        column3.setPrefWidth(275);
         column3.setCellValueFactory(new PropertyValueFactory<>("supplierNature"));
         column3.setStyle("-fx-alignment: center-left;");
 
-        TableColumn<SupplierInfo, String> column4 = new TableColumn<>("Status");
-        column4.setMinWidth(150);
-        column4.setMaxWidth(150);
-        column4.setPrefWidth(150);
-        column4.setCellValueFactory(new PropertyValueFactory<>("Status"));
-        column4.setStyle("-fx-alignment: center-left;");
+        TableColumn<SupplierInfo, String> column4 = new TableColumn<>("Tax Type");
+        column4.setMinWidth(75);
+        column4.setMaxWidth(75);
+        column4.setPrefWidth(75);
+        column4.setCellValueFactory(new PropertyValueFactory<>("taxType"));
+        column4.setStyle("-fx-alignment: center;");
 
         TableColumn<SupplierInfo, SupplierInfo> column8 = new TableColumn<>("Action");
         column8.setMinWidth(100);
@@ -154,7 +154,7 @@ public class SupplierController extends MenuControllerHandler implements Initial
                             SupplierInfo supplier = SupplierDAO.get(item.getSupplierID());
                             viewButton.setOnAction(actionEvent -> {
                                 Utility.setSelectedObject(supplier);
-                                ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_stock_update.fxml", Utility.getStackPane());
+                                ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../supplier/update_record_layout.fxml", Utility.getStackPane());
                             });
                         } catch (Exception e) {
 
