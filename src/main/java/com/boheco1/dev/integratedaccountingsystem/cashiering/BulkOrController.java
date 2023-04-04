@@ -357,11 +357,8 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
                 fileChooser.setInitialFileName(uploadedFile.getText()+"_OR_.pdf");
                 File selectedFile = fileChooser.showSaveDialog(stage);
                 if (selectedFile != null) {
-                    float[] columns = {2.3f,1f,.5f,2.2f,1f};
-                    PrintPDF pdf = new PrintPDF(selectedFile, columns);
-
-                    for(int x=1;x<500;x++)
-                        pdf.createCell(" ", 2, 9, Font.NORMAL, Element.ALIGN_CENTER);
+                    //float[] columns = {1f, 2f, 1f, 1f, 1f, 2f, 1f};
+                    PrintPDF pdf = new PrintPDF(selectedFile, new float[]{1f});
 
                     pdf.generateForOR();
                 }

@@ -5,6 +5,7 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import javafx.print.Paper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,23 +43,47 @@ public class PrintPDF {
     }
 
     public void generateForOR() throws Exception{
-        document = new Document(new Rectangle(612f, 396f),5,5,40,5);
+        document = new Document(PageSize.LETTER,5,5,60,5);
        // Paragraph preface = new Paragraph();
         PdfWriter.getInstance(document, new FileOutputStream(pdf));
         document.open();
-        table.getDefaultCell().setFixedHeight(100);
-        table.setWidthPercentage(100);
 
-        table.setHorizontalAlignment(PdfPTable.ALIGN_LEFT);
 
-       // preface.setAlignment(1);
-       // preface.add(table);
-//
-        document.add(table);
+
+        //preface.setAlignment(1);
+        //preface.add(table);
+        for (int x = 1; x <=1; x++){
+            table = new PdfPTable(this.column);
+            table.getDefaultCell().setFixedHeight(100);
+            table.setWidthPercentage(100);
+            table.setHorizontalAlignment(PdfPTable.ALIGN_CENTER);
+            PdfPTable itemTable = new PdfPTable(new float[]{2f,1f,1f,2f,1f});
+            itemTable.getDefaultCell().setFixedHeight(100);
+            itemTable.setWidthPercentage(100);
+            itemTable.setHorizontalAlignment(PdfPTable.ALIGN_CENTER);
+            for (int y = 1; y <= 25; y++){
+                createCell(itemTable,""+y, 1, 9, Font.NORMAL, Element.ALIGN_CENTER);
+                createCell(itemTable,""+y, 1, 9, Font.NORMAL, Element.ALIGN_CENTER);
+                createCell(itemTable,""+y, 1, 9, Font.NORMAL, Element.ALIGN_CENTER);
+                createCell(itemTable,""+y, 1, 9, Font.NORMAL, Element.ALIGN_CENTER);
+                createCell(itemTable,""+y, 1, 9, Font.NORMAL, Element.ALIGN_CENTER);
+            }
+            cell=new PdfPCell(itemTable);
+            cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+            cell.setBorder(Rectangle.NO_BORDER);
+            table.addCell(cell);
+            document.add(table);
+            document.newPage();
+        }
+
+
+
         document.setMarginMirroring(true);
         document.close();
 
         displayOutput(pdf);
+
+
     }
 
     public void generateLandscape() throws Exception{
@@ -236,6 +261,23 @@ public class PrintPDF {
         cell.setColspan(span);
         cell.setHorizontalAlignment(alignment);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        table.addCell(cell);
+    }
+
+    public void createCell(PdfPTable table, String text, int span, int size, int font, int alignment){
+        cell=new PdfPCell(new Paragraph(text,new Font(Font.FontFamily.TIMES_ROMAN,size,font)));
+        cell.setColspan(span);
+        cell.setHorizontalAlignment(alignment);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        table.addCell(cell);
+    }
+
+    public void createCell(PdfPTable table, String text, int span, int size, int font, int alignment, int border){
+        cell=new PdfPCell(new Paragraph(text,new Font(Font.FontFamily.TIMES_ROMAN,size,font)));
+        cell.setColspan(span);
+        cell.setHorizontalAlignment(alignment);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        cell.setBorder(border);
         table.addCell(cell);
     }
 
