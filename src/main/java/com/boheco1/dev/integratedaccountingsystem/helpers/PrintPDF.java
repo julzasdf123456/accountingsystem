@@ -43,12 +43,10 @@ public class PrintPDF {
     }
 
     public void generateForOR() throws Exception{
-        document = new Document(PageSize.LETTER,5,5,60,5);
+        document = new Document(PageSize.LETTER,10,10,60,10);
        // Paragraph preface = new Paragraph();
         PdfWriter.getInstance(document, new FileOutputStream(pdf));
         document.open();
-
-
 
         //preface.setAlignment(1);
         //preface.add(table);
@@ -57,17 +55,63 @@ public class PrintPDF {
             table.getDefaultCell().setFixedHeight(100);
             table.setWidthPercentage(100);
             table.setHorizontalAlignment(PdfPTable.ALIGN_CENTER);
-            PdfPTable itemTable = new PdfPTable(new float[]{2f,1f,1f,2f,1f});
+            float[] column = {.5f,2f,1f,.5f,.5f,2f,1f};
+            PdfPTable itemTable = new PdfPTable(column);
             itemTable.getDefaultCell().setFixedHeight(100);
             itemTable.setWidthPercentage(100);
             itemTable.setHorizontalAlignment(PdfPTable.ALIGN_CENTER);
-            for (int y = 1; y <= 25; y++){
-                createCell(itemTable,""+y, 1, 9, Font.NORMAL, Element.ALIGN_CENTER);
-                createCell(itemTable,""+y, 1, 9, Font.NORMAL, Element.ALIGN_CENTER);
-                createCell(itemTable,""+y, 1, 9, Font.NORMAL, Element.ALIGN_CENTER);
-                createCell(itemTable,""+y, 1, 9, Font.NORMAL, Element.ALIGN_CENTER);
-                createCell(itemTable,""+y, 1, 9, Font.NORMAL, Element.ALIGN_CENTER);
-            }
+
+            double total = 4139943.69;
+            //Date and OR
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);//date here
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);//OR number
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_LEFT);//date here
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);//OR number
+            createCell(itemTable,1,column.length,1);
+
+            //Description
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER,50f);
+            //name, address, and amount in word add \n iin each item
+            createCell(itemTable," ",2,1,  9, Font.NORMAL, Element.ALIGN_LEFT);
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
+            //name, address, and amount in word add \n iin each item
+            createCell(itemTable," ",2,1,  9, Font.NORMAL, Element.ALIGN_LEFT);
+            createCell(itemTable,3,column.length,1);
+
+            //for (int y = 1; y <= 15; y++){
+                //item
+
+                createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER,175f);
+                createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_LEFT);//items
+                createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_RIGHT);//amount
+                createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
+                createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
+                createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_LEFT);//items
+                createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_RIGHT);//amount
+            //}
+
+            //Total amount
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_LEFT);
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);//total amount
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_LEFT);
+            createCell(itemTable," ",1,0,  9, Font.NORMAL, Element.ALIGN_CENTER);//total amount
+
+            //Signatories
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_LEFT);
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);//cashier
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_LEFT);
+            createCell(itemTable," ",1,0,  9, Font.NORMAL, Element.ALIGN_CENTER);//cashier
+
             cell=new PdfPCell(itemTable);
             cell.setHorizontalAlignment(Element.ALIGN_LEFT);
             cell.setBorder(Rectangle.NO_BORDER);
@@ -227,10 +271,22 @@ public class PrintPDF {
         }
     }
 
-    public void createCell(int loop, int span){
+    public void createCell(int loop, int colSpan){
         for(int x=1;x<=loop;x++){
             cell=new PdfPCell(new Paragraph(" ",new Font(Font.FontFamily.TIMES_ROMAN,8,Font.BOLD)));
-            cell.setColspan(span);
+            cell.setColspan(colSpan);
+            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            cell.setBorder(Rectangle.NO_BORDER);
+            table.addCell(cell);
+        }
+    }
+
+    public void createCell(PdfPTable table, int loop, int colSpan, int rowSpan){
+        for(int x=1;x<=loop;x++){
+            cell=new PdfPCell(new Paragraph(" ",new Font(Font.FontFamily.TIMES_ROMAN,8,Font.BOLD)));
+            cell.setColspan(colSpan);
+            cell.setRowspan(rowSpan);
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
             cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
             cell.setBorder(Rectangle.NO_BORDER);
@@ -264,17 +320,29 @@ public class PrintPDF {
         table.addCell(cell);
     }
 
-    public void createCell(PdfPTable table, String text, int span, int size, int font, int alignment){
+    public void createCell(PdfPTable table, String text, int colSpan, int rowSpan, int size, int font, int alignment){
         cell=new PdfPCell(new Paragraph(text,new Font(Font.FontFamily.TIMES_ROMAN,size,font)));
-        cell.setColspan(span);
+        cell.setColspan(colSpan);
+        cell.setRowspan(rowSpan);
         cell.setHorizontalAlignment(alignment);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         table.addCell(cell);
     }
 
-    public void createCell(PdfPTable table, String text, int span, int size, int font, int alignment, int border){
+    public void createCell(PdfPTable table, String text, int colSpan, int rowSpan, int size, int font, int alignment, float height){
         cell=new PdfPCell(new Paragraph(text,new Font(Font.FontFamily.TIMES_ROMAN,size,font)));
-        cell.setColspan(span);
+        cell.setColspan(colSpan);
+        cell.setRowspan(rowSpan);
+        cell.setMinimumHeight(height);
+        cell.setHorizontalAlignment(alignment);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        table.addCell(cell);
+    }
+
+    public void createCell(PdfPTable table, String text, int colSpan, int rowSpan, int size, int font, int alignment, int border){
+        cell=new PdfPCell(new Paragraph(text,new Font(Font.FontFamily.TIMES_ROMAN,size,font)));
+        cell.setColspan(colSpan);
+        cell.setRowspan(rowSpan);
         cell.setHorizontalAlignment(alignment);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setBorder(border);
