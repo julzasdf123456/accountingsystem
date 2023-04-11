@@ -52,6 +52,8 @@ public class TransactionHeaderDetailDAO {
                                 "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
                 for (TransactionDetails td : tds) {
+                    if(td.getParticulars().contains("TIN"))
+                        continue;
                     ps2.setDate(1, Date.valueOf(td.getPeriod()));
                     ps2.setString(2, td.getTransactionNumber());
                     ps2.setString(3, td.getTransactionCode());

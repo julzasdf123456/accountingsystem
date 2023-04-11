@@ -22,6 +22,7 @@ public class ORContent {
     private CRMQueue crmQueue;
     private TransactionHeader transactionHeader;
     private List<TransactionDetails> tds;
+    private List<ORItemSummary> bulkPrinting;
 
     public ORContent(TransactionHeader transactionHeader, List<TransactionDetails> tds) {
         this.transactionHeader = transactionHeader;
@@ -148,5 +149,13 @@ public class ORContent {
 
     public void setTds(List<TransactionDetails> tds) {
         this.tds = tds;
+    }
+
+    public List<ORItemSummary> getBulkPrinting() {
+        return bulkPrinting;
+    }
+
+    public void setBulkPrinting(List<ORItemSummary> bulkPrinting) {
+        this.bulkPrinting = bulkPrinting;
     }
 }

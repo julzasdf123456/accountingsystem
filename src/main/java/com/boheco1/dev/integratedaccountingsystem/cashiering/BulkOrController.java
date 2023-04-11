@@ -41,10 +41,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class BulkOrController extends MenuControllerHandler implements Initializable {
     @FXML
@@ -68,7 +65,7 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
     public void initialize(URL url, ResourceBundle resourceBundle) {
         niheObservableList =  FXCollections.observableArrayList();
         ieopObservableList =  FXCollections.observableArrayList();
-        samplePrintOR();
+       // generateOR();
     }
 
     private void resetController(){
@@ -133,7 +130,7 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
         if(uploadedFile.getText().toLowerCase().contains("iemop")) {
             saveTransactionInfoForIEOP();
         }else if(uploadedFile.getText().toLowerCase().contains("nihe")){
-
+            saveTransactionInfoForNIHE();
         }
     }
 
@@ -184,6 +181,9 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
         tableView.getColumns().add(column5);
         tableView.getColumns().add(column6);
         tableView.getColumns().add(column7);
+
+        if(workSheet.getSelectionModel().getSelectedIndex()==-1)
+            return;
 
         sheet = wb.getSheetAt(workSheet.getSelectionModel().getSelectedIndex());
         Row rowData;
@@ -258,7 +258,7 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
     }
 
     private void saveTransactionInfoForIEOP() throws Exception {
-
+        List<ORContent> orContents = new ArrayList<>();
         List<BatchTransactionInfo> batchTransactionInfo = new ArrayList<>();
         for(IEOP ieop : ieopObservableList){
             int month = ieop.getOrDate().getMonthValue();
@@ -310,6 +310,23 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
             batch.add(transactionDetailsWTAX);
 
             batchTransactionInfo.add(batch);
+
+            List<ORItemSummary> orItemSummaryList = new ArrayList<>();
+            ORItemSummary item1 = new ORItemSummary("AR/Others", ieop.getSales());
+            ORItemSummary item2 = new ORItemSummary("Prepayment-Others 2307 (2%)", ieop.getWtax()*-1);
+            orItemSummaryList.add(item1);
+            orItemSummaryList.add(item2);
+            ORContent orContent = new ORContent();
+            orContent.setBulkPrinting(orItemSummaryList);
+            orContent.setIssuedTo(ieop.getConsumerName());
+            orContent.setAddress(ieop.getConsumerAddress());
+            orContent.setDate(ieop.getOrDate());
+            orContent.setOrNumber(ieop.getOrNumber());
+            EmployeeInfo employeeInfo = ActiveUser.getUser().getEmployeeInfo();
+            orContent.setIssuedBy(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
+            orContent.setTotal(ieop.getNetCash());
+
+            orContents.add(orContent);
         }
 
         JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing request.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
@@ -330,6 +347,7 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
             if(Utility.ERROR_MSG == null){
                 AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
                         Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                generateOR(orContents);
             }else {
                 AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: "+Utility.ERROR_MSG,
                         Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
@@ -346,21 +364,196 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
 
     }
 
-    private void samplePrintOR(){
+    private void saveTransactionInfoForNIHE() throws Exception {
+        List<ORContent> orContents = new ArrayList<>();
+        List<BatchTransactionInfo> batchTransactionInfo = new ArrayList<>();
+        for(NIHE nihe : niheObservableList){
+            int month = nihe.getOrDate().getMonthValue();
+            int year = nihe.getOrDate().getYear();
+            LocalDate period = LocalDate.of(year, month, 1);
+
+            TransactionHeader transactionHeader= new TransactionHeader();
+            transactionHeader.setPeriod(period);
+            transactionHeader.setTransactionNumber(nihe.getOrNumber());
+            transactionHeader.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
+            transactionHeader.setOffice(Utility.OFFICE_PREFIX);
+            transactionHeader.setSource("nihe");
+            transactionHeader.setParticulars(nihe.getConsumerName());
+            transactionHeader.setEnteredBy(ActiveUser.getUser().getUserName());
+            transactionHeader.setAccountID(ActiveUser.getUser().getId());
+            transactionHeader.setAmount(nihe.getAmount());
+            transactionHeader.setTransactionDate(Utility.serverDate());
+            transactionHeader.setDateEntered(LocalDateTime.now());
+
+            HashMap<String, Double> niheFee = new HashMap<>();
+            niheFee.put("Membership fee",5.0);
+            niheFee.put("Membership ID",50.0);
+            niheFee.put("Bill Deposit",70.0);
+            niheFee.put("EVAT-61.00",6.0);
+            niheFee.put("EVAT-88.72",8.97);
+            niheFee.put("EVAT-139.40",14.40);
+            niheFee.put("Primer-Charges 1",65.0);
+            niheFee.put("Primer-Charges 2",9.75);
+
+            BatchTransactionInfo batch = new BatchTransactionInfo();
+            TransactionDetails transactionDetail = new TransactionDetails();
+            List<ORItemSummary> orItemSummaryList = new ArrayList<>();
+            if(nihe.getAmount()==5){
+                transactionDetail.setPeriod(period);
+                transactionDetail.setTransactionNumber(nihe.getOrNumber());
+                transactionDetail.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
+                transactionDetail.setTransactionDate(Utility.serverDate());
+                transactionDetail.setOrDate(nihe.getOrDate());
+                transactionDetail.setParticulars("Membership fee");
+                transactionDetail.setSequenceNumber(1);
+                if(nihe.getAmount() > 0)
+                    transactionDetail.setCredit(niheFee.get("Membership fee"));
+                else
+                    transactionDetail.setDebit(niheFee.get("Membership fee"));
+                batch.setTransactionHeader(transactionHeader);
+                batch.add(transactionDetail);
+
+                ORItemSummary item = new ORItemSummary("Membership fee", 5.00);
+                orItemSummaryList.add(item);
+            }else if(nihe.getAmount()==61){
+                String[] key = {"Membership fee","Membership ID","EVAT-61.00"};
+
+                for(String k : key){
+                    int seq = 1;
+                    transactionDetail.setPeriod(period);
+                    transactionDetail.setTransactionNumber(nihe.getOrNumber());
+                    transactionDetail.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
+                    transactionDetail.setTransactionDate(Utility.serverDate());
+                    transactionDetail.setOrDate(nihe.getOrDate());
+                    transactionDetail.setParticulars(k.replace("-61.00",""));
+                    transactionDetail.setSequenceNumber(seq);
+                    if(nihe.getAmount() > 0)
+                        transactionDetail.setCredit(niheFee.get(k));
+                    else
+                        transactionDetail.setDebit(niheFee.get(k));
+                    batch.setTransactionHeader(transactionHeader);
+                    batch.add(transactionDetail);
+                    seq++;
+
+                    ORItemSummary item = new ORItemSummary(k.replace("-61.00",""), niheFee.get(k));
+                    orItemSummaryList.add(item);
+                }
+            }else if(nihe.getAmount()==88.72){
+                String[] key = {"Primer-Charges 1","Primer-Charges 2","EVAT-88.72","Membership fee"};
+
+                for(String k : key){
+                    int seq = 1;
+                    transactionDetail.setPeriod(period);
+                    transactionDetail.setTransactionNumber(nihe.getOrNumber());
+                    transactionDetail.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
+                    transactionDetail.setTransactionDate(Utility.serverDate());
+                    transactionDetail.setOrDate(nihe.getOrDate());
+                    transactionDetail.setParticulars(k.replace("-88.72",""));
+                    transactionDetail.setSequenceNumber(seq);
+                    if(nihe.getAmount() > 0)
+                        transactionDetail.setCredit(niheFee.get(k));
+                    else
+                        transactionDetail.setDebit(niheFee.get(k));
+                    batch.setTransactionHeader(transactionHeader);
+                    batch.add(transactionDetail);
+                    seq++;
+
+                    ORItemSummary item = new ORItemSummary(k.replace("-88.72",""), niheFee.get(k));
+                    orItemSummaryList.add(item);
+                }
+            }else if(nihe.getAmount()==139.40){
+                String[] key = {"Membership fee","Membership ID","Bill Deposit","EVAT-139.40"};
+
+                for(String k : key){
+                    int seq = 1;
+                    transactionDetail.setPeriod(period);
+                    transactionDetail.setTransactionNumber(nihe.getOrNumber());
+                    transactionDetail.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
+                    transactionDetail.setTransactionDate(Utility.serverDate());
+                    transactionDetail.setOrDate(nihe.getOrDate());
+                    transactionDetail.setParticulars(k.replace("-139.40",""));
+                    transactionDetail.setSequenceNumber(seq);
+                    if(nihe.getAmount() > 0)
+                        transactionDetail.setCredit(niheFee.get(k));
+                    else
+                        transactionDetail.setDebit(niheFee.get(k));
+                    batch.setTransactionHeader(transactionHeader);
+                    batch.add(transactionDetail);
+                    seq++;
+
+                    ORItemSummary item = new ORItemSummary(k.replace("-139.40",""), niheFee.get(k));
+                    orItemSummaryList.add(item);
+                }
+            }
+
+            batchTransactionInfo.add(batch);
+            ORContent orContent = new ORContent();
+            orContent.setBulkPrinting(orItemSummaryList);
+            orContent.setIssuedTo(nihe.getConsumerName());
+            orContent.setAddress(nihe.getConsumerAddress());
+            orContent.setDate(nihe.getOrDate());
+            orContent.setOrNumber(nihe.getOrNumber());
+            EmployeeInfo employeeInfo = ActiveUser.getUser().getEmployeeInfo();
+            orContent.setIssuedBy(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
+            orContent.setTotal(nihe.getAmount());
+
+            orContents.add(orContent);
+        }
+
+        JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing request.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws SQLException, ClassNotFoundException {
+                TransactionHeaderDetailDAO.save(batchTransactionInfo);
+                return null;
+            }
+        };
+
+        task.setOnRunning(wse -> {
+            dialog.show();
+        });
+
+        task.setOnSucceeded(wse -> {
+            dialog.close();
+            if(Utility.ERROR_MSG == null){
+                AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
+                        Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                generateOR(orContents);
+            }else {
+                AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: "+Utility.ERROR_MSG,
+                        Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+            }
+        });
+
+        task.setOnFailed(wse -> {
+            dialog.close();
+            AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: "+Utility.ERROR_MSG,
+                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+        });
+
+        new Thread(task).start();
+
+    }
+
+    private void generateOR(List<ORContent> orContents){
         Platform.runLater(() -> {
             try {
                 Stage stage = (Stage) Utility.getContentPane().getScene().getWindow();
                 FileChooser fileChooser = new FileChooser();
+                if(!Utility.FILE_PATH.isEmpty())
+                    fileChooser.setInitialDirectory(new File(Utility.FILE_PATH));
                 fileChooser.getExtensionFilters().addAll(
                         new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
                 );
-                fileChooser.setInitialFileName(uploadedFile.getText()+"_OR_.pdf");
+                fileChooser.setInitialFileName(uploadedFile.getText()+"_"+wb.getSheetName(workSheet.getSelectionModel().getSelectedIndex())+"_OR_.pdf");
                 File selectedFile = fileChooser.showSaveDialog(stage);
                 if (selectedFile != null) {
                     //float[] columns = {1f, 2f, 1f, 1f, 1f, 2f, 1f};
                     PrintPDF pdf = new PrintPDF(selectedFile, new float[]{1f});
 
-                    pdf.generateForOR();
+
+                    pdf.generateForOR(orContents);
+                    Utility.FILE_PATH= selectedFile.getParent();
                 }
 
 

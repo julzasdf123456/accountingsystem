@@ -176,7 +176,8 @@ public class SupplierORController extends MenuControllerHandler implements Initi
             transactionDetails.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
             transactionDetails.setTransactionDate(date.getValue());
             transactionDetails.setParticulars(items.getDescription());
-            transactionDetails.setSequenceNumber(seq++);
+            if(!transactionDetails.getParticulars().contains("TIN"))
+                transactionDetails.setSequenceNumber(seq++);
 
             if(items.getAmount() > 0)
                 transactionDetails.setCredit(items.getAmount());

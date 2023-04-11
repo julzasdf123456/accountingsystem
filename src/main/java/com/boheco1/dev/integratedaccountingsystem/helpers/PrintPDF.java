@@ -1,17 +1,20 @@
 package com.boheco1.dev.integratedaccountingsystem.helpers;
 
+import com.boheco1.dev.integratedaccountingsystem.objects.ORContent;
+import com.boheco1.dev.integratedaccountingsystem.objects.ORItemSummary;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-import javafx.print.Paper;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.DateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 
 public class PrintPDF {
 
@@ -42,7 +45,8 @@ public class PrintPDF {
         this.footerText = footerText;
     }
 
-    public void generateForOR() throws Exception{
+    public void generateForOR(List<ORContent> items) throws Exception{
+
         document = new Document(PageSize.LETTER,10,10,60,10);
        // Paragraph preface = new Paragraph();
         PdfWriter.getInstance(document, new FileOutputStream(pdf));
@@ -50,7 +54,7 @@ public class PrintPDF {
 
         //preface.setAlignment(1);
         //preface.add(table);
-        for (int x = 1; x <=1; x++){
+        for (ORContent orContent : items){
             table = new PdfPTable(this.column);
             table.getDefaultCell().setFixedHeight(100);
             table.setWidthPercentage(100);
@@ -61,56 +65,64 @@ public class PrintPDF {
             itemTable.setWidthPercentage(100);
             itemTable.setHorizontalAlignment(PdfPTable.ALIGN_CENTER);
 
-            double total = 4139943.69;
             //Date and OR
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY");
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
-            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);//date here
-            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);//OR number
+            createCell(itemTable,formatter.format(orContent.getDate()),1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);//date here
+            createCell(itemTable,orContent.getOrNumber(),1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);//OR number
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
-            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_LEFT);//date here
-            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);//OR number
+            createCell(itemTable,formatter.format(orContent.getDate()),1,1,  9, Font.NORMAL, Element.ALIGN_LEFT);//date here
+            createCell(itemTable,orContent.getOrNumber(),1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);//OR number
             createCell(itemTable,1,column.length,1);
 
             //Description
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER,50f);
-            //name, address, and amount in word add \n iin each item
-            createCell(itemTable," ",2,1,  9, Font.NORMAL, Element.ALIGN_LEFT);
+            //name, address, and amount in word add \n in each item
+            createCell(itemTable,orContent.getIssuedTo()+"\n" +
+                    ""+orContent.getAddress()+"\n" +
+                    ""+Utility.doubleAmountToWords(orContent.getTotal())+" " +Utility.formatDecimal(orContent.getTotal()),2,1,  9, Font.NORMAL, Element.ALIGN_LEFT);
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
-            //name, address, and amount in word add \n iin each item
-            createCell(itemTable," ",2,1,  9, Font.NORMAL, Element.ALIGN_LEFT);
+            //name, address, and amount in word add \n in each item
+            createCell(itemTable,orContent.getIssuedTo()+"\n" +
+                    ""+orContent.getAddress()+"\n" +
+                    ""+Utility.doubleAmountToWords(orContent.getTotal())+" " +Utility.formatDecimal(orContent.getTotal()),2,1,  9, Font.NORMAL, Element.ALIGN_LEFT);
             createCell(itemTable,3,column.length,1);
 
-            //for (int y = 1; y <= 15; y++){
-                //item
+            String description="", amount="";
+            for (ORItemSummary particulars : orContent.getBulkPrinting()){
+                description+=particulars.getDescription()+"\n";
+                if(particulars.getAmount()==0)
+                    particulars.setTotalView(particulars.getTotalView().replace("-",""));
+                amount+=particulars.getTotalView()+"\n";
+            }
 
-                createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER,175f);
-                createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_LEFT);//items
-                createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_RIGHT);//amount
-                createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
-                createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
-                createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_LEFT);//items
-                createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_RIGHT);//amount
-            //}
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER,175f);
+            createCell(itemTable,description,1,1,  9, Font.NORMAL, Element.ALIGN_LEFT);//items
+            createCell(itemTable,amount,1,1,  9, Font.NORMAL, Element.ALIGN_RIGHT);//amount
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
+            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
+            createCell(itemTable,description,1,1,  9, Font.NORMAL, Element.ALIGN_LEFT);//items
+            createCell(itemTable,amount,1,1,  9, Font.NORMAL, Element.ALIGN_RIGHT);//amount
 
             //Total amount
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_LEFT);
-            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);//total amount
+            createCell(itemTable,Utility.formatDecimal(orContent.getTotal()),1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);//total amount
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_LEFT);
-            createCell(itemTable," ",1,0,  9, Font.NORMAL, Element.ALIGN_CENTER);//total amount
+            createCell(itemTable,Utility.formatDecimal(orContent.getTotal()),1,0,  9, Font.NORMAL, Element.ALIGN_CENTER);//total amount
 
             //Signatories
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_LEFT);
-            createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);//cashier
+            createCell(itemTable,orContent.getIssuedBy(),1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);//cashier
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER);
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_LEFT);
-            createCell(itemTable," ",1,0,  9, Font.NORMAL, Element.ALIGN_CENTER);//cashier
+            createCell(itemTable,orContent.getIssuedBy(),1,0,  9, Font.NORMAL, Element.ALIGN_CENTER);//cashier
 
             cell=new PdfPCell(itemTable);
             cell.setHorizontalAlignment(Element.ALIGN_LEFT);
