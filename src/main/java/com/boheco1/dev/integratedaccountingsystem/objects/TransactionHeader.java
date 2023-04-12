@@ -23,6 +23,9 @@ public class TransactionHeader {
     private String updatedBy;//refers to user ID of the updating user
     private String remarks;
 
+    private String name;
+    protected String address;
+
     private String tinNo;
 
     private String office; //refers to OfficeID in Offices table
@@ -183,5 +186,21 @@ public class TransactionHeader {
         props.load(is);
 
         return props.getProperty("account_code");
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

@@ -23,8 +23,8 @@ public class TransactionHeaderDetailDAO {
                             "(Period, TransactionNumber, TransactionCode, " +
                             "AccountID, Source, Particulars, TransactionDate, " +
                             "Bank, ReferenceNo, Amount, EnteredBy, DateEntered, " +
-                            "DateLastModified, UpdatedBy, Remarks, TIN) " +
-                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,GETDATE(),GETDATE(),?,?, ?)");
+                            "DateLastModified, UpdatedBy, Remarks, TIN, Name, Address) " +
+                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,GETDATE(),GETDATE(),?,?,?,?,?)");
             ps1.setDate(1, Date.valueOf(transactionHeader.getPeriod()));
             ps1.setString(2, transactionHeader.getTransactionNumber());
             ps1.setString(3, transactionHeader.getTransactionCode());
@@ -41,6 +41,8 @@ public class TransactionHeaderDetailDAO {
             ps1.setString(12, transactionHeader.getUpdatedBy());
             ps1.setString(13, transactionHeader.getRemarks());
             ps1.setString(14, transactionHeader.getTinNo());
+            ps1.setString(15, transactionHeader.getName());
+            ps1.setString(16, transactionHeader.getAddress());
 
             ps2 =null;
             if(tds!=null && !tds.isEmpty()) {
@@ -125,8 +127,8 @@ public class TransactionHeaderDetailDAO {
                             "(Period, TransactionNumber, TransactionCode, " +
                             "AccountID, Source, Particulars, TransactionDate, " +
                             "Bank, ReferenceNo, Amount, EnteredBy, DateEntered, " +
-                            "DateLastModified, UpdatedBy, Remarks, TIN) " +
-                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,GETDATE(),GETDATE(),?,?, ?);");
+                            "DateLastModified, UpdatedBy, Remarks, TIN, Name, Address) " +
+                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,GETDATE(),GETDATE(),?,?,?,?,?);");
 
             ps2 = DB.getConnection().prepareStatement(
                     "INSERT INTO TransactionDetails (" +
@@ -152,6 +154,8 @@ public class TransactionHeaderDetailDAO {
                 ps1.setString(12, transactionHeader.getUpdatedBy());
                 ps1.setString(13, transactionHeader.getRemarks());
                 ps1.setString(14, transactionHeader.getTinNo());
+                ps1.setString(15, transactionHeader.getName());
+                ps1.setString(16, transactionHeader.getAddress());
                 ps1.addBatch();
 
                 for(TransactionDetails td : transactionDetails){

@@ -166,6 +166,8 @@ public class SupplierORController extends MenuControllerHandler implements Initi
         transactionHeader.setAmount(totalAmount);
         transactionHeader.setTransactionDate(date.getValue());
         transactionHeader.setTinNo(supplier.getTINNo());
+        transactionHeader.setAddress(supplier.getCompanyAddress());
+        transactionHeader.setName(supplier.getCompanyName());
 
         List<TransactionDetails> transactionDetailsList = new ArrayList<>();
         int seq =1;

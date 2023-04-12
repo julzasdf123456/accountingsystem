@@ -271,12 +271,14 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
             transactionHeader.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
             transactionHeader.setOffice(Utility.OFFICE_PREFIX);
             transactionHeader.setSource("iemop");
-            transactionHeader.setParticulars(ieop.getConsumerName());
+            //transactionHeader.setParticulars(ieop.getConsumerName());
             transactionHeader.setEnteredBy(ActiveUser.getUser().getUserName());
             transactionHeader.setAccountID(ActiveUser.getUser().getId());
             transactionHeader.setAmount(ieop.getNetCash());
             transactionHeader.setTransactionDate(Utility.serverDate());
             transactionHeader.setDateEntered(LocalDateTime.now());
+            transactionHeader.setName(ieop.getConsumerName());
+            transactionHeader.setAddress(ieop.getConsumerAddress());
 
             TransactionDetails transactionDetailsSales = new TransactionDetails();
             transactionDetailsSales.setPeriod(period);
@@ -378,12 +380,14 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
             transactionHeader.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
             transactionHeader.setOffice(Utility.OFFICE_PREFIX);
             transactionHeader.setSource("nihe");
-            transactionHeader.setParticulars(nihe.getConsumerName());
+            //transactionHeader.setParticulars(nihe.getConsumerName());
             transactionHeader.setEnteredBy(ActiveUser.getUser().getUserName());
             transactionHeader.setAccountID(ActiveUser.getUser().getId());
             transactionHeader.setAmount(nihe.getAmount());
             transactionHeader.setTransactionDate(Utility.serverDate());
             transactionHeader.setDateEntered(LocalDateTime.now());
+            transactionHeader.setName(nihe.getConsumerName());
+            transactionHeader.setAddress(nihe.getConsumerAddress());
 
             HashMap<String, Double> niheFee = new HashMap<>();
             niheFee.put("Membership fee",5.0);
@@ -396,9 +400,10 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
             niheFee.put("Primer-Charges 2",9.75);
 
             BatchTransactionInfo batch = new BatchTransactionInfo();
-            TransactionDetails transactionDetail = new TransactionDetails();
+
             List<ORItemSummary> orItemSummaryList = new ArrayList<>();
             if(nihe.getAmount()==5){
+                TransactionDetails transactionDetail = new TransactionDetails();
                 transactionDetail.setPeriod(period);
                 transactionDetail.setTransactionNumber(nihe.getOrNumber());
                 transactionDetail.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
@@ -417,9 +422,9 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
                 orItemSummaryList.add(item);
             }else if(nihe.getAmount()==61){
                 String[] key = {"Membership fee","Membership ID","EVAT-61.00"};
-
+                int seq = 1;
                 for(String k : key){
-                    int seq = 1;
+                    TransactionDetails transactionDetail = new TransactionDetails();
                     transactionDetail.setPeriod(period);
                     transactionDetail.setTransactionNumber(nihe.getOrNumber());
                     transactionDetail.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
@@ -440,9 +445,9 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
                 }
             }else if(nihe.getAmount()==88.72){
                 String[] key = {"Primer-Charges 1","Primer-Charges 2","EVAT-88.72","Membership fee"};
-
+                int seq = 1;
                 for(String k : key){
-                    int seq = 1;
+                    TransactionDetails transactionDetail = new TransactionDetails();
                     transactionDetail.setPeriod(period);
                     transactionDetail.setTransactionNumber(nihe.getOrNumber());
                     transactionDetail.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
@@ -463,9 +468,9 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
                 }
             }else if(nihe.getAmount()==139.40){
                 String[] key = {"Membership fee","Membership ID","Bill Deposit","EVAT-139.40"};
-
+                int seq = 1;
                 for(String k : key){
-                    int seq = 1;
+                    TransactionDetails transactionDetail = new TransactionDetails();
                     transactionDetail.setPeriod(period);
                     transactionDetail.setTransactionNumber(nihe.getOrNumber());
                     transactionDetail.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
@@ -480,7 +485,6 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
                     batch.setTransactionHeader(transactionHeader);
                     batch.add(transactionDetail);
                     seq++;
-
                     ORItemSummary item = new ORItemSummary(k.replace("-139.40",""), niheFee.get(k));
                     orItemSummaryList.add(item);
                 }
