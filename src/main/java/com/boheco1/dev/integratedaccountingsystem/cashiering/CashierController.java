@@ -241,17 +241,16 @@ public class CashierController extends MenuControllerHandler implements Initiali
             this.paymentTable.setItems(result);
 
             TableColumn<ORItemSummary, String> column0 = new TableColumn<>("Account Code");
-
-            column0.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getAccountCode()));
             column0.setStyle("-fx-alignment: center-left;");
+            column0.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getAccountCode()));
 
             TableColumn<ORItemSummary, String> column1 = new TableColumn<>("Item Description");
             column1.setMinWidth(220);
             column1.setCellValueFactory(new PropertyValueFactory<>("description"));
 
             TableColumn<ORItemSummary, String> column2 = new TableColumn<>("Total Amount");
-            column2.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getTotalView()));
             column2.setStyle("-fx-alignment: center-right;");
+            column2.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getTotalView()));
 
             this.paymentTable.getColumns().add(column0);
             this.paymentTable.getColumns().add(column1);
@@ -267,10 +266,12 @@ public class CashierController extends MenuControllerHandler implements Initiali
     @FXML
     private void addPrepayment(ActionEvent event) {
         ObservableList<ORItemSummary> result = paymentTable.getItems();
+        ORItemSummary foundItem=null;
         boolean found = false;
         for(ORItemSummary search : result){
             if(search.getDescription().equals("Other Deduction") && search.getAmount()>0){
                 found = true;
+                foundItem = search;
                 break;
             }
         }
@@ -282,6 +283,11 @@ public class CashierController extends MenuControllerHandler implements Initiali
         if (tellerInfo != null) {
             if(!accNum.getText().isEmpty() && !prepayment.getText().isEmpty()){
                 double amount = Double.parseDouble(prepayment.getText());
+                if(amount>foundItem.getAmount()){
+                    AlertDialogBuilder.messgeDialog("Transaction Error", "Prepayment cannot be more than other deduction.",
+                            Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                    return;
+                }
                 ORItemSummary items = (ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1);
                 String[] pre = items.getDescription().split("-");
 

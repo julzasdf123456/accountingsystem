@@ -74,7 +74,7 @@ public class HomeController implements Initializable {
     public JFXButton viewBills;
 
     //CASHIER
-    public JFXButton bulk_or, supplier_or, consumer_teller_or, bankRemittance, acknowledgement_receipts;
+    public JFXButton orUpdate, bulk_or, supplier_or, consumer_teller_or, bankRemittance, acknowledgement_receipts;
     // WAREHOUSE
     public JFXButton warehouseDashboard, fileMirs, generateMct, mrT, stocks, receiving, addMR, supplier;
 
@@ -133,12 +133,14 @@ public class HomeController implements Initializable {
         supplier_or = new JFXButton("Supplier O.R");
         supplier = new JFXButton("Supplier");
         bulk_or = new JFXButton("Bulk O.R");
+        orUpdate = new JFXButton("Update O.R");
 
         // ADD ALL ITEMS TO NAV SEQUENTIALLY
         if(ActiveUser.getUser().can("manage-finance")) {
             NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Finance"), new FontIcon("mdi2f-finance"), homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, journalEntries, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, budget, homeStackPane);
+            NavMenuHelper.addMenu(navMenuBox, orUpdate, homeStackPane);
         }
 
         if(ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-tellering")) {
@@ -206,6 +208,7 @@ public class HomeController implements Initializable {
         if(ActiveUser.getUser().can("manage-finance")) {
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(journalEntries, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, journalEntries.getText(), contentPane, "journal_entries_layout.fxml", subToolbar, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(budget, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, budget.getText(), contentPane, "budget_layout.fxml", subToolbar, null, "manage-budget", homeStackPane, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(orUpdate, new FontIcon("mdi2f-file"), drawerMenus, orUpdate.getText(), contentPane, "finance/or_update_layout.fxml", null, null, title);
         }
 
         if(ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-tellering")) {
