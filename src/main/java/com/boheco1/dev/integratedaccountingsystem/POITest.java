@@ -282,13 +282,13 @@ public class POITest extends Application {
     }
 
     public static void printOEBR(){
-        CustomPrintHelper print = new CustomPrintHelper("OEBR", 18, 3);
-        print.prepareOEBR(new PaidBill());
-        try {
-            print.print();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        CustomPrintHelper print = new CustomPrintHelper("OEBR", 18, 3);
+//        print.prepareOEBR(new PaidBill());
+//        try {
+//            print.print();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         /*
         print.setOnFailed(e->{
             System.out.println("Error!");
