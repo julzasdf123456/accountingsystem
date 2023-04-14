@@ -108,17 +108,17 @@ public class ORLayoutController implements Initializable {
             String description = "", amount = "";
             if(orContent.getTellerCollection()!=null){
                 ObservableList<ORItemSummary> items = orContent.getTellerCollection();
-                double energyBillsOthers = 0;
+                /*double energyBillsOthers = 0;
                 for (ORItemSummary a : items) {
                     if(a.getDescription().equals("Others") || a.getDescription().equals("Other Deduction")){
                         energyBillsOthers+=a.getAmount();
                     }
-                }
+                }*/
 
 
                 for (ORItemSummary a : items) {
                     if (a.getAmount() > 0) {
-                        if(a.getDescription().equals("Others") || a.getDescription().equals("Other Deduction"))
+                        /*if(a.getDescription().equals("Others") || a.getDescription().equals("Other Deduction"))
                             continue;
 
                         if(a.getDescription().equals("Surcharge")){
@@ -126,7 +126,7 @@ public class ORLayoutController implements Initializable {
                                 description +="Energy Bills - Others\n";
                                 amount += Utility.formatDecimal(energyBillsOthers)+ "\n";
                             }
-                        }
+                        }*/
 
                         description += a.getDescription() + "\n";
                         if(a.getTotalView().contains("("))

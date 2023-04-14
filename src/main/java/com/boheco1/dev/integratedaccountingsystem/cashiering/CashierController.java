@@ -67,6 +67,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private List<CRMDetails> crmDetails;
 
     private double collectionFromTeller;
+    private double otherDeduction;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -228,15 +229,24 @@ public class CashierController extends MenuControllerHandler implements Initiali
             this.crmDetails = crmDetails;
         }if(o instanceof Teller){
             Teller teller = (Teller)  o;
+            ORItemSummary removeGrandTotal=null, removeOtherDeduction=null;
             List<ORItemSummary> orItemSummaries = teller.getOrItemSummaries();
             ObservableList<ORItemSummary> result = FXCollections.observableArrayList(orItemSummaries);
             for (ORItemSummary orItemSummary : result){
+                if(orItemSummary.getDescription().equals("Other Deduction")){
+                    otherDeduction = orItemSummary.getAmount();
+                    removeOtherDeduction = orItemSummary;
+                }
                 if(orItemSummary.getDescription().equals("Grand Total")){
                     collectionFromTeller = orItemSummary.getAmount();
+                    removeGrandTotal = orItemSummary;
                     total.setText(""+Utility.formatDecimal(collectionFromTeller));
-                    break;
                 }
             }
+
+            //remove the item Grand total and Other Deduction
+            result.remove(removeOtherDeduction);
+            result.remove(removeGrandTotal);
 
             this.paymentTable.setItems(result);
 
@@ -255,8 +265,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             this.paymentTable.getColumns().add(column0);
             this.paymentTable.getColumns().add(column1);
             this.paymentTable.getColumns().add(column2);
-            //remove the last item Grand total
-            paymentTable.getItems().remove(paymentTable.getItems().size()-1);
+
 
             paymentTable.refresh();
         }
@@ -265,38 +274,29 @@ public class CashierController extends MenuControllerHandler implements Initiali
     }
     @FXML
     private void addPrepayment(ActionEvent event) {
-        ObservableList<ORItemSummary> result = paymentTable.getItems();
-        ORItemSummary foundItem=null;
-        boolean found = false;
-        for(ORItemSummary search : result){
-            if(search.getDescription().equals("Other Deduction") && search.getAmount()>0){
-                found = true;
-                foundItem = search;
-                break;
-            }
-        }
-        if(!found) {
-            AlertDialogBuilder.messgeDialog("Transaction Error", "Cannot add prepayment, since other deduction is zero.",
-                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-            return;
-        }
+
         if (tellerInfo != null) {
             if(!accNum.getText().isEmpty() && !prepayment.getText().isEmpty()){
                 double amount = Double.parseDouble(prepayment.getText());
-                if(amount>foundItem.getAmount()){
+                if(otherDeduction==0) {
+                    AlertDialogBuilder.messgeDialog("Transaction Error", "Cannot add prepayment, since other deduction is zero.",
+                            Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                    return;
+                }else if(amount>otherDeduction){
                     AlertDialogBuilder.messgeDialog("Transaction Error", "Prepayment cannot be more than other deduction.",
                             Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
                     return;
                 }
+
                 ORItemSummary items = (ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1);
                 String[] pre = items.getDescription().split("-");
 
-                    if(pre[0].equals("Energy Prepayment")){
-                        ((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setAmount(amount);
-                        ((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setTotalView(Utility.formatDecimal(amount));
-                    }else{
-                        paymentTable.getItems().add(new ORItemSummary("Energy Prepayment-"+accNum.getText(),Double.parseDouble(prepayment.getText())));
-                    }
+                if(pre[0].equals("Energy Prepayment")){
+                    ((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setAmount(amount);
+                    ((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setTotalView(Utility.formatDecimal(amount));
+                }else{
+                    paymentTable.getItems().add(new ORItemSummary("Energy Prepayment-"+accNum.getText(),Double.parseDouble(prepayment.getText())));
+                }
             }
             paymentTable.refresh();
         }

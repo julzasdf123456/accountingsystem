@@ -20,7 +20,7 @@ public class CashierDAO {
      * @return list The list of dcr breakdown
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static List<ORItemSummary> getDCRBreakDown(int year, int month, int day, String teller) throws Exception{
+    public static List<ORItemSummary> getOrItems(int year, int month, int day, String teller) throws Exception{
         String sql = "SELECT "+
                 "( "+
                 "        (SUM(ISNULL(p.CurrentBills,0)) + SUM(ISNULL(p.Within30Days,0)) + SUM(ISNULL(p.Over30Days,0))) "+
@@ -116,7 +116,8 @@ public class CashierDAO {
 
             ORItemSummary energyItem = new ORItemSummary("12410101000","Energy Bill", energy);
             ORItemSummary trItem = new ORItemSummary("43040300000","Transformer rental", tr);
-            ORItemSummary othersItem = new ORItemSummary("124101010001","Others", others);
+            ORItemSummary energyBillsOthers = new ORItemSummary("124101010001","Energy Bills - Others", others+otherDeduction);
+            //ORItemSummary othersItem = new ORItemSummary("124101010001","Others", others);
             ORItemSummary surChargeItem = new ORItemSummary("43040500000","Surcharge", surcharge);
             ORItemSummary evatItem = new ORItemSummary("22420414001","EVAT", evat);
             ORItemSummary slAdjItem = new ORItemSummary("56150304000","Systems Loss Adjustment", slAdj);
@@ -133,7 +134,8 @@ public class CashierDAO {
 
             tempORItems.add(energyItem);
             tempORItems.add(trItem);
-            tempORItems.add(othersItem);
+            tempORItems.add(energyBillsOthers);
+            //tempORItems.add(othersItem);
             tempORItems.add(surChargeItem);
             tempORItems.add(evatItem);
             tempORItems.add(slAdjItem);

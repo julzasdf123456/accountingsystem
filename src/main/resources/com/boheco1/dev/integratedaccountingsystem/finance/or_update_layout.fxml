@@ -1,14 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.boheco1.dev.integratedaccountingsystem.finance.ORUpdateController"
-            prefHeight="400.0" prefWidth="600.0">
 
+<AnchorPane prefHeight="533.0" prefWidth="1031.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.finance.ORUpdateController">
+   <children>
+      <VBox layoutY="25.0" prefHeight="70.0" prefWidth="989.0" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="25.0">
+         <children>
+            <HBox>
+               <children>
+                  <JFXTextField fx:id="orNumber" onAction="#searchOR" prefHeight="29.0" prefWidth="163.0" promptText="OR Number">
+                     <HBox.margin>
+                        <Insets right="16.0" />
+                     </HBox.margin>
+                  </JFXTextField>
+                  <JFXTextField fx:id="name" editable="false" promptText="Name" HBox.hgrow="ALWAYS" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="12.0" />
+               </VBox.margin>
+            </HBox>
+            <JFXTextField fx:id="address" editable="false" promptText="Address" />
+         </children>
+      </VBox>
+      <TableView fx:id="orTable" layoutX="14.0" layoutY="109.0" prefHeight="409.0" prefWidth="485.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="109.0">
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+      </TableView>
+      <TableView fx:id="newItemTable" layoutX="518.0" layoutY="231.0" prefHeight="231.0" prefWidth="485.0" AnchorPane.leftAnchor="518.0" AnchorPane.topAnchor="194.0">
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+      </TableView>
+      <HBox layoutX="518.0" layoutY="109.0" prefHeight="29.0" prefWidth="485.0" AnchorPane.leftAnchor="518.0" AnchorPane.topAnchor="109.0">
+         <children>
+            <JFXTextField fx:id="orItem" editable="false" prefHeight="29.0" prefWidth="242.0" promptText="O.R Item" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets right="16.0" />
+               </HBox.margin>
+            </JFXTextField>
+            <JFXTextField fx:id="orItemAmount" editable="false" prefHeight="29.0" prefWidth="149.0" promptText="Amount" />
+         </children>
+      </HBox>
+      <HBox layoutX="518.0" layoutY="154.0" prefHeight="29.0" prefWidth="485.0" AnchorPane.leftAnchor="518.0" AnchorPane.topAnchor="154.0">
+         <children>
+            <JFXTextField fx:id="newItemDescription" prefHeight="29.0" prefWidth="242.0" promptText="Description" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets right="16.0" />
+               </HBox.margin>
+            </JFXTextField>
+            <JFXTextField fx:id="newItemAmount" prefHeight="29.0" prefWidth="149.0" promptText="Amount" />
+         </children>
+      </HBox>
+      <JFXButton layoutX="719.0" layoutY="472.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#saveTransaction" prefHeight="29.0" prefWidth="84.0" styleClass="btn-info" text="Save" />
+   </children>
 </AnchorPane>

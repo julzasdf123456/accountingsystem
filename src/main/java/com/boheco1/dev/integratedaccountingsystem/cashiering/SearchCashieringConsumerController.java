@@ -64,7 +64,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                                     int day = searchDate.getValue().getDayOfMonth();
                                     int year = searchDate.getValue().getYear();
                                     String username = UserDAO.get(employeeInfo.getId()).getUserName();
-                                    List<ORItemSummary> orItemSummaries = CashierDAO.getDCRBreakDown(year,month,day, username);
+                                    List<ORItemSummary> orItemSummaries = CashierDAO.getOrItems(year,month,day, username);
                                     Teller teller = new Teller(username, employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), searchDate.getValue(), orItemSummaries);
                                     resultInfo = teller;
                                     return null;
