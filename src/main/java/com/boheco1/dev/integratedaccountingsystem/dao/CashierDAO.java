@@ -20,7 +20,7 @@ public class CashierDAO {
      * @return list The list of dcr breakdown
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static List<ORItemSummary> getDCRBreakDown(int year, int month, int day, String teller) throws Exception{
+    public static List<ORItemSummary> getOrItems(int year, int month, int day, String teller) throws Exception{
         String sql = "SELECT "+
                 "( "+
                 "        (SUM(ISNULL(p.CurrentBills,0)) + SUM(ISNULL(p.Within30Days,0)) + SUM(ISNULL(p.Over30Days,0))) "+
@@ -116,7 +116,8 @@ public class CashierDAO {
 
             ORItemSummary energyItem = new ORItemSummary("12410101000","Energy Bill", energy);
             ORItemSummary trItem = new ORItemSummary("43040300000","Transformer rental", tr);
-            ORItemSummary othersItem = new ORItemSummary("124101010001","Others", others);
+            ORItemSummary energyBillsOthers = new ORItemSummary("124101010001","Energy Bills - Others", others+otherDeduction);
+            //ORItemSummary othersItem = new ORItemSummary("124101010001","Others", others);
             ORItemSummary surChargeItem = new ORItemSummary("43040500000","Surcharge", surcharge);
             ORItemSummary evatItem = new ORItemSummary("22420414001","EVAT", evat);
             ORItemSummary slAdjItem = new ORItemSummary("56150304000","Systems Loss Adjustment", slAdj);
@@ -125,15 +126,16 @@ public class CashierDAO {
             ORItemSummary otherDeductionsItem = new ORItemSummary("124101010001","Other Deduction", otherDeduction);
             ORItemSummary mdRefundItem = new ORItemSummary("21720112002","Meter Deposit-Main", mdRefund);
             ORItemSummary scDiscountItem = new ORItemSummary("12410101000","Senior Citizen Discount", scDiscount);
-            ORItemSummary ch2307Item = new ORItemSummary("22420414002","EVAT 2307 (5%)", amount2307);
-            ORItemSummary ch2306Item = new ORItemSummary("12910111002","Prepayments - Others 2307 (2%)", amount2306);
+            ORItemSummary ch2307Item = new ORItemSummary("22420414002","Prepayments - Others 2307 (2%)", amount2307);
+            ORItemSummary ch2306Item = new ORItemSummary("12910111002","EVAT 2307 (5%)", amount2306);
             ORItemSummary arVATTransItem = new ORItemSummary("12410311000","AR VAT - Transco", arTrans);
             ORItemSummary arVATGenItem = new ORItemSummary("12410310000","AR VAT - GenCo - Gen", arGen);
             ORItemSummary totalItem = new ORItemSummary("Grand Total", total);
 
             tempORItems.add(energyItem);
             tempORItems.add(trItem);
-            tempORItems.add(othersItem);
+            tempORItems.add(energyBillsOthers);
+            //tempORItems.add(othersItem);
             tempORItems.add(surChargeItem);
             tempORItems.add(evatItem);
             tempORItems.add(slAdjItem);

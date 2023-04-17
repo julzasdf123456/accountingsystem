@@ -7,9 +7,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import pl.allegro.finance.tradukisto.ValueConverters;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.ResultSet;
@@ -329,6 +327,14 @@ public class Utility {
         props.load(is);
 
         return props.getProperty("account_code");
+    }
+
+    public static String getTransactionCodeProperty() throws IOException {
+        Properties props = new Properties();
+        InputStream is = new FileInputStream("application.properties");
+        props.load(is);
+
+        return props.getProperty("station").equalsIgnoreCase("main") ? "OR" : "ORSub";
     }
 
     public static LocalDate serverDate() throws SQLException, ClassNotFoundException {

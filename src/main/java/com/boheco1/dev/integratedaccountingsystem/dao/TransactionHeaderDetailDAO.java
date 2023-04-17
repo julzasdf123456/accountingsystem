@@ -118,6 +118,8 @@ public class TransactionHeaderDetailDAO {
             e.printStackTrace();
         }
     }
+
+
     public static void save(List<BatchTransactionInfo> batch) throws SQLException, ClassNotFoundException {
 
         try{

@@ -38,7 +38,7 @@ public class ORLayoutController implements Initializable {
     private Node node;
 
     @FXML
-    private Label cusName1, cusName2, cashier1, cashier2, date1, date2, description1, description2, orNum1, orNum2, ref1, ref2, desc1, desc2, amount1, amount2, totalAmount1, totalAmount2, totalAmount3, totalAmount4;
+    private Label cusName1, cusName2, cashier1, cashier2, date1, date2, description1, description2, orNum1, orNum2, ref1, ref2, desc1, desc2, amount1, amount2, totalAmount3, totalAmount4;
 
     private ORContent orContent = null;
 
@@ -108,17 +108,17 @@ public class ORLayoutController implements Initializable {
             String description = "", amount = "";
             if(orContent.getTellerCollection()!=null){
                 ObservableList<ORItemSummary> items = orContent.getTellerCollection();
-                double energyBillsOthers = 0;
+                /*double energyBillsOthers = 0;
                 for (ORItemSummary a : items) {
                     if(a.getDescription().equals("Others") || a.getDescription().equals("Other Deduction")){
                         energyBillsOthers+=a.getAmount();
                     }
-                }
+                }*/
 
 
                 for (ORItemSummary a : items) {
                     if (a.getAmount() > 0) {
-                        if(a.getDescription().equals("Others") || a.getDescription().equals("Other Deduction"))
+                        /*if(a.getDescription().equals("Others") || a.getDescription().equals("Other Deduction"))
                             continue;
 
                         if(a.getDescription().equals("Surcharge")){
@@ -126,7 +126,7 @@ public class ORLayoutController implements Initializable {
                                 description +="Energy Bills - Others\n";
                                 amount += Utility.formatDecimal(energyBillsOthers)+ "\n";
                             }
-                        }
+                        }*/
 
                         description += a.getDescription() + "\n";
                         if(a.getTotalView().contains("("))
@@ -158,10 +158,8 @@ public class ORLayoutController implements Initializable {
             description2.setText(orContent.getAddress());
             orNum1.setText(orContent.getOrNumber());
             orNum2.setText(orContent.getOrNumber());
-            description1.setText(description1.getText()+"\n"+Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£",""));
-            description2.setText(description2.getText()+"\n"+Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£",""));
-            totalAmount1.setText(amount);
-            totalAmount2.setText(amount);
+            description1.setText(description1.getText()+"\n"+Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£","")+"   "+Utility.formatDecimal(orContent.getTotal()));
+            description2.setText(description2.getText()+"\n"+Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£","")+"   "+Utility.formatDecimal(orContent.getTotal()));
             totalAmount3.setText(Utility.formatDecimal(orContent.getTotal()));
             totalAmount4.setText(Utility.formatDecimal(orContent.getTotal()));
             ref1.setText("");
