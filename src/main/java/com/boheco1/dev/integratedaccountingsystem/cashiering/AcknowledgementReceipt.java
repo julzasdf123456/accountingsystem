@@ -44,6 +44,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
     @FXML TextField orNumber;
     @FXML JFXTextField amount;
     @FXML TextField receivedFrom;
+    @FXML TextField address;
     @FXML TextField paymentFor;
     @FXML Label totalLabel;
     @FXML JFXTextArea amountInWords;
@@ -166,6 +167,8 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             currentTransaction.setTransactionDate(orDate.getValue());
             currentTransaction.setParticulars(receivedFrom.getText());
             currentTransaction.setRemarks(paymentFor.getText());
+            currentTransaction.setName(receivedFrom.getText());
+            currentTransaction.setAddress(address.getText());
             try {
                 TransactionHeaderDAO.add(currentTransaction);
             }catch(Exception ex) {
@@ -345,6 +348,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
     private void loadTransaction() {
         try {
             receivedFrom.setText(currentTransaction.getParticulars());
+            address.setText(currentTransaction.getAddress());
             paymentFor.setText(currentTransaction.getRemarks());
             orNumber.setText(currentTransaction.getTransactionNumber());
             orDate.setValue(currentTransaction.getTransactionDate());

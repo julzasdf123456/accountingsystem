@@ -20,8 +20,8 @@ public class TransactionHeaderDAO {
                         "(Period, TransactionNumber, TransactionCode, " +
                         "AccountID, Source, Particulars, TransactionDate, " +
                         "Bank, ReferenceNo, Amount, EnteredBy, DateEntered, " +
-                        "DateLastModified, UpdatedBy, Remarks) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                        "DateLastModified, UpdatedBy, Remarks, Name, Address) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         ps.setDate(1, java.sql.Date.valueOf(transactionHeader.getPeriod()));
         ps.setString(2, transactionHeader.getTransactionNumber());
         ps.setString(3, transactionHeader.getTransactionCode());
@@ -37,6 +37,8 @@ public class TransactionHeaderDAO {
         ps.setTimestamp(13, transactionHeader.getDateLastModified()!=null ? java.sql.Timestamp.valueOf(transactionHeader.getDateLastModified()) : null);
         ps.setString(14, transactionHeader.getUpdatedBy());
         ps.setString(15, transactionHeader.getRemarks());
+        ps.setString(16,transactionHeader.getName());
+        ps.setString(17, transactionHeader.getAddress());
 
         ps.executeUpdate();
         ps.close();
@@ -80,6 +82,8 @@ public class TransactionHeaderDAO {
             th.setDateLastModified(rs.getTimestamp("DateLastModified") !=null ? rs.getTimestamp("DateLastModified").toLocalDateTime() : null);
             th.setUpdatedBy(rs.getString("UpdatedBy"));
             th.setRemarks(rs.getString("Remarks"));
+            th.setName(rs.getString("Name"));
+            th.setAddress(rs.getString("Address"));
 
             tas.add(th);
         }
@@ -131,6 +135,8 @@ public class TransactionHeaderDAO {
             th.setDateLastModified(rs.getTimestamp("DateLastModified") !=null ? rs.getTimestamp("DateLastModified").toLocalDateTime() : null);
             th.setUpdatedBy(rs.getString("UpdatedBy"));
             th.setRemarks(rs.getString("Remarks"));
+            th.setName(rs.getString("Name"));
+            th.setAddress(rs.getString("Address"));
 
             return th;
         }else {
@@ -165,6 +171,8 @@ public class TransactionHeaderDAO {
             th.setDateLastModified(rs.getTimestamp("DateLastModified") !=null ? rs.getTimestamp("DateLastModified").toLocalDateTime() : null);
             th.setUpdatedBy(rs.getString("UpdatedBy"));
             th.setRemarks(rs.getString("Remarks"));
+            th.setName(rs.getString("Name"));
+            th.setAddress(rs.getString("Address"));
 
             return th;
         }else {
@@ -198,6 +206,8 @@ public class TransactionHeaderDAO {
             th.setDateLastModified(rs.getTimestamp("DateLastModified") !=null ? rs.getTimestamp("DateLastModified").toLocalDateTime() : null);
             th.setUpdatedBy(rs.getString("UpdatedBy"));
             th.setRemarks(rs.getString("Remarks"));
+            th.setName(rs.getString("Name"));
+            th.setAddress(rs.getString("Address"));
 
             return th;
         }
