@@ -30,7 +30,6 @@ public class ORItemSummary {
         if (negVal.contains(description)) {
             if (this.amount != 0) {
                 this.setTotalView("(" + Utility.formatDecimal(Math.abs(this.amount)) + ")");
-                this.amount = amount*-1;
             }else
                 this.setTotalView(" ");
         }else{

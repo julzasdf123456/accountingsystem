@@ -99,14 +99,14 @@ public class CashierDAO {
             double others = rs.getDouble("Others");
             double surcharge = rs.getDouble("Surcharge");
             double evat = rs.getDouble("Evat");
-            double slAdj = rs.getDouble("SLAdj");
-            double ppD = rs.getDouble("PPD");
-            double katasNgVAT = rs.getDouble("KatasNgVAT");
-            double otherDeduction = rs.getDouble("OtherDeduction");
-            double mdRefund = rs.getDouble("MDRefund");
-            double scDiscount = rs.getDouble("SeniorCitizenDiscount");
-            double amount2307 = rs.getDouble("Amount2307");
-            double amount2306 = rs.getDouble("Amount2306");
+            double slAdj = rs.getDouble("SLAdj")*-1;
+            double ppD = rs.getDouble("PPD")*-1;
+            double katasNgVAT = rs.getDouble("KatasNgVAT")*-1;
+            double otherDeduction = rs.getDouble("OtherDeduction")*-1;
+            double mdRefund = rs.getDouble("MDRefund")*-1;
+            double scDiscount = rs.getDouble("SeniorCitizenDiscount")*-1;
+            double amount2307 = rs.getDouble("Amount2307")*-1;
+            double amount2306 = rs.getDouble("Amount2306")*-1;
             double arTrans = rs.getDouble("ARVATTrans");
             double arGen = rs.getDouble("ARVATGen");
 
