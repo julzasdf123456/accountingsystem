@@ -295,7 +295,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     ((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setAmount(amount);
                     ((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setTotalView(Utility.formatDecimal(amount));
                 }else{
-                    paymentTable.getItems().add(new ORItemSummary("Energy Prepayment-"+accNum.getText(),Double.parseDouble(prepayment.getText())));
+                    paymentTable.getItems().add(new ORItemSummary("23220901000","Energy Prepayment-"+accNum.getText(),Double.parseDouble(prepayment.getText())));
                 }
             }
             paymentTable.refresh();

@@ -252,8 +252,9 @@ public class TransactionDetailsDAO {
 
     public static List<TransactionDetails> get(String transactionNumber) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM TransactionDetails WHERE TransactionNumber=?");
+                "SELECT * FROM TransactionDetails WHERE TransactionNumber=? AND TransactionCode = ?");
         ps.setString(1, transactionNumber);
+        ps.setString(2,Utility.getTransactionCodeProperty());
 
         ResultSet rs = ps.executeQuery();
 

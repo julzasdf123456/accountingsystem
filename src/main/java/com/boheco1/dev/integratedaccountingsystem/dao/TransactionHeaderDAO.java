@@ -209,8 +209,9 @@ public class TransactionHeaderDAO {
     public static TransactionHeader get(String orNumber) throws Exception {
 
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM TransactionHeader WHERE TransactionNumber=?");
+                "SELECT * FROM TransactionHeader WHERE TransactionNumber=? AND TransactionCode = ?");
         ps.setString(1, orNumber);
+        ps.setString(2,Utility.getTransactionCodeProperty());
 
         ResultSet rs = ps.executeQuery();
 
