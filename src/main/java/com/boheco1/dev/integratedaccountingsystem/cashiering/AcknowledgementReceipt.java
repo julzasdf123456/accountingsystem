@@ -31,7 +31,17 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import org.apache.poi.ss.formula.functions.Column;
 
+import javax.print.*;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.HashPrintServiceAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.PrintServiceAttributeSet;
+import javax.print.attribute.standard.MediaPrintableArea;
+import javax.print.attribute.standard.OrientationRequested;
+import javax.print.attribute.standard.PrinterName;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,6 +54,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
     @FXML TextField orNumber;
     @FXML JFXTextField amount;
     @FXML TextField receivedFrom;
+    @FXML TextField address;
     @FXML TextField paymentFor;
     @FXML Label totalLabel;
     @FXML JFXTextArea amountInWords;
@@ -166,6 +177,8 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             currentTransaction.setTransactionDate(orDate.getValue());
             currentTransaction.setParticulars(receivedFrom.getText());
             currentTransaction.setRemarks(paymentFor.getText());
+            currentTransaction.setName(receivedFrom.getText());
+            currentTransaction.setAddress(address.getText());
             try {
                 TransactionHeaderDAO.add(currentTransaction);
             }catch(Exception ex) {
@@ -345,6 +358,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
     private void loadTransaction() {
         try {
             receivedFrom.setText(currentTransaction.getParticulars());
+            address.setText(currentTransaction.getAddress());
             paymentFor.setText(currentTransaction.getRemarks());
             orNumber.setText(currentTransaction.getTransactionNumber());
             orDate.setValue(currentTransaction.getTransactionDate());
@@ -370,7 +384,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         }
     }
 
-    public void onPrint() {
+    public void onPrintx() {
         System.out.println("Commence printing...");
         PrinterJob printJob = PrinterJob.createPrinterJob();
         Printer printer = printJob.getPrinter();
@@ -381,9 +395,9 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
         Paper a4 = Paper.A4;
 
-        PageLayout layout = printer.createPageLayout(letter, PageOrientation.PORTRAIT, Printer.MarginType.HARDWARE_MINIMUM);
+        PageLayout layout = printer.createPageLayout(arsize, PageOrientation.PORTRAIT, Printer.MarginType.HARDWARE_MINIMUM);
 
-        System.out.println(letter.getWidth() + "x" + letter.getHeight() + " ");
+        System.out.println(arsize.getWidth() + "x" + arsize.getHeight() + " ");
         System.out.println("Printable: " + layout.getPrintableWidth() + "x" + layout.getPrintableHeight());
 
         printJob.setPrinter(printer);
@@ -398,6 +412,92 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         }else {
             System.out.println("Unable to create print job.");
         }
+    }
+
+    public void onPrint() {
+        try{
+            InputStream is = new ByteArrayInputStream(getPrintData().getBytes());
+            DocFlavor flavor =  DocFlavor.INPUT_STREAM.AUTOSENSE;
+
+            PrintService service = PrintServiceLookup.lookupDefaultPrintService();
+            PrintRequestAttributeSet printRequestAttributeSet = new HashPrintRequestAttributeSet();
+            printRequestAttributeSet.add(new MediaPrintableArea(0, 0, 217, 76, MediaPrintableArea.MM));
+            printRequestAttributeSet.add(OrientationRequested.LANDSCAPE);
+
+            DocPrintJob job = service.createPrintJob();
+            Doc doc= new SimpleDoc(is, flavor, null);
+
+            job.print(doc, printRequestAttributeSet);
+
+            is.close();
+        } catch (PrintException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String leftPadding(int length, String text) {
+        StringBuffer sb = new StringBuffer();
+        for(int i=0; i<length-text.length(); i++) {
+            sb.append(' ');
+        }
+        sb.append(text);
+        return sb.toString();
+    }
+
+    private String getPrintData() {
+        StringBuffer data = new StringBuffer();
+        String line = "                                                                                ";
+
+        String pmtFor = currentTransaction.getParticulars();
+
+        String[] item = new String[transactionDetails.size()];
+        String[] amount = new String[transactionDetails.size()];
+        double totalAmount = 0.0;
+        int idx=0;
+        for(TransactionDetails td: transactionDetails) {
+            item[idx] = td.getParticulars();
+            amount[idx++] = String.format("%,.2f", td.getDebit());
+            totalAmount += td.getDebit();
+        }
+
+        String amountStr = Utility.doubleAmountToWords(totalAmount);
+        String amountSplit1 = Utility.doubleAmountToWords(totalAmount);
+        String amountSplit2 = "";
+        if(amountSplit1.length()>38) {
+            amountSplit1 = amountStr.substring(0, 35);
+            amountSplit2 = amountStr.substring(35);
+        }
+
+        for(int i=0; i<3; i++) data.append(line);
+
+        data.append(new StringBuffer(line).replace(4,pmtFor.length()+4, pmtFor)
+                .replace(45,pmtFor.length()+45, pmtFor));
+
+        data.append(new StringBuffer(line).replace(4, amountSplit1.length()+4, amountSplit1)
+                .replace(45, amountSplit1.length()+45, amountSplit1));
+        data.append(new StringBuffer(line).replace(6, amountSplit2.length()+6, amountSplit2)
+                .replace(47, amountSplit2.length()+47, amountSplit2));
+
+        data.append(line);
+
+        for(int i=0; i<item.length; i++) {
+            String amt = leftPadding(10, amount[i]);
+            data.append(
+                    new StringBuffer(line).replace(0, item[i].length(), item[i]).replace(25, 35, amt)
+                            .replace(43, item[i].length()+43, item[i]).replace(68,78, amt)
+            );
+        }
+
+        for(int i=0; i<3-item.length; i++) data.append(line);
+
+        data.append(
+                new StringBuffer(line).replace(25,35, leftPadding(10,String.format("%,.2f", totalAmount)))
+                        .replace(68,78, leftPadding(10,String.format("%,.2f", totalAmount)))
+        );
+
+        for(int i=0; i<7; i++) data.append(line);
+
+        return data.toString();
     }
 
     private Node buildPrintableNode() {

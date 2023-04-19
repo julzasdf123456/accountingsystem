@@ -166,7 +166,7 @@ public class TransactionDetailsDAO {
             td.setNote(rs.getString("Note"));
             td.setCheckNumber(rs.getString("CheckNumber"));
             td.setParticulars(rs.getString("Particulars"));
-            td.setDepositedDate(rs.getDate("DepositedDate").toLocalDate());
+            td.setDepositedDate(rs.getDate("DepositedDate")!=null ? rs.getDate("DepositedDate").toLocalDate() : null);
             tds.add(td);
         }
 
