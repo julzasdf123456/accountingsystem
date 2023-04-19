@@ -1,5 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -114,6 +116,19 @@ public class TransactionDetails {
 
     public void setCredit(double credit) {
         this.credit = credit;
+    }
+
+    public String getAmount(){
+        double amount;
+        if(credit!=0)
+            amount = credit;
+        else
+            amount = debit;
+
+        if(amount > 0)
+            return Utility.formatDecimal(amount);
+        else
+            return "("+Utility.formatDecimal(Math.abs(amount))+")";
     }
 
     public LocalDate getOrDate() {
