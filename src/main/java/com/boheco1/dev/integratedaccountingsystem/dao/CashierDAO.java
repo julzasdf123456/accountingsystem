@@ -112,7 +112,7 @@ public class CashierDAO {
 
 
 
-            double total = (energy + tr + others + surcharge + evat) + (-slAdj - ppD - katasNgVAT - otherDeduction - mdRefund - scDiscount - amount2307 - amount2306) + arTrans + arGen;
+            double total = (energy + tr + others + surcharge + evat) + (+slAdj + ppD + katasNgVAT + otherDeduction + mdRefund + scDiscount + amount2307 + amount2306) + arTrans + arGen;
 
             ORItemSummary energyItem = new ORItemSummary("12410101000","Energy Bill", energy);
             ORItemSummary trItem = new ORItemSummary("43040300000","Transformer rental", tr);
