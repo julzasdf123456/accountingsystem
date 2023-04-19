@@ -495,7 +495,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
                         .replace(68,78, leftPadding(10,String.format("%,.2f", totalAmount)))
         );
 
-        for(int i=0; i<4; i++) data.append(line);
+        for(int i=0; i<7; i++) data.append(line);
 
         return data.toString();
     }
