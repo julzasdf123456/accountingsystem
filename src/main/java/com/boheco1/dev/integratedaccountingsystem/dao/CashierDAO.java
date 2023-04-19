@@ -101,15 +101,14 @@ public class CashierDAO {
             double evat = rs.getDouble("Evat");
             double slAdj = rs.getDouble("SLAdj")*-1;
             double ppD = rs.getDouble("PPD")*-1;
-            double katasNgVAT = rs.getDouble("KatasNgVAT")*-1;
-            double otherDeduction = rs.getDouble("OtherDeduction")*-1;
-            double mdRefund = rs.getDouble("MDRefund")*-1;
-            double scDiscount = rs.getDouble("SeniorCitizenDiscount")*-1;
-            double amount2307 = rs.getDouble("Amount2307")*-1;
-            double amount2306 = rs.getDouble("Amount2306")*-1;
+            double katasNgVAT = Math.abs(rs.getDouble("KatasNgVAT"))*-1;
+            double otherDeduction = Math.abs(rs.getDouble("OtherDeduction"))*-1;
+            double mdRefund = Math.abs(rs.getDouble("MDRefund"))*-1;
+            double scDiscount = Math.abs(rs.getDouble("SeniorCitizenDiscount"))*-1;
+            double amount2307 = Math.abs(rs.getDouble("Amount2307"))*-1;
+            double amount2306 = Math.abs(rs.getDouble("Amount2306"))*-1;
             double arTrans = rs.getDouble("ARVATTrans");
             double arGen = rs.getDouble("ARVATGen");
-
 
 
             double total = (energy + tr + others + surcharge + evat) + (slAdj + ppD + katasNgVAT + otherDeduction + mdRefund + scDiscount + amount2307 + amount2306) + arTrans + arGen;

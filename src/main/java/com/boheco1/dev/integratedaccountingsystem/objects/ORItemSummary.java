@@ -24,22 +24,12 @@ public class ORItemSummary {
         this.description = description;
         this.amount = amount;
 
-        String[] ars = {"Systems Loss Adjustment", "Prompt payment discount", "Sinking Fund - Katas ng VAT", "Other Deduction", "Meter Deposit-Main", "Senior Citizen Discount", "Prepayments - Others 2307 (2%)", "EVAT 2307 (5%)"};
-        List<String> negVal = Arrays.asList(ars);
-
-        if (negVal.contains(description)) {
-            if (this.amount != 0) {
-                this.setTotalView("(" + Utility.formatDecimal(Math.abs(this.amount)) + ")");
-            }else
-                this.setTotalView(" ");
-        }else{
-            if (this.amount == 0)
-                this.setTotalView(" ");
-            else if (this.amount > 0)
-                this.setTotalView(Utility.formatDecimal(this.amount));
-            else
-                this.setTotalView("("+Utility.formatDecimal(Math.abs(this.amount))+")");
-        }
+        if (this.amount == 0)
+            this.setTotalView(" ");
+        else if (this.amount > 0)
+            this.setTotalView(Utility.formatDecimal(this.amount));
+        else
+            this.setTotalView("("+Utility.formatDecimal(Math.abs(this.amount))+")");
 
     }
 

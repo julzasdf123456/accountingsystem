@@ -103,8 +103,6 @@ public class ORLayoutController implements Initializable {
             //double collectionFromTeller = Double.parseDouble(String.format("%.2f",misc.get(1).getTotal()));
 
 
-
-
             String description = "", amount = "";
             if(orContent.getTellerCollection()!=null){
                 ObservableList<ORItemSummary> items = orContent.getTellerCollection();
@@ -117,7 +115,6 @@ public class ORLayoutController implements Initializable {
 
 
                 for (ORItemSummary a : items) {
-                    if (a.getAmount() > 0) {
                         /*if(a.getDescription().equals("Others") || a.getDescription().equals("Other Deduction"))
                             continue;
 
@@ -129,11 +126,7 @@ public class ORLayoutController implements Initializable {
                         }*/
 
                         description += a.getDescription() + "\n";
-                        if(a.getTotalView().contains("("))
-                            amount += "-"+Utility.formatDecimal(a.getAmount()) + "\n";
-                        else
-                            amount += Utility.formatDecimal(a.getAmount()) + "\n";
-                    }
+                        amount += Utility.formatDecimal(a.getAmount()) + "\n";
                 }
             }else if(orContent.getCustomerCollection() != null) {
                 ObservableList<CRMDetails> items = orContent.getCustomerCollection();

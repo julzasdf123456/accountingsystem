@@ -82,7 +82,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
 
         TableColumn<TransactionDetails, String> orTablecolumn2 = new TableColumn<>("Total Amount");
         orTablecolumn2.setStyle("-fx-alignment: center-right;");
-        orTablecolumn2.setCellValueFactory(obj-> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getCredit())));
+        orTablecolumn2.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getAmount()));
 
         this.orTable.getColumns().add(orTablecolumn1);
         this.orTable.getColumns().add(orTablecolumn2);
@@ -95,7 +95,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
 
         TableColumn<TransactionDetails, String> newItemTablecolumn2 = new TableColumn<>("Total Amount");
         newItemTablecolumn2.setStyle("-fx-alignment: center-right;");
-        newItemTablecolumn2.setCellValueFactory(obj-> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getCredit())));
+        newItemTablecolumn2.setCellValueFactory(obj-> new SimpleStringProperty((obj.getValue().getAmount())));
 
         TableColumn<TransactionDetails, String> removeCol = new TableColumn<>(" ");
         removeCol.setPrefWidth(50);
@@ -193,8 +193,10 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     selectedItem = (TransactionDetails) row.getItem();
-                    orItem.setText(selectedItem.getParticulars());
-                    orItemAmount.setText(Utility.formatDecimal(selectedItem.getCredit()));
+                    if(selectedItem.getCredit()>0) {
+                        orItem.setText(selectedItem.getParticulars());
+                        orItemAmount.setText(Utility.formatDecimal(selectedItem.getCredit()));
+                    }
                 }
             });
             return row ;
@@ -232,8 +234,14 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                     td.setTransactionDate(selectedItem.getTransactionDate());
                     //account sequence will be set upon saving
                     td.setAccountCode(selectedItem.getAccountCode());
-                    td.setDebit(selectedItem.getDebit());
-                    td.setCredit(amount);
+                    if(amount > 0){
+                        td.setDebit(selectedItem.getDebit());
+                        td.setCredit(amount);
+                    }else{
+                        td.setCredit(selectedItem.getCredit());
+                        td.setDebit(amount);
+                    }
+
                     td.setParticulars(selectedItem.getParticulars());
                     td.setOrDate(selectedItem.getOrDate());
                     td.setBankID(selectedItem.getBankID());

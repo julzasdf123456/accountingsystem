@@ -503,34 +503,32 @@ public class CashierController extends MenuControllerHandler implements Initiali
             int seq = 1;
             ObservableList<ORItemSummary> temp = paymentTable.getItems();
             for (ORItemSummary orItemSummary : temp) {
-                if(orItemSummary.getAmount()>0) {
-                    TransactionDetails transactionDetails = new TransactionDetails();
-                    transactionDetails.setPeriod(period);
-                    transactionDetails.setTransactionNumber(orNumber);
+                TransactionDetails transactionDetails = new TransactionDetails();
+                transactionDetails.setPeriod(period);
+                transactionDetails.setTransactionNumber(orNumber);
 
-                    transactionDetails.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
+                transactionDetails.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
 
-                    transactionDetails.setTransactionDate(date.getValue());
+                transactionDetails.setTransactionDate(date.getValue());
 
-                    if (paymentMode.equals("CASH ON HAND") || paymentMode.equals("CHEQUES")) {
-                        transactionDetails.setAccountCode(orItemSummary.getAccountCode());
-                    } else {
-                        transactionDetails.setAccountCode(bankAccountCode);
-                    }
-
-                    transactionDetails.setParticulars(orItemSummary.getDescription());
-                    transactionDetails.setSequenceNumber(seq++);
-
-                    if (orItemSummary.getAmount() > 0)
-                        transactionDetails.setCredit(orItemSummary.getAmount());
-                    else
-                        transactionDetails.setDebit(orItemSummary.getAmount());
-
-                    transactionDetails.setOrDate(date.getValue());
-                    //transactionDetails.setBankID("N/A");
-                    //transactionDetails.setNote("N/A");
-                    transactionDetailsList.add(transactionDetails);
+                if (paymentMode.equals("CASH ON HAND") || paymentMode.equals("CHEQUES")) {
+                    transactionDetails.setAccountCode(orItemSummary.getAccountCode());
+                } else {
+                    transactionDetails.setAccountCode(bankAccountCode);
                 }
+
+                transactionDetails.setParticulars(orItemSummary.getDescription());
+                transactionDetails.setSequenceNumber(seq++);
+
+                if (orItemSummary.getAmount() > 0)
+                    transactionDetails.setCredit(orItemSummary.getAmount());
+                else
+                    transactionDetails.setDebit(orItemSummary.getAmount());
+
+                transactionDetails.setOrDate(date.getValue());
+                //transactionDetails.setBankID("N/A");
+                //transactionDetails.setNote("N/A");
+                transactionDetailsList.add(transactionDetails);
             }
         }
 
