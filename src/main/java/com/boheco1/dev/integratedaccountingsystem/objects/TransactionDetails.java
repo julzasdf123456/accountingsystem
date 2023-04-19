@@ -20,6 +20,8 @@ public class TransactionDetails {
     private String checkNumber;
     private String particulars;
 
+    private String newParticularsLabel;
+
     private LocalDate depositedDate;
 
     public LocalDate getDepositedDate() {
@@ -28,6 +30,21 @@ public class TransactionDetails {
 
     public void setDepositedDate(LocalDate depositedDate) {
         this.depositedDate = depositedDate;
+    }
+
+    public String getNewParticularsLabel() {
+        return newParticularsLabel;
+    }
+
+    public void setNewParticularsLabel(String newParticularsLabel) {
+        this.newParticularsLabel = newParticularsLabel;
+    }
+
+    public String getParticularsLabel(){
+        if(newParticularsLabel==null)
+            return particulars;
+        else
+            return newParticularsLabel;
     }
 
     public String getParticulars() {
@@ -118,7 +135,7 @@ public class TransactionDetails {
         this.credit = credit;
     }
 
-    public String getAmount(){
+    public String getAmountView(){
         double amount;
         if(credit!=0)
             amount = credit;
@@ -129,6 +146,16 @@ public class TransactionDetails {
             return Utility.formatDecimal(amount);
         else
             return "("+Utility.formatDecimal(Math.abs(amount))+")";
+    }
+
+    public double getAmount(){
+        double amount;
+        if(credit!=0)
+            amount = credit;
+        else
+            amount = debit;
+
+        return amount;
     }
 
     public LocalDate getOrDate() {

@@ -86,9 +86,9 @@ public class TransactionDetailsDAO {
                             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
              psUpdate = DB.getConnection().prepareStatement(
-                    "UPDATE TransactionDetails SET Credit = ? " +
+                    "UPDATE TransactionDetails SET Credit = ?, Particulars = ? " +
                             "WHERE " +
-                            "TransactionNumber = ? AND AccountCode = ? ;");
+                            "TransactionNumber = ? AND AccountCode = ? and Particulars = ?;");
 
             DB.getConnection().setAutoCommit(false);
             int sequence = updateRecord.size()+1;
@@ -113,8 +113,10 @@ public class TransactionDetailsDAO {
 
             for(TransactionDetails td: updateRecord) {
                 psUpdate.setDouble(1, td.getCredit());
-                psUpdate.setString(2, td.getTransactionNumber());
-                psUpdate.setString(3, td.getAccountCode());
+                psUpdate.setString(2, td.getParticularsLabel());
+                psUpdate.setString(3, td.getTransactionNumber());
+                psUpdate.setString(4, td.getAccountCode());
+                psUpdate.setString(5,td.getParticulars());
                 psUpdate.addBatch();
             }
 
