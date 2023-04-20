@@ -181,13 +181,6 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                     @Override
                     public void handle(ActionEvent __) {
                         try {
-
-                            if(TransactionHeaderDAO.isAvailable(transactionHeader.getPeriod(), transactionHeader.getTransactionNumber(), transactionHeader.getTransactionCode())){
-                                AlertDialogBuilder.messgeDialog("System Message", "OR number is already used.",
-                                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-                                return;
-                            }
-
                             addUpdate(transactionDetails,newTransactionDetails);
                             reset();
                         } catch (Exception e) {

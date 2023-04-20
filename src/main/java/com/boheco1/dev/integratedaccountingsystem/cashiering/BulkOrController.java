@@ -288,10 +288,7 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
             transactionDetailsSales.setOrDate(ieop.getOrDate());
             transactionDetailsSales.setParticulars("sales");
             transactionDetailsSales.setSequenceNumber(1);
-            if(ieop.getSales() > 0)
-                transactionDetailsSales.setCredit(ieop.getSales());
-            else
-                transactionDetailsSales.setDebit(ieop.getSales());
+            transactionDetailsSales.setCredit(ieop.getSales());
 
             TransactionDetails transactionDetailsWTAX = new TransactionDetails();
             transactionDetailsWTAX.setPeriod(period);
@@ -301,10 +298,8 @@ public class BulkOrController extends MenuControllerHandler implements Initializ
             transactionDetailsWTAX.setOrDate(ieop.getOrDate());
             transactionDetailsWTAX.setParticulars("wtax");
             transactionDetailsWTAX.setSequenceNumber(2);
-            if(ieop.getWtax() > 0)
-                transactionDetailsWTAX.setCredit(ieop.getWtax());
-            else
-                transactionDetailsWTAX.setDebit(ieop.getWtax());
+            transactionDetailsWTAX.setDebit(Math.abs(ieop.getWtax())*-1);
+
 
             BatchTransactionInfo batch = new BatchTransactionInfo();
             batch.setTransactionHeader(transactionHeader);
