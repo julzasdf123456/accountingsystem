@@ -19,6 +19,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Paint;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.TextFields;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
@@ -35,7 +38,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     @FXML
     private DatePicker transactionDate;
     @FXML
-    private JFXTextField orNumber;
+    private JFXTextField orNumber, particular;
 
     @FXML
     private JFXTextField name;
@@ -56,15 +59,14 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     private JFXTextField orItemAmount;
 
     @FXML
-    private JFXComboBox<ParticularsAccount> particular;
-
-    @FXML
     private Label totalAmount, newTotalAmount;
     @FXML
     private JFXTextField newItemAmount;
 
     private TransactionDetails selectedItem;
     TransactionHeader transactionHeader = null;
+
+    ParticularsAccount particularsAccount = null;
     List<TransactionDetails> transactionDetails = null;
     List<TransactionDetails> newTransactionDetails = new ArrayList<>();
     @Override
@@ -76,23 +78,12 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
         updateItem(orItemAmount);
         InputValidation.restrictNumbersOnly(newItemAmount);
         InputValidation.restrictNumbersOnly(orItemAmount);
+        bindParticularAccountInfoAutocomplete(particular);
         totalAmount.setText("");
         newTotalAmount.setText("");
 
-        try {
-            transactionDate.setValue(Utility.serverDate());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        transactionDate.setPromptText("Transaction Date");
 
-        try {
-            ObservableList<ParticularsAccount> particularsAccounts = FXCollections.observableArrayList(ParticularsAccountDAO.getByType("OR"));
-            particular.setItems(particularsAccounts);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void initTable(){
@@ -314,7 +305,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
 
     private void addNewItem(JFXTextField jfxTextField){
         jfxTextField.setOnAction(e -> {
-            if(!particular.getSelectionModel().isEmpty() && !newItemAmount.getText().isEmpty()){
+            if(!particular.getText().isEmpty() && !newItemAmount.getText().isEmpty()){
                 double amount = Double.parseDouble(newItemAmount.getText());
                 if(amount > 0){
                     TransactionDetails temp = (TransactionDetails) orTable.getItems().get(0);
@@ -325,7 +316,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                     td.setTransactionDate(temp.getTransactionDate());
                     //account sequence will be set upon saving
 
-                    ParticularsAccount newItem = particular.getSelectionModel().getSelectedItem();
+                    ParticularsAccount newItem = particularsAccount;
                     td.setAccountCode(newItem.getAccountCode());
                     td.setCredit(amount);
                     td.setParticulars(newItem.getParticulars());
@@ -340,7 +331,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                     ObservableList<TransactionDetails> result = FXCollections.observableArrayList(newTransactionDetails);
                     newItemTable.setItems(result);
                     newItemTable.refresh();
-                    particular.getSelectionModel().clearSelection();
+                    particular.setText("");
                     newItemAmount.setText("");
                     particular.requestFocus();
                     reCompute();
@@ -354,7 +345,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
         address.setText("");
         orItem.setText("");
         orItemAmount.setText("");
-        particular.getSelectionModel().clearSelection();
+        particular.setText("");
         newItemAmount.setText("");
         orTable.getItems().clear();
         newItemTable.getItems().clear();
@@ -381,5 +372,43 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
             newTotalAmount.setText("");
             return true;
         }
+    }
+
+    private void bindParticularAccountInfoAutocomplete(JFXTextField textField){
+        AutoCompletionBinding<ParticularsAccount> suggestion = TextFields.bindAutoCompletion(textField,
+                param -> {
+                    //Value typed in the textfield
+                    String query = param.getUserText();
+
+                    //Initialize list of stocks
+                    List<ParticularsAccount> list = new ArrayList<>();
+
+                    //Perform DB query when length of search string is 4 or above
+                    if (query.length() >= 1){
+                        try {
+                            list = ParticularsAccountDAO.get(query);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    return list;
+                }, new StringConverter<>() {
+                    //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
+                    @Override
+                    public String toString(ParticularsAccount object) {
+                        return object.getParticulars() ;
+                    }
+
+                    @Override
+                    public ParticularsAccount fromString(String string) {
+                        throw new UnsupportedOperationException();
+                    }
+                });
+
+        //This will set the actions once the user clicks an item from the popupmenu.
+        suggestion.setOnAutoCompleted(event -> {
+            particularsAccount = event.getCompletion();
+        });
     }
 }

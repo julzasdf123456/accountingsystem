@@ -66,6 +66,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private CRMQueue crmQueue;
     private List<CRMDetails> crmDetails;
 
+    ORItemSummary grandTotalHolder;
+
     private double collectionFromTeller;
     private double otherDeduction;
 
@@ -238,11 +240,14 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     removeOtherDeduction = orItemSummary;
                 }
                 if(orItemSummary.getDescription().equals("Grand Total")){
+                    grandTotalHolder = new ORItemSummary(orItemSummary.getAccountCode(),orItemSummary.getDescription(),orItemSummary.getAmount());
                     collectionFromTeller = orItemSummary.getAmount();
                     removeGrandTotal = orItemSummary;
                     total.setText(""+Utility.formatDecimal(collectionFromTeller));
                 }
             }
+
+
 
             //remove the item Grand total and Other Deduction
             result.remove(removeOtherDeduction);
@@ -502,6 +507,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         }else if(tellerInfo != null) {
             int seq = 1;
             ObservableList<ORItemSummary> temp = paymentTable.getItems();
+            temp.add(grandTotalHolder);
             for (ORItemSummary orItemSummary : temp) {
                 TransactionDetails transactionDetails = new TransactionDetails();
                 transactionDetails.setPeriod(period);
@@ -520,10 +526,15 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 transactionDetails.setParticulars(orItemSummary.getDescription());
                 transactionDetails.setSequenceNumber(seq++);
 
-                if (orItemSummary.getAmount() > 0)
-                    transactionDetails.setCredit(orItemSummary.getAmount());
-                else
+                if(orItemSummary.getDescription().equals("Grand Total")){
                     transactionDetails.setDebit(orItemSummary.getAmount());
+                }else{
+                    if (orItemSummary.getAmount() > 0)
+                        transactionDetails.setCredit(orItemSummary.getAmount());
+                    else
+                        transactionDetails.setDebit(orItemSummary.getAmount());
+                }
+
 
                 transactionDetails.setOrDate(date.getValue());
                 //transactionDetails.setBankID("N/A");

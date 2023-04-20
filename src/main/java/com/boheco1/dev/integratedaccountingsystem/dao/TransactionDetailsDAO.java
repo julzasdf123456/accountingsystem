@@ -93,7 +93,7 @@ public class TransactionDetailsDAO {
             psDelete = DB.getConnection().prepareStatement("Delete From TransactionDetails WHERE Note='Remove during O.R Update' ");
 
             DB.getConnection().setAutoCommit(false);
-            int sequence = updateRecord.size()+1;
+            int sequence = updateRecord.size()+2;
             for(TransactionDetails td: newRecord) {
                 psAdd.setDate(1, java.sql.Date.valueOf(td.getPeriod()));
                 psAdd.setString(2, td.getTransactionNumber());
@@ -294,7 +294,7 @@ public class TransactionDetailsDAO {
 
     public static List<TransactionDetails> get(String transactionNumber, String transactionCode, LocalDate transactionDate) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM TransactionDetails WHERE TransactionNumber=? AND TransactionCode = ? AND TransactionDate=?");
+                "SELECT * FROM TransactionDetails WHERE TransactionNumber=? AND TransactionCode = ? AND TransactionDate=?  AND Particulars!='Grand Total'");
         ps.setString(1, transactionNumber);
         ps.setString(2, transactionCode);
         ps.setDate(3, java.sql.Date.valueOf(transactionDate));
