@@ -75,7 +75,7 @@ public class TransactionDetailsDAO {
 
         ps.close();
     }
-    private static PreparedStatement psAdd, psUpdate;
+    private static PreparedStatement psAdd, psUpdate, psDelete;
     public static void addUpdate(List<TransactionDetails> updateRecord, List<TransactionDetails> newRecord) throws Exception {
         try {
              psAdd = DB.getConnection().prepareStatement(
@@ -86,9 +86,11 @@ public class TransactionDetailsDAO {
                             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
              psUpdate = DB.getConnection().prepareStatement(
-                    "UPDATE TransactionDetails SET Credit = ?, Particulars = ? " +
+                    "UPDATE TransactionDetails SET Credit = ?, Particulars = ? , Note = ? " +
                             "WHERE " +
                             "TransactionNumber = ? AND AccountCode = ? and Particulars = ?;");
+
+            psDelete = DB.getConnection().prepareStatement("Delete From TransactionDetails WHERE Note='Remove during O.R Update' ");
 
             DB.getConnection().setAutoCommit(false);
             int sequence = updateRecord.size()+1;
@@ -114,15 +116,18 @@ public class TransactionDetailsDAO {
             for(TransactionDetails td: updateRecord) {
                 psUpdate.setDouble(1, td.getCredit());
                 psUpdate.setString(2, td.getParticularsLabel());
-                psUpdate.setString(3, td.getTransactionNumber());
-                psUpdate.setString(4, td.getAccountCode());
-                psUpdate.setString(5,td.getParticulars());
+                psUpdate.setString(3, td.getNote());
+                psUpdate.setString(4, td.getTransactionNumber());
+                psUpdate.setString(5, td.getAccountCode());
+                psUpdate.setString(6,td.getParticulars());
                 psUpdate.addBatch();
             }
 
 
+
             psUpdate.executeBatch();
             psAdd.executeBatch();
+            psDelete.executeUpdate();
             DB.getConnection().setAutoCommit(true);
 
             psAdd.close();

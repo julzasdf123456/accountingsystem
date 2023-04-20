@@ -106,8 +106,58 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
         orTablecolumn2.setStyle("-fx-alignment: center-right;");
         orTablecolumn2.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getAmountView()));
 
+        TableColumn<TransactionDetails, String> orTablecolumnremoveCol = new TableColumn<>(" ");
+        orTablecolumnremoveCol.setPrefWidth(50);
+        orTablecolumnremoveCol.setMaxWidth(50);
+        orTablecolumnremoveCol.setMinWidth(50);
+        Callback<TableColumn<TransactionDetails, String>, TableCell<TransactionDetails, String>> orTableRemoveColCellFactory
+                = //
+                new Callback<TableColumn<TransactionDetails, String>, TableCell<TransactionDetails, String>>() {
+                    @Override
+                    public TableCell call(final TableColumn<TransactionDetails, String> param) {
+                        final TableCell<TransactionDetails, String> cell = new TableCell<TransactionDetails, String>() {
+
+                            FontIcon icon = new FontIcon("mdi2c-close-circle");
+                            private final JFXButton btn = new JFXButton("", icon);
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    TransactionDetails data = getTableView().getItems().get(getIndex());
+                                    icon.setIconSize(16);
+                                    icon.setIconColor(Paint.valueOf(ColorPalette.DANGER));
+                                    btn.setOnAction(event -> {
+                                        try{
+                                            data.setCredit(0);
+                                            data.setNote("Remove during O.R Update");//do not change this message its use during delete db record
+                                            //transactionDetails.remove(data);
+                                            ObservableList<TransactionDetails> result = FXCollections.observableArrayList(transactionDetails);
+                                            orTable.setItems(result);
+                                            orTable.refresh();
+                                            reCompute();
+                                        }catch (Exception e){
+                                            e.printStackTrace();
+                                            AlertDialogBuilder.messgeDialog("System Error", "Error encountered while removing item: "+ e.getMessage(),
+                                                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                        }
+                                    });
+
+                                    setStyle("-fx-background-color: #ffff; -fx-alignment: center; ");
+                                    setGraphic(btn);
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+        orTablecolumnremoveCol.setCellFactory(orTableRemoveColCellFactory);
+
         this.orTable.getColumns().add(orTablecolumn1);
         this.orTable.getColumns().add(orTablecolumn2);
+        this.orTable.getColumns().add(orTablecolumnremoveCol);
 
 
         TableColumn<TransactionDetails, String> newItemTablecolumn1 = new TableColumn<>("Item Description");
@@ -325,7 +375,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
             newTotal+=t.getAmount();
 
         if(!Utility.formatDecimal(newTotal).equals(Utility.formatDecimal(transactionHeader.getAmount())) ){
-            newTotalAmount.setText("Total Amount: "+Utility.formatDecimal(newTotal));
+            newTotalAmount.setText("Amount Difference: "+Utility.formatDecimal(transactionHeader.getAmount() - newTotal));
             return false;
         }else{
             newTotalAmount.setText("");
