@@ -144,6 +144,8 @@ public class TransactionDetails {
 
         if(amount > 0)
             return Utility.formatDecimal(amount);
+        else if(amount == 0)
+            return "0.00";
         else
             return "("+Utility.formatDecimal(Math.abs(amount))+")";
     }

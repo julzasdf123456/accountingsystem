@@ -38,31 +38,26 @@ public class SupplierORController extends MenuControllerHandler implements Initi
     private JFXTextArea supplierInfo;
 
     @FXML
-    private JFXTextField orNumber, amount, searchSupplier;
+    private JFXTextField orNumber, amount, searchSupplier, particular;
 
-    @FXML
-    private JFXComboBox<ParticularsAccount> particular;
     @FXML
     private Label totalDisplay;
 
     @FXML
     private TableView<ORItemSummary> itemTable;
     private SupplierInfo supplier;
+
+    ParticularsAccount particularsAccount = null;
     private ObservableList<ORItemSummary> observableList;
     private double totalAmount;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         bindSupplierInfoAutocomplete(searchSupplier);
+        bindParticularAccountInfoAutocomplete(particular);
         initController();
         clearText();
         Utility.setParentController(this);
 
-        try {
-            ObservableList<ParticularsAccount> particularsAccounts = FXCollections.observableArrayList(ParticularsAccountDAO.getByType("OR"));
-            particular.setItems(particularsAccounts);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void clearText(){
@@ -70,7 +65,7 @@ public class SupplierORController extends MenuControllerHandler implements Initi
             orNumber.setText(""+Utility.OR_NUMBER);
 
         totalDisplay.setText("");
-        particular.getSelectionModel().clearSelection();
+        particular.setText("");
         amount.setText("");
         searchSupplier.setText("");
         supplierInfo.setText("");
@@ -110,12 +105,12 @@ public class SupplierORController extends MenuControllerHandler implements Initi
     @FXML
     private void getAmount(ActionEvent event) {
         if(!amount.getText().isEmpty()){
-            if(!amount.getText().isEmpty() && !particular.getSelectionModel().isEmpty()){
-                ORItemSummary orItemSummary = new ORItemSummary(particular.getSelectionModel().getSelectedItem().getAccountCode(), particular.getSelectionModel().getSelectedItem().getParticulars(), Double.parseDouble(amount.getText()));
+            if(!amount.getText().isEmpty() && !particular.getText().isEmpty()){
+                ORItemSummary orItemSummary = new ORItemSummary(particularsAccount.getAccountCode(), particularsAccount.getParticulars(), Double.parseDouble(amount.getText()));
                 observableList.add(orItemSummary);
                 itemTable.refresh();
                 particular.requestFocus();
-                particular.getSelectionModel().clearSelection();
+                particular.setText("");
                 amount.setText("");
                 totalAmount+=orItemSummary.getAmount();
                 totalDisplay.setText(Utility.formatDecimal(totalAmount));
@@ -204,6 +199,44 @@ public class SupplierORController extends MenuControllerHandler implements Initi
             ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
         }
 
+    }
+
+    private void bindParticularAccountInfoAutocomplete(JFXTextField textField){
+        AutoCompletionBinding<ParticularsAccount> suggestion = TextFields.bindAutoCompletion(textField,
+                param -> {
+                    //Value typed in the textfield
+                    String query = param.getUserText();
+
+                    //Initialize list of stocks
+                    List<ParticularsAccount> list = new ArrayList<>();
+
+                    //Perform DB query when length of search string is 4 or above
+                    if (query.length() >= 1){
+                        try {
+                            list = ParticularsAccountDAO.get(query);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    return list;
+                }, new StringConverter<>() {
+                    //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
+                    @Override
+                    public String toString(ParticularsAccount object) {
+                        return object.getParticulars() ;
+                    }
+
+                    @Override
+                    public ParticularsAccount fromString(String string) {
+                        throw new UnsupportedOperationException();
+                    }
+                });
+
+        //This will set the actions once the user clicks an item from the popupmenu.
+        suggestion.setOnAutoCompleted(event -> {
+            particularsAccount = event.getCompletion();
+        });
     }
 
     private void bindSupplierInfoAutocomplete(JFXTextField textField){

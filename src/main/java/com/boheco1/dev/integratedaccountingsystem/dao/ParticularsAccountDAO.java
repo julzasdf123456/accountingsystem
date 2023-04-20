@@ -43,4 +43,23 @@ public class ParticularsAccountDAO {
 
         return pas;
     }
+
+    public static List<ParticularsAccount> get(String particulars) throws Exception {
+        ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                "SELECT * FROM ParticularsAccount " +
+                        "WHERE Particulars LIKE '%" + particulars + "%' " +
+                        "ORDER BY Particulars");
+
+        ArrayList<ParticularsAccount> pas = new ArrayList<>();
+
+        while(rs.next()) {
+            pas.add(new ParticularsAccount(
+                    rs.getString("Particulars"),
+                    rs.getString("AccountCode"),
+                    rs.getDouble("Amount")
+            ));
+        }
+
+        return pas;
+    }
 }

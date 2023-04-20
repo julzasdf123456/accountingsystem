@@ -129,7 +129,7 @@ public class CashierDAO {
             ORItemSummary ch2306Item = new ORItemSummary("12910111002","EVAT 2307 (5%)", amount2306);
             ORItemSummary arVATTransItem = new ORItemSummary("12410311000","AR VAT - Transco", arTrans);
             ORItemSummary arVATGenItem = new ORItemSummary("12410310000","AR VAT - GenCo - Gen", arGen);
-            ORItemSummary totalItem = new ORItemSummary("Grand Total", total);
+            ORItemSummary totalItem = new ORItemSummary(Utility.getAccountCodeProperty(),"Grand Total", total);//do not change the description it used during teller save transaction details
 
             tempORItems.add(energyItem);
             tempORItems.add(trItem);

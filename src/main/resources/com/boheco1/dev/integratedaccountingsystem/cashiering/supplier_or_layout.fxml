@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXTextArea?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
@@ -51,11 +50,11 @@
             <Separator prefWidth="200.0" />
             <HBox prefHeight="44.0" prefWidth="485.0">
                <children>
-                  <JFXComboBox fx:id="particular" focusColor="#009688" maxWidth="1.7976931348623157E308" promptText="Particular" style="-fx-background-color: #F5F5F5;" HBox.hgrow="ALWAYS">
+                  <JFXTextField fx:id="particular" promptText="Particular" HBox.hgrow="ALWAYS">
                      <HBox.margin>
-                        <Insets top="6.0" />
+                        <Insets right="16.0" top="6.0" />
                      </HBox.margin>
-                  </JFXComboBox>
+                  </JFXTextField>
                   <JFXTextField fx:id="amount" labelFloat="true" maxWidth="-Infinity" onAction="#getAmount" prefHeight="25.0" prefWidth="126.0" promptText="Amount">
                      <HBox.margin>
                         <Insets left="3.0" top="6.0" />

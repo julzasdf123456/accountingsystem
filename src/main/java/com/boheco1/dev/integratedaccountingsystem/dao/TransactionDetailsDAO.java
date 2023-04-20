@@ -75,7 +75,7 @@ public class TransactionDetailsDAO {
 
         ps.close();
     }
-    private static PreparedStatement psAdd, psUpdate;
+    private static PreparedStatement psAdd, psUpdate, psDelete;
     public static void addUpdate(List<TransactionDetails> updateRecord, List<TransactionDetails> newRecord) throws Exception {
         try {
              psAdd = DB.getConnection().prepareStatement(
@@ -86,12 +86,14 @@ public class TransactionDetailsDAO {
                             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
              psUpdate = DB.getConnection().prepareStatement(
-                    "UPDATE TransactionDetails SET Credit = ?, Particulars = ? " +
+                    "UPDATE TransactionDetails SET Credit = ?, Particulars = ? , Note = ? " +
                             "WHERE " +
                             "TransactionNumber = ? AND AccountCode = ? and Particulars = ?;");
 
+            psDelete = DB.getConnection().prepareStatement("Delete From TransactionDetails WHERE Note='Remove during O.R Update' ");
+
             DB.getConnection().setAutoCommit(false);
-            int sequence = updateRecord.size()+1;
+            int sequence = updateRecord.size()+2;
             for(TransactionDetails td: newRecord) {
                 psAdd.setDate(1, java.sql.Date.valueOf(td.getPeriod()));
                 psAdd.setString(2, td.getTransactionNumber());
@@ -114,15 +116,18 @@ public class TransactionDetailsDAO {
             for(TransactionDetails td: updateRecord) {
                 psUpdate.setDouble(1, td.getCredit());
                 psUpdate.setString(2, td.getParticularsLabel());
-                psUpdate.setString(3, td.getTransactionNumber());
-                psUpdate.setString(4, td.getAccountCode());
-                psUpdate.setString(5,td.getParticulars());
+                psUpdate.setString(3, td.getNote());
+                psUpdate.setString(4, td.getTransactionNumber());
+                psUpdate.setString(5, td.getAccountCode());
+                psUpdate.setString(6,td.getParticulars());
                 psUpdate.addBatch();
             }
 
 
+
             psUpdate.executeBatch();
             psAdd.executeBatch();
+            psDelete.executeUpdate();
             DB.getConnection().setAutoCommit(true);
 
             psAdd.close();
@@ -289,7 +294,7 @@ public class TransactionDetailsDAO {
 
     public static List<TransactionDetails> get(String transactionNumber, String transactionCode, LocalDate transactionDate) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM TransactionDetails WHERE TransactionNumber=? AND TransactionCode = ? AND TransactionDate=?");
+                "SELECT * FROM TransactionDetails WHERE TransactionNumber=? AND TransactionCode = ? AND TransactionDate=?  AND Particulars!='Grand Total'");
         ps.setString(1, transactionNumber);
         ps.setString(2, transactionCode);
         ps.setDate(3, java.sql.Date.valueOf(transactionDate));
