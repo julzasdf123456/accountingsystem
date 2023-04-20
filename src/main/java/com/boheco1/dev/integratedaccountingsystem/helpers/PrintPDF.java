@@ -2,12 +2,16 @@ package com.boheco1.dev.integratedaccountingsystem.helpers;
 
 import com.boheco1.dev.integratedaccountingsystem.objects.ORContent;
 import com.boheco1.dev.integratedaccountingsystem.objects.ORItemSummary;
+import com.boheco1.dev.integratedaccountingsystem.objects.Teller;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.DateFormat;
@@ -92,15 +96,15 @@ public class PrintPDF {
 
             String description="", amount="";
             for (ORItemSummary particulars : orContent.getBulkPrinting()){
-                description+=particulars.getDescription()+"\n";
-                if(particulars.getAmount()==0)
-                    particulars.setTotalView(particulars.getTotalView().replace("-",""));
-                amount+=particulars.getTotalView()+"\n";
+                if(particulars.getAmount()!=0){
+                    description+=particulars.getDescription()+"\n";
+                    amount+=particulars.getTotalView().concat("\n");
+                }
             }
 
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER,175f, Rectangle.NO_BORDER);
             createCell(itemTable,description,1,1,  9, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);//items
-            createCell(itemTable,amount,1,1,  9, Font.NORMAL, Element.ALIGN_RIGHT, Rectangle.NO_BORDER);//amount
+            createCell(itemTable,amount,1,1,  9, Font.NORMAL, Element.ALIGN_RIGHT, Rectangle.NO_BORDER,20f);//amount
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
             createCell(itemTable," ",1,1,  9, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
             createCell(itemTable,description,1,1,  9, Font.NORMAL, Element.ALIGN_LEFT, Rectangle.NO_BORDER);//items
@@ -366,6 +370,17 @@ public class PrintPDF {
         cell=new PdfPCell(new Paragraph(text,new Font(Font.FontFamily.TIMES_ROMAN,size,font)));
         cell.setColspan(colSpan);
         cell.setRowspan(rowSpan);
+        cell.setHorizontalAlignment(alignment);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        cell.setBorder(border);
+        table.addCell(cell);
+    }
+
+    public void createCell(PdfPTable table, String text, int colSpan, int rowSpan, int size, int font, int alignment, int border, float padding){
+        cell=new PdfPCell(new Paragraph(text,new Font(Font.FontFamily.TIMES_ROMAN,size,font)));
+        cell.setColspan(colSpan);
+        cell.setRowspan(rowSpan);
+        cell.setPaddingRight(padding);
         cell.setHorizontalAlignment(alignment);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         cell.setBorder(border);
