@@ -4,6 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXTextField;
 import javafx.beans.property.SimpleStringProperty;
@@ -21,6 +22,8 @@ import javafx.util.Callback;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +32,8 @@ import java.util.ResourceBundle;
 import static com.boheco1.dev.integratedaccountingsystem.dao.TransactionDetailsDAO.addUpdate;
 
 public class ORUpdateController extends MenuControllerHandler implements Initializable {
-
+    @FXML
+    private DatePicker transactionDate;
     @FXML
     private JFXTextField orNumber;
 
@@ -52,7 +56,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     private JFXTextField orItemAmount;
 
     @FXML
-    private JFXTextField newItemDescription, newItemAccountCode;
+    private JFXComboBox<ParticularsAccount> particular;
 
     @FXML
     private Label totalAmount, newTotalAmount;
@@ -67,7 +71,6 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initTable();
         tableClick();
-        addNewItem(newItemDescription);
         addNewItem(newItemAmount);
         updateItem(orItem);
         updateItem(orItemAmount);
@@ -75,6 +78,21 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
         InputValidation.restrictNumbersOnly(orItemAmount);
         totalAmount.setText("");
         newTotalAmount.setText("");
+
+        try {
+            transactionDate.setValue(Utility.serverDate());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            ObservableList<ParticularsAccount> particularsAccounts = FXCollections.observableArrayList(ParticularsAccountDAO.getByType("OR"));
+            particular.setItems(particularsAccounts);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void initTable(){
@@ -163,6 +181,13 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                     @Override
                     public void handle(ActionEvent __) {
                         try {
+
+                            if(TransactionHeaderDAO.isAvailable(transactionHeader.getPeriod(), transactionHeader.getTransactionNumber(), transactionHeader.getTransactionCode())){
+                                AlertDialogBuilder.messgeDialog("System Message", "OR number is already used.",
+                                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                return;
+                            }
+
                             addUpdate(transactionDetails,newTransactionDetails);
                             reset();
                         } catch (Exception e) {
@@ -186,10 +211,13 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     @FXML
     private void searchOR(ActionEvent event) throws Exception {
         String searchOr = orNumber.getText();//temporary store search string before reset and clear all field
+        if(searchOr.isEmpty() && transactionDate.getValue()==null)
+            return;
+
         reset();
         orNumber.setText(searchOr);
-        transactionHeader = TransactionHeaderDAO.get(searchOr);
-        transactionDetails = TransactionDetailsDAO.get(searchOr);
+        transactionHeader = TransactionHeaderDAO.get(searchOr,Utility.getTransactionCodeProperty(), transactionDate.getValue());
+        transactionDetails = TransactionDetailsDAO.get(searchOr,Utility.getTransactionCodeProperty(), transactionDate.getValue());
         newTotalAmount.setText("");
         fillUpFields();
     }
@@ -243,7 +271,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
 
     private void addNewItem(JFXTextField jfxTextField){
         jfxTextField.setOnAction(e -> {
-            if(!newItemDescription.getText().isEmpty() && !newItemAmount.getText().isEmpty()){
+            if(!particular.getSelectionModel().isEmpty() && !newItemAmount.getText().isEmpty()){
                 double amount = Double.parseDouble(newItemAmount.getText());
                 if(amount > 0){
                     TransactionDetails temp = (TransactionDetails) orTable.getItems().get(0);
@@ -254,9 +282,10 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                     td.setTransactionDate(temp.getTransactionDate());
                     //account sequence will be set upon saving
 
-                    td.setAccountCode(newItemAccountCode.getText());
+                    ParticularsAccount newItem = particular.getSelectionModel().getSelectedItem();
+                    td.setAccountCode(newItem.getAccountCode());
                     td.setCredit(amount);
-                    td.setParticulars(newItemDescription.getText());
+                    td.setParticulars(newItem.getParticulars());
 
                     td.setOrDate(temp.getOrDate());
                     td.setBankID(temp.getBankID());
@@ -268,10 +297,9 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                     ObservableList<TransactionDetails> result = FXCollections.observableArrayList(newTransactionDetails);
                     newItemTable.setItems(result);
                     newItemTable.refresh();
-                    newItemAccountCode.setText("");
-                    newItemDescription.setText("");
+                    particular.getSelectionModel().clearSelection();
                     newItemAmount.setText("");
-                    newItemAccountCode.requestFocus();
+                    particular.requestFocus();
                     reCompute();
                 }
             }
@@ -283,7 +311,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
         address.setText("");
         orItem.setText("");
         orItemAmount.setText("");
-        newItemDescription.setText("");
+        particular.getSelectionModel().clearSelection();
         newItemAmount.setText("");
         orTable.getItems().clear();
         newItemTable.getItems().clear();

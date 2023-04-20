@@ -1,9 +1,11 @@
 package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.ParticularsAccountDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.SupplierDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
+import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
 import javafx.collections.FXCollections;
@@ -36,8 +38,10 @@ public class SupplierORController extends MenuControllerHandler implements Initi
     private JFXTextArea supplierInfo;
 
     @FXML
-    private JFXTextField orNumber, particular, amount, searchSupplier;
+    private JFXTextField orNumber, amount, searchSupplier;
 
+    @FXML
+    private JFXComboBox<ParticularsAccount> particular;
     @FXML
     private Label totalDisplay;
 
@@ -52,6 +56,13 @@ public class SupplierORController extends MenuControllerHandler implements Initi
         initController();
         clearText();
         Utility.setParentController(this);
+
+        try {
+            ObservableList<ParticularsAccount> particularsAccounts = FXCollections.observableArrayList(ParticularsAccountDAO.getByType("OR"));
+            particular.setItems(particularsAccounts);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void clearText(){
@@ -59,7 +70,7 @@ public class SupplierORController extends MenuControllerHandler implements Initi
             orNumber.setText(""+Utility.OR_NUMBER);
 
         totalDisplay.setText("");
-        particular.setText("");
+        particular.getSelectionModel().clearSelection();
         amount.setText("");
         searchSupplier.setText("");
         supplierInfo.setText("");
@@ -95,33 +106,16 @@ public class SupplierORController extends MenuControllerHandler implements Initi
         observableList =  FXCollections.observableArrayList();
         itemTable.setItems(observableList);
     }
-    @FXML
-    private void getParticular(ActionEvent event) {
-        if(!particular.getText().isEmpty()){
-            if(!amount.getText().isEmpty() && !particular.getText().isEmpty()){
-                ORItemSummary orItemSummary = new ORItemSummary(particular.getText(), Double.parseDouble(amount.getText()));
-                observableList.add(orItemSummary);
-                itemTable.refresh();
-                particular.requestFocus();
-                particular.setText("");
-                amount.setText("");
-                totalAmount+=orItemSummary.getAmount();
-                totalDisplay.setText(Utility.formatDecimal(totalAmount));
-            }else{
-                amount.requestFocus();
-            }
-        }
-    }
 
     @FXML
     private void getAmount(ActionEvent event) {
         if(!amount.getText().isEmpty()){
-            if(!amount.getText().isEmpty() && !particular.getText().isEmpty()){
-                ORItemSummary orItemSummary = new ORItemSummary(particular.getText(), Double.parseDouble(amount.getText()));
+            if(!amount.getText().isEmpty() && !particular.getSelectionModel().isEmpty()){
+                ORItemSummary orItemSummary = new ORItemSummary(particular.getSelectionModel().getSelectedItem().getAccountCode(), particular.getSelectionModel().getSelectedItem().getParticulars(), Double.parseDouble(amount.getText()));
                 observableList.add(orItemSummary);
                 itemTable.refresh();
                 particular.requestFocus();
-                particular.setText("");
+                particular.getSelectionModel().clearSelection();
                 amount.setText("");
                 totalAmount+=orItemSummary.getAmount();
                 totalDisplay.setText(Utility.formatDecimal(totalAmount));
@@ -180,6 +174,7 @@ public class SupplierORController extends MenuControllerHandler implements Initi
             transactionDetails.setParticulars(items.getDescription());
             if(!transactionDetails.getParticulars().contains("TIN"))
                 transactionDetails.setSequenceNumber(seq++);
+            transactionDetails.setAccountCode(items.getAccountCode());
 
             if(items.getAmount() > 0)
                 transactionDetails.setCredit(items.getAmount());
@@ -187,6 +182,7 @@ public class SupplierORController extends MenuControllerHandler implements Initi
                 transactionDetails.setDebit(items.getAmount());
 
             transactionDetails.setOrDate(date.getValue());
+
             transactionDetailsList.add(transactionDetails);
         }
 

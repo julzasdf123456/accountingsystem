@@ -287,6 +287,42 @@ public class TransactionDetailsDAO {
         return tds;
     }
 
+    public static List<TransactionDetails> get(String transactionNumber, String transactionCode, LocalDate transactionDate) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM TransactionDetails WHERE TransactionNumber=? AND TransactionCode = ? AND TransactionDate=?");
+        ps.setString(1, transactionNumber);
+        ps.setString(2, transactionCode);
+        ps.setDate(3, java.sql.Date.valueOf(transactionDate));
+
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<TransactionDetails> tds = new ArrayList<>();
+
+        while(rs.next()) {
+            TransactionDetails td = new TransactionDetails();
+            td.setPeriod(rs.getDate("Period").toLocalDate());
+            td.setTransactionNumber(rs.getString("TransactionNumber"));
+            td.setTransactionCode(rs.getString("TransactionCode"));
+            td.setTransactionDate(rs.getDate("TransactionDate")!=null?rs.getDate("TransactionDate").toLocalDate():null);
+            td.setSequenceNumber(rs.getInt("AccountSequence"));
+            td.setAccountCode(rs.getString("AccountCode"));
+            td.setDebit(rs.getDouble("Debit"));
+            td.setCredit(rs.getDouble("Credit"));
+            td.setOrDate(rs.getDate("ORDate")!=null?rs.getDate("ORDate").toLocalDate():null);
+            td.setBankID(rs.getString("BankID"));
+            td.setNote(rs.getString("Note"));
+            td.setCheckNumber(rs.getString("CheckNumber"));
+            td.setParticulars(rs.getString("Particulars"));
+            td.setDepositedDate(rs.getDate("DepositedDate")==null ? null : rs.getDate("DepositedDate").toLocalDate());
+            tds.add(td);
+        }
+
+        rs.close();
+        ps.close();
+
+        return tds;
+    }
+
     public static int getNextSequenceNumber(LocalDate period, String transactionNumber) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT MAX(AccountSequence) FROM TransactionDetails td WHERE  Period=? AND TransactionCode ='BR' AND TransactionNumber = ? AND AccountSequence <> 999;");
