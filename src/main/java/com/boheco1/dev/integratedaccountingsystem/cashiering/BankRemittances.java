@@ -61,7 +61,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
 
     private void renderTable() {
         TableColumn orDateFromColumn = new TableColumn<BankRemittance, LocalDate>("OR Date");
-        orDateFromColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, LocalDate>("orDateFrom"));
+        orDateFromColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, LocalDate>("orDateStr"));
 
         TableColumn descriptionColumn = new TableColumn<BankRemittance, String>("Bank Account Description");
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, String>("description"));
@@ -209,7 +209,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
             remittanceNo.setText(dateStr);
 
             String transactionNumber = remittanceNo.getText();
-            transactionHeader = TransactionHeaderDAO.get(transactionNumber, "BR");
+            transactionHeader = TransactionHeaderDAO.get(transactionNumber, TransactionHeader.getTransactionCodeProperty());
 
             if(transactionHeader==null) {
                 tableList.clear();
@@ -219,7 +219,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
                 generateReportBtn.setDisable(true);
                 computeTotals();
             }else {
-                List<TransactionDetails> tds = TransactionDetailsDAO.get(transactionHeader.getPeriod(),dateStr,"BR");
+                List<TransactionDetails> tds = TransactionDetailsDAO.get(transactionHeader.getPeriod(),dateStr, TransactionHeader.getTransactionCodeProperty());
 
                 tableList.clear();
 

@@ -60,6 +60,11 @@ public class BankRemittance {
         return this.depositedDate.format(DateTimeFormatter.ofPattern("MMM-dd-yyy"));
     }
 
+    public String getOrDateStr() {
+        if(this.orDateFrom == null) return "";
+        return this.orDateFrom.format(DateTimeFormatter.ofPattern("MMM-dd-yyy"));
+    }
+
     public LocalDate getPeriod() {
         return period;
     }
