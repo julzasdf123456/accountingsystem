@@ -5,6 +5,7 @@ import com.boheco1.dev.integratedaccountingsystem.dao.SupplierDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
@@ -13,14 +14,14 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.paint.Paint;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -95,8 +96,56 @@ public class SupplierORController extends MenuControllerHandler implements Initi
         amountColumn.setMinWidth(150);
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("totalView"));
 
+        TableColumn<ORItemSummary, String> removeColumn = new TableColumn<>(" ");
+        removeColumn.setPrefWidth(50);
+        removeColumn.setMaxWidth(50);
+        removeColumn.setMinWidth(50);
+        Callback<TableColumn<ORItemSummary, String>, TableCell<ORItemSummary, String>> removeColCellFactory
+                = //
+                new Callback<TableColumn<ORItemSummary, String>, TableCell<ORItemSummary, String>>() {
+                    @Override
+                    public TableCell call(final TableColumn<ORItemSummary, String> param) {
+                        final TableCell<ORItemSummary, String> cell = new TableCell<ORItemSummary, String>() {
+
+                            FontIcon icon = new FontIcon("mdi2c-close-circle");
+                            private final JFXButton btn = new JFXButton("", icon);
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    ORItemSummary data = getTableView().getItems().get(getIndex());
+                                    icon.setIconSize(24);
+                                    icon.setIconColor(Paint.valueOf(ColorPalette.DANGER));
+                                    btn.setOnAction(event -> {
+                                        try{
+                                            observableList.remove(data);
+                                            //ObservableList<ORItemSummary> result = FXCollections.observableArrayList(observableList);
+                                            //itemTable.setItems(result);
+                                            itemTable.refresh();
+                                            reCompute();
+                                        }catch (Exception e){
+                                            e.printStackTrace();
+                                            AlertDialogBuilder.messgeDialog("System Error", "Error encountered while removing item: "+ e.getMessage(),
+                                                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                        }
+                                    });
+
+                                    setStyle("-fx-background-color: #ffff; -fx-alignment: center; ");
+                                    setGraphic(btn);
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+        removeColumn.setCellFactory(removeColCellFactory);
+
         itemTable.getColumns().add(particularColumn);
         itemTable.getColumns().add(amountColumn);
+        itemTable.getColumns().add(removeColumn);
         itemTable.setPlaceholder(new Label("No item Added"));
         observableList =  FXCollections.observableArrayList();
         itemTable.setItems(observableList);
@@ -112,12 +161,21 @@ public class SupplierORController extends MenuControllerHandler implements Initi
                 particular.requestFocus();
                 particular.setText("");
                 amount.setText("");
-                totalAmount+=orItemSummary.getAmount();
-                totalDisplay.setText(Utility.formatDecimal(totalAmount));
+                reCompute();
+                itemTable.refresh();
             }else{
                 particular.requestFocus();
             }
         }
+    }
+
+    private void reCompute() {
+        double total = 0;
+        for (ORItemSummary t : observableList)
+            total += t.getAmount();
+
+        totalAmount=total;
+        totalDisplay.setText(Utility.formatDecimal(totalAmount));
     }
 
     @FXML
@@ -159,6 +217,10 @@ public class SupplierORController extends MenuControllerHandler implements Initi
         transactionHeader.setName(supplier.getCompanyName());
 
         List<TransactionDetails> transactionDetailsList = new ArrayList<>();
+
+        //do not delete and change the description it used during supplier save transaction details
+        ORItemSummary grandTotal = new ORItemSummary(Utility.getAccountCodeProperty(),"Grand Total", totalAmount);
+        observableList.add(grandTotal);
         int seq =1;
         for(ORItemSummary items : observableList){
             TransactionDetails transactionDetails = new TransactionDetails();
@@ -171,10 +233,14 @@ public class SupplierORController extends MenuControllerHandler implements Initi
                 transactionDetails.setSequenceNumber(seq++);
             transactionDetails.setAccountCode(items.getAccountCode());
 
-            if(items.getAmount() > 0)
-                transactionDetails.setCredit(items.getAmount());
-            else
+            if(items.getDescription().equals("Grand Total")){
                 transactionDetails.setDebit(items.getAmount());
+            }else{
+                if (items.getAmount() > 0)
+                    transactionDetails.setCredit(items.getAmount());
+                else
+                    transactionDetails.setDebit(items.getAmount());
+            }
 
             transactionDetails.setOrDate(date.getValue());
 
