@@ -2,8 +2,10 @@ package com.boheco1.dev.integratedaccountingsystem;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.NotificationsDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
+import com.boheco1.dev.integratedaccountingsystem.objects.BankRemittance;
 import com.boheco1.dev.integratedaccountingsystem.objects.Notifications;
 import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
+import com.boheco1.dev.integratedaccountingsystem.objects.TransactionHeader;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import javafx.animation.*;
@@ -126,7 +128,18 @@ public class HomeController implements Initializable {
         power_bills_payment = new JFXButton("Power Bills Payment");
         dcr = new JFXButton("Daily Collection Report");
         viewBills = new JFXButton("View Consumer Bills");
-        bankRemittance = new JFXButton("Bank Remittance");
+
+        String brStr = "Bank Remittance";
+
+        try {
+            if(TransactionHeader.getBRTransactionCodeProperty().equalsIgnoreCase("brsub")){
+                brStr = "Bank Remittance Sub";
+            }
+        }catch(Exception ex) {
+            ex.printStackTrace();
+        }
+
+        bankRemittance = new JFXButton(brStr);
         acknowledgement_receipts = new JFXButton("Ack Receipts");
 
         consumer_teller_or = new JFXButton("Consumer/Teller O.R");

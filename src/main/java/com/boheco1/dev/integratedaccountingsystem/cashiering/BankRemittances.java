@@ -209,7 +209,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
             remittanceNo.setText(dateStr);
 
             String transactionNumber = remittanceNo.getText();
-            transactionHeader = TransactionHeaderDAO.get(transactionNumber, TransactionHeader.getTransactionCodeProperty());
+            transactionHeader = TransactionHeaderDAO.get(transactionNumber, TransactionHeader.getBRTransactionCodeProperty());
 
             if(transactionHeader==null) {
                 tableList.clear();
@@ -219,7 +219,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
                 generateReportBtn.setDisable(true);
                 computeTotals();
             }else {
-                List<TransactionDetails> tds = TransactionDetailsDAO.get(transactionHeader.getPeriod(),dateStr, TransactionHeader.getTransactionCodeProperty());
+                List<TransactionDetails> tds = TransactionDetailsDAO.get(transactionHeader.getPeriod(),dateStr, TransactionHeader.getBRTransactionCodeProperty());
 
                 tableList.clear();
 
@@ -259,7 +259,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
         transactionHeader.setRemarks(remarksField.getText());
 
         try {
-            transactionHeader.setTransactionCode(TransactionHeader.getTransactionCodeProperty());
+            transactionHeader.setTransactionCode(TransactionHeader.getBRTransactionCodeProperty());
             TransactionHeaderDAO.add(transactionHeader);
             AlertDialogBuilder.messgeDialog("New Transaction","A new transaction has been created for \"BR\" " + remittanceNo.getText() + ".",stackPane, AlertDialogBuilder.INFO_DIALOG);
             tableList.clear();

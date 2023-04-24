@@ -166,7 +166,7 @@ public class TransactionHeader {
         this.tinNo = tinNo;
     }
 
-    public static String getTransactionCodeProperty() throws Exception{
+    public static String getBRTransactionCodeProperty() throws Exception{
         Properties props = new Properties();
         InputStream is = new FileInputStream("application.properties");
         props.load(is);
