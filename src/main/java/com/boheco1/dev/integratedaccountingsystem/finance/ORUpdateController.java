@@ -186,8 +186,9 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                                     btn.setOnAction(event -> {
                                         try{
                                             newTransactionDetails.remove(data);
-                                            ObservableList<TransactionDetails> result = FXCollections.observableArrayList(newTransactionDetails);
-                                            newItemTable.setItems(result);
+                                            //ObservableList<TransactionDetails> result = FXCollections.observableArrayList(newTransactionDetails);
+                                            //newItemTable.setItems(result);
+                                            newItemTable.refresh();
                                             reCompute();
                                         }catch (Exception e){
                                             e.printStackTrace();
