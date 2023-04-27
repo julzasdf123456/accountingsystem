@@ -365,6 +365,7 @@ public class TransactionDetailsDAO {
             ps.executeUpdate();
         }else {
             TransactionHeader th = TransactionHeaderDAO.get(transactionNumber, transactionCode);
+            System.out.println(transactionNumber + " - " + transactionCode);
             TransactionDetails td = new TransactionDetails();
             td.setPeriod(period);
             td.setTransactionNumber(transactionNumber);
