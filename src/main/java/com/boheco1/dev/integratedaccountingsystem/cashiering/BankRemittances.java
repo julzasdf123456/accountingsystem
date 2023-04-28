@@ -148,7 +148,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
         try{
             TransactionDetails td = bankRemittance.getTransactionDetails();
             TransactionDetailsDAO.delete(td);
-            TransactionDetailsDAO.syncDebit(td.getPeriod(),td.getTransactionNumber(),"BR");
+            TransactionDetailsDAO.syncDebit(td.getPeriod(),td.getTransactionNumber(),TransactionHeader.getBRTransactionCodeProperty());
             tableList.remove(bankRemittance);
             remittanceTable.refresh();
             computeTotals();
