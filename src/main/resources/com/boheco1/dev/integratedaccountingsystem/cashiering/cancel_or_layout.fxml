@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXTextArea?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+
+<AnchorPane prefHeight="435.0" prefWidth="803.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.CancelOrController">
+   <children>
+      <TableView fx:id="orTable" layoutX="218.0" layoutY="72.0" prefHeight="347.0" prefWidth="569.0" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="218.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="14.0" />
+      <VBox alignment="TOP_CENTER" layoutX="14.0" layoutY="14.0" prefHeight="414.0" prefWidth="191.0">
+         <children>
+            <DatePicker fx:id="transactionDate" maxWidth="1.7976931348623157E308" prefHeight="29.0" prefWidth="151.0" promptText="Transaction Date" VBox.vgrow="ALWAYS">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </DatePicker>
+            <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 11;" text="Press Enter to commit date" textFill="RED">
+               <VBox.margin>
+                  <Insets bottom="16.0" />
+               </VBox.margin>
+            </Label>
+            <JFXComboBox fx:id="transCode" focusColor="#009688" maxWidth="1.7976931348623157E308" prefHeight="29.0" prefWidth="137.0" promptText="Transaction Code" VBox.vgrow="ALWAYS">
+               <VBox.margin>
+                  <Insets bottom="16.0" />
+               </VBox.margin>
+            </JFXComboBox>
+            <JFXTextField fx:id="orNumber" maxWidth="1.7976931348623157E308" onAction="#searchBtn" promptText="O.R Number" VBox.vgrow="ALWAYS">
+               <VBox.margin>
+                  <Insets bottom="16.0" />
+               </VBox.margin>
+            </JFXTextField>
+            <JFXTextArea fx:id="note" prefHeight="148.0" prefWidth="191.0" promptText="Note">
+               <VBox.margin>
+                  <Insets bottom="16.0" />
+               </VBox.margin>
+            </JFXTextArea>
+            <JFXButton onAction="#submitBtn" prefHeight="29.0" prefWidth="83.0" styleClass="btn-theme" text="Submit" textFill="WHITE">
+               <VBox.margin>
+                  <Insets bottom="16.0" />
+               </VBox.margin>
+            </JFXButton>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

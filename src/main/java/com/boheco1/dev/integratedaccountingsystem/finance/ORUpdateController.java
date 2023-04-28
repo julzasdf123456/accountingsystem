@@ -53,6 +53,9 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     private TableView newItemTable;
 
     @FXML
+    private JFXComboBox<TransactionDefinition> transCode;
+
+    @FXML
     private JFXTextField orItem;
 
     @FXML
@@ -83,6 +86,18 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
         newTotalAmount.setText("");
 
         transactionDate.setPromptText("Transaction Date");
+
+
+        try {
+            List<TransactionDefinition> transactionDefinitions =  TransactionDefinitionDao.get();
+            for(TransactionDefinition td : transactionDefinitions){
+                transCode.getItems().add(td);
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
 
@@ -246,13 +261,14 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     @FXML
     private void searchOR(ActionEvent event) throws Exception {
         String searchOr = orNumber.getText();//temporary store search string before reset and clear all field
-        if(searchOr.isEmpty() && transactionDate.getValue()==null)
+        if(searchOr.isEmpty() || transactionDate.getValue()==null || transCode.getSelectionModel().isEmpty())
             return;
+
 
         reset();
         orNumber.setText(searchOr);
-        transactionHeader = TransactionHeaderDAO.get(searchOr,Utility.getTransactionCodeProperty(), transactionDate.getValue());
-        transactionDetails = TransactionDetailsDAO.get(searchOr,Utility.getTransactionCodeProperty(), transactionDate.getValue());
+        transactionHeader = TransactionHeaderDAO.get(searchOr,transCode.getSelectionModel().getSelectedItem().getTransactionCode(), transactionDate.getValue());
+        transactionDetails = TransactionDetailsDAO.get(searchOr,transCode.getSelectionModel().getSelectedItem().getTransactionCode(), transactionDate.getValue());
         newTotalAmount.setText("");
         fillUpFields();
     }

@@ -76,7 +76,7 @@ public class HomeController implements Initializable {
     public JFXButton viewBills;
 
     //CASHIER
-    public JFXButton orUpdate, bulk_or, supplier_or, consumer_teller_or, bankRemittance, acknowledgement_receipts;
+    public JFXButton orCancel, orUpdate, bulk_or, supplier_or, consumer_teller_or, bankRemittance, acknowledgement_receipts;
     // WAREHOUSE
     public JFXButton warehouseDashboard, fileMirs, generateMct, mrT, stocks, receiving, addMR, supplier;
 
@@ -147,6 +147,7 @@ public class HomeController implements Initializable {
         supplier = new JFXButton("Supplier");
         bulk_or = new JFXButton("Bulk O.R");
         orUpdate = new JFXButton("Update O.R");
+        orCancel = new JFXButton("Cancel O.R");
 
         // ADD ALL ITEMS TO NAV SEQUENTIALLY
         if(ActiveUser.getUser().can("manage-finance")) {
@@ -182,6 +183,7 @@ public class HomeController implements Initializable {
             NavMenuHelper.addMenu(navMenuBox, bulk_or, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, bankRemittance, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, acknowledgement_receipts, homeStackPane);
+            NavMenuHelper.addMenu(navMenuBox, orCancel, homeStackPane);
         }
 
         if(ActiveUser.getUser().can("manage-warehouse")) {
@@ -249,6 +251,7 @@ public class HomeController implements Initializable {
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(supplier_or, new FontIcon("mdi2t-truck-outline"), drawerMenus, supplier_or.getText(), contentPane, "cashiering/supplier_or_layout.fxml", null, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(bulk_or, new FontIcon("mdi2f-file-upload-outline"), drawerMenus, bulk_or.getText(), contentPane, "cashiering/or_bulk_layout.fxml", null, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(acknowledgement_receipts, new FontIcon("mdi2f-file"), drawerMenus, "Acknowledgement Receipts", contentPane, "cashiering/acknowledgement_receipts.fxml", null, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(orCancel, new FontIcon("mdi2f-file-cancel"), drawerMenus, orCancel.getText(), contentPane, "cashiering/cancel_or_layout.fxml", null, null, title);
         }
 
         // WAREHOUSE

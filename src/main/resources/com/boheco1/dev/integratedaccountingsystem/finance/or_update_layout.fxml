@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.DatePicker?>
@@ -15,13 +16,22 @@
    <children>
       <VBox layoutY="25.0" prefHeight="70.0" prefWidth="989.0" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="25.0">
          <children>
-            <HBox>
+            <HBox alignment="BOTTOM_LEFT">
                <children>
-                  <DatePicker fx:id="transactionDate" prefHeight="29.0" prefWidth="174.0" promptText="Transaction Date">
+                  <VBox>
+                     <children>
+                        <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 11;" text="Press Enter to commit date" textFill="RED" />
+                        <DatePicker fx:id="transactionDate" prefHeight="29.0" prefWidth="148.0" promptText="Transaction Date" />
+                     </children>
                      <HBox.margin>
                         <Insets right="16.0" />
                      </HBox.margin>
-                  </DatePicker>
+                  </VBox>
+                  <JFXComboBox fx:id="transCode" focusColor="#009688" prefHeight="29.0" prefWidth="145.0" promptText="Transaction Code">
+                     <HBox.margin>
+                        <Insets right="16.0" />
+                     </HBox.margin>
+                  </JFXComboBox>
                   <JFXTextField fx:id="orNumber" onAction="#searchOR" prefHeight="29.0" prefWidth="163.0" promptText="OR Number">
                      <HBox.margin>
                         <Insets right="16.0" />

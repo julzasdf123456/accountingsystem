@@ -205,7 +205,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
             TableColumn<CRMDetails, String> column4 = new TableColumn<>("Total");
             column4.setMinWidth(100);
-            column4.setCellValueFactory(obj-> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getTotal())));
+            column4.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getTotalView()));
             column4.setStyle("-fx-alignment: center-right;");
 
             this.paymentTable.getColumns().add(column1);
@@ -453,6 +453,10 @@ public class CashierController extends MenuControllerHandler implements Initiali
         int year = date.getValue().getYear();
         LocalDate period = LocalDate.of(year, month, 1);
 
+        double CRMDetailsTotal=0;
+        for (CRMDetails cr: crmDetails) {
+            CRMDetailsTotal+=cr.getTotal();
+        }
         TransactionHeader transactionHeader= new TransactionHeader();
         transactionHeader.setPeriod(period);
         transactionHeader.setTransactionNumber(orNumber);
@@ -463,6 +467,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             transactionHeader.setAccountID(crmQueue.getSourseId());//CRM Source ID
             transactionHeader.setEnteredBy(ActiveUser.getUser().getUserName());
             transactionHeader.setTransactionDate(date.getValue());
+            transactionHeader.setAmount(CRMDetailsTotal);
         }else if(tellerInfo != null) {
             transactionHeader.setSource("employee");
             transactionHeader.setEnteredBy(tellerInfo.getUsername());
@@ -481,6 +486,11 @@ public class CashierController extends MenuControllerHandler implements Initiali
         transactionHeader.setDateEntered(LocalDateTime.now());
 
         List<TransactionDetails> transactionDetailsList = new ArrayList<>();
+        CRMDetails getOne = crmDetails.get(0);
+        CRMDetails grandTotal = new CRMDetails();
+        grandTotal.setReferenceNo(getOne.getReferenceNo());
+        grandTotal.setParticulars("Grand Total");
+        grandTotal.setTotal(CRMDetailsTotal);
 
         if(crmDetails != null) {
             int seq = 1;
@@ -494,10 +504,14 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 transactionDetails.setParticulars(cd.getParticulars());
                 transactionDetails.setSequenceNumber(seq++);
 
-                if(cd.getTotal() > 0)
-                    transactionDetails.setCredit(cd.getTotal());
-                else
+                if(cd.getParticulars().equals("Grand Total")){
                     transactionDetails.setDebit(cd.getTotal());
+                }else{
+                    if (cd.getTotal() > 0)
+                        transactionDetails.setCredit(cd.getTotal());
+                    else
+                        transactionDetails.setDebit(cd.getTotal());
+                }
 
                 transactionDetails.setOrDate(date.getValue());
                 //transactionDetails.setBankID("N/A");
