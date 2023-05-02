@@ -339,10 +339,10 @@ public class TransactionDetailsDAO {
         return rs.getInt(1) + 1;
     }
 
-    public static double getTotalDebit(LocalDate period, String transactionNumber) throws Exception {
+    public static double getTotalDebit(String transactionNumber) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT SUM(td.Debit) FROM TransactionDetails td WHERE td.Period=? AND td.TransactionNumber=? AND td.Credit=0");
-        ps.setDate(1, java.sql.Date.valueOf(period));
+                "SELECT SUM(td.Debit) FROM TransactionDetails td WHERE td.TransactionCode=? AND td.TransactionNumber=? AND td.Credit=0");
+        ps.setString(1, TransactionHeader.getBRTransactionCodeProperty());
         ps.setString(2, transactionNumber);
         ResultSet rs = ps.executeQuery();
         rs.next();
@@ -358,7 +358,7 @@ public class TransactionDetailsDAO {
 
         if(rs.next()) {
             PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE TransactionDetails SET Credit=? WHERE Period=? AND TransactionNumber=? AND TransactionCode=? AND Debit=0 AND AccountSequence=999");
-            ps.setDouble(1, getTotalDebit(period, transactionNumber));
+            ps.setDouble(1, getTotalDebit(transactionNumber));
             ps.setDate(2, java.sql.Date.valueOf(period));
             ps.setString(3, transactionNumber);
             ps.setString(4, transactionCode);
@@ -370,7 +370,7 @@ public class TransactionDetailsDAO {
             td.setPeriod(period);
             td.setTransactionNumber(transactionNumber);
             td.setTransactionCode(transactionCode);
-            td.setCredit(getTotalDebit(period, transactionNumber));
+            td.setCredit(getTotalDebit(transactionNumber));
             td.setSequenceNumber(999);
             td.setTransactionDate(th.getTransactionDate());
             //BR or BRSub
