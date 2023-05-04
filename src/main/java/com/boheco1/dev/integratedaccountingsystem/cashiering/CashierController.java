@@ -4,28 +4,22 @@ package com.boheco1.dev.integratedaccountingsystem.cashiering;
 import com.boheco1.dev.integratedaccountingsystem.dao.BankAccountDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.CRMDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDetailDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Paint;
-import javafx.util.Callback;
 
 
 import java.net.URL;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -70,7 +64,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     private double collectionFromTeller;
     private double otherDeduction;
-
+    double collectionFromCRM;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Utility.setParentController(this);
@@ -219,11 +213,11 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 crmDetails = CRMDAO.getConsumerTransaction(crmQueue.getId());
                 result = FXCollections.observableArrayList(crmDetails);
                 this.paymentTable.setItems(result);
-                double calculate = 0;
+                collectionFromCRM = 0;
                 for (CRMDetails c : result){
-                    calculate+=c.getTotal();
+                    collectionFromCRM +=c.getTotal();
                 }
-                this.total.setText(""+String.format("%,.2f",calculate));
+                this.total.setText(""+String.format("%,.2f", collectionFromCRM));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -453,10 +447,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
         int year = date.getValue().getYear();
         LocalDate period = LocalDate.of(year, month, 1);
 
-        double CRMDetailsTotal=0;
-        for (CRMDetails cr: crmDetails) {
-            CRMDetailsTotal+=cr.getTotal();
-        }
         TransactionHeader transactionHeader= new TransactionHeader();
         transactionHeader.setPeriod(period);
         transactionHeader.setTransactionNumber(orNumber);
@@ -467,7 +457,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             transactionHeader.setAccountID(crmQueue.getSourseId());//CRM Source ID
             transactionHeader.setEnteredBy(ActiveUser.getUser().getUserName());
             transactionHeader.setTransactionDate(date.getValue());
-            transactionHeader.setAmount(CRMDetailsTotal);
+            transactionHeader.setAmount(collectionFromCRM);
         }else if(tellerInfo != null) {
             transactionHeader.setSource("employee");
             transactionHeader.setEnteredBy(tellerInfo.getUsername());
@@ -485,14 +475,16 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
         transactionHeader.setDateEntered(LocalDateTime.now());
 
-        List<TransactionDetails> transactionDetailsList = new ArrayList<>();
-        CRMDetails getOne = crmDetails.get(0);
-        CRMDetails grandTotal = new CRMDetails();
-        grandTotal.setReferenceNo(getOne.getReferenceNo());
-        grandTotal.setParticulars("Grand Total");
-        grandTotal.setTotal(CRMDetailsTotal);
 
+        List<TransactionDetails> transactionDetailsList = new ArrayList<>();
         if(crmDetails != null) {
+
+            CRMDetails getOne = crmDetails.get(0);
+            CRMDetails grandTotal = new CRMDetails();
+            grandTotal.setReferenceNo(getOne.getReferenceNo());
+            grandTotal.setParticulars("Grand Total");
+            grandTotal.setTotal(collectionFromCRM);
+            crmDetails.add(grandTotal);
             int seq = 1;
             for (CRMDetails cd : crmDetails) {
                 TransactionDetails transactionDetails = new TransactionDetails();
