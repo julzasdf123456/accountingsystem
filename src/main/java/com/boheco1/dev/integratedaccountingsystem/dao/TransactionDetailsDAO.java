@@ -101,7 +101,7 @@ public class TransactionDetailsDAO {
                 psAdd.setDate(4, java.sql.Date.valueOf(td.getTransactionDate()));
                 psAdd.setInt(5, sequence++);
                 psAdd.setString(6, td.getAccountCode());
-                psAdd.setDouble(7, td.getDebit());
+                psAdd.setDouble(7, Math.abs(td.getDebit()));
                 psAdd.setDouble(8, td.getCredit());
                 psAdd.setDate(9, td.getOrDate()==null?null:java.sql.Date.valueOf(td.getOrDate()));
                 psAdd.setString(10, td.getBankID());

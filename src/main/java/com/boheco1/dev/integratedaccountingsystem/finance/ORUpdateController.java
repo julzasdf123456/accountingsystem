@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static com.boheco1.dev.integratedaccountingsystem.dao.TransactionDetailsDAO.addUpdate;
 
 public class ORUpdateController extends MenuControllerHandler implements Initializable {
     @FXML
@@ -53,7 +52,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     private TableView newItemTable;
 
     @FXML
-    private JFXComboBox<TransactionDefinition> transCode;
+    private JFXComboBox<String> transCode;
 
     @FXML
     private JFXTextField orItem;
@@ -87,16 +86,8 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
 
         transactionDate.setPromptText("Transaction Date");
 
-
-        try {
-            List<TransactionDefinition> transactionDefinitions =  TransactionDefinitionDao.get();
-            for(TransactionDefinition td : transactionDefinitions){
-                transCode.getItems().add(td);
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        transCode.getItems().add("OR");
+        transCode.getItems().add("ORSub");
 
 
     }
@@ -238,7 +229,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                     @Override
                     public void handle(ActionEvent __) {
                         try {
-                            addUpdate(transactionDetails,newTransactionDetails);
+                            TransactionDetailsDAO.addUpdate(transactionDetails,newTransactionDetails);
                             reset();
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -267,8 +258,8 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
 
         reset();
         orNumber.setText(searchOr);
-        transactionHeader = TransactionHeaderDAO.get(searchOr,transCode.getSelectionModel().getSelectedItem().getTransactionCode(), transactionDate.getValue());
-        transactionDetails = TransactionDetailsDAO.get(searchOr,transCode.getSelectionModel().getSelectedItem().getTransactionCode(), transactionDate.getValue());
+        transactionHeader = TransactionHeaderDAO.get(searchOr,transCode.getSelectionModel().getSelectedItem(), transactionDate.getValue());
+        transactionDetails = TransactionDetailsDAO.get(searchOr,transCode.getSelectionModel().getSelectedItem(), transactionDate.getValue());
         newTotalAmount.setText("");
         fillUpFields();
     }

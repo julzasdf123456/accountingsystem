@@ -63,7 +63,7 @@ public class TransactionHeaderDetailDAO {
                     ps2.setDate(4, Date.valueOf(td.getTransactionDate()));
                     ps2.setInt(5, td.getSequenceNumber());
                     ps2.setString(6, td.getAccountCode());
-                    ps2.setDouble(7, td.getDebit());
+                    ps2.setDouble(7, Math.abs(td.getDebit()));
                     ps2.setDouble(8, td.getCredit());
                     ps2.setDate(9, Date.valueOf(td.getOrDate()));
                     ps2.setString(10, td.getBankID());
@@ -168,7 +168,7 @@ public class TransactionHeaderDetailDAO {
                     ps2.setDate(4, Date.valueOf(td.getTransactionDate()));
                     ps2.setInt(5, td.getSequenceNumber());
                     ps2.setString(6, td.getAccountCode());
-                    ps2.setDouble(7, td.getDebit());
+                    ps2.setDouble(7, Math.abs(td.getDebit()));
                     ps2.setDouble(8, td.getCredit());
                     ps2.setDate(9, Date.valueOf(td.getOrDate()));
                     ps2.setString(10, td.getBankID());
