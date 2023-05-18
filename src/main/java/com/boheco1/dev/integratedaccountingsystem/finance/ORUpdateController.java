@@ -128,7 +128,10 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                                     icon.setIconColor(Paint.valueOf(ColorPalette.DANGER));
                                     btn.setOnAction(event -> {
                                         try{
-                                            data.setCredit(0);
+                                            if(data.getAmount()>0)
+                                                data.setCredit(0);
+                                            else
+                                                data.setDebit(0);
                                             data.setNote("Remove during O.R Update");//do not change this message its use during delete db record
                                             //transactionDetails.remove(data);
                                             ObservableList<TransactionDetails> result = FXCollections.observableArrayList(transactionDetails);
@@ -262,6 +265,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
         transactionDetails = TransactionDetailsDAO.get(searchOr,transCode.getSelectionModel().getSelectedItem(), transactionDate.getValue());
         newTotalAmount.setText("");
         fillUpFields();
+        reCompute();
     }
 
     private void tableClick(){
@@ -270,10 +274,10 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     selectedItem = (TransactionDetails) row.getItem();
-                    //if(selectedItem.getCredit()>0) {
+                    if(selectedItem.getAmount()!=0) {
                         orItem.setText(selectedItem.getParticularsLabel());
-                        orItemAmount.setText(""+selectedItem.getAmount());
-                    //}
+                        orItemAmount.setText("" + selectedItem.getAmount());
+                    }
                 }
             });
             return row ;
@@ -295,18 +299,15 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
             if(!orItem.getText().isEmpty() && !orItemAmount.getText().isEmpty()) {
                 double amount = Double.parseDouble(orItemAmount.getText());
                 if(amount > 0){
-                    if(amount > selectedItem.getCredit()){
-                        AlertDialogBuilder.messgeDialog("System Message", "Insufficient amount, to perform breakdown." ,
-                                Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-                    }else{
-                        selectedItem.setCredit(amount);
-                        selectedItem.setNewParticularsLabel(orItem.getText());
-                        orTable.refresh();
-                        orItem.setText("");
-                        orItemAmount.setText("");
-                        reCompute();
-                    }
+                    selectedItem.setCredit(amount);
+                }else{
+                    selectedItem.setDebit(amount);
                 }
+                    selectedItem.setNewParticularsLabel(orItem.getText());
+                    orTable.refresh();
+                    orItem.setText("");
+                    orItemAmount.setText("");
+                    reCompute();
             }
         });
     }
@@ -331,7 +332,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
 
                     td.setOrDate(temp.getOrDate());
                     td.setBankID(temp.getBankID());
-                    td.setNote(temp.getNote());
+                    td.setNote(temp.getParticulars()+": "+temp.getNote()+", added as new item during finance update");
                     td.setCheckNumber(temp.getCheckNumber());
                     td.setDepositedDate(temp.getDepositedDate());
 
@@ -365,6 +366,12 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     }
 
     private boolean reCompute(){
+
+        if(transactionHeader==null){
+            AlertDialogBuilder.messgeDialog("System Message", "No result found." ,
+                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+            return false;
+        }
         double newTotal=0;
         for(TransactionDetails t : transactionDetails)
             newTotal+=t.getAmount();

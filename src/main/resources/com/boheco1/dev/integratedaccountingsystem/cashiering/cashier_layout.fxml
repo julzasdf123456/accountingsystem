@@ -123,7 +123,24 @@
                      </VBox.margin>
                   </Label>
                   <Separator prefWidth="200.0" />
-                  <TableView fx:id="paymentTable" maxWidth="1.7976931348623157E308" prefHeight="433.0" prefWidth="614.0" VBox.vgrow="NEVER">
+                  <HBox prefHeight="44.0" prefWidth="485.0">
+                     <children>
+                        <JFXTextField fx:id="particular" promptText="Particular" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets right="16.0" top="6.0" />
+                           </HBox.margin>
+                        </JFXTextField>
+                        <JFXTextField fx:id="amount" labelFloat="true" maxWidth="-Infinity" onAction="#getAmount" prefHeight="25.0" prefWidth="126.0" promptText="Amount">
+                           <HBox.margin>
+                              <Insets left="3.0" top="6.0" />
+                           </HBox.margin>
+                        </JFXTextField>
+                     </children>
+                     <padding>
+                        <Insets top="5.0" />
+                     </padding>
+                  </HBox>
+                  <TableView fx:id="paymentTable" maxWidth="1.7976931348623157E308" prefHeight="363.0" prefWidth="556.0" VBox.vgrow="NEVER">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor>

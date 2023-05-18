@@ -124,9 +124,12 @@ public class ORLayoutController implements Initializable {
                                 amount += Utility.formatDecimal(energyBillsOthers)+ "\n";
                             }
                         }*/
-
+                    if(a.getDescription().length() > 26){
+                        description += a.getDescription().substring(0,25) + "...\n";
+                    }else{
                         description += a.getDescription() + "\n";
-                        amount += Utility.formatDecimal(a.getAmount()) + "\n";
+                    }
+                    amount += Utility.formatDecimal(a.getAmount()) + "\n";
                 }
             }else if(orContent.getCustomerCollection() != null) {
                 ObservableList<CRMDetails> items = orContent.getCustomerCollection();

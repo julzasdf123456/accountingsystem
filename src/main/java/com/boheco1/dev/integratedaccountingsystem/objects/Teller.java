@@ -21,13 +21,12 @@ public class Teller {
     public Teller() {
     }
 
-    public Teller(String username, String name, String address, String phone, LocalDate date, List<ORItemSummary> orItemSummaries) {
+    public Teller(String username, String name, String address, String phone, LocalDate date) {
         this.username = username;
         this.name = name;
         this.address = address;
         this.phone = phone;
         this.date=date;
-        this.orItemSummaries = orItemSummaries;
     }
 
     public String getUsername() {

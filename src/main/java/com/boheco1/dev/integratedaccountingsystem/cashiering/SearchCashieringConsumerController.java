@@ -19,6 +19,7 @@ import javafx.scene.layout.AnchorPane;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -42,6 +43,11 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
     //private ObservableList<CRMQueue> result = null;
     private Object resultInfo = null;
     private ObjectTransaction parentController = null;
+
+    private List<TransactionDetails> transactionDetails;
+    private TransactionHeader transactionHeader;
+
+    private Teller teller;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
        // this.createTable();
@@ -63,10 +69,12 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                                     int month = searchDate.getValue().getMonthValue();
                                     int day = searchDate.getValue().getDayOfMonth();
                                     int year = searchDate.getValue().getYear();
-                                    String username = UserDAO.get(employeeInfo.getId()).getUserName();
-                                    List<ORItemSummary> orItemSummaries = CashierDAO.getOrItems(year,month,day, username);
-                                    Teller teller = new Teller(username, employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), searchDate.getValue(), orItemSummaries);
-                                    resultInfo = teller;
+                                    LocalDate period = LocalDate.of(year, month, 1);
+                                    User user = UserDAO.get(employeeInfo.getId());
+                                    transactionHeader = TransactionHeaderDAO.get(user.getUserName(), searchDate.getValue());
+                                    transactionDetails = TransactionDetailsDAO.get(period, "OR", user );
+                                    teller = new Teller(user.getUserName(), employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), searchDate.getValue());
+
                                     return null;
                                 }
                             };
@@ -78,15 +86,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                             task.setOnSucceeded(wse -> {
                                 dialog.close();
                                 try {
-                                    TransactionHeader transactionHeader = TransactionHeaderDAO.get(UserDAO.get(employeeInfo.getId()).getUserName(), searchDate.getValue());
-                                    if(transactionHeader == null){
-                                        AlertDialogBuilder.messgeDialog("System Message", "Task successful." ,
-                                                Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
-                                    }else {
-                                        AlertDialogBuilder.messgeDialog("System Message", "Transaction has already been processed and assigned with an OR number." ,
-                                                Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-
-                                    }
+                                    resultInfo = teller;
                                     HashMap<String, Object> result = new HashMap<>();
                                     result.put("SearchResult", resultInfo);
                                     result.put("TransactionHeader", transactionHeader);
@@ -112,7 +112,6 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                         //return costumer info from CRMQueue
                         this.parentController.receive(resultInfo);
                     }
-
                 }
             });
             return row ;

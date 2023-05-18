@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.BankAccountDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.CRMDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.ParticularsAccountDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
@@ -17,6 +18,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Paint;
+import javafx.util.Callback;
+import javafx.util.StringConverter;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.TextFields;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 
 import java.net.URL;
@@ -34,7 +40,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private JFXButton submitBtn;
 
     @FXML
-    private JFXTextField name, address, purpose, energyBill, vat, surcharge, prepayment, accNum, tinNo, orNumber, businessStyle;
+    private JFXTextField amount, particular, name, address, purpose, energyBill, vat, surcharge, prepayment, accNum, tinNo, orNumber, businessStyle;
 
 
     @FXML
@@ -60,10 +66,11 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private CRMQueue crmQueue;
     private List<CRMDetails> crmDetails;
 
-    ORItemSummary grandTotalHolder;
-
+    //ORItemSummary grandTotalHolder;
+    ParticularsAccount particularsAccount = null;
+    private ObservableList<ORItemSummary> OR_itemList;
     private double collectionFromTeller;
-    private double otherDeduction;
+    //private double otherDeduction;
     double collectionFromCRM;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -80,6 +87,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         InputValidation.restrictNumbersOnly(surcharge);
         InputValidation.restrictNumbersOnly(prepayment);
         InputValidation.restrictNumbersOnly(accNum);
+        InputValidation.restrictNumbersOnly(amount);
 
         InputValidation.restrictNumbersOnly(tinNo);
         InputValidation.restrictNumbersOnly(orNumber);
@@ -100,6 +108,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
         paymentMode.getSelectionModel().selectFirst();
         bankInfo.setDisable(true);
+        bindParticularAccountInfoAutocomplete(particular);
     }
 
     @FXML
@@ -152,21 +161,26 @@ public class CashierController extends MenuControllerHandler implements Initiali
             TransactionHeader transactionHeader = (TransactionHeader) ((HashMap<?, ?>) o).get("TransactionHeader");
             LocalDate localDate = (LocalDate) ((HashMap<?, ?>) o).get("SearchDate");
             this.tellerInfo = (Teller) ((HashMap<?, ?>) o).get("SearchResult");
-            this.name.setText(tellerInfo.getName());
-            this.date.setValue(localDate);
-            this.address.setText(tellerInfo.getAddress());
-            this.purpose.setText("for DCR OR");
 
-            if(transactionHeader != null){
-                this.date.setValue(transactionHeader.getTransactionDate());
-                this.orNumber.setText(transactionHeader.getTransactionNumber());
-                this.remarks.setText(transactionHeader.getRemarks());
-                submitBtn.setDisable(true);
+
+            if(transactionHeader == null){
+                //this.date.setValue(transactionHeader.getTransactionDate());
+                //this.orNumber.setText(transactionHeader.getTransactionNumber());
+                //this.remarks.setText(transactionHeader.getRemarks());
+                //submitBtn.setDisable(true);
+                this.name.setText(tellerInfo.getName());
+                this.date.setValue(localDate);
+                this.address.setText(tellerInfo.getAddress());
+                this.purpose.setText("for DCR OR");
+                address.setEditable(false);
+                purpose.setEditable(false);
+                consumerInfo = null;
+                initTable(tellerInfo);
+            }else{
+                AlertDialogBuilder.messgeDialog("System Message", "Transaction has already been processed and assigned with an OR number." ,
+                        Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
             }
-            address.setEditable(false);
-            purpose.setEditable(false);
-            consumerInfo = null;
-            initTable(tellerInfo);
+
         }else if (o instanceof Boolean) {
             //Receive from ORLayoutController
             boolean b = (Boolean) o;
@@ -225,58 +239,149 @@ public class CashierController extends MenuControllerHandler implements Initiali
             this.crmDetails = crmDetails;
         }if(o instanceof Teller){
             Teller teller = (Teller)  o;
-            ORItemSummary removeGrandTotal=null, removeOtherDeduction=null;
+            ORItemSummary removeGrandTotal=null;
             List<ORItemSummary> orItemSummaries = teller.getOrItemSummaries();
-            ObservableList<ORItemSummary> result = FXCollections.observableArrayList(orItemSummaries);
+            /*ObservableList<ORItemSummary> result = FXCollections.observableArrayList(orItemSummaries);
             for (ORItemSummary orItemSummary : result){
-                if(orItemSummary.getDescription().equals("Other Deduction")){
-                    otherDeduction = orItemSummary.getAmount();
-                    removeOtherDeduction = orItemSummary;
-                }
                 if(orItemSummary.getDescription().equals("Grand Total")){
                     grandTotalHolder = new ORItemSummary(orItemSummary.getAccountCode(),orItemSummary.getDescription(),orItemSummary.getAmount());
                     collectionFromTeller = orItemSummary.getAmount();
                     removeGrandTotal = orItemSummary;
                     total.setText(""+Utility.formatDecimal(collectionFromTeller));
+                    break;
                 }
             }
 
 
 
             //remove the item Grand total and Other Deduction
-            result.remove(removeOtherDeduction);
             result.remove(removeGrandTotal);
 
-            this.paymentTable.setItems(result);
+            this.paymentTable.setItems(result);*/
 
             TableColumn<ORItemSummary, String> column0 = new TableColumn<>("Account Code");
             column0.setStyle("-fx-alignment: center-left;");
+            column0.setMinWidth(120);
             column0.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getAccountCode()));
 
             TableColumn<ORItemSummary, String> column1 = new TableColumn<>("Item Description");
-            column1.setMinWidth(220);
+            column1.setMinWidth(250);
             column1.setCellValueFactory(new PropertyValueFactory<>("description"));
 
             TableColumn<ORItemSummary, String> column2 = new TableColumn<>("Total Amount");
             column2.setStyle("-fx-alignment: center-right;");
+            column2.setMinWidth(100);
             column2.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getTotalView()));
+
+            TableColumn<ORItemSummary, String> column3 = new TableColumn<>(" ");
+            column3.setPrefWidth(50);
+            column3.setMaxWidth(50);
+            column3.setMinWidth(50);
+            Callback<TableColumn<ORItemSummary, String>, TableCell<ORItemSummary, String>> column3Remove
+                    = //
+                    new Callback<TableColumn<ORItemSummary, String>, TableCell<ORItemSummary, String>>() {
+                        @Override
+                        public TableCell call(final TableColumn<ORItemSummary, String> param) {
+                            final TableCell<ORItemSummary, String> cell = new TableCell<ORItemSummary, String>() {
+
+                                FontIcon icon = new FontIcon("mdi2c-close-circle");
+                                private final JFXButton btn = new JFXButton("", icon);
+                                @Override
+                                public void updateItem(String item, boolean empty) {
+                                    super.updateItem(item, empty);
+                                    if (empty) {
+                                        setGraphic(null);
+                                        setText(null);
+                                    } else {
+                                        ORItemSummary data = getTableView().getItems().get(getIndex());
+                                        icon.setIconSize(16);
+                                        icon.setIconColor(Paint.valueOf(ColorPalette.DANGER));
+                                        btn.setOnAction(event -> {
+                                            try{
+                                                OR_itemList.remove(data);
+                                                //ObservableList<TransactionDetails> result = FXCollections.observableArrayList(newTransactionDetails);
+                                                //newItemTable.setItems(result);
+                                                paymentTable.refresh();
+                                                reCompute();
+                                            }catch (Exception e){
+                                                e.printStackTrace();
+                                                AlertDialogBuilder.messgeDialog("System Error", "Error encountered while removing item: "+ e.getMessage(),
+                                                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                            }
+                                        });
+                                        setStyle("-fx-background-color: #ffff; -fx-alignment: center; ");
+                                        setGraphic(btn);
+                                    }
+                                }
+                            };
+                            return cell;
+                        }
+                    };
+            column3.setCellFactory(column3Remove);
 
             this.paymentTable.getColumns().add(column0);
             this.paymentTable.getColumns().add(column1);
             this.paymentTable.getColumns().add(column2);
+            this.paymentTable.getColumns().add(column3);
 
+            OR_itemList =  FXCollections.observableArrayList();
+            paymentTable.setItems(OR_itemList);
 
-            paymentTable.refresh();
+            //paymentTable.refresh();
         }
 
         this.paymentTable.setPlaceholder(new Label("No consumer records was searched."));
     }
+
+    @FXML
+    private void getAmount(ActionEvent event) {
+        if(tellerInfo == null){
+            AlertDialogBuilder.messgeDialog("System Message", "Please select teller information and try again." ,
+                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+            return;
+        }
+        if(!amount.getText().isEmpty()){
+            if(!amount.getText().isEmpty() && !particular.getText().isEmpty()){
+                if(!particularsAccount.getAccountCode().equals("23220901000")){ //check if selected item is not Energy prepayments
+                    ORItemSummary orItemSummary = new ORItemSummary(particularsAccount.getAccountCode(), particularsAccount.getParticulars(), Double.parseDouble(amount.getText()));
+                    OR_itemList.add(orItemSummary);
+                    paymentTable.setItems(OR_itemList);
+                    particular.requestFocus();
+                    particular.setText("");
+                    amount.setText("");
+                    reCompute();
+                    paymentTable.refresh();
+                }else{
+                    AlertDialogBuilder.messgeDialog("System Message", "Please use the add prepayment function." ,
+                            Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                }
+                particular.requestFocus();
+            }
+        }
+    }
+
+    private void reCompute() {
+        double calculate = 0;
+        for (ORItemSummary t : OR_itemList)
+            calculate += t.getAmount();
+
+        collectionFromTeller=calculate;
+        total.setText(""+Utility.formatDecimal(collectionFromTeller));
+        //totalDisplay.setText(Utility.formatDecimal(totalAmount));
+    }
+
     @FXML
     private void addPrepayment(ActionEvent event) {
-
+        double otherDeduction=0;
         if (tellerInfo != null) {
             if(!accNum.getText().isEmpty() && !prepayment.getText().isEmpty()){
                 double amount = Double.parseDouble(prepayment.getText());
+                for(ORItemSummary os : OR_itemList){
+                    if(os.getAccountCode().equals("124101010001")){ //check is Energy Bill - Others is already added
+                        otherDeduction = os.getAmount();
+                        break;
+                    }
+                }
                 if(otherDeduction==0) {
                     AlertDialogBuilder.messgeDialog("Transaction Error", "Cannot add prepayment, since other deduction is zero.",
                             Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
@@ -513,7 +618,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
         }else if(tellerInfo != null) {
             int seq = 1;
             ObservableList<ORItemSummary> temp = paymentTable.getItems();
-            temp.add(grandTotalHolder);
             for (ORItemSummary orItemSummary : temp) {
                 TransactionDetails transactionDetails = new TransactionDetails();
                 transactionDetails.setPeriod(period);
@@ -532,14 +636,14 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 transactionDetails.setParticulars(orItemSummary.getDescription());
                 transactionDetails.setSequenceNumber(seq++);
 
-                if(orItemSummary.getDescription().equals("Grand Total")){
+                /*if(orItemSummary.getDescription().equals("Grand Total")){
                     transactionDetails.setDebit(orItemSummary.getAmount());
-                }else{
+                }else{*/
                     if (orItemSummary.getAmount() > 0)
                         transactionDetails.setCredit(orItemSummary.getAmount());
                     else
                         transactionDetails.setDebit(orItemSummary.getAmount());
-                }
+                //}
 
 
                 transactionDetails.setOrDate(date.getValue());
@@ -547,6 +651,20 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 //transactionDetails.setNote("N/A");
                 transactionDetailsList.add(transactionDetails);
             }
+
+            //Grand total transaction detail item
+            TransactionDetails transactionDetails = new TransactionDetails();
+            transactionDetails.setPeriod(period);
+            transactionDetails.setTransactionNumber(orNumber);
+            transactionDetails.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
+            transactionDetails.setTransactionDate(date.getValue());
+            //transactionDetails.setAccountCode(orItemSummary.getAccountCode());
+            transactionDetails.setParticulars("Grand Total");
+            transactionDetails.setSequenceNumber(seq++);
+            transactionDetails.setDebit(collectionFromTeller);
+            transactionDetails.setOrDate(date.getValue());
+            transactionDetailsList.add(transactionDetails);
+
         }
 
         //check Period, TransactionNumber(OR number), TransactionCode(main or sub)
@@ -573,6 +691,48 @@ public class CashierController extends MenuControllerHandler implements Initiali
         Utility.setOrContent(orContent);
         ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
 
+    }
+
+    private void bindParticularAccountInfoAutocomplete(JFXTextField textField){
+
+        AutoCompletionBinding<ParticularsAccount> suggestion = TextFields.bindAutoCompletion(textField,
+                param -> {
+                    //Value typed in the textfield
+                    String query = param.getUserText();
+
+                    //Initialize list of stocks
+                    List<ParticularsAccount> list = new ArrayList<>();
+
+                    //Perform DB query
+                    if (query.length() >= 1){
+                        try {
+                            list = ParticularsAccountDAO.get(query);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    return list;
+                }, new StringConverter<>() {
+                    //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
+                    @Override
+                    public String toString(ParticularsAccount object) {
+                        return object.getParticulars() ;
+                    }
+
+                    @Override
+                    public ParticularsAccount fromString(String string) {
+                        throw new UnsupportedOperationException();
+                    }
+                });
+
+        //This will set the actions once the user clicks an item from the popupmenu.
+        suggestion.setOnAutoCompleted(event -> {
+            particularsAccount = event.getCompletion();
+            if(particularsAccount.getAmount() != 0)
+                amount.setText(""+particularsAccount.getAmount());
+            amount.requestFocus();
+        });
     }
 
 }
