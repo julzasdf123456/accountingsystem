@@ -73,8 +73,9 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                                     User user = UserDAO.get(employeeInfo.getId());
                                     transactionHeader = TransactionHeaderDAO.get(user.getUserName(), searchDate.getValue());
                                     transactionDetails = TransactionDetailsDAO.get(period, "OR", user );
+                                    List<ORItemSummary> orItemSummaries = CashierDAO.getOrItems(year, month,day,user.getUserName());
                                     teller = new Teller(user.getUserName(), employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), searchDate.getValue());
-
+                                    teller.setOrItemSummaries(orItemSummaries);
                                     return null;
                                 }
                             };

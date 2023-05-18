@@ -87,7 +87,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         InputValidation.restrictNumbersOnly(surcharge);
         InputValidation.restrictNumbersOnly(prepayment);
         InputValidation.restrictNumbersOnly(accNum);
-        InputValidation.restrictNumbersOnly(amount);
+        //InputValidation.restrictNumbersOnly(amount);
 
         InputValidation.restrictNumbersOnly(tinNo);
         InputValidation.restrictNumbersOnly(orNumber);
@@ -108,7 +108,10 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
         paymentMode.getSelectionModel().selectFirst();
         bankInfo.setDisable(true);
-        bindParticularAccountInfoAutocomplete(particular);
+        //bindParticularAccountInfoAutocomplete(particular);
+
+        amount.setVisible(false);
+        particular.setVisible(false);
     }
 
     @FXML
@@ -265,7 +268,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             column0.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getAccountCode()));
 
             TableColumn<ORItemSummary, String> column1 = new TableColumn<>("Item Description");
-            column1.setMinWidth(250);
+            //column1.setMinWidth(250);
             column1.setCellValueFactory(new PropertyValueFactory<>("description"));
 
             TableColumn<ORItemSummary, String> column2 = new TableColumn<>("Total Amount");
@@ -322,11 +325,11 @@ public class CashierController extends MenuControllerHandler implements Initiali
             this.paymentTable.getColumns().add(column0);
             this.paymentTable.getColumns().add(column1);
             this.paymentTable.getColumns().add(column2);
-            this.paymentTable.getColumns().add(column3);
+            //this.paymentTable.getColumns().add(column3);
 
-            OR_itemList =  FXCollections.observableArrayList();
+            OR_itemList =  FXCollections.observableArrayList(teller.getOrItemSummaries());
             paymentTable.setItems(OR_itemList);
-
+            reCompute();
             //paymentTable.refresh();
         }
 
