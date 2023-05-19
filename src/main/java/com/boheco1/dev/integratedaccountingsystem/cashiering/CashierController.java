@@ -167,22 +167,26 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
 
             if(transactionHeader == null){
-                //this.date.setValue(transactionHeader.getTransactionDate());
-                //this.orNumber.setText(transactionHeader.getTransactionNumber());
-                //this.remarks.setText(transactionHeader.getRemarks());
-                //submitBtn.setDisable(true);
                 this.name.setText(tellerInfo.getName());
                 this.date.setValue(localDate);
                 this.address.setText(tellerInfo.getAddress());
-                this.purpose.setText("for DCR OR");
+                this.purpose.setText("for DCR O.R");
                 address.setEditable(false);
                 purpose.setEditable(false);
                 consumerInfo = null;
-                initTable(tellerInfo);
+                submitBtn.setDisable(false);
             }else{
+                this.address.setText(tellerInfo.getAddress());
+                this.name.setText(tellerInfo.getName());
+                this.date.setValue(transactionHeader.getTransactionDate());
+                this.orNumber.setText(transactionHeader.getTransactionNumber());
+                this.purpose.setText("for DCR O.R");
+                this.remarks.setText(transactionHeader.getRemarks());
+                submitBtn.setDisable(true);
                 AlertDialogBuilder.messgeDialog("System Message", "Transaction has already been processed and assigned with an OR number." ,
                         Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
             }
+            initTable(tellerInfo);
 
         }else if (o instanceof Boolean) {
             //Receive from ORLayoutController
@@ -567,7 +571,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             transactionHeader.setTransactionDate(date.getValue());
             transactionHeader.setAmount(collectionFromCRM);
         }else if(tellerInfo != null) {
-            transactionHeader.setSource("employee");
+            transactionHeader.setSource("Billing");
             transactionHeader.setEnteredBy(tellerInfo.getUsername());
             transactionHeader.setAccountID(ActiveUser.getUser().getId());
             transactionHeader.setAmount(collectionFromTeller);

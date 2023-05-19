@@ -155,7 +155,7 @@ public class TransactionDetails {
         if(credit!=0)
             amount = credit;
         else
-            amount = debit;
+            amount = debit*-1;
 
         return amount;
     }

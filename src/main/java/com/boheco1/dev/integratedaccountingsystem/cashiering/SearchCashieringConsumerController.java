@@ -69,11 +69,22 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                                     int month = searchDate.getValue().getMonthValue();
                                     int day = searchDate.getValue().getDayOfMonth();
                                     int year = searchDate.getValue().getYear();
+                                    List<ORItemSummary> orItemSummaries =null;
                                     LocalDate period = LocalDate.of(year, month, 1);
                                     User user = UserDAO.get(employeeInfo.getId());
                                     transactionHeader = TransactionHeaderDAO.get(user.getUserName(), searchDate.getValue());
-                                    transactionDetails = TransactionDetailsDAO.get(period, "OR", user );
-                                    List<ORItemSummary> orItemSummaries = CashierDAO.getOrItems(year, month,day,user.getUserName());
+                                    if(transactionHeader==null) {
+                                        orItemSummaries = CashierDAO.getOrItems(year, month, day, user.getUserName());
+                                    }else {
+                                        transactionDetails = TransactionDetailsDAO.get(period, "OR", user);
+                                        orItemSummaries = new ArrayList<>();
+                                        for(TransactionDetails td : transactionDetails){
+                                            if(!td.getParticulars().equals("Grand Total")){
+                                                ORItemSummary os = new ORItemSummary(td.getAccountCode(),td.getParticulars(),td.getAmount());
+                                                orItemSummaries.add(os);
+                                            }
+                                        }
+                                    }
                                     teller = new Teller(user.getUserName(), employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), searchDate.getValue());
                                     teller.setOrItemSummaries(orItemSummaries);
                                     return null;
