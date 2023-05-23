@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+
+<AnchorPane prefHeight="619.0" prefWidth="781.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.finance.CheckVoucherController">
+   <children>
+      <VBox layoutX="14.0" layoutY="14.0" prefHeight="179.0" prefWidth="673.0">
+         <children>
+            <HBox alignment="CENTER_RIGHT">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+               <children>
+                  <Label text="Date: " />
+                  <DatePicker />
+               </children>
+            </HBox>
+            <Label prefHeight="17.0" prefWidth="45.0" text="Payee: " />
+            <JFXTextField prefHeight="25.0" prefWidth="302.0" style="-fx-background-color: #f5f5f5;">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </JFXTextField>
+            <Label text="Nature of Transaction:" />
+            <TextArea prefHeight="63.0" prefWidth="587.0" />
+            <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" style="-fx-font-size: 14;" text="Total: 99,999,999,999.99">
+               <VBox.margin>
+                  <Insets bottom="5.0" top="5.0" />
+               </VBox.margin>
+            </Label>
+         </children>
+      </VBox>
+      <TableView layoutX="14.0" layoutY="205.0" prefHeight="400.0" prefWidth="673.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="205.0">
+        <columns>
+          <TableColumn prefWidth="75.0" text="C1" />
+          <TableColumn prefWidth="75.0" text="C2" />
+        </columns>
+      </TableView>
+   </children>
+</AnchorPane>
