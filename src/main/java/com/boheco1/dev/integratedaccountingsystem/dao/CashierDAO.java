@@ -122,7 +122,7 @@ public class CashierDAO {
             ORItemSummary slAdjItem = new ORItemSummary("56150304000","Systems Loss Adjustment", slAdj);
             ORItemSummary ppdItem = new ORItemSummary("51350210000","Prompt payment discount", ppD);
             ORItemSummary katasvatItem = new ORItemSummary("11310806000","Sinking Fund - Katas ng VAT", katasNgVAT);
-            ORItemSummary otherDeductionsItem = new ORItemSummary("124101010001","Other Deduction", otherDeduction);
+            //ORItemSummary otherDeductionsItem = new ORItemSummary("124101010001","Other Deduction", otherDeduction);
             ORItemSummary mdRefundItem = new ORItemSummary("21720112002","Meter Deposit-Main", mdRefund);
             ORItemSummary scDiscountItem = new ORItemSummary("12410101000","Senior Citizen Discount", scDiscount);
             ORItemSummary ch2307Item = new ORItemSummary("12910111002","Prepayments - Others 2307", amount2307);
@@ -140,7 +140,7 @@ public class CashierDAO {
             tempORItems.add(slAdjItem);
             tempORItems.add(ppdItem);
             tempORItems.add(katasvatItem);
-            tempORItems.add(otherDeductionsItem);
+            //tempORItems.add(otherDeductionsItem);
             tempORItems.add(mdRefundItem);
             tempORItems.add(scDiscountItem);
             tempORItems.add(ch2306Item);
@@ -149,10 +149,13 @@ public class CashierDAO {
             tempORItems.add(arVATGenItem);
            // tempORItems.add(totalItem);
 
+            System.out.println("Grand Total: "+total);
 
             for(ORItemSummary or : tempORItems){
                 if(or.getAmount()!=0)
                     orItems.add(or);
+
+                System.out.println(or.getDescription()+": "+or.getAmount());
             }
         }
 

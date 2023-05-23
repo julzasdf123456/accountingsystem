@@ -124,26 +124,32 @@ public class ORLayoutController implements Initializable {
                                 amount += Utility.formatDecimal(energyBillsOthers)+ "\n";
                             }
                         }*/
-                    if(a.getDescription().length() > 26){
-                        description += a.getDescription().substring(0,25) + "...\n";
-                    }else{
-                        description += a.getDescription() + "\n";
+                    if(!a.getDescription().equals("Grand Total")) {
+                        if (a.getDescription().length() > 26) {
+                            description += a.getDescription().substring(0, 25) + "...\n";
+                        } else {
+                            description += a.getDescription() + "\n";
+                        }
+                        amount += Utility.formatDecimal(a.getAmount()) + "\n";
                     }
-                    amount += Utility.formatDecimal(a.getAmount()) + "\n";
                 }
             }else if(orContent.getCustomerCollection() != null) {
                 ObservableList<CRMDetails> items = orContent.getCustomerCollection();
                 for (CRMDetails a : items) {
                     if (a.getTotal() > 0) {
-                        description += a.getParticulars() + "\n";
-                        amount += Utility.formatDecimal(a.getTotal()) + "\n";
+                        if(!a.getParticulars().equals("Grand Total")) {
+                            description += a.getParticulars() + "\n";
+                            amount += Utility.formatDecimal(a.getTotal()) + "\n";
+                        }
                     }
                 }
             }else if(orContent.getSupplierItems() != null){
                 ObservableList<ORItemSummary> items = orContent.getSupplierItems();
                 for (ORItemSummary a : items) {
-                    description += a.getDescription() + "\n";
-                    amount += a.getTotalView() + "\n";
+                    if(!a.getDescription().equals("Grand Total")) {
+                        description += a.getDescription() + "\n";
+                        amount += a.getTotalView() + "\n";
+                    }
                 }
             }
             date1.setText(orContent.getDate().format(dateFormatter));
