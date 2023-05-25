@@ -186,22 +186,23 @@ public class BillDAO {
     public static List<Bill> getConsumerBills(ConsumerInfo consumerInfo, boolean paid) throws Exception {
         String sql = "SELECT " +
                 "BillNumber, AccountNumber, ServicePeriodEnd, ServiceDateFrom, ServiceDateTo, DueDate, ISNULL(PR,0) AS PR, " +
-                "(SELECT PowerNew FROM BillsForDCRRevision a WHERE b.AccountNumber = a.AccountNumber AND b.ServicePeriodEnd = a.ServicePeriodEnd) AS PowerNew, " +
-                "(SELECT KatasBalance FROM KatasData c WHERE b.AccountNumber = c.AccountNumber AND b.ServicePeriodEnd = c.ServicePeriodEnd) AS KatasAmt, " +
+                "ISNULL((SELECT PowerNew FROM BillsForDCRRevision a WHERE b.AccountNumber = a.AccountNumber AND b.ServicePeriodEnd = a.ServicePeriodEnd), 0) AS PowerNew, " +
+                "ISNULL((SELECT KatasBalance FROM KatasData c WHERE b.AccountNumber = c.AccountNumber AND b.ServicePeriodEnd = c.ServicePeriodEnd), 0) AS KatasAmt, " +
                 "DATEDIFF(day, DueDate, getdate()) AS daysDelayed, ISNULL(NetAmount,0) AS NetAmount, ISNULL(ConsumerType,'RM') AS ConsumerType, ISNULL(PowerKWH,0) AS PowerKWH, " +
                 "ISNULL(withPenalty, 1) AS withPenalty, " +
                 "ISNULL(Item2, 0) AS VATandTaxes, ISNULL(PR,0) AS TransformerRental, ISNULL(Others,0) AS OthersCharges, ISNULL(ACRM_TAFPPCA,0) AS ACRM_TAFPPCA, ISNULL(DAA_GRAM,0) AS DAA_GRAM " +
                 "FROM Bills b ";
         if (paid)
-            sql += "WHERE BillNumber IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ? ";
+            sql += "WHERE b.ServicePeriodEnd IN (SELECT PaidBills.ServicePeriodEnd FROM PaidBills WHERE AccountNumber = ?) AND AccountNumber = ? ";
         else
-            sql += "WHERE BillNumber NOT IN (SELECT BillNumber FROM PaidBills) AND AccountNumber = ? ";
+            sql += "WHERE b.ServicePeriodEnd NOT IN (SELECT PaidBills.ServicePeriodEnd FROM PaidBills WHERE AccountNumber = ?) AND AccountNumber = ? ";
 
         sql += "ORDER BY b.ServicePeriodEnd";
 
         PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
 
         ps.setString(1, consumerInfo.getAccountID());
+        ps.setString(2, consumerInfo.getAccountID());
 
         ResultSet rs = ps.executeQuery();
 
