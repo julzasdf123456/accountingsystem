@@ -65,7 +65,7 @@ public class HomeController implements Initializable {
      * Nav Menu Items
      */
     // FINANCE
-    public JFXButton journalEntries, budget;
+    public JFXButton journalEntries, budget, checkVoucher, journalVoucher;
 
     // BILLING
     public JFXButton allAccounts, orPosting;
@@ -148,6 +148,8 @@ public class HomeController implements Initializable {
         bulk_or = new JFXButton("Bulk O.R");
         orUpdate = new JFXButton("Update O.R");
         orCancel = new JFXButton("Cancel O.R");
+        checkVoucher = new JFXButton("Check Voucher");
+        journalVoucher = new JFXButton("Journal Voucher");
 
         // ADD ALL ITEMS TO NAV SEQUENTIALLY
         if(ActiveUser.getUser().can("manage-finance")) {
@@ -155,6 +157,8 @@ public class HomeController implements Initializable {
             NavMenuHelper.addMenu(navMenuBox, journalEntries, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, budget, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, orUpdate, homeStackPane);
+            NavMenuHelper.addMenu(navMenuBox, checkVoucher, homeStackPane);
+            NavMenuHelper.addMenu(navMenuBox, journalVoucher, homeStackPane);
         }
 
         if(ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-tellering")) {
@@ -224,6 +228,8 @@ public class HomeController implements Initializable {
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(journalEntries, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, journalEntries.getText(), contentPane, "journal_entries_layout.fxml", subToolbar, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(budget, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, budget.getText(), contentPane, "budget_layout.fxml", subToolbar, null, "manage-budget", homeStackPane, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(orUpdate, new FontIcon("mdi2f-file"), drawerMenus, orUpdate.getText(), contentPane, "finance/or_update_layout.fxml", null, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(checkVoucher, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, checkVoucher.getText(), contentPane, "finance/cv_layout.fxml", subToolbar, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(journalVoucher, new FontIcon("mdi2f-file"), drawerMenus, journalVoucher.getText(), contentPane, "finance/jv_layout.fxml", null, null, title);
         }
 
         if(ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-tellering")) {

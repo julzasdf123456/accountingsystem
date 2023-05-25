@@ -281,7 +281,7 @@ public class TransactionDetailsDAO {
             td.setTransactionDate(rs.getDate("TransactionDate")!=null?rs.getDate("TransactionDate").toLocalDate():null);
             td.setSequenceNumber(rs.getInt("AccountSequence"));
             td.setAccountCode(rs.getString("AccountCode"));
-            td.setDebit(rs.getDouble("Debit"));
+            td.setDebit(rs.getDouble("Debit")*-1);
             td.setCredit(rs.getDouble("Credit"));
             td.setOrDate(rs.getDate("ORDate")!=null?rs.getDate("ORDate").toLocalDate():null);
             td.setBankID(rs.getString("BankID"));

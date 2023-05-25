@@ -587,61 +587,65 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
         transactionHeader.setDateEntered(LocalDateTime.now());
 
+        //check Period, TransactionNumber(OR number), TransactionCode(main or sub)
+        if(TransactionHeaderDAO.isAvailable(transactionHeader.getPeriod(), transactionHeader.getTransactionNumber(), transactionHeader.getTransactionCode())){
+            AlertDialogBuilder.messgeDialog("System Message", "OR number is already used.",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }else{
+            List<TransactionDetails> transactionDetailsList = new ArrayList<>();
+            if(crmDetails != null) {
 
-        List<TransactionDetails> transactionDetailsList = new ArrayList<>();
-        if(crmDetails != null) {
+                CRMDetails getOne = crmDetails.get(0);
+                CRMDetails grandTotal = new CRMDetails();
+                grandTotal.setReferenceNo(getOne.getReferenceNo());
+                grandTotal.setParticulars("Grand Total");
+                grandTotal.setTotal(collectionFromCRM);
+                crmDetails.add(grandTotal);
+                int seq = 1;
+                for (CRMDetails cd : crmDetails) {
+                    TransactionDetails transactionDetails = new TransactionDetails();
+                    transactionDetails.setPeriod(period);
+                    transactionDetails.setTransactionNumber(orNumber);
+                    transactionDetails.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
+                    transactionDetails.setTransactionDate(date.getValue());
+                    transactionDetails.setAccountCode(cd.getGlCode());//GL Code or the account code of the particular
+                    transactionDetails.setParticulars(cd.getParticulars());
+                    transactionDetails.setSequenceNumber(seq++);
 
-            CRMDetails getOne = crmDetails.get(0);
-            CRMDetails grandTotal = new CRMDetails();
-            grandTotal.setReferenceNo(getOne.getReferenceNo());
-            grandTotal.setParticulars("Grand Total");
-            grandTotal.setTotal(collectionFromCRM);
-            crmDetails.add(grandTotal);
-            int seq = 1;
-            for (CRMDetails cd : crmDetails) {
-                TransactionDetails transactionDetails = new TransactionDetails();
-                transactionDetails.setPeriod(period);
-                transactionDetails.setTransactionNumber(orNumber);
-                transactionDetails.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
-                transactionDetails.setTransactionDate(date.getValue());
-                transactionDetails.setAccountCode(cd.getGlCode());//GL Code or the account code of the particular
-                transactionDetails.setParticulars(cd.getParticulars());
-                transactionDetails.setSequenceNumber(seq++);
-
-                if(cd.getParticulars().equals("Grand Total")){
-                    transactionDetails.setDebit(cd.getTotal());
-                }else{
-                    if (cd.getTotal() > 0)
-                        transactionDetails.setCredit(cd.getTotal());
-                    else
+                    if(cd.getParticulars().equals("Grand Total")){
                         transactionDetails.setDebit(cd.getTotal());
+                    }else{
+                        if (cd.getTotal() > 0)
+                            transactionDetails.setCredit(cd.getTotal());
+                        else
+                            transactionDetails.setDebit(cd.getTotal());
+                    }
+
+                    transactionDetails.setOrDate(date.getValue());
+                    //transactionDetails.setBankID("N/A");
+                    //transactionDetails.setNote("N/A");
+                    transactionDetailsList.add(transactionDetails);
                 }
+            }else if(tellerInfo != null) {
+                int seq = 1;
+                ObservableList<ORItemSummary> temp = paymentTable.getItems();
+                for (ORItemSummary orItemSummary : temp) {
+                    TransactionDetails transactionDetails = new TransactionDetails();
+                    transactionDetails.setPeriod(period);
+                    transactionDetails.setTransactionNumber(orNumber);
 
-                transactionDetails.setOrDate(date.getValue());
-                //transactionDetails.setBankID("N/A");
-                //transactionDetails.setNote("N/A");
-                transactionDetailsList.add(transactionDetails);
-            }
-        }else if(tellerInfo != null) {
-            int seq = 1;
-            ObservableList<ORItemSummary> temp = paymentTable.getItems();
-            for (ORItemSummary orItemSummary : temp) {
-                TransactionDetails transactionDetails = new TransactionDetails();
-                transactionDetails.setPeriod(period);
-                transactionDetails.setTransactionNumber(orNumber);
+                    transactionDetails.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
 
-                transactionDetails.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
+                    transactionDetails.setTransactionDate(date.getValue());
 
-                transactionDetails.setTransactionDate(date.getValue());
+                    if (paymentMode.equals("CASH ON HAND") || paymentMode.equals("CHEQUES")) {
+                        transactionDetails.setAccountCode(orItemSummary.getAccountCode());
+                    } else {
+                        transactionDetails.setAccountCode(bankAccountCode);
+                    }
 
-                if (paymentMode.equals("CASH ON HAND") || paymentMode.equals("CHEQUES")) {
-                    transactionDetails.setAccountCode(orItemSummary.getAccountCode());
-                } else {
-                    transactionDetails.setAccountCode(bankAccountCode);
-                }
-
-                transactionDetails.setParticulars(orItemSummary.getDescription());
-                transactionDetails.setSequenceNumber(seq++);
+                    transactionDetails.setParticulars(orItemSummary.getDescription());
+                    transactionDetails.setSequenceNumber(seq++);
 
                 /*if(orItemSummary.getDescription().equals("Grand Total")){
                     transactionDetails.setDebit(orItemSummary.getAmount());
@@ -650,54 +654,49 @@ public class CashierController extends MenuControllerHandler implements Initiali
                         transactionDetails.setCredit(orItemSummary.getAmount());
                     else
                         transactionDetails.setDebit(orItemSummary.getAmount());
-                //}
+                    //}
 
 
+                    transactionDetails.setOrDate(date.getValue());
+                    //transactionDetails.setBankID("N/A");
+                    //transactionDetails.setNote("N/A");
+                    transactionDetailsList.add(transactionDetails);
+                }
+
+                //Grand total transaction detail item
+                TransactionDetails transactionDetails = new TransactionDetails();
+                transactionDetails.setPeriod(period);
+                transactionDetails.setTransactionNumber(orNumber);
+                transactionDetails.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
+                transactionDetails.setTransactionDate(date.getValue());
+                //transactionDetails.setAccountCode(orItemSummary.getAccountCode());
+                transactionDetails.setParticulars("Grand Total");
+                transactionDetails.setSequenceNumber(seq++);
+                transactionDetails.setDebit(collectionFromTeller);
                 transactionDetails.setOrDate(date.getValue());
-                //transactionDetails.setBankID("N/A");
-                //transactionDetails.setNote("N/A");
                 transactionDetailsList.add(transactionDetails);
+
             }
 
-            //Grand total transaction detail item
-            TransactionDetails transactionDetails = new TransactionDetails();
-            transactionDetails.setPeriod(period);
-            transactionDetails.setTransactionNumber(orNumber);
-            transactionDetails.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
-            transactionDetails.setTransactionDate(date.getValue());
-            //transactionDetails.setAccountCode(orItemSummary.getAccountCode());
-            transactionDetails.setParticulars("Grand Total");
-            transactionDetails.setSequenceNumber(seq++);
-            transactionDetails.setDebit(collectionFromTeller);
-            transactionDetails.setOrDate(date.getValue());
-            transactionDetailsList.add(transactionDetails);
 
+
+            ORContent orContent = new ORContent(crmQueue, transactionHeader, transactionDetailsList);
+            orContent.setAddress(address.getText());
+            orContent.setDate(date.getValue());
+            orContent.setOrNumber(orNumber);
+            orContent.setIssuedTo(name.getText());
+            EmployeeInfo employeeInfo = ActiveUser.getUser().getEmployeeInfo();
+            orContent.setIssuedBy(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
+            orContent.setTotal(Double.parseDouble(total.getText().replaceAll(",","")));
+            if(consumerInfo!=null){
+                orContent.setCustomerCollection(paymentTable.getItems());
+            }else{
+                orContent.setTellerCollection(paymentTable.getItems());
+            }
+
+            Utility.setOrContent(orContent);
+            ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
         }
-
-        //check Period, TransactionNumber(OR number), TransactionCode(main or sub)
-        if(TransactionHeaderDAO.isAvailable(transactionHeader.getPeriod(), transactionHeader.getTransactionNumber(), transactionHeader.getTransactionCode())){
-            AlertDialogBuilder.messgeDialog("System Message", "OR number is already used.",
-                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            return;
-        }
-
-        ORContent orContent = new ORContent(crmQueue, transactionHeader, transactionDetailsList);
-        orContent.setAddress(address.getText());
-        orContent.setDate(date.getValue());
-        orContent.setOrNumber(orNumber);
-        orContent.setIssuedTo(name.getText());
-        EmployeeInfo employeeInfo = ActiveUser.getUser().getEmployeeInfo();
-        orContent.setIssuedBy(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
-        orContent.setTotal(Double.parseDouble(total.getText().replaceAll(",","")));
-        if(consumerInfo!=null){
-            orContent.setCustomerCollection(paymentTable.getItems());
-        }else{
-            orContent.setTellerCollection(paymentTable.getItems());
-        }
-
-        Utility.setOrContent(orContent);
-        ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
-
     }
 
     private void bindParticularAccountInfoAutocomplete(JFXTextField textField){
