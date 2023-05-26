@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.DatePicker?>
@@ -11,10 +12,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-
 <AnchorPane prefHeight="619.0" prefWidth="781.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.finance.CheckVoucherController">
    <children>
-      <VBox layoutX="14.0" layoutY="14.0" prefHeight="179.0" prefWidth="673.0">
+      <VBox layoutX="14.0" layoutY="14.0" prefHeight="217.0" prefWidth="673.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0">
          <children>
             <HBox alignment="CENTER_RIGHT">
                <VBox.margin>
@@ -33,18 +33,33 @@
             </JFXTextField>
             <Label text="Nature of Transaction:" />
             <TextArea prefHeight="63.0" prefWidth="587.0" />
-            <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" style="-fx-font-size: 14;" text="Total: 99,999,999,999.99">
-               <VBox.margin>
-                  <Insets bottom="5.0" top="5.0" />
-               </VBox.margin>
-            </Label>
+            <HBox alignment="CENTER_LEFT" prefHeight="49.0" prefWidth="673.0">
+               <children>
+                  <JFXButton prefHeight="29.0" prefWidth="54.0" styleClass="btn-info" text="New">
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </JFXButton>
+                  <JFXButton prefHeight="29.0" prefWidth="54.0" styleClass="btn-info" text="Save">
+                     <HBox.margin>
+                        <Insets left="5.0" right="5.0" />
+                     </HBox.margin>
+                  </JFXButton>
+                  <JFXButton prefHeight="29.0" prefWidth="54.0" styleClass="btn-info" text="Print">
+                     <HBox.margin>
+                        <Insets left="5.0" right="5.0" />
+                     </HBox.margin>
+                  </JFXButton>
+                  <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" style="-fx-font-size: 14;" text="Total: 99,999,999,999.99" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+            <TableView prefHeight="355.0" prefWidth="673.0">
+              <columns>
+                <TableColumn prefWidth="75.0" text="C1" />
+                <TableColumn prefWidth="75.0" text="C2" />
+              </columns>
+            </TableView>
          </children>
       </VBox>
-      <TableView layoutX="14.0" layoutY="205.0" prefHeight="400.0" prefWidth="673.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="205.0">
-        <columns>
-          <TableColumn prefWidth="75.0" text="C1" />
-          <TableColumn prefWidth="75.0" text="C2" />
-        </columns>
-      </TableView>
    </children>
 </AnchorPane>

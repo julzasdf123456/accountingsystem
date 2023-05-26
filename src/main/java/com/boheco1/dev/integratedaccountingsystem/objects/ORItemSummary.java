@@ -61,6 +61,12 @@ public class ORItemSummary {
 
     public void setAmount(double amount) {
         this.amount = amount;
+        if (this.amount == 0)
+            this.setTotalView(" ");
+        else if (this.amount > 0)
+            this.setTotalView(Utility.formatDecimal(this.amount));
+        else
+            this.setTotalView("("+Utility.formatDecimal(Math.abs(this.amount))+")");
     }
 
     public String getTotalView() {

@@ -195,8 +195,8 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                                     btn.setOnAction(event -> {
                                         try{
                                             newTransactionDetails.remove(data);
-                                            //ObservableList<TransactionDetails> result = FXCollections.observableArrayList(newTransactionDetails);
-                                            //newItemTable.setItems(result);
+                                            ObservableList<TransactionDetails> result = FXCollections.observableArrayList(newTransactionDetails);
+                                            newItemTable.setItems(result);
                                             newItemTable.refresh();
                                             reCompute();
                                         }catch (Exception e){
@@ -316,35 +316,39 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
         jfxTextField.setOnAction(e -> {
             if(!particular.getText().isEmpty() && !newItemAmount.getText().isEmpty()){
                 double amount = Double.parseDouble(newItemAmount.getText());
+
+                TransactionDetails temp = (TransactionDetails) orTable.getItems().get(0);
+                TransactionDetails td = new TransactionDetails();
+                td.setPeriod(temp.getPeriod());
+                td.setTransactionNumber(temp.getTransactionNumber());
+                td.setTransactionCode(temp.getTransactionCode());
+                td.setTransactionDate(temp.getTransactionDate());
+                //account sequence will be set upon saving
+
+                ParticularsAccount newItem = particularsAccount;
+                td.setAccountCode(newItem.getAccountCode());
                 if(amount > 0){
-                    TransactionDetails temp = (TransactionDetails) orTable.getItems().get(0);
-                    TransactionDetails td = new TransactionDetails();
-                    td.setPeriod(temp.getPeriod());
-                    td.setTransactionNumber(temp.getTransactionNumber());
-                    td.setTransactionCode(temp.getTransactionCode());
-                    td.setTransactionDate(temp.getTransactionDate());
-                    //account sequence will be set upon saving
-
-                    ParticularsAccount newItem = particularsAccount;
-                    td.setAccountCode(newItem.getAccountCode());
                     td.setCredit(amount);
-                    td.setParticulars(newItem.getParticulars());
-
-                    td.setOrDate(temp.getOrDate());
-                    td.setBankID(temp.getBankID());
-                    td.setNote(temp.getParticulars()+": "+temp.getNote()+", added as new item during finance update");
-                    td.setCheckNumber(temp.getCheckNumber());
-                    td.setDepositedDate(temp.getDepositedDate());
-
-                    newTransactionDetails.add(td);
-                    ObservableList<TransactionDetails> result = FXCollections.observableArrayList(newTransactionDetails);
-                    newItemTable.setItems(result);
-                    newItemTable.refresh();
-                    particular.setText("");
-                    newItemAmount.setText("");
-                    particular.requestFocus();
-                    reCompute();
+                }else{
+                    td.setDebit(amount);
                 }
+                td.setParticulars(newItem.getParticulars());
+
+                td.setOrDate(temp.getOrDate());
+                td.setBankID(temp.getBankID());
+                td.setNote(temp.getParticulars()+": "+temp.getNote()+", added as new item during finance update");
+                td.setCheckNumber(temp.getCheckNumber());
+                td.setDepositedDate(temp.getDepositedDate());
+
+                newTransactionDetails.add(td);
+                ObservableList<TransactionDetails> result = FXCollections.observableArrayList(newTransactionDetails);
+                newItemTable.setItems(result);
+                newItemTable.refresh();
+                particular.setText("");
+                newItemAmount.setText("");
+                particular.requestFocus();
+                reCompute();
+
             }
         });
     }

@@ -69,6 +69,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
     //ORItemSummary grandTotalHolder;
     ParticularsAccount particularsAccount = null;
     private ObservableList<ORItemSummary> OR_itemList;
+    private ORItemSummary selectedItemFromTable = null;
     private double collectionFromTeller;
     //private double otherDeduction;
     double collectionFromCRM;
@@ -108,10 +109,10 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
         paymentMode.getSelectionModel().selectFirst();
         bankInfo.setDisable(true);
-        //bindParticularAccountInfoAutocomplete(particular);
-
-        amount.setVisible(false);
-        particular.setVisible(false);
+        bindParticularAccountInfoAutocomplete(particular);
+        tableClick();
+        //amount.setVisible(false);
+        //particular.setVisible(false);
     }
 
     @FXML
@@ -349,22 +350,50 @@ public class CashierController extends MenuControllerHandler implements Initiali
         }
         if(!amount.getText().isEmpty()){
             if(!amount.getText().isEmpty() && !particular.getText().isEmpty()){
-                if(!particularsAccount.getAccountCode().equals("23220901000")){ //check if selected item is not Energy prepayments
-                    ORItemSummary orItemSummary = new ORItemSummary(particularsAccount.getAccountCode(), particularsAccount.getParticulars(), Double.parseDouble(amount.getText()));
-                    OR_itemList.add(orItemSummary);
-                    paymentTable.setItems(OR_itemList);
-                    particular.requestFocus();
+                if(selectedItemFromTable != null){
+                    double amt = Double.parseDouble(amount.getText());
+                    selectedItemFromTable.setAmount(amt);
+                    selectedItemFromTable.setDescription(particular.getText());
+                    System.out.println("SELECTED");
                     particular.setText("");
                     amount.setText("");
+                    selectedItemFromTable= null;
                     reCompute();
                     paymentTable.refresh();
                 }else{
-                    AlertDialogBuilder.messgeDialog("System Message", "Please use the add prepayment function." ,
-                            Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                    if(!particularsAccount.getAccountCode().equals("23220901000")){ //check if selected item is not Energy prepayments
+                        ORItemSummary orItemSummary = new ORItemSummary(particularsAccount.getAccountCode(), particularsAccount.getParticulars(), Double.parseDouble(amount.getText()));
+                        OR_itemList.add(orItemSummary);
+                        paymentTable.setItems(OR_itemList);
+                        particular.requestFocus();
+                        particular.setText("");
+                        amount.setText("");
+                        reCompute();
+                        paymentTable.refresh();
+                    }else{
+                        AlertDialogBuilder.messgeDialog("System Message", "Please use the add prepayment function." ,
+                                Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                    }
                 }
                 particular.requestFocus();
             }
         }
+    }
+
+    private void tableClick(){
+        this.paymentTable.setRowFactory(tv -> {
+            TableRow row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    selectedItemFromTable = (ORItemSummary) row.getItem();
+                    if(selectedItemFromTable.getAmount()!=0) {
+                        particular.setText(selectedItemFromTable.getDescription());
+                        amount.setText("" + selectedItemFromTable.getAmount());
+                    }
+                }
+            });
+            return row ;
+        });
     }
 
     private void reCompute() {
@@ -479,6 +508,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
                 paymentTable.refresh();
                 dialog.close();
+                reCompute();
             }
         });
     }
