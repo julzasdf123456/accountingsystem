@@ -3,16 +3,16 @@ package com.boheco1.dev.integratedaccountingsystem.objects;
 public class ChartOfAccount {
     private String accountCode;
     private String description;
-    private char accountType;
+    private String accountType;
     private int levelNumber;
     private String summaryAccount;
-    private char glsl;
+    private String glsl;
     private String oldAccountCode;
     private String newDescription;
     private String oldSummaryAccount;
     private String status;
 
-    public ChartOfAccount(String accountCode, String description, char accountType, int levelNumber, String summaryAccount, char glsl, String oldAccountCode, String newDescription, String oldSummaryAccount, String status) {
+    public ChartOfAccount(String accountCode, String description, String accountType, int levelNumber, String summaryAccount, String glsl, String oldAccountCode, String newDescription, String oldSummaryAccount, String status) {
         this.accountCode = accountCode;
         this.description = description;
         this.accountType = accountType;
@@ -41,11 +41,11 @@ public class ChartOfAccount {
         this.description = description;
     }
 
-    public char getAccountType() {
+    public String getAccountType() {
         return accountType;
     }
 
-    public void setAccountType(char accountType) {
+    public void setAccountType(String accountType) {
         this.accountType = accountType;
     }
 
@@ -65,11 +65,11 @@ public class ChartOfAccount {
         this.summaryAccount = summaryAccount;
     }
 
-    public char getGlsl() {
+    public String getGlsl() {
         return glsl;
     }
 
-    public void setGlsl(char glsl) {
+    public void setGlsl(String glsl) {
         this.glsl = glsl;
     }
 
@@ -103,5 +103,12 @@ public class ChartOfAccount {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getTitle(){
+        if(newDescription != null && !newDescription.isEmpty())
+            return newDescription;
+        else
+            return description;
     }
 }

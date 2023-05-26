@@ -48,6 +48,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
     private TransactionHeader transactionHeader;
 
     private Teller teller;
+    private int countAccount;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
        // this.createTable();
@@ -75,6 +76,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                                     transactionHeader = TransactionHeaderDAO.get(user.getUserName(), searchDate.getValue());
                                     if(transactionHeader==null) {
                                         orItemSummaries = CashierDAO.getOrItems(year, month, day, user.getUserName());
+                                        countAccount = CashierDAO.countAccount(year, month, day, user.getUserName());
                                     }else {
                                         transactionDetails = TransactionDetailsDAO.get(period, "OR", user);
                                         orItemSummaries = new ArrayList<>();
@@ -103,6 +105,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                                     result.put("SearchResult", resultInfo);
                                     result.put("TransactionHeader", transactionHeader);
                                     result.put("SearchDate", searchDate.getValue());
+                                    result.put("CountAccount", countAccount);
                                     this.parentController.receive(result);
 
                                 } catch (Exception e) {

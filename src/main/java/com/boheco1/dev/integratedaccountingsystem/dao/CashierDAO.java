@@ -6,6 +6,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.ORItemSummary;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,5 +164,22 @@ public class CashierDAO {
         ps.close();
 
         return orItems;
+    }
+
+    public static int countAccount (int year, int month, int day, String teller) throws SQLException, ClassNotFoundException {
+        int count = 0;
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement("" +
+                "SELECT COUNT ( DISTINCT AccountNumber ) AS countAccount FROM PaidBills WHERE " +
+                "PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND p.PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59' AND p.TELLER = '"+teller+"' ");
+
+        ResultSet rs = ps.executeQuery();
+
+        if(rs.next())
+            count = rs.getInt("countAccount");
+
+        rs.close();
+        ps.close();
+
+        return count;
     }
 }
