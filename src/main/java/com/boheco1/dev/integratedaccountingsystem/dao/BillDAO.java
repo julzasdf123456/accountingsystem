@@ -243,8 +243,8 @@ public class BillDAO {
             bill.setAddCharges(bill.getPr()+bill.getOtherCharges());
             //Disable surcharge computation when set in the Bills table withPenalty value of 1
             if (bill.isWithPenalty()) {
-                bill.setSurCharge(bill.computeSurCharge());
-                bill.setSurChargeTax(bill.getSurCharge() * 0.12);
+                bill.setSurCharge(Utility.round(bill.computeSurCharge(), 2));
+                bill.setSurChargeTax(Utility.round(bill.getSurCharge() * 0.12, 2));
             }else{
                 bill.setSurCharge(0);
                 bill.setSurChargeTax(0);
