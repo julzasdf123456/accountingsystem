@@ -1,5 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+
 import java.time.LocalDate;
 
 public class Bill {
@@ -446,8 +448,8 @@ public class Bill {
     public void computeTotalAmount() {
         double charges = this.getSurCharge() + this.getSurChargeTax() + this.getAmountDue();
         double deductions = this.getDiscount() + this.getMdRefund() + this.getKatas() + this.getCh2306() + this.getCh2307() + this.getSlAdjustment() + this.getOtherAdjustment();
-        this.setTotalAmount(charges - deductions);
-        this.setBalance(this.getTotalAmount());
+        this.setTotalAmount(Utility.round(charges - deductions, 2));
+        this.setBalance(Utility.round(this.getTotalAmount(), 2));
     }
 
     public double getScDiscount() {
