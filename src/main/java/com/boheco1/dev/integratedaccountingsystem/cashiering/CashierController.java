@@ -1,10 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
 
-import com.boheco1.dev.integratedaccountingsystem.dao.BankAccountDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.CRMDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.ParticularsAccountDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.*;
@@ -40,7 +37,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private JFXButton submitBtn;
 
     @FXML
-    private JFXTextField amount, particular, name, address, purpose, energyBill, vat, surcharge, prepayment, accNum, tinNo, orNumber, businessStyle;
+    private JFXTextField serviceFeeAmount, serviceFeeAccounts, name, address, purpose, energyBill, vat, surcharge, prepayment, accNum, tinNo, orNumber, businessStyle;
 
 
     @FXML
@@ -69,7 +66,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
     //ORItemSummary grandTotalHolder;
     ParticularsAccount particularsAccount = null;
     private ObservableList<ORItemSummary> OR_itemList;
-    private ORItemSummary selectedItemFromTable = null;
+    private ParticularsAccount serviceFee;
     private double collectionFromTeller;
     //private double otherDeduction;
     double collectionFromCRM;
@@ -109,15 +106,46 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
         paymentMode.getSelectionModel().selectFirst();
         bankInfo.setDisable(true);
-        bindParticularAccountInfoAutocomplete(particular);
-        tableClick();
-        //amount.setVisible(false);
-        //particular.setVisible(false);
+
+        try {
+            serviceFee = ParticularsAccountDAO.getParticularsAccount("Service Fee");
+            serviceFeeAmount.setText(Utility.formatDecimal(serviceFee.getAmount()));
+        } catch (Exception e) {
+            AlertDialogBuilder.messgeDialog("System Error", "Unable to retrieve service fee information, due to: " + e.getMessage() ,
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }
     }
 
     @FXML
     private void search(ActionEvent event) {
         ModalBuilder.showModalFromXMLNoClose(CashierController.class, "../cashiering/cashiering_search_consumer.fxml", Utility.getStackPane());
+    }
+
+
+    @FXML
+    void addServiceFee(ActionEvent event) {
+        try{
+            if(!serviceFeeAccounts.getText().isEmpty() && Double.parseDouble(serviceFeeAccounts.getText())>0){
+                double fee = serviceFee.getAmount() * Double.parseDouble(serviceFeeAccounts.getText());
+                boolean found = false;
+                for(ORItemSummary os : OR_itemList){
+                    if(os.getDescription().equals("Service Fee")){
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found){
+                    ORItemSummary orItemSummary = new ORItemSummary(serviceFee.getAccountCode(), serviceFee.getParticulars(), fee);
+                    OR_itemList.add(orItemSummary);
+                    paymentTable.setItems(OR_itemList);
+                    reCompute();
+                    paymentTable.refresh();
+                }
+            }
+        } catch (Exception e) {
+            AlertDialogBuilder.messgeDialog("System Error", "Can not add service fee information, due to: " + e.getMessage() ,
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }
     }
 
     @FXML
@@ -165,6 +193,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             TransactionHeader transactionHeader = (TransactionHeader) ((HashMap<?, ?>) o).get("TransactionHeader");
             LocalDate localDate = (LocalDate) ((HashMap<?, ?>) o).get("SearchDate");
             this.tellerInfo = (Teller) ((HashMap<?, ?>) o).get("SearchResult");
+            serviceFeeAccounts.setText(""+(int) ((HashMap<?, ?>) o).get("CountAccount"));
 
 
             if(transactionHeader == null){
@@ -341,60 +370,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
         this.paymentTable.setPlaceholder(new Label("No consumer records was searched."));
     }
 
-    @FXML
-    private void getAmount(ActionEvent event) {
-        if(tellerInfo == null){
-            AlertDialogBuilder.messgeDialog("System Message", "Please select teller information and try again." ,
-                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-            return;
-        }
-        if(!amount.getText().isEmpty()){
-            if(!amount.getText().isEmpty() && !particular.getText().isEmpty()){
-                if(selectedItemFromTable != null){
-                    double amt = Double.parseDouble(amount.getText());
-                    selectedItemFromTable.setAmount(amt);
-                    selectedItemFromTable.setDescription(particular.getText());
-                    System.out.println("SELECTED");
-                    particular.setText("");
-                    amount.setText("");
-                    selectedItemFromTable= null;
-                    reCompute();
-                    paymentTable.refresh();
-                }else{
-                    if(!particularsAccount.getAccountCode().equals("23220901000")){ //check if selected item is not Energy prepayments
-                        ORItemSummary orItemSummary = new ORItemSummary(particularsAccount.getAccountCode(), particularsAccount.getParticulars(), Double.parseDouble(amount.getText()));
-                        OR_itemList.add(orItemSummary);
-                        paymentTable.setItems(OR_itemList);
-                        particular.requestFocus();
-                        particular.setText("");
-                        amount.setText("");
-                        reCompute();
-                        paymentTable.refresh();
-                    }else{
-                        AlertDialogBuilder.messgeDialog("System Message", "Please use the add prepayment function." ,
-                                Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-                    }
-                }
-                particular.requestFocus();
-            }
-        }
-    }
 
-    private void tableClick(){
-        this.paymentTable.setRowFactory(tv -> {
-            TableRow row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-                    selectedItemFromTable = (ORItemSummary) row.getItem();
-                    if(selectedItemFromTable.getAmount()!=0) {
-                        particular.setText(selectedItemFromTable.getDescription());
-                        amount.setText("" + selectedItemFromTable.getAmount());
-                    }
-                }
-            });
-            return row ;
-        });
-    }
+
 
     private void reCompute() {
         double calculate = 0;
@@ -727,48 +704,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
             Utility.setOrContent(orContent);
             ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
         }
-    }
-
-    private void bindParticularAccountInfoAutocomplete(JFXTextField textField){
-
-        AutoCompletionBinding<ParticularsAccount> suggestion = TextFields.bindAutoCompletion(textField,
-                param -> {
-                    //Value typed in the textfield
-                    String query = param.getUserText();
-
-                    //Initialize list of stocks
-                    List<ParticularsAccount> list = new ArrayList<>();
-
-                    //Perform DB query
-                    if (query.length() >= 1){
-                        try {
-                            list = ParticularsAccountDAO.get(query);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    return list;
-                }, new StringConverter<>() {
-                    //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
-                    @Override
-                    public String toString(ParticularsAccount object) {
-                        return object.getParticulars() ;
-                    }
-
-                    @Override
-                    public ParticularsAccount fromString(String string) {
-                        throw new UnsupportedOperationException();
-                    }
-                });
-
-        //This will set the actions once the user clicks an item from the popupmenu.
-        suggestion.setOnAutoCompleted(event -> {
-            particularsAccount = event.getCompletion();
-            if(particularsAccount.getAmount() != 0)
-                amount.setText(""+particularsAccount.getAmount());
-            amount.requestFocus();
-        });
     }
 
 }

@@ -107,6 +107,12 @@
                         <Insets bottom="20.0" top="20.0" />
                      </VBox.margin>
                   </HBox>
+                  <Label text="Remarks">
+                     <VBox.margin>
+                        <Insets top="50.0" />
+                     </VBox.margin>
+                  </Label>
+                  <JFXTextArea fx:id="remarks" />
                </children>
                <HBox.margin>
                   <Insets />
@@ -123,24 +129,7 @@
                      </VBox.margin>
                   </Label>
                   <Separator prefWidth="200.0" />
-                  <HBox prefHeight="44.0" prefWidth="485.0">
-                     <children>
-                        <JFXTextField fx:id="particular" promptText="Particular" HBox.hgrow="ALWAYS">
-                           <HBox.margin>
-                              <Insets right="16.0" top="6.0" />
-                           </HBox.margin>
-                        </JFXTextField>
-                        <JFXTextField fx:id="amount" labelFloat="true" maxWidth="-Infinity" onAction="#getAmount" prefHeight="25.0" prefWidth="126.0" promptText="Amount">
-                           <HBox.margin>
-                              <Insets left="3.0" top="6.0" />
-                           </HBox.margin>
-                        </JFXTextField>
-                     </children>
-                     <padding>
-                        <Insets top="5.0" />
-                     </padding>
-                  </HBox>
-                  <TableView fx:id="paymentTable" maxWidth="1.7976931348623157E308" prefHeight="363.0" prefWidth="556.0" VBox.vgrow="NEVER">
+                  <TableView fx:id="paymentTable" maxWidth="1.7976931348623157E308" prefHeight="392.0" prefWidth="556.0" VBox.vgrow="NEVER">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor>
@@ -194,16 +183,16 @@
                               <Insets bottom="10.0" top="10.0" />
                            </VBox.margin>
                         </JFXTextField>
-                        <JFXTextField fx:id="prepayment" labelFloat="true" onAction="#addPrepayment" promptText="Amount">
-                           <VBox.margin>
-                              <Insets bottom="10.0" top="10.0" />
-                           </VBox.margin>
-                        </JFXTextField>
-                        <JFXButton buttonType="RAISED" contentDisplay="CENTER" onAction="#removePrepayment" prefHeight="29.0" prefWidth="74.0" styleClass="btn-danger" text="Cancel " textFill="WHITE">
-                           <VBox.margin>
-                              <Insets />
-                           </VBox.margin>
-                        </JFXButton>
+                        <HBox>
+                           <children>
+                              <JFXTextField fx:id="prepayment" labelFloat="true" onAction="#addPrepayment" prefHeight="29.0" prefWidth="115.0" promptText="Amount">
+                                 <HBox.margin>
+                                    <Insets right="10.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXButton contentDisplay="CENTER" onAction="#removePrepayment" prefHeight="29.0" prefWidth="62.0" style="-fx-background-color: gray;" text="Cancel " textFill="WHITE" />
+                           </children>
+                        </HBox>
                      </children>
                   </VBox>
                   <VBox alignment="TOP_CENTER">
@@ -229,7 +218,7 @@
                               <Insets bottom="10.0" top="10.0" />
                            </VBox.margin>
                         </JFXTextField>
-                        <JFXButton fx:id="refund_btn" alignment="CENTER" buttonType="RAISED" onAction="#addRefund" prefHeight="29.0" prefWidth="74.0" styleClass="btn-warning" text="Refund" textFill="WHITE">
+                        <JFXButton fx:id="refund_btn" alignment="CENTER" buttonType="RAISED" onAction="#addRefund" prefHeight="29.0" prefWidth="74.0" styleClass="btn-info" text="Refund" textFill="WHITE">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
@@ -242,12 +231,35 @@
                         <Insets top="15.0" />
                      </VBox.margin>
                   </VBox>
-                  <Label text="Remarks">
+                  <VBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 15; -fx-font-weight: bold;" text="Service Fee">
+                           <font>
+                              <Font name="System Bold" size="22.0" />
+                           </font>
+                        </Label>
+                        <Separator prefWidth="200.0" />
+                        <Label text="Amount">
+                           <VBox.margin>
+                              <Insets top="10.0" />
+                           </VBox.margin>
+                        </Label>
+                        <JFXTextField fx:id="serviceFeeAmount" editable="false" labelFloat="true" prefHeight="30.0" prefWidth="184.0">
+                           <VBox.margin>
+                              <Insets bottom="10.0" />
+                           </VBox.margin>
+                        </JFXTextField>
+                        <Label text="Account" />
+                        <JFXTextField fx:id="serviceFeeAccounts" labelFloat="true" onAction="#addServiceFee">
+                           <VBox.margin>
+                              <Insets bottom="10.0" />
+                           </VBox.margin>
+                        </JFXTextField>
+                     </children>
                      <VBox.margin>
-                        <Insets top="50.0" />
+                        <Insets top="15.0" />
                      </VBox.margin>
-                  </Label>
-                  <JFXTextArea fx:id="remarks" />
+                  </VBox>
                </children>
             </VBox>
          </children>

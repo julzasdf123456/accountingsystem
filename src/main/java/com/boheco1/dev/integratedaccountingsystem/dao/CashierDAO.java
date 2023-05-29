@@ -150,13 +150,10 @@ public class CashierDAO {
             tempORItems.add(arVATGenItem);
            // tempORItems.add(totalItem);
 
-            System.out.println("Grand Total: "+total);
 
             for(ORItemSummary or : tempORItems){
                 if(or.getAmount()!=0)
                     orItems.add(or);
-
-                System.out.println(or.getDescription()+": "+or.getAmount());
             }
         }
 
@@ -170,7 +167,7 @@ public class CashierDAO {
         int count = 0;
         PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement("" +
                 "SELECT COUNT ( DISTINCT AccountNumber ) AS countAccount FROM PaidBills WHERE " +
-                "PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND p.PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59' AND p.TELLER = '"+teller+"' ");
+                "PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59' AND TELLER = '"+teller+"' ");
 
         ResultSet rs = ps.executeQuery();
 
