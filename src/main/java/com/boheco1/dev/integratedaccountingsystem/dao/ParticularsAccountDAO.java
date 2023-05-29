@@ -62,4 +62,23 @@ public class ParticularsAccountDAO {
 
         return pas;
     }
+
+    public static ParticularsAccount getParticularsAccount(String particulars) throws Exception {
+        ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                "SELECT * FROM ParticularsAccount " +
+                        "WHERE Particulars LIKE '%" + particulars + "%' " +
+                        "ORDER BY Particulars");
+
+        ParticularsAccount result = null;
+
+        if(rs.next()) {
+            result = new ParticularsAccount(
+                    rs.getString("Particulars"),
+                    rs.getString("AccountCode"),
+                    rs.getDouble("Amount")
+            );
+        }
+
+        return result;
+    }
 }
