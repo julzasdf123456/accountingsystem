@@ -24,7 +24,7 @@
             <VBox prefHeight="452.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                <children>
                   <Label text="Control Number" />
-                  <JFXTextField fx:id="teller_tf3" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                  <JFXTextField fx:id="cn_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -33,7 +33,7 @@
                      </VBox.margin>
                   </JFXTextField>
                   <Label text="Major Activity" />
-                  <JFXTextField fx:id="teller_tf31" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                  <JFXTextField fx:id="activity_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -42,7 +42,7 @@
                      </VBox.margin>
                   </JFXTextField>
                   <Label text="Board Resolution" />
-                  <JFXTextField fx:id="teller_tf311" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                  <JFXTextField fx:id="board_res_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -51,13 +51,13 @@
                      </VBox.margin>
                   </JFXTextField>
                   <Label text="Fund Source" />
-                  <JFXComboBox prefHeight="29.0" prefWidth="200.0" promptText="General Fund">
+                  <JFXComboBox fx:id="fs_cb" prefHeight="29.0" prefWidth="200.0" promptText="General Fund">
                      <VBox.margin>
                         <Insets bottom="16.0" />
                      </VBox.margin>
                   </JFXComboBox>
                   <Label text="Type" />
-                  <JFXComboBox prefHeight="29.0" prefWidth="200.0" promptText="Office Supply">
+                  <JFXComboBox fx:id="type_cb" prefHeight="29.0" prefWidth="200.0" promptText="Office Supply">
                      <VBox.margin>
                         <Insets bottom="24.0" />
                      </VBox.margin>
@@ -136,7 +136,7 @@
                                           <HBox GridPane.rowIndex="1">
                                              <children>
                                                 <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
-                                                <TextField />
+                                                <TextField fx:id="totals_tf" styleClass="bold" />
                                              </children>
                                           </HBox>
                                           <Label prefHeight="25.0" styleClass="bold" text="1st Quarter" GridPane.columnIndex="1" />
@@ -146,25 +146,25 @@
                                           <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
                                              <children>
                                                 <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
-                                                <TextField />
+                                                <TextField fx:id="q1_tf" styleClass="bold" />
                                              </children>
                                           </HBox>
                                           <HBox GridPane.columnIndex="2" GridPane.rowIndex="1">
                                              <children>
                                                 <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
-                                                <TextField />
+                                                <TextField fx:id="q2_tf" styleClass="bold" />
                                              </children>
                                           </HBox>
                                           <HBox GridPane.columnIndex="3" GridPane.rowIndex="1">
                                              <children>
                                                 <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
-                                                <TextField />
+                                                <TextField fx:id="q3_tf" styleClass="bold" />
                                              </children>
                                           </HBox>
                                           <HBox GridPane.columnIndex="4" GridPane.rowIndex="1">
                                              <children>
                                                 <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
-                                                <TextField />
+                                                <TextField fx:id="q4_tf" styleClass="bold" />
                                              </children>
                                           </HBox>
                                        </children>
@@ -200,7 +200,7 @@
                         </HBox>
                         <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
-                              <JFXTextField fx:id="teller_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" promptText="Juan Dela Cruz" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="prepared_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" text="Juan Dela Cruz" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -208,7 +208,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="teller_tf1" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" promptText="Tom Cruise" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="reviewed_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" text="Tom Cruise" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -216,7 +216,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="teller_tf2" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" promptText="Tom Cruise" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="approved_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" text="Tom Cruise" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
