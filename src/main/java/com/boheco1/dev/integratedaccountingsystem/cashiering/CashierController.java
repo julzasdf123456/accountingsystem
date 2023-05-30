@@ -70,6 +70,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private double collectionFromTeller;
     //private double otherDeduction;
     double collectionFromCRM;
+    double originalEvatAmount;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Utility.setParentController(this);
@@ -122,31 +123,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
     }
 
 
-    @FXML
-    void addServiceFee(ActionEvent event) {
-        try{
-            if(!serviceFeeAccounts.getText().isEmpty() && Double.parseDouble(serviceFeeAccounts.getText())>0){
-                double fee = serviceFee.getAmount() * Double.parseDouble(serviceFeeAccounts.getText());
-                boolean found = false;
-                for(ORItemSummary os : OR_itemList){
-                    if(os.getDescription().equals("Service Fee")){
-                        found = true;
-                        break;
-                    }
-                }
-                if(!found){
-                    ORItemSummary orItemSummary = new ORItemSummary(serviceFee.getAccountCode(), serviceFee.getParticulars(), fee);
-                    OR_itemList.add(orItemSummary);
-                    paymentTable.setItems(OR_itemList);
-                    reCompute();
-                    paymentTable.refresh();
-                }
-            }
-        } catch (Exception e) {
-            AlertDialogBuilder.messgeDialog("System Error", "Can not add service fee information, due to: " + e.getMessage() ,
-                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-        }
-    }
+
 
     @FXML
     private void selectPaymentMode(ActionEvent event) {
@@ -177,6 +154,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         bankInfo.getSelectionModel().clearSelection();
         remarks.setText("");
         businessStyle.setText("");
+        serviceFeeAccounts.setText("");
     }
     @Override
     public void receive(Object o) {
@@ -278,23 +256,13 @@ public class CashierController extends MenuControllerHandler implements Initiali
             Teller teller = (Teller)  o;
             ORItemSummary removeGrandTotal=null;
             List<ORItemSummary> orItemSummaries = teller.getOrItemSummaries();
-            /*ObservableList<ORItemSummary> result = FXCollections.observableArrayList(orItemSummaries);
-            for (ORItemSummary orItemSummary : result){
-                if(orItemSummary.getDescription().equals("Grand Total")){
-                    grandTotalHolder = new ORItemSummary(orItemSummary.getAccountCode(),orItemSummary.getDescription(),orItemSummary.getAmount());
-                    collectionFromTeller = orItemSummary.getAmount();
-                    removeGrandTotal = orItemSummary;
-                    total.setText(""+Utility.formatDecimal(collectionFromTeller));
+            ObservableList<ORItemSummary> result = FXCollections.observableArrayList(orItemSummaries);
+            for (ORItemSummary os : result){
+                if(os.getDescription().equals("EVAT")){
+                    originalEvatAmount = os.getAmount();
                     break;
                 }
             }
-
-
-
-            //remove the item Grand total and Other Deduction
-            result.remove(removeGrandTotal);
-
-            this.paymentTable.setItems(result);*/
 
             TableColumn<ORItemSummary, String> column0 = new TableColumn<>("Account Code");
             column0.setStyle("-fx-alignment: center-left;");
@@ -488,6 +456,44 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 reCompute();
             }
         });
+    }
+
+    @FXML
+    private void addServiceFee(ActionEvent event) {
+        try{
+            if(!serviceFeeAccounts.getText().isEmpty()){
+                double fee = serviceFee.getAmount() * Double.parseDouble(serviceFeeAccounts.getText());
+                boolean found = false;
+                for(ORItemSummary os : OR_itemList){
+                    if(os.getDescription().equals("Service Fee")){
+                        if(fee <= 0){
+                            OR_itemList.remove(os);
+                            os.setAmount(originalEvatAmount);
+                            reCompute();
+                            paymentTable.refresh();
+                            return;
+                        }
+                        found = true;
+                        os.setAmount(fee);
+                    }
+
+                    if(os.getDescription().equals("EVAT")){
+                        os.setAmount(originalEvatAmount + (3.6 * Double.parseDouble(serviceFeeAccounts.getText())));
+                    }
+                }
+                if(!found){
+                    ORItemSummary orItemSummary = new ORItemSummary(serviceFee.getAccountCode(), serviceFee.getParticulars(), fee);
+                    OR_itemList.add(orItemSummary);
+                    paymentTable.setItems(OR_itemList);
+                }
+
+                reCompute();
+                paymentTable.refresh();
+            }
+        } catch (Exception e) {
+            AlertDialogBuilder.messgeDialog("System Error", "Can not add service fee information, due to: " + e.getMessage() ,
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }
     }
 
     @FXML
