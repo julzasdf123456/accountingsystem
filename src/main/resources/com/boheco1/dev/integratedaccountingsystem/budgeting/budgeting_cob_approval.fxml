@@ -5,10 +5,14 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -79,7 +83,7 @@
                         <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                         <JFXButton alignment="CENTER" buttonType="RAISED" contentDisplay="CENTER" prefWidth="75.0" style="-fx-background-color: #009688;" text="Approve" textFill="WHITE">
                            <HBox.margin>
-                              <Insets right="16.0" />
+                              <Insets right="24.0" />
                            </HBox.margin>
                         </JFXButton>
                         <JFXButton buttonType="RAISED" contentDisplay="CENTER" maxHeight="29.0" minHeight="29.0" prefWidth="72.0" styleClass="btn-danger" text="Reject" textFill="WHITE">
@@ -97,13 +101,67 @@
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                      </columnResizePolicy>
                   </TableView>
-                  <HBox>
+                  <VBox maxWidth="1.7976931348623157E308">
                      <children>
-                        <HBox prefHeight="20.0" prefWidth="5.0" HBox.hgrow="ALWAYS" />
-                        <Label prefHeight="25.0" styleClass="bold" text="TOTAL AMOUNT: " />
-                        <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱                             " />
+                        <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                           <children>
+                              <GridPane maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="100.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                                 <children>
+                                    <Label prefHeight="25.0" styleClass="bold" text="TOTAL" />
+                                    <HBox GridPane.rowIndex="1">
+                                       <children>
+                                          <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
+                                          <TextField />
+                                       </children>
+                                    </HBox>
+                                    <Label prefHeight="25.0" styleClass="bold" text="1st Quarter" GridPane.columnIndex="1" />
+                                    <Label prefHeight="25.0" styleClass="bold" text="2nd Quarter" GridPane.columnIndex="2" />
+                                    <Label prefHeight="25.0" styleClass="bold" text="3rd Quarter" GridPane.columnIndex="3" />
+                                    <Label prefHeight="25.0" styleClass="bold" text="4th Quarter" GridPane.columnIndex="4" />
+                                    <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                       <children>
+                                          <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
+                                          <TextField />
+                                       </children>
+                                    </HBox>
+                                    <HBox GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                       <children>
+                                          <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
+                                          <TextField />
+                                       </children>
+                                    </HBox>
+                                    <HBox GridPane.columnIndex="3" GridPane.rowIndex="1">
+                                       <children>
+                                          <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
+                                          <TextField />
+                                       </children>
+                                    </HBox>
+                                    <HBox GridPane.columnIndex="4" GridPane.rowIndex="1">
+                                       <children>
+                                          <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
+                                          <TextField />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </GridPane>
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="16.0" />
+                           </VBox.margin>
+                        </HBox>
                      </children>
-                  </HBox>
+                  </VBox>
                </children>
             </VBox>
          </center>

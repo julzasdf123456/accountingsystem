@@ -185,7 +185,7 @@ public class BillDAO {
      */
     public static List<Bill> getConsumerBills(ConsumerInfo consumerInfo, boolean paid) throws Exception {
         String sql = "SELECT " +
-                "BillNumber, AccountNumber, ServicePeriodEnd, ServiceDateFrom, ServiceDateTo, DueDate, ISNULL(PR,0) AS PR, " +
+                "BillNumber, AccountNumber, ServicePeriodEnd, ServiceDateFrom, ServiceDateTo, DueDate, ISNULL(PR,0) AS PR, ISNULL(NetMeteringNetAmount, 0) AS NetMeterAmount, " +
                 "ISNULL((SELECT PowerNew FROM BillsForDCRRevision a WHERE b.AccountNumber = a.AccountNumber AND b.ServicePeriodEnd = a.ServicePeriodEnd), 0) AS PowerNew, " +
                 "ISNULL((SELECT KatasBalance FROM KatasData c WHERE b.AccountNumber = c.AccountNumber AND b.ServicePeriodEnd = c.ServicePeriodEnd), 0) AS KatasAmt, " +
                 "DATEDIFF(day, DueDate, getdate()) AS daysDelayed, ISNULL(NetAmount,0) AS NetAmount, ISNULL(ConsumerType,'RM') AS ConsumerType, ISNULL(PowerKWH,0) AS PowerKWH, " +
@@ -216,7 +216,11 @@ public class BillDAO {
                     rs.getDate("ServiceDateTo").toLocalDate(),
                     rs.getDate("DueDate").toLocalDate(),
                     rs.getDouble("NetAmount"));
-
+            //apply other deductions when account is netmetering, set net amount as netmeter amount
+            if (consumerInfo.getAccountID().startsWith("3232")) {
+                bill.setAmountDue(rs.getDouble("NetMeterAmount"));
+                bill.setOtherAdjustment(rs.getDouble("NetAmount") - rs.getDouble("NetMeterAmount"));
+            }
             Date date = rs.getDate("ServicePeriodEnd");
             LocalDate billMonth = date.toLocalDate();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM YYYY");
@@ -239,8 +243,8 @@ public class BillDAO {
             bill.setAddCharges(bill.getPr()+bill.getOtherCharges());
             //Disable surcharge computation when set in the Bills table withPenalty value of 1
             if (bill.isWithPenalty()) {
-                bill.setSurCharge(bill.computeSurCharge());
-                bill.setSurChargeTax(bill.getSurCharge() * 0.12);
+                bill.setSurCharge(Utility.round(bill.computeSurCharge(), 2));
+                bill.setSurChargeTax(Utility.round(bill.getSurCharge() * 0.12, 2));
             }else{
                 bill.setSurCharge(0);
                 bill.setSurChargeTax(0);
