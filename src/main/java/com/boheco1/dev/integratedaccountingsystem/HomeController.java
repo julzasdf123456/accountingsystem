@@ -76,7 +76,7 @@ public class HomeController implements Initializable {
     public JFXButton viewBills;
 
     //BUDGETING
-    public JFXButton cob, approve_cob, user_cob;
+    public JFXButton cob, approve_cob, user_cob, manage_app;
 
     //CASHIER
     public JFXButton orCancel, orUpdate, bulk_or, supplier_or, consumer_teller_or, bankRemittance, acknowledgement_receipts;
@@ -135,6 +135,7 @@ public class HomeController implements Initializable {
         cob = new JFXButton("Prepare C.O.B.");
         approve_cob = new JFXButton("Approve C.O.B.");
         user_cob = new JFXButton("Home");
+        manage_app = new JFXButton("Manage APP");
 
         String brStr = "Bank Remittance";
 
@@ -158,10 +159,17 @@ public class HomeController implements Initializable {
         checkVoucher = new JFXButton("Check Voucher");
         journalVoucher = new JFXButton("Journal Voucher");
 
-        NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Budgeting"), new FontIcon("mdi2c-cash-register"), homeStackPane);
-        NavMenuHelper.addMenu(navMenuBox, user_cob, homeStackPane);
-        NavMenuHelper.addMenu(navMenuBox, cob, homeStackPane);
-        NavMenuHelper.addMenu(navMenuBox, approve_cob, homeStackPane);
+        if(ActiveUser.getUser().can("prepare-budget") || ActiveUser.getUser().can("manage-app")) {
+            NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Budgeting"), new FontIcon("mdi2c-cash-register"), homeStackPane);
+            if(ActiveUser.getUser().can("prepare-budget")){
+                NavMenuHelper.addMenu(navMenuBox, user_cob, homeStackPane);
+                NavMenuHelper.addMenu(navMenuBox, cob, homeStackPane);
+                NavMenuHelper.addMenu(navMenuBox, approve_cob, homeStackPane);
+            }
+            if(ActiveUser.getUser().can("manage-app")) {
+                NavMenuHelper.addMenu(navMenuBox, manage_app, homeStackPane);
+            }
+        }
 
         // ADD ALL ITEMS TO NAV SEQUENTIALLY
         if(ActiveUser.getUser().can("manage-finance")) {
@@ -238,9 +246,14 @@ public class HomeController implements Initializable {
         drawerMenus = new ArrayList<>();
 
         //BUDGETING
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(user_cob, new FontIcon("mdi2v-view-dashboard"), drawerMenus, user_cob.getText(), contentPane, "budgeting/budgeting_user_cob_list.fxml", subToolbar, null, title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(cob, new FontIcon("mdi2c-cash-usd"), drawerMenus, cob.getText(), contentPane, "budgeting/budgeting_cob.fxml", subToolbar, null, title);
-        DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(approve_cob, new FontIcon("mdi2f-file-document-edit"), drawerMenus, approve_cob.getText(), contentPane, "budgeting/budgeting_cob_approval.fxml", subToolbar, null, title);
+        if(ActiveUser.getUser().can("prepare-budget")) {
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(user_cob, new FontIcon("mdi2v-view-dashboard"), drawerMenus, user_cob.getText(), contentPane, "budgeting/budgeting_user_cob_list.fxml", subToolbar, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(cob, new FontIcon("mdi2c-cash-usd"), drawerMenus, cob.getText(), contentPane, "budgeting/budgeting_cob.fxml", subToolbar, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(approve_cob, new FontIcon("mdi2f-file-document-edit"), drawerMenus, approve_cob.getText(), contentPane, "budgeting/budgetting_cob_approval.fxml", subToolbar, null, title);
+        }
+        if(ActiveUser.getUser().can("manage-app")) {
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(manage_app, new FontIcon("mdi2f-file-document-edit"), drawerMenus, manage_app.getText(), contentPane, "budgeting/manage_app.fxml", subToolbar, null, title);
+        }
 
         if(ActiveUser.getUser().can("manage-finance")) {
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(journalEntries, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, journalEntries.getText(), contentPane, "journal_entries_layout.fxml", subToolbar, null, title);
