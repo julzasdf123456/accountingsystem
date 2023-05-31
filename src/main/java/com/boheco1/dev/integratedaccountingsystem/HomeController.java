@@ -2,6 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.NotificationsDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
+import com.boheco1.dev.integratedaccountingsystem.objects.BankRemittance;
 import com.boheco1.dev.integratedaccountingsystem.objects.Notifications;
 import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 import com.boheco1.dev.integratedaccountingsystem.objects.TransactionHeader;
@@ -64,7 +65,7 @@ public class HomeController implements Initializable {
      * Nav Menu Items
      */
     // FINANCE
-    public JFXButton journalEntries, budget;
+    public JFXButton journalEntries, budget, checkVoucher, journalVoucher;
 
     // BILLING
     public JFXButton allAccounts, orPosting;
@@ -74,8 +75,11 @@ public class HomeController implements Initializable {
     public JFXButton dcr;
     public JFXButton viewBills;
 
+    //BUDGETING
+    public JFXButton cob, approve_cob, user_cob, manage_app;
+
     //CASHIER
-    public JFXButton orUpdate, bulk_or, supplier_or, consumer_teller_or, bankRemittance, acknowledgement_receipts;
+    public JFXButton orCancel, orUpdate, bulk_or, supplier_or, consumer_teller_or, bankRemittance, acknowledgement_receipts;
     // WAREHOUSE
     public JFXButton warehouseDashboard, fileMirs, generateMct, mrT, stocks, receiving, addMR, supplier;
 
@@ -128,12 +132,22 @@ public class HomeController implements Initializable {
         dcr = new JFXButton("Daily Collection Report");
         viewBills = new JFXButton("View Consumer Bills");
 
+        cob = new JFXButton("Prepare C.O.B.");
+        approve_cob = new JFXButton("Approve C.O.B.");
+        user_cob = new JFXButton("Home");
+        manage_app = new JFXButton("Manage APP");
+
+        String brStr = "Bank Remittance";
+
         try {
-            bankRemittance = new JFXButton(TransactionHeader.getTransactionCodeProperty().equals("BR") ? "Bank Remittance" : "Bank Remittance Sub");
+            if(TransactionHeader.getBRTransactionCodeProperty().equalsIgnoreCase("brsub")){
+                brStr = "Bank Remittance Sub";
+            }
         }catch(Exception ex) {
             ex.printStackTrace();
         }
 
+        bankRemittance = new JFXButton(brStr);
         acknowledgement_receipts = new JFXButton("Ack Receipts");
 
         consumer_teller_or = new JFXButton("Consumer/Teller O.R");
@@ -141,6 +155,21 @@ public class HomeController implements Initializable {
         supplier = new JFXButton("Supplier");
         bulk_or = new JFXButton("Bulk O.R");
         orUpdate = new JFXButton("Update O.R");
+        orCancel = new JFXButton("Cancel O.R");
+        checkVoucher = new JFXButton("Check Voucher");
+        journalVoucher = new JFXButton("Journal Voucher");
+
+        if(ActiveUser.getUser().can("prepare-budget") || ActiveUser.getUser().can("manage-app")) {
+            NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Budgeting"), new FontIcon("mdi2c-cash-register"), homeStackPane);
+            if(ActiveUser.getUser().can("prepare-budget")){
+                NavMenuHelper.addMenu(navMenuBox, user_cob, homeStackPane);
+                NavMenuHelper.addMenu(navMenuBox, cob, homeStackPane);
+                NavMenuHelper.addMenu(navMenuBox, approve_cob, homeStackPane);
+            }
+            if(ActiveUser.getUser().can("manage-app")) {
+                NavMenuHelper.addMenu(navMenuBox, manage_app, homeStackPane);
+            }
+        }
 
         // ADD ALL ITEMS TO NAV SEQUENTIALLY
         if(ActiveUser.getUser().can("manage-finance")) {
@@ -148,6 +177,8 @@ public class HomeController implements Initializable {
             NavMenuHelper.addMenu(navMenuBox, journalEntries, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, budget, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, orUpdate, homeStackPane);
+            NavMenuHelper.addMenu(navMenuBox, checkVoucher, homeStackPane);
+            NavMenuHelper.addMenu(navMenuBox, journalVoucher, homeStackPane);
         }
 
         if(ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-tellering")) {
@@ -176,6 +207,7 @@ public class HomeController implements Initializable {
             NavMenuHelper.addMenu(navMenuBox, bulk_or, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, bankRemittance, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, acknowledgement_receipts, homeStackPane);
+            NavMenuHelper.addMenu(navMenuBox, orCancel, homeStackPane);
         }
 
         if(ActiveUser.getUser().can("manage-warehouse")) {
@@ -212,10 +244,23 @@ public class HomeController implements Initializable {
 
         // INITIALIZE MENU FUNCTIONS
         drawerMenus = new ArrayList<>();
+
+        //BUDGETING
+        if(ActiveUser.getUser().can("prepare-budget")) {
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(user_cob, new FontIcon("mdi2v-view-dashboard"), drawerMenus, user_cob.getText(), contentPane, "budgeting/budgeting_user_cob_list.fxml", subToolbar, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(cob, new FontIcon("mdi2c-cash-usd"), drawerMenus, cob.getText(), contentPane, "budgeting/budgeting_cob.fxml", subToolbar, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(approve_cob, new FontIcon("mdi2f-file-document-edit"), drawerMenus, approve_cob.getText(), contentPane, "budgeting/budgetting_cob_approval.fxml", subToolbar, null, title);
+        }
+        if(ActiveUser.getUser().can("manage-app")) {
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(manage_app, new FontIcon("mdi2f-file-document-edit"), drawerMenus, manage_app.getText(), contentPane, "budgeting/manage_app.fxml", subToolbar, null, title);
+        }
+
         if(ActiveUser.getUser().can("manage-finance")) {
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(journalEntries, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, journalEntries.getText(), contentPane, "journal_entries_layout.fxml", subToolbar, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(budget, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, budget.getText(), contentPane, "budget_layout.fxml", subToolbar, null, "manage-budget", homeStackPane, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(orUpdate, new FontIcon("mdi2f-file"), drawerMenus, orUpdate.getText(), contentPane, "finance/or_update_layout.fxml", null, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(checkVoucher, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, checkVoucher.getText(), contentPane, "finance/voucher_layout.fxml", subToolbar, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(journalVoucher, new FontIcon("mdi2f-file"), drawerMenus, journalVoucher.getText(), contentPane, "finance/voucher_layout.fxml", null, null, title);
         }
 
         if(ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-tellering")) {
@@ -226,8 +271,7 @@ public class HomeController implements Initializable {
         }
 
         if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-cashiering")) {
-            //DrawerMenuHelper.setMenuButton(power_bills_payment, new FontIcon("mdi2c-cash-usd"), drawerMenus, power_bills_payment.getText());
-            if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering") || ActiveUser.getUser().can("manage-billing"))
+           if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering") || ActiveUser.getUser().can("manage-billing"))
                 DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(power_bills_payment, new FontIcon("mdi2c-cash-usd"), drawerMenus, power_bills_payment.getText(), contentPane, "tellering/tellering_bills_payment.fxml", null, null, title);
             if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering"))
                 DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(dcr, new FontIcon("mdi2c-chart-bar"), drawerMenus, dcr.getText(), contentPane, "tellering/tellering_dcr.fxml", null, null, title);
@@ -243,6 +287,7 @@ public class HomeController implements Initializable {
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(supplier_or, new FontIcon("mdi2t-truck-outline"), drawerMenus, supplier_or.getText(), contentPane, "cashiering/supplier_or_layout.fxml", null, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(bulk_or, new FontIcon("mdi2f-file-upload-outline"), drawerMenus, bulk_or.getText(), contentPane, "cashiering/or_bulk_layout.fxml", null, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(acknowledgement_receipts, new FontIcon("mdi2f-file"), drawerMenus, "Acknowledgement Receipts", contentPane, "cashiering/acknowledgement_receipts.fxml", null, null, title);
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(orCancel, new FontIcon("mdi2f-file-cancel"), drawerMenus, orCancel.getText(), contentPane, "cashiering/cancel_or_layout.fxml", null, null, title);
         }
 
         // WAREHOUSE

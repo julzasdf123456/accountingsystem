@@ -1,5 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+
 public class CRMDetails {
     String id;
     String referenceNo;
@@ -8,6 +10,8 @@ public class CRMDetails {
     double subTotal;
     double VAT;
     double total;
+
+    String totalView;
     public CRMDetails(){}
     public CRMDetails(String id, String referenceNo, String particulars, String glCode, double subTotal, double VAT, double total) {
         this.id = id;
@@ -17,6 +21,21 @@ public class CRMDetails {
         this.subTotal = subTotal;
         this.VAT = VAT;
         this.total = total;
+
+        if (this.total == 0)
+            this.setTotalView(" ");
+        else if (this.total > 0)
+            this.setTotalView(Utility.formatDecimal(this.total));
+        else
+            this.setTotalView("("+Utility.formatDecimal(Math.abs(this.total))+")");
+    }
+
+    public String getTotalView() {
+        return totalView;
+    }
+
+    public void setTotalView(String totalView) {
+        this.totalView = totalView;
     }
 
     public String getId() {

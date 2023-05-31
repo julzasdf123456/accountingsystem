@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
+import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
@@ -62,7 +63,7 @@ public class TransactionHeaderDetailDAO {
                     ps2.setDate(4, Date.valueOf(td.getTransactionDate()));
                     ps2.setInt(5, td.getSequenceNumber());
                     ps2.setString(6, td.getAccountCode());
-                    ps2.setDouble(7, td.getDebit());
+                    ps2.setDouble(7, Math.abs(td.getDebit()));
                     ps2.setDouble(8, td.getCredit());
                     ps2.setDate(9, Date.valueOf(td.getOrDate()));
                     ps2.setString(10, td.getBankID());
@@ -167,7 +168,7 @@ public class TransactionHeaderDetailDAO {
                     ps2.setDate(4, Date.valueOf(td.getTransactionDate()));
                     ps2.setInt(5, td.getSequenceNumber());
                     ps2.setString(6, td.getAccountCode());
-                    ps2.setDouble(7, td.getDebit());
+                    ps2.setDouble(7, Math.abs(td.getDebit()));
                     ps2.setDouble(8, td.getCredit());
                     ps2.setDate(9, Date.valueOf(td.getOrDate()));
                     ps2.setString(10, td.getBankID());
@@ -196,5 +197,51 @@ public class TransactionHeaderDetailDAO {
             e.printStackTrace();
         }
 
+    }
+
+    public static void cancelOR(TransactionHeader transactionHeader) throws SQLException, ClassNotFoundException {
+        try{
+            DB.getConnection().setAutoCommit(false);
+            ps1 = DB.getConnection().prepareStatement(
+                    "UPDATE TransactionHeader SET Amount = '0', Name = 'CANCELLED', Remarks = ? " +
+                            "WHERE " +
+                            "Period = ? AND TransactionNumber = ? AND TransactionCode = ? ;" +
+                            "DELETE FROM TransactionDetails WHERE Period = ? AND TransactionNumber = ? AND TransactionCode = ?;");
+            ps1.setString(1, transactionHeader.getRemarks());
+            ps1.setDate(2, java.sql.Date.valueOf(transactionHeader.getPeriod()));
+            ps1.setString(3, transactionHeader.getTransactionNumber());
+            ps1.setString(4, transactionHeader.getTransactionCode());
+            ps1.setDate(5, java.sql.Date.valueOf(transactionHeader.getPeriod()));
+            ps1.setString(6, transactionHeader.getTransactionNumber());
+            ps1.setString(7, transactionHeader.getTransactionCode());
+            ps1.executeUpdate();
+
+           /* ps1 = DB.getConnection().prepareStatement(
+                    "DELETE FROM TransactionDetails WHERE " +
+                            "Period = ? AND TransactionNumber = ? AND TransactionCode = ? ;");
+            ps1.setDate(1, java.sql.Date.valueOf(transactionHeader.getPeriod()));
+            ps1.setString(2, transactionHeader.getTransactionNumber());
+            ps1.setString(3, transactionHeader.getTransactionCode());
+            ps1.addBatch();*/
+
+            Utility.ERROR_MSG = null;
+            ps1.executeUpdate();
+            DB.getConnection().setAutoCommit(true);
+            ps1.close();
+            AlertDialogBuilder.messgeDialog("System Message", "Transaction successful.",
+                    Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+        } catch (Exception e){
+            AlertDialogBuilder.messgeDialog("System Error", "Error encounter while process request."+ e.getMessage(),
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            Utility.ERROR_MSG = e.getMessage();
+            try {
+                DB.getConnection().rollback();
+                DB.getConnection().setAutoCommit(true);
+                ps1.close();
+            } catch (SQLException | ClassNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+            e.printStackTrace();
+        }
     }
 }

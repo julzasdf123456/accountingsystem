@@ -24,4 +24,8 @@ public class TransactionDefinition {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public String toString(){
+        return transactionCode;
+    }
 }

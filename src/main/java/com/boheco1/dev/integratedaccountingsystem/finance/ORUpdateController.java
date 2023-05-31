@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static com.boheco1.dev.integratedaccountingsystem.dao.TransactionDetailsDAO.addUpdate;
 
 public class ORUpdateController extends MenuControllerHandler implements Initializable {
     @FXML
@@ -51,6 +50,9 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
 
     @FXML
     private TableView newItemTable;
+
+    @FXML
+    private JFXComboBox<String> transCode;
 
     @FXML
     private JFXTextField orItem;
@@ -83,6 +85,10 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
         newTotalAmount.setText("");
 
         transactionDate.setPromptText("Transaction Date");
+
+        transCode.getItems().add("OR");
+        transCode.getItems().add("ORSub");
+
 
     }
 
@@ -122,7 +128,10 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                                     icon.setIconColor(Paint.valueOf(ColorPalette.DANGER));
                                     btn.setOnAction(event -> {
                                         try{
-                                            data.setCredit(0);
+                                            if(data.getAmount()>0)
+                                                data.setCredit(0);
+                                            else
+                                                data.setDebit(0);
                                             data.setNote("Remove during O.R Update");//do not change this message its use during delete db record
                                             //transactionDetails.remove(data);
                                             ObservableList<TransactionDetails> result = FXCollections.observableArrayList(transactionDetails);
@@ -188,6 +197,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                                             newTransactionDetails.remove(data);
                                             ObservableList<TransactionDetails> result = FXCollections.observableArrayList(newTransactionDetails);
                                             newItemTable.setItems(result);
+                                            newItemTable.refresh();
                                             reCompute();
                                         }catch (Exception e){
                                             e.printStackTrace();
@@ -222,7 +232,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                     @Override
                     public void handle(ActionEvent __) {
                         try {
-                            addUpdate(transactionDetails,newTransactionDetails);
+                            TransactionDetailsDAO.addUpdate(transactionDetails,newTransactionDetails);
                             reset();
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -245,15 +255,17 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     @FXML
     private void searchOR(ActionEvent event) throws Exception {
         String searchOr = orNumber.getText();//temporary store search string before reset and clear all field
-        if(searchOr.isEmpty() && transactionDate.getValue()==null)
+        if(searchOr.isEmpty() || transactionDate.getValue()==null || transCode.getSelectionModel().isEmpty())
             return;
+
 
         reset();
         orNumber.setText(searchOr);
-        transactionHeader = TransactionHeaderDAO.get(searchOr,Utility.getTransactionCodeProperty(), transactionDate.getValue());
-        transactionDetails = TransactionDetailsDAO.get(searchOr,Utility.getTransactionCodeProperty(), transactionDate.getValue());
+        transactionHeader = TransactionHeaderDAO.get(searchOr,transCode.getSelectionModel().getSelectedItem(), transactionDate.getValue());
+        transactionDetails = TransactionDetailsDAO.get(searchOr,transCode.getSelectionModel().getSelectedItem(), transactionDate.getValue());
         newTotalAmount.setText("");
         fillUpFields();
+        reCompute();
     }
 
     private void tableClick(){
@@ -262,10 +274,10 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     selectedItem = (TransactionDetails) row.getItem();
-                    //if(selectedItem.getCredit()>0) {
+                    if(selectedItem.getAmount()!=0) {
                         orItem.setText(selectedItem.getParticularsLabel());
-                        orItemAmount.setText(""+selectedItem.getAmount());
-                    //}
+                        orItemAmount.setText("" + selectedItem.getAmount());
+                    }
                 }
             });
             return row ;
@@ -287,18 +299,15 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
             if(!orItem.getText().isEmpty() && !orItemAmount.getText().isEmpty()) {
                 double amount = Double.parseDouble(orItemAmount.getText());
                 if(amount > 0){
-                    if(amount > selectedItem.getCredit()){
-                        AlertDialogBuilder.messgeDialog("System Message", "Insufficient amount, to perform breakdown." ,
-                                Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-                    }else{
-                        selectedItem.setCredit(amount);
-                        selectedItem.setNewParticularsLabel(orItem.getText());
-                        orTable.refresh();
-                        orItem.setText("");
-                        orItemAmount.setText("");
-                        reCompute();
-                    }
+                    selectedItem.setCredit(amount);
+                }else{
+                    selectedItem.setDebit(amount);
                 }
+                    selectedItem.setNewParticularsLabel(orItem.getText());
+                    orTable.refresh();
+                    orItem.setText("");
+                    orItemAmount.setText("");
+                    reCompute();
             }
         });
     }
@@ -307,35 +316,39 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
         jfxTextField.setOnAction(e -> {
             if(!particular.getText().isEmpty() && !newItemAmount.getText().isEmpty()){
                 double amount = Double.parseDouble(newItemAmount.getText());
+
+                TransactionDetails temp = (TransactionDetails) orTable.getItems().get(0);
+                TransactionDetails td = new TransactionDetails();
+                td.setPeriod(temp.getPeriod());
+                td.setTransactionNumber(temp.getTransactionNumber());
+                td.setTransactionCode(temp.getTransactionCode());
+                td.setTransactionDate(temp.getTransactionDate());
+                //account sequence will be set upon saving
+
+                ParticularsAccount newItem = particularsAccount;
+                td.setAccountCode(newItem.getAccountCode());
                 if(amount > 0){
-                    TransactionDetails temp = (TransactionDetails) orTable.getItems().get(0);
-                    TransactionDetails td = new TransactionDetails();
-                    td.setPeriod(temp.getPeriod());
-                    td.setTransactionNumber(temp.getTransactionNumber());
-                    td.setTransactionCode(temp.getTransactionCode());
-                    td.setTransactionDate(temp.getTransactionDate());
-                    //account sequence will be set upon saving
-
-                    ParticularsAccount newItem = particularsAccount;
-                    td.setAccountCode(newItem.getAccountCode());
                     td.setCredit(amount);
-                    td.setParticulars(newItem.getParticulars());
-
-                    td.setOrDate(temp.getOrDate());
-                    td.setBankID(temp.getBankID());
-                    td.setNote(temp.getNote());
-                    td.setCheckNumber(temp.getCheckNumber());
-                    td.setDepositedDate(temp.getDepositedDate());
-
-                    newTransactionDetails.add(td);
-                    ObservableList<TransactionDetails> result = FXCollections.observableArrayList(newTransactionDetails);
-                    newItemTable.setItems(result);
-                    newItemTable.refresh();
-                    particular.setText("");
-                    newItemAmount.setText("");
-                    particular.requestFocus();
-                    reCompute();
+                }else{
+                    td.setDebit(amount);
                 }
+                td.setParticulars(newItem.getParticulars());
+
+                td.setOrDate(temp.getOrDate());
+                td.setBankID(temp.getBankID());
+                td.setNote(temp.getParticulars()+": "+temp.getNote()+", added as new item during finance update");
+                td.setCheckNumber(temp.getCheckNumber());
+                td.setDepositedDate(temp.getDepositedDate());
+
+                newTransactionDetails.add(td);
+                ObservableList<TransactionDetails> result = FXCollections.observableArrayList(newTransactionDetails);
+                newItemTable.setItems(result);
+                newItemTable.refresh();
+                particular.setText("");
+                newItemAmount.setText("");
+                particular.requestFocus();
+                reCompute();
+
             }
         });
     }
@@ -357,6 +370,12 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     }
 
     private boolean reCompute(){
+
+        if(transactionHeader==null){
+            AlertDialogBuilder.messgeDialog("System Message", "No result found." ,
+                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+            return false;
+        }
         double newTotal=0;
         for(TransactionDetails t : transactionDetails)
             newTotal+=t.getAmount();
