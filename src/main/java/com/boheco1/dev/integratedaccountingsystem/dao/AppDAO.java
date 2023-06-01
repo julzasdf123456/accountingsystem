@@ -7,7 +7,6 @@ import com.boheco1.dev.integratedaccountingsystem.objects.APP;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.List;
 
 public class AppDAO {
     public static ArrayList<APP> getAll() throws Exception {
@@ -30,13 +29,16 @@ public class AppDAO {
 
     public static void create(APP app) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement("INSERT INTO APP (AppId, Year, IsOpen, BoardRes, TotalBudget) " +
-                "SET (?,?,?,?,?)");
-        ps.setString(1, Utility.generateRandomId());
+                "VALUES (?,?,?,?,?)");
+        String rndKey = Utility.generateRandomId();
+        ps.setString(1, rndKey);
         ps.setString(2,app.getYear());
         ps.setBoolean(3, true);
         ps.setString(4, app.getBoardRes());
         ps.setDouble(5, app.getTotalBudget());
         ps.executeUpdate();
+
+        app.setAppId(rndKey);
     }
 
     public static APP get(String id) throws Exception {

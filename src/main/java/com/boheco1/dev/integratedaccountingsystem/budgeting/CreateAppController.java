@@ -1,10 +1,10 @@
 package com.boheco1.dev.integratedaccountingsystem.budgeting;
 
+import com.boheco1.dev.integratedaccountingsystem.JournalEntriesController;
+import com.boheco1.dev.integratedaccountingsystem.dao.AppDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.DepartmentDAO;
-import com.boheco1.dev.integratedaccountingsystem.helpers.AlertDialogBuilder;
-import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
-import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
-import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.dao.DeptThresholdDAO;
+import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.APP;
 import com.boheco1.dev.integratedaccountingsystem.objects.Department;
 import com.boheco1.dev.integratedaccountingsystem.objects.DeptThreshold;
@@ -32,18 +32,20 @@ public class CreateAppController extends MenuControllerHandler implements Initia
     @FXML TextField cobText;
     @FXML TableView thresholdTable;
 
+    private List<DeptThreshold> thresholds;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
             List<Department> depts = DepartmentDAO.getAll(DB.getConnection());
-            List<DeptThreshold> thresholds = new ArrayList<>();
+            thresholds = new ArrayList<>();
             for(Department d: depts) {
                 thresholds.add(
                         new DeptThreshold("",0, d.getDepartmentID(), null)
                 );
             }
 
-            renderTable(thresholds);
+            renderTable();
 
         }catch(Exception ex) {
             ex.printStackTrace();
@@ -51,20 +53,20 @@ public class CreateAppController extends MenuControllerHandler implements Initia
         }
     }
 
-    private void renderTable(List<DeptThreshold> thresholds) {
+    private void renderTable() {
         TableColumn<DeptThreshold, String> deptCol = new TableColumn<>("Department");
         deptCol.setCellValueFactory(new PropertyValueFactory<DeptThreshold, String>("departmentName"));
 
 
-        TableColumn<DeptThreshold, Double> threshCol = new TableColumn<>("Threshold");
-        threshCol.setCellValueFactory(new PropertyValueFactory<DeptThreshold, Double>("threshAmount"));
+        TableColumn<DeptThreshold, String> threshCol = new TableColumn<>("Threshold");
+        threshCol.setCellValueFactory(new PropertyValueFactory<DeptThreshold, String>("threshAmountStr"));
         threshCol.setStyle("-fx-alignment: CENTER_RIGHT");
-        threshCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
-        threshCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<DeptThreshold, Double>>() {
+        threshCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        threshCol.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<DeptThreshold, String>>() {
             @Override
-            public void handle(TableColumn.CellEditEvent<DeptThreshold, Double> event) {
+            public void handle(TableColumn.CellEditEvent<DeptThreshold, String> event) {
                 DeptThreshold dt = event.getRowValue();
-                dt.setThreshAmount(event.getNewValue());
+                dt.setThreshAmount(Double.parseDouble(event.getNewValue().replace(",","").replace("₱","")));
             }
         });
 
@@ -87,7 +89,20 @@ public class CreateAppController extends MenuControllerHandler implements Initia
         app.setBoardRes(boardResoText.getText());
         app.setTotalBudget(Double.parseDouble(cobText.getText().replace(",","")));
 
+        try {
+            AppDAO.create(app);
+            for(DeptThreshold dt: thresholds) {
+                dt.setAppID(app.getAppId());
+            }
+            DeptThresholdDAO.create(thresholds);
+        }catch(Exception ex) {
+            ex.printStackTrace();
+            AlertDialogBuilder.messgeDialog("DB Error", ex.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }
 
+        AlertDialogBuilder.messgeDialog("APP Created","The APP has been created successfully!!!", Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+
+        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(JournalEntriesController.class, "budgeting/manage_app.fxml"));
     }
 
     private String validate() {

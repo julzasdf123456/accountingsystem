@@ -52,4 +52,8 @@ public class DeptThreshold {
     public String getDepartmentName() throws Exception {
         return DepartmentDAO.get(this.departmentID).getDepartmentName();
     }
+
+    public String getThreshAmountStr() {
+        return String.format("₱ %,.2f", threshAmount);
+    }
 }
