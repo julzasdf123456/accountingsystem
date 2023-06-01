@@ -5,7 +5,6 @@ public class APP {
     private String year;
     private boolean isOpen;
     private String boardRes;
-
     private double totalBudget;
 
     public APP(){}

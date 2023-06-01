@@ -40,6 +40,24 @@ import java.util.*;
 
 public class COBController extends MenuControllerHandler implements Initializable {
     @FXML
+    private JFXButton submit_btn;
+
+    @FXML
+    private JFXButton reset_btn;
+
+    @FXML
+    private Label category_lbl, threshold_lbl;
+
+    @FXML
+    private JFXButton import_btn;
+
+    @FXML
+    private JFXButton add_btn;
+
+    @FXML
+    private JFXButton remove_btn;
+
+    @FXML
     private JFXTextField cn_tf;
 
     @FXML
