@@ -64,4 +64,11 @@ public class DeptThresholdDAO {
 
         return null;
     }
+
+    public static void updateAmount(DeptThreshold dt) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE DeptThreshold SET ThreshAmount=? WHERE ThreshId=?");
+        ps.setDouble(1, dt.getThreshAmount());
+        ps.setString(2, dt.getThresID());
+        ps.executeUpdate();
+    }
 }

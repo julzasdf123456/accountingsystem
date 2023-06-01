@@ -54,4 +54,13 @@ public class AppDAO {
         }
         return null;
     }
+
+    public static void update(APP app) throws Exception{
+        PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE APP SET Year=?, BoardRes=?, TotalBudget=? WHERE AppId=?");
+        ps.setString(1, app.getYear());
+        ps.setString(2, app.getBoardRes());
+        ps.setDouble(3, app.getTotalBudget());
+        ps.setString(4, app.getAppId());
+        ps.executeUpdate();
+    }
 }
