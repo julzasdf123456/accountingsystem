@@ -47,4 +47,21 @@ public class DeptThresholdDAO {
 
         ps.executeBatch();
     }
+
+    public static DeptThreshold find(String appId, String departmentId) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM DeptThreshold WHERE AppId=? AND DepartmentId=?");
+        ps.setString(1, appId);
+        ps.setString(2, departmentId);
+        ResultSet rs = ps.executeQuery();
+        if(rs.next()) {
+            return new DeptThreshold(
+                    rs.getString("ThreshId"),
+                    rs.getDouble("ThreshAmount"),
+                    rs.getString("DepartmentId"),
+                    rs.getString("AppId")
+            );
+        }
+
+        return null;
+    }
 }

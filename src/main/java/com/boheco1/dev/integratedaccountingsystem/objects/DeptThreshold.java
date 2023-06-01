@@ -56,4 +56,8 @@ public class DeptThreshold {
     public String getThreshAmountStr() {
         return String.format("₱ %,.2f", threshAmount);
     }
+
+    public String getDeptAppropriationsStr() {
+        return "Php Temp00.00";
+    }
 }

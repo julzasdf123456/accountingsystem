@@ -78,7 +78,8 @@ public class ManageAppController extends MenuControllerHandler implements Initia
                     setGraphic(openButton);
 
                     openButton.setOnAction(actionEvent->{
-
+                        Utility.setSelectedAPP(app);
+                        Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(JournalEntriesController.class, "budgeting/view_app.fxml"));
                     });
                 }
             }

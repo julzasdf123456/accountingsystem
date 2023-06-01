@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import java.lang.String?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+
+<AnchorPane prefHeight="677.0" prefWidth="873.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.budgeting.ViewAppController">
+   <children>
+      <Label layoutX="40.0" layoutY="32.0" styleClass="heading-label" stylesheets="@../style.css" text="View APP" textFill="#555555" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="30.0" />
+      <GridPane layoutX="47.0" layoutY="93.0" prefHeight="90.0" prefWidth="352.0" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="80.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="171.0" minWidth="10.0" prefWidth="154.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="217.0" minWidth="10.0" prefWidth="198.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints maxHeight="35.0" minHeight="35.0" prefHeight="35.0" />
+            <RowConstraints maxHeight="35.0" minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="35.0" minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <Label text="Budget Year:" />
+            <Label text="Board Resolution:" GridPane.rowIndex="1" />
+            <Label text="Cash Operating Budget:" GridPane.rowIndex="2" />
+            <TextField fx:id="budgetYearText" alignment="CENTER" GridPane.columnIndex="1" />
+            <TextField fx:id="boardResoText" alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="cobText" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+         </children>
+      </GridPane>
+      <Separator layoutX="27.0" layoutY="197.0" prefHeight="4.0" prefWidth="490.0" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="197.0" />
+      <Label layoutX="27.0" layoutY="289.0" styleClass="bold" stylesheets="@../style.css" text="Departmental Budget Threshold" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="289.0" />
+      <ScrollPane layoutX="30.0" layoutY="312.0" AnchorPane.bottomAnchor="79.0" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="312.0">
+         <content>
+            <TableView fx:id="thresholdTable" prefHeight="286.0" prefWidth="618.0" />
+         </content>
+      </ScrollPane>
+      <JFXButton layoutX="27.0" layoutY="575.0" onAction="#onSave" prefHeight="35.0" prefWidth="152.0" text="Save New APP" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="30.0">
+         <styleClass>
+            <String fx:value="btn-info" />
+            <String fx:value="bold" />
+         </styleClass>
+      </JFXButton>
+      <Label layoutX="27.0" layoutY="209.0" styleClass="bold" stylesheets="@../style.css" text="Total Appropriation:" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="209.0" />
+      <Label layoutX="27.0" layoutY="236.0" styleClass="bold" stylesheets="@../style.css" text="Remaining:" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="235.0" />
+      <Separator layoutX="27.0" layoutY="268.0" prefHeight="4.0" prefWidth="490.0" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="270.0" />
+      <Label fx:id="appropriationsLabel" alignment="CENTER_RIGHT" layoutX="182.0" layoutY="209.0" prefHeight="19.0" prefWidth="198.0" styleClass="bold" stylesheets="@../style.css" text="PhP 0.00" textAlignment="RIGHT" AnchorPane.leftAnchor="182.0" AnchorPane.topAnchor="209.0" />
+      <Label fx:id="remainingLabel" alignment="CENTER_RIGHT" layoutX="183.0" layoutY="235.0" prefHeight="19.0" prefWidth="198.0" styleClass="bold" stylesheets="@../style.css" text="PhP 0.00" textAlignment="RIGHT" AnchorPane.leftAnchor="182.0" AnchorPane.topAnchor="235.0" />
+   </children>
+</AnchorPane>
