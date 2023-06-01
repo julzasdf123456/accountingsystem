@@ -74,6 +74,8 @@ public class Utility {
 
     private static ORContent orContent;
 
+    public static APP selectedAPP;
+
     public static MIRS getActiveMIRS() {
         return activeMIRS;
     }
@@ -356,4 +358,11 @@ public class Utility {
         Utility.orContent = orContent;
     }
 
+    public static void setSelectedAPP(APP app) {
+        selectedAPP = app;
+    }
+
+    public static APP getSelectedAPP() {
+        return selectedAPP;
+    }
 }

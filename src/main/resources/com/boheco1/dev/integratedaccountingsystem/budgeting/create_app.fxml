@@ -11,7 +11,6 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-
 <AnchorPane prefHeight="726.0" prefWidth="1038.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.budgeting.CreateAppController">
    <children>
       <Label layoutX="43.0" layoutY="37.0" styleClass="heading-label" stylesheets="@../style.css" text="Create APP" textFill="#555555" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="30.0" />
@@ -29,8 +28,8 @@
             <Label text="Budget Year:" />
             <Label text="Board Resolution:" GridPane.rowIndex="1" />
             <Label text="Cash Operating Budget:" GridPane.rowIndex="2" />
-            <TextField fx:id="budgetYearText" alignment="CENTER_RIGHT" GridPane.columnIndex="1" />
-            <TextField fx:id="boardResoText" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="budgetYearText" alignment="CENTER" GridPane.columnIndex="1" />
+            <TextField fx:id="boardResoText" alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <TextField fx:id="cobText" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="2" />
          </children>
       </GridPane>
