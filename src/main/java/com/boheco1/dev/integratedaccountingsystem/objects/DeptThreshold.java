@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.DepartmentDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.DeptThresholdDAO;
 
 public class DeptThreshold {
     private String thresID;
@@ -57,7 +58,11 @@ public class DeptThreshold {
         return String.format("₱ %,.2f", threshAmount);
     }
 
-    public String getDeptAppropriationsStr() {
-        return "Php Temp00.00";
+    public String getDeptAppropriationsStr() throws Exception{
+        return DeptThresholdDAO.getTotalAppropriationsStr(this);
+    }
+
+    public double getDeptAppropriations() throws Exception {
+        return DeptThresholdDAO.getTotalAppropriations(this);
     }
 }

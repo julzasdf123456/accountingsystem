@@ -71,4 +71,24 @@ public class DeptThresholdDAO {
         ps.setString(2, dt.getThresID());
         ps.executeUpdate();
     }
+
+    public static double getTotalAppropriations(DeptThreshold deptThreshold) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT SUM(c.Amount) FROM COB c LEFT JOIN EmployeeInfo ei ON c.Prepared = ei.EmployeeID \n" +
+                "WHERE c.AppId = ? AND ei.DepartmentId = ?;");
+        ps.setString(1, deptThreshold.getAppID());
+        ps.setString(2, deptThreshold.getDepartmentID());
+
+        ResultSet rs = ps.executeQuery();
+
+        if(rs.next()) {
+            return rs.getDouble(1);
+        }
+
+        return 0;
+    }
+
+    public static String getTotalAppropriationsStr(DeptThreshold deptThreshold) throws Exception {
+        return String.format("₱ %,.2f", getTotalAppropriations(deptThreshold));
+    }
 }

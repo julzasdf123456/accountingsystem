@@ -115,7 +115,7 @@ public class ViewAppController extends MenuControllerHandler implements Initiali
                     openButton.setOnAction(new EventHandler<ActionEvent>() {
                         @Override
                         public void handle(ActionEvent actionEvent) {
-                            Utility.setSelectedObject(deptThreshold);
+                            Utility.setSelectedDeptThreshold(deptThreshold);
                             Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(JournalEntriesController.class, "budgeting/view_dept_summary.fxml"));
                         }
                     });

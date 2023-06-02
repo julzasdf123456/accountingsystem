@@ -46,7 +46,7 @@
             <TableView fx:id="thresholdTable" prefHeight="286.0" prefWidth="568.0" />
          </content>
       </ScrollPane>
-      <JFXButton layoutX="27.0" layoutY="575.0" onAction="#onSave" prefHeight="35.0" prefWidth="152.0" text="Save New APP" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="30.0">
+      <JFXButton layoutX="27.0" layoutY="575.0" onAction="#onSave" prefHeight="35.0" prefWidth="152.0" text="Save Changes" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="30.0">
          <styleClass>
             <String fx:value="btn-info" />
             <String fx:value="bold" />

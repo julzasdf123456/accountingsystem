@@ -76,6 +76,10 @@ public class Utility {
 
     public static APP selectedAPP;
 
+    public static DeptThreshold selectedDeptThreshold;
+
+    public static COB selectedCOB;
+
     public static MIRS getActiveMIRS() {
         return activeMIRS;
     }
@@ -365,4 +369,15 @@ public class Utility {
     public static APP getSelectedAPP() {
         return selectedAPP;
     }
+
+    public static void setSelectedDeptThreshold(DeptThreshold dt) {
+        selectedDeptThreshold = dt;
+    }
+
+    public static DeptThreshold getSelectedDeptThreshold() { return selectedDeptThreshold; }
+    public static void setSelectedCOB(COB cob) {
+        selectedCOB = cob;
+    }
+
+    public static COB getSelectedCOB() { return selectedCOB; }
 }

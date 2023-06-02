@@ -20,6 +20,21 @@ public class COB {
 
     public COB(){}
 
+    public COB(String cobId, String activity, double amount, String status, String appId, String fsId, EmployeeInfo prepared, LocalDate datePrepared, EmployeeInfo reviewed, LocalDate dateReviewed, EmployeeInfo approved, LocalDate dateApproved) {
+        this.cobId = cobId;
+        this.activity = activity;
+        this.amount = amount;
+        this.status = status;
+        this.appId = appId;
+        this.fsId = fsId;
+        this.prepared = prepared;
+        this.datePrepared = datePrepared;
+        this.reviewed = reviewed;
+        this.dateReviewed = dateReviewed;
+        this.approved = approved;
+        this.dateApproved = dateApproved;
+    }
+
     public String getCobId() {
         return cobId;
     }
@@ -122,5 +137,9 @@ public class COB {
 
     public void setItems(List<COBItem> items) {
         this.items = items;
+    }
+
+    public String getAppropriationStr() {
+        return String.format("₱ %,.2f", this.amount);
     }
 }
