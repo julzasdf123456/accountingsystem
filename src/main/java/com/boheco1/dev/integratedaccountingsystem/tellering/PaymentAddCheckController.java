@@ -22,9 +22,6 @@ public class PaymentAddCheckController extends MenuControllerHandler implements 
     private TextField bank_tf;
 
     @FXML
-    private TextField check_no_tf;
-
-    @FXML
     private TextField amount_tf;
 
     @FXML
@@ -46,7 +43,6 @@ public class PaymentAddCheckController extends MenuControllerHandler implements 
     public Check getCheck(){
         Check check = null;
         String bank = this.bank_tf.getText();
-        String checkNo = this.check_no_tf.getText();
         double amount = 0;
         try{
             amount = Double.parseDouble(this.amount_tf.getText());
@@ -54,10 +50,9 @@ public class PaymentAddCheckController extends MenuControllerHandler implements 
             e.printStackTrace();
         }
 
-        if (!bank.isEmpty() && !checkNo.isEmpty() && amount != 0){
-            check = new Check(bank, checkNo, amount);
+        if (!bank.isEmpty() && amount != 0){
+            check = new Check(bank,  amount);
             this.bank_tf.setText("");
-            this.check_no_tf.setText("");
             this.amount_tf.setText("");
         }
         return check;

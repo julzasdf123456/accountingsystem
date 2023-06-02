@@ -162,6 +162,70 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.view_account_tf.setOnAction(actionEvent -> {
             //connect to CRM
         });
+        //If account number entered is 10 digits, automatic display
+        this.acct_no_tf.setOnKeyReleased(event -> {
+            String no = acct_no_tf.getText();
+            if (no.strip().length() == 10){
+                try {
+                    this.consumerInfo = ConsumerDAO.getConsumerRecord(no);
+                    if (this.consumerInfo != null) {
+                        Task<Void> task = new Task<>() {
+                            @Override
+                            protected Void call() throws SQLException {
+                                try{
+                                    if (bills.size() == 0) bills = FXCollections.observableArrayList();
+                                    List<Bill> consumerBills = BillDAO.getConsumerBills(consumerInfo, false);
+                                    if (consumerBills.size() > 0) {
+                                        for (Bill b : consumerBills){
+                                            if (!bills.contains(b)) {
+                                                bills.add(b);
+                                            }
+                                        }
+                                    }
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
+                                return null;
+                            }
+                        };
+
+                        task.setOnRunning(wse -> {
+                            acct_no_tf.setDisable(true);
+                            progressBar.setVisible(true);
+                        });
+
+                        task.setOnSucceeded(wse -> {
+                            setBillInfo(bills);
+                            acct_no_tf.setDisable(false);
+                            add_check_btn.setDisable(false);
+                            acct_no_tf.setText("");
+                            setConsumerInfo(consumerInfo);
+                            fees_table.setItems(bills);
+                            setPayables();
+                            payment_tf.setDisable(false);
+                            payment_tf.requestFocus();
+                            transact_btn.setDisable(false);
+                            total_paid_tf.setDisable(false);
+                            InputHelper.restrictNumbersOnly(payment_tf);
+                            progressBar.setVisible(false);
+                            acct_no_tf.requestFocus();
+                        });
+
+                        task.setOnFailed(wse -> {
+                            //Do nothing
+                            acct_no_tf.setDisable(false);
+                            progressBar.setVisible(false);
+                        });
+
+                        new Thread(task).start();
+                    }else{
+                        AlertDialogBuilder.messgeDialog("System Error", "No existing consumer account! Please refine search and try again!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         this.acct_no_tf.setOnAction(actionEvent -> {
             String no = acct_no_tf.getText();
@@ -574,6 +638,22 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.fees_table.getColumns().add(column52);
         this.fees_table.getColumns().add(column7);
         this.fees_table.setFixedCellSize(27.0);
+        //Keyboard event to remove bill when E is pressed
+        this.fees_table.setOnKeyReleased(event -> {
+            if (event.getCode() == KeyCode.E){
+                this.fees_table.getItems().remove(this.fees_table.getSelectionModel().getSelectedIndex());
+                fees_table.refresh();
+                this.setPayables();
+                if (this.fees_table.getItems().size() == 0) {
+                    this.reset();
+                    this.resetBillInfo();
+                }else{
+                    this.payment_tf.requestFocus();
+                    this.setBillInfo(this.bills);
+                }
+                this.billsNo_lbl.setText(bills.size()+"");
+            }
+        });
     }
     /**
      * Receives ConsumerInfo object from dialog
@@ -712,6 +792,16 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             if (event.getCode() == KeyCode.ESCAPE){
                 dialog.close();
                 payment_tf.requestFocus();
+            }else if (event.getCode() == KeyCode.ENTER) {
+                Check check = addCheckController.getCheck();
+                if (check != null){
+                    if (this.checks == null || this.checks.size() == 0)
+                        this.checks = FXCollections.observableArrayList();
+                    this.checks.add(check);
+                    this.checks_lv.setItems(this.checks);
+                    this.total_paid_tf.setText(Utility.formatDecimal(this.computeTotalPayments()));
+                    dialog.close();
+                }
             }
         });
 
@@ -886,14 +976,6 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             }
         });
         controller.getConfirm_btn().setOnAction(action ->{
-            //Get the default printer
-            //Printer printer = Printer.getDefaultPrinter();
-
-            /*Check if the default printer is not LQ-310 and prompt error, otherwise proceed to batch transaction and printing of oebr
-            if (printer.getName().contains("PDF") || printer.getName().contains("Fax") || printer.getName().contains("XPS") || printer.getName().contains("OneNote")) {
-                dialog.close();
-                AlertDialogBuilder.messgeDialog("System Error", "The default printer is not set! Please set the printer before printing!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            }else {*/
             Object obj = controller.getAccount_list().getSelectionModel().getSelectedItem();
 
             if (obj == null && controller.checkDeposit()) {
@@ -1003,10 +1085,9 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     this.setConsumerInfo(consumer);
                 }
             });
-
+            //Popup Menu when right clicking table row
             if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering")) {
                 final ContextMenu rowMenu = new ContextMenu();
-
 
                 MenuItem itemRemoveBill = new MenuItem("Remove Bill");
                 itemRemoveBill.setOnAction(actionEvent -> {

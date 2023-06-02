@@ -52,7 +52,7 @@ public class BillDAO {
                 "CheckAmount) " +
                 " VALUES (SYSDATETIME(), ?, ?, ?, ?, ?, ?, ?, ROUND(?, 2), ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2));";
 
-        String sql_check = "INSERT INTO CheckPayment (AccountNumber, ServicePeriodEnd, Bank, CheckNumber, Amount) VALUES(?, ?, ?, ?, ROUND(?, 2))";
+        String sql_check = "INSERT INTO CheckPayment (AccountNumber, ServicePeriodEnd, Bank, RefNo, Amount) VALUES(?, ?, ?, ?, ROUND(?, 2))";
         String sql_md = "UPDATE MDRefund SET Amount=ROUND(Amount-?, 2) WHERE AccountNumber=?";
         String sql_deposit = "INSERT INTO OtherCharges (AccountNumber, ";
         boolean depUpdate = false;
@@ -139,7 +139,7 @@ public class BillDAO {
                     ps_check.setString(1, paid.getConsumer().getAccountID());
                     ps_check.setDate(2, Date.valueOf(paid.getServicePeriodEnd()));
                     ps_check.setString(3, c.getBank());
-                    ps_check.setString(4, c.getCheckNo());
+                    ps_check.setString(4, Utility.generateRandomId()); //Generate unique id as refno(pk)
                     ps_check.setDouble(5, c.getOriginalAmount());
                     ps_check.executeUpdate();
                 }
@@ -739,7 +739,20 @@ public class BillDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static void cancelBill(PaidBill bill) throws Exception {
+        cancelCheck(bill);
         String sql = "DELETE FROM PaidBills WHERE AccountNumber = '"+bill.getConsumer().getAccountID()+"' AND ServicePeriodEnd = '"+bill.getServicePeriodEnd().toString()+"';";
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
+        ps.executeUpdate();
+        ps.close();
+    }
+    /**
+     * Cancel Check Payments for cancelling Paid Bills
+     * @param bill The Paid bill
+     * @return void
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void cancelCheck(PaidBill bill) throws Exception {
+        String sql = "DELETE FROM CheckPayment WHERE AccountNumber = '"+bill.getConsumer().getAccountID()+"' AND ServicePeriodEnd = '"+bill.getServicePeriodEnd().toString()+"';";
         PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
         ps.executeUpdate();
         ps.close();

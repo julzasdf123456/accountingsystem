@@ -17,6 +17,12 @@ public class Check {
         this.originalAmount = amount;
     }
 
+    public Check(String bank, double amount) {
+        this.bank = bank;
+        this.amount = amount;
+        this.originalAmount = amount;
+    }
+
     public String getBank() {
         return bank;
     }
@@ -42,7 +48,7 @@ public class Check {
     }
 
     public String toString(){
-        return this.bank+", check no: "+ this.checkNo+", ₱ "+ Utility.formatDecimal(this.amount);
+        return this.bank+", ₱ "+ Utility.formatDecimal(this.amount);
     }
 
     public double getOriginalAmount() {
