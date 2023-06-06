@@ -146,6 +146,13 @@
                                                 <Insets left="16.0" />
                                              </HBox.margin>
                                           </Label>
+                                          <HBox prefHeight="25.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                          <Label text="Total : " />
+                                          <Label fx:id="bills_total_lbl" styleClass="bold" text="0">
+                                             <HBox.margin>
+                                                <Insets left="16.0" />
+                                             </HBox.margin>
+                                          </Label>
                                        </children>
                                        <padding>
                                           <Insets bottom="8.0" top="8.0" />

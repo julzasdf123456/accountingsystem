@@ -66,12 +66,12 @@ public class DCRController extends MenuControllerHandler implements Initializabl
     private TableView<Bill> dcr_power_table;
 
     @FXML
-    private Label dcr_total_kwh, dcr_total, dcr_transNo_lbl;
+    private Label dcr_total_kwh, dcr_total, dcr_transNo_lbl, bills_total_lbl;
 
     private ObservableList<Bill> bills = FXCollections.observableArrayList();
     private ObservableList<ItemSummary> dcrItems = FXCollections.observableArrayList();
     private ObservableList<ItemSummary> dcrPayments = FXCollections.observableArrayList();
-    private double totalKwh = 0, grandTotal = 0, billTotal = 0, amountDue = 0, cashAmount = 0, checkAmount = 0;
+    private double totalKwh = 0, grandTotal = 0, billTotal = 0, amountDue = 0, cashAmount = 0, checkAmount = 0, collectedTotal = 0;
 
     private String teller = ActiveUser.getUser().getUserName();
 
@@ -289,6 +289,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                     grandTotal = 0;
                     cashAmount = 0;
                     checkAmount = 0;
+                    collectedTotal = 0;
 
                     String currentDate[] = date_pker.getEditor().getText().split("/");
 
@@ -333,6 +334,10 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                         grandTotal = misc.get(1).getTotal();
                         billTotal = misc.get(2).getTotal();
                         amountDue = misc.get(3).getTotal();
+
+                        for (Bill b : bills){
+                            collectedTotal += b.getTotalAmount();
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                         AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request: " + e.getMessage(),
@@ -354,6 +359,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                 progressbar.setVisible(true);
                 dcr_total_kwh.setText("0");
                 dcr_total.setText("0");
+                bills_total_lbl.setText("0");
             });
 
             task.setOnSucceeded(wse -> {
@@ -366,6 +372,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                 dcr_transNo_lbl.setText(bills.size() + "");
                 dcr_total_kwh.setText(Utility.formatDecimal(totalKwh));
                 dcr_total.setText(Utility.formatDecimal(grandTotal));
+                bills_total_lbl.setText(Utility.formatDecimal(collectedTotal));
             });
 
             task.setOnFailed(wse -> {
@@ -375,6 +382,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                 progressbar.setVisible(false);
                 dcr_total_kwh.setText("0");
                 dcr_total.setText("0");
+                bills_total_lbl.setText("0");
                 dcr_breakdown_table.setItems(FXCollections.observableArrayList());
                 dcr_power_table.setItems(FXCollections.observableArrayList());
                 AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request! "+wse.getSource().getException().getMessage(),
@@ -467,6 +475,15 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         column8.setMinWidth(65);
         column8.setStyle("-fx-alignment: center;");
 
+        TableColumn<Bill, String> column9 = new TableColumn<>("Seq.");
+        column9.setCellValueFactory(obj -> new SimpleStringProperty(
+                ((PaidBill) obj.getValue()).getPostingSequence()+""
+        ));
+        column9.setPrefWidth(65);
+        column9.setMaxWidth(65);
+        column9.setMinWidth(65);
+        column9.setStyle("-fx-alignment: center;");
+
         this.bills =  FXCollections.observableArrayList();
         this.dcr_power_table.setFixedCellSize(35);
         this.dcr_power_table.setPlaceholder(new Label("No Bills added"));
@@ -482,6 +499,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         this.dcr_power_table.getColumns().add(column6);
         this.dcr_power_table.getColumns().add(column7);
         this.dcr_power_table.getColumns().add(column8);
+        this.dcr_power_table.getColumns().add(column9);
     }
 
     public void createDCRBreakDown(){
