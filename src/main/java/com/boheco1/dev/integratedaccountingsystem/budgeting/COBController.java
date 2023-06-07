@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.budgeting;
 import com.boheco1.dev.integratedaccountingsystem.dao.BillDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
+import com.boheco1.dev.integratedaccountingsystem.tellering.WaiveChargesController;
 import com.boheco1.dev.integratedaccountingsystem.tellering.WaiveConfirmationController;
 import com.jfoenix.controls.*;
 import javafx.beans.binding.Bindings;
@@ -104,6 +105,13 @@ public class COBController extends MenuControllerHandler implements Initializabl
         this.createTable();
         init();
         setAmount();
+        this.add_btn.setOnAction(evt -> {
+            try {
+                showAddItemForm();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     /**
@@ -217,6 +225,41 @@ public class COBController extends MenuControllerHandler implements Initializabl
         this.cob_items.setItems(this.items);
     }
 
+    /**
+     * Displays Add Item UI
+     * @return void
+     */
+    public void showAddItemForm() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../budgeting/budgeting_add_item.fxml"));
+        Parent parent = fxmlLoader.load();
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setBody(parent);
+        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+        AddItemController ctrl = fxmlLoader.getController();
+        /*waiveController.setBill(bill);
+        waiveController.setData(table, total);
+        waiveController.getSave_btn().setOnAction(actionEvent -> {
+            double addon = 0;
+            try {
+                addon = Double.parseDouble(waiveController.getSurcharge_tf().getText());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            if (addon <= 0){
+                dialog.close();
+                AlertDialogBuilder.messgeDialog("System Error", "The surcharge cannot be 0!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            }else {
+                waiveController.save();
+                this.fees_table.setItems(bills);
+                this.setBillInfo(bills);
+                this.setPayables();
+                this.setMenuActions();
+            }
+        });
+         */
+        dialog.setOnDialogOpened((event) -> { ctrl.getDescription_tf().requestFocus(); });
+        dialog.show();
+    }
     public void setAmount(){
         double total = 0, qtr1 = 0, qtr2 = 0, qtr3 = 0, qtr4 = 0;
         for (COBItem i : this.items){
