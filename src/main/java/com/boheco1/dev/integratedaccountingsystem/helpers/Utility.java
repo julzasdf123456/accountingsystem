@@ -219,8 +219,6 @@ public class Utility {
     }
 
     public static String formatDecimal(double val){
-        if(val%1 == 0)
-            return String.format("%,.0f",val);
         return String.format("%,.2f",val);
     }
 

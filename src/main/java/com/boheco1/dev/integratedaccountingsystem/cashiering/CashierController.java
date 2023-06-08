@@ -621,17 +621,20 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     transactionDetails.setTransactionNumber(orNumber);
                     transactionDetails.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
                     transactionDetails.setTransactionDate(date.getValue());
-                    transactionDetails.setAccountCode(cd.getGlCode());//GL Code or the account code of the particular
+
                     transactionDetails.setParticulars(cd.getParticulars());
                     transactionDetails.setSequenceNumber(seq++);
 
                     if(cd.getParticulars().equals("Grand Total")){
+                        transactionDetails.setAccountCode(Utility.getAccountCodeProperty());
                         transactionDetails.setDebit(cd.getTotal());
                     }else{
                         if (cd.getTotal() > 0)
                             transactionDetails.setCredit(cd.getTotal());
                         else
                             transactionDetails.setDebit(cd.getTotal());
+
+                        transactionDetails.setAccountCode(cd.getGlCode());//GL Code or the account code of the particular
                     }
 
                     transactionDetails.setOrDate(date.getValue());
@@ -682,7 +685,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 transactionDetails.setTransactionNumber(orNumber);
                 transactionDetails.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
                 transactionDetails.setTransactionDate(date.getValue());
-                //transactionDetails.setAccountCode(orItemSummary.getAccountCode());
+                transactionDetails.setAccountCode(Utility.getAccountCodeProperty());
                 transactionDetails.setParticulars("Grand Total");
                 transactionDetails.setSequenceNumber(seq++);
                 transactionDetails.setDebit(collectionFromTeller);
