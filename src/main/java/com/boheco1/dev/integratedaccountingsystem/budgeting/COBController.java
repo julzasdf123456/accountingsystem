@@ -1,42 +1,21 @@
 package com.boheco1.dev.integratedaccountingsystem.budgeting;
 
-import com.boheco1.dev.integratedaccountingsystem.dao.BillDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.boheco1.dev.integratedaccountingsystem.tellering.WaiveChargesController;
-import com.boheco1.dev.integratedaccountingsystem.tellering.WaiveConfirmationController;
 import com.jfoenix.controls.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.KeyCode;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.util.StringConverter;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URL;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class COBController extends MenuControllerHandler implements Initializable, ObjectTransaction {
@@ -110,6 +89,56 @@ public class COBController extends MenuControllerHandler implements Initializabl
                 throw new RuntimeException(e);
             }
         });
+
+        this.remove_btn.setOnAction(evt -> {
+            try {
+                int row = this.cob_items.getSelectionModel().getSelectedIndex();
+                this.items.remove(row);
+                this.cob_items.refresh();
+                this.setTable();
+                this.setAmount();
+            }catch (Exception e){
+                //Do nothing
+            }
+        });
+        this.cob_items.setRowFactory(tv -> {
+            TableRow<COBItem> row = new TableRow<>();
+            final ContextMenu rowMenu = new ContextMenu();
+
+            MenuItem remove = new MenuItem("Remove Item");
+            remove.setOnAction(actionEvent -> {
+                this.cob_items.getItems().remove(row.getItem());
+                this.cob_items.refresh();
+                this.setAmount();
+            });
+
+            MenuItem dist = new MenuItem("Distribute");
+            dist.setOnAction(actionEvent -> {
+                double qtr = (row.getItem().getCost() * row.getItem().getQty()) / 4;
+                row.getItem().setQtr1(qtr);
+                row.getItem().setQtr2(qtr);
+                row.getItem().setQtr3(qtr);
+                row.getItem().setQtr4(qtr);
+                this.cob_items.refresh();
+                this.setAmount();
+            });
+
+            MenuItem removeAll = new MenuItem("Clear Items");
+            removeAll.setOnAction(actionEvent -> {
+                this.items = FXCollections.observableArrayList(new ArrayList<>());
+                this.cob_items.setItems(this.items);
+                this.cob_items.refresh();
+                this.setAmount();
+            });
+
+            rowMenu.getItems().addAll(remove, new SeparatorMenuItem(), dist, new SeparatorMenuItem(), removeAll);
+
+            row.contextMenuProperty().bind(
+            Bindings.when(row.emptyProperty())
+                    .then((ContextMenu) null)
+                    .otherwise(rowMenu));
+            return row;
+        });
         //Pass this controller to the Add Item controller
         Utility.setParentController(this);
     }
@@ -138,7 +167,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
         column2.setStyle("-fx-alignment: center;");
 
         TableColumn<COBItem, String> column3 = new TableColumn<>("Qty");
-        column3.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQty() != 0 ? obj.getValue().getQty()+"" : ""));
+        column3.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQty() > 0 ? obj.getValue().getQty()+"" : ""));
         column3.setPrefWidth(50);
         column3.setMaxWidth(50);
         column3.setMinWidth(50);
@@ -247,7 +276,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
         double total = 0, qtr1 = 0, qtr2 = 0, qtr3 = 0, qtr4 = 0;
 
         for (COBItem i : this.items){
-            total += i.getCost();
+            total += i.getCost() * i.getQty();
             qtr1 += i.getQtr1();
             qtr2 += i.getQtr2();
             qtr3 += i.getQtr3();

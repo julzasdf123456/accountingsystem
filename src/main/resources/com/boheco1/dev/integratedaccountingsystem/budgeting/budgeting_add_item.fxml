@@ -64,12 +64,15 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </Label>
-                              <Label prefWidth="113.0" text="Qty On Hand">
+                              <Label prefWidth="113.0" text="Desired Qty">
                                  <HBox.margin>
                                     <Insets right="16.0" />
+                                 </HBox.margin></Label>
+                              <Label prefWidth="113.0" text="Total Amount">
+                                 <HBox.margin>
+                                    <Insets />
                                  </HBox.margin>
                               </Label>
-                              <Label prefWidth="113.0" text="Desired Qty" />
                            </children>
                         </HBox>
                         <HBox>
@@ -90,7 +93,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="qty_onhand_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="113.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="qty_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="113.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -98,10 +101,13 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="qty_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="113.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="total_amount_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="113.0" style="-fx-background-color: #f5f5f5;" styleClass="bold" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
                               </JFXTextField>
                            </children>
                            <VBox.margin>
@@ -196,7 +202,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </HBox>
-                              <JFXButton fx:id="bal_btn" buttonType="RAISED" maxWidth="1.7976931348623157E308" prefHeight="37.0" prefWidth="113.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Dist. Evenly" textFill="WHITE">
+                              <JFXButton fx:id="bal_btn" buttonType="RAISED" maxWidth="1.7976931348623157E308" prefHeight="37.0" prefWidth="113.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Distribute" textFill="WHITE">
                                  <effect>
                                     <DropShadow />
                                  </effect>

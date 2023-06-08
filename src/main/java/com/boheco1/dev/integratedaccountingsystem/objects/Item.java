@@ -3,8 +3,8 @@ package com.boheco1.dev.integratedaccountingsystem.objects;
 public class Item {
     private String itemId;
     private String particulars;
-    private double price;
-    private int qtyOnHand;
+    private double price = 0;
+    private int qtyOnHand = 0;
     private String unit;
     private String scopeId;
 

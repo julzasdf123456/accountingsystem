@@ -4,14 +4,14 @@ public class COBItem extends Item{
     private String cItemId;
     private String remarks;
     private String description;
-    private double cost;
+    private double cost = 0;
 
-    private int qty;
+    private int qty = 0;
 
-    private double qtr1;
-    private double qtr2;
-    private double qtr3;
-    private double qtr4;
+    private double qtr1 = 0;
+    private double qtr2 = 0;
+    private double qtr3 = 0;
+    private double qtr4 = 0;
 
     private String cobId;
 
