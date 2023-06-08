@@ -39,7 +39,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class COBController extends MenuControllerHandler implements Initializable {
+public class COBController extends MenuControllerHandler implements Initializable, ObjectTransaction {
     @FXML
     private JFXButton submit_btn;
 
@@ -103,8 +103,6 @@ public class COBController extends MenuControllerHandler implements Initializabl
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.createTable();
-        init();
-        setAmount();
         this.add_btn.setOnAction(evt -> {
             try {
                 showAddItemForm();
@@ -112,6 +110,8 @@ public class COBController extends MenuControllerHandler implements Initializabl
                 throw new RuntimeException(e);
             }
         });
+        //Pass this controller to the Add Item controller
+        Utility.setParentController(this);
     }
 
     /**
@@ -120,18 +120,18 @@ public class COBController extends MenuControllerHandler implements Initializabl
      */
     public void createTable(){
         TableColumn<COBItem, String> column = new TableColumn<>("Particulars");
-        column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getScopeId() == null ? obj.getValue().getParticulars() : "  "+obj.getValue().getParticulars()));
+        column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getScopeId() == null ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
         column.setStyle("-fx-alignment: center-left;");
 
         TableColumn<COBItem, String> column1 = new TableColumn<>("Est. Cost");
-        column1.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getPrice() != 0 ? obj.getValue().getPrice()+"" : ""));
+        column1.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getCost()) : ""));
         column1.setPrefWidth(100);
         column1.setMaxWidth(100);
         column1.setMinWidth(100);
-        column1.setStyle("-fx-alignment: center-left;");
+        column1.setStyle("-fx-alignment: center-right;");
 
         TableColumn<COBItem, String> column2 = new TableColumn<>("Unit");
-        column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getUnit() != null ? obj.getValue().getUnit()+"" : ""));
+        column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getRemarks() != null ? obj.getValue().getRemarks()+"" : ""));
         column2.setPrefWidth(100);
         column2.setMaxWidth(100);
         column2.setMinWidth(100);
@@ -145,39 +145,39 @@ public class COBController extends MenuControllerHandler implements Initializabl
         column3.setStyle("-fx-alignment: center;");
 
         TableColumn<COBItem, String> column4 = new TableColumn<>("Amount");
-        column4.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? obj.getValue().getCost()+"" : ""));
+        column4.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getCost()*obj.getValue().getQty()) : ""));
         column4.setPrefWidth(100);
         column4.setMaxWidth(100);
         column4.setMinWidth(100);
         column4.setStyle("-fx-alignment: center-right;");
 
         TableColumn<COBItem, String> column5 = new TableColumn<>("1st Qtr");
-        column5.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr1() != 0 ? obj.getValue().getQtr1()+"" : ""));
+        column5.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr1() != 0 ? Utility.formatDecimal(obj.getValue().getQtr1()) : ""));
         column5.setPrefWidth(100);
         column5.setMaxWidth(100);
         column5.setMinWidth(100);
-        column5.setStyle("-fx-alignment: center;");
+        column5.setStyle("-fx-alignment: center-right;");
 
         TableColumn<COBItem, String> column6 = new TableColumn<>("2nd Qtr");
-        column6.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr2() != 0 ? obj.getValue().getQtr2()+"" : ""));
+        column6.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr2() != 0 ? Utility.formatDecimal(obj.getValue().getQtr2()) : ""));
         column6.setPrefWidth(100);
         column6.setMaxWidth(100);
         column6.setMinWidth(100);
-        column6.setStyle("-fx-alignment: center;");
+        column6.setStyle("-fx-alignment: center-right;");
 
         TableColumn<COBItem, String> column7 = new TableColumn<>("3rd Qtr");
-        column7.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr3() != 0 ? obj.getValue().getQtr3()+"" : ""));
+        column7.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr3() != 0 ? Utility.formatDecimal(obj.getValue().getQtr3()) : ""));
         column7.setPrefWidth(100);
         column7.setMaxWidth(100);
         column7.setMinWidth(100);
-        column7.setStyle("-fx-alignment: center;");
+        column7.setStyle("-fx-alignment: center-right;");
 
         TableColumn<COBItem, String> column8 = new TableColumn<>("4th Qtr");
-        column8.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr4() != 0 ? obj.getValue().getQtr4()+"" : ""));
+        column8.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr4() != 0 ? Utility.formatDecimal(obj.getValue().getQtr4()) : ""));
         column8.setPrefWidth(100);
         column8.setMaxWidth(100);
         column8.setMinWidth(100);
-        column8.setStyle("-fx-alignment: center;");
+        column8.setStyle("-fx-alignment: center-right;");
 
         this.cob_items.setFixedCellSize(35);
         this.cob_items.setPlaceholder(new Label("No Items added"));
@@ -236,32 +236,16 @@ public class COBController extends MenuControllerHandler implements Initializabl
         dialogLayout.setBody(parent);
         JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
         AddItemController ctrl = fxmlLoader.getController();
-        /*waiveController.setBill(bill);
-        waiveController.setData(table, total);
-        waiveController.getSave_btn().setOnAction(actionEvent -> {
-            double addon = 0;
-            try {
-                addon = Double.parseDouble(waiveController.getSurcharge_tf().getText());
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-            if (addon <= 0){
-                dialog.close();
-                AlertDialogBuilder.messgeDialog("System Error", "The surcharge cannot be 0!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            }else {
-                waiveController.save();
-                this.fees_table.setItems(bills);
-                this.setBillInfo(bills);
-                this.setPayables();
-                this.setMenuActions();
-            }
-        });
-         */
         dialog.setOnDialogOpened((event) -> { ctrl.getDescription_tf().requestFocus(); });
         dialog.show();
     }
+    public void setTable() {
+        this.cob_items.setItems(this.items);
+    }
+
     public void setAmount(){
         double total = 0, qtr1 = 0, qtr2 = 0, qtr3 = 0, qtr4 = 0;
+
         for (COBItem i : this.items){
             total += i.getCost();
             qtr1 += i.getQtr1();
@@ -269,10 +253,39 @@ public class COBController extends MenuControllerHandler implements Initializabl
             qtr3 += i.getQtr3();
             qtr4 += i.getQtr4();
         }
-        this.totals_tf.setText(total+"");
-        this.q1_tf.setText(qtr1+"");
-        this.q2_tf.setText(qtr2+"");
-        this.q3_tf.setText(qtr3+"");
-        this.q4_tf.setText(qtr4+"");
+        this.totals_tf.setText(Utility.formatDecimal(total));
+        this.q1_tf.setText(Utility.formatDecimal(qtr1));
+        this.q2_tf.setText(Utility.formatDecimal(qtr2));
+        this.q3_tf.setText(Utility.formatDecimal(qtr3));
+        this.q4_tf.setText(Utility.formatDecimal(qtr4));
+    }
+
+    @Override
+    public void receive(Object o) {
+        if (o instanceof COBItem) {
+            Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() {
+                    COBItem item = (COBItem) o;
+                    items.add(item);
+                    return null;
+                }
+            };
+
+            task.setOnRunning(wse -> {
+                //progressBar.setVisible(true);
+            });
+
+            task.setOnSucceeded(wse -> {
+                setAmount();
+                setTable();
+            });
+
+            task.setOnFailed(wse -> {
+                //progressBar.setVisible(false);
+            });
+
+            new Thread(task).start();
+        }
     }
 }

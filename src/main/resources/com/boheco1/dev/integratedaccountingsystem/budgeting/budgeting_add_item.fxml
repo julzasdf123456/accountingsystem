@@ -22,7 +22,7 @@
                <center>
                   <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="450.0" prefWidth="800.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Label fx:id="status_lbl" text=" ">
+                        <Label fx:id="status_lbl" alignment="CENTER" prefWidth="500.0" text=" " textAlignment="CENTER">
                            <styleClass>
                               <String fx:value="bold" />
                               <String fx:value="red" />
@@ -169,7 +169,7 @@
                         </HBox>
                         <HBox prefHeight="37.0" prefWidth="450.0">
                            <children>
-                              <JFXButton fx:id="add_btn" buttonType="RAISED" prefHeight="37.0" prefWidth="113.0" styleClass="btn-info" text="Add" textFill="WHITE">
+                              <JFXButton fx:id="add_btn" buttonType="RAISED" prefHeight="37.0" prefWidth="113.0" styleClass="btn-sucess" text="Add" textFill="WHITE">
                                  <effect>
                                     <DropShadow />
                                  </effect>
@@ -180,7 +180,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXButton>
-                              <JFXButton maxWidth="1.7976931348623157E308" prefHeight="37.0" prefWidth="113.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Reset" textFill="WHITE">
+                              <JFXButton fx:id="reset_btn" maxWidth="1.7976931348623157E308" prefHeight="37.0" prefWidth="113.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Reset" textFill="WHITE">
                                  <effect>
                                     <DropShadow />
                                  </effect>
@@ -188,8 +188,21 @@
                                     <Font name="System Bold" size="16.0" />
                                  </font>
                                  <HBox.margin>
-                                    <Insets />
+                                    <Insets right="16.0" />
                                  </HBox.margin>
+                              </JFXButton>
+                              <HBox prefHeight="100.0" prefWidth="113.0">
+                                 <HBox.margin>
+                                    <Insets right="16.0" />
+                                 </HBox.margin>
+                              </HBox>
+                              <JFXButton fx:id="bal_btn" buttonType="RAISED" maxWidth="1.7976931348623157E308" prefHeight="37.0" prefWidth="113.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Dist. Evenly" textFill="WHITE">
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
                               </JFXButton>
                            </children>
                         </HBox>
