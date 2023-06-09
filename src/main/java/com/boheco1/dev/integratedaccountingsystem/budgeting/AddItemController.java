@@ -90,106 +90,28 @@ public class AddItemController extends MenuControllerHandler implements Initiali
         });
 
         //Quantity change event to update total amount and set it in Q1
-        this.qty_tf.textProperty().addListener((observableValue, o, n) -> {
-            double total = 0, cost = 0;
-            int qty = 0;
-            try{
-                cost = Double.parseDouble(cost_tf.getText());
-                qty = Integer.parseInt(n);
-                total = cost * qty;
-                q1_tf.setText(Utility.formatDecimal(total).replace(",", ""));
-                total_amount_tf.setText(Utility.formatDecimal(total));
-            } catch (Exception e) {
-
-            }
+        this.qty_tf.setOnKeyReleased(evt -> {
+            costUpdate(cost_tf.getText(), qty_tf.getText());
         });
 
-        this.q1_tf.textProperty().addListener((observable, o, n) -> {
-            double total = 0, q1 = 0, q2 = 0, q3 = 0, q4 = 0;
-
-            try{
-                total = Double.parseDouble(total_amount_tf.getText().replace(",", ""));
-                q1 = Double.parseDouble(n.isEmpty() ? "0" : n);
-                q2 = Double.parseDouble(q2_tf.getText().isEmpty() ? "0" : q2_tf.getText());
-                q3 = Double.parseDouble(q3_tf.getText().isEmpty() ? "0" : q3_tf.getText());
-                q4 = Double.parseDouble(q4_tf.getText().isEmpty() ? "0" : q4_tf.getText());
-                //If sum of quarter amounts exceeded the total amount
-                if (q1+q2+q3+q4 == total) {
-                    status_lbl.setText("");
-                    add_btn.setDisable(false);
-                }else{
-                    status_lbl.setText("The sum of amount per quarter is not equal to the total amount!");
-                    add_btn.setDisable(true);
-                }
-            } catch (Exception e) {
-
-            }
+        this.cost_tf.setOnKeyReleased(evt -> {
+            costUpdate(cost_tf.getText(), qty_tf.getText());
         });
 
-        this.q2_tf.textProperty().addListener((observable, o, n) -> {
-            double total = 0, q1 = 0, q2 = 0, q3 = 0, q4 = 0;
-
-            try{
-                total = Double.parseDouble(total_amount_tf.getText().replace(",", ""));
-                q1 = Double.parseDouble(q1_tf.getText().isEmpty() ? "0" : q1_tf.getText());
-                q2 = Double.parseDouble(n.isEmpty() ? "0" : n);
-                q3 = Double.parseDouble(q3_tf.getText().isEmpty() ? "0" : q3_tf.getText());
-                q4 = Double.parseDouble(q4_tf.getText().isEmpty() ? "0" : q4_tf.getText());
-                //If sum of quarter amounts exceeded the total amount
-                if (q1+q2+q3+q4 == total) {
-                    status_lbl.setText("");
-                    add_btn.setDisable(false);
-                }else{
-                    status_lbl.setText("The sum of amount per quarter is not equal to the total amount!");
-                    add_btn.setDisable(true);
-                }
-            } catch (Exception e) {
-
-            }
+        this.q1_tf.setOnKeyReleased(evt -> {
+            validateQuarter(q1_tf.getText(), q2_tf.getText(), q3_tf.getText(), q4_tf.getText());
         });
 
-        this.q3_tf.textProperty().addListener((observable, o, n) -> {
-            double total = 0, q1 = 0, q2 = 0, q3 = 0, q4 = 0;
-
-            try{
-                total = Double.parseDouble(total_amount_tf.getText().replace(",", ""));
-                q1 = Double.parseDouble(q1_tf.getText().isEmpty() ? "0" : q1_tf.getText());
-                q2 = Double.parseDouble(q2_tf.getText().isEmpty() ? "0" : q2_tf.getText());
-                q3 = Double.parseDouble(n.isEmpty() ? "0" : n);
-                q4 = Double.parseDouble(q4_tf.getText().isEmpty() ? "0" : q4_tf.getText());
-                //If sum of quarter amounts exceeded the total amount
-                if (q1+q2+q3+q4 == total) {
-                    status_lbl.setText("");
-                    add_btn.setDisable(false);
-                }else{
-                    status_lbl.setText("The sum of amount per quarter is not equal to the total amount!");
-                    add_btn.setDisable(true);
-                }
-            } catch (Exception e) {
-
-            }
+        this.q2_tf.setOnKeyReleased(evt -> {
+            validateQuarter(q1_tf.getText(), q2_tf.getText(), q3_tf.getText(), q4_tf.getText());
         });
 
-        this.q4_tf.textProperty().addListener((observable, o, n) -> {
-            double total = 0, q1 = 0, q2 = 0, q3 = 0, q4 = 0;
+        this.q3_tf.setOnKeyReleased(evt -> {
+            validateQuarter(q1_tf.getText(), q2_tf.getText(), q3_tf.getText(), q4_tf.getText());
+        });
 
-            try{
-                total = Double.parseDouble(total_amount_tf.getText().replace(",", ""));
-                q1 = Double.parseDouble(q1_tf.getText().isEmpty() ? "0" : q1_tf.getText());
-                q2 = Double.parseDouble(q2_tf.getText().isEmpty() ? "0" : q2_tf.getText());
-                q3 = Double.parseDouble(q3_tf.getText().isEmpty() ? "0" : q3_tf.getText());
-                q4 = Double.parseDouble(n.isEmpty() ? "0" : n);
-                //If sum of quarter amounts exceeded the total amount
-                if (q1+q2+q3+q4 == total) {
-                    status_lbl.setText("");
-                    add_btn.setDisable(false);
-                }else{
-                    status_lbl.setText("The sum of amount per quarter is not equal to the total amount!");
-                    add_btn.setDisable(true);
-                }
-            } catch (Exception e) {
-
-            }
+        this.q4_tf.setOnKeyReleased(evt -> {
+            validateQuarter(q1_tf.getText(), q2_tf.getText(), q3_tf.getText(), q4_tf.getText());
         });
 
         //Add item when enter key is pressed
@@ -315,6 +237,45 @@ public class AddItemController extends MenuControllerHandler implements Initiali
         this.description_tf.requestFocus();
     }
 
+    public void validateQuarter(String s1, String s2, String s3, String s4){
+        double total = 0, q1 = 0, q2 = 0, q3 = 0, q4 = 0;
+
+        try{
+            total = Double.parseDouble(total_amount_tf.getText().replace(",", ""));
+            q1 = Double.parseDouble(s1.isEmpty() ? "0" : s1);
+            q2 = Double.parseDouble(s2.isEmpty() ? "0" : s2);
+            q3 = Double.parseDouble(s3.isEmpty() ? "0" : s3);
+            q4 = Double.parseDouble(s4.isEmpty() ? "0" : s4);
+            //If sum of quarter amounts exceeded the total amount
+            if (q1+q2+q3+q4 == total) {
+                status_lbl.setText("");
+                add_btn.setDisable(false);
+            }else{
+                status_lbl.setText("The sum of amount per quarter is not equal to the total amount!");
+                add_btn.setDisable(true);
+            }
+        } catch (Exception e) {
+
+        }
+        System.out.println("Total: "+total);
+    }
+
+    public void costUpdate(String c, String q){
+        double total = 0, cost = 0;
+        int qty = 0;
+        try{
+            cost = Double.parseDouble(c);
+            qty = Integer.parseInt(q);
+            total = cost * qty;
+            q1_tf.setText(Utility.formatDecimal(total).replace(",", ""));
+            q2_tf.setText("");
+            q3_tf.setText("");
+            q4_tf.setText("");
+            total_amount_tf.setText(Utility.formatDecimal(total));
+        } catch (Exception e) {
+
+        }
+    }
     public JFXButton getAdd_btn() {
         return this.add_btn;
     }
