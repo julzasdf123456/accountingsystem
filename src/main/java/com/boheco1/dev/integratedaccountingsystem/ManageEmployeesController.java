@@ -177,6 +177,7 @@ public class ManageEmployeesController extends MenuControllerHandler implements 
             signatoryLevels.add("Department Manager");
             signatoryLevels.add("Supervisor");
             signatoryLevels.add("Section Head");
+            signatoryLevels.add("Rank In File");
             signatoryLevelField.setItems(FXCollections.observableArrayList(signatoryLevels));
 
             employeesTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<EmployeeInfo>() {
