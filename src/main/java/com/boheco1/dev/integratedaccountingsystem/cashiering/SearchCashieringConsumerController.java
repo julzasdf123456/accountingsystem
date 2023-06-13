@@ -209,19 +209,20 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
         if(result.get(0) instanceof CRMQueue){
             TableColumn<CRMQueue, String> consumerCol = new TableColumn<>("Consumer");
             consumerCol.setCellValueFactory(new PropertyValueFactory<>("consumerName"));
+            consumerCol.setMinWidth(220);
             consumerCol.setStyle("-fx-alignment: center-left;");
-
-            TableColumn<CRMQueue, String> addressCol = new TableColumn<>("Address");
-            addressCol.setCellValueFactory(new PropertyValueFactory<>("consumerAddress"));
-            addressCol.setStyle("-fx-alignment: center-left;");
 
             TableColumn<CRMQueue, String> purposeCol = new TableColumn<>("Purpose");
             purposeCol.setCellValueFactory(new PropertyValueFactory<>("transactionPurpose"));
             purposeCol.setStyle("-fx-alignment: center-left;");
 
+            TableColumn<CRMQueue, String> addressCol = new TableColumn<>("Address");
+            addressCol.setCellValueFactory(new PropertyValueFactory<>("consumerAddress"));
+            addressCol.setStyle("-fx-alignment: center-left;");
+
             this.searchResultTable.getColumns().add(consumerCol);
-            this.searchResultTable.getColumns().add(addressCol);
             this.searchResultTable.getColumns().add(purposeCol);
+            this.searchResultTable.getColumns().add(addressCol);
         } else if (result.get(0) instanceof EmployeeInfo) {
             TableColumn<EmployeeInfo, String> tellerCol = new TableColumn<>("Teller");
             tellerCol.setCellValueFactory(new PropertyValueFactory<>("signatoryNameFormat"));

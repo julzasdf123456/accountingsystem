@@ -129,7 +129,7 @@ public class ConsumerDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static List<CRMQueue> getConsumerRecordFromCRMList(String key) throws Exception  {
-        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM CRMQueue WHERE ConsumerName LIKE ? OR ConsumerAddress LIKE ? ");
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM CRMQueue WHERE ConsumerName LIKE ? OR ConsumerAddress LIKE ? ORDER BY created_at DESC");
 
         ps.setString(1, '%'+ key+'%');
         ps.setString(2, '%'+ key+'%');
@@ -163,7 +163,7 @@ public class ConsumerDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static List<CRMQueue> getConsumerRecordFromCRMList() throws Exception  {
-        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM CRMQueue ORDER by created_at ASC");
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM CRMQueue ORDER by created_at DESC");
 
         ResultSet rs = ps.executeQuery();
 

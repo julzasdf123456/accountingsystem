@@ -341,6 +341,14 @@ public class Utility {
         return props.getProperty("station").equalsIgnoreCase("main") ? "OR" : "ORSub";
     }
 
+    public static String getOfficeProperty() throws IOException {
+        Properties props = new Properties();
+        InputStream is = new FileInputStream("application.properties");
+        props.load(is);
+
+        return props.getProperty("office");
+    }
+
     public static LocalDate serverDate() throws SQLException, ClassNotFoundException {
         ResultSet rs = DB.getConnection().createStatement().executeQuery(
                         "SELECT SYSDATETIME() as serverDate");

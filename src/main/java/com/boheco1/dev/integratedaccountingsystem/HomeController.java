@@ -2,10 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.NotificationsDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
-import com.boheco1.dev.integratedaccountingsystem.objects.BankRemittance;
-import com.boheco1.dev.integratedaccountingsystem.objects.Notifications;
-import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
-import com.boheco1.dev.integratedaccountingsystem.objects.TransactionHeader;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import javafx.animation.*;
@@ -28,6 +25,9 @@ import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class HomeController implements Initializable {
@@ -341,6 +341,18 @@ public class HomeController implements Initializable {
                 }
             });
         });
+
+        try {
+            LocalDateTime now = LocalDateTime.now();
+            String dateStr = now.format(DateTimeFormatter.ofPattern("MMM dd, YYYY"));
+            String timeStr = now.format(DateTimeFormatter.ofPattern("HH:MM"));
+            NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("User: " + ActiveUser.getUser().getFullName()), new FontIcon("mdi2a-account"), homeStackPane);
+            NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Date/Time: " + dateStr + " " + timeStr), new FontIcon("mdi2c-calendar"), homeStackPane);
+            NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Office: " + Utility.getOfficeProperty()), new FontIcon("mdi2o-office-building"), homeStackPane);
+            NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Server: " + DB.getConnection().getCatalog()), new FontIcon("mdi2s-server"), homeStackPane);
+        }catch(Exception ex) {
+            ex.printStackTrace();
+        }
 
         // INITIALIZE NOTIFICATION BUTTON
         notificationIcon = new FontIcon("mdi2b-bell");
