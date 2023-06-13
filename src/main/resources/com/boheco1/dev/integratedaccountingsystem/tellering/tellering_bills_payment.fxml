@@ -281,26 +281,40 @@
                                              </HBox.margin>
                                           </HBox>
                                           <HBox prefHeight="155.0" prefWidth="2.0" HBox.hgrow="ALWAYS" />
-                                          <Label style="-fx-font-size: 16px;" styleClass="bold" text="Total Payable Amount">
+                                          <Label prefHeight="27.0" text="Total Bill Amount">
                                              <HBox.margin>
                                                 <Insets top="8.0" />
                                              </HBox.margin>
+                                             <styleClass>
+                                                <String fx:value="bold" />
+                                                <String fx:value="emphasize" />
+                                             </styleClass>
                                              <padding>
-                                                <Insets right="16.0" />
+                                                <Insets right="6.0" />
                                              </padding>
                                           </Label>
-                                          <Label style="-fx-font-size: 16px;" styleClass="bold" text="₱">
+                                          <Label text="₱">
                                              <padding>
                                                 <Insets top="8.0" />
                                              </padding>
                                              <HBox.margin>
-                                                <Insets right="4.0" />
+                                                <Insets />
                                              </HBox.margin>
+                                             <styleClass>
+                                                <String fx:value="bold" />
+                                                <String fx:value="red" />
+                                                <String fx:value="emphasize" />
+                                             </styleClass>
                                           </Label>
-                                          <Label fx:id="total_payable_lbl" style="-fx-font-size: 16px;" styleClass="bold" text="0.00" textAlignment="RIGHT">
+                                          <Label fx:id="total_payable_lbl" prefHeight="27.0" text="0.00" textAlignment="RIGHT">
                                              <HBox.margin>
                                                 <Insets top="8.0" />
                                              </HBox.margin>
+                                             <styleClass>
+                                                <String fx:value="emphasize" />
+                                                <String fx:value="red" />
+                                                <String fx:value="bold" />
+                                             </styleClass>
                                           </Label>
                                        </children>
                                     </HBox>
@@ -385,7 +399,12 @@
                         <HBox prefHeight="40.0" prefWidth="200.0">
                            <children>
                               <Label minWidth="110.0" prefHeight="37.0" prefWidth="110.0" style="-fx-font-size: 16px;" text="Total Payment" />
-                              <TextField fx:id="total_paid_tf" alignment="CENTER_RIGHT" disable="true" editable="false" focusTraversable="false" minWidth="150.0" prefHeight="37.0" prefWidth="165.0" style="-fx-font-size: 16px;" styleClass="bold" text="0.00" />
+                              <TextField fx:id="total_paid_tf" alignment="CENTER_RIGHT" disable="true" editable="false" focusTraversable="false" minWidth="150.0" prefHeight="37.0" prefWidth="165.0" style="-fx-font-size: 16px;" text="0.00">
+                                 <styleClass>
+                                    <String fx:value="bold" />
+                                    <String fx:value="emphasize" />
+                                    <String fx:value="red" />
+                                 </styleClass></TextField>
                            </children>
                         </HBox>
                         <Separator prefWidth="200.0">
