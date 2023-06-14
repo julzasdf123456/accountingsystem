@@ -72,7 +72,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
     @FXML
     private TableView<Bill> fees_table;
-
+    private TableView<Bill> excluded_table = new TableView();
     @FXML
     private TextField payment_tf;
 
@@ -128,11 +128,15 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     private VBox sidebar_vbox;
 
     @FXML
+    private VBox tableBox;
+
+    @FXML
     private ProgressBar progressBar;
 
     private ConsumerInfo consumerInfo = null;
 
     private ObservableList<Bill> bills = FXCollections.observableArrayList();
+    private ObservableList<Bill> excluded_bills = FXCollections.observableArrayList();
     private ObservableList<Check> checks = FXCollections.observableArrayList();
     private boolean isPaid = false;
     private double toDeposit, cash = 0;
@@ -144,12 +148,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        confirmEvent = new EventHandler<>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                confirmPayment();
-            }
-        };
+        confirmEvent = actionEvent -> confirmPayment();
 
         if (ActiveUser.getUser().can("manage-billing"))
             sidebar_vbox.setVisible(false);
@@ -658,6 +657,247 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         });
     }
     /**
+     * Initializes the excluded bills table
+     * @return void
+     */
+    public void createExcludedTable(){
+        TableColumn<Bill, String> ecolumn0 = new TableColumn<>("Bill #");
+        ecolumn0.setPrefWidth(88);
+        ecolumn0.setMaxWidth(88);
+        ecolumn0.setMinWidth(8);
+        ecolumn0.setCellValueFactory(new PropertyValueFactory<>("billNo"));
+        ecolumn0.setStyle("-fx-alignment: center-left;");
+
+        TableColumn<Bill, String> ecolumn = new TableColumn<>("Account #");
+        ecolumn.setPrefWidth(88);
+        ecolumn.setMaxWidth(88);
+        ecolumn.setMinWidth(88);
+        ecolumn.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumer().getAccountID()));
+        ecolumn.setStyle("-fx-alignment: center-left;");
+
+        TableColumn<Bill, String> ecolumn_con = new TableColumn<>("(T) - Consumer Name");
+        ecolumn_con.setPrefWidth(150);
+        ecolumn_con.setMaxWidth(150);
+        ecolumn_con.setMinWidth(150);
+        ecolumn_con.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumerType()+" - "+obj.getValue().getConsumer().getConsumerName()));
+        ecolumn_con.setStyle("-fx-alignment: center-left;");
+
+        TableColumn<Bill, String> ecolumn1 = new TableColumn<>("Billing Month");
+        ecolumn1.setPrefWidth(112);
+        ecolumn1.setMaxWidth(112);
+        ecolumn1.setMinWidth(112);
+        ecolumn1.setCellValueFactory(new PropertyValueFactory<>("billMonth"));
+        ecolumn1.setStyle("-fx-alignment: center-left;");
+
+        TableColumn<Bill, String> ecolumn2 = new TableColumn<>("Due Date");
+        ecolumn2.setPrefWidth(89);
+        ecolumn2.setMaxWidth(89);
+        ecolumn2.setMinWidth(89);
+        ecolumn2.setCellValueFactory(new PropertyValueFactory<>("dueDate"));
+        ecolumn2.setStyle("-fx-alignment: center;");
+        int amtSize = 93;
+        int smSize = 67;
+        TableColumn<Bill, String> ecolumn3 = new TableColumn<>("Bill Amount");
+        ecolumn3.setPrefWidth(amtSize);
+        ecolumn3.setMaxWidth(amtSize);
+        ecolumn3.setMinWidth(amtSize);
+        ecolumn3.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(
+                obj.getValue().getAmountDue()
+        )));
+        ecolumn3.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> ecolumn31 = new TableColumn<>("Pwr Amount");
+        ecolumn31.setPrefWidth(amtSize);
+        ecolumn31.setMaxWidth(amtSize);
+        ecolumn31.setMinWidth(amtSize);
+        ecolumn31.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(
+                obj.getValue().getPowerAmount() - obj.getValue().getAcrmVat() - obj.getValue().getDAAVat()
+        )));
+        ecolumn31.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> ecolumn32 = new TableColumn<>("TSF");
+        ecolumn32.setPrefWidth(smSize);
+        ecolumn32.setMaxWidth(smSize);
+        ecolumn32.setMinWidth(smSize);
+        ecolumn32.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(
+                obj.getValue().getTransformerRental()
+        )));
+        ecolumn32.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> ecolumn33 = new TableColumn<>("Others");
+        ecolumn33.setPrefWidth(smSize);
+        ecolumn33.setMaxWidth(smSize);
+        ecolumn33.setMinWidth(smSize);
+        ecolumn33.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(
+                obj.getValue().getOtherCharges()
+        )));
+        ecolumn33.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> ecolumn4 = new TableColumn<>("Penalty");
+        ecolumn4.setPrefWidth(smSize);
+        ecolumn4.setMaxWidth(smSize);
+        ecolumn4.setMinWidth(smSize);
+        ecolumn4.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getSurCharge())));
+        ecolumn4.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> ecolumn41 = new TableColumn<>("PPD");
+        ecolumn41.setPrefWidth(smSize);
+        ecolumn41.setMaxWidth(smSize);
+        ecolumn41.setMinWidth(smSize);
+        ecolumn41.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getDiscount())));
+        ecolumn41.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> ecolumn42 = new TableColumn<>("SL Adj");
+        ecolumn42.setPrefWidth(smSize);
+        ecolumn42.setMaxWidth(smSize);
+        ecolumn42.setMinWidth(smSize);
+        ecolumn42.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getSlAdjustment())));
+        ecolumn42.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> ecolumn43 = new TableColumn<>("Other Adj");
+        ecolumn43.setPrefWidth(smSize);
+        ecolumn43.setMaxWidth(smSize);
+        ecolumn43.setMinWidth(smSize);
+        ecolumn43.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getOtherAdjustment())));
+        ecolumn43.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> ecolumn44 = new TableColumn<>("KWH");
+        ecolumn44.setPrefWidth(75);
+        ecolumn44.setMaxWidth(75);
+        ecolumn44.setMinWidth(75);
+        ecolumn44.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getPowerKWH())));
+        ecolumn44.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> ecolumn45 = new TableColumn<>("VAT");
+        ecolumn45.setPrefWidth(smSize);
+        ecolumn45.setMaxWidth(smSize);
+        ecolumn45.setMinWidth(smSize);
+        ecolumn45.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getVat() + obj.getValue().getSurChargeTax())));
+        ecolumn45.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> ecolumn46 = new TableColumn<>("Katas");
+        ecolumn46.setPrefWidth(smSize);
+        ecolumn46.setMaxWidth(smSize);
+        ecolumn46.setMinWidth(smSize);
+        ecolumn46.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getKatas())));
+        ecolumn46.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> ecolumn47 = new TableColumn<>("MD Refd");
+        ecolumn47.setPrefWidth(smSize);
+        ecolumn47.setMaxWidth(smSize);
+        ecolumn47.setMinWidth(smSize);
+        ecolumn47.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getMdRefund())));
+        ecolumn47.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> ecolumn5 = new TableColumn<>("2307 5%");
+        ecolumn5.setPrefWidth(smSize);
+        ecolumn5.setMaxWidth(smSize);
+        ecolumn5.setMinWidth(smSize);
+        ecolumn5.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal((obj.getValue().getCh2306()))));
+        ecolumn5.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> ecolumn51 = new TableColumn<>("2307 2%");
+        ecolumn51.setPrefWidth(smSize);
+        ecolumn51.setMaxWidth(smSize);
+        ecolumn51.setMinWidth(smSize);
+        ecolumn51.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal((obj.getValue().getCh2307()))));
+        ecolumn51.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> ecolumn52 = new TableColumn<>("TIN");
+        ecolumn52.setPrefWidth(smSize);
+        ecolumn52.setMaxWidth(smSize);
+        ecolumn52.setMinWidth(smSize);
+        ecolumn52.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumer().getTINNo()));
+        ecolumn52.setStyle("-fx-alignment: center;");
+
+        TableColumn<Bill, String> ecolumn7 = new TableColumn<>("Total Amount");
+        ecolumn7.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getTotalAmount())));
+        ecolumn7.setStyle("-fx-alignment: center-right;");
+        ecolumn7.setPrefWidth(amtSize);
+        ecolumn7.setMaxWidth(amtSize);
+        ecolumn7.setMinWidth(amtSize);
+
+        this.excluded_bills =  FXCollections.observableArrayList();
+        this.excluded_table.setFixedCellSize(35);
+        this.excluded_table.setPlaceholder(new Label("No bills added! Search or input the account number!"));
+
+        this.excluded_table.getColumns().add(ecolumn0);
+        this.excluded_table.getColumns().add(ecolumn);
+        this.excluded_table.getColumns().add(ecolumn_con);
+        this.excluded_table.getColumns().add(ecolumn1);
+
+        this.excluded_table.getColumns().add(ecolumn3);
+        this.excluded_table.getColumns().add(ecolumn31);
+        this.excluded_table.getColumns().add(ecolumn32);
+        this.excluded_table.getColumns().add(ecolumn33);
+        this.excluded_table.getColumns().add(ecolumn4);
+        this.excluded_table.getColumns().add(ecolumn41);
+        this.excluded_table.getColumns().add(ecolumn42);
+        this.excluded_table.getColumns().add(ecolumn43);
+        this.excluded_table.getColumns().add(ecolumn2);
+        this.excluded_table.getColumns().add(ecolumn44);
+        this.excluded_table.getColumns().add(ecolumn45);
+        this.excluded_table.getColumns().add(ecolumn46);
+        this.excluded_table.getColumns().add(ecolumn47);
+        this.excluded_table.getColumns().add(ecolumn5);
+        this.excluded_table.getColumns().add(ecolumn51);
+        this.excluded_table.getColumns().add(ecolumn52);
+        this.excluded_table.getColumns().add(ecolumn7);
+        this.excluded_table.setFixedCellSize(27.0);
+
+        this.excluded_table.setRowFactory(tv -> {
+            TableRow<Bill> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 1 && (! row.isEmpty()) ) {
+                    ConsumerInfo consumer = row.getItem().getConsumer();
+                    this.setConsumerInfo(consumer);
+                }
+            });
+            //Popup Menu when right click table row
+            if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering")) {
+                final ContextMenu rowMenu = new ContextMenu();
+
+                MenuItem itemRemoveBill = new MenuItem("Remove Bill");
+                itemRemoveBill.setOnAction(actionEvent -> {
+                    this.excluded_table.getItems().remove(row.getItem());
+                    if (this.excluded_table.getItems().size() == 0) {
+                        this.tableBox.getChildren().remove(this.excluded_table);
+                    }else{
+                        this.excluded_table.refresh();
+                    }
+                });
+
+                MenuItem itemIncludeBill = new MenuItem("Include Bill");
+                itemIncludeBill.setOnAction(actionEvent -> {
+
+                    this.bills.add(row.getItem());
+                    this.fees_table.setItems(this.bills);
+                    this.fees_table.refresh();
+                    this.payment_tf.requestFocus();
+                    this.setBillInfo(this.bills);
+                    this.setPayables();
+                    this.billsNo_lbl.setText(bills.size()+"");
+
+                    this.excluded_table.getItems().remove(row.getItem());
+                    if (this.excluded_table.getItems().size() == 0) {
+                        this.tableBox.getChildren().remove(this.excluded_table);
+                    }else{
+                        this.excluded_table.refresh();
+                    }
+
+                });
+
+                rowMenu.getItems().addAll(itemIncludeBill, new SeparatorMenuItem(), itemRemoveBill);
+
+                row.contextMenuProperty().bind(
+                        Bindings.when(row.emptyProperty())
+                                .then((ContextMenu) null)
+                                .otherwise(rowMenu));
+            }
+            return row;
+        });
+    }
+    /**
      * Receives ConsumerInfo object from dialog
      * @param o the object reference
      * @return void
@@ -1040,38 +1280,111 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     }
 
     /**
-     * Displays TIN UI
+     * Displays Withholding & TIN UI
      * @return void
      */
-    public void showTIN(Bill bill, String type){
-        JFXButton accept = new JFXButton("SAVE TIN");
-        JFXTextField input = new JFXTextField();
-        JFXDialog dialog = DialogBuilder.showInputDialog("TIN Entry for "+type,"Enter TIN:  ", "", input, accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
-        accept.setOnAction(action -> {
-            boolean repeat = true;
-            while (repeat) {
-                try {
-                    if (input.getText().length() == 0) {
-                        AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter TIN!",
-                                Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-                    } else {
-                        ConsumerDAO.updateTIN(bill.getConsumer(), input.getText());
-                        bill.getConsumer().setTINNo(input.getText());
-                        if (type.equals("2306")) {
-                            bill.setForm2306(input.getText());
-                        } else {
-                            bill.setForm2307(input.getText());
-                        }
-                        repeat = false;
+    public void showTIN(Bill bill, String type) throws Exception{
+        payment_tf.removeEventHandler(ActionEvent.ACTION, confirmEvent);
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_withholding.fxml"));
+        Parent parent = fxmlLoader.load();
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setHeading(new Label("2307 5%/2% & TIN"));
+        dialogLayout.setBody(parent);
+        dialogConfirm = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM, true);
+        WithHoldingController controller = fxmlLoader.getController();
+        double withholding = 0;
+        EventHandler saveEvent = evt -> {
+            try{
+                double amount = Double.parseDouble(controller.getWithhold().getText());
+                String tn = controller.getTin_tf().getText();
+                if (type.equals("2306")) {
+                    bill.setCh2306(amount);
+                    bill.setForm2306(tn);
+                }else{
+                    bill.setCh2307(amount);
+                    bill.setForm2307(tn);
+                }
+                ConsumerDAO.updateTIN(bill.getConsumer(), tn);
+                bill.getConsumer().setTINNo(tn);
+                bill.computeTotalAmount();
+                this.fees_table.refresh();
+                this.setBillInfo(bills);
+                this.setPayables();
+                dialogConfirm.close();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        };
+
+        if (type.equals("2306")) {
+            withholding = BillDAO.getForm2306(bill);
+            controller.getWithhold_lbl().setText("2307 5%");
+        } else {
+            withholding = BillDAO.getForm2307(bill);
+            controller.getWithhold_lbl().setText("2307 2%");
+        }
+        controller.getWithhold().setText(withholding+"");
+        controller.getTin_tf().setText(bill.getConsumer().getTINNo() != null ? bill.getConsumer().getTINNo() : "");
+
+        controller.getTin_tf().setOnKeyReleased(event->{
+            if (event.getCode() == KeyCode.ESCAPE) {
+                dialogConfirm.close();
+            }else if (event.getCode() == KeyCode.ENTER) {
+                try{
+                    double amount = Double.parseDouble(controller.getWithhold().getText());
+                    String tn = controller.getTin_tf().getText();
+                    if (type.equals("2306")) {
+                        bill.setCh2306(amount);
+                        bill.setForm2306(tn);
+                    }else{
+                        bill.setCh2307(amount);
+                        bill.setForm2307(tn);
                     }
-                } catch (Exception e) {
-                    AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    ConsumerDAO.updateTIN(bill.getConsumer(), tn);
+                    bill.getConsumer().setTINNo(tn);
+                    bill.computeTotalAmount();
+                    this.fees_table.refresh();
+                    this.setBillInfo(bills);
+                    this.setPayables();
+                    dialogConfirm.close();
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
             }
-            dialog.close();
         });
-        dialog.setOnDialogClosed((event) -> {this.payment_tf.requestFocus(); });
-        dialog.show();
+
+        controller.getWithhold().setOnKeyReleased(event->{
+            if (event.getCode() == KeyCode.ESCAPE) {
+                dialogConfirm.close();
+            }else if (event.getCode() == KeyCode.ENTER) {
+                try{
+                    double amount = Double.parseDouble(controller.getWithhold().getText());
+                    String tn = controller.getTin_tf().getText();
+                    if (type.equals("2306")) {
+                        bill.setCh2306(amount);
+                        bill.setForm2306(tn);
+                    }else{
+                        bill.setCh2307(amount);
+                        bill.setForm2307(tn);
+                    }
+                    ConsumerDAO.updateTIN(bill.getConsumer(), tn);
+                    bill.getConsumer().setTINNo(tn);
+                    bill.computeTotalAmount();
+                    this.fees_table.refresh();
+                    this.setBillInfo(bills);
+                    this.setPayables();
+                    dialogConfirm.close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        controller.getSave_btn().addEventHandler(ActionEvent.ACTION, saveEvent);
+
+        dialogConfirm.setOnDialogOpened((event) -> { controller.getWithhold().requestFocus(); });
+        dialogConfirm.setOnDialogClosed((event) -> { payment_tf.requestFocus(); payment_tf.addEventHandler(ActionEvent.ACTION, confirmEvent); });
+        dialogConfirm.show();
     }
 
     /**
@@ -1088,12 +1401,34 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     this.setConsumerInfo(consumer);
                 }
             });
-            //Popup Menu when right clicking table row
+            //Popup Menu when right click table row
             if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering")) {
                 final ContextMenu rowMenu = new ContextMenu();
 
                 MenuItem itemRemoveBill = new MenuItem("Remove Bill");
                 itemRemoveBill.setOnAction(actionEvent -> {
+                    this.fees_table.getItems().remove(row.getItem());
+                    tv.refresh();
+                    this.setPayables();
+                    if (this.fees_table.getItems().size() == 0) {
+                        this.reset();
+                        this.resetBillInfo();
+                    }else{
+                        this.payment_tf.requestFocus();
+                        this.setBillInfo(this.bills);
+                    }
+                    this.billsNo_lbl.setText(bills.size()+"");
+                });
+
+                MenuItem itemExcludeBill = new MenuItem("Exclude Bill");
+                itemExcludeBill.setOnAction(actionEvent -> {
+                    if (this.excluded_bills.size() == 0){
+                        createExcludedTable();
+                        this.tableBox.getChildren().add(excluded_table);
+                    }
+                    this.excluded_bills.add(row.getItem());
+                    this.excluded_table.setItems(this.excluded_bills);
+                    this.excluded_table.refresh();
                     this.fees_table.getItems().remove(row.getItem());
                     tv.refresh();
                     this.setPayables();
@@ -1199,17 +1534,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                         return;
                     }
                     try {
-                        if (row.getItem().getConsumer().getTINNo() == null || row.getItem().getConsumer().getTINNo().isEmpty() || row.getItem().getConsumer().getTINNo().equals("")) {
-                            this.showTIN(row.getItem(), "2306");
-                        }else{
-                            row.getItem().setForm2306(row.getItem().getConsumer().getTINNo());
-                        }
-                        row.getItem().setCh2306(BillDAO.getForm2306(row.getItem()));
-                        row.getItem().computeTotalAmount();
-                        tv.refresh();
-                        this.setBillInfo(bills);
-                        this.setPayables();
-                        this.payment_tf.requestFocus();
+                        this.showTIN(row.getItem(), "2306");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -1222,17 +1547,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                         return;
                     }
                     try {
-                        if (row.getItem().getConsumer().getTINNo() == null || row.getItem().getConsumer().getTINNo().isEmpty() || row.getItem().getConsumer().getTINNo().equals("")) {
-                            this.showTIN(row.getItem(), "2307");
-                        }else{
-                            row.getItem().setForm2306(row.getItem().getConsumer().getTINNo());
-                        }
-                        row.getItem().setCh2307(BillDAO.getForm2307(row.getItem()));
-                        row.getItem().computeTotalAmount();
-                        tv.refresh();
-                        this.setBillInfo(bills);
-                        this.setPayables();
-                        this.payment_tf.requestFocus();
+                        this.showTIN(row.getItem(), "2307");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -1276,7 +1591,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     this.payment_tf.requestFocus();
                 });
 
-                rowMenu.getItems().addAll(itemRemoveBill, new SeparatorMenuItem(), itemClear, new SeparatorMenuItem(), itemAddPPD, itemRemovePPD,  new SeparatorMenuItem(), itemAddSurcharge, itemWaiveSurcharge,  new SeparatorMenuItem(), item2306, item2307,  new SeparatorMenuItem(), itemSLAdj, itemRemoveSLAdj,  new SeparatorMenuItem(), itemOthersAdj, itemRemoveOthersAdj);
+                rowMenu.getItems().addAll(itemRemoveBill, new SeparatorMenuItem(), itemExcludeBill, new SeparatorMenuItem(), itemClear, new SeparatorMenuItem(), itemAddPPD, itemRemovePPD,  new SeparatorMenuItem(), itemAddSurcharge, itemWaiveSurcharge,  new SeparatorMenuItem(), item2306, item2307,  new SeparatorMenuItem(), itemSLAdj, itemRemoveSLAdj,  new SeparatorMenuItem(), itemOthersAdj, itemRemoveOthersAdj);
 
                 row.contextMenuProperty().bind(
                         Bindings.when(row.emptyProperty())

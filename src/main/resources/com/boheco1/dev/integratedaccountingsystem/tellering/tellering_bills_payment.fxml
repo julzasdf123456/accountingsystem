@@ -194,10 +194,14 @@
                      <children>
                         <VBox layoutY="8.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="8.0">
                            <children>
-                              <TableView fx:id="fees_table" prefHeight="390.0" prefWidth="927.0" styleClass="datatable" VBox.vgrow="ALWAYS" />
-                              <VBox prefHeight="197.0" prefWidth="927.0">
+                              <VBox fx:id="tableBox" VBox.vgrow="ALWAYS">
                                  <children>
-                                    <HBox prefHeight="115.0" prefWidth="927.0" VBox.vgrow="ALWAYS">
+                                    <TableView fx:id="fees_table" prefWidth="927.0" styleClass="datatable" VBox.vgrow="ALWAYS" />
+                                 </children>
+                              </VBox>
+                              <VBox maxHeight="140.0" minHeight="140.0" prefHeight="140.0" prefWidth="927.0">
+                                 <children>
+                                    <HBox prefWidth="927.0" VBox.vgrow="ALWAYS">
                                        <children>
                                           <Label prefHeight="19.0" prefWidth="68.0" text="No. of Bills: ">
                                              <HBox.margin>
