@@ -45,9 +45,9 @@
             <JFXButton fx:id="print_dcr_btn" alignment="CENTER" buttonType="RAISED" contentDisplay="CENTER" style="-fx-background-color: #009688;" text="Print DCR" textFill="WHITE" />
          </children>
       </HBox>
-      <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="36.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="68.0">
+      <TabPane fx:id="resultsTab" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="36.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="68.0">
         <tabs>
-          <Tab text="DCR Summary">
+          <Tab fx:id="dcrTab" text="DCR Summary">
                <content>
                   <BorderPane prefHeight="200.0" prefWidth="200.0">
                      <center>
@@ -120,7 +120,7 @@
                   </BorderPane>
                </content>
             </Tab>
-          <Tab text="Power Bills Payment">
+          <Tab fx:id="billsTab" text="Power Bills Payment">
                <content>
                   <AnchorPane>
                      <children>

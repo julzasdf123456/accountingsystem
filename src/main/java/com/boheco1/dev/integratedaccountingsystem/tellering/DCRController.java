@@ -32,7 +32,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -72,7 +71,10 @@ public class DCRController extends MenuControllerHandler implements Initializabl
     private ObservableList<ItemSummary> dcrItems = FXCollections.observableArrayList();
     private ObservableList<ItemSummary> dcrPayments = FXCollections.observableArrayList();
     private double totalKwh = 0, grandTotal = 0, billTotal = 0, amountDue = 0, cashAmount = 0, checkAmount = 0, collectedTotal = 0;
-
+    @FXML
+    private TabPane resultsTab;
+    @FXML
+    private Tab dcrTab, billsTab;
     private String teller = ActiveUser.getUser().getUserName();
 
     @Override
@@ -81,7 +83,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         this.createDCRTransactionsTable();
         this.createDCRSummary();
         this.createDCRBreakDown();
-
+        this.resultsTab.setDisable(true);
         this.dcr_power_table.setRowFactory(tv -> {
             TableRow<Bill> row = new TableRow<>();
             if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering")) {
@@ -181,6 +183,12 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         });
         this.setDate();
         this.generateReport();
+
+        this.resultsTab.getSelectionModel().selectedItemProperty().addListener((observableValue, tab, t1) -> {
+            if (t1 == this.billsTab) {
+                this.generateBillsReport();
+            }
+        });
     }
     /**
      * Generates DCR in excel format
@@ -261,7 +269,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
     }
 
     /**
-     * Generates and displays DCR on the tables
+     * Generates and displays DCR on the table
      * @return void
      */
     public void generateReport() {
@@ -280,7 +288,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         if (proceed) {
             Task<Void> task = new Task<>() {
                 @Override
-                protected Void call() throws SQLException {
+                protected Void call() {
                     int day = 0, year = 0, month = 0;
 
                     totalKwh = 0;
@@ -315,7 +323,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                                         Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                                 return null;
                             }
-                            date_pker.setValue(LocalDate.of(year, month,day));
+                            date_pker.setValue(LocalDate.of(year, month, day));
                         }catch (Exception e){
                             AlertDialogBuilder.messgeDialog("System Error", "Invalid date format!",
                                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
@@ -324,7 +332,6 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                     }
 
                     try {
-                        bills = FXCollections.observableArrayList(BillDAO.getAllPaidBills(year, month, day, teller));
                         HashMap<String, List<ItemSummary>> breakdown = BillDAO.getDCRBreakDown(year, month, day, teller);
                         dcrItems = FXCollections.observableArrayList(breakdown.get("Breakdown"));
                         dcrPayments = FXCollections.observableArrayList(breakdown.get("Payments"));
@@ -335,9 +342,6 @@ public class DCRController extends MenuControllerHandler implements Initializabl
                         billTotal = misc.get(2).getTotal();
                         amountDue = misc.get(3).getTotal();
 
-                        for (Bill b : bills){
-                            collectedTotal += b.getTotalAmount();
-                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                         AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request: " + e.getMessage(),
@@ -348,43 +352,50 @@ public class DCRController extends MenuControllerHandler implements Initializabl
             };
 
             task.setOnRunning(wse -> {
-                date_pker.setDisable(true);
-                bills = FXCollections.observableArrayList();
-                dcrItems = FXCollections.observableArrayList();
-                dcrPayments = FXCollections.observableArrayList();
-                dcr_power_table.setItems(bills);
-                dcr_breakdown_table.setItems(dcrItems);
-                payments_table.setItems(dcrPayments);
-                view_btn.setDisable(true);
-                progressbar.setVisible(true);
-                dcr_total_kwh.setText("0");
-                dcr_total.setText("0");
-                bills_total_lbl.setText("0");
+                this.resultsTab.setDisable(true);
+                this.resultsTab.getSelectionModel().select(dcrTab);
+                this.date_pker.setDisable(true);
+                this.teller_tf.setDisable(true);
+                this.view_btn.setDisable(true);
+                this.progressbar.setVisible(true);
+                this.bills = FXCollections.observableArrayList();
+                this.dcrItems = FXCollections.observableArrayList();
+                this.dcrPayments = FXCollections.observableArrayList();
+                this.dcr_power_table.setItems(bills);
+                this.dcr_breakdown_table.setItems(dcrItems);
+                this.payments_table.setItems(dcrPayments);
+                this.dcr_transNo_lbl.setText("0");
+                this.dcr_total_kwh.setText("0.00");
+                this.dcr_total.setText("0.00");
+                this.bills_total_lbl.setText("0.00");
             });
 
             task.setOnSucceeded(wse -> {
-                date_pker.setDisable(false);
-                view_btn.setDisable(false);
-                dcr_power_table.setItems(bills);
-                dcr_breakdown_table.setItems(dcrItems);
-                payments_table.setItems(dcrPayments);
-                progressbar.setVisible(false);
-                dcr_transNo_lbl.setText(bills.size() + "");
-                dcr_total_kwh.setText(Utility.formatDecimal(totalKwh));
-                dcr_total.setText(Utility.formatDecimal(grandTotal));
-                bills_total_lbl.setText(Utility.formatDecimal(collectedTotal));
+                this.resultsTab.setDisable(false);
+                this.date_pker.setDisable(false);
+                this.teller_tf.setDisable(false);
+                this.view_btn.setDisable(false);
+                this.progressbar.setVisible(false);
+                this.payments_table.setItems(FXCollections.observableArrayList());
+                this.dcr_breakdown_table.setItems(dcrItems);
+                this.payments_table.setItems(dcrPayments);
+                this.dcr_total_kwh.setText(Utility.formatDecimal(totalKwh));
+                this.dcr_total.setText(Utility.formatDecimal(grandTotal));
             });
 
             task.setOnFailed(wse -> {
-                date_pker.setDisable(false);
-                dcr_transNo_lbl.setText("0");
-                view_btn.setDisable(false);
-                progressbar.setVisible(false);
-                dcr_total_kwh.setText("0");
-                dcr_total.setText("0");
-                bills_total_lbl.setText("0");
-                dcr_breakdown_table.setItems(FXCollections.observableArrayList());
-                dcr_power_table.setItems(FXCollections.observableArrayList());
+                this.resultsTab.setDisable(false);
+                this.date_pker.setDisable(false);
+                this.teller_tf.setDisable(true);
+                this.view_btn.setDisable(false);
+                this.progressbar.setVisible(false);
+                this.dcr_transNo_lbl.setText("0");
+                this.dcr_total_kwh.setText("0.00");
+                this.dcr_total.setText("0.00");
+                this.bills_total_lbl.setText("0.00");
+                this.payments_table.setItems(FXCollections.observableArrayList());
+                this.dcr_breakdown_table.setItems(FXCollections.observableArrayList());
+                this.dcr_power_table.setItems(FXCollections.observableArrayList());
                 AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request! "+wse.getSource().getException().getMessage(),
                         Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             });
@@ -392,7 +403,109 @@ public class DCRController extends MenuControllerHandler implements Initializabl
             new Thread(task).start();
         }
     }
+    /**
+     * Generates and displays bills on the table when Bills tab is selected
+     * @return void
+     */
+    public void generateBillsReport() {
 
+        String currentDate[] = date_pker.getEditor().getText().split("/");
+
+
+            Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() {
+                    int year = 0, day = 0, month = 0;
+
+                    collectedTotal = 0;
+
+
+                    if (currentDate.length != 3) {
+                        AlertDialogBuilder.messgeDialog("System Error", "Invalid date format!",
+                                Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                        return null;
+                    } else {
+
+                        try {
+                            month = Integer.parseInt(currentDate[0]);
+                            day = Integer.parseInt(currentDate[1]);
+                            year = Integer.parseInt(currentDate[2]);
+                            if (!(month >= 1 && month <= 12)) {
+                                AlertDialogBuilder.messgeDialog("System Error", "The correct month value should be from 1 - 12!",
+                                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                return null;
+                            } else if (!(day >= 1 && day <= 31)) {
+                                AlertDialogBuilder.messgeDialog("System Error", "The correct day value should be from 1 - 31!",
+                                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                return null;
+                            } else if (year < 1000) {
+                                AlertDialogBuilder.messgeDialog("System Error", "The correct year value should be follow the format 1XXX!",
+                                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                return null;
+                            }
+                            date_pker.setValue(LocalDate.of(year, month, day));
+                        } catch (Exception e) {
+                            AlertDialogBuilder.messgeDialog("System Error", "Invalid date format!",
+                                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                            return null;
+                        }
+                    }
+
+                    try {
+                        bills = FXCollections.observableArrayList(BillDAO.getAllPaidBills(year, month, day, teller));
+
+                        for (Bill b : bills) {
+                            collectedTotal += b.getTotalAmount();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request: " + e.getMessage(),
+                                Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    }
+
+                    return null;
+                }
+            };
+
+            task.setOnRunning(wse -> {
+                this.resultsTab.getSelectionModel().select(billsTab);
+                this.date_pker.setDisable(true);
+                this.teller_tf.setDisable(true);
+                this.resultsTab.setDisable(true);
+                this.view_btn.setDisable(true);
+                this.progressbar.setVisible(true);
+                this.bills = FXCollections.observableArrayList();
+                this.dcr_power_table.setItems(this.bills);
+                this.dcr_transNo_lbl.setText("0");
+                this.bills_total_lbl.setText("0.00");
+            });
+
+            task.setOnSucceeded(wse -> {
+                this.resultsTab.setDisable(false);
+                this.date_pker.setDisable(false);
+                this.teller_tf.setDisable(false);
+                this.view_btn.setDisable(false);
+                this.progressbar.setVisible(false);
+                this.dcr_power_table.setItems(this.bills);
+                this.dcr_transNo_lbl.setText(bills.size() + "");
+                this.bills_total_lbl.setText(Utility.formatDecimal(collectedTotal));
+            });
+
+            task.setOnFailed(wse -> {
+                this.resultsTab.setDisable(false);
+                this.date_pker.setDisable(false);
+                this.teller_tf.setDisable(false);
+                this.view_btn.setDisable(false);
+                this.progressbar.setVisible(false);
+                this.bills = FXCollections.observableArrayList();
+                this.dcr_power_table.setItems(this.bills);
+                this.dcr_transNo_lbl.setText("0");
+                this.bills_total_lbl.setText("0.00");
+            });
+
+            new Thread(task).start();
+
+    }
     /**
      * Initializes the DCR transactions table
      * @return void
