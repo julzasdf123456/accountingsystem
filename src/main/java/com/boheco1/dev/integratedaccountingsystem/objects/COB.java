@@ -18,6 +18,11 @@ public class COB {
     private LocalDate dateApproved;
     private List<COBItem> items;
 
+    public static final String PENDING_REVIEW = "Pending Review";
+    public static final String PENDING_APPROVAL = "Pending Approval";
+    public static final String APPROVED = "Approved";
+    public static final String REJECTED = "Rejected";
+
     public COB(){}
 
     public COB(String cobId, String activity, double amount, String status, String appId, String fsId, EmployeeInfo prepared, LocalDate datePrepared, EmployeeInfo reviewed, LocalDate dateReviewed, EmployeeInfo approved, LocalDate dateApproved) {
