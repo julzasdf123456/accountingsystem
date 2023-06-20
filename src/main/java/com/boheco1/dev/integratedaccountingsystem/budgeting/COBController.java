@@ -1,5 +1,8 @@
 package com.boheco1.dev.integratedaccountingsystem.budgeting;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.AppDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.CobDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.DeptThresholdDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.*;
@@ -78,10 +81,32 @@ public class COBController extends MenuControllerHandler implements Initializabl
     @FXML
     private TableView cob_items;
     private ObservableList<COBItem> items = FXCollections.observableArrayList(new ArrayList<>());
+    private APP app = null;
+    private DeptThreshold threshold = null;
+    private double totalAppropriations = 0;
+    private String totalBudget = "Current Total Appropriation: ₱ %.2f out of ₱ %.2f Department Threshold!";
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        try {
+            this.app = AppDAO.getOpen(true);
+            this.threshold = DeptThresholdDAO.find(this.app.getAppId(), ActiveUser.getUser().getEmployeeInfo().getDepartmentID());
+            this.totalAppropriations = DeptThresholdDAO.getTotalAppropriations(threshold);
+            String dept = ActiveUser.getUser().getEmployeeInfo().getDepartment().getDepartmentName();
+            this.cn_tf.setText(this.app.getYear()+"-"+dept+"-"+ (CobDAO.countCob(dept)+1));
+            this.board_res_tf.setText(this.app.getBoardRes());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (this.app != null) {
+            this.threshold_lbl.setText(String.format(this.totalBudget, totalAppropriations, threshold.getThreshAmount()));
+        }else{
+            this.threshold_lbl.setText("");
+        }
+
         this.createTable();
+
         this.add_btn.setOnAction(evt -> {
             try {
                 showAddItemForm();
@@ -287,6 +312,8 @@ public class COBController extends MenuControllerHandler implements Initializabl
         this.q2_tf.setText(Utility.formatDecimal(qtr2));
         this.q3_tf.setText(Utility.formatDecimal(qtr3));
         this.q4_tf.setText(Utility.formatDecimal(qtr4));
+
+        this.threshold_lbl.setText(String.format(this.totalBudget, total+totalAppropriations, threshold.getThreshAmount()));
     }
 
     @Override

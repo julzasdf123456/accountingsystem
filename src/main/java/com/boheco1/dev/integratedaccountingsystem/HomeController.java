@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.AppDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.NotificationsDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
@@ -164,8 +165,17 @@ public class HomeController implements Initializable {
             NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Budgeting"), new FontIcon("mdi2c-cash-register"), homeStackPane);
             if(ActiveUser.getUser().can("prepare-budget")){
                 NavMenuHelper.addMenu(navMenuBox, user_cob, homeStackPane);
-                NavMenuHelper.addMenu(navMenuBox, cob, homeStackPane);
-                NavMenuHelper.addMenu(navMenuBox, approve_cob, homeStackPane);
+                APP current = null;
+                try {
+                    current = AppDAO.getOpen(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if (current != null) {
+                    NavMenuHelper.addMenu(navMenuBox, cob, homeStackPane);
+                    NavMenuHelper.addMenu(navMenuBox, approve_cob, homeStackPane);
+                }
             }
             if(ActiveUser.getUser().can("manage-app")) {
                 NavMenuHelper.addMenu(navMenuBox, manage_app, homeStackPane);

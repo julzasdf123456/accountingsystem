@@ -43,7 +43,7 @@
                      </VBox.margin>
                   </JFXTextField>
                   <Label text="Board Resolution" />
-                  <JFXTextField fx:id="board_res_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                  <JFXTextField fx:id="board_res_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -90,7 +90,7 @@
                      <children>
                         <HBox prefHeight="35.0" prefWidth="491.0">
                            <children>
-                              <Label fx:id="category_lbl" styleClass="bold" text="Office Supply">
+                              <Label fx:id="category_lbl" styleClass="bold">
                                  <HBox.margin>
                                     <Insets top="8.0" />
                                  </HBox.margin>
@@ -127,7 +127,7 @@
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
                         </TableView>
-                        <Label fx:id="threshold_lbl" text="Threshold amount of 200,000 was reached.">
+                        <Label fx:id="threshold_lbl" text=" ">
                            <VBox.margin>
                               <Insets top="16.0" />
                            </VBox.margin>

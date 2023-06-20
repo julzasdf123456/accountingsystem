@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
@@ -32,6 +33,15 @@
                         <FontIcon iconColor="WHITE" iconLiteral="mdi2e-eye" />
                      </graphic>
                   </JFXButton>
+                  <Label fx:id="app_status_lbl" text=" ">
+                     <HBox.margin>
+                        <Insets left="16.0" top="6.0" />
+                     </HBox.margin>
+                     <styleClass>
+                        <String fx:value="bold" />
+                        <String fx:value="red" />
+                     </styleClass>
+                  </Label>
                </children></HBox>
          </children>
       </HBox>

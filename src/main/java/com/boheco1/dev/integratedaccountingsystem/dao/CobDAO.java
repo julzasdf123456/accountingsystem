@@ -251,4 +251,19 @@ public class CobDAO {
         ps.setString(3, cob.getCobId());
         ps.executeUpdate();
     }
+
+    /**
+     * Count a department's COB
+     * @param dept the department
+     * @return integer
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static int countCob(String dept) throws Exception {
+        ResultSet rs = DB.getConnection().createStatement().executeQuery("SELECT count(cobid) AS count FROM cob a INNER JOIN employeeinfo b ON a.Prepared = b.EmployeeID INNER JOIN departments c ON b.DepartmentId = c.DepartmentID\n" +
+                "WHERE DepartmentName = '"+dept+"'");
+        if(rs.next()) {
+            return rs.getInt("count");
+        }
+        return 0;
+    }
 }

@@ -63,4 +63,19 @@ public class AppDAO {
         ps.setString(4, app.getAppId());
         ps.executeUpdate();
     }
+
+    public static APP getOpen(boolean isOpen) throws Exception {
+        ResultSet rs = DB.getConnection().createStatement().executeQuery("SELECT * FROM APP WHERE isOpen='" + isOpen + "'");
+        if(rs.next()) {
+            return new APP(
+                    rs.getString("AppId"),
+                    rs.getString("Year"),
+                    rs.getString("BoardRes"),
+                    rs.getBoolean("isOpen"),
+                    rs.getDouble("TotalBudget")
+            );
+        }
+        return null;
+    }
+
 }
