@@ -58,8 +58,8 @@ public class CobDAO {
         String cob_sql = "INSERT INTO COB (AppId, COBId, FSId, Activity, Amount, Status, Prepared, DatePrepared) " +
                          "VALUES (?, ?, ?, ?, ROUND(?, 2), ?, ?, getdate())";
 
-        String item_sql = "INSERT INTO COBItem (CItemId, ItemId, COBId, Qty, Remarks, Description, Cost, Qtr1, Qtr2, Qtr3, Qtr4) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2))";
+        String item_sql = "INSERT INTO COBItem (CItemId, ItemId, COBId, Qty, Remarks, Description, Cost, Qtr1, Qtr2, Qtr3, Qtr4, Sequence) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?)";
 
         //Prepared statements
         PreparedStatement ps_cob = DB.getConnection().prepareStatement(cob_sql);
@@ -92,6 +92,7 @@ public class CobDAO {
                 ps_item.setDouble(9, item.getQtr2());
                 ps_item.setDouble(10, item.getQtr3());
                 ps_item.setDouble(11, item.getQtr4());
+                ps_item.setInt(12, item.getSequence());
                 ps_item.executeUpdate();
             }
             //Commit insert
@@ -125,8 +126,8 @@ public class CobDAO {
 
         String del_sql = "DELETE FROM COBItem WHERE COBId = ?";
 
-        String item_sql = "INSERT INTO COBItem (CItemId, ItemId, COBId, Qty, Remarks, Description, Cost, Qtr1, Qtr2, Qtr3, Qtr4) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2))";
+        String item_sql = "INSERT INTO COBItem (CItemId, ItemId, COBId, Qty, Remarks, Description, Cost, Qtr1, Qtr2, Qtr3, Qtr4, Sequence) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?)";
 
         //Prepared statements
         PreparedStatement ps_cob = DB.getConnection().prepareStatement(cob_sql);
@@ -151,16 +152,19 @@ public class CobDAO {
 
             //Insert current cob items
             for (COBItem item : cob.getItems()) {
-                ps_item.setString(1, item.getItemId());
-                ps_item.setInt(2, item.getQty());
-                ps_item.setString(3, item.getRemarks());
-                ps_item.setString(4, item.getDescription());
-                ps_item.setDouble(5, item.getCost());
-                ps_item.setDouble(6, item.getQtr1());
-                ps_item.setDouble(7, item.getQtr2());
-                ps_item.setDouble(8, item.getQtr3());
-                ps_item.setDouble(9, item.getQtr4());
-                ps_item.setString(10, item.getcItemId());
+                String rndKey = Utility.generateRandomId();
+                ps_item.setString(1, rndKey);
+                ps_item.setString(2, item.getItemId());
+                ps_item.setString(3, cob.getCobId());
+                ps_item.setInt(4, item.getQty());
+                ps_item.setString(5, item.getRemarks());
+                ps_item.setString(6, item.getDescription());
+                ps_item.setDouble(7, item.getCost());
+                ps_item.setDouble(8, item.getQtr1());
+                ps_item.setDouble(9, item.getQtr2());
+                ps_item.setDouble(10, item.getQtr3());
+                ps_item.setDouble(11, item.getQtr4());
+                ps_item.setInt(12, item.getSequence());
                 ps_item.executeUpdate();
             }
 

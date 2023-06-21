@@ -50,7 +50,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
     private JFXTextField board_res_tf;
 
     @FXML
-    private JFXComboBox<?> fs_cb;
+    private JFXComboBox<FundSource> fs_cb;
 
     @FXML
     private JFXComboBox<?> type_cb;
@@ -83,15 +83,18 @@ public class COBController extends MenuControllerHandler implements Initializabl
     private ObservableList<COBItem> items = FXCollections.observableArrayList(new ArrayList<>());
     private APP app = null;
     private DeptThreshold threshold = null;
-    private double totalAppropriations = 0;
+    private double totalAppropriations = 0, cobAmount = 0, appropFromDB = 0;
     private String totalBudget = "Current Total Appropriation: ₱ %.2f out of ₱ %.2f Department Threshold!";
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
         try {
+            this.fs_cb.setItems(FXCollections.observableArrayList(AppDAO.getFundSources()));
             this.app = AppDAO.getOpen(true);
             this.threshold = DeptThresholdDAO.find(this.app.getAppId(), ActiveUser.getUser().getEmployeeInfo().getDepartmentID());
             this.totalAppropriations = DeptThresholdDAO.getTotalAppropriations(threshold);
+            this.appropFromDB = this.totalAppropriations;
             String dept = ActiveUser.getUser().getEmployeeInfo().getDepartment().getDepartmentName();
             this.cn_tf.setText(this.app.getYear()+"-"+dept+"-"+ (CobDAO.countCob(dept)+1));
             this.board_res_tf.setText(this.app.getBoardRes());
@@ -164,6 +167,11 @@ public class COBController extends MenuControllerHandler implements Initializabl
                     .otherwise(rowMenu));
             return row;
         });
+
+        this.reset_btn.setOnAction(evt ->{
+            reset();
+        });
+
         //Pass this controller to the Add Item controller
         Utility.setParentController(this);
     }
@@ -247,38 +255,6 @@ public class COBController extends MenuControllerHandler implements Initializabl
         this.cob_items.getColumns().add(column8);
     }
 
-    public void init(){
-        COBItem item1 = new COBItem();
-        item1.setParticulars("Office Supplies");
-
-        COBItem item2C = new COBItem();
-        item2C.setParticulars("Bond Paper");
-        item2C.setPrice(500);
-        item2C.setUnit("Rim");
-        item2C.setQty(8);
-        item2C.setCost(item2C.getPrice()*item2C.getQty());
-        item2C.setQtr1(item2C.getPrice()*2);
-        item2C.setQtr2(item2C.getPrice()*2);
-        item2C.setQtr3(item2C.getPrice()*2);
-        item2C.setQtr4(item2C.getPrice()*2);
-        item2C.setScopeId("1");
-
-        COBItem item3C = new COBItem();
-        item3C.setParticulars("Epson Ink");
-        item3C.setPrice(1500);
-        item3C.setUnit("Pieces");
-        item3C.setQty(2);
-        item3C.setCost(item3C.getPrice()*item3C.getQty());
-        item3C.setQtr1(item3C.getPrice()*1);
-        item3C.setQtr3(item3C.getPrice()*1);
-        item3C.setScopeId("1");
-
-        this.items.add(item1);
-        this.items.add(item2C);
-        this.items.add(item3C);
-        this.cob_items.setItems(this.items);
-    }
-
     /**
      * Displays Add Item UI
      * @return void
@@ -307,6 +283,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
             qtr3 += i.getQtr3();
             qtr4 += i.getQtr4();
         }
+        this.cobAmount = total;
         this.totals_tf.setText(Utility.formatDecimal(total));
         this.q1_tf.setText(Utility.formatDecimal(qtr1));
         this.q2_tf.setText(Utility.formatDecimal(qtr2));
@@ -314,6 +291,20 @@ public class COBController extends MenuControllerHandler implements Initializabl
         this.q4_tf.setText(Utility.formatDecimal(qtr4));
 
         this.threshold_lbl.setText(String.format(this.totalBudget, total+totalAppropriations, threshold.getThreshAmount()));
+    }
+
+    public void reset(){
+        this.items = FXCollections.observableArrayList(new ArrayList<>());
+        this.cob_items.setItems(this.items);
+        this.cobAmount = 0;
+        this.totals_tf.setText("");
+        this.q1_tf.setText("");
+        this.q2_tf.setText("");
+        this.q3_tf.setText("");
+        this.q4_tf.setText("");
+        this.activity_tf.setText("");
+        this.fs_cb.getSelectionModel().clearSelection();
+        this.threshold_lbl.setText(String.format(this.totalBudget, this.appropFromDB, threshold.getThreshAmount()));
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.APP;
+import com.boheco1.dev.integratedaccountingsystem.objects.FundSource;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -78,4 +79,18 @@ public class AppDAO {
         return null;
     }
 
+    public static ArrayList<FundSource> getFundSources() throws Exception {
+        ArrayList<FundSource> src = new ArrayList();
+
+        ResultSet rs = DB.getConnection().createStatement().executeQuery("SELECT * FROM FundSource");
+
+        while(rs.next()) {
+            FundSource fs = new FundSource();
+            fs.setFsId(rs.getString("FSId"));
+            fs.setSource(rs.getString("Source"));
+            src.add(fs);
+        }
+
+        return src;
+    }
 }

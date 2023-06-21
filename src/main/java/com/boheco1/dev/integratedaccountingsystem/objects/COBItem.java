@@ -5,9 +5,8 @@ public class COBItem extends Item{
     private String remarks;
     private String description;
     private double cost = 0;
-
     private int qty = 0;
-
+    private int sequence = 0;
     private double qtr1 = 0;
     private double qtr2 = 0;
     private double qtr3 = 0;
@@ -95,5 +94,13 @@ public class COBItem extends Item{
 
     public void setQty(int qty) {
         this.qty = qty;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 }

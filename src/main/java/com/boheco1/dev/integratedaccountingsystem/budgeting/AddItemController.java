@@ -78,13 +78,18 @@ public class AddItemController extends MenuControllerHandler implements Initiali
         InputHelper.restrictNumbersOnly(this.q3_tf);
         InputHelper.restrictNumbersOnly(this.q4_tf);
         this.exists_check.setSelected(true);
+        this.unit_tf.setEditable(false);
+        this.unit_tf.setText("");
         this.exists_check.setOnAction(evt ->{
+            this.unit_tf.setText("");
             if (exists_check.isSelected()){
                 this.price_lbl.setText("Price");
                 this.unit_lbl.setText("Unit");
+                this.unit_tf.setEditable(false);
             }else{
                 this.price_lbl.setText("Cost");
                 this.unit_lbl.setText("Remarks");
+                this.unit_tf.setEditable(true);
             }
             this.description_tf.requestFocus();
         });

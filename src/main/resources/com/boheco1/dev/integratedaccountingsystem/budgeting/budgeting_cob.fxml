@@ -52,13 +52,13 @@
                      </VBox.margin>
                   </JFXTextField>
                   <Label text="Fund Source" />
-                  <JFXComboBox fx:id="fs_cb" prefHeight="29.0" prefWidth="200.0" promptText="General Fund">
+                  <JFXComboBox fx:id="fs_cb" prefHeight="29.0" prefWidth="200.0">
                      <VBox.margin>
                         <Insets bottom="16.0" />
                      </VBox.margin>
                   </JFXComboBox>
                   <Label text="Type" />
-                  <JFXComboBox fx:id="type_cb" prefHeight="29.0" prefWidth="200.0" promptText="Office Supply">
+                  <JFXComboBox fx:id="type_cb" prefHeight="29.0" prefWidth="200.0">
                      <VBox.margin>
                         <Insets bottom="24.0" />
                      </VBox.margin>
