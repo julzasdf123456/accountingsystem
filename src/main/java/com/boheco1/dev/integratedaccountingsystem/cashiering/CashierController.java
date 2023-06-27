@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Paint;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
@@ -32,12 +33,17 @@ import java.util.ResourceBundle;
 
 public class CashierController extends MenuControllerHandler implements Initializable, ObjectTransaction {
 
+    @FXML
+    private JFXToggleButton manualORToggle;
 
     @FXML
-    private JFXButton submitBtn;
+    private JFXButton submitBtn, search_btn;
 
     @FXML
-    private JFXTextField serviceFeeAmount, serviceFeeAccounts, name, address, purpose, energyBill, vat, surcharge, prepayment, accNum, tinNo, orNumber, businessStyle;
+    private HBox manualORinput;
+
+    @FXML
+    private JFXTextField orItem, orItemAmount, serviceFeeAmount, serviceFeeAccounts, name, address, purpose, energyBill, vat, surcharge, prepayment, accNum, tinNo, orNumber, businessStyle;
 
 
     @FXML
@@ -80,6 +86,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             date.setValue(LocalDate.now());
             throw new RuntimeException(e);
         }
+        manualORinput.setVisible(false);
 
         InputValidation.restrictNumbersOnly(energyBill);
         InputValidation.restrictNumbersOnly(vat);
@@ -87,6 +94,12 @@ public class CashierController extends MenuControllerHandler implements Initiali
         InputValidation.restrictNumbersOnly(prepayment);
         InputValidation.restrictNumbersOnly(accNum);
         //InputValidation.restrictNumbersOnly(amount);
+
+        addManualORItem(orItemAmount);
+        addManualORItem(name);
+        InputValidation.restrictNumbersOnly(orItemAmount);
+        bindParticularAccountInfoAutocomplete(orItem);
+        bindEmployeeInfoAutocomplete(name);
 
         InputValidation.restrictNumbersOnly(tinNo);
         InputValidation.restrictNumbersOnly(orNumber);
@@ -117,11 +130,115 @@ public class CashierController extends MenuControllerHandler implements Initiali
         }
     }
 
+    private void addManualORItem(JFXTextField jfxTextField) {
+        jfxTextField.setOnAction(e -> {
+            if(!orItem.getText().isEmpty() && !orItemAmount.getText().isEmpty()){
+                try{
+                    double amount = Double.parseDouble(orItemAmount.getText());
+                    ORItemSummary orItemSummary = new ORItemSummary(particularsAccount.getAccountCode(), particularsAccount.getParticulars(), amount);
+                    OR_itemList.add(orItemSummary);
+                    orItem.requestFocus();
+                    orItem.setText("");
+                    orItemAmount.setText("");
+                    reCompute();
+                    paymentTable.setItems(OR_itemList);
+                    reCompute();
+                    paymentTable.refresh();
+                }catch (Exception ex){
+                    AlertDialogBuilder.messgeDialog("System Error", "Manual O.R.:"+ex.getMessage(),
+                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }
+            }
+        });
+    }
+
     @FXML
     private void search(ActionEvent event) {
         ModalBuilder.showModalFromXMLNoClose(CashierController.class, "../cashiering/cashiering_search_consumer.fxml", Utility.getStackPane());
     }
 
+    @FXML
+    void switchORMode(ActionEvent event) {
+        resetField();
+        if(manualORToggle.isSelected()){
+            search_btn.setDisable(true);
+            manualORinput.setVisible(true);
+            name.setEditable(true);
+
+            TableColumn<ORItemSummary, String> column0 = new TableColumn<>("Account Code");
+            column0.setStyle("-fx-alignment: center-left;");
+            column0.setMinWidth(120);
+            column0.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getAccountCode()));
+
+            TableColumn<ORItemSummary, String> column1 = new TableColumn<>("Item Description");
+            column1.setMinWidth(250);
+            column1.setCellValueFactory(new PropertyValueFactory<>("description"));
+
+            TableColumn<ORItemSummary, String> column2 = new TableColumn<>("Total Amount");
+            column2.setStyle("-fx-alignment: center-right;");
+            column2.setMinWidth(100);
+            column2.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getTotalView()));
+
+            TableColumn<ORItemSummary, String> column3 = new TableColumn<>(" ");
+            column3.setPrefWidth(50);
+            column3.setMaxWidth(50);
+            column3.setMinWidth(50);
+            Callback<TableColumn<ORItemSummary, String>, TableCell<ORItemSummary, String>> column3Remove
+                    = //
+                    new Callback<TableColumn<ORItemSummary, String>, TableCell<ORItemSummary, String>>() {
+                        @Override
+                        public TableCell call(final TableColumn<ORItemSummary, String> param) {
+                            final TableCell<ORItemSummary, String> cell = new TableCell<ORItemSummary, String>() {
+
+                                FontIcon icon = new FontIcon("mdi2c-close-circle");
+                                private final JFXButton btn = new JFXButton("", icon);
+                                @Override
+                                public void updateItem(String item, boolean empty) {
+                                    super.updateItem(item, empty);
+                                    if (empty) {
+                                        setGraphic(null);
+                                        setText(null);
+                                    } else {
+                                        ORItemSummary data = getTableView().getItems().get(getIndex());
+                                        icon.setIconSize(16);
+                                        icon.setIconColor(Paint.valueOf(ColorPalette.DANGER));
+                                        btn.setOnAction(event -> {
+                                            try{
+                                                OR_itemList.remove(data);
+                                                //ObservableList<TransactionDetails> result = FXCollections.observableArrayList(newTransactionDetails);
+                                                //newItemTable.setItems(result);
+                                                paymentTable.refresh();
+                                                reCompute();
+                                            }catch (Exception e){
+                                                e.printStackTrace();
+                                                AlertDialogBuilder.messgeDialog("System Error", "Error encountered while removing item: "+ e.getMessage(),
+                                                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                            }
+                                        });
+                                        setStyle("-fx-background-color: #ffff; -fx-alignment: center; ");
+                                        setGraphic(btn);
+                                    }
+                                }
+                            };
+                            return cell;
+                        }
+                    };
+            column3.setCellFactory(column3Remove);
+
+            this.paymentTable.getColumns().add(column0);
+            this.paymentTable.getColumns().add(column1);
+            this.paymentTable.getColumns().add(column2);
+            this.paymentTable.getColumns().add(column3);
+            paymentTable.setPlaceholder(new Label("No item Added"));
+            OR_itemList =  FXCollections.observableArrayList();
+            reCompute();
+        }else{
+            search_btn.setDisable(false);
+            manualORinput.setVisible(false);
+            name.setEditable(false);
+        }
+
+    }
 
 
 
@@ -137,12 +254,13 @@ public class CashierController extends MenuControllerHandler implements Initiali
         }
     }
     private void resetField(){
-        name.setText(""); address.setText(""); purpose.setText("");// remarks.setText("");
+        name.setText(""); address.setText(""); purpose.setText("");
+        OR_itemList = null;
         date.setValue(LocalDate.now());
-        this.paymentTable.getColumns().clear();
         submitBtn.setDisable(false);
-        total.setText("");
+        total.setText("0");
         paymentTable.getColumns().clear();
+        paymentTable.getItems().clear();
         crmQueue = null;
         crmDetails = null;
         consumerInfo = null;
@@ -270,7 +388,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             column0.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getAccountCode()));
 
             TableColumn<ORItemSummary, String> column1 = new TableColumn<>("Item Description");
-            //column1.setMinWidth(250);
+            column1.setMinWidth(250);
             column1.setCellValueFactory(new PropertyValueFactory<>("description"));
 
             TableColumn<ORItemSummary, String> column2 = new TableColumn<>("Total Amount");
@@ -342,6 +460,9 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
 
     private void reCompute() {
+        if(OR_itemList == null)
+            return;
+
         double calculate = 0;
         for (ORItemSummary t : OR_itemList)
             calculate += t.getAmount();
@@ -495,6 +616,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }
     }
+
 
     @FXML
     private void submitForConfirmation(ActionEvent event) throws Exception {
@@ -714,5 +836,93 @@ public class CashierController extends MenuControllerHandler implements Initiali
             ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
         }
     }
+
+    private void bindParticularAccountInfoAutocomplete(JFXTextField textField){
+        AutoCompletionBinding<ParticularsAccount> suggestion = TextFields.bindAutoCompletion(textField,
+                param -> {
+                    //Value typed in the textfield
+                    String query = param.getUserText();
+
+                    //Initialize list of stocks
+                    List<ParticularsAccount> list = new ArrayList<>();
+
+                    //Perform DB query when length of search string is 4 or above
+                    if (query.length() >= 1){
+                        try {
+                            list = ParticularsAccountDAO.get(query);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    return list;
+                }, new StringConverter<>() {
+                    //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
+                    @Override
+                    public String toString(ParticularsAccount object) {
+                        return object.getParticulars() ;
+                    }
+
+                    @Override
+                    public ParticularsAccount fromString(String string) {
+                        throw new UnsupportedOperationException();
+                    }
+                });
+
+        //This will set the actions once the user clicks an item from the popupmenu.
+        suggestion.setOnAutoCompleted(event -> {
+            particularsAccount = event.getCompletion();
+            orItemAmount.requestFocus();
+        });
+    }
+
+    private void bindEmployeeInfoAutocomplete(JFXTextField textField){
+        AutoCompletionBinding<EmployeeInfo> employeeSuggest = TextFields.bindAutoCompletion(textField,
+                param -> {
+                    //Value typed in the textfield
+                    String query = param.getUserText();
+
+                    //Initialize list of stocks
+                    List<EmployeeInfo> list = new ArrayList<>();
+
+                    //Perform DB query when length of search string is 4 or above
+                    if (query.length() > 3){
+                        try {
+                            list = EmployeeDAO.getEmployeeInfo(query);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    return list;
+                }, new StringConverter<>() {
+                    //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
+                    @Override
+                    public String toString(EmployeeInfo object) {
+                        return object.getEmployeeFirstName() + " "+ object.getEmployeeLastName();
+                    }
+
+                    @Override
+                    public EmployeeInfo fromString(String string) {
+                        throw new UnsupportedOperationException();
+                    }
+                });
+
+        //This will set the actions once the user clicks an item from the popupmenu.
+        employeeSuggest.setOnAutoCompleted(event -> {
+            try {
+                EmployeeInfo employeeInfo = event.getCompletion();
+                User user = UserDAO.get(employeeInfo.getId());
+                tellerInfo = new Teller(user.getUserName(), employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), date.getValue());
+                this.name.setText(tellerInfo.getName());
+                this.date.setValue(date.getValue());
+                this.address.setText(tellerInfo.getAddress());
+                this.purpose.setText("for DCR O.R");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
 
 }
