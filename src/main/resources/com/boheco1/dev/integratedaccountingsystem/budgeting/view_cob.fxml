@@ -17,7 +17,7 @@
          </content>
       </ScrollPane>
       <Label layoutX="37.0" layoutY="676.0" style="-fx-font-size: 16;" text="COB Status:" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="30.0" />
-      <ComboBox fx:id="statusComboBox" layoutX="130.0" layoutY="665.0" prefHeight="25.0" prefWidth="234.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="130.0" />
+      <ComboBox fx:id="statusComboBox" layoutX="130.0" layoutY="665.0" onAction="#changeStatus" prefHeight="25.0" prefWidth="234.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="130.0" />
       <Label fx:id="totalLabel" alignment="CENTER_RIGHT" layoutX="1027.0" layoutY="680.0" prefHeight="47.0" prefWidth="320.0" style="-fx-font-size: 24pt;" text="TOTAL" textAlignment="RIGHT" AnchorPane.bottomAnchor="21.0" AnchorPane.rightAnchor="31.0" />
    </children>
 </AnchorPane>

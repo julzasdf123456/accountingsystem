@@ -2,6 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem.budgeting;
 
 import com.boheco1.dev.integratedaccountingsystem.JournalEntriesController;
 import com.boheco1.dev.integratedaccountingsystem.cashiering.ArSearchPayeeController;
+import com.boheco1.dev.integratedaccountingsystem.dao.CobDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.COB;
 import com.boheco1.dev.integratedaccountingsystem.objects.COBItem;
@@ -46,6 +47,13 @@ public class ViewCobController extends MenuControllerHandler implements Initiali
             this.items = cob.getItems();
 
             renderTable();
+
+            statusComboBox.getItems().add(COB.PENDING_REVIEW);
+            statusComboBox.getItems().add(COB.PENDING_APPROVAL);
+            statusComboBox.getItems().add(COB.APPROVED);
+            statusComboBox.getItems().add(COB.REJECTED);
+
+            statusComboBox.getSelectionModel().select(cob.getStatus());
 
             computeTotals();
         }catch(Exception ex) {
@@ -153,6 +161,24 @@ public class ViewCobController extends MenuControllerHandler implements Initiali
             cobTable.setItems(FXCollections.observableArrayList(this.items));
             computeTotals();
             modal.close();
+        }catch(Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void changeStatus() {
+        try {
+
+            if(statusComboBox.getSelectionModel().getSelectedItem().toString().equals(COB.APPROVED)) {
+                CobDAO.approveCob(cob);
+                return;
+            }
+
+            if(statusComboBox.getSelectionModel().getSelectedItem().equals(COB.PENDING_APPROVAL)) {
+                CobDAO.reviewCob(cob);
+                return;
+            }
+
         }catch(Exception ex) {
             ex.printStackTrace();
         }
