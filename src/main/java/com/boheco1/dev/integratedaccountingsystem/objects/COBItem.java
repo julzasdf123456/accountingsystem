@@ -103,4 +103,17 @@ public class COBItem extends Item{
     public void setSequence(int sequence) {
         this.sequence = sequence;
     }
+
+    public double getAmount() {
+        return this.qty * this.cost;
+    }
+
+    public String getAmountStr() {
+        return String.format("₱ %,.2f", getAmount());
+    }
+
+    public String getQtr1Str() { return String.format("₱ %,.2f", qtr1); }
+    public String getQtr2Str() { return String.format("₱ %,.2f", qtr2); }
+    public String getQtr3Str() { return String.format("₱ %,.2f", qtr3); }
+    public String getQtr4Str() { return String.format("₱ %,.2f", qtr4); }
 }
