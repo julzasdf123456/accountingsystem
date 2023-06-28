@@ -717,6 +717,11 @@ public class CashierController extends MenuControllerHandler implements Initiali
         transactionHeader.setRemarks(remarks);
         transactionHeader.setName(name.getText());
         transactionHeader.setAddress(address.getText());
+        if(manualORToggle.isSelected()){
+            transactionHeader.setTransactionLog(Utility.MANUAL_ENTRY);
+        }else {
+            transactionHeader.setTransactionLog(Utility.SYSTEM_GENERATED);
+        }
         //transactionHeader.setBank("N/A");
         //transactionHeader.setReferenceNo("N/A");
 
