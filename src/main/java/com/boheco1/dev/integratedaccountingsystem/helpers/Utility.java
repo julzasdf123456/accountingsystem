@@ -16,6 +16,9 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class Utility {
+    public static String MANUAL_ENTRY = "manual_entry";
+    public static String SYSTEM_GENERATED= "system_generated";
+
     public static boolean TOGGLE_SEARCH = true;
     public static String NOT_FOUND = "NOT FOUND";
     public static String ADDED = "ADDED";

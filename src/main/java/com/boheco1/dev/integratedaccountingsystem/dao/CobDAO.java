@@ -270,4 +270,14 @@ public class CobDAO {
         }
         return 0;
     }
+
+    public static void resetAmount(COB cob) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE COB set Amount=? WHERE COBId=?");
+        ps.setDouble(1, cob.getTotal());
+        ps.setString(2, cob.getCobId());
+        ps.executeUpdate();
+    }
+
+
 }

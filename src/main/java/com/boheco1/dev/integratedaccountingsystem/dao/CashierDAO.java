@@ -7,6 +7,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.ORItemSummary;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -178,5 +179,47 @@ public class CashierDAO {
         ps.close();
 
         return count;
+    }
+
+    public static int[] countORTransactionType(int year, int month, int day) throws SQLException, ClassNotFoundException {
+        PreparedStatement ps;
+        ResultSet rs;
+        ps = DB.getConnection().prepareStatement("" +
+                        "SELECT " +
+                        "(SELECT COUNT(TransactionLog) FROM TransactionHeader WHERE TransactionLog = 'system_generated' AND TransactionDate = '"+year+"-"+month+"-"+day+" 00:00:00') as sys_gen, " +
+                        "(SELECT COUNT(TransactionLog) FROM TransactionHeader WHERE TransactionLog = 'manual_entry' AND TransactionDate = '"+year+"-"+month+"-"+day+" 00:00:00') as manual " +
+                        "FROM TransactionHeader");
+
+        rs = ps.executeQuery();
+        int[] counter = new int[2];
+        if(rs.next()){
+            counter[0] = rs.getInt("sys_gen");
+            counter[1] = rs.getInt("manual");
+        }
+        rs.close();
+        ps.close();
+
+        return counter;
+    }
+
+    public static int[] countORTransactionType() throws SQLException, ClassNotFoundException {
+        PreparedStatement ps;
+        ResultSet rs;
+        ps = DB.getConnection().prepareStatement("" +
+                "SELECT " +
+                "(SELECT COUNT(TransactionLog) FROM TransactionHeader WHERE TransactionLog = 'system_generated' ) as sys_gen, " +
+                "(SELECT COUNT(TransactionLog) FROM TransactionHeader WHERE TransactionLog = 'manual_entry' ) as manual " +
+                "FROM TransactionHeader");
+
+        rs = ps.executeQuery();
+        int[] counter = new int[2];
+        if(rs.next()){
+            counter[0] = rs.getInt("sys_gen");
+            counter[1] = rs.getInt("manual");
+        }
+        rs.close();
+        ps.close();
+
+        return counter;
     }
 }

@@ -4,6 +4,7 @@
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXTextArea?>
 <?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.DatePicker?>
@@ -32,6 +33,7 @@
                      </VBox.margin>
                   </Label>
                   <Separator prefWidth="200.0" />
+                  <JFXToggleButton fx:id="manualORToggle" alignment="BOTTOM_LEFT" contentDisplay="RIGHT" maxWidth="1.7976931348623157E308" onAction="#switchORMode" style="-fx-font-size: 19;" text="Manual O.R." />
                   <HBox>
                      <children>
                         <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 12;" text="Date">
@@ -129,6 +131,19 @@
                      </VBox.margin>
                   </Label>
                   <Separator prefWidth="200.0" />
+                  <HBox fx:id="manualORinput" prefHeight="29.0" prefWidth="485.0">
+                     <children>
+                        <JFXTextField fx:id="orItem" prefHeight="29.0" prefWidth="242.0" promptText="O.R Item" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </JFXTextField>
+                        <JFXTextField fx:id="orItemAmount" prefHeight="29.0" prefWidth="149.0" promptText="Amount" />
+                     </children>
+                     <VBox.margin>
+                        <Insets top="6.0" />
+                     </VBox.margin>
+                  </HBox>
                   <TableView fx:id="paymentTable" maxWidth="1.7976931348623157E308" prefHeight="392.0" prefWidth="556.0" VBox.vgrow="NEVER">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />

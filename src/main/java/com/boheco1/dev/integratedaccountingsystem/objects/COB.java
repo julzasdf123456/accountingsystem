@@ -1,5 +1,8 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.CobDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.CobItemDAO;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -136,8 +139,23 @@ public class COB {
         this.dateApproved = dateApproved;
     }
 
-    public List<COBItem> getItems() {
-        return items;
+    public List<COBItem> getItems() throws Exception {
+        return CobItemDAO.getItems(this);
+    }
+
+    public double getTotal() throws Exception {
+        double total = 0;
+        for(COBItem i: getItems()) {
+            total += i.getAmount();
+        }
+        this.amount = total;
+        return this.amount;
+    }
+
+    public double resetAmount() throws Exception {
+        double amount = getTotal();
+        CobDAO.resetAmount(this);
+        return amount;
     }
 
     public void setItems(List<COBItem> items) {

@@ -24,7 +24,10 @@ public class TransactionHeader {
     private String remarks;
 
     private String name;
+
     protected String address;
+
+    private String TransactionLog;
 
     private String tinNo;
 
@@ -202,5 +205,13 @@ public class TransactionHeader {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getTransactionLog() {
+        return TransactionLog;
+    }
+
+    public void setTransactionLog(String transactionLog) {
+        TransactionLog = transactionLog;
     }
 }

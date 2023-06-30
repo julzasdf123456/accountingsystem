@@ -3,61 +3,131 @@
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="703.0" prefWidth="739.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.SearchOr">
+<AnchorPane prefHeight="703.0" prefWidth="985.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.SearchOr">
       <children>
-         <VBox layoutY="25.0" prefHeight="86.0" prefWidth="797.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="25.0">
-            <children>
-               <HBox alignment="BOTTOM_LEFT">
-                  <children>
-                     <VBox>
-                        <children>
-                           <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 11;" text="Press Enter to commit date" textFill="RED" />
-                           <DatePicker fx:id="transactionDate" prefHeight="29.0" prefWidth="148.0" promptText="Transaction Date" />
-                        </children>
-                        <HBox.margin>
-                           <Insets right="16.0" />
-                        </HBox.margin>
-                     </VBox>
-                     <JFXComboBox fx:id="transCode" focusColor="#009688" prefHeight="29.0" prefWidth="145.0" promptText="Transaction Code">
-                        <HBox.margin>
-                           <Insets right="16.0" />
-                        </HBox.margin>
-                     </JFXComboBox>
-                     <JFXTextField fx:id="orNumber" onAction="#searchOR" prefHeight="29.0" prefWidth="179.0" promptText="OR Number">
-                        <HBox.margin>
-                           <Insets right="16.0" />
-                        </HBox.margin>
-                     </JFXTextField>
-                  </children>
-                  <VBox.margin>
-                     <Insets bottom="12.0" />
-                  </VBox.margin>
-               </HBox>
-            <HBox>
-               <children>
-                     <JFXTextField fx:id="name" editable="false" prefHeight="29.0" prefWidth="320.0" promptText="Name">
-                     <HBox.margin>
-                        <Insets right="15.0" />
-                     </HBox.margin>
-                  </JFXTextField>
-                     <JFXTextField fx:id="address" editable="false" maxWidth="1.7976931348623157E308" promptText="Address" HBox.hgrow="ALWAYS" />
-               </children>
-            </HBox>
-            </children>
-         </VBox>
-         <TableView fx:id="orTable" layoutX="29.0" layoutY="152.0" prefHeight="536.0" prefWidth="695.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="152.0" />
-         <Label fx:id="totalAmount" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="15.0" layoutY="122.0" style="-fx-font-size: 20;" text="Total Amount: ">
-            <font>
-               <Font name="System Bold" size="21.0" />
-            </font>
-         </Label>
+      <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="16.0">
+        <tabs>
+          <Tab text="Search O.R.">
+               <content>
+                  <VBox>
+                     <children>
+                           <VBox prefHeight="86.0" prefWidth="797.0">
+                              <children>
+                                 <HBox alignment="BOTTOM_LEFT">
+                                    <children>
+                                       <VBox>
+                                          <children>
+                                             <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 11;" text="Press Enter to commit date" textFill="RED" />
+                                             <DatePicker fx:id="transactionDate" prefHeight="29.0" prefWidth="148.0" promptText="Transaction Date" />
+                                          </children>
+                                          <HBox.margin>
+                                             <Insets right="16.0" />
+                                          </HBox.margin>
+                                       </VBox>
+                                       <JFXComboBox fx:id="transCode" focusColor="#009688" prefHeight="29.0" prefWidth="145.0" promptText="Transaction Code">
+                                          <HBox.margin>
+                                             <Insets right="16.0" />
+                                          </HBox.margin>
+                                       </JFXComboBox>
+                                       <JFXTextField fx:id="orNumber" onAction="#searchOR" prefHeight="29.0" prefWidth="179.0" promptText="OR Number">
+                                          <HBox.margin>
+                                             <Insets right="16.0" />
+                                          </HBox.margin>
+                                       </JFXTextField>
+                                    </children>
+                                    <VBox.margin>
+                                       <Insets bottom="12.0" />
+                                    </VBox.margin>
+                                 </HBox>
+                              <HBox>
+                                 <children>
+                                       <JFXTextField fx:id="name" editable="false" prefHeight="29.0" prefWidth="320.0" promptText="Name">
+                                       <HBox.margin>
+                                          <Insets right="15.0" />
+                                       </HBox.margin>
+                                    </JFXTextField>
+                                       <JFXTextField fx:id="address" editable="false" maxWidth="1.7976931348623157E308" promptText="Address" HBox.hgrow="ALWAYS" />
+                                 </children>
+                              </HBox>
+                              </children>
+                           </VBox>
+                           <Label fx:id="totalAmount" alignment="CENTER_RIGHT" contentDisplay="RIGHT" style="-fx-font-size: 20;" text="Total Amount: ">
+                              <font>
+                                 <Font name="System Bold" size="21.0" />
+                              </font>
+                           <VBox.margin>
+                              <Insets top="16.0" />
+                           </VBox.margin>
+                           </Label>
+                           <TableView fx:id="orTable" maxHeight="1.7976931348623157E308" prefHeight="536.0" prefWidth="695.0" VBox.vgrow="ALWAYS" />
+                     </children>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </VBox>
+               </content>
+            </Tab>
+          <Tab text="View Summary">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <HBox prefHeight="268.0" prefWidth="973.0" VBox.vgrow="NEVER">
+                           <children>
+                              <VBox maxWidth="-Infinity" prefHeight="254.0" prefWidth="388.0" HBox.hgrow="NEVER">
+                                 <children>
+                                    <HBox alignment="CENTER">
+                                       <children>
+                                          <Label alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" prefHeight="29.0" prefWidth="184.0" style="-fx-font-size: 18;" text="O.R Transaction Log">
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                          <DatePicker fx:id="searchDate" layoutX="250.0" layoutY="13.0" onAction="#filterDate" prefHeight="29.0" prefWidth="129.0" promptText="Select Date" />
+                                       </children>
+                                    </HBox>
+                                    <PieChart fx:id="pieChart" labelLineLength="7.0" legendVisible="false" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="239.0" prefWidth="449.0" VBox.vgrow="ALWAYS" />
+                                 </children>
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </VBox>
+                           </children>
+                        </HBox>
+                        <HBox maxHeight="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                           <children>
+                              <TableView fx:id="transHeaderTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="386.0" prefWidth="388.0" HBox.hgrow="NEVER">
+                                 <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                                 <HBox.margin>
+                                    <Insets right="5.0" />
+                                 </HBox.margin>
+                              </TableView>
+                              <TableView fx:id="transDetailsTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+                                 <HBox.margin>
+                                    <Insets left="5.0" />
+                                 </HBox.margin>
+                              </TableView>
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="6.0" left="6.0" right="6.0" top="12.0" />
+                     </padding>
+                  </VBox>
+               </content></Tab>
+        </tabs>
+      </TabPane>
       </children>
    </AnchorPane>
