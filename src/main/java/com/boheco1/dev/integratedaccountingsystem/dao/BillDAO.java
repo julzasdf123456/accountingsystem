@@ -185,11 +185,11 @@ public class BillDAO {
      */
     public static List<Bill> getConsumerBills(ConsumerInfo consumerInfo, boolean paid) throws Exception {
         String sql = "SELECT " +
-                "BillNumber, AccountNumber, ServicePeriodEnd, ServiceDateFrom, ServiceDateTo, DueDate, ISNULL(PR,0) AS PR, ISNULL(NetMeteringNetAmount, 0) AS NetMeterAmount, " +
+                "BillNumber, AccountNumber, ServicePeriodEnd, ServiceDateFrom, ServiceDateTo, DueDate, ISNULL(PR,0) AS PR, (SELECT computemode FROM AccountMaster WHERE AccountNumber = ?) AS ComputeMode, " +
                 "ISNULL((SELECT PowerNew FROM BillsForDCRRevision a WHERE b.AccountNumber = a.AccountNumber AND b.ServicePeriodEnd = a.ServicePeriodEnd), 0) AS PowerNew, " +
                 "ISNULL((SELECT KatasBalance FROM KatasData c WHERE b.AccountNumber = c.AccountNumber AND b.ServicePeriodEnd = c.ServicePeriodEnd), 0) AS KatasAmt, " +
-                "DATEDIFF(day, DueDate, getdate()) AS daysDelayed, ISNULL(NetAmount,0) AS NetAmount, ISNULL(ConsumerType,'RM') AS ConsumerType, ISNULL(PowerKWH,0) AS PowerKWH, " +
-                "ISNULL(withPenalty, 1) AS withPenalty, " +
+                "DATEDIFF(day, DueDate, getdate()) AS daysDelayed, ISNULL(NetAmount,0) AS NetAmount, ISNULL(NetMeteringNetAmount, 0) AS NetMeterAmount, " +
+                "ISNULL(ConsumerType,'RM') AS ConsumerType, ISNULL(PowerKWH,0) AS PowerKWH, ISNULL(withPenalty, 1) AS withPenalty, " +
                 "ISNULL(Item2, 0) AS VATandTaxes, ISNULL(PR,0) AS TransformerRental, ISNULL(Others,0) AS OthersCharges, ISNULL(ACRM_TAFPPCA,0) AS ACRM_TAFPPCA, ISNULL(DAA_GRAM,0) AS DAA_GRAM " +
                 "FROM Bills b ";
         if (paid)
@@ -203,6 +203,7 @@ public class BillDAO {
 
         ps.setString(1, consumerInfo.getAccountID());
         ps.setString(2, consumerInfo.getAccountID());
+        ps.setString(3, consumerInfo.getAccountID());
 
         ResultSet rs = ps.executeQuery();
 
@@ -216,9 +217,12 @@ public class BillDAO {
                     rs.getDate("ServiceDateTo").toLocalDate(),
                     rs.getDate("DueDate").toLocalDate(),
                     rs.getDouble("NetAmount"));
-            //apply other deductions when account is netmetering, set net amount as netmeter amount
-            if (consumerInfo.getAccountID().startsWith("3232")) {
-                bill.setAmountDue(rs.getDouble("NetMeterAmount"));
+            //Set ComputeMode
+            bill.setComputeMode(rs.getString("ComputeMode"));
+            //Set NetMeteringAmount for NetMetered compute mode
+            bill.setNetMeteredAmount(rs.getDouble("NetMeterAmount"));
+            //apply other deductions when account is netmetering (based on NetMetered value in the ComputeMode of AccountMaster), set net amount as netmeter amount
+            if (bill.getComputeMode().equals(Bill.NETMETERED)) {
                 bill.setOtherAdjustment(rs.getDouble("NetAmount") - rs.getDouble("NetMeterAmount"));
             }
             Date date = rs.getDate("ServicePeriodEnd");

@@ -58,7 +58,11 @@ public class Bill {
     private String Form2307;
     private double balance;
     private boolean withPenalty;
-
+    private double NetMeteredAmount;
+    private String ComputeMode;
+    public static final String NETMETERED = "NetMetered";
+    public static final String METERED = "Metered";
+    public static final String FLAT = "NetMetered";
     public Bill(){}
 
     public Bill(String billNo, LocalDate from, LocalDate to, LocalDate dueDate, double amountDue){
@@ -446,8 +450,15 @@ public class Bill {
     }
 
     public void computeTotalAmount() {
-        double charges = this.getSurCharge() + this.getSurChargeTax() + this.getAmountDue();
+        //Default bill amount (NetAmount)
+        double amount = this.getAmountDue();
         double deductions = this.getDiscount() + this.getMdRefund() + this.getKatas() + this.getCh2306() + this.getCh2307() + this.getSlAdjustment() + this.getOtherAdjustment();
+        //Change to NetMeteringNetAmount if ComputeMode is NetMetered
+        if (this.getComputeMode().equals(Bill.NETMETERED)) {
+            amount = this.getNetMeteredAmount();
+            deductions = this.getDiscount() + this.getMdRefund() + this.getKatas() + this.getCh2306() + this.getCh2307() + this.getSlAdjustment();
+        }
+        double charges = this.getSurCharge() + this.getSurChargeTax() + amount;
         this.setTotalAmount(Utility.round(charges - deductions, 2));
         this.setBalance(Utility.round(this.getTotalAmount(), 2));
     }
@@ -570,6 +581,21 @@ public class Bill {
 
     public void setWithPenalty(boolean exemptPenalty) {
         this.withPenalty = exemptPenalty;
+    }
+
+    public double getNetMeteredAmount() {
+        return NetMeteredAmount;
+    }
+
+    public void setNetMeteredAmount(double netMeteredAmount) {
+        NetMeteredAmount = netMeteredAmount;
+    }
+
+    public String getComputeMode() {
+        return ComputeMode;
+    }
+    public void setComputeMode(String computeMode) {
+        ComputeMode = computeMode;
     }
 }
 

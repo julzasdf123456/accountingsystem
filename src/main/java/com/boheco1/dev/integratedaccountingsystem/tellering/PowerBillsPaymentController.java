@@ -1405,21 +1405,6 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering")) {
                 final ContextMenu rowMenu = new ContextMenu();
 
-                MenuItem itemRemoveBill = new MenuItem("Remove Bill");
-                itemRemoveBill.setOnAction(actionEvent -> {
-                    this.fees_table.getItems().remove(row.getItem());
-                    tv.refresh();
-                    this.setPayables();
-                    if (this.fees_table.getItems().size() == 0) {
-                        this.reset();
-                        this.resetBillInfo();
-                    }else{
-                        this.payment_tf.requestFocus();
-                        this.setBillInfo(this.bills);
-                    }
-                    this.billsNo_lbl.setText(bills.size()+"");
-                });
-
                 MenuItem itemExcludeBill = new MenuItem("Exclude Bill");
                 itemExcludeBill.setOnAction(actionEvent -> {
                     if (this.excluded_bills.size() == 0){
@@ -1591,7 +1576,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     this.payment_tf.requestFocus();
                 });
 
-                rowMenu.getItems().addAll(itemRemoveBill, new SeparatorMenuItem(), itemExcludeBill, new SeparatorMenuItem(), itemClear, new SeparatorMenuItem(), itemAddPPD, itemRemovePPD,  new SeparatorMenuItem(), itemAddSurcharge, itemWaiveSurcharge,  new SeparatorMenuItem(), item2306, item2307,  new SeparatorMenuItem(), itemSLAdj, itemRemoveSLAdj,  new SeparatorMenuItem(), itemOthersAdj, itemRemoveOthersAdj);
+                rowMenu.getItems().addAll(itemExcludeBill, new SeparatorMenuItem(), itemClear, new SeparatorMenuItem(), itemAddPPD, itemRemovePPD,  new SeparatorMenuItem(), itemAddSurcharge, itemWaiveSurcharge,  new SeparatorMenuItem(), item2306, item2307,  new SeparatorMenuItem(), itemSLAdj, itemRemoveSLAdj,  new SeparatorMenuItem(), itemOthersAdj, itemRemoveOthersAdj);
 
                 row.contextMenuProperty().bind(
                         Bindings.when(row.emptyProperty())

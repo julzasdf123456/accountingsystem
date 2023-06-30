@@ -203,12 +203,12 @@
                                  <children>
                                     <HBox prefWidth="927.0" VBox.vgrow="ALWAYS">
                                        <children>
-                                          <Label prefHeight="19.0" prefWidth="68.0" text="No. of Bills: ">
+                                          <Label prefHeight="19.0" prefWidth="58.0" text="# of Bills: ">
                                              <HBox.margin>
                                                 <Insets top="6.0" />
                                              </HBox.margin>
                                           </Label>
-                                          <Label fx:id="billsNo_lbl" alignment="CENTER" minWidth="30.0" style="-fx-border-color: #555555; -fx-background-color: #EEEEEE;" styleClass="bold" text="0" textAlignment="CENTER">
+                                          <Label fx:id="billsNo_lbl" alignment="CENTER" minWidth="24.0" style="-fx-border-color: #555555; -fx-background-color: #EEEEEE;" styleClass="bold" text="0" textAlignment="CENTER">
                                              <HBox.margin>
                                                 <Insets top="5.0" />
                                              </HBox.margin>
@@ -285,7 +285,7 @@
                                              </HBox.margin>
                                           </HBox>
                                           <HBox prefHeight="155.0" prefWidth="2.0" HBox.hgrow="ALWAYS" />
-                                          <Label prefHeight="27.0" text="Total Bill Amount">
+                                          <Label prefHeight="27.0" text="Total Payable Amount">
                                              <HBox.margin>
                                                 <Insets top="8.0" />
                                              </HBox.margin>
