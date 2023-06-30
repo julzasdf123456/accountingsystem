@@ -63,7 +63,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
     @FXML
     private TableView paymentTable;
 
-    private CRMQueue consumerInfo = null;
+    private CRMQueue customerFromCRM = null;
     private Teller tellerInfo = null;
 
     private CRMQueue crmQueue;
@@ -158,12 +158,14 @@ public class CashierController extends MenuControllerHandler implements Initiali
     }
 
     @FXML
-    void switchORMode(ActionEvent event) {
+    private void switchORMode(ActionEvent event) {
         resetField();
         if(manualORToggle.isSelected()){
             search_btn.setDisable(true);
             manualORinput.setVisible(true);
             name.setEditable(true);
+            address.setEditable(true);
+            purpose.setEditable(true);
 
             TableColumn<ORItemSummary, String> column0 = new TableColumn<>("Account Code");
             column0.setStyle("-fx-alignment: center-left;");
@@ -236,6 +238,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
             search_btn.setDisable(false);
             manualORinput.setVisible(false);
             name.setEditable(false);
+            address.setEditable(false);
+            purpose.setEditable(false);
         }
 
     }
@@ -263,7 +267,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         paymentTable.getItems().clear();
         crmQueue = null;
         crmDetails = null;
-        consumerInfo = null;
+        customerFromCRM = null;
         tellerInfo = null;
         accNum.setText("");
         prepayment.setText("");
@@ -278,12 +282,12 @@ public class CashierController extends MenuControllerHandler implements Initiali
     public void receive(Object o) {
         if (o instanceof CRMQueue) {
             resetField();
-            this.consumerInfo = (CRMQueue) o;
-            this.name.setText(consumerInfo.getConsumerName());
-            this.address.setText(consumerInfo.getConsumerAddress());
-            this.purpose.setText(consumerInfo.getTransactionPurpose());
+            this.customerFromCRM = (CRMQueue) o;
+            this.name.setText(customerFromCRM.getConsumerName());
+            this.address.setText(customerFromCRM.getConsumerAddress());
+            this.purpose.setText(customerFromCRM.getTransactionPurpose());
             tellerInfo = null;
-            initTable(consumerInfo);
+            initTable(customerFromCRM);
         }else if (o instanceof  HashMap) {
             resetField();
             TransactionHeader transactionHeader = (TransactionHeader) ((HashMap<?, ?>) o).get("TransactionHeader");
@@ -299,7 +303,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 this.purpose.setText("for DCR O.R");
                 address.setEditable(false);
                 purpose.setEditable(false);
-                consumerInfo = null;
+                customerFromCRM = null;
                 submitBtn.setDisable(false);
             }else{
                 this.address.setText(tellerInfo.getAddress());
@@ -629,8 +633,9 @@ public class CashierController extends MenuControllerHandler implements Initiali
         }
 
 
-        if(consumerInfo == null && tellerInfo == null){
-            AlertDialogBuilder.messgeDialog("System Message", "Please select consumer or teller information.",
+        if(customerFromCRM == null && tellerInfo == null && name.getText().isEmpty() && address.getText().isEmpty() && purpose.getText().isEmpty()){
+
+            AlertDialogBuilder.messgeDialog("System Message", "Please select/set consumer or teller information.",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             return;
         }
@@ -699,7 +704,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         transactionHeader.setTransactionNumber(orNumber);
         transactionHeader.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
         transactionHeader.setOffice(Utility.OFFICE_PREFIX);
-        if(consumerInfo != null) {
+        if(customerFromCRM != null) {
             transactionHeader.setSource(crmQueue.getSource());
             transactionHeader.setAccountID(crmQueue.getSourseId());//CRM Source ID
             transactionHeader.setEnteredBy(ActiveUser.getUser().getUserName());
@@ -711,10 +716,16 @@ public class CashierController extends MenuControllerHandler implements Initiali
             transactionHeader.setAccountID(ActiveUser.getUser().getId());
             transactionHeader.setAmount(collectionFromTeller);
             transactionHeader.setTransactionDate(tellerInfo.getDate());
+        }else{
+            transactionHeader.setSource("Normal Customer");
+            transactionHeader.setEnteredBy(ActiveUser.getUser().getUserName());
+            transactionHeader.setAccountID(ActiveUser.getUser().getId());
+            transactionHeader.setAmount(collectionFromTeller);
+            transactionHeader.setTransactionDate(date.getValue());
         }
         //transactionHeader.setParticulars("N/A");
         transactionHeader.setTinNo(tinNo);
-        transactionHeader.setRemarks(remarks);
+        transactionHeader.setRemarks(purpose.getText()+", "+this.remarks.getText()+", "+remarks);
         transactionHeader.setName(name.getText());
         transactionHeader.setAddress(address.getText());
         if(manualORToggle.isSelected()){
@@ -769,7 +780,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     //transactionDetails.setNote("N/A");
                     transactionDetailsList.add(transactionDetails);
                 }
-            }else if(tellerInfo != null) {
+            }else { //for teller and walk-in customer
                 int seq = 1;
                 ObservableList<ORItemSummary> temp = paymentTable.getItems();
                 for (ORItemSummary orItemSummary : temp) {
@@ -831,7 +842,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             EmployeeInfo employeeInfo = ActiveUser.getUser().getEmployeeInfo();
             orContent.setIssuedBy(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
             orContent.setTotal(Double.parseDouble(total.getText().replaceAll(",","")));
-            if(consumerInfo!=null){
+            if(customerFromCRM !=null){
                 orContent.setCustomerCollection(paymentTable.getItems());
             }else{
                 orContent.setTellerCollection(paymentTable.getItems());
@@ -897,6 +908,9 @@ public class CashierController extends MenuControllerHandler implements Initiali
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+                    }else{
+                        tellerInfo = null;
+                        customerFromCRM = null;
                     }
 
                     return list;
@@ -922,7 +936,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 this.name.setText(tellerInfo.getName());
                 this.date.setValue(date.getValue());
                 this.address.setText(tellerInfo.getAddress());
-                this.purpose.setText("for DCR O.R");
+                this.purpose.setText("for customer O.R");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
