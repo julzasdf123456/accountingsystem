@@ -157,7 +157,7 @@
                                           <HBox GridPane.rowIndex="1">
                                              <children>
                                                 <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
-                                                <TextField fx:id="totals_tf" styleClass="bold" />
+                                                <TextField fx:id="totals_tf" editable="false" styleClass="bold" />
                                              </children>
                                           </HBox>
                                           <Label prefHeight="25.0" styleClass="bold" text="1st Quarter" GridPane.columnIndex="1" />
@@ -167,25 +167,25 @@
                                           <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
                                              <children>
                                                 <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
-                                                <TextField fx:id="q1_tf" styleClass="bold" />
+                                                <TextField fx:id="q1_tf" editable="false" styleClass="bold" />
                                              </children>
                                           </HBox>
                                           <HBox GridPane.columnIndex="2" GridPane.rowIndex="1">
                                              <children>
                                                 <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
-                                                <TextField fx:id="q2_tf" styleClass="bold" />
+                                                <TextField fx:id="q2_tf" editable="false" styleClass="bold" />
                                              </children>
                                           </HBox>
                                           <HBox GridPane.columnIndex="3" GridPane.rowIndex="1">
                                              <children>
                                                 <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
-                                                <TextField fx:id="q3_tf" styleClass="bold" />
+                                                <TextField fx:id="q3_tf" editable="false" styleClass="bold" />
                                              </children>
                                           </HBox>
                                           <HBox GridPane.columnIndex="4" GridPane.rowIndex="1">
                                              <children>
                                                 <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
-                                                <TextField fx:id="q4_tf" styleClass="bold" />
+                                                <TextField fx:id="q4_tf" editable="false" styleClass="bold" />
                                              </children>
                                           </HBox>
                                        </children>

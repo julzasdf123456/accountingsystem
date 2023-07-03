@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.budgeting;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.ItemDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ObjectTransaction;
@@ -8,14 +9,17 @@ import com.boheco1.dev.integratedaccountingsystem.objects.COBItem;
 import com.boheco1.dev.integratedaccountingsystem.objects.Item;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.util.StringConverter;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.TextFields;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class AddItemController extends MenuControllerHandler implements Initializable {
@@ -67,7 +71,7 @@ public class AddItemController extends MenuControllerHandler implements Initiali
 
     private ObjectTransaction parentController = null;
     private COBItem item = null;
-    private Item storedItem = null;
+    private Item selectedItem = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -80,8 +84,11 @@ public class AddItemController extends MenuControllerHandler implements Initiali
         this.exists_check.setSelected(true);
         this.unit_tf.setEditable(false);
         this.unit_tf.setText("");
+        this.bindAutoSuggest(description_tf);
         this.exists_check.setOnAction(evt ->{
+            this.selectedItem = null;
             this.unit_tf.setText("");
+            this.cost_tf.setText("");
             if (exists_check.isSelected()){
                 this.price_lbl.setText("Price");
                 this.unit_lbl.setText("Unit");
@@ -124,6 +131,11 @@ public class AddItemController extends MenuControllerHandler implements Initiali
             addItem();
         });
 
+        //Add item when enter key is pressed
+        this.qty_tf.setOnAction(evt -> {
+            addItem();
+        });
+
         //Add item when button is clicked
         this.add_btn.setOnAction(evt -> {
             addItem();
@@ -154,7 +166,7 @@ public class AddItemController extends MenuControllerHandler implements Initiali
                 }
             }
         });
-
+        this.bindAutoSuggest(description_tf);
         this.parentController = Utility.getParentController();
     }
     public void addItem(){
@@ -171,12 +183,12 @@ public class AddItemController extends MenuControllerHandler implements Initiali
             String q4S = this.q4_tf.getText();
 
             this.item = new COBItem();
-
+            this.item.setcItemId(Utility.generateRandomId());
             //If item is from database
-            if (this.exists_check.isSelected() && this.storedItem != null){
-                this.item.setItemId(this.storedItem.getItemId());
-                this.item.setDescription(this.storedItem.getParticulars());
-                this.item.setRemarks(this.storedItem.getUnit());
+            if (this.exists_check.isSelected() && this.selectedItem != null){
+                this.item.setItemId(this.selectedItem.getItemId());
+                this.item.setDescription(this.selectedItem.getParticulars());
+                this.item.setRemarks(this.selectedItem.getUnit());
             //Else, selected is open-ended item
             }else{
                 this.item.setDescription(desc);
@@ -230,6 +242,7 @@ public class AddItemController extends MenuControllerHandler implements Initiali
     public void reset(){
         this.status_lbl.setText("");
         this.item = null;
+        this.selectedItem = null;
         this.description_tf.setText("");
         this.cost_tf.setText("");
         this.unit_tf.setText("");
@@ -256,13 +269,12 @@ public class AddItemController extends MenuControllerHandler implements Initiali
                 status_lbl.setText("");
                 add_btn.setDisable(false);
             }else{
-                status_lbl.setText("The sum of amount per quarter is not equal to the total amount!");
+                status_lbl.setText("The total amount per quarter is not equal to the grand total amount !");
                 add_btn.setDisable(true);
             }
         } catch (Exception e) {
 
         }
-        System.out.println("Total: "+total);
     }
 
     public void costUpdate(String c, String q){
@@ -281,6 +293,42 @@ public class AddItemController extends MenuControllerHandler implements Initiali
 
         }
     }
+    public void bindAutoSuggest(JFXTextField textField){
+        AutoCompletionBinding<Item> suggest = TextFields.bindAutoCompletion(textField,
+                param -> {
+                    //Value typed in the textfield
+                    String query = param.getUserText();
+                    //Initialize list of stocks
+                    List<Item> list = new ArrayList<>();
+                    if (query.length() >= 3 && exists_check.isSelected()){
+                        try {
+                            list = ItemDAO.searchItems(query);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    return list;
+                }, new StringConverter<>() {
+                    @Override
+                    public String toString(Item o) {
+                        return o.getParticulars();
+                    }
+                    @Override
+                    public Item fromString(String string) {
+                        throw new UnsupportedOperationException();
+                    }
+                });
+        suggest.setOnAutoCompleted(event -> {
+            selectedItem = event.getCompletion();
+            description_tf.setText(selectedItem.getParticulars());
+            if (selectedItem.getPrice() > 0) {
+                cost_tf.setText(Utility.formatDecimal(selectedItem.getPrice()));
+                unit_tf.setText(selectedItem.getUnit());
+                qty_tf.requestFocus();
+            }
+        });
+    }
+
     public JFXButton getAdd_btn() {
         return this.add_btn;
     }

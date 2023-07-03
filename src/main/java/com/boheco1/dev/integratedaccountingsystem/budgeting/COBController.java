@@ -16,9 +16,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-
+import javafx.scene.paint.Paint;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.*;
 
 public class COBController extends MenuControllerHandler implements Initializable, ObjectTransaction {
@@ -85,6 +86,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
     private DeptThreshold threshold = null;
     private double totalAppropriations = 0, cobAmount = 0, appropFromDB = 0;
     private String totalBudget = "Current Total Appropriation: ₱ %.2f out of ₱ %.2f Department Threshold!";
+    private String dept;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -95,9 +97,11 @@ public class COBController extends MenuControllerHandler implements Initializabl
             this.threshold = DeptThresholdDAO.find(this.app.getAppId(), ActiveUser.getUser().getEmployeeInfo().getDepartmentID());
             this.totalAppropriations = DeptThresholdDAO.getTotalAppropriations(threshold);
             this.appropFromDB = this.totalAppropriations;
-            String dept = ActiveUser.getUser().getEmployeeInfo().getDepartment().getDepartmentName();
+            EmployeeInfo emp = ActiveUser.getUser().getEmployeeInfo();
+            this.dept = emp.getDepartment().getDepartmentName();
             this.cn_tf.setText(this.app.getYear()+"-"+dept+"-"+ (CobDAO.countCob(dept)+1));
             this.board_res_tf.setText(this.app.getBoardRes());
+            this.prepared_tf.setText(emp.getEmployeeFirstName()+" "+emp.getEmployeeLastName());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -140,13 +144,72 @@ public class COBController extends MenuControllerHandler implements Initializabl
                 this.setAmount();
             });
 
-            MenuItem dist = new MenuItem("Distribute");
+            MenuItem child = new MenuItem("=>");
+            child.setOnAction(actionEvent -> {
+                for (Object item:  this.cob_items.getItems()) {
+                    COBItem curr = (COBItem) item;
+                    if (curr.getCost() == 0
+                            && !curr.getcItemId().equals(row.getItem().getcItemId())) {
+                        row.getItem().setScopeId(curr.getcItemId());
+                        break;
+                    }
+                }
+                this.cob_items.refresh();
+            });
+
+            MenuItem parent = new MenuItem("<=");
+            parent.setOnAction(actionEvent -> {
+                row.getItem().setScopeId(null);
+                this.cob_items.refresh();
+            });
+
+            MenuItem dist = new MenuItem("Distribute Per Qtr");
             dist.setOnAction(actionEvent -> {
                 double qtr = (row.getItem().getCost() * row.getItem().getQty()) / 4;
                 row.getItem().setQtr1(qtr);
                 row.getItem().setQtr2(qtr);
                 row.getItem().setQtr3(qtr);
                 row.getItem().setQtr4(qtr);
+                this.cob_items.refresh();
+                this.setAmount();
+            });
+
+            MenuItem q1 = new MenuItem("Set to Qtr 1");
+            q1.setOnAction(actionEvent -> {
+                row.getItem().setQtr1(row.getItem().getCost() * row.getItem().getQty());
+                row.getItem().setQtr2(0);
+                row.getItem().setQtr3(0);
+                row.getItem().setQtr4(0);
+                this.cob_items.refresh();
+                this.setAmount();
+            });
+
+            MenuItem q2 = new MenuItem("Set to Qtr 2");
+            q2.setOnAction(actionEvent -> {
+                row.getItem().setQtr2(row.getItem().getCost() * row.getItem().getQty());
+                row.getItem().setQtr1(0);
+                row.getItem().setQtr3(0);
+                row.getItem().setQtr4(0);
+                this.cob_items.refresh();
+                this.setAmount();
+            });
+
+            MenuItem q3 = new MenuItem("Set to Qtr 3");
+            q3.setOnAction(actionEvent -> {
+                row.getItem().setQtr3(row.getItem().getCost() * row.getItem().getQty());
+                row.getItem().setQtr2(0);
+                row.getItem().setQtr1(0);
+                row.getItem().setQtr4(0);
+                this.cob_items.refresh();
+                this.setAmount();
+            });
+
+            MenuItem q4 = new MenuItem("Set to Qtr 4");
+            q4.setOnAction(actionEvent -> {
+                row.getItem().setQtr4(row.getItem().getCost() * row.getItem().getQty());
+                row.getItem().setQtr2(0);
+                row.getItem().setQtr3(0);
+                row.getItem().setQtr1(0);
                 this.cob_items.refresh();
                 this.setAmount();
             });
@@ -159,13 +222,17 @@ public class COBController extends MenuControllerHandler implements Initializabl
                 this.setAmount();
             });
 
-            rowMenu.getItems().addAll(remove, new SeparatorMenuItem(), dist, new SeparatorMenuItem(), removeAll);
+            rowMenu.getItems().addAll(remove, new SeparatorMenuItem(), child, parent, new SeparatorMenuItem(), dist, q1, q2, q3, q4, new SeparatorMenuItem(), removeAll);
 
             row.contextMenuProperty().bind(
             Bindings.when(row.emptyProperty())
                     .then((ContextMenu) null)
                     .otherwise(rowMenu));
             return row;
+        });
+
+        this.submit_btn.setOnAction(evt ->{
+            this.submitCOB();
         });
 
         this.reset_btn.setOnAction(evt ->{
@@ -256,6 +323,65 @@ public class COBController extends MenuControllerHandler implements Initializabl
     }
 
     /**
+     * Insert COB
+     * @return void
+     */
+    public void submitCOB(){
+        final String cn = this.cn_tf.getText();
+        final String activity = this.activity_tf.getText();
+        double amount = 0;
+        try {
+            amount = Double.parseDouble(this.totals_tf.getText().replace(",", ""));
+        }catch (Exception e){
+
+        }
+        if (cn.isEmpty()) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide the control number! Format: YEAR-DEPT-NO",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }else if (activity.isEmpty()) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide the major activity title for this budget!",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }else if (this.fs_cb.getSelectionModel().getSelectedItem() == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please select the fund source!",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }else if (this.items.size() == 0) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please add the projected expenses for this COB!",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }else if (amount == 0) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please add the projected expenses for this COB!",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }else {
+            JFXButton accept = new JFXButton("Proceed");
+            JFXDialog dialog = DialogBuilder.showConfirmDialog("Submit COB", "This process is final. Confirm submission?", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+            accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+            final double amt = amount;
+            accept.setOnAction(__ -> {
+                dialog.close();
+                try {
+                    final String fsid = this.fs_cb.getSelectionModel().getSelectedItem().getFsId();
+                    COB cob = new COB();
+                    cob.setAppId(this.app.getAppId());
+                    cob.setCobId(cn);
+                    cob.setFsId(fsid);
+                    cob.setActivity(activity);
+                    cob.setAmount(amt);
+                    cob.setItems(this.items);
+                    CobDAO.createCOB(cob);
+                    reset();
+                    this.cn_tf.setText(this.app.getYear()+"-"+dept+"-"+ (CobDAO.countCob(dept)+1));
+                    AlertDialogBuilder.messgeDialog("Submit COB", "The COB was successfully submitted and awaiting review by your department head!",
+                            Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                } catch (SQLException e) {
+                    AlertDialogBuilder.messgeDialog("System Error", "An SQL error occurred: " + e.getMessage(),
+                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                } catch (Exception e) {
+                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred: " + e.getMessage(),
+                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }
+            });
+        }
+    }
+    /**
      * Displays Add Item UI
      * @return void
      */
@@ -314,6 +440,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
                 @Override
                 protected Void call() {
                     COBItem item = (COBItem) o;
+                    item.setSequence(items.size()+1);
                     items.add(item);
                     return null;
                 }

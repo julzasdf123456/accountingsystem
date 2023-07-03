@@ -5,31 +5,21 @@ import com.boheco1.dev.integratedaccountingsystem.dao.ConsumerDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTextField;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.print.Printer;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-
-import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class ViewConsumerBillsController extends MenuControllerHandler implements Initializable, ObjectTransaction {
@@ -181,8 +171,9 @@ public class ViewConsumerBillsController extends MenuControllerHandler implement
         this.bapa_tf.setText("");
         this.acct_no_tf.setText("");
         this.bills = FXCollections.observableArrayList(new ArrayList<>());
+        this.paidbills = FXCollections.observableArrayList(new ArrayList<>());
         this.fees_table.setItems(this.bills);
-        this.consumerBills_table.setItems(this.bills);
+        this.consumerBills_table.setItems(this.paidbills);
         this.acct_no_tf.requestFocus();
         this.unpaidBills_lbl.setText("0");
         this.unpaidBills_amount_lbl.setText("0");

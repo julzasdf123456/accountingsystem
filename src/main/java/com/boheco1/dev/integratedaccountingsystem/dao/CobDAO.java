@@ -1,7 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
-import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
 import java.sql.Connection;
@@ -75,13 +74,11 @@ public class CobDAO {
             ps_cob.setDouble(5, cob.getAmount());
             ps_cob.setString(6, COB.PENDING_REVIEW);
             ps_cob.setString(7, ActiveUser.getUser().getEmployeeID());
-            ps_cob.setDate(8, java.sql.Date.valueOf(cob.getDatePrepared()));
             ps_cob.executeUpdate();
 
             //Insert cob items
             for (COBItem item : cob.getItems()) {
-                String rndKey = Utility.generateRandomId();
-                ps_item.setString(1, rndKey);
+                ps_item.setString(1, item.getcItemId());
                 ps_item.setString(2, item.getItemId());
                 ps_item.setString(3, cob.getCobId());
                 ps_item.setInt(4, item.getQty());
@@ -98,6 +95,7 @@ public class CobDAO {
             //Commit insert
             conn.commit();
         }catch (SQLException e){
+            e.printStackTrace();
             //If error, rollback
             conn.rollback();
         }
@@ -152,8 +150,7 @@ public class CobDAO {
 
             //Insert current cob items
             for (COBItem item : cob.getItems()) {
-                String rndKey = Utility.generateRandomId();
-                ps_item.setString(1, rndKey);
+                ps_item.setString(1, item.getcItemId());
                 ps_item.setString(2, item.getItemId());
                 ps_item.setString(3, cob.getCobId());
                 ps_item.setInt(4, item.getQty());

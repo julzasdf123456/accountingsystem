@@ -139,8 +139,12 @@ public class COB {
         this.dateApproved = dateApproved;
     }
 
-    public List<COBItem> getItems() throws Exception {
+    public List<COBItem> getItemsFromDB() throws Exception {
         return CobItemDAO.getItems(this);
+    }
+
+    public List<COBItem> getItems() throws Exception {
+        return this.items;
     }
 
     public double getTotal() throws Exception {
