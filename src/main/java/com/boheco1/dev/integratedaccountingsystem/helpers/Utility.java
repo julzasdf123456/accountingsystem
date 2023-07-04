@@ -389,4 +389,12 @@ public class Utility {
     }
 
     public static COB getSelectedCOB() { return selectedCOB; }
+
+    public static String getHostProperty() throws Exception {
+        Properties props = new Properties();
+        InputStream is = new FileInputStream("application.properties");
+        props.load(is);
+
+        return props.getProperty("host");
+    }
 }

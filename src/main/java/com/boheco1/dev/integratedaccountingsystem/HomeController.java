@@ -356,10 +356,13 @@ public class HomeController implements Initializable {
             LocalDateTime now = LocalDateTime.now();
             String dateStr = now.format(DateTimeFormatter.ofPattern("MMM dd, YYYY"));
             String timeStr = now.format(DateTimeFormatter.ofPattern("HH:MM"));
+//            String dbUrl = DB.getConnection().getMetaData().getURL();
+//            String serverIP = dbUrl.substring(dbUrl.indexOf('/')+2, dbUrl.lastIndexOf(":"));
             NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("User: " + ActiveUser.getUser().getFullName()), new FontIcon("mdi2a-account"), homeStackPane);
-            NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Date/Time: " + dateStr + " " + timeStr), new FontIcon("mdi2c-calendar"), homeStackPane);
-            NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Office: " + Utility.getOfficeProperty()), new FontIcon("mdi2o-office-building"), homeStackPane);
-            NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Server: " + DB.getConnection().getCatalog()), new FontIcon("mdi2s-server"), homeStackPane);
+            NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Date: " + dateStr), new FontIcon("mdi2c-calendar"), homeStackPane);
+            NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Server IP: " + Utility.getHostProperty()), new FontIcon("mdi2o-office-building"), homeStackPane);
+            NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Database: " + DB.getConnection().getCatalog()), new FontIcon("mdi2s-server"), homeStackPane);
+
         }catch(Exception ex) {
             ex.printStackTrace();
         }
