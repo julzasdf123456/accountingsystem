@@ -193,12 +193,12 @@ public class SearchOr extends MenuControllerHandler implements Initializable {
         transHeaderTableColumn1.setStyle("-fx-alignment: center-left;");
         transHeaderTableColumn1.setCellValueFactory(new PropertyValueFactory<>("transactionNumber"));
 
-        TableColumn<TransactionHeader, String> transHeaderTableColumn2 = new TableColumn<>("Code");
+        TableColumn<TransactionHeader, String> transHeaderTableColumn2 = new TableColumn<>("Entered By");
         transHeaderTableColumn2.setMinWidth(100);
         transHeaderTableColumn2.setMaxWidth(100);
         transHeaderTableColumn2.setPrefWidth(100);
         transHeaderTableColumn2.setStyle("-fx-alignment: center-left;");
-        transHeaderTableColumn2.setCellValueFactory(new PropertyValueFactory<>("transactionCode"));
+        transHeaderTableColumn2.setCellValueFactory(new PropertyValueFactory<>("enteredBy"));
 
         TableColumn<TransactionHeader, String> transHeaderTableColumn3 = new TableColumn<>("Name");
         transHeaderTableColumn3.setStyle("-fx-alignment: center-left;");

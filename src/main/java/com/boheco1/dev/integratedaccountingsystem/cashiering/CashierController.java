@@ -166,73 +166,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             name.setEditable(true);
             address.setEditable(true);
             purpose.setEditable(true);
-
-            TableColumn<ORItemSummary, String> column0 = new TableColumn<>("Account Code");
-            column0.setStyle("-fx-alignment: center-left;");
-            column0.setMinWidth(120);
-            column0.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getAccountCode()));
-
-            TableColumn<ORItemSummary, String> column1 = new TableColumn<>("Item Description");
-            column1.setMinWidth(250);
-            column1.setCellValueFactory(new PropertyValueFactory<>("description"));
-
-            TableColumn<ORItemSummary, String> column2 = new TableColumn<>("Total Amount");
-            column2.setStyle("-fx-alignment: center-right;");
-            column2.setMinWidth(100);
-            column2.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getTotalView()));
-
-            TableColumn<ORItemSummary, String> column3 = new TableColumn<>(" ");
-            column3.setPrefWidth(50);
-            column3.setMaxWidth(50);
-            column3.setMinWidth(50);
-            Callback<TableColumn<ORItemSummary, String>, TableCell<ORItemSummary, String>> column3Remove
-                    = //
-                    new Callback<TableColumn<ORItemSummary, String>, TableCell<ORItemSummary, String>>() {
-                        @Override
-                        public TableCell call(final TableColumn<ORItemSummary, String> param) {
-                            final TableCell<ORItemSummary, String> cell = new TableCell<ORItemSummary, String>() {
-
-                                FontIcon icon = new FontIcon("mdi2c-close-circle");
-                                private final JFXButton btn = new JFXButton("", icon);
-                                @Override
-                                public void updateItem(String item, boolean empty) {
-                                    super.updateItem(item, empty);
-                                    if (empty) {
-                                        setGraphic(null);
-                                        setText(null);
-                                    } else {
-                                        ORItemSummary data = getTableView().getItems().get(getIndex());
-                                        icon.setIconSize(16);
-                                        icon.setIconColor(Paint.valueOf(ColorPalette.DANGER));
-                                        btn.setOnAction(event -> {
-                                            try{
-                                                OR_itemList.remove(data);
-                                                //ObservableList<TransactionDetails> result = FXCollections.observableArrayList(newTransactionDetails);
-                                                //newItemTable.setItems(result);
-                                                paymentTable.refresh();
-                                                reCompute();
-                                            }catch (Exception e){
-                                                e.printStackTrace();
-                                                AlertDialogBuilder.messgeDialog("System Error", "Error encountered while removing item: "+ e.getMessage(),
-                                                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-                                            }
-                                        });
-                                        setStyle("-fx-background-color: #ffff; -fx-alignment: center; ");
-                                        setGraphic(btn);
-                                    }
-                                }
-                            };
-                            return cell;
-                        }
-                    };
-            column3.setCellFactory(column3Remove);
-
-            this.paymentTable.getColumns().add(column0);
-            this.paymentTable.getColumns().add(column1);
-            this.paymentTable.getColumns().add(column2);
-            this.paymentTable.getColumns().add(column3);
-            paymentTable.setPlaceholder(new Label("No item Added"));
-            OR_itemList =  FXCollections.observableArrayList();
+            initTableForManualOR();
             reCompute();
         }else{
             search_btn.setDisable(false);
@@ -244,6 +178,75 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     }
 
+    private void initTableForManualOR() {
+        paymentTable.getColumns().clear();
+        TableColumn<ORItemSummary, String> column0 = new TableColumn<>("Account Code");
+        column0.setStyle("-fx-alignment: center-left;");
+        column0.setMinWidth(120);
+        column0.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getAccountCode()));
+
+        TableColumn<ORItemSummary, String> column1 = new TableColumn<>("Item Description");
+        column1.setMinWidth(250);
+        column1.setCellValueFactory(new PropertyValueFactory<>("description"));
+
+        TableColumn<ORItemSummary, String> column2 = new TableColumn<>("Total Amount");
+        column2.setStyle("-fx-alignment: center-right;");
+        column2.setMinWidth(100);
+        column2.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getTotalView()));
+
+        TableColumn<ORItemSummary, String> column3 = new TableColumn<>(" ");
+        column3.setPrefWidth(50);
+        column3.setMaxWidth(50);
+        column3.setMinWidth(50);
+        Callback<TableColumn<ORItemSummary, String>, TableCell<ORItemSummary, String>> column3Remove
+                = //
+                new Callback<TableColumn<ORItemSummary, String>, TableCell<ORItemSummary, String>>() {
+                    @Override
+                    public TableCell call(final TableColumn<ORItemSummary, String> param) {
+                        final TableCell<ORItemSummary, String> cell = new TableCell<ORItemSummary, String>() {
+
+                            FontIcon icon = new FontIcon("mdi2c-close-circle");
+                            private final JFXButton btn = new JFXButton("", icon);
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    ORItemSummary data = getTableView().getItems().get(getIndex());
+                                    icon.setIconSize(16);
+                                    icon.setIconColor(Paint.valueOf(ColorPalette.DANGER));
+                                    btn.setOnAction(event -> {
+                                        try{
+                                            OR_itemList.remove(data);
+                                            //ObservableList<TransactionDetails> result = FXCollections.observableArrayList(newTransactionDetails);
+                                            //newItemTable.setItems(result);
+                                            paymentTable.refresh();
+                                            reCompute();
+                                        }catch (Exception e){
+                                            e.printStackTrace();
+                                            AlertDialogBuilder.messgeDialog("System Error", "Error encountered while removing item: "+ e.getMessage(),
+                                                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                        }
+                                    });
+                                    setStyle("-fx-background-color: #ffff; -fx-alignment: center; ");
+                                    setGraphic(btn);
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+        column3.setCellFactory(column3Remove);
+
+        this.paymentTable.getColumns().add(column0);
+        this.paymentTable.getColumns().add(column1);
+        this.paymentTable.getColumns().add(column2);
+        this.paymentTable.getColumns().add(column3);
+        paymentTable.setPlaceholder(new Label("No item Added"));
+        OR_itemList =  FXCollections.observableArrayList();
+    }
 
 
     @FXML
@@ -259,12 +262,13 @@ public class CashierController extends MenuControllerHandler implements Initiali
     }
     private void resetField(){
         name.setText(""); address.setText(""); purpose.setText("");
-        OR_itemList = null;
         date.setValue(LocalDate.now());
         submitBtn.setDisable(false);
         total.setText("0");
         paymentTable.getColumns().clear();
         paymentTable.getItems().clear();
+        initTableForManualOR();
+
         crmQueue = null;
         crmDetails = null;
         customerFromCRM = null;
@@ -715,7 +719,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             transactionHeader.setEnteredBy(tellerInfo.getUsername());
             transactionHeader.setAccountID(ActiveUser.getUser().getId());
             transactionHeader.setAmount(collectionFromTeller);
-            transactionHeader.setTransactionDate(tellerInfo.getDate());
+            transactionHeader.setTransactionDate(date.getValue());
         }else{
             transactionHeader.setSource("Normal Customer");
             transactionHeader.setEnteredBy(ActiveUser.getUser().getUserName());
