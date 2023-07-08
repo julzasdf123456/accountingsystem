@@ -420,6 +420,33 @@ public class TransactionDetailsDAO {
         }
     }
 
+    public static void syncAR(TransactionHeader th, double amount) throws Exception {
+        PreparedStatement psx = DB.getConnection().prepareStatement("SELECT * FROM TransactionDetails td WHERE td.Period=? AND td.TransactionNumber=? AND td.TransactionCode=? AND td.AccountSequence=999");
+        psx.setDate(1, java.sql.Date.valueOf(th.getPeriod()));
+        psx.setString(2, th.getTransactionNumber());
+        psx.setString(3, th.getTransactionCode());
+        ResultSet rs = psx.executeQuery();
+
+        if(rs.next()) {
+            PreparedStatement ps1 = DB.getConnection().prepareStatement("UPDATE TransactionDetails SET debit=? WHERE td.Period=? AND td.TransactionNumber=? AND td.TransactionCode=? AND td.AccountSequence=999 ");
+            ps1.setDouble(1, amount);
+            ps1.setDate(2, java.sql.Date.valueOf(th.getPeriod()));
+            ps1.setString(3, th.getTransactionNumber());
+            ps1.setString(4, th.getTransactionCode());
+            ps1.executeUpdate();
+        }else {
+            TransactionDetails td = new TransactionDetails();
+            td.setPeriod(th.getPeriod());
+            td.setTransactionNumber(th.getTransactionNumber());
+            td.setTransactionCode(th.getTransactionCode());
+            td.setDebit(amount);
+            td.setSequenceNumber(999);
+            td.setTransactionDate(th.getTransactionDate());
+            td.setAccountCode(Utility.getAccountCodeProperty());
+            TransactionDetailsDAO.add(td);
+        }
+    }
+
     public static void delete(TransactionDetails td) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement("DELETE FROM TransactionDetails " +
                 "WHERE Period=? AND TransactionNumber=? AND TransactionCode=? AND AccountSequence=? AND Debit=?");

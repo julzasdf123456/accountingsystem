@@ -112,7 +112,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         accountDescriptionCol.setCellValueFactory(new PropertyValueFactory<TransactionDetails, String>("particulars"));
 
         TableColumn amountCol = new TableColumn<BankAccount, String>("Amount");
-        amountCol.setCellValueFactory(new PropertyValueFactory<TransactionDetails, Double>("formattedDebit"));
+        amountCol.setCellValueFactory(new PropertyValueFactory<TransactionDetails, Double>("formattedARAmount"));
         amountCol.setStyle( "-fx-alignment: CENTER-RIGHT;");
 
         breakdownTable.getColumns().add(accountCodeCol);
@@ -126,7 +126,8 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
     private void recomputeTotal() {
         total = 0;
         for(TransactionDetails td: transactionDetails) {
-            total += td.getDebit();
+            total += td.getCredit();
+            total -= td.getDebit();
         }
         totalLabel.setText(String.format("₱ %,.2f", total));
     }
@@ -179,6 +180,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             currentTransaction.setRemarks(paymentFor.getText());
             currentTransaction.setName(receivedFrom.getText());
             currentTransaction.setAddress(address.getText());
+            currentTransaction.setAmount(total);
             try {
                 TransactionHeaderDAO.add(currentTransaction);
             }catch(Exception ex) {
@@ -203,7 +205,10 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
                     num++;
                 }
             }
-            TransactionDetailsDAO.syncDebit(currentTransaction.getPeriod(), currentTransaction.getTransactionNumber(),"AR");
+            //Add debit entry based on total credits
+            recomputeTotal();
+            TransactionDetailsDAO.syncAR(currentTransaction, total);
+
             AlertDialogBuilder.messgeDialog("Saved!", (isNew ? "New AR transaction saved with " : "Current AR saved with ") + num + " new " + (num>1? " items." : "item"),
                     stackPane, AlertDialogBuilder.INFO_DIALOG);
         }catch(Exception ex) {
@@ -277,13 +282,14 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         try {
             String entry = amount.getText();
 
-            if(entry.isEmpty()) {
+            if (entry.isEmpty()) {
                 amountInWords.setText(null);
                 return;
             }
 
             double amt = Double.parseDouble(entry);
             amountInWords.setText(Utility.doubleAmountToWords(amt));
+        }catch(IllegalArgumentException ex1) {
         }catch(Exception ex) {
             ex.printStackTrace();
             AlertDialogBuilder.messgeDialog("Error!", ex.getMessage(),
@@ -303,9 +309,16 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         TransactionDetails td = new TransactionDetails();
         ParticularsAccount pa = accountDescription.getSelectionModel().getSelectedItem();
         try {
+
+            double amt = Double.parseDouble(amount.getText());
             td.setAccountCode(pa.getAccountCode());
             td.setParticulars(pa.getParticulars());
-            td.setDebit(Double.parseDouble(amount.getText()));
+
+            if(amt>=0) {
+                td.setCredit(amt);
+            }else {
+                td.setDebit(Math.abs(amt));
+            }
 
             transactionDetails.add(td);
 

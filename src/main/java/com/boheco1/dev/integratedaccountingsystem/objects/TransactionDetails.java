@@ -187,4 +187,12 @@ public class TransactionDetails {
     public String getFormattedDebit() {
         return String.format("%,.2f", debit);
     }
+
+    public String getFormattedARAmount() {
+        if(this.credit>0) {
+            return String.format("%,.2f", this.credit);
+        }else {
+            return String.format("(%,.2f)", this.debit);
+        }
+    }
 }
