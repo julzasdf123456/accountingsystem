@@ -121,6 +121,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
         breakdownTable.setItems(transactionDetails);
         breakdownTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        recomputeTotal();
     }
 
     private void recomputeTotal() {
@@ -208,6 +209,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             //Add debit entry based on total credits
             recomputeTotal();
             TransactionDetailsDAO.syncAR(currentTransaction, total);
+            TransactionHeaderDAO.updateAmount(currentTransaction, total);
 
             AlertDialogBuilder.messgeDialog("Saved!", (isNew ? "New AR transaction saved with " : "Current AR saved with ") + num + " new " + (num>1? " items." : "item"),
                     stackPane, AlertDialogBuilder.INFO_DIALOG);
@@ -377,7 +379,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             orDate.setValue(currentTransaction.getTransactionDate());
 
             transactionDetails.clear();
-            transactionDetails.addAll(TransactionDetailsDAO.getDebitOnly(currentTransaction.getPeriod(), currentTransaction.getTransactionNumber(), "AR"));
+            transactionDetails.addAll(TransactionDetailsDAO.getAR(currentTransaction.getTransactionDate(), currentTransaction.getTransactionNumber()));
             paymentFor.setEditable(false);
             receivedFrom.setEditable(false);
             recomputeTotal();

@@ -293,6 +293,18 @@ public class TransactionHeaderDAO {
 
     }
 
+    public static void updateAmount(TransactionHeader th, double amount) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE TransactionHeader SET Amount=? " +
+                        "WHERE TransactionNumber=? " +
+                        "AND TransactionDate=? AND " +
+                        "TransactionCode='AR'");
+        ps.setDouble(1, amount);
+        ps.setString(2, th.getTransactionNumber());
+        ps.setDate(3, java.sql.Date.valueOf(th.getTransactionDate()));
+        ps.executeUpdate();
+    }
+
     public static int getNextARNumber() throws Exception {
         ResultSet rs = DB.getConnection().createStatement().executeQuery(
                 "SELECT TransactionNumber FROM TransactionHeader WHERE TransactionCode='AR' ORDER BY TransactionDate DESC, TransactionNumber DESC");

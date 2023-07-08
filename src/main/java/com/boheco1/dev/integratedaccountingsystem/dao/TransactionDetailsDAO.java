@@ -145,13 +145,12 @@ public class TransactionDetailsDAO {
 
 
 
-    public static List<TransactionDetails> getDebitOnly(LocalDate period, String transactionNumber, String transactionCode) throws Exception {
+    public static List<TransactionDetails> getAR(LocalDate transactionDate, String transactionNumber) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM TransactionDetails WHERE period=? AND TransactionNumber=? " +
-                        "AND TransactionCode=? AND Debit>0 AND Credit=0");
-        ps.setDate(1, java.sql.Date.valueOf(period));
+                "SELECT * FROM TransactionDetails WHERE TransactionDate=? AND TransactionNumber=? " +
+                        "AND TransactionCode='AR' AND AccountSequence!=999");
+        ps.setDate(1, java.sql.Date.valueOf(transactionDate));
         ps.setString(2, transactionNumber);
-        ps.setString(3, transactionCode);
 
         ResultSet rs = ps.executeQuery();
 
@@ -428,11 +427,13 @@ public class TransactionDetailsDAO {
         ResultSet rs = psx.executeQuery();
 
         if(rs.next()) {
-            PreparedStatement ps1 = DB.getConnection().prepareStatement("UPDATE TransactionDetails SET debit=? WHERE td.Period=? AND td.TransactionNumber=? AND td.TransactionCode=? AND td.AccountSequence=999 ");
+            PreparedStatement ps1 = DB.getConnection().prepareStatement("UPDATE TransactionDetails SET Debit=? " +
+                    "WHERE TransactionDate=? AND TransactionNumber=? AND TransactionCode=? AND Period=? AND AccountSequence=999 ");
             ps1.setDouble(1, amount);
-            ps1.setDate(2, java.sql.Date.valueOf(th.getPeriod()));
+            ps1.setDate(2, java.sql.Date.valueOf(th.getTransactionDate()));
             ps1.setString(3, th.getTransactionNumber());
             ps1.setString(4, th.getTransactionCode());
+            ps1.setDate(5, java.sql.Date.valueOf(th.getPeriod()));
             ps1.executeUpdate();
         }else {
             TransactionDetails td = new TransactionDetails();
