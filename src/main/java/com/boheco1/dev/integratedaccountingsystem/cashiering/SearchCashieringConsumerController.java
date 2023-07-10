@@ -16,6 +16,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
+import javafx.util.StringConverter;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.TextFields;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -57,76 +60,8 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
         this.searchResultTable.setRowFactory(tv -> {
             TableRow row = new TableRow<>();
             row.setOnMouseClicked(event -> {
-
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-                    resultInfo = row.getItem();
-                    if(resultInfo instanceof EmployeeInfo){
-                        EmployeeInfo employeeInfo = (EmployeeInfo) resultInfo;
-                        try {
-                            JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing request.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
-                            Task<Void> task = new Task<>() {
-                                @Override
-                                protected Void call() throws Exception {
-                                    int month = searchDate.getValue().getMonthValue();
-                                    int day = searchDate.getValue().getDayOfMonth();
-                                    int year = searchDate.getValue().getYear();
-                                    List<ORItemSummary> orItemSummaries =null;
-                                    LocalDate period = LocalDate.of(year, month, 1);
-                                    User user = UserDAO.get(employeeInfo.getId());
-                                    transactionHeader = TransactionHeaderDAO.get(user.getUserName(), searchDate.getValue());
-                                    if(transactionHeader==null) {
-                                        orItemSummaries = CashierDAO.getOrItems(year, month, day, user.getUserName());
-                                        countAccount = CashierDAO.countAccount(year, month, day, user.getUserName());
-                                    }else {
-                                        transactionDetails = TransactionDetailsDAO.get(period, "OR", user);
-                                        orItemSummaries = new ArrayList<>();
-                                        for(TransactionDetails td : transactionDetails){
-                                            if(!td.getParticulars().equals("Grand Total")){
-                                                ORItemSummary os = new ORItemSummary(td.getAccountCode(),td.getParticulars(),td.getAmount());
-                                                orItemSummaries.add(os);
-                                            }
-                                        }
-                                    }
-                                    teller = new Teller(user.getUserName(), employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), searchDate.getValue());
-                                    teller.setOrItemSummaries(orItemSummaries);
-                                    return null;
-                                }
-                            };
-
-                            task.setOnRunning(wse -> {
-                                dialog.show();
-                            });
-
-                            task.setOnSucceeded(wse -> {
-                                dialog.close();
-                                try {
-                                    resultInfo = teller;
-                                    HashMap<String, Object> result = new HashMap<>();
-                                    result.put("SearchResult", resultInfo);
-                                    result.put("TransactionHeader", transactionHeader);
-                                    result.put("SearchDate", searchDate.getValue());
-                                    result.put("CountAccount", countAccount);
-                                    this.parentController.receive(result);
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            });
-
-                            task.setOnFailed(wse -> {
-                                dialog.close();
-                                AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request! Please try again!",
-                                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-                            });
-
-                            new Thread(task).start();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }else{
-                        //return costumer info from CRMQueue
-                        this.parentController.receive(resultInfo);
-                    }
+                    processRequest(row.getItem());
                 }
             });
             return row ;
@@ -169,6 +104,33 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                 search();
         });
 
+        searchTf.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                searchResultTable.requestFocus();
+                if(countTableItem() > 0){
+                    Object selected = searchResultTable.getSelectionModel().getSelectedItem();
+                    if(selected == null){
+                        searchResultTable.getSelectionModel().selectFirst();
+                    }else {
+                        processRequest(selected);
+                    }
+                }
+            }else {
+                if(searchTf.getText().length() >= 3 || searchTf.getText().length() < 3){
+                    search();
+                }
+            }
+        });
+
+        searchResultTable.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                Object selected = searchResultTable.getSelectionModel().getSelectedItem();
+                processRequest(selected);
+            }
+        });
+
+
+
     }
 
     /**
@@ -176,7 +138,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
      * @return void
      */
     @FXML
-    public void search(){
+    private void search(){
         String query = this.searchTf.getText();
         if(this.toggleSearch.isSelected()){
             try {
@@ -248,5 +210,80 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
             searchResultTable.getItems().clear();
         }
 
+    }
+
+    private int countTableItem(){
+        return searchResultTable.getItems().size();
+    }
+
+    private void processRequest(Object row){
+        resultInfo = row;
+        if(resultInfo instanceof EmployeeInfo){
+            EmployeeInfo employeeInfo = (EmployeeInfo) resultInfo;
+            try {
+                JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing request.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+                Task<Void> task = new Task<>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        int month = searchDate.getValue().getMonthValue();
+                        int day = searchDate.getValue().getDayOfMonth();
+                        int year = searchDate.getValue().getYear();
+                        List<ORItemSummary> orItemSummaries =null;
+                        LocalDate period = LocalDate.of(year, month, 1);
+                        User user = UserDAO.get(employeeInfo.getId());
+                        transactionHeader = TransactionHeaderDAO.get(user.getUserName(), searchDate.getValue());
+                        if(transactionHeader==null) {
+                            orItemSummaries = CashierDAO.getOrItems(year, month, day, user.getUserName());
+                            countAccount = CashierDAO.countAccount(year, month, day, user.getUserName());
+                        }else {
+                            transactionDetails = TransactionDetailsDAO.get(period, "OR", user);
+                            orItemSummaries = new ArrayList<>();
+                            for(TransactionDetails td : transactionDetails){
+                                if(!td.getParticulars().equals("Grand Total")){
+                                    ORItemSummary os = new ORItemSummary(td.getAccountCode(),td.getParticulars(),td.getAmount());
+                                    orItemSummaries.add(os);
+                                }
+                            }
+                        }
+                        teller = new Teller(user.getUserName(), employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), searchDate.getValue());
+                        teller.setOrItemSummaries(orItemSummaries);
+                        return null;
+                    }
+                };
+
+                task.setOnRunning(wse -> {
+                    dialog.show();
+                });
+
+                task.setOnSucceeded(wse -> {
+                    dialog.close();
+                    try {
+                        resultInfo = teller;
+                        HashMap<String, Object> result = new HashMap<>();
+                        result.put("SearchResult", resultInfo);
+                        result.put("TransactionHeader", transactionHeader);
+                        result.put("SearchDate", searchDate.getValue());
+                        result.put("CountAccount", countAccount);
+                        this.parentController.receive(result);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+
+                task.setOnFailed(wse -> {
+                    dialog.close();
+                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request! Please try again!",
+                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                });
+
+                new Thread(task).start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else{
+            //return costumer info from CRMQueue
+            this.parentController.receive(resultInfo);
+        }
     }
 }

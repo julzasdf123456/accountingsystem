@@ -22,7 +22,7 @@
             </HBox>
                     <HBox alignment="CENTER_LEFT" maxWidth="-Infinity" prefHeight="39.0" prefWidth="470.0">
                         <children>
-                            <JFXTextField fx:id="searchTf" focusColor="#00ad8e" labelFloat="true" maxWidth="-Infinity" onAction="#search" prefHeight="29.0" prefWidth="296.0" promptText="Reference Number/Last Name/First Name/Address" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5" HBox.hgrow="ALWAYS">
+                            <JFXTextField fx:id="searchTf" focusColor="#00ad8e" labelFloat="true" maxWidth="-Infinity" prefHeight="29.0" prefWidth="296.0" promptText="Reference Number/Last Name/First Name/Address" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5" HBox.hgrow="ALWAYS">
                                 <font>
                                     <Font size="14.0" />
                                 </font>

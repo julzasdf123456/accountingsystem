@@ -10,12 +10,14 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.boheco1.dev.integratedaccountingsystem.helpers.Utility.ERROR_MSG;
+
 public class TransactionHeaderDetailDAO {
     private static PreparedStatement ps1;
     private static PreparedStatement ps2;
     private static PreparedStatement ps3 = null;
     private static PreparedStatement ps4 = null;
-    public static void save(CRMQueue crmQueue, TransactionHeader transactionHeader, List<TransactionDetails> tds) {
+    public static void save(CRMQueue crmQueue, TransactionHeader transactionHeader, List<TransactionDetails> tds) throws SQLException, ClassNotFoundException {
         try {
             DB.getConnection().setAutoCommit(false);
 
@@ -56,7 +58,8 @@ public class TransactionHeaderDetailDAO {
                                 "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
                 for (TransactionDetails td : tds) {
-                    if(td.getParticulars().contains("TIN"))
+                    System.out.println(td.getParticulars());
+                    if(td.getParticulars().contains("TIN")) //check from supplier OR will not save the TIN row in the table
                         continue;
                     ps2.setDate(1, Date.valueOf(td.getPeriod()));
                     ps2.setString(2, td.getTransactionNumber());
@@ -86,36 +89,32 @@ public class TransactionHeaderDetailDAO {
                 ps4.setString(1, crmQueue.getId());
             }
 
-            Utility.ERROR_MSG = null;
-            ps1.executeUpdate();
+            ERROR_MSG = null;
+            ps1.execute();
             if(ps2 != null)//is null if save teller transaction
                 ps2.executeBatch();
-            if(ps3 != null) {//check only ps3 since ps3 and ps4 are in the same code block
-                ps3.executeUpdate();
-                ps4.executeUpdate();
+            if(crmQueue!=null){
+                ps3.execute();
+                ps4.execute();
             }
             DB.getConnection().setAutoCommit(true);
             ps1.close();
             if(ps2 != null) //is null if save teller transaction
                 ps2.close();
-            if(ps3 != null) {
+            if(crmQueue!=null){
                 ps3.close();
                 ps4.close();
             }
         } catch (Exception e){
-            Utility.ERROR_MSG = e.getMessage();
-            try {
-                DB.getConnection().rollback();
-                DB.getConnection().setAutoCommit(true);
-                ps1.close();
-                if(ps2 != null) //is null if save teller transaction
-                    ps2.close();
-                if(ps3 != null) {
-                    ps3.close();
-                    ps4.close();
-                }
-            } catch (SQLException | ClassNotFoundException ex) {
-                throw new RuntimeException(ex);
+            ERROR_MSG = "Saving from DAO, "+e.getMessage();
+            DB.getConnection().rollback();
+            DB.getConnection().setAutoCommit(true);
+            ps1.close();
+            if(ps2 != null) //is null if save teller transaction
+                ps2.close();
+            if(crmQueue!=null){
+                ps3.close();
+                ps4.close();
             }
             e.printStackTrace();
         }
@@ -131,8 +130,8 @@ public class TransactionHeaderDetailDAO {
                             "(Period, TransactionNumber, TransactionCode, " +
                             "AccountID, Source, Particulars, TransactionDate, " +
                             "Bank, ReferenceNo, Amount, EnteredBy, DateEntered, " +
-                            "DateLastModified, UpdatedBy, Remarks, TIN, Name, Address) " +
-                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,GETDATE(),GETDATE(),?,?,?,?,?);");
+                            "DateLastModified, UpdatedBy, Remarks, TIN, Name, Address, TransactionLog) " +
+                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,GETDATE(),GETDATE(),?,?,?,?,?,?);");
 
             ps2 = DB.getConnection().prepareStatement(
                     "INSERT INTO TransactionDetails (" +
@@ -160,6 +159,7 @@ public class TransactionHeaderDetailDAO {
                 ps1.setString(14, transactionHeader.getTinNo());
                 ps1.setString(15, transactionHeader.getName());
                 ps1.setString(16, transactionHeader.getAddress());
+                ps1.setString(17, transactionHeader.getTransactionLog());
                 ps1.addBatch();
 
                 for(TransactionDetails td : transactionDetails){
@@ -179,14 +179,14 @@ public class TransactionHeaderDetailDAO {
                     ps2.addBatch();
                 }
             }
-            Utility.ERROR_MSG = null;
+            ERROR_MSG = null;
             ps1.executeBatch();
             ps2.executeBatch();
             DB.getConnection().setAutoCommit(true);
             ps1.close();
             ps2.close();
         } catch (Exception e){
-            Utility.ERROR_MSG = e.getMessage();
+            ERROR_MSG = e.getMessage();
             try {
                 DB.getConnection().rollback();
                 DB.getConnection().setAutoCommit(true);
@@ -204,17 +204,18 @@ public class TransactionHeaderDetailDAO {
         try{
             DB.getConnection().setAutoCommit(false);
             ps1 = DB.getConnection().prepareStatement(
-                    "UPDATE TransactionHeader SET Amount = '0', Name = 'CANCELLED', Remarks = ? " +
+                    "UPDATE TransactionHeader SET Amount = '0', Name = '"+Utility.CANCELLED+"', DateLastModified = GETDATE(), UpdatedBy = ?, Remarks = ? " +
                             "WHERE " +
                             "Period = ? AND TransactionNumber = ? AND TransactionCode = ? ;" +
                             "DELETE FROM TransactionDetails WHERE Period = ? AND TransactionNumber = ? AND TransactionCode = ?;");
-            ps1.setString(1, transactionHeader.getRemarks());
-            ps1.setDate(2, java.sql.Date.valueOf(transactionHeader.getPeriod()));
-            ps1.setString(3, transactionHeader.getTransactionNumber());
-            ps1.setString(4, transactionHeader.getTransactionCode());
-            ps1.setDate(5, java.sql.Date.valueOf(transactionHeader.getPeriod()));
-            ps1.setString(6, transactionHeader.getTransactionNumber());
-            ps1.setString(7, transactionHeader.getTransactionCode());
+            ps1.setString(1, ActiveUser.getUser().getUserName());
+            ps1.setString(2, transactionHeader.getRemarks());
+            ps1.setDate(3, java.sql.Date.valueOf(transactionHeader.getPeriod()));
+            ps1.setString(4, transactionHeader.getTransactionNumber());
+            ps1.setString(5, transactionHeader.getTransactionCode());
+            ps1.setDate(6, java.sql.Date.valueOf(transactionHeader.getPeriod()));
+            ps1.setString(7, transactionHeader.getTransactionNumber());
+            ps1.setString(8, transactionHeader.getTransactionCode());
             ps1.executeUpdate();
 
            /* ps1 = DB.getConnection().prepareStatement(
@@ -225,7 +226,7 @@ public class TransactionHeaderDetailDAO {
             ps1.setString(3, transactionHeader.getTransactionCode());
             ps1.addBatch();*/
 
-            Utility.ERROR_MSG = null;
+            ERROR_MSG = null;
             ps1.executeUpdate();
             DB.getConnection().setAutoCommit(true);
             ps1.close();
@@ -234,7 +235,7 @@ public class TransactionHeaderDetailDAO {
         } catch (Exception e){
             AlertDialogBuilder.messgeDialog("System Error", "Error encounter while process request."+ e.getMessage(),
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            Utility.ERROR_MSG = e.getMessage();
+            ERROR_MSG = e.getMessage();
             try {
                 DB.getConnection().rollback();
                 DB.getConnection().setAutoCommit(true);

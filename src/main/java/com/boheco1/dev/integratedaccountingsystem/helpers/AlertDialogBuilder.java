@@ -23,7 +23,7 @@ public class AlertDialogBuilder {
     public static String SUCCESS_DIALOG = ColorPalette.SUCCESS;
     public static String DANGER_DIALOG = ColorPalette.DANGER;
     public static String WARNING_DIALOG = ColorPalette.WARNING;
-
+    private static JFXDialog alertDialog;
     public static void messgeDialog(String title, String message, StackPane pane, String type) {
         JFXDialogLayout dialogContent = new JFXDialogLayout();
         dialogContent.setStyle("-fx-border-width: 0 0 0 15; -fx-border-color: " + type + ";");
@@ -49,22 +49,28 @@ public class AlertDialogBuilder {
         flowPane.getChildren().add(context);
 
         dialogContent.setBody(flowPane);
+        dialogContent.requestFocus();
 
         JFXButton close = new JFXButton("Close");
         close.setDefaultButton(true);
         close.getStyleClass().add("JFXButton");
         dialogContent.setActions(close);
 
-        JFXDialog dialog = new JFXDialog(pane, dialogContent, JFXDialog.DialogTransition.CENTER);
+        alertDialog = new JFXDialog(pane, dialogContent, JFXDialog.DialogTransition.CENTER);
 
         close.setTextFill(Paint.valueOf(ColorPalette.GREY));
         close.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent __) {
-                dialog.close();
+                alertDialog.close();
             }
         });
 
-        dialog.show();
+        alertDialog.show();
+    }
+
+    public static void CLOSE_ALERT_DIALOG(){
+        if(alertDialog != null)
+            alertDialog.close();
     }
 }

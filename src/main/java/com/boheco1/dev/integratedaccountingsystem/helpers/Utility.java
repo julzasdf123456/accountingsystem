@@ -19,6 +19,8 @@ public class Utility {
     public static String MANUAL_ENTRY = "manual_entry";
     public static String SYSTEM_GENERATED= "system_generated";
 
+    public static String CANCELLED = "CANCELLED";
+
     public static boolean TOGGLE_SEARCH = true;
     public static String NOT_FOUND = "NOT FOUND";
     public static String ADDED = "ADDED";

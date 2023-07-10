@@ -154,6 +154,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     @FXML
     private void search(ActionEvent event) {
+        AlertDialogBuilder.CLOSE_ALERT_DIALOG();
         ModalBuilder.showModalFromXMLNoClose(CashierController.class, "../cashiering/cashiering_search_consumer.fxml", Utility.getStackPane());
     }
 
@@ -292,6 +293,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             this.purpose.setText(customerFromCRM.getTransactionPurpose());
             tellerInfo = null;
             initTable(customerFromCRM);
+            orNumber.requestFocus();
         }else if (o instanceof  HashMap) {
             resetField();
             TransactionHeader transactionHeader = (TransactionHeader) ((HashMap<?, ?>) o).get("TransactionHeader");
@@ -309,6 +311,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 purpose.setEditable(false);
                 customerFromCRM = null;
                 submitBtn.setDisable(false);
+                orNumber.requestFocus();
             }else{
                 this.address.setText(tellerInfo.getAddress());
                 this.name.setText(tellerInfo.getName());
@@ -317,6 +320,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 this.purpose.setText("for DCR O.R");
                 this.remarks.setText(transactionHeader.getRemarks());
                 submitBtn.setDisable(true);
+                search_btn.requestFocus();
                 AlertDialogBuilder.messgeDialog("System Message", "Transaction has already been processed and assigned with an OR number." ,
                         Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
             }
@@ -328,6 +332,9 @@ public class CashierController extends MenuControllerHandler implements Initiali
             if(b){
                 resetField();
                 orNumber.setText(""+Utility.OR_NUMBER);
+                search_btn.requestFocus();
+            }else{
+                resetField();
             }
         }
         ModalBuilder.MODAL_CLOSE();

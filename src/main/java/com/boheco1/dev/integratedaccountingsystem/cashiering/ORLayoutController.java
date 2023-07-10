@@ -48,44 +48,52 @@ public class ORLayoutController implements Initializable {
         parentController = Utility.getParentController();
         try {
             initField();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing request.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                printSaveOR();
-                return null;
-            }
-        };
 
-        task.setOnRunning(wse -> {
-            dialog.show();
-        });
+            JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing request.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+            Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() {
+                    printSaveOR();
+                    return null;
+                }
+            };
 
-        task.setOnSucceeded(wse -> {
-            dialog.close();
-            if(Utility.ERROR_MSG == null){
-                AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
-                        Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
-                Utility.OR_NUMBER = Integer.parseInt(orContent.getOrNumber())+1;
-                parentController.receive(true);
-            }else {
-                AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: "+Utility.ERROR_MSG,
+            task.setOnRunning(wse -> {
+                dialog.show();
+            });
+
+            task.setOnSucceeded(wse -> {
+                dialog.close();
+                if(Utility.ERROR_MSG == null){
+                    AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
+                            Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                    Utility.OR_NUMBER = Integer.parseInt(orContent.getOrNumber())+1;
+                    parentController.receive(true);
+                }else {
+                    AlertDialogBuilder.messgeDialog("System Error (On Succeeded)", "Error encounter while saving transaction: "+Utility.ERROR_MSG +", please try again.",
+                            Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                    parentController.receive(false);
+                }
+
+            });
+
+            task.setOnFailed(wse -> {
+                dialog.close();
+                AlertDialogBuilder.messgeDialog("System Error (On Failed)", "Error encounter while saving transaction: "+Utility.ERROR_MSG,
                         Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-            }
+                parentController.receive(false);
+                ModalBuilder.MODAL_CLOSE();
+            });
 
-        });
+            new Thread(task).start();
 
-        task.setOnFailed(wse -> {
-            dialog.close();
-            AlertDialogBuilder.messgeDialog("System Error", "Error encounter while saving transaction: "+Utility.ERROR_MSG,
+        } catch (Exception e) {
+            AlertDialogBuilder.messgeDialog("System Error (O.R Layout)", "Error encounter while initializing fields: "+e.getMessage(),
                     Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-            ModalBuilder.MODAL_CLOSE();
-        });
+            parentController.receive(false);
+            e.printStackTrace();
+        }
 
-        new Thread(task).start();
     }
 
     private void initField() throws Exception {

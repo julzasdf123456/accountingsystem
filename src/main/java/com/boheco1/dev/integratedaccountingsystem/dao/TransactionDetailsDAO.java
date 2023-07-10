@@ -2,10 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
-import com.boheco1.dev.integratedaccountingsystem.objects.BankRemittance;
-import com.boheco1.dev.integratedaccountingsystem.objects.TransactionDetails;
-import com.boheco1.dev.integratedaccountingsystem.objects.TransactionHeader;
-import com.boheco1.dev.integratedaccountingsystem.objects.User;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -76,17 +73,26 @@ public class TransactionDetailsDAO {
 
         ps.close();
     }
-    private static PreparedStatement psAdd, psUpdate, psDelete;
-    public static void addUpdate(List<TransactionDetails> updateRecord, List<TransactionDetails> newRecord) throws Exception {
+    private static PreparedStatement psAdd, psUpdate, psDelete, psUpdateTransHeader;
+    public static void addUpdate(TransactionHeader transactionHeader, List<TransactionDetails> updateRecord, List<TransactionDetails> newRecord) throws Exception {
         try {
-             psAdd = DB.getConnection().prepareStatement(
+            psUpdateTransHeader = DB.getConnection().prepareStatement(
+                    "UPDATE TransactionHeader SET DateLastModified = GETDATE(), UpdatedBy = ? " +
+                            "WHERE " +
+                            "Period = ? AND TransactionNumber = ? AND TransactionCode = ? ;");
+            psUpdateTransHeader.setString(1, ActiveUser.getUser().getUserName());
+            psUpdateTransHeader.setDate(2, java.sql.Date.valueOf(transactionHeader.getPeriod()));
+            psUpdateTransHeader.setString(3, transactionHeader.getTransactionNumber());
+            psUpdateTransHeader.setString(4, transactionHeader.getTransactionCode());
+
+            psAdd = DB.getConnection().prepareStatement(
                     "INSERT INTO TransactionDetails (" +
                             "Period, TransactionNumber, TransactionCode, TransactionDate, " +
                             "AccountSequence, AccountCode, Debit, Credit, ORDate, " +
                             "BankID, Note, CheckNumber, Particulars, DepositedDate) " +
                             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
-             psUpdate = DB.getConnection().prepareStatement(
+            psUpdate = DB.getConnection().prepareStatement(
                     "UPDATE TransactionDetails SET Debit = ?, Credit = ?, Particulars = ? , Note = ? " +
                             "WHERE " +
                             "TransactionNumber = ? AND AccountCode = ? and Particulars = ?;");
@@ -125,7 +131,7 @@ public class TransactionDetailsDAO {
                 psUpdate.addBatch();
             }
 
-
+            psUpdateTransHeader.execute();
             psAdd.executeBatch();
             psUpdate.executeBatch();
             psDelete.executeUpdate();
@@ -133,12 +139,16 @@ public class TransactionDetailsDAO {
 
             psAdd.close();
             psUpdate.close();
+            psDelete.close();
+            psUpdateTransHeader.close();
         } catch (Exception e){
             Utility.ERROR_MSG = e.getMessage();
             DB.getConnection().rollback();
             DB.getConnection().setAutoCommit(true);
             psAdd.close();
             psUpdate.close();
+            psDelete.close();
+            psUpdateTransHeader.close();
             e.printStackTrace();
         }
     }
