@@ -299,6 +299,7 @@ public class BillDAO {
         ResultSet rs = ps.executeQuery();
         while(rs.next()) {
             BillStanding b = new BillStanding();
+            b.setConsumer(consumerInfo);
             b.setServicePeriodEnd(rs.getDate("ServicePeriodEnd").toLocalDate());
             b.setDueDate(rs.getDate("DueDate").toLocalDate());
             b.setBillNo(rs.getString("BillNumber"));
