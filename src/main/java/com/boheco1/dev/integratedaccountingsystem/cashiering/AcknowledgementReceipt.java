@@ -467,12 +467,13 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
         String[] item = new String[transactionDetails.size()];
         String[] amount = new String[transactionDetails.size()];
-        double totalAmount = 0.0;
+        double totalAmount = total;
         int idx=0;
         for(TransactionDetails td: transactionDetails) {
             item[idx] = td.getParticulars();
-            amount[idx++] = String.format("%,.2f", td.getDebit());
-            totalAmount += td.getDebit();
+//            amount[idx++] = String.format("%,.2f", td.getDebit());
+            amount[idx++] = td.getFormattedARAmount();
+//            totalAmount += td.getDebit();
         }
 
         String amountStr = Utility.doubleAmountToWords(totalAmount);
