@@ -128,7 +128,18 @@ public class COBController extends MenuControllerHandler implements Initializabl
 
         this.add_btn.setOnAction(evt -> {
             try {
-                showAddItemForm();
+                String n = this.type_cb.getSelectionModel().getSelectedItem();
+                if (n.equals(COBItem.TYPES[0])) {
+                    this.showAddItemForm();
+                }else if (n.equals(COBItem.TYPES[1])) {
+                    this.showAddReprForm();
+                }else if (n.equals(COBItem.TYPES[2])) {
+                    this.showAddSalaryForm();
+                }else if (n.equals(COBItem.TYPES[3])) {
+                    this.showAddTravelForm();
+                }else{
+                    this.showAddItemForm();
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -372,54 +383,26 @@ public class COBController extends MenuControllerHandler implements Initializabl
         column3.setMinWidth(50);
         column3.setStyle("-fx-alignment: center;");
 
-        TableColumn<Representation, String> column4 = new TableColumn<>("Allowance");
+        TableColumn<Representation, String> column4 = new TableColumn<>("Basic Allowance");
         column4.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getAmount()) : ""));
-        column4.setPrefWidth(100);
-        column4.setMaxWidth(100);
-        column4.setMinWidth(100);
+        column4.setPrefWidth(150);
+        column4.setMaxWidth(150);
+        column4.setMinWidth(150);
         column4.setStyle("-fx-alignment: center-right;");
 
-        TableColumn<Representation, String> column41 = new TableColumn<>("Reimbursable");
+        TableColumn<Representation, String> column41 = new TableColumn<>("Reimb. Allowance");
         column41.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getReimbursableAllowance()) : ""));
-        column41.setPrefWidth(100);
-        column41.setMaxWidth(100);
-        column41.setMinWidth(100);
+        column41.setPrefWidth(150);
+        column41.setMaxWidth(150);
+        column41.setMinWidth(150);
         column41.setStyle("-fx-alignment: center-right;");
 
-        TableColumn<Representation, String> column42 = new TableColumn<>("Others");
+        TableColumn<Representation, String> column42 = new TableColumn<>("Other Allowance");
         column42.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getOtherAllowance()) : ""));
-        column42.setPrefWidth(100);
-        column42.setMaxWidth(100);
-        column42.setMinWidth(100);
+        column42.setPrefWidth(150);
+        column42.setMaxWidth(150);
+        column42.setMinWidth(150);
         column42.setStyle("-fx-alignment: center-right;");
-
-        TableColumn<Representation, String> column5 = new TableColumn<>("1st Qtr");
-        column5.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr1() != 0 ? Utility.formatDecimal(obj.getValue().getQtr1()) : ""));
-        column5.setPrefWidth(100);
-        column5.setMaxWidth(100);
-        column5.setMinWidth(100);
-        column5.setStyle("-fx-alignment: center-right;");
-
-        TableColumn<Representation, String> column6 = new TableColumn<>("2nd Qtr");
-        column6.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr2() != 0 ? Utility.formatDecimal(obj.getValue().getQtr2()) : ""));
-        column6.setPrefWidth(100);
-        column6.setMaxWidth(100);
-        column6.setMinWidth(100);
-        column6.setStyle("-fx-alignment: center-right;");
-
-        TableColumn<Representation, String> column7 = new TableColumn<>("3rd Qtr");
-        column7.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr3() != 0 ? Utility.formatDecimal(obj.getValue().getQtr3()) : ""));
-        column7.setPrefWidth(100);
-        column7.setMaxWidth(100);
-        column7.setMinWidth(100);
-        column7.setStyle("-fx-alignment: center-right;");
-
-        TableColumn<Representation, String> column8 = new TableColumn<>("4th Qtr");
-        column8.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr4() != 0 ? Utility.formatDecimal(obj.getValue().getQtr4()) : ""));
-        column8.setPrefWidth(100);
-        column8.setMaxWidth(100);
-        column8.setMinWidth(100);
-        column8.setStyle("-fx-alignment: center-right;");
 
         this.cob_items.setFixedCellSize(35);
         this.cob_items.setPlaceholder(new Label("No Items added"));
@@ -431,10 +414,6 @@ public class COBController extends MenuControllerHandler implements Initializabl
         this.cob_items.getColumns().add(column4);
         this.cob_items.getColumns().add(column41);
         this.cob_items.getColumns().add(column42);
-        this.cob_items.getColumns().add(column5);
-        this.cob_items.getColumns().add(column6);
-        this.cob_items.getColumns().add(column7);
-        this.cob_items.getColumns().add(column8);
     }
 
     /**
@@ -636,34 +615,6 @@ public class COBController extends MenuControllerHandler implements Initializabl
         column47.setMinWidth(85);
         column47.setStyle("-fx-alignment: center-right;");
 
-        TableColumn<Salary, String> column5 = new TableColumn<>("1st Qtr");
-        column5.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr1() != 0 ? Utility.formatDecimal(obj.getValue().getQtr1()) : ""));
-        column5.setPrefWidth(85);
-        column5.setMaxWidth(85);
-        column5.setMinWidth(85);
-        column5.setStyle("-fx-alignment: center-right;");
-
-        TableColumn<Salary, String> column6 = new TableColumn<>("2nd Qtr");
-        column6.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr2() != 0 ? Utility.formatDecimal(obj.getValue().getQtr2()) : ""));
-        column6.setPrefWidth(85);
-        column6.setMaxWidth(85);
-        column6.setMinWidth(85);
-        column6.setStyle("-fx-alignment: center-right;");
-
-        TableColumn<Salary, String> column7 = new TableColumn<>("3rd Qtr");
-        column7.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr3() != 0 ? Utility.formatDecimal(obj.getValue().getQtr3()) : ""));
-        column7.setPrefWidth(85);
-        column7.setMaxWidth(85);
-        column7.setMinWidth(85);
-        column7.setStyle("-fx-alignment: center-right;");
-
-        TableColumn<Salary, String> column8 = new TableColumn<>("4th Qtr");
-        column8.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr4() != 0 ? Utility.formatDecimal(obj.getValue().getQtr4()) : ""));
-        column8.setPrefWidth(85);
-        column8.setMaxWidth(85);
-        column8.setMinWidth(85);
-        column8.setStyle("-fx-alignment: center-right;");
-
         this.cob_items.setFixedCellSize(35);
         this.cob_items.setPlaceholder(new Label("No Items added"));
 
@@ -677,10 +628,6 @@ public class COBController extends MenuControllerHandler implements Initializabl
         this.cob_items.getColumns().add(column45);
         this.cob_items.getColumns().add(column46);
         this.cob_items.getColumns().add(column47);
-        this.cob_items.getColumns().add(column5);
-        this.cob_items.getColumns().add(column6);
-        this.cob_items.getColumns().add(column7);
-        this.cob_items.getColumns().add(column8);
     }
 
     /**
@@ -757,6 +704,52 @@ public class COBController extends MenuControllerHandler implements Initializabl
         dialog.setOnDialogOpened((event) -> { ctrl.getDescription_tf().requestFocus(); });
         dialog.show();
     }
+
+    /**
+     * Displays Add Item (Representation) UI
+     * @return void
+     */
+    public void showAddReprForm() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../budgeting/budgeting_add_repr.fxml"));
+        Parent parent = fxmlLoader.load();
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setBody(parent);
+        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+        AddReprController ctrl = fxmlLoader.getController();
+        dialog.setOnDialogOpened((event) -> { ctrl.getDescription_tf().requestFocus(); });
+        dialog.show();
+    }
+
+    /**
+     * Displays Add Item (Travel) UI
+     * @return void
+     */
+    public void showAddTravelForm() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../budgeting/budgeting_add_travel.fxml"));
+        Parent parent = fxmlLoader.load();
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setBody(parent);
+        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+        AddTravelController ctrl = fxmlLoader.getController();
+        dialog.setOnDialogOpened((event) -> { ctrl.getDescription_tf().requestFocus(); });
+        dialog.show();
+    }
+
+    /**
+     * Displays Add Item (Salary) UI
+     * @return void
+     */
+    public void showAddSalaryForm() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../budgeting/budgeting_add_salaries.fxml"));
+        Parent parent = fxmlLoader.load();
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setBody(parent);
+        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+        AddSalaryController ctrl = fxmlLoader.getController();
+        dialog.setOnDialogOpened((event) -> { ctrl.getDescription_tf().requestFocus(); });
+        dialog.show();
+    }
+
     public void setTable() {
         this.cob_items.setItems(this.items);
     }
