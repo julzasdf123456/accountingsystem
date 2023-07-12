@@ -56,7 +56,7 @@
                               <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
                                     <Label text="List of Pending COBs" />
-                                    <TableView fx:id="dcr_breakdown_table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                                    <TableView fx:id="pending_table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                        <columnResizePolicy>
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                        </columnResizePolicy>
@@ -84,7 +84,7 @@
                               <HBox>
                                  <children>
                                     <Label text="No. of Records : " />
-                                    <Label fx:id="dcr_total_kwh" styleClass="bold" text="0">
+                                    <Label fx:id="pending_lbl" styleClass="bold" text="0">
                                        <HBox.margin>
                                           <Insets left="16.0" />
                                        </HBox.margin>
@@ -108,7 +108,7 @@
                         <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
                               <Label text="List of Approved COBs" />
-                              <TableView fx:id="dcr_power_table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                              <TableView fx:id="approved_table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                  <columnResizePolicy>
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                  </columnResizePolicy>
@@ -130,7 +130,7 @@
                                     <HBox>
                                        <children>
                                           <Label text="No. of Records : " />
-                                          <Label fx:id="dcr_transNo_lbl" styleClass="bold" text="0">
+                                          <Label fx:id="approved_lbl" styleClass="bold" text="0">
                                              <HBox.margin>
                                                 <Insets left="16.0" />
                                              </HBox.margin>

@@ -1,12 +1,14 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 public class COBItem extends Item{
+    public static String[] TYPES = {"Benefits/Allowances", "Representation", "Salaries", "Travels/Seminars", "Others"};
     private String cItemId;
     private String remarks;
     private String description;
     private double cost = 0;
     private int qty = 0;
     private int sequence = 0;
+    private int noOfTimes = 1;
     private double qtr1 = 0;
     private double qtr2 = 0;
     private double qtr3 = 0;
@@ -105,7 +107,7 @@ public class COBItem extends Item{
     }
 
     public double getAmount() {
-        return this.qty * this.cost;
+        return this.qty * this.cost * this.noOfTimes;
     }
 
     public String getAmountStr() {
@@ -116,4 +118,12 @@ public class COBItem extends Item{
     public String getQtr2Str() { return String.format("₱ %,.2f", qtr2); }
     public String getQtr3Str() { return String.format("₱ %,.2f", qtr3); }
     public String getQtr4Str() { return String.format("₱ %,.2f", qtr4); }
+
+    public int getNoOfTimes() {
+        return noOfTimes;
+    }
+
+    public void setNoOfTimes(int noOfTimes) {
+        this.noOfTimes = noOfTimes;
+    }
 }

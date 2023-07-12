@@ -81,4 +81,9 @@ public class Travel extends COBItem{
         //Rate * No. of Days * No. of Persons * No. of Times/Travel
         return getIncidental() * getNoOfDays() * getQty() * getNoOfTimes();
     }
+    @Override
+    public double getAmount(){
+        //Rate per diem * No. of days * No. of Person * No. of times
+        return this.getCost() * getNoOfDays() * getQty() * getNoOfTimes();
+    }
 }

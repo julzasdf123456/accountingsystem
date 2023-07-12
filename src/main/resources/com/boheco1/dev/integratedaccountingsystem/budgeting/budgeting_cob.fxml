@@ -21,68 +21,6 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="514.0" prefWidth="700.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.budgeting.COBController">
    <children>
       <BorderPane layoutY="116.0" prefHeight="399.0" prefWidth="687.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <left>
-            <VBox prefHeight="452.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-               <children>
-                  <Label text="Control Number" />
-                  <JFXTextField fx:id="cn_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets bottom="16.0" />
-                     </VBox.margin>
-                  </JFXTextField>
-                  <Label text="Major Activity" />
-                  <JFXTextField fx:id="activity_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets bottom="16.0" />
-                     </VBox.margin>
-                  </JFXTextField>
-                  <Label text="Board Resolution" />
-                  <JFXTextField fx:id="board_res_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets bottom="16.0" />
-                     </VBox.margin>
-                  </JFXTextField>
-                  <Label text="Fund Source" />
-                  <JFXComboBox fx:id="fs_cb" prefHeight="29.0" prefWidth="200.0">
-                     <VBox.margin>
-                        <Insets bottom="16.0" />
-                     </VBox.margin>
-                  </JFXComboBox>
-                  <Label text="Type" />
-                  <JFXComboBox fx:id="type_cb" prefHeight="29.0" prefWidth="200.0">
-                     <VBox.margin>
-                        <Insets bottom="24.0" />
-                     </VBox.margin>
-                  </JFXComboBox>
-                  <HBox>
-                     <children>
-                        <JFXButton fx:id="submit_btn" alignment="CENTER" buttonType="RAISED" contentDisplay="CENTER" prefWidth="75.0" style="-fx-background-color: #009688;" text="Submit" textFill="WHITE" />
-                        <HBox prefHeight="24.0" prefWidth="50.0" />
-                        <JFXButton fx:id="reset_btn" focusTraversable="false" maxWidth="1.7976931348623157E308" minHeight="28.0" prefHeight="28.0" prefWidth="75.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Reset" textFill="WHITE">
-                           <effect>
-                              <DropShadow />
-                           </effect>
-                           <font>
-                              <Font name="System Bold" size="16.0" />
-                           </font>
-                        </JFXButton>
-                     </children>
-                  </HBox>
-               </children>
-               <BorderPane.margin>
-                  <Insets right="16.0" top="8.0" />
-               </BorderPane.margin>
-            </VBox>
-         </left>
          <center>
             <HBox BorderPane.alignment="CENTER">
                <children>
@@ -203,23 +141,16 @@
             </HBox>
          </center>
          <bottom>
-            <HBox prefHeight="62.0" prefWidth="671.0" BorderPane.alignment="CENTER">
+            <HBox prefHeight="62.0" BorderPane.alignment="CENTER">
                <children>
-                  <HBox prefHeight="44.0" prefWidth="50.0" HBox.hgrow="ALWAYS">
-                     <HBox.margin>
-                        <Insets />
-                     </HBox.margin>
-                  </HBox>
-                  <VBox prefHeight="69.0" prefWidth="600.0">
+                  <VBox prefHeight="69.0" HBox.hgrow="ALWAYS">
                      <children>
-                        <HBox prefHeight="24.0" prefWidth="400.0">
+                        <HBox prefHeight="24.0" VBox.vgrow="ALWAYS">
                            <children>
                               <Label prefWidth="200.0" text="Prepared by:" />
-                              <Label prefWidth="200.0" text="Reviewed by:" />
-                              <Label prefWidth="200.0" text="Approved by:" />
                            </children>
                         </HBox>
-                        <HBox prefHeight="100.0" prefWidth="200.0">
+                        <HBox prefHeight="100.0" VBox.vgrow="ALWAYS">
                            <children>
                               <JFXTextField fx:id="prepared_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
@@ -229,27 +160,122 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="reviewed_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                              <JFXButton fx:id="reset_btn" focusTraversable="false" maxWidth="1.7976931348623157E308" minHeight="28.0" prefHeight="28.0" prefWidth="75.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Reset" textFill="WHITE">
+                                 <effect>
+                                    <DropShadow />
+                                 </effect>
                                  <font>
-                                    <Font size="14.0" />
+                                    <Font name="System Bold" size="16.0" />
                                  </font>
                                  <HBox.margin>
-                                    <Insets right="16.0" />
+                                    <Insets right="16.0" top="5.0" />
                                  </HBox.margin>
-                              </JFXTextField>
-                              <JFXTextField fx:id="approved_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                              </JFXTextField>
+                              </JFXButton>
+                              <JFXButton fx:id="submit_btn" alignment="CENTER" buttonType="RAISED" contentDisplay="CENTER" prefWidth="75.0" style="-fx-background-color: #009688;" text="Submit" textFill="WHITE">
+                                 <HBox.margin>
+                                    <Insets top="5.0" />
+                                 </HBox.margin>
+                              </JFXButton>
+                              <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </HBox>
+                              <HBox prefHeight="100.0" prefWidth="184.0">
+                                 <HBox.margin>
+                                    <Insets left="16.0" />
+                                 </HBox.margin>
+                              </HBox>
                            </children>
                         </HBox>
                      </children>
                   </VBox>
-                  <HBox prefHeight="100.0" prefWidth="50.0" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
          </bottom>
+         <top>
+            <VBox prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <HBox>
+                     <children>
+                        <Label prefWidth="184.0" text="Control Number">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </Label>
+                        <Label text="Major Activity" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin></Label>
+                        <HBox prefHeight="19.0" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </HBox>
+                        <Label prefWidth="184.0" text="Board Resolution">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </Label>
+                        <Label prefWidth="184.0" text="Fund Source">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </Label>
+                        <Label prefWidth="184.0" text="Type" />
+                     </children>
+                  </HBox>
+                  <HBox>
+                     <children>
+                        <JFXTextField fx:id="cn_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </JFXTextField>
+                        <JFXTextField fx:id="activity_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5" HBox.hgrow="ALWAYS">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </JFXTextField>
+                        <JFXTextField fx:id="board_res_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </JFXTextField>
+                        <JFXComboBox fx:id="fs_cb" prefHeight="33.0" prefWidth="184.0">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </JFXComboBox>
+                        <JFXComboBox fx:id="type_cb" prefHeight="33.0" prefWidth="184.0" />
+                     </children>
+                  </HBox>
+                  <HBox>
+                     <VBox.margin>
+                        <Insets top="8.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox>
+                     <VBox.margin>
+                        <Insets bottom="16.0" />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+               <BorderPane.margin>
+                  <Insets right="16.0" top="8.0" />
+               </BorderPane.margin>
+            </VBox>
+         </top>
       </BorderPane>
    </children>
    <padding>

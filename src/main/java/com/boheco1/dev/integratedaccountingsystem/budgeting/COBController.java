@@ -54,7 +54,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
     private JFXComboBox<FundSource> fs_cb;
 
     @FXML
-    private JFXComboBox<?> type_cb;
+    private JFXComboBox<String> type_cb;
 
     @FXML
     private TextField totals_tf;
@@ -75,11 +75,6 @@ public class COBController extends MenuControllerHandler implements Initializabl
     private JFXTextField prepared_tf;
 
     @FXML
-    private JFXTextField reviewed_tf;
-
-    @FXML
-    private JFXTextField approved_tf;
-    @FXML
     private TableView cob_items;
     private ObservableList<COBItem> items = FXCollections.observableArrayList(new ArrayList<>());
     private APP app = null;
@@ -90,7 +85,24 @@ public class COBController extends MenuControllerHandler implements Initializabl
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        ObservableList<String> types = FXCollections.observableArrayList(COBItem.TYPES);
+        this.type_cb.setItems(types);
+        this.type_cb.getSelectionModel().select(4);
+        this.type_cb.getSelectionModel().selectedItemProperty().addListener((observableValue, o, n) -> {
+            this.cob_items.getColumns().clear();
+            if (n.equals(COBItem.TYPES[0])) {
+                this.createTable(true);
+            }else if (n.equals(COBItem.TYPES[1])) {
+                this.createRepresentationTable();
+            }else if (n.equals(COBItem.TYPES[2])) {
+                this.createSalariesTable();
+            }else if (n.equals(COBItem.TYPES[3])) {
+                this.createTravelsTable();
+            }else{
+                this.createTable(false);
+            }
+            this.cob_items.refresh();
+        });
         try {
             this.fs_cb.setItems(FXCollections.observableArrayList(AppDAO.getFundSources()));
             this.app = AppDAO.getOpen(true);
@@ -112,7 +124,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
             this.threshold_lbl.setText("");
         }
 
-        this.createTable();
+        this.createTable(false);
 
         this.add_btn.setOnAction(evt -> {
             try {
@@ -244,10 +256,10 @@ public class COBController extends MenuControllerHandler implements Initializabl
     }
 
     /**
-     * Initializes the DCR transactions table
+     * Initializes the COB Items (Supplies and Materials, and other budget which follows Description, Cost, Unit, Quantity, Amount) table
      * @return void
      */
-    public void createTable(){
+    public void createTable(boolean isBenefits){
         TableColumn<COBItem, String> column = new TableColumn<>("Particulars");
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getScopeId() == null ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
         column.setStyle("-fx-alignment: center-left;");
@@ -273,8 +285,15 @@ public class COBController extends MenuControllerHandler implements Initializabl
         column3.setMinWidth(50);
         column3.setStyle("-fx-alignment: center;");
 
+        TableColumn<COBItem, String> column31 = new TableColumn<>("Times");
+        column31.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getNoOfTimes() > 0 ? obj.getValue().getNoOfTimes()+"" : ""));
+        column31.setPrefWidth(50);
+        column31.setMaxWidth(50);
+        column31.setMinWidth(50);
+        column31.setStyle("-fx-alignment: center;");
+
         TableColumn<COBItem, String> column4 = new TableColumn<>("Amount");
-        column4.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getCost()*obj.getValue().getQty()) : ""));
+        column4.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getAmount()) : ""));
         column4.setPrefWidth(100);
         column4.setMaxWidth(100);
         column4.setMinWidth(100);
@@ -315,7 +334,349 @@ public class COBController extends MenuControllerHandler implements Initializabl
         this.cob_items.getColumns().add(column1);
         this.cob_items.getColumns().add(column2);
         this.cob_items.getColumns().add(column3);
+        if (isBenefits) this.cob_items.getColumns().add(column31);
         this.cob_items.getColumns().add(column4);
+        this.cob_items.getColumns().add(column5);
+        this.cob_items.getColumns().add(column6);
+        this.cob_items.getColumns().add(column7);
+        this.cob_items.getColumns().add(column8);
+    }
+
+    /**
+     * Initializes the COB Items (Representation) table
+     * @return void
+     */
+    public void createRepresentationTable(){
+        TableColumn<Representation, String> column = new TableColumn<>("Particulars");
+        column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getScopeId() == null ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
+        column.setStyle("-fx-alignment: center-left;");
+
+        TableColumn<Representation, String> column1 = new TableColumn<>("Est. Cost");
+        column1.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getCost()) : ""));
+        column1.setPrefWidth(100);
+        column1.setMaxWidth(100);
+        column1.setMinWidth(100);
+        column1.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Representation, String> column2 = new TableColumn<>("Unit");
+        column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getRemarks() != null ? obj.getValue().getRemarks()+"" : ""));
+        column2.setPrefWidth(100);
+        column2.setMaxWidth(100);
+        column2.setMinWidth(100);
+        column2.setStyle("-fx-alignment: center;");
+
+        TableColumn<Representation, String> column3 = new TableColumn<>("Qty");
+        column3.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQty() > 0 ? obj.getValue().getQty()+"" : ""));
+        column3.setPrefWidth(50);
+        column3.setMaxWidth(50);
+        column3.setMinWidth(50);
+        column3.setStyle("-fx-alignment: center;");
+
+        TableColumn<Representation, String> column4 = new TableColumn<>("Allowance");
+        column4.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getAmount()) : ""));
+        column4.setPrefWidth(100);
+        column4.setMaxWidth(100);
+        column4.setMinWidth(100);
+        column4.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Representation, String> column41 = new TableColumn<>("Reimbursable");
+        column41.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getReimbursableAllowance()) : ""));
+        column41.setPrefWidth(100);
+        column41.setMaxWidth(100);
+        column41.setMinWidth(100);
+        column41.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Representation, String> column42 = new TableColumn<>("Others");
+        column42.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getOtherAllowance()) : ""));
+        column42.setPrefWidth(100);
+        column42.setMaxWidth(100);
+        column42.setMinWidth(100);
+        column42.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Representation, String> column5 = new TableColumn<>("1st Qtr");
+        column5.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr1() != 0 ? Utility.formatDecimal(obj.getValue().getQtr1()) : ""));
+        column5.setPrefWidth(100);
+        column5.setMaxWidth(100);
+        column5.setMinWidth(100);
+        column5.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Representation, String> column6 = new TableColumn<>("2nd Qtr");
+        column6.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr2() != 0 ? Utility.formatDecimal(obj.getValue().getQtr2()) : ""));
+        column6.setPrefWidth(100);
+        column6.setMaxWidth(100);
+        column6.setMinWidth(100);
+        column6.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Representation, String> column7 = new TableColumn<>("3rd Qtr");
+        column7.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr3() != 0 ? Utility.formatDecimal(obj.getValue().getQtr3()) : ""));
+        column7.setPrefWidth(100);
+        column7.setMaxWidth(100);
+        column7.setMinWidth(100);
+        column7.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Representation, String> column8 = new TableColumn<>("4th Qtr");
+        column8.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr4() != 0 ? Utility.formatDecimal(obj.getValue().getQtr4()) : ""));
+        column8.setPrefWidth(100);
+        column8.setMaxWidth(100);
+        column8.setMinWidth(100);
+        column8.setStyle("-fx-alignment: center-right;");
+
+        this.cob_items.setFixedCellSize(35);
+        this.cob_items.setPlaceholder(new Label("No Items added"));
+
+        this.cob_items.getColumns().add(column);
+        this.cob_items.getColumns().add(column1);
+        this.cob_items.getColumns().add(column2);
+        this.cob_items.getColumns().add(column3);
+        this.cob_items.getColumns().add(column4);
+        this.cob_items.getColumns().add(column41);
+        this.cob_items.getColumns().add(column42);
+        this.cob_items.getColumns().add(column5);
+        this.cob_items.getColumns().add(column6);
+        this.cob_items.getColumns().add(column7);
+        this.cob_items.getColumns().add(column8);
+    }
+
+    /**
+     * Initializes the COB Items (Travels) table
+     * @return void
+     */
+    public void createTravelsTable(){
+        TableColumn<Travel, String> column = new TableColumn<>("Particulars");
+        column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getScopeId() == null ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
+        column.setStyle("-fx-alignment: center-left;");
+
+        TableColumn<Travel, String> column1 = new TableColumn<>("Travel Cost");
+        column1.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getAmount()) : ""));
+        column1.setPrefWidth(100);
+        column1.setMaxWidth(100);
+        column1.setMinWidth(100);
+        column1.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Travel, String> column2 = new TableColumn<>("Unit");
+        column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getRemarks() != null ? obj.getValue().getRemarks()+"" : ""));
+        column2.setPrefWidth(75);
+        column2.setMaxWidth(75);
+        column2.setMinWidth(75);
+        column2.setStyle("-fx-alignment: center;");
+
+        TableColumn<Travel, String> column3 = new TableColumn<>("Pax");
+        column3.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQty() > 0 ? obj.getValue().getQty()+"" : ""));
+        column3.setPrefWidth(50);
+        column3.setMaxWidth(50);
+        column3.setMinWidth(50);
+        column3.setStyle("-fx-alignment: center;");
+
+        TableColumn<Travel, String> column4 = new TableColumn<>("Days");
+        column4.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? obj.getValue().getNoOfDays()+"" : ""));
+        column4.setPrefWidth(50);
+        column4.setMaxWidth(50);
+        column4.setMinWidth(50);
+        column4.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Travel, String> column41 = new TableColumn<>("Times");
+        column41.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? obj.getValue().getNoOfTimes()+"" : ""));
+        column41.setPrefWidth(50);
+        column41.setMaxWidth(50);
+        column41.setMinWidth(50);
+        column41.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Travel, String> column42 = new TableColumn<>("Transp.");
+        column42.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getTotalTransport()) : ""));
+        column42.setPrefWidth(75);
+        column42.setMaxWidth(75);
+        column42.setMinWidth(75);
+        column42.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Travel, String> column43 = new TableColumn<>("Lodging");
+        column43.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getTotalLodging()) : ""));
+        column43.setPrefWidth(75);
+        column43.setMaxWidth(75);
+        column43.setMinWidth(75);
+        column43.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Travel, String> column44 = new TableColumn<>("Reg. Fee");
+        column44.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getRegistration()) : ""));
+        column44.setPrefWidth(75);
+        column44.setMaxWidth(75);
+        column44.setMinWidth(75);
+        column44.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Travel, String> column45 = new TableColumn<>("Incidental");
+        column45.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getTotalIncidental()) : ""));
+        column45.setPrefWidth(75);
+        column45.setMaxWidth(75);
+        column45.setMinWidth(75);
+        column45.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Travel, String> column46 = new TableColumn<>("Mode");
+        column46.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? obj.getValue().getMode() : ""));
+        column46.setPrefWidth(50);
+        column46.setMaxWidth(50);
+        column46.setMinWidth(50);
+        column46.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Travel, String> column5 = new TableColumn<>("1st Qtr");
+        column5.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr1() != 0 ? Utility.formatDecimal(obj.getValue().getQtr1()) : ""));
+        column5.setPrefWidth(75);
+        column5.setMaxWidth(75);
+        column5.setMinWidth(75);
+        column5.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Travel, String> column6 = new TableColumn<>("2nd Qtr");
+        column6.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr2() != 0 ? Utility.formatDecimal(obj.getValue().getQtr2()) : ""));
+        column6.setPrefWidth(75);
+        column6.setMaxWidth(75);
+        column6.setMinWidth(75);
+        column6.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Travel, String> column7 = new TableColumn<>("3rd Qtr");
+        column7.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr3() != 0 ? Utility.formatDecimal(obj.getValue().getQtr3()) : ""));
+        column7.setPrefWidth(75);
+        column7.setMaxWidth(75);
+        column7.setMinWidth(75);
+        column7.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Travel, String> column8 = new TableColumn<>("4th Qtr");
+        column8.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr4() != 0 ? Utility.formatDecimal(obj.getValue().getQtr4()) : ""));
+        column8.setPrefWidth(75);
+        column8.setMaxWidth(75);
+        column8.setMinWidth(75);
+        column8.setStyle("-fx-alignment: center-right;");
+
+        this.cob_items.setFixedCellSize(35);
+        this.cob_items.setPlaceholder(new Label("No Items added"));
+
+        this.cob_items.getColumns().add(column);
+        this.cob_items.getColumns().add(column1);
+        this.cob_items.getColumns().add(column2);
+        this.cob_items.getColumns().add(column3);
+        this.cob_items.getColumns().add(column4);
+        this.cob_items.getColumns().add(column41);
+        this.cob_items.getColumns().add(column42);
+        this.cob_items.getColumns().add(column43);
+        this.cob_items.getColumns().add(column44);
+        this.cob_items.getColumns().add(column45);
+        this.cob_items.getColumns().add(column46);
+        this.cob_items.getColumns().add(column5);
+        this.cob_items.getColumns().add(column6);
+        this.cob_items.getColumns().add(column7);
+        this.cob_items.getColumns().add(column8);
+    }
+
+    /**
+     * Initializes the COB Items (Salaries) table
+     * @return void
+     */
+    public void createSalariesTable(){
+        TableColumn<Salary, String> column = new TableColumn<>("Particulars");
+        column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getScopeId() == null ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
+        column.setStyle("-fx-alignment: center-left;");
+
+        TableColumn<Salary, String> column1 = new TableColumn<>("Basic Salary");
+        column1.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getAmount()) : ""));
+        column1.setPrefWidth(100);
+        column1.setMaxWidth(100);
+        column1.setMinWidth(100);
+        column1.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Salary, String> column2 = new TableColumn<>("Unit");
+        column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getRemarks() != null ? obj.getValue().getRemarks()+"" : ""));
+        column2.setPrefWidth(75);
+        column2.setMaxWidth(75);
+        column2.setMinWidth(75);
+        column2.setStyle("-fx-alignment: center;");
+
+        TableColumn<Salary, String> column3 = new TableColumn<>("Qty");
+        column3.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQty() > 0 ? obj.getValue().getQty()+"" : ""));
+        column3.setPrefWidth(50);
+        column3.setMaxWidth(50);
+        column3.setMinWidth(50);
+        column3.setStyle("-fx-alignment: center;");
+
+        TableColumn<Salary, String> column42 = new TableColumn<>("Long.");
+        column42.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getLongetivity()) : ""));
+        column42.setPrefWidth(85);
+        column42.setMaxWidth(85);
+        column42.setMinWidth(85);
+        column42.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Salary, String> column43 = new TableColumn<>("SSS/PhilH");
+        column43.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getsSSPhilH()) : ""));
+        column43.setPrefWidth(85);
+        column43.setMaxWidth(85);
+        column43.setMinWidth(85);
+        column43.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Salary, String> column44 = new TableColumn<>("Overtime");
+        column44.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getOvertime()) : ""));
+        column44.setPrefWidth(85);
+        column44.setMaxWidth(85);
+        column44.setMinWidth(85);
+        column44.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Salary, String> column45 = new TableColumn<>("Cash Gift");
+        column45.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getCashGift()) : ""));
+        column45.setPrefWidth(75);
+        column45.setMaxWidth(75);
+        column45.setMinWidth(75);
+        column45.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Salary, String> column46 = new TableColumn<>("13th Mo.");
+        column46.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getBonus13()) : ""));
+        column46.setPrefWidth(85);
+        column46.setMaxWidth(85);
+        column46.setMinWidth(85);
+        column46.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Salary, String> column47 = new TableColumn<>("Annual Total");
+        column47.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getAnnualTotal()) : ""));
+        column47.setPrefWidth(85);
+        column47.setMaxWidth(85);
+        column47.setMinWidth(85);
+        column47.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Salary, String> column5 = new TableColumn<>("1st Qtr");
+        column5.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr1() != 0 ? Utility.formatDecimal(obj.getValue().getQtr1()) : ""));
+        column5.setPrefWidth(85);
+        column5.setMaxWidth(85);
+        column5.setMinWidth(85);
+        column5.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Salary, String> column6 = new TableColumn<>("2nd Qtr");
+        column6.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr2() != 0 ? Utility.formatDecimal(obj.getValue().getQtr2()) : ""));
+        column6.setPrefWidth(85);
+        column6.setMaxWidth(85);
+        column6.setMinWidth(85);
+        column6.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Salary, String> column7 = new TableColumn<>("3rd Qtr");
+        column7.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr3() != 0 ? Utility.formatDecimal(obj.getValue().getQtr3()) : ""));
+        column7.setPrefWidth(85);
+        column7.setMaxWidth(85);
+        column7.setMinWidth(85);
+        column7.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Salary, String> column8 = new TableColumn<>("4th Qtr");
+        column8.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getQtr4() != 0 ? Utility.formatDecimal(obj.getValue().getQtr4()) : ""));
+        column8.setPrefWidth(85);
+        column8.setMaxWidth(85);
+        column8.setMinWidth(85);
+        column8.setStyle("-fx-alignment: center-right;");
+
+        this.cob_items.setFixedCellSize(35);
+        this.cob_items.setPlaceholder(new Label("No Items added"));
+
+        this.cob_items.getColumns().add(column);
+        this.cob_items.getColumns().add(column1);
+        this.cob_items.getColumns().add(column2);
+        this.cob_items.getColumns().add(column3);
+        this.cob_items.getColumns().add(column42);
+        this.cob_items.getColumns().add(column43);
+        this.cob_items.getColumns().add(column44);
+        this.cob_items.getColumns().add(column45);
+        this.cob_items.getColumns().add(column46);
+        this.cob_items.getColumns().add(column47);
         this.cob_items.getColumns().add(column5);
         this.cob_items.getColumns().add(column6);
         this.cob_items.getColumns().add(column7);
@@ -392,6 +753,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
         dialogLayout.setBody(parent);
         JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
         AddItemController ctrl = fxmlLoader.getController();
+        ctrl.setType(this.type_cb.getSelectionModel().getSelectedItem());
         dialog.setOnDialogOpened((event) -> { ctrl.getDescription_tf().requestFocus(); });
         dialog.show();
     }
