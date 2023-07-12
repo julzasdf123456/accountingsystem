@@ -52,7 +52,7 @@ public class AddItemController extends MenuControllerHandler implements Initiali
     private JFXTextField total_amount_tf;
 
     @FXML
-    private JFXTextField qty_tf;
+    private JFXTextField qty_tf, times_tf;
 
     @FXML
     private JFXTextField q1_tf;
@@ -90,12 +90,12 @@ public class AddItemController extends MenuControllerHandler implements Initiali
             this.unit_tf.setText("");
             this.cost_tf.setText("");
             if (exists_check.isSelected()){
-                this.price_lbl.setText("Price");
+                this.price_lbl.setText("Est. Price");
                 this.unit_lbl.setText("Unit");
                 this.unit_tf.setEditable(false);
             }else{
-                this.price_lbl.setText("Cost");
-                this.unit_lbl.setText("Remarks");
+                this.price_lbl.setText("Est. Cost");
+                this.unit_lbl.setText("Remarks/Unit");
                 this.unit_tf.setEditable(true);
             }
             this.description_tf.requestFocus();
@@ -339,5 +339,13 @@ public class AddItemController extends MenuControllerHandler implements Initiali
 
     public CheckBox getCheck(){
         return this.exists_check;
+    }
+
+    public void setType(String type){
+        if (type.equals(COBItem.TYPES[0])){
+            this.times_tf.setDisable(false);
+        }else{
+            this.times_tf.setDisable(true);
+        }
     }
 }
