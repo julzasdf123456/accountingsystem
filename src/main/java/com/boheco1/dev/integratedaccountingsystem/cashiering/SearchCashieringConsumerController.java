@@ -52,6 +52,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
 
     private Teller teller;
     private int countAccount;
+    private boolean taskIsRunning = false;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
        // this.createTable();
@@ -100,8 +101,10 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
         }
 
         searchDate.getEditor().setOnKeyReleased(e ->{
-            if (e.getCode() == KeyCode.ENTER)
+            if (e.getCode() == KeyCode.ENTER) {
                 search();
+                searchTf.requestFocus();
+            }
         });
 
         searchTf.setOnKeyPressed(e -> {
@@ -217,6 +220,9 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
     }
 
     private void processRequest(Object row){
+       if(taskIsRunning)
+           return;
+
         resultInfo = row;
         if(resultInfo instanceof EmployeeInfo){
             EmployeeInfo employeeInfo = (EmployeeInfo) resultInfo;
@@ -252,6 +258,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                 };
 
                 task.setOnRunning(wse -> {
+                    taskIsRunning = true;
                     dialog.show();
                 });
 
@@ -265,7 +272,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                         result.put("SearchDate", searchDate.getValue());
                         result.put("CountAccount", countAccount);
                         this.parentController.receive(result);
-
+                        taskIsRunning = false;
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

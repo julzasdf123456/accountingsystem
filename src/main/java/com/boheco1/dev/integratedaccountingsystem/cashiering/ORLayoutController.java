@@ -195,7 +195,7 @@ public class ORLayoutController implements Initializable {
             TransactionHeaderDetailDAO.save(orContent.getCrmQueue(), orContent.getTransactionHeader(), orContent.getTds());
             if(Utility.ERROR_MSG == null){//error message from TransactionHeaderDAO
                 Node node = printArea;
-                Paper paper = PrintHelper.createPaper("OR", 18, 6, Units.INCH);
+                Paper paper = PrintHelper.createPaper("OR", 18, 5.5, Units.INCH);
                 Printer printer = Printer.getDefaultPrinter();
                 PageLayout pageLayout = printer.createPageLayout(paper,
                         PageOrientation.PORTRAIT, 10, 10, 0, 0);

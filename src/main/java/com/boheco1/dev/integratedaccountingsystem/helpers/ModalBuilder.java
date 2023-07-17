@@ -2,6 +2,8 @@ package com.boheco1.dev.integratedaccountingsystem.helpers;
 
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
@@ -32,6 +34,11 @@ public class ModalBuilder {
             dialogLayout.setBody(parent);
             dialogLayout.setPadding(new Insets(-40,-15,-40,-15));// top, left, bottom, right
             dialog = new JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+            dialog.setOnDialogClosed(event -> {
+                // Handle any actions after the dialog is closed
+                running = false;
+                System.out.println("Dialog closed.");
+            });
             dialog.show();
             running = true;
         } catch (Exception e) {
