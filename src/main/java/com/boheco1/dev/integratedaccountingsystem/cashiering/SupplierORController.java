@@ -39,7 +39,7 @@ public class SupplierORController extends MenuControllerHandler implements Initi
     private JFXTextArea supplierInfo;
 
     @FXML
-    private JFXTextField orNumber, amount, searchSupplier, particular;
+    private JFXTextField orNumber, amount, searchSupplier, particular, tinNumber, style;
 
     @FXML
     private Label totalDisplay;
@@ -64,7 +64,8 @@ public class SupplierORController extends MenuControllerHandler implements Initi
     private void clearText(){
         if(Utility.OR_NUMBER!=0)
             orNumber.setText(""+Utility.OR_NUMBER);
-
+        tinNumber.setText("");
+        style.setText("");
         totalDisplay.setText("");
         particular.setText("");
         amount.setText("");
@@ -228,6 +229,15 @@ public class SupplierORController extends MenuControllerHandler implements Initi
                 ORItemSummary grandTotal = new ORItemSummary(Utility.getAccountCodeProperty(),"Grand Total", totalAmount);
                 observableList.add(grandTotal);
                 int seq =1;
+                if(!style.getText().isEmpty()){
+                    ORItemSummary orItemSummaryTIN = new ORItemSummary("BUSINESS STYLE: "+ style.getText());//just to display TIN in the table
+                    observableList.add(0,orItemSummaryTIN);
+                }
+
+                if(!tinNumber.getText().isEmpty()){
+                    ORItemSummary orItemSummaryTIN = new ORItemSummary("TIN "+ tinNumber.getText());//just to display TIN in the table
+                    observableList.add(0,orItemSummaryTIN);
+                }
                 for(ORItemSummary items : observableList){
                     TransactionDetails transactionDetails = new TransactionDetails();
                     transactionDetails.setPeriod(period);
@@ -235,7 +245,7 @@ public class SupplierORController extends MenuControllerHandler implements Initi
                     transactionDetails.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
                     transactionDetails.setTransactionDate(date.getValue());
                     transactionDetails.setParticulars(items.getDescription());
-                    if(!transactionDetails.getParticulars().contains("TIN"))
+                    if(!transactionDetails.getParticulars().contains("TIN") && !transactionDetails.getParticulars().contains("BUSINESS STYLE"))
                         transactionDetails.setSequenceNumber(seq++);
                     transactionDetails.setAccountCode(items.getAccountCode());
 
@@ -304,6 +314,8 @@ public class SupplierORController extends MenuControllerHandler implements Initi
         //This will set the actions once the user clicks an item from the popupmenu.
         suggestion.setOnAutoCompleted(event -> {
             particularsAccount = event.getCompletion();
+            amount.setText(""+particularsAccount.getAmount());
+            amount.requestFocus();
         });
     }
 
@@ -345,13 +357,8 @@ public class SupplierORController extends MenuControllerHandler implements Initi
             supplier = event.getCompletion();
             searchSupplier.setText(supplier.getCompanyName());
             supplierInfo.setText(supplier.getCompanyAddress());
-
-            if(supplier.getTINNo().isEmpty())
-                return;
-
-            ORItemSummary orItemSummary = new ORItemSummary("TIN "+ supplier.getTINNo());//just to display TIN in the table
-            observableList.add(orItemSummary);
-            itemTable.refresh();
+            tinNumber.setText(supplier.getTINNo());
+            style.setText(supplier.getSupplierNature());
         });
     }
 

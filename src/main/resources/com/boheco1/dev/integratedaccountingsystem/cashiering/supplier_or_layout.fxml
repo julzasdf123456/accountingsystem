@@ -43,14 +43,31 @@
             </JFXButton>
          </children>
       </VBox>
-      <TableView fx:id="itemTable" layoutX="233.0" layoutY="115.0" prefHeight="434.0" prefWidth="566.0" stylesheets="@../style.css" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="241.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="115.0" />
+      <TableView fx:id="itemTable" layoutX="233.0" layoutY="170.0" prefHeight="379.0" prefWidth="566.0" stylesheets="@../style.css" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="241.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="170.0" />
       <VBox layoutX="241.0" layoutY="23.0" prefHeight="74.0" prefWidth="485.0" AnchorPane.leftAnchor="241.0" AnchorPane.topAnchor="15.0">
          <children>
             <Label style="-fx-font-size: 14; -fx-font-weight: bold;" text="OR Content" />
             <Separator prefWidth="200.0" />
+            <HBox layoutX="10.0" layoutY="43.0" prefHeight="44.0" prefWidth="485.0">
+               <children>
+                  <JFXTextField fx:id="tinNumber" labelFloat="true" prefHeight="29.0" prefWidth="176.0" promptText="TIN" HBox.hgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets right="16.0" top="6.0" />
+                     </HBox.margin>
+                  </JFXTextField>
+                  <JFXTextField fx:id="style" labelFloat="true" maxWidth="-Infinity" onAction="#getAmount" prefHeight="29.0" prefWidth="314.0" promptText="Business Style">
+                     <HBox.margin>
+                        <Insets left="3.0" top="6.0" />
+                     </HBox.margin>
+                  </JFXTextField>
+               </children>
+               <VBox.margin>
+                  <Insets top="8.0" />
+               </VBox.margin>
+            </HBox>
             <HBox prefHeight="44.0" prefWidth="485.0">
                <children>
-                  <JFXTextField fx:id="particular" promptText="Particular" HBox.hgrow="ALWAYS">
+                  <JFXTextField fx:id="particular" labelFloat="true" prefWidth="253.0" promptText="Particular" HBox.hgrow="ALWAYS">
                      <HBox.margin>
                         <Insets right="16.0" top="6.0" />
                      </HBox.margin>
@@ -62,12 +79,23 @@
                   </JFXTextField>
                </children>
                <VBox.margin>
-                  <Insets top="10.0" />
+                  <Insets top="16.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox>
+               <children>
+                  <Label style="-fx-font-size: 16;" text="Total:">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </Label>
+                  <Label fx:id="totalDisplay" style="-fx-font-size: 16;" text="0" />
+               </children>
+               <VBox.margin>
+                  <Insets top="8.0" />
                </VBox.margin>
             </HBox>
          </children>
       </VBox>
-      <Label fx:id="totalDisplay" layoutX="286.0" layoutY="89.0" style="-fx-font-size: 16;" text="0" AnchorPane.leftAnchor="286.0" AnchorPane.topAnchor="89.0" />
-      <Label layoutX="246.0" layoutY="89.0" style="-fx-font-size: 16;" text="Total:" AnchorPane.leftAnchor="246.0" AnchorPane.topAnchor="89.0" />
    </children>
 </AnchorPane>

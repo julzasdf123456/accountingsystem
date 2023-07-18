@@ -899,6 +899,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         //This will set the actions once the user clicks an item from the popupmenu.
         suggestion.setOnAutoCompleted(event -> {
             particularsAccount = event.getCompletion();
+            orItemAmount.setText(""+particularsAccount.getAmount());
             orItemAmount.requestFocus();
         });
     }

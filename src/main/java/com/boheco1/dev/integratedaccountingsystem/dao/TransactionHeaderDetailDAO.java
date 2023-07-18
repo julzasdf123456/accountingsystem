@@ -59,7 +59,7 @@ public class TransactionHeaderDetailDAO {
 
                 for (TransactionDetails td : tds) {
                     System.out.println(td.getParticulars());
-                    if(td.getParticulars().contains("TIN")) //check from supplier OR will not save the TIN row in the table
+                    if(td.getParticulars().contains("TIN") || td.getParticulars().contains("BUSINESS STYLE")) //check from supplier OR will not save the TIN and business style row in the table
                         continue;
                     ps2.setDate(1, Date.valueOf(td.getPeriod()));
                     ps2.setString(2, td.getTransactionNumber());

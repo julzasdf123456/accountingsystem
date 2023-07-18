@@ -151,8 +151,19 @@ public class ORLayoutController implements Initializable {
                 }
             }else if(orContent.getSupplierItems() != null){
                 ObservableList<ORItemSummary> items = orContent.getSupplierItems();
+
                 for (ORItemSummary a : items) {
-                    if(!a.getDescription().equals("Grand Total")) {
+                    if(a.getDescription().contains("TIN") || a.getDescription().contains("BUSINESS STYLE")){
+                        description += a.getDescription() + "\n";
+                        amount += a.getTotalView() + "\n";
+                    }
+                }
+
+                description += "\n";
+                amount += "\n";
+
+                for (ORItemSummary a : items) {
+                    if(!a.getDescription().equals("Grand Total") && !a.getDescription().contains("TIN") && !a.getDescription().contains("BUSINESS STYLE")) {
                         description += a.getDescription() + "\n";
                         amount += a.getTotalView() + "\n";
                     }
