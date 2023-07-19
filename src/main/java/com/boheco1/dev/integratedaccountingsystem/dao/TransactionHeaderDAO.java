@@ -173,7 +173,7 @@ public class TransactionHeaderDAO {
             th.setRemarks(rs.getString("Remarks"));
             th.setName(rs.getString("Name"));
             th.setAddress(rs.getString("Address"));
-            th.setTransactionLog(rs.getString("TransactionLog"));
+//            th.setTransactionLog(rs.getString("TransactionLog"));
 
             return th;
         }else {

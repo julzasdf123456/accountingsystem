@@ -399,4 +399,12 @@ public class Utility {
 
         return props.getProperty("host");
     }
+
+    public static String breakString(String str, int maxChars, int line) {
+        if(str.length()<maxChars) return line==1 ? str : "";
+        String maxStr = str.substring(0, maxChars);
+        int indexOfLastSpace = maxStr.lastIndexOf(' ');
+
+        return line==1 ? str.substring(0, indexOfLastSpace) : str.substring(indexOfLastSpace+1);
+    }
 }

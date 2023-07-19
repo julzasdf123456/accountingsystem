@@ -4,10 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.dao.ParticularsAccountDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionDetailsDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
-import com.boheco1.dev.integratedaccountingsystem.objects.BankAccount;
-import com.boheco1.dev.integratedaccountingsystem.objects.ParticularsAccount;
-import com.boheco1.dev.integratedaccountingsystem.objects.TransactionDetails;
-import com.boheco1.dev.integratedaccountingsystem.objects.TransactionHeader;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.*;
 import com.sun.javafx.print.PrintHelper;
 import com.sun.javafx.print.Units;
@@ -45,6 +42,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -484,7 +482,11 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             amountSplit2 = amountStr.substring(35);
         }
 
-        for(int i=0; i<3; i++) data.append(line);
+        for(int i=0; i<2; i++) data.append(line);
+
+        String dateStr = currentTransaction.getTransactionDate().format(DateTimeFormatter.ofPattern("MM/dd/YYYY"));
+
+        data.append(new StringBuffer(line).replace(28, 38, dateStr).replace(69,79,dateStr));
 
         data.append(new StringBuffer(line).replace(4,pmtFor.length()+4, pmtFor)
                 .replace(45,pmtFor.length()+45, pmtFor));
@@ -496,22 +498,44 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
         data.append(line);
 
+        int nLines = 0;
+
         for(int i=0; i<item.length; i++) {
             String amt = leftPadding(10, amount[i]);
+            String name1 = Utility.breakString(item[i], 25, 1);
+            String name2 = Utility.breakString(item[i], 25, 2);
             data.append(
-                    new StringBuffer(line).replace(0, item[i].length(), item[i]).replace(25, 35, amt)
-                            .replace(43, item[i].length()+43, item[i]).replace(68,78, amt)
+                    new StringBuffer(line).replace(0, name1.length(), name1).replace(25, 35, amt)
+                            .replace(43, name1.length()+43, name1).replace(68,78, amt)
             );
+
+            nLines++;
+
+            if(!name2.isEmpty()) {
+                data.append(
+                        new StringBuffer(line).replace(4, name2.length()+4, name2).replace(47, 47+name2.length(), name2)
+                );
+                nLines++;
+            }
         }
 
-        for(int i=0; i<3-item.length; i++) data.append(line);
+        for(int i=0; i<3-nLines; i++) data.append(line);
 
         data.append(
                 new StringBuffer(line).replace(25,35, leftPadding(10,String.format("%,.2f", totalAmount)))
                         .replace(68,78, leftPadding(10,String.format("%,.2f", totalAmount)))
         );
 
-        for(int i=0; i<7; i++) data.append(line);
+        data.append(line);
+
+        String username = ActiveUser.getUser().getUserName();
+
+        data.append(
+                new StringBuffer(line).replace(25, 25+username.length(), username)
+                        .replace(68, 68+username.length(), username)
+        );
+
+        for(int i=0; i<5; i++) data.append(line);
 
         return data.toString();
     }
