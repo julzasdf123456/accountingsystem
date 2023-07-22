@@ -482,11 +482,13 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             amountSplit2 = amountStr.substring(35);
         }
 
-        for(int i=0; i<2; i++) data.append(line);
+        for(int i=0; i<1; i++) data.append(line);
 
         String dateStr = currentTransaction.getTransactionDate().format(DateTimeFormatter.ofPattern("MM/dd/YYYY"));
 
-        data.append(new StringBuffer(line).replace(28, 38, dateStr).replace(69,79,dateStr));
+        data.append(new StringBuffer(line).replace(24, 34, dateStr).replace(66,76,dateStr));
+
+        data.append(line);
 
         data.append(new StringBuffer(line).replace(4,pmtFor.length()+4, pmtFor)
                 .replace(45,pmtFor.length()+45, pmtFor));
