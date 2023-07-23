@@ -68,8 +68,8 @@ public class Travel extends COBItem{
     }
 
     public double getTotalTransport() {
-        //Rate * No. of Days * No. of Persons * No. of Times/Travel
-        return getTransport() * getNoOfDays() * getQty() * getNoOfTimes();
+        //Rate * No. of Persons * No. of Times/Travel
+        return getTransport() * getQty() * getNoOfTimes();
     }
 
     public double getTotalLodging() {
@@ -81,9 +81,24 @@ public class Travel extends COBItem{
         //Rate * No. of Days * No. of Persons * No. of Times/Travel
         return getIncidental() * getNoOfDays() * getQty() * getNoOfTimes();
     }
+
+    public double getTotalTravel(){
+        //Rate per diem * No. of days * No. of Person * No. of times
+        return this.getCost() * getNoOfDays() * getQty() * getNoOfTimes();
+    }
+
+    public double getTotalRegistration(){
+        //Rate per diem * No. of Person * No. of times
+        return this.getRegistration() * getQty() * getNoOfTimes();
+    }
+
     @Override
     public double getAmount(){
         //Rate per diem * No. of days * No. of Person * No. of times
-        return this.getCost() * getNoOfDays() * getQty() * getNoOfTimes();
+        return getTotalTravel()
+                + getTotalTransport()
+                + getTotalLodging()
+                + getTotalRegistration()
+                + getTotalIncidental();
     }
 }

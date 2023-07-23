@@ -13,7 +13,7 @@ public class COBItem extends Item{
     private double qtr2 = 0;
     private double qtr3 = 0;
     private double qtr4 = 0;
-
+    private double amount=0;
     private String cobId;
 
     public COBItem(){}
@@ -125,5 +125,9 @@ public class COBItem extends Item{
 
     public void setNoOfTimes(int noOfTimes) {
         this.noOfTimes = noOfTimes;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
 }
