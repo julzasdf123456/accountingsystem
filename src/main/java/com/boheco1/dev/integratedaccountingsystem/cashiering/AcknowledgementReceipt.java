@@ -397,16 +397,16 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         }
     }
 
-    public void onPrintx() {
+    public void onPrint() {
         System.out.println("Commence printing...");
         PrinterJob printJob = PrinterJob.createPrinterJob();
         Printer printer = printJob.getPrinter();
 
-        Paper arsize = PrintHelper.createPaper("8.5x11", 8.5,8.5,Units.INCH);
+        Paper arsize = PrintHelper.createPaper("ARR", 18, 3, Units.INCH);
 
-        Paper letter = Paper.NA_LETTER;
+//        Paper letter = Paper.NA_LETTER;
 
-        Paper a4 = Paper.A4;
+//        Paper a4 = Paper.A4;
 
         PageLayout layout = printer.createPageLayout(arsize, PageOrientation.PORTRAIT, Printer.MarginType.HARDWARE_MINIMUM);
 
@@ -427,7 +427,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         }
     }
 
-    public void onPrint() {
+    public void onPrintx() {
         try{
             InputStream is = new ByteArrayInputStream(getPrintData().getBytes());
             DocFlavor flavor =  DocFlavor.INPUT_STREAM.AUTOSENSE;
@@ -486,7 +486,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
         String dateStr = currentTransaction.getTransactionDate().format(DateTimeFormatter.ofPattern("MM/dd/YYYY"));
 
-        data.append(new StringBuffer(line).replace(24, 34, dateStr).replace(66,76,dateStr));
+        data.append(new StringBuffer(line).replace(25, 35, dateStr).replace(67,77,dateStr));
 
         data.append(line);
 
@@ -557,10 +557,10 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             for(int i=0; i<transactionDetails.size(); i++) {
                 TransactionDetails td = transactionDetails.get(i);
                 pmtFor[i] = td.getParticulars();
-                amount[i] = td.getDebit();
+                amount[i] = td.getCredit();
             }
 
-            cnt.setData(receivedFrom, Utility.doubleAmountToWords(total), total, pmtFor, amount );
+            cnt.setData(receivedFrom, Utility.doubleAmountToWords(total), total, pmtFor, amount, currentTransaction.getTransactionDate() );
 
             return root;
         }catch(IOException ex) {
