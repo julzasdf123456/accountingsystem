@@ -20,7 +20,7 @@ public class COB {
     private EmployeeInfo approved;
     private LocalDate dateApproved;
     private List<COBItem> items;
-
+    private String type;
     public static final String PENDING_REVIEW = "Pending Review";
     public static final String PENDING_APPROVAL = "Pending Approval";
     public static final String APPROVED = "Approved";
@@ -168,5 +168,13 @@ public class COB {
 
     public String getAppropriationStr() {
         return String.format("₱ %,.2f", this.amount);
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

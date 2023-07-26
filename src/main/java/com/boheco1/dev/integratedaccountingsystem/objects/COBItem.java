@@ -1,7 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 public class COBItem extends Item{
-    public static String[] TYPES = {"Benefits/Allowances", "Representation", "Salaries", "Travels/Seminars", "Others"};
+    public static String[] TYPES = {"Benefits/Allowances", "Representation", "Salaries", "Travels/Seminars", "Supplies/Materials", "Transportation", "Others"};
     private String cItemId;
     private String remarks;
     private String description;

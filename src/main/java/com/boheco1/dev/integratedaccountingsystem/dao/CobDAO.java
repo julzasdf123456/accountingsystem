@@ -54,26 +54,40 @@ public class CobDAO {
         conn.setAutoCommit(false);
 
         //Queries
-        String cob_sql = "INSERT INTO COB (AppId, COBId, FSId, Activity, Amount, Status, Prepared, DatePrepared) " +
-                         "VALUES (?, ?, ?, ?, ROUND(?, 2), ?, ?, getdate())";
+        String cob_sql = "INSERT INTO COB (AppId, COBId, COBType, FSId, Activity, Amount, Status, Prepared, DatePrepared) " +
+                         "VALUES (?, ?, ?, ?, ?, ROUND(?, 2), ?, ?, getdate())";
 
-        String item_sql = "INSERT INTO COBItem (CItemId, ItemId, COBId, Qty, Remarks, Description, Cost, Qtr1, Qtr2, Qtr3, Qtr4, Sequence) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?)";
+        String item_sql = "INSERT INTO COBItem (CItemId, ItemId, COBId, Qty, Remarks, Description, Cost, Qtr1, Qtr2, Qtr3, Qtr4, Sequence, NoOfTimes) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?)";
+
+        String subtype = "";
+        if (cob.getType().equals(COBItem.TYPES[1])){
+            subtype = "INSERT INTO Representation (reprnAllowance, reimbursableAllowance, otherAllowance, CItemId) " +
+                    "VALUES (ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?)";
+        }else if (cob.getType().equals(COBItem.TYPES[2])) {
+            subtype = "INSERT INTO Salaries(Longetivity, SSSPhilH, Overtime, CashGift, Bonus13, CItemId) " +
+                    "VALUES(ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?)";
+        }else if (cob.getType().equals(COBItem.TYPES[3])){
+            subtype = "INSERT INTO Travel (NoOfDays, Transport, Lodging, Registration, Incidental, Mode, CItemId) " +
+                    "VALUES(?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?)";
+        }
 
         //Prepared statements
         PreparedStatement ps_cob = DB.getConnection().prepareStatement(cob_sql);
         PreparedStatement ps_item = DB.getConnection().prepareStatement(item_sql);
+        PreparedStatement ps_sub = DB.getConnection().prepareStatement(subtype);
 
         //Transact
         try {
             //Insert COB
             ps_cob.setString(1, cob.getAppId());
             ps_cob.setString(2, cob.getCobId());
-            ps_cob.setString(3, cob.getFsId());
-            ps_cob.setString(4, cob.getActivity());
-            ps_cob.setDouble(5, cob.getAmount());
-            ps_cob.setString(6, COB.PENDING_REVIEW);
-            ps_cob.setString(7, ActiveUser.getUser().getEmployeeID());
+            ps_cob.setString(3, cob.getType());
+            ps_cob.setString(4, cob.getFsId());
+            ps_cob.setString(5, cob.getActivity());
+            ps_cob.setDouble(6, cob.getAmount());
+            ps_cob.setString(7, COB.PENDING_REVIEW);
+            ps_cob.setString(8, ActiveUser.getUser().getEmployeeID());
             ps_cob.executeUpdate();
 
             //Insert cob items
@@ -90,7 +104,40 @@ public class CobDAO {
                 ps_item.setDouble(10, item.getQtr3());
                 ps_item.setDouble(11, item.getQtr4());
                 ps_item.setInt(12, item.getSequence());
+                ps_item.setInt(13, item.getNoOfTimes());
                 ps_item.executeUpdate();
+
+                //Insert also to child table if COB Item is representation, Salaries, Travels
+                //Representation
+                if (cob.getType().equals(COBItem.TYPES[1])){
+                    Representation r = (Representation) item;
+                    ps_sub.setDouble(1, r.getRepresentationAllowance());
+                    ps_sub.setDouble(2, r.getReimbursableAllowance());
+                    ps_sub.setDouble(3, r.getOtherAllowance());
+                    ps_sub.setString(4, item.getcItemId());
+                    ps_sub.executeUpdate();
+                //Salaries
+                }else if (cob.getType().equals(COBItem.TYPES[2])) {
+                    Salary s = (Salary) item;
+                    ps_sub.setDouble(1, s.getLongetivity());
+                    ps_sub.setDouble(2, s.getsSSPhilH());
+                    ps_sub.setDouble(3, s.getOvertime());
+                    ps_sub.setDouble(4, s.getCashGift());
+                    ps_sub.setDouble(5, s.getBonus13());
+                    ps_sub.setString(6, item.getcItemId());
+                    ps_sub.executeUpdate();
+                //Travels/Seminars
+                }else if (cob.getType().equals(COBItem.TYPES[3])){
+                    Travel t = (Travel) item;
+                    ps_sub.setInt(1, t.getNoOfDays());
+                    ps_sub.setDouble(2, t.getTransport());
+                    ps_sub.setDouble(3, t.getLodging());
+                    ps_sub.setDouble(4, t.getRegistration());
+                    ps_sub.setDouble(5, t.getIncidental());
+                    ps_sub.setString(6, t.getMode());
+                    ps_sub.setString(7, item.getcItemId());
+                    ps_sub.executeUpdate();
+                }
             }
             //Commit insert
             conn.commit();
@@ -103,6 +150,7 @@ public class CobDAO {
         //Close connections
         ps_cob.close();
         ps_item.close();
+        ps_sub.close();
 
         //Set autocommit to true
         conn.setAutoCommit(true);
