@@ -90,10 +90,12 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
             accountDescription.setItems(FXCollections.observableList(ParticularsAccountDAO.getByType("AR")));
             transactionDetails = FXCollections.observableList(new ArrayList<>());
+
+            //set initial date to server date
+            orDate.setValue(Utility.serverDate());
+
             renderTable();
             breakdownTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-
 
         }catch(Exception ex) {
             ex.printStackTrace();
