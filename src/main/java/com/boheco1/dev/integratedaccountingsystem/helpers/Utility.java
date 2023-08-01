@@ -407,4 +407,7 @@ public class Utility {
 
         return line==1 ? str.substring(0, indexOfLastSpace) : str.substring(indexOfLastSpace+1);
     }
+
+    public static String COB_APPROVAL = "budget officer";
+    public static String COB_REVIEWER = "manager";
 }

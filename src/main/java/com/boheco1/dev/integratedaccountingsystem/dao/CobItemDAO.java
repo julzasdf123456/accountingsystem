@@ -1,8 +1,8 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
-import com.boheco1.dev.integratedaccountingsystem.objects.COB;
-import com.boheco1.dev.integratedaccountingsystem.objects.COBItem;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
+import org.apache.poi.ss.formula.functions.T;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,7 +17,53 @@ public class CobItemDAO {
      * @throws Exception
      */
     public static List<COBItem> getItems(COB cob) throws Exception {
-        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM COBItem WHERE COBId=?");
+
+        String sql = "SELECT CItemId, Sequence, Level, ItemId, Description, Cost, Remarks, Qty, NoOfTimes, (Cost * Qty * NoOfTimes) AS Total, Qtr1, Qtr2, Qtr3, Qtr4 " +
+                "FROM COBItem ci ";
+
+        //Benefits/Allowances
+        if (cob.getType().equals(COBItem.TYPES[0])){
+
+        //Representation
+        } else if (cob.getType().equals(COBItem.TYPES[1])) {
+            sql = "SELECT ci.CItemId, Sequence, Level, ItemId, Description, Cost, Remarks, Qty, NoOfTimes, (Cost * Qty * NoOfTimes) AS Total, reprnAllowance, reimbursableAllowance, otherAllowance " +
+                    "FROM COBItem ci INNER JOIN Representation c ON ci.CItemId = c.CItemId ";
+        //Salaries
+        }else if (cob.getType().equals(COBItem.TYPES[2])) {
+            sql = "SELECT ci.CItemId, Sequence, Level, ItemId, Description AS Position, Cost AS BasicSalary, Remarks, Qty AS Persons, NoOfTimes, " +
+                    "Longetivity, SSSPhilH, CashGift, Bonus13, " +
+                    "(Cost * Qty * NoOfTimes * 12) As AnnualTotal " +
+                    "FROM COBItem ci INNER JOIN Salaries s ON ci.CItemId = s.CItemId ";
+        //Travels/Seminars
+        }else if (cob.getType().equals(COBItem.TYPES[3])) {
+            sql = "SELECT ci.CItemId, Sequence, Level, ItemId, Description, " +
+                    "Cost AS RatePerDiem, (Cost * NoOfDays * Qty * NoOfTimes)  AS TravelCost, " +
+                    "Remarks, Qty AS Persons, NoOfDays, NoOfTimes AS TimesPerYear, " +
+                    "Transport, (Transport * Qty * NoOfTimes) AS TotalTransport, " +
+                    "Lodging, (Lodging * NoOfDays * Qty * NoOfTimes) AS TotalLodging, " +
+                    "Incidental, (Incidental * NoOfDays * Qty * NoOfTimes) AS TotalIncidental, " +
+                    "Registration, (Registration * Qty * NoOfTimes) AS TotalRegistration, " +
+                    "((Cost * NoOfDays * Qty * NoOfTimes) " +
+                    "+ (Transport * Qty * NoOfTimes) " +
+                    "+ (Lodging * NoOfDays * Qty * NoOfTimes) " +
+                    "+ (Registration * Qty * NoOfTimes) " +
+                    "+ (Incidental * NoOfDays * Qty * NoOfTimes)) AS TotalAmount, " +
+                    "Mode, " +
+                    "Qtr1, Qtr2, Qtr3, Qtr4, (Qtr1 + Qtr2 + Qtr3 + Qtr4) AS Total " +
+                    "FROM COBItem ci INNER JOIN Travel t ON ci.CItemId = t.CItemId ";
+        //Supplies/Materials
+        }else if (cob.getType().equals(COBItem.TYPES[4])) {
+
+        //Transportation
+        }else if (cob.getType().equals(COBItem.TYPES[5])) {
+
+        //Others
+        }else{
+
+        }
+        sql += "WHERE COBId = ? ORDER BY Sequence ASC;";
+
+        PreparedStatement ps = DB.getConnection().prepareStatement(sql);
         ps.setString(1, cob.getCobId());
 
         ResultSet rs = ps.executeQuery();
@@ -25,17 +71,85 @@ public class CobItemDAO {
         List<COBItem> items = new ArrayList<>();
 
         while(rs.next()) {
+
             COBItem item = new COBItem();
-            item.setcItemId(rs.getString("CItemId"));
-            item.setDescription(rs.getString("Description"));
-            item.setQty(rs.getInt("Qty"));
-            item.setCost(rs.getDouble("Cost"));
-            item.setItemId(rs.getString("ItemId"));
-            item.setQtr1(rs.getDouble("Qtr1"));
-            item.setQtr2(rs.getDouble("Qtr2"));
-            item.setQtr3(rs.getDouble("Qtr3"));
-            item.setQtr4(rs.getDouble("Qtr4"));
-            item.setRemarks(rs.getString("Remarks"));
+
+            //Representation
+            if (cob.getType().equals(COBItem.TYPES[1])) {
+                Representation repr = new Representation();
+                repr.setcItemId(rs.getString("CItemId"));
+                repr.setItemId(rs.getString("ItemId"));
+                repr.setDescription(rs.getString("Description"));
+                repr.setQty(rs.getInt("Qty"));
+                repr.setCost(rs.getDouble("Cost"));
+                repr.setRepresentationAllowance(rs.getDouble("reprnAllowance"));
+                repr.setReimbursableAllowance(rs.getDouble("reimbursableAllowance"));
+                repr.setOtherAllowance(rs.getDouble("otherAllowance"));
+                repr.setRemarks(rs.getString("Remarks"));
+                repr.setSequence(rs.getInt("Sequence"));
+                repr.setNoOfTimes(rs.getInt("NoOfTimes"));
+                repr.setLevel(rs.getInt("Level"));
+                item = repr;
+            //Salaries
+            }else if (cob.getType().equals(COBItem.TYPES[2])) {
+                Salary sal = new Salary();
+
+                sal.setcItemId(rs.getString("CItemId"));
+                sal.setItemId(rs.getString("ItemId"));
+                sal.setDescription(rs.getString("Position"));
+                sal.setQty(rs.getInt("Persons"));
+                sal.setCost(rs.getDouble("BasicSalary"));
+                sal.setRemarks(rs.getString("Remarks"));
+                sal.setSequence(rs.getInt("Sequence"));
+                sal.setNoOfTimes(rs.getInt("NoOfTimes"));
+                sal.setCashGift(rs.getDouble("CashGift"));
+                sal.setLongetivity(rs.getDouble("Longetivity"));
+                sal.setsSSPhilH(rs.getDouble("SSSPhilH"));
+                sal.setBonus13(rs.getDouble("Bonus13"));
+                sal.setLevel(rs.getInt("Level"));
+                item = sal;
+            //Travels/Seminars
+            }else if (cob.getType().equals(COBItem.TYPES[3])) {
+
+                Travel trav = new Travel();
+
+                trav.setcItemId(rs.getString("CItemId"));
+                trav.setSequence(rs.getInt("Sequence"));
+                trav.setItemId(rs.getString("ItemId"));
+                trav.setDescription(rs.getString("Description"));
+                trav.setCost(rs.getDouble("RatePerDiem"));
+                trav.setRemarks(rs.getString("Remarks"));
+                trav.setQty(rs.getInt("Persons"));
+                trav.setLodging(rs.getDouble("Lodging"));
+                trav.setTransport(rs.getDouble("Transport"));
+                trav.setIncidental(rs.getDouble("Incidental"));
+                trav.setRegistration(rs.getDouble("Registration"));
+                trav.setNoOfDays(rs.getInt("NoOfDays"));
+                trav.setNoOfTimes(rs.getInt("TimesPerYear"));
+                trav.setMode(rs.getString("Mode"));
+                trav.setQtr1(rs.getDouble("Qtr1"));
+                trav.setQtr2(rs.getDouble("Qtr2"));
+                trav.setQtr3(rs.getDouble("Qtr3"));
+                trav.setQtr4(rs.getDouble("Qtr4"));
+                trav.setLevel(rs.getInt("Level"));
+                item = trav;
+            //Others
+            }else{
+                item = new COBItem();
+                item.setcItemId(rs.getString("CItemId"));
+                item.setItemId(rs.getString("ItemId"));
+                item.setDescription(rs.getString("Description"));
+                item.setQty(rs.getInt("Qty"));
+                item.setCost(rs.getDouble("Cost"));
+                item.setQtr1(rs.getDouble("Qtr1"));
+                item.setQtr2(rs.getDouble("Qtr2"));
+                item.setQtr3(rs.getDouble("Qtr3"));
+                item.setQtr4(rs.getDouble("Qtr4"));
+                item.setRemarks(rs.getString("Remarks"));
+                item.setSequence(rs.getInt("Sequence"));
+                item.setNoOfTimes(rs.getInt("NoOfTimes"));
+                item.setLevel(rs.getInt("Level"));
+            }
 
             items.add(item);
         }

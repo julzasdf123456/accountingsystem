@@ -23,7 +23,6 @@ public class ItemDAO {
             item.setPrice(rs.getDouble("Price"));
             item.setQtyOnHand(rs.getInt("QtyOnHand"));
             item.setUnit(rs.getString("Unit"));
-            item.setScopeId(rs.getString("ScopeId"));
             items.add(item);
         }
         return items;

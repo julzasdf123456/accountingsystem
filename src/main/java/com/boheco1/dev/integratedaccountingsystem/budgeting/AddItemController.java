@@ -75,8 +75,20 @@ public class AddItemController extends MenuControllerHandler implements Initiali
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        this.add_btn.setDisable(false);
+        this.total_amount_tf.setText("0");
+        this.q1_tf.setText("0");
+        this.q2_tf.setText("0");
+        this.q3_tf.setText("0");
+        this.q4_tf.setText("0");
+
+        this.item = new COBItem();
+        this.item.setcItemId(Utility.generateRandomId());
+        this.item.setNoOfTimes(1);
+
         InputHelper.restrictNumbersOnly(this.cost_tf);
         InputHelper.restrictNumbersOnly(this.qty_tf);
+        InputHelper.restrictNumbersOnly(this.times_tf);
         InputHelper.restrictNumbersOnly(this.q1_tf);
         InputHelper.restrictNumbersOnly(this.q2_tf);
         InputHelper.restrictNumbersOnly(this.q3_tf);
@@ -90,12 +102,8 @@ public class AddItemController extends MenuControllerHandler implements Initiali
             this.unit_tf.setText("");
             this.cost_tf.setText("");
             if (exists_check.isSelected()){
-                this.price_lbl.setText("Est. Price");
-                this.unit_lbl.setText("Unit");
                 this.unit_tf.setEditable(false);
             }else{
-                this.price_lbl.setText("Est. Cost");
-                this.unit_lbl.setText("Remarks/Unit");
                 this.unit_tf.setEditable(true);
             }
             this.description_tf.requestFocus();
@@ -103,27 +111,68 @@ public class AddItemController extends MenuControllerHandler implements Initiali
 
         //Quantity change event to update total amount and set it in Q1
         this.qty_tf.setOnKeyReleased(evt -> {
-            costUpdate(cost_tf.getText(), qty_tf.getText());
+            int qty = 0;
+            try {
+                qty = Integer.parseInt(this.qty_tf.getText());
+            }catch (Exception e){
+
+            }
+            this.item.setQty(qty);
+            this.setTotals();
         });
 
         this.cost_tf.setOnKeyReleased(evt -> {
-            costUpdate(cost_tf.getText(), qty_tf.getText());
+            double total = 0;
+            try {
+                total = Double.parseDouble(this.cost_tf.getText());
+            }catch (Exception e){
+
+            }
+            this.item.setCost(total);
+            this.setTotals();
+        });
+
+        this.times_tf.setOnKeyReleased(evt -> {
+            int times = 0;
+            try {
+                times = Integer.parseInt(this.times_tf.getText());
+            }catch (Exception e){
+
+            }
+            this.item.setNoOfTimes(times);
+            this.setTotals();
         });
 
         this.q1_tf.setOnKeyReleased(evt -> {
-            validateQuarter(q1_tf.getText(), q2_tf.getText(), q3_tf.getText(), q4_tf.getText());
+            validateQuarter();
         });
 
         this.q2_tf.setOnKeyReleased(evt -> {
-            validateQuarter(q1_tf.getText(), q2_tf.getText(), q3_tf.getText(), q4_tf.getText());
+            validateQuarter();
         });
 
         this.q3_tf.setOnKeyReleased(evt -> {
-            validateQuarter(q1_tf.getText(), q2_tf.getText(), q3_tf.getText(), q4_tf.getText());
+            validateQuarter();
         });
 
         this.q4_tf.setOnKeyReleased(evt -> {
-            validateQuarter(q1_tf.getText(), q2_tf.getText(), q3_tf.getText(), q4_tf.getText());
+            validateQuarter();
+        });
+
+        this.q1_tf.setOnAction(evt -> {
+            addItem();
+        });
+
+        this.q2_tf.setOnAction(evt -> {
+            addItem();
+        });
+
+        this.q3_tf.setOnAction(evt -> {
+            addItem();
+        });
+
+        this.q4_tf.setOnAction(evt -> {
+            addItem();
         });
 
         //Add item when enter key is pressed
@@ -133,6 +182,11 @@ public class AddItemController extends MenuControllerHandler implements Initiali
 
         //Add item when enter key is pressed
         this.qty_tf.setOnAction(evt -> {
+            addItem();
+        });
+
+        //Add item when enter key is pressed
+        this.times_tf.setOnAction(evt -> {
             addItem();
         });
 
@@ -151,22 +205,18 @@ public class AddItemController extends MenuControllerHandler implements Initiali
             if (desc.isEmpty()) {
                 this.status_lbl.setText("Item is not set! Please provide the item details!");
             }else {
-                double total = 0, qtr = 0;
-                try {
-                    double cost = Double.parseDouble(this.cost_tf.getText());
-                    int qty = Integer.parseInt(this.qty_tf.getText());
-                    total = cost * qty;
-                    qtr = total / 4;
-                    this.q1_tf.setText(Utility.formatDecimal(qtr).replace(",", ""));
-                    this.q2_tf.setText(Utility.formatDecimal(qtr).replace(",", ""));
-                    this.q3_tf.setText(Utility.formatDecimal(qtr).replace(",", ""));
-                    this.q4_tf.setText(Utility.formatDecimal(qtr).replace(",", ""));
-                } catch (Exception e) {
-
-                }
+                double qtr = this.item.getAmount() / 4;
+                this.item.setQtr1(qtr);
+                this.item.setQtr2(qtr);
+                this.item.setQtr3(qtr);
+                this.item.setQtr4(qtr);
+                this.q1_tf.setText(Utility.formatDecimal(qtr).replace(",", ""));
+                this.q2_tf.setText(Utility.formatDecimal(qtr).replace(",", ""));
+                this.q3_tf.setText(Utility.formatDecimal(qtr).replace(",", ""));
+                this.q4_tf.setText(Utility.formatDecimal(qtr).replace(",", ""));
+                this.add_btn.setDisable(false);
             }
         });
-        this.bindAutoSuggest(description_tf);
         this.parentController = Utility.getParentController();
     }
     public void addItem(){
@@ -177,13 +227,6 @@ public class AddItemController extends MenuControllerHandler implements Initiali
         String qty = this.qty_tf.getText();
 
         if ((!desc.isEmpty() && !remarks.isEmpty() && !cost.isEmpty() && !qty.isEmpty()) || (!desc.isEmpty() && remarks.isEmpty() && cost.isEmpty() && qty.isEmpty())) {
-            String q1S = this.q1_tf.getText();
-            String q2S = this.q2_tf.getText();
-            String q3S = this.q3_tf.getText();
-            String q4S = this.q4_tf.getText();
-
-            this.item = new COBItem();
-            this.item.setcItemId(Utility.generateRandomId());
             //If item is from database
             if (this.exists_check.isSelected() && this.selectedItem != null){
                 this.item.setItemId(this.selectedItem.getItemId());
@@ -194,44 +237,6 @@ public class AddItemController extends MenuControllerHandler implements Initiali
                 this.item.setDescription(desc);
                 this.item.setRemarks(remarks);
             }
-            double amount = 0, q1 = 0, q2 = 0, q3 = 0, q4 = 0;
-            int no = 0;
-            try{
-                amount = Double.parseDouble(cost);
-            }catch (Exception e) {
-
-            }
-            try {
-                q1 = Double.parseDouble(q1S);
-            }catch (Exception e) {
-
-            }
-            try {
-                q2 = Double.parseDouble(q2S);
-            }catch (Exception e) {
-
-            }
-            try {
-                q3 = Double.parseDouble(q3S);
-            }catch (Exception e) {
-
-            }
-            try {
-                q4 = Double.parseDouble(q4S);
-            }catch (Exception e) {
-
-            }
-            try{
-                no = Integer.parseInt(qty);
-            }catch (Exception e){
-
-            }
-            this.item.setCost(amount);
-            this.item.setQty(no);
-            this.item.setQtr1(q1);
-            this.item.setQtr2(q2);
-            this.item.setQtr3(q3);
-            this.item.setQtr4(q4);
             this.parentController.receive(this.item);
             this.reset();
         }else{
@@ -239,58 +244,80 @@ public class AddItemController extends MenuControllerHandler implements Initiali
         }
     }
 
+    public void editItem(){
+        this.status_lbl.setText("");
+        String desc = this.description_tf.getText();
+        String remarks = this.unit_tf.getText();
+        String cost = this.cost_tf.getText();
+        String qty = this.qty_tf.getText();
+
+        if ((!desc.isEmpty() && !remarks.isEmpty() && !cost.isEmpty() && !qty.isEmpty()) || (!desc.isEmpty() && remarks.isEmpty() && cost.isEmpty() && qty.isEmpty())) {
+            //If item is from database
+            if (this.exists_check.isSelected() && this.selectedItem != null){
+                this.item.setItemId(this.selectedItem.getItemId());
+                this.item.setDescription(this.selectedItem.getParticulars());
+                this.item.setRemarks(this.selectedItem.getUnit());
+            //Else, selected is open-ended item
+            }else{
+                this.item.setDescription(desc);
+                this.item.setRemarks(remarks);
+            }
+            COBController ctrl = (COBController) this.parentController;
+            ctrl.refreshItems();
+        }else{
+            this.status_lbl.setText("Item is not set! Please provide the item details!");
+        }
+    }
+
     public void reset(){
         this.status_lbl.setText("");
-        this.item = null;
+        this.item = new COBItem();
+        this.item.setcItemId(Utility.generateRandomId());
+        this.item.setAmount(0);
+        this.item.setCost(0);
+        this.item.setQty(0);
+        this.item.setNoOfTimes(1);
+        this.item.setQtr1(0);
+        this.item.setQtr2(0);
+        this.item.setQtr3(0);
+        this.item.setQtr4(0);
         this.selectedItem = null;
         this.description_tf.setText("");
         this.cost_tf.setText("");
         this.unit_tf.setText("");
         this.total_amount_tf.setText("");
         this.qty_tf.setText("");
+        this.times_tf.setText("1");
         this.q1_tf.setText("");
         this.q2_tf.setText("");
         this.q3_tf.setText("");
         this.q4_tf.setText("");
         this.description_tf.requestFocus();
+        this.add_btn.setDisable(false);
+    }
+    public void setTotals(){
+        this.total_amount_tf.setText(Utility.formatDecimal(this.item.getAmount()).replace(",", ""));
+        this.add_btn.setDisable(true);
     }
 
-    public void validateQuarter(String s1, String s2, String s3, String s4){
-        double total = 0, q1 = 0, q2 = 0, q3 = 0, q4 = 0;
-
-        try{
-            total = Double.parseDouble(total_amount_tf.getText().replace(",", ""));
-            q1 = Double.parseDouble(s1.isEmpty() ? "0" : s1);
-            q2 = Double.parseDouble(s2.isEmpty() ? "0" : s2);
-            q3 = Double.parseDouble(s3.isEmpty() ? "0" : s3);
-            q4 = Double.parseDouble(s4.isEmpty() ? "0" : s4);
-            //If sum of quarter amounts exceeded the total amount
-            if (q1+q2+q3+q4 == total) {
-                status_lbl.setText("");
-                add_btn.setDisable(false);
-            }else{
-                status_lbl.setText("The total amount per quarter is not equal to the grand total amount !");
-                add_btn.setDisable(true);
-            }
-        } catch (Exception e) {
-
-        }
-    }
-
-    public void costUpdate(String c, String q){
-        double total = 0, cost = 0;
-        int qty = 0;
-        try{
-            cost = Double.parseDouble(c);
-            qty = Integer.parseInt(q);
-            total = cost * qty;
-            q1_tf.setText(Utility.formatDecimal(total).replace(",", ""));
-            q2_tf.setText("");
-            q3_tf.setText("");
-            q4_tf.setText("");
-            total_amount_tf.setText(Utility.formatDecimal(total));
-        } catch (Exception e) {
-
+    public void validateQuarter(){
+        double q1 = 0, q2 = 0, q3 = 0, q4 = 0;
+        double total = this.item.getAmount();
+        q1 = Double.parseDouble(this.q1_tf.getText().isEmpty() ? "0" : this.q1_tf.getText());
+        q2 = Double.parseDouble(this.q2_tf.getText().isEmpty() ? "0" : this.q2_tf.getText());
+        q3 = Double.parseDouble(this.q3_tf.getText().isEmpty() ? "0" : this.q3_tf.getText());
+        q4 = Double.parseDouble(this.q4_tf.getText().isEmpty() ? "0" : this.q4_tf.getText());
+        this.item.setQtr1(q1);
+        this.item.setQtr2(q2);
+        this.item.setQtr3(q3);
+        this.item.setQtr4(q4);
+        //If sum of quarter amounts exceeded the total amount
+        if (q1+q2+q3+q4 == total) {
+            this.status_lbl.setText("");
+            this.add_btn.setDisable(false);
+        }else{
+            this.status_lbl.setText("The total amount per quarter is not equal to the grand total amount !");
+            this.add_btn.setDisable(true);
         }
     }
     public void bindAutoSuggest(JFXTextField textField){
@@ -322,9 +349,13 @@ public class AddItemController extends MenuControllerHandler implements Initiali
             selectedItem = event.getCompletion();
             description_tf.setText(selectedItem.getParticulars());
             if (selectedItem.getPrice() > 0) {
-                cost_tf.setText(Utility.formatDecimal(selectedItem.getPrice()));
+                item.setCost(selectedItem.getPrice());
+                item.setQty(1);
+                cost_tf.setText(Utility.formatDecimal(selectedItem.getPrice()).replace(",",""));
                 unit_tf.setText(selectedItem.getUnit());
+                total_amount_tf.setText(Utility.formatDecimal(selectedItem.getPrice() * 1));
                 qty_tf.requestFocus();
+                validateQuarter();
             }
         });
     }
@@ -332,7 +363,9 @@ public class AddItemController extends MenuControllerHandler implements Initiali
     public JFXButton getAdd_btn() {
         return this.add_btn;
     }
-
+    public JFXButton getReset_btn() {
+        return this.reset_btn;
+    }
     public JFXTextField getDescription_tf() {
         return this.description_tf;
     }
@@ -342,10 +375,37 @@ public class AddItemController extends MenuControllerHandler implements Initiali
     }
 
     public void setType(String type){
-        if (type.equals(COBItem.TYPES[0])){
+        if (type.equals(COBItem.TYPES[0]) || type.equals(COBItem.TYPES[5])){
             this.times_tf.setDisable(false);
         }else{
             this.times_tf.setDisable(true);
         }
+        if (type.equals(COBItem.TYPES[5]))
+            this.unit_tf.setText("Liters per mo");
+    }
+
+    public void disableUnit(boolean ok){
+        this.unit_tf.setEditable(ok);
+    }
+
+    public COBItem getItem() {
+        return item;
+    }
+
+    public void setItem(COBItem item) {
+        this.item = item;
+    }
+
+    public void showDetails(){
+        this.description_tf.setText(this.item.getDescription());
+        this.cost_tf.setText(this.item.getCost()+"");
+        this.unit_tf.setText(this.item.getRemarks());
+        this.total_amount_tf.setText(Utility.formatDecimal(this.item.getAmount()));
+        this.qty_tf.setText(this.item.getQty()+"");
+        this.times_tf.setText(this.item.getNoOfTimes()+"");
+        this.q1_tf.setText(this.item.getQtr1()+"");
+        this.q2_tf.setText(this.item.getQtr2()+"");
+        this.q3_tf.setText(this.item.getQtr3()+"");
+        this.q4_tf.setText(this.item.getQtr4()+"");
     }
 }

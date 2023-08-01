@@ -22,7 +22,7 @@
                <center>
                   <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="450.0" prefWidth="699.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Label fx:id="status_lbl" alignment="CENTER" prefWidth="500.0" text=" " textAlignment="CENTER">
+                        <Label fx:id="status_lbl" alignment="CENTER" prefWidth="699.0" text=" " textAlignment="CENTER">
                            <styleClass>
                               <String fx:value="bold" />
                               <String fx:value="red" />
@@ -39,7 +39,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <CheckBox fx:id="exists_check" mnemonicParsing="false" text="From Records">
+                              <CheckBox fx:id="exists_check" focusTraversable="false" mnemonicParsing="false" text="From Records">
                                  <HBox.margin>
                                     <Insets top="8.0" />
                                  </HBox.margin>
@@ -54,17 +54,17 @@
                               <Insets />
                            </VBox.margin>
                            <children>
-                              <Label fx:id="price_lbl" prefWidth="163.0" text="Price">
+                              <Label fx:id="price_lbl" prefWidth="163.0" text="Estimated Cost">
                                  <HBox.margin>
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </Label>
-                              <Label fx:id="unit_lbl" prefWidth="162.0" text="Unit">
+                              <Label fx:id="unit_lbl" prefWidth="162.0" text="Unit of Measure">
                                  <HBox.margin>
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </Label>
-                              <Label prefWidth="73.0" text="Desired Qty">
+                              <Label prefWidth="73.0" text="Qty/No. ">
                                  <HBox.margin>
                                     <Insets right="16.0" />
                                  </HBox.margin></Label>
@@ -73,7 +73,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </Label>
-                              <Label prefWidth="163.0" text="Total Amount">
+                              <Label prefWidth="163.0" styleClass="bold" text="TOTAL AMOUNT">
                                  <HBox.margin>
                                     <Insets />
                                  </HBox.margin>

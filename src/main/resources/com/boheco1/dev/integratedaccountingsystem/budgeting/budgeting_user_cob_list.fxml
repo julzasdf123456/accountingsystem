@@ -3,13 +3,12 @@
 <?import com.jfoenix.controls.JFXButton?>
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -23,11 +22,11 @@
          <children>
             <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                <children>
-                  <DatePicker fx:id="date_pker" promptText="Year">
+                  <ComboBox fx:id="date_pker" prefHeight="29.0" prefWidth="150.0" promptText="Year">
                      <HBox.margin>
                         <Insets right="16.0" />
                      </HBox.margin>
-                  </DatePicker>
+                  </ComboBox>
                   <JFXButton fx:id="view_btn" alignment="CENTER" contentDisplay="CENTER" styleClass="btn-info" text=" ">
                      <graphic>
                         <FontIcon iconColor="WHITE" iconLiteral="mdi2e-eye" />
@@ -45,9 +44,51 @@
                </children></HBox>
          </children>
       </HBox>
-      <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="36.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="68.0">
+      <TabPane fx:id="tabs" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="36.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="68.0">
         <tabs>
-          <Tab text="Pending COBs">
+           <Tab fx:id="revision_tab" text="For Revision">
+              <content>
+                 <AnchorPane>
+                    <children>
+                       <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <children>
+                             <Label text="List of For Revision COBs" />
+                             <TableView fx:id="revision_table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                                <columnResizePolicy>
+                                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                </columnResizePolicy>
+                                <VBox.margin>
+                                   <Insets />
+                                </VBox.margin>
+                             </TableView>
+                             <VBox>
+                                <children>
+                                   <Separator prefWidth="200.0" />
+                                   <HBox>
+                                      <children>
+                                         <Label text="No. of Records : " />
+                                         <Label fx:id="revision_lbl" styleClass="bold" text="0">
+                                            <HBox.margin>
+                                               <Insets left="16.0" />
+                                            </HBox.margin>
+                                         </Label>
+                                      </children>
+                                      <padding>
+                                         <Insets bottom="8.0" top="8.0" />
+                                      </padding>
+                                   </HBox>
+                                </children>
+                             </VBox>
+                          </children>
+                          <padding>
+                             <Insets top="8.0" />
+                          </padding>
+                       </VBox>
+                    </children>
+                 </AnchorPane>
+              </content>
+           </Tab>
+          <Tab fx:id="pending_tab" text="Pending COBs">
                <content>
                   <BorderPane prefHeight="200.0" prefWidth="200.0">
                      <center>
@@ -59,16 +100,7 @@
                                     <TableView fx:id="pending_table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                        <columnResizePolicy>
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                       </columnResizePolicy>
-                                       <columns>
-                                          <TableColumn prefWidth="75.0" text="Control Number" />
-                                          <TableColumn prefWidth="75.0" text="Major Activity" />
-                                          <TableColumn prefWidth="75.0" text="Scope/Item Type" />
-                                          <TableColumn prefWidth="75.0" text="No. of Items" />
-                                          <TableColumn prefWidth="75.0" text="Total Amount" />
-                                          <TableColumn prefWidth="75.0" text="Date Prepared" />
-                                          <TableColumn prefWidth="75.0" text="Status" />
-                                       </columns></TableView>
+                                       </columnResizePolicy></TableView>
                                  </children>
                                  <padding>
                                     <Insets top="8.0" />
@@ -101,7 +133,49 @@
                   </BorderPane>
                </content>
             </Tab>
-          <Tab text="Approved COBs">
+           <Tab fx:id="reviewed_tab" text="Reviewed COBs">
+              <content>
+                 <AnchorPane>
+                    <children>
+                       <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <children>
+                             <Label text="List of Reviewed COBs" />
+                             <TableView fx:id="approval_table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                                <columnResizePolicy>
+                                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                </columnResizePolicy>
+                                <VBox.margin>
+                                   <Insets />
+                                </VBox.margin>
+                             </TableView>
+                             <VBox>
+                                <children>
+                                   <Separator prefWidth="200.0" />
+                                   <HBox>
+                                      <children>
+                                         <Label text="No. of Records : " />
+                                         <Label fx:id="approval_lbl" styleClass="bold" text="0">
+                                            <HBox.margin>
+                                               <Insets left="16.0" />
+                                            </HBox.margin>
+                                         </Label>
+                                      </children>
+                                      <padding>
+                                         <Insets bottom="8.0" top="8.0" />
+                                      </padding>
+                                   </HBox>
+                                </children>
+                             </VBox>
+                          </children>
+                          <padding>
+                             <Insets top="8.0" />
+                          </padding>
+                       </VBox>
+                    </children>
+                 </AnchorPane>
+              </content>
+           </Tab>
+          <Tab fx:id="approved_tab" text="Approved COBs">
                <content>
                   <AnchorPane>
                      <children>
@@ -115,14 +189,6 @@
                                  <VBox.margin>
                                     <Insets />
                                  </VBox.margin>
-                                 <columns>
-                                    <TableColumn prefWidth="75.0" text="Control Number" />
-                                    <TableColumn prefWidth="75.0" text="Major Activity" />
-                                    <TableColumn prefWidth="75.0" text="Scope/Item Type" />
-                                    <TableColumn prefWidth="75.0" text="No. of Items" />
-                                    <TableColumn prefWidth="75.0" text="Total Amount" />
-                                    <TableColumn prefWidth="75.0" text="Date Approved" />
-                                 </columns>
                               </TableView>
                               <VBox>
                                  <children>

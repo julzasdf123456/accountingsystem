@@ -1,9 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.helpers;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialogLayout;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
@@ -100,6 +97,55 @@ public class DialogBuilder {
         input.setLabelFloat(true);
 
         flowPane.getChildren().add(context);
+        flowPane.getChildren().add(input);
+        dialogContent.setBody(flowPane);
+
+        JFXDialog dialog = new JFXDialog(pane, dialogContent, JFXDialog.DialogTransition.CENTER);
+        dialog.setOverlayClose(false);
+
+        btn.setDefaultButton(true);
+        btn.getStyleClass().add("JFXButton");
+
+        JFXButton cancel = new JFXButton("Cancel");
+        cancel.setDefaultButton(true);
+        cancel.getStyleClass().add("JFXButton");
+        dialogContent.setActions(cancel,btn);
+
+        btn.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+
+        cancel.setTextFill(Paint.valueOf(ColorPalette.GREY));
+        cancel.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent __) {
+                dialog.close();
+            }
+        });
+        dialog.show();
+        return dialog;
+    }
+
+    public static JFXDialog showInputDialog(String title, String promptText, JFXTextArea input, JFXButton btn, StackPane pane, String style){
+        JFXDialogLayout dialogContent = new JFXDialogLayout();
+        dialogContent.setStyle("-fx-border-width: 0 0 0 15; -fx-border-color: " + style + ";");
+        dialogContent.setPrefHeight(200);
+
+        Label head = new Label(title);
+        head.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 15));
+        head.setTextFill(Paint.valueOf(style));
+        dialogContent.setHeading(head);
+
+        FlowPane flowPane = new FlowPane();
+        flowPane.setOrientation(Orientation.VERTICAL);
+        flowPane.setAlignment(Pos.CENTER);
+        flowPane.setRowValignment(VPos.CENTER);
+        flowPane.setColumnHalignment(HPos.CENTER);
+        flowPane.setVgap(6);
+
+        input.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.NORMAL, 18));
+        input.setStyle("-fx-text-fill: " + ColorPalette.BLACK + ";");
+        input.setPromptText(promptText);
+        input.setLabelFloat(true);
+
         flowPane.getChildren().add(input);
         dialogContent.setBody(flowPane);
 

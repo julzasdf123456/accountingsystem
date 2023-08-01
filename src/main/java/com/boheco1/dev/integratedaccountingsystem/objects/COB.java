@@ -11,8 +11,10 @@ public class COB {
     private String activity;
     private double amount;
     private String status;
+    private String remarks;
     private String appId;
     private String fsId;
+    private FundSource source;
     private EmployeeInfo prepared;
     private LocalDate datePrepared;
     private EmployeeInfo reviewed;
@@ -20,7 +22,9 @@ public class COB {
     private EmployeeInfo approved;
     private LocalDate dateApproved;
     private List<COBItem> items;
+    private int noOfItems = 0;
     private String type;
+    public static final String PENDING_REVISION = "Pending Revision";
     public static final String PENDING_REVIEW = "Pending Review";
     public static final String PENDING_APPROVAL = "Pending Approval";
     public static final String APPROVED = "Approved";
@@ -176,5 +180,29 @@ public class COB {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public int getNoOfItems() {
+        return noOfItems;
+    }
+
+    public void setNoOfItems(int noOfItems) {
+        this.noOfItems = noOfItems;
+    }
+
+    public FundSource getFundSource() {
+        return source;
+    }
+
+    public void setFundSource(FundSource source) {
+        this.source = source;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 }

@@ -8,6 +8,7 @@ public class COBItem extends Item{
     private double cost = 0;
     private int qty = 0;
     private int sequence = 0;
+    private int level = 1;
     private int noOfTimes = 1;
     private double qtr1 = 0;
     private double qtr2 = 0;
@@ -129,5 +130,13 @@ public class COBItem extends Item{
 
     public void setAmount(double amount) {
         this.amount = amount;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 }

@@ -7,6 +7,10 @@ public class FundSource {
 
     public FundSource() {}
 
+    public FundSource(String id, String source) {
+        this.fsId = id;
+        this.source = source;
+    }
     public String getFsId() {
         return fsId;
     }

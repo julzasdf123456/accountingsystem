@@ -5,7 +5,6 @@
 <?import com.jfoenix.controls.JFXTextField?>
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -23,7 +22,7 @@
                <center>
                   <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="202.0" prefWidth="699.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Label fx:id="status_lbl" alignment="CENTER" prefWidth="500.0" text=" " textAlignment="CENTER">
+                        <Label fx:id="status_lbl" alignment="CENTER" prefWidth="699.0" text=" " textAlignment="CENTER">
                            <styleClass>
                               <String fx:value="bold" />
                               <String fx:value="red" />
@@ -32,19 +31,14 @@
                         <Label text="Activity" />
                         <HBox prefWidth="200.0">
                            <children>
-                              <JFXTextField fx:id="description_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="37.0" prefWidth="520.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="description_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="37.0" prefWidth="699.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                                  <HBox.margin>
-                                    <Insets right="16.0" />
+                                    <Insets />
                                  </HBox.margin>
                               </JFXTextField>
-                              <CheckBox fx:id="exists_check" mnemonicParsing="false" text="From Records">
-                                 <HBox.margin>
-                                    <Insets top="8.0" />
-                                 </HBox.margin>
-                              </CheckBox>
                            </children>
                            <VBox.margin>
                               <Insets bottom="16.0" />
@@ -69,7 +63,7 @@
                                  <HBox.margin>
                                     <Insets right="16.0" />
                                  </HBox.margin></Label>
-                              <Label prefWidth="163.0" text="Allowance">
+                              <Label prefWidth="163.0" styleClass="bold" text="TOTAL ALLOWANCE">
                                  <HBox.margin>
                                     <Insets right="16.0" />
                                  </HBox.margin>
@@ -91,7 +85,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="unit_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="73.0" style="-fx-background-color: #f5f5f5;" text="per diem" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="unit_tf" editable="false" focusColor="#00ad8e" focusTraversable="false" labelFloat="true" prefHeight="30.0" prefWidth="73.0" style="-fx-background-color: #f5f5f5;" text="per diem" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -107,7 +101,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="total_amount_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="163.0" style="-fx-background-color: #f5f5f5;" styleClass="bold" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="total_amount_tf" editable="false" focusColor="#00ad8e" focusTraversable="false" labelFloat="true" prefHeight="30.0" prefWidth="163.0" style="-fx-background-color: #f5f5f5;" styleClass="bold" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>

@@ -22,7 +22,7 @@
                <center>
                   <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="202.0" prefWidth="699.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Label fx:id="status_lbl" alignment="CENTER" prefWidth="500.0" text=" " textAlignment="CENTER">
+                        <Label fx:id="status_lbl" alignment="CENTER" prefWidth="699.0" text=" " textAlignment="CENTER">
                            <styleClass>
                               <String fx:value="bold" />
                               <String fx:value="red" />
@@ -39,7 +39,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <CheckBox fx:id="exists_check" mnemonicParsing="false" text="From Records">
+                              <CheckBox fx:id="salary_type_cb" focusTraversable="false" mnemonicParsing="false" text="Regular">
                                  <HBox.margin>
                                     <Insets top="8.0" />
                                  </HBox.margin>
@@ -54,12 +54,12 @@
                               <Insets />
                            </VBox.margin>
                            <children>
-                              <Label fx:id="price_lbl" prefWidth="163.0" text="Basic Salary">
+                              <Label fx:id="price_lbl" prefWidth="163.0" text="Basic Salary/Rate Per Day">
                                  <HBox.margin>
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </Label>
-                              <Label fx:id="unit_lbl" prefWidth="73.0" text="Per Day/SG">
+                              <Label fx:id="unit_lbl" prefWidth="73.0" text="Unit">
                                  <HBox.margin>
                                     <Insets right="16.0" />
                                  </HBox.margin>
@@ -112,7 +112,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="longetivity_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="73.0" style="-fx-background-color: #f5f5f5;" styleClass="bold" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="longetivity_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="73.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -120,7 +120,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="sss_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="73.0" style="-fx-background-color: #f5f5f5;" styleClass="bold" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="sss_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="73.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -128,7 +128,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="cashgift_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="73.0" style="-fx-background-color: #f5f5f5;" text="2000" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="cashgift_tf" editable="false" focusColor="#00ad8e" focusTraversable="false" labelFloat="true" prefHeight="30.0" prefWidth="73.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -136,7 +136,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="bonus_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="73.0" style="-fx-background-color: #f5f5f5;" styleClass="bold" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="bonus_tf" editable="false" focusColor="#00ad8e" focusTraversable="false" labelFloat="true" prefHeight="30.0" prefWidth="73.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -175,7 +175,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </HBox>
-                              <JFXButton fx:id="bal_btn" buttonType="RAISED" maxWidth="1.7976931348623157E308" prefHeight="37.0" prefWidth="162.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Set All Reg. Employees" textFill="WHITE">
+                              <JFXButton fx:id="bal_btn" buttonType="RAISED" maxWidth="1.7976931348623157E308" prefHeight="37.0" prefWidth="162.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Set All Reg. Employees" textFill="WHITE" visible="false">
                                  <effect>
                                     <DropShadow />
                                  </effect>
