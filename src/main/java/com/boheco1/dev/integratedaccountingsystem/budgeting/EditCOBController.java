@@ -1,7 +1,9 @@
 package com.boheco1.dev.integratedaccountingsystem.budgeting;
 
+import com.boheco1.dev.integratedaccountingsystem.JournalEntriesController;
 import com.boheco1.dev.integratedaccountingsystem.dao.AppDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.CobDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.CobItemDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.DeptThresholdDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
@@ -17,12 +19,15 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.paint.Paint;
+
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 
-public class COBController extends MenuControllerHandler implements Initializable, ObjectTransaction {
+public class EditCOBController extends MenuControllerHandler implements Initializable, ObjectTransaction {
     @FXML
     private JFXButton submit_btn;
 
@@ -78,6 +83,9 @@ public class COBController extends MenuControllerHandler implements Initializabl
     private TableView cob_items;
 
     @FXML
+    private Label remarks_lbl;
+
+    @FXML
     private ProgressBar progressBar;
 
     private ObservableList<COBItem> items = FXCollections.observableArrayList(new ArrayList<>());
@@ -86,9 +94,12 @@ public class COBController extends MenuControllerHandler implements Initializabl
     private double totalAppropriations = 0, cobAmount = 0, appropFromDB = 0;
     private String totalBudget = "Current Total Appropriation: ₱ %.2f out of ₱ %.2f Department Threshold!";
     private String dept;
+    private COB current = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        this.current = (COB) Utility.getSelectedObject();
+
         ObservableList<String> types = FXCollections.observableArrayList(COBItem.TYPES);
         this.type_cb.setItems(types);
         this.type_cb.getSelectionModel().select(4);
@@ -109,6 +120,11 @@ public class COBController extends MenuControllerHandler implements Initializabl
             this.cob_items.setItems(FXCollections.observableArrayList(new ArrayList<>()));
             this.cob_items.refresh();
         });
+
+        //Combobox is disabled, type cannot be changed
+        this.type_cb.setDisable(true);
+        this.cn_tf.setEditable(false);
+
         try {
             this.fs_cb.setItems(FXCollections.observableArrayList(AppDAO.getFundSources()));
             this.app = AppDAO.getOpen(true);
@@ -152,16 +168,20 @@ public class COBController extends MenuControllerHandler implements Initializabl
         });
 
         this.remove_btn.setOnAction(evt -> {
-            try {
-                int row = this.cob_items.getSelectionModel().getSelectedIndex();
-                this.items.remove(row);
-                this.cob_items.refresh();
-                this.setTable();
-                this.setAmount();
-            }catch (Exception e){
-                //Do nothing
+            COBItem selected = (COBItem) this.cob_items.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                try {
+                    this.deleteItem(selected);
+                } catch (Exception e) {
+                    AlertDialogBuilder.messgeDialog("System Error", "A System error occurred: " + e.getMessage(),
+                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }
+            }else{
+                AlertDialogBuilder.messgeDialog("Delete COB Item", "Please select the item to delete and try again!",
+                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }
         });
+
         this.cob_items.setRowFactory(tv -> {
             TableRow<COBItem> row = new TableRow<>();
             final ContextMenu rowMenu = new ContextMenu();
@@ -188,72 +208,105 @@ public class COBController extends MenuControllerHandler implements Initializabl
 
             MenuItem remove = new MenuItem("Remove Item");
             remove.setOnAction(actionEvent -> {
-                this.cob_items.getItems().remove(row.getItem());
-                this.cob_items.refresh();
-                this.setAmount();
+                this.deleteItem(row.getItem());
             });
 
             MenuItem child = new MenuItem("=>");
             child.setOnAction(actionEvent -> {
-                row.getItem().setLevel(2);
-                this.cob_items.refresh();
+                try {
+                    CobItemDAO.changeLevel(row.getItem(), 2);
+                    row.getItem().setLevel(2);
+                    this.cob_items.refresh();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             });
 
             MenuItem parent = new MenuItem("<=");
             parent.setOnAction(actionEvent -> {
-                row.getItem().setLevel(1);
-                this.cob_items.refresh();
+                try {
+                    CobItemDAO.changeLevel(row.getItem(), 1);
+                    row.getItem().setLevel(1);
+                    this.cob_items.refresh();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             });
 
             MenuItem dist = new MenuItem("Distribute Per Qtr");
             dist.setOnAction(actionEvent -> {
-                double qtr = (row.getItem().getAmount()) / 4;
-                row.getItem().setQtr1(qtr);
-                row.getItem().setQtr2(qtr);
-                row.getItem().setQtr3(qtr);
-                row.getItem().setQtr4(qtr);
-                this.cob_items.refresh();
-                this.setAmount();
+                try {
+                    double qtr = (row.getItem().getAmount()) / 4;
+                    row.getItem().setQtr1(qtr);
+                    row.getItem().setQtr2(qtr);
+                    row.getItem().setQtr3(qtr);
+                    row.getItem().setQtr4(qtr);
+                    CobItemDAO.changeQtrAmount(row.getItem());
+                    this.cob_items.refresh();
+                    this.setAmount();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             });
 
             MenuItem q1 = new MenuItem("Set to Qtr 1");
             q1.setOnAction(actionEvent -> {
-                row.getItem().setQtr1(row.getItem().getAmount());
-                row.getItem().setQtr2(0);
-                row.getItem().setQtr3(0);
-                row.getItem().setQtr4(0);
-                this.cob_items.refresh();
-                this.setAmount();
+                try {
+                    row.getItem().setQtr1(row.getItem().getAmount());
+                    row.getItem().setQtr2(0);
+                    row.getItem().setQtr3(0);
+                    row.getItem().setQtr4(0);
+                    CobItemDAO.changeQtrAmount(row.getItem());
+                    this.cob_items.refresh();
+                    this.setAmount();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             });
 
             MenuItem q2 = new MenuItem("Set to Qtr 2");
             q2.setOnAction(actionEvent -> {
-                row.getItem().setQtr2(row.getItem().getAmount());
-                row.getItem().setQtr1(0);
-                row.getItem().setQtr3(0);
-                row.getItem().setQtr4(0);
-                this.cob_items.refresh();
-                this.setAmount();
+                try {
+                    row.getItem().setQtr2(row.getItem().getAmount());
+                    row.getItem().setQtr1(0);
+                    row.getItem().setQtr3(0);
+                    row.getItem().setQtr4(0);
+                    CobItemDAO.changeQtrAmount(row.getItem());
+                    this.cob_items.refresh();
+                    this.setAmount();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             });
 
             MenuItem q3 = new MenuItem("Set to Qtr 3");
             q3.setOnAction(actionEvent -> {
-                row.getItem().setQtr3(row.getItem().getAmount());
-                row.getItem().setQtr2(0);
-                row.getItem().setQtr1(0);
-                row.getItem().setQtr4(0);
-                this.cob_items.refresh();
-                this.setAmount();
+                try {
+                    row.getItem().setQtr3(row.getItem().getAmount());
+                    row.getItem().setQtr2(0);
+                    row.getItem().setQtr1(0);
+                    row.getItem().setQtr4(0);
+                    CobItemDAO.changeQtrAmount(row.getItem());
+                    this.cob_items.refresh();
+                    this.setAmount();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             });
 
             MenuItem q4 = new MenuItem("Set to Qtr 4");
             q4.setOnAction(actionEvent -> {
-                row.getItem().setQtr4(row.getItem().getAmount());
-                row.getItem().setQtr2(0);
-                row.getItem().setQtr3(0);
-                row.getItem().setQtr1(0);
-                this.cob_items.refresh();
-                this.setAmount();
+                try {
+                    row.getItem().setQtr4(row.getItem().getAmount());
+                    row.getItem().setQtr2(0);
+                    row.getItem().setQtr3(0);
+                    row.getItem().setQtr1(0);
+                    CobItemDAO.changeQtrAmount(row.getItem());
+                    this.cob_items.refresh();
+                    this.setAmount();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             });
 
             MenuItem removeAll = new MenuItem("Clear Items");
@@ -283,7 +336,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
         });
 
         this.reset_btn.setOnAction(evt ->{
-            this.reset();
+            Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(JournalEntriesController.class, "budgeting/budgeting_user_cob_list.fxml"));
         });
 
         this.import_btn.setOnAction(evt ->{
@@ -296,6 +349,8 @@ public class COBController extends MenuControllerHandler implements Initializabl
 
         //Pass this controller to the Add Item controller
         Utility.setParentController(this);
+
+        this.setDetails();
 
         this.progressBar.setVisible(false);
     }
@@ -704,25 +759,23 @@ public class COBController extends MenuControllerHandler implements Initializabl
             JFXButton accept = new JFXButton("Proceed");
             JFXDialog dialog = DialogBuilder.showConfirmDialog("Submit COB", "This process is final. Confirm submission?", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
             accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
-            final double amt = amount;
             accept.setOnAction(__ -> {
                 dialog.close();
                 try {
                     final String fsid = this.fs_cb.getSelectionModel().getSelectedItem().getFsId();
-                    final String type = this.type_cb.getSelectionModel().getSelectedItem();
-                    COB cob = new COB();
-                    cob.setAppId(this.app.getAppId());
-                    cob.setCobId(cn);
-                    cob.setFsId(fsid);
-                    cob.setActivity(activity);
-                    cob.setAmount(amt);
-                    cob.setItems(this.items);
-                    cob.setType(type);
-                    CobDAO.createCOB(cob);
-                    reset();
-                    this.cn_tf.setText(this.app.getYear()+"-"+dept+"-"+ (CobDAO.countCob(dept)+1));
+                    current.setFsId(fsid);
+                    current.setActivity(activity);
+                    CobDAO.submitRevisedCob(current);
                     AlertDialogBuilder.messgeDialog("Submit COB", "The COB was successfully submitted and awaiting review by your department head!",
                             Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                    this.add_btn.setDisable(true);
+                    this.submit_btn.setDisable(true);
+                    this.remove_btn.setDisable(true);
+                    this.import_btn.setDisable(true);
+                    this.add_btn.setVisible(false);
+                    this.submit_btn.setVisible(false);
+                    this.remove_btn.setVisible(false);
+                    this.import_btn.setVisible(false);
                 } catch (SQLException e) {
                     AlertDialogBuilder.messgeDialog("System Error", "An SQL error occurred: " + e.getMessage(),
                             Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
@@ -774,7 +827,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
             ctrl.setItem(item);
             ctrl.showDetails();
             ctrl.getAdd_btn().setOnAction(evt -> {
-                ctrl.editItem();
+                ctrl.updateItem(current);
             });
             ctrl.getAdd_btn().setText("Update");
             ctrl.getReset_btn().setDisable(true);
@@ -807,7 +860,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
             ctrl.setItem(item);
             ctrl.showDetails();
             ctrl.getAdd_btn().setOnAction(evt -> {
-                ctrl.editItem();
+                ctrl.updateItem(current);
             });
             ctrl.getAdd_btn().setText("Update");
             ctrl.getReset_btn().setDisable(true);
@@ -837,7 +890,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
             ctrl.setItem(item);
             ctrl.showDetails();
             ctrl.getAdd_btn().setOnAction(evt -> {
-                ctrl.editItem();
+                ctrl.updateItem(current);
             });
             ctrl.getAdd_btn().setText("Update");
             ctrl.getReset_btn().setDisable(true);
@@ -867,7 +920,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
             ctrl.setItem(item);
             ctrl.showDetails();
             ctrl.getAdd_btn().setOnAction(evt -> {
-                ctrl.editItem();
+                ctrl.updateItem(current);
             });
             ctrl.getAdd_btn().setText("Update");
             ctrl.getReset_btn().setDisable(true);
@@ -925,9 +978,14 @@ public class COBController extends MenuControllerHandler implements Initializabl
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() {
-                    COBItem item = (COBItem) o;
-                    item.setSequence(items.size()+1);
-                    items.add(item);
+                    try {
+                        COBItem item = (COBItem) o;
+                        item.setSequence(items.size() + 1);
+                        CobItemDAO.add(current, item);
+                        items.add(item);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                     return null;
                 }
             };
@@ -952,11 +1010,16 @@ public class COBController extends MenuControllerHandler implements Initializabl
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() {
-                    List<COBItem> imported = (List<COBItem>) o;
-                    for(COBItem i : imported){
-                        i.setcItemId(Utility.generateRandomId());
+                    try {
+                        List<COBItem> imported = (List<COBItem>) o;
+                        for (COBItem i : imported) {
+                            i.setcItemId(Utility.generateRandomId());
+                            items.add(i);
+                        }
+                        CobItemDAO.add(current, imported);
+                    }catch (Exception e){
+                        e.printStackTrace();
                     }
-                    items = FXCollections.observableArrayList(imported);
                     return null;
                 }
             };
@@ -979,6 +1042,64 @@ public class COBController extends MenuControllerHandler implements Initializabl
         }
     }
 
+    public void setDetails(){
+        try {
+            this.current.setItems(CobItemDAO.getItems(this.current));
+            this.remarks_lbl.setText(this.current.getRemarks());
+
+            this.cn_tf.setText(this.current.getCobId());
+            this.activity_tf.setText(this.current.getActivity());
+            this.board_res_tf.setText(AppDAO.get(this.current.getAppId()).getBoardRes());
+            int index = 0, select = -1;
+            for(FundSource f : this.fs_cb.getItems()){
+                if (f.getSource().equals(this.current.getFundSource().getSource())){
+                    select = index;
+                }
+                index++;
+            }
+            this.fs_cb.getSelectionModel().select(select);
+            this.type_cb.getSelectionModel().select(this.current.getType());
+
+            this.items = FXCollections.observableArrayList(this.current.getItems());
+            this.cob_items.setItems(this.items);
+            this.cob_items.refresh();
+
+            this.prepared_tf.setText(this.current.getPrepared().getEmployeeFirstName()+" "+this.current.getPrepared().getEmployeeLastName()+" ("+this.current.getDatePrepared()+")");
+            this.threshold = DeptThresholdDAO.find(this.current.getAppId(), this.current.getPrepared().getDepartmentID());
+            this.totalAppropriations = DeptThresholdDAO.getTotalAppropriations(threshold);
+            this.appropFromDB = this.totalAppropriations;
+
+            this.setAmount();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Method to delete a COB item, automatically update table and values
+     * @param item - COB item reference
+     */
+    public void deleteItem(COBItem item){
+        JFXButton accept = new JFXButton("Proceed");
+        JFXDialog dialog = DialogBuilder.showConfirmDialog("Delete COB Item", "This process is final. Confirm delete?", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+        accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+        accept.setOnAction(__ -> {
+            try{
+                int row = this.cob_items.getSelectionModel().getSelectedIndex();
+                this.items.remove(row);
+                CobItemDAO.delete(current, item);
+                this.setAmount();
+                this.cob_items.refresh();
+                AlertDialogBuilder.messgeDialog("Delete COB Item", "The COB item was successfully removed from the COB!",
+                        Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+            }catch (Exception e){
+                AlertDialogBuilder.messgeDialog("System Error", "An SQL error occurred: " + e.getMessage(),
+                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            }
+            dialog.close();
+        });
+    }
     public void refreshItems(){
         this.cob_items.refresh();
         setAmount();

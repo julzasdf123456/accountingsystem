@@ -1,9 +1,11 @@
 package com.boheco1.dev.integratedaccountingsystem.budgeting;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.CobItemDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ObjectTransaction;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.objects.COB;
 import com.boheco1.dev.integratedaccountingsystem.objects.Travel;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
@@ -91,7 +93,7 @@ public class AddTravelController extends MenuControllerHandler implements Initia
 
     @FXML
     private JFXButton bal_btn;
-
+    private double oldAmount = 0;
     private Travel item = null;
     private ObjectTransaction parentController = null;
     @Override
@@ -399,7 +401,9 @@ public class AddTravelController extends MenuControllerHandler implements Initia
             this.status_lbl.setText("Item is not set! Please provide the item details!");
         }
     }
-
+    /**
+     * Method to call when COB is created (COBController) and user wants to edit a newly added item
+     */
     public void editItem() {
         this.status_lbl.setText("");
         String desc = this.description_tf.getText();
@@ -443,6 +447,62 @@ public class AddTravelController extends MenuControllerHandler implements Initia
             this.item.setMode(modeR);
             COBController ctrl = (COBController) this.parentController;
             ctrl.refreshItems();
+        }else{
+            this.status_lbl.setText("Item is not set! Please provide the item details!");
+        }
+    }
+    /**
+     * Method to call when COB is revised (EditCOBController) and user wants to edit an existing item
+     * @param cob - COB reference
+     */
+    public void updateItem(COB cob){
+        this.status_lbl.setText("");
+        String desc = this.description_tf.getText();
+        String qtyR = this.qty_tf.getText();
+        String unit = this.unit_tf.getText();
+        String daysR = this.days_tf.getText();
+        String timesR = this.times_tf.getText();
+        String travelR = this.travel_tf.getText();
+        String modeR = this.mode_cb.getSelectionModel().getSelectedItem();
+        double travel = 0;
+        int persons = 0, days = 0, times = 0;
+
+        try{
+            travel = Double.parseDouble(travelR);
+        }catch (Exception e) {
+
+        }
+
+        try{
+            persons = Integer.parseInt(qtyR);
+        }catch (Exception e) {
+
+        }
+
+        try{
+            days = Integer.parseInt(daysR);
+        }catch (Exception e) {
+
+        }
+
+        try{
+            times = Integer.parseInt(timesR);
+        }catch (Exception e) {
+
+        }
+
+        if ((!desc.isEmpty() && persons > 0 && days > 0 && times > 0 && travel > 0 && modeR != null)
+                || (!desc.isEmpty() && persons <= 0 && days <= 0 && times <= 1 && travel <= 0 && modeR == null)) {
+            try {
+                this.item.setDescription(desc);
+                this.item.setRemarks(unit);
+                this.item.setMode(modeR);
+                EditCOBController ctrl = (EditCOBController) this.parentController;
+                CobItemDAO.update(cob, this.item, this.oldAmount);
+                ctrl.refreshItems();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }else{
             this.status_lbl.setText("Item is not set! Please provide the item details!");
         }
@@ -518,5 +578,6 @@ public class AddTravelController extends MenuControllerHandler implements Initia
 
     public void setItem(Travel item) {
         this.item = item;
+        this.oldAmount = this.item.getAmount();
     }
 }

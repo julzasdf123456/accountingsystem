@@ -1,7 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 public class Travel extends COBItem{
-    private String trId;
+    private int trId;
     private int NoOfDays = 0;
     private double transport = 0;
     private double lodging = 0;
@@ -11,11 +11,11 @@ public class Travel extends COBItem{
 
     public Travel(){}
 
-    public String getTrId() {
+    public int getTrId() {
         return trId;
     }
 
-    public void setTrId(String trId) {
+    public void setTrId(int trId) {
         this.trId = trId;
     }
 

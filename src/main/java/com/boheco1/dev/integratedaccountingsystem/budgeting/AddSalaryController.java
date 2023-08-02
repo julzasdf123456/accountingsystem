@@ -1,9 +1,11 @@
 package com.boheco1.dev.integratedaccountingsystem.budgeting;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.CobItemDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ObjectTransaction;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.objects.COB;
 import com.boheco1.dev.integratedaccountingsystem.objects.Salary;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
@@ -61,7 +63,7 @@ public class AddSalaryController extends MenuControllerHandler implements Initia
     private JFXButton reset_btn;
 
     private ObjectTransaction parentController = null;
-
+    private double oldAmount = 0;
     private Salary item = null;
 
     @Override
@@ -223,7 +225,9 @@ public class AddSalaryController extends MenuControllerHandler implements Initia
             this.status_lbl.setText("Item is not set! Please provide the item details!");
         }
     }
-
+    /**
+     * Method to call when COB is created (COBController) and user wants to edit a newly added item
+     */
     public void editItem() {
         this.status_lbl.setText("");
         String desc = this.description_tf.getText();
@@ -234,6 +238,30 @@ public class AddSalaryController extends MenuControllerHandler implements Initia
             this.item.setRemarks(this.unit_tf.getText());
             COBController ctrl = (COBController) this.parentController;
             ctrl.refreshItems();
+        }else{
+            this.status_lbl.setText("Item is not set! Please provide the item details!");
+        }
+    }
+    /**
+     * Method to call when COB is revised (EditCOBController) and user wants to edit an existing item
+     * @param cob - COB reference
+     */
+    public void updateItem(COB cob){
+        this.status_lbl.setText("");
+        String desc = this.description_tf.getText();
+        String cost = this.cost_tf.getText();
+        String qty = this.qty_tf.getText();
+        if ((!desc.isEmpty() && !cost.isEmpty() && !qty.isEmpty()) || (!desc.isEmpty() && cost.isEmpty() && qty.isEmpty())) {
+            try{
+                this.item.setDescription(desc);
+                this.item.setRemarks(this.unit_tf.getText());
+                EditCOBController ctrl = (EditCOBController) this.parentController;
+                CobItemDAO.update(cob, this.item, this.oldAmount);
+                ctrl.refreshItems();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
         }else{
             this.status_lbl.setText("Item is not set! Please provide the item details!");
         }
@@ -290,6 +318,7 @@ public class AddSalaryController extends MenuControllerHandler implements Initia
 
     public void setItem(Salary item) {
         this.item = item;
+        this.oldAmount = this.item.getAmount();
     }
 
     public void showDetails(){

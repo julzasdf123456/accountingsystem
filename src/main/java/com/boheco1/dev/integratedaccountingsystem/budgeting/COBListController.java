@@ -277,6 +277,25 @@ public class COBListController extends MenuControllerHandler implements Initiali
         this.revision_table.getColumns().add(column4);
         this.revision_table.getColumns().add(column5);
         this.revision_table.getColumns().add(column6);
+
+        this.revision_table.setRowFactory(tv -> {
+            TableRow<COB> row = new TableRow<>();
+            final ContextMenu rowMenu = new ContextMenu();
+
+            MenuItem view = new MenuItem("Edit Budget");
+            view.setOnAction(actionEvent -> {
+                Utility.setSelectedObject(row.getItem());
+                Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(JournalEntriesController.class, "budgeting/budgeting_edit_cob.fxml"));
+            });
+
+            rowMenu.getItems().addAll(view);
+
+            row.contextMenuProperty().bind(
+                    Bindings.when(row.emptyProperty())
+                            .then((ContextMenu) null)
+                            .otherwise(rowMenu));
+            return row;
+        });
     }
 
     /**

@@ -1,10 +1,12 @@
 package com.boheco1.dev.integratedaccountingsystem.budgeting;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.CobItemDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.ItemDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ObjectTransaction;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
+import com.boheco1.dev.integratedaccountingsystem.objects.COB;
 import com.boheco1.dev.integratedaccountingsystem.objects.COBItem;
 import com.boheco1.dev.integratedaccountingsystem.objects.Item;
 import com.jfoenix.controls.JFXButton;
@@ -71,6 +73,7 @@ public class AddItemController extends MenuControllerHandler implements Initiali
 
     private ObjectTransaction parentController = null;
     private COBItem item = null;
+    private double oldAmount = 0;
     private Item selectedItem = null;
 
     @Override
@@ -244,6 +247,9 @@ public class AddItemController extends MenuControllerHandler implements Initiali
         }
     }
 
+    /**
+     * Method to call when COB is created (COBController) and user wants to edit a newly added item
+     */
     public void editItem(){
         this.status_lbl.setText("");
         String desc = this.description_tf.getText();
@@ -264,6 +270,40 @@ public class AddItemController extends MenuControllerHandler implements Initiali
             }
             COBController ctrl = (COBController) this.parentController;
             ctrl.refreshItems();
+        }else{
+            this.status_lbl.setText("Item is not set! Please provide the item details!");
+        }
+    }
+    /**
+     * Method to call when COB is revised (EditCOBController) and user wants to edit an existing item
+     * @param cob - COB reference
+     */
+    public void updateItem(COB cob){
+        this.status_lbl.setText("");
+        String desc = this.description_tf.getText();
+        String remarks = this.unit_tf.getText();
+        String cost = this.cost_tf.getText();
+        String qty = this.qty_tf.getText();
+
+        if ((!desc.isEmpty() && !remarks.isEmpty() && !cost.isEmpty() && !qty.isEmpty()) || (!desc.isEmpty() && remarks.isEmpty() && cost.isEmpty() && qty.isEmpty())) {
+            try {
+                //If item is from database
+                if (this.exists_check.isSelected() && this.selectedItem != null) {
+                    this.item.setItemId(this.selectedItem.getItemId());
+                    this.item.setDescription(this.selectedItem.getParticulars());
+                    this.item.setRemarks(this.selectedItem.getUnit());
+                //Else, selected is open-ended item
+                } else {
+                    this.item.setItemId(null);
+                    this.item.setDescription(desc);
+                    this.item.setRemarks(remarks);
+                }
+                EditCOBController ctrl = (EditCOBController) this.parentController;
+                CobItemDAO.update(cob, this.item, this.oldAmount);
+                ctrl.refreshItems();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }else{
             this.status_lbl.setText("Item is not set! Please provide the item details!");
         }
@@ -394,6 +434,7 @@ public class AddItemController extends MenuControllerHandler implements Initiali
 
     public void setItem(COBItem item) {
         this.item = item;
+        this.oldAmount = this.item.getAmount();
     }
 
     public void showDetails(){

@@ -1,7 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 public class Salary extends COBItem{
-    private String salId;
+    private int salId;
     private double longetivity;
     private double sSSPhilH;
 	private double CashGift;
@@ -11,11 +11,11 @@ public class Salary extends COBItem{
 
     public Salary(){}
 
-    public String getSalId() {
+    public int getSalId() {
         return salId;
     }
 
-    public void setSalId(String salId) {
+    public void setSalId(int salId) {
         this.salId = salId;
     }
 

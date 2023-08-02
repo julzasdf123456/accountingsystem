@@ -1,18 +1,18 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 public class Representation extends COBItem{
-    private String RId;
+    private int RId;
     private double representationAllowance = 0;
     private double reimbursableAllowance = 0;
     private double otherAllowance = 0;
 
     public Representation(){}
 
-    public String getRId() {
+    public int getRId() {
         return RId;
     }
 
-    public void setRId(String RId) {
+    public void setRId(int RId) {
         this.RId = RId;
     }
 
