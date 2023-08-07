@@ -317,7 +317,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
         column1.setStyle("-fx-alignment: center-right;");
 
         TableColumn<COBItem, String> column2 = new TableColumn<>("Unit");
-        column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getRemarks() != null ? obj.getValue().getRemarks()+"" : ""));
+        column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? obj.getValue().getRemarks()+"" : ""));
         column2.setPrefWidth(100);
         column2.setMaxWidth(100);
         column2.setMinWidth(100);
@@ -404,7 +404,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
         column1.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Representation, String> column2 = new TableColumn<>("Unit");
-        column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getRemarks() != null ? obj.getValue().getRemarks()+"" : ""));
+        column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? obj.getValue().getRemarks()+"" : ""));
         column2.setPrefWidth(100);
         column2.setMaxWidth(100);
         column2.setMinWidth(100);

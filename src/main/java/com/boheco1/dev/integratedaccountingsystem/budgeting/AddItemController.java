@@ -75,7 +75,7 @@ public class AddItemController extends MenuControllerHandler implements Initiali
     private COBItem item = null;
     private double oldAmount = 0;
     private Item selectedItem = null;
-
+    private String type = "";
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.add_btn.setDisable(false);
@@ -229,7 +229,7 @@ public class AddItemController extends MenuControllerHandler implements Initiali
         String cost = this.cost_tf.getText();
         String qty = this.qty_tf.getText();
 
-        if ((!desc.isEmpty() && !remarks.isEmpty() && !cost.isEmpty() && !qty.isEmpty()) || (!desc.isEmpty() && remarks.isEmpty() && cost.isEmpty() && qty.isEmpty())) {
+        if ((!desc.isEmpty() && !cost.isEmpty() && !qty.isEmpty()) || (!desc.isEmpty() && cost.isEmpty() && qty.isEmpty())) {
             //If item is from database
             if (this.exists_check.isSelected() && this.selectedItem != null){
                 this.item.setItemId(this.selectedItem.getItemId());
@@ -257,7 +257,7 @@ public class AddItemController extends MenuControllerHandler implements Initiali
         String cost = this.cost_tf.getText();
         String qty = this.qty_tf.getText();
 
-        if ((!desc.isEmpty() && !remarks.isEmpty() && !cost.isEmpty() && !qty.isEmpty()) || (!desc.isEmpty() && remarks.isEmpty() && cost.isEmpty() && qty.isEmpty())) {
+        if ((!desc.isEmpty() && !cost.isEmpty() && !qty.isEmpty()) || (!desc.isEmpty() && cost.isEmpty() && qty.isEmpty())) {
             //If item is from database
             if (this.exists_check.isSelected() && this.selectedItem != null){
                 this.item.setItemId(this.selectedItem.getItemId());
@@ -285,7 +285,7 @@ public class AddItemController extends MenuControllerHandler implements Initiali
         String cost = this.cost_tf.getText();
         String qty = this.qty_tf.getText();
 
-        if ((!desc.isEmpty() && !remarks.isEmpty() && !cost.isEmpty() && !qty.isEmpty()) || (!desc.isEmpty() && remarks.isEmpty() && cost.isEmpty() && qty.isEmpty())) {
+        if ((!desc.isEmpty() && !cost.isEmpty() && !qty.isEmpty()) || (!desc.isEmpty() && cost.isEmpty() && qty.isEmpty())) {
             try {
                 //If item is from database
                 if (this.exists_check.isSelected() && this.selectedItem != null) {
@@ -324,7 +324,10 @@ public class AddItemController extends MenuControllerHandler implements Initiali
         this.selectedItem = null;
         this.description_tf.setText("");
         this.cost_tf.setText("");
-        this.unit_tf.setText("");
+        if (this.type.equals(COBItem.TYPES[5]))
+            this.unit_tf.setText("Liters per mo");
+        else
+            this.unit_tf.setText("");
         this.total_amount_tf.setText("");
         this.qty_tf.setText("");
         this.times_tf.setText("1");
@@ -415,6 +418,7 @@ public class AddItemController extends MenuControllerHandler implements Initiali
     }
 
     public void setType(String type){
+        this.type = type;
         if (type.equals(COBItem.TYPES[0]) || type.equals(COBItem.TYPES[5])){
             this.times_tf.setDisable(false);
         }else{
@@ -422,6 +426,7 @@ public class AddItemController extends MenuControllerHandler implements Initiali
         }
         if (type.equals(COBItem.TYPES[5]))
             this.unit_tf.setText("Liters per mo");
+
     }
 
     public void disableUnit(boolean ok){
