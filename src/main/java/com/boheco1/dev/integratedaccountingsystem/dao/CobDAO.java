@@ -568,9 +568,10 @@ public class CobDAO {
 
     public static List<COB> getAll(String departmentId) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT c.* FROM COB c " +
+                "SELECT c.*, fs.FSId, (SELECT Source FROM FundSource fs2 WHERE c.FSId = fs2.FSId) AS source FROM COB c " +
                         "INNER JOIN APP a ON a.AppId=c.AppId " +
                         "INNER JOIN EmployeeInfo e ON e.EmployeeID=c.Prepared " +
+                        "INNER JOIN FundSource fs ON fs.FSId=c.FSId " +
                         "WHERE a.isOpen=1 AND e.DepartmentId=? " +
                         "ORDER BY c.DatePrepared DESC "
         );
@@ -596,6 +597,7 @@ public class CobDAO {
                     rs.getDate("DateApproved")!=null ? rs.getDate("DateApproved").toLocalDate() : null
             );
             cob.setType(rs.getString("CobType"));
+            cob.setFundSource(new FundSource(rs.getString("FSId"), rs.getString("Source")));
             cobs.add(cob);
         }
 

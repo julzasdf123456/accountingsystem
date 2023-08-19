@@ -86,29 +86,29 @@ public class ViewDeptSummaryController extends MenuControllerHandler implements 
         actionCol.setCellValueFactory(cobcobCellDataFeatures -> new ReadOnlyObjectWrapper<>(cobcobCellDataFeatures.getValue()));
         actionCol.setStyle("-fx-alignment: CENTER");
 
-//        actionCol.setCellFactory(cobcobTableColumn -> new TableCell<>(){
-//            final FontIcon openIcon =  new FontIcon("mdi2d-door-open");
-//            private final JFXButton openButton = new JFXButton("", openIcon);
-//
-//            @Override
-//            protected void updateItem(COB cob, boolean b) {
-//                super.updateItem(cob, b);
-//                if(cob!=null) {
-//                    openButton.setStyle("-fx-background-color: #009688;");
-//                    openIcon.setIconSize(14);
-//                    openIcon.setIconColor(Color.WHITE);
-//                    setGraphic(openButton);
-//
-//                    openButton.setOnAction(new EventHandler<ActionEvent>() {
-//                        @Override
-//                        public void handle(ActionEvent actionEvent) {
-//                            Utility.setSelectedCOB(cob);
-//                            Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(JournalEntriesController.class, "budgeting/view_cob.fxml"));
-//                        }
-//                    });
-//                }
-//            }
-//        });
+        actionCol.setCellFactory(cobcobTableColumn -> new TableCell<>(){
+            final FontIcon openIcon =  new FontIcon("mdi2d-door-open");
+            private final JFXButton openButton = new JFXButton("", openIcon);
+
+            @Override
+            protected void updateItem(COB cob, boolean b) {
+                super.updateItem(cob, b);
+                if(cob!=null) {
+                    openButton.setStyle("-fx-background-color: #009688;");
+                    openIcon.setIconSize(14);
+                    openIcon.setIconColor(Color.WHITE);
+                    setGraphic(openButton);
+
+                    openButton.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent actionEvent) {
+                            Utility.setSelectedObject(cob);
+                            Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(JournalEntriesController.class, "budgeting/budgeting_cob_approval.fxml"));
+                        }
+                    });
+                }
+            }
+        });
 
         summaryTable.getColumns().add(cobIdCol);
         summaryTable.getColumns().add(activityCol);
@@ -116,7 +116,7 @@ public class ViewDeptSummaryController extends MenuControllerHandler implements 
         summaryTable.getColumns().add(appropCol);
         summaryTable.getColumns().add(statusCol);
         summaryTable.getColumns().add(prepCol);
-//        summaryTable.getColumns().add(actionCol);
+        summaryTable.getColumns().add(actionCol);
 
         summaryTable.setItems(FXCollections.observableArrayList(cobs));
     }
