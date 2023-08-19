@@ -49,7 +49,7 @@ public class ViewDeptSummaryController extends MenuControllerHandler implements 
             selectedDepartment = Utility.getSelectedDeptThreshold();
             titleLabel.setText(selectedDepartment.getDepartmentName() + " Budget Summary");
 
-            cobs = CobDAO.getAll(selectedDepartment);
+            cobs = CobDAO.getAll(selectedDepartment.getDepartmentID());
 
             renderTable();
             updateComputations();
@@ -60,8 +60,15 @@ public class ViewDeptSummaryController extends MenuControllerHandler implements 
     }
 
     private void renderTable() {
+        TableColumn<COB, String> cobIdCol = new TableColumn<>("COB ID");
+        cobIdCol.setCellValueFactory(new PropertyValueFactory<COB, String>("cobId"));
+
         TableColumn<COB, String> activityCol = new TableColumn<>("Major Activity");
         activityCol.setCellValueFactory(new PropertyValueFactory<COB, String>("activity"));
+        activityCol.setMinWidth(250.0);
+
+        TableColumn<COB, String> cobTypeCol = new TableColumn<>("COB Type");
+        cobTypeCol.setCellValueFactory(new PropertyValueFactory<COB, String>("type"));
 
         TableColumn<COB, String> appropCol = new TableColumn<>("Appropriation");
         appropCol.setCellValueFactory(new PropertyValueFactory<COB, String>("appropriationStr"));
@@ -78,35 +85,38 @@ public class ViewDeptSummaryController extends MenuControllerHandler implements 
         TableColumn<COB, COB> actionCol = new TableColumn<>("Action");
         actionCol.setCellValueFactory(cobcobCellDataFeatures -> new ReadOnlyObjectWrapper<>(cobcobCellDataFeatures.getValue()));
         actionCol.setStyle("-fx-alignment: CENTER");
-        actionCol.setCellFactory(cobcobTableColumn -> new TableCell<>(){
-            final FontIcon openIcon =  new FontIcon("mdi2d-door-open");
-            private final JFXButton openButton = new JFXButton("", openIcon);
 
-            @Override
-            protected void updateItem(COB cob, boolean b) {
-                super.updateItem(cob, b);
-                if(cob!=null) {
-                    openButton.setStyle("-fx-background-color: #009688;");
-                    openIcon.setIconSize(14);
-                    openIcon.setIconColor(Color.WHITE);
-                    setGraphic(openButton);
+//        actionCol.setCellFactory(cobcobTableColumn -> new TableCell<>(){
+//            final FontIcon openIcon =  new FontIcon("mdi2d-door-open");
+//            private final JFXButton openButton = new JFXButton("", openIcon);
+//
+//            @Override
+//            protected void updateItem(COB cob, boolean b) {
+//                super.updateItem(cob, b);
+//                if(cob!=null) {
+//                    openButton.setStyle("-fx-background-color: #009688;");
+//                    openIcon.setIconSize(14);
+//                    openIcon.setIconColor(Color.WHITE);
+//                    setGraphic(openButton);
+//
+//                    openButton.setOnAction(new EventHandler<ActionEvent>() {
+//                        @Override
+//                        public void handle(ActionEvent actionEvent) {
+//                            Utility.setSelectedCOB(cob);
+//                            Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(JournalEntriesController.class, "budgeting/view_cob.fxml"));
+//                        }
+//                    });
+//                }
+//            }
+//        });
 
-                    openButton.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent actionEvent) {
-                            Utility.setSelectedCOB(cob);
-                            Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(JournalEntriesController.class, "budgeting/view_cob.fxml"));
-                        }
-                    });
-                }
-            }
-        });
-
+        summaryTable.getColumns().add(cobIdCol);
         summaryTable.getColumns().add(activityCol);
+        summaryTable.getColumns().add(cobTypeCol);
         summaryTable.getColumns().add(appropCol);
         summaryTable.getColumns().add(statusCol);
         summaryTable.getColumns().add(prepCol);
-        summaryTable.getColumns().add(actionCol);
+//        summaryTable.getColumns().add(actionCol);
 
         summaryTable.setItems(FXCollections.observableArrayList(cobs));
     }

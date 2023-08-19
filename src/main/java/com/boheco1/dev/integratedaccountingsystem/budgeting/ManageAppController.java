@@ -57,6 +57,10 @@ public class ManageAppController extends MenuControllerHandler implements Initia
         cobCol.setCellValueFactory(new PropertyValueFactory<APP, String>("formattedTotalBudget"));
         cobCol.setStyle("-fx-alignment: CENTER_RIGHT");
 
+        TableColumn totAppCol = new TableColumn<APP, String>("Total Appropriations");
+        totAppCol.setCellValueFactory(new PropertyValueFactory<APP, String>("totalStr"));
+        totAppCol.setStyle("-fx-alignment: CENTER_RIGHT");
+
         TableColumn isOpenCol = new TableColumn<APP, String>("Is Open?");
         isOpenCol.setCellValueFactory(new PropertyValueFactory<APP, String>("isOpenString"));
 
@@ -88,6 +92,7 @@ public class ManageAppController extends MenuControllerHandler implements Initia
         appTable.getColumns().add(yearCol);
         appTable.getColumns().add(boardResoCol);
         appTable.getColumns().add(cobCol);
+        appTable.getColumns().add(totAppCol);
         appTable.getColumns().add(isOpenCol);
         appTable.getColumns().add(actionCol);
 

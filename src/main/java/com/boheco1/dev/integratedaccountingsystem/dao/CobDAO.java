@@ -566,5 +566,40 @@ public class CobDAO {
         ps.executeUpdate();
     }
 
+    public static List<COB> getAll(String departmentId) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT c.* FROM COB c " +
+                        "INNER JOIN APP a ON a.AppId=c.AppId " +
+                        "INNER JOIN EmployeeInfo e ON e.EmployeeID=c.Prepared " +
+                        "WHERE a.isOpen=1 AND e.DepartmentId=? " +
+                        "ORDER BY c.DatePrepared DESC "
+        );
+
+        ps.setString(1, departmentId);
+        ResultSet rs = ps.executeQuery();
+
+        List<COB> cobs = new ArrayList<>();
+
+        while(rs.next()) {
+            COB cob = new COB(
+                    rs.getString("COBId"),
+                    rs.getString("Activity"),
+                    rs.getDouble("Amount"),
+                    rs.getString("Status"),
+                    rs.getString("AppId"),
+                    rs.getString("FSId"),
+                    EmployeeDAO.getOne(rs.getString("Prepared"), DB.getConnection()),
+                    rs.getDate("DatePrepared").toLocalDate(),
+                    EmployeeDAO.getOne(rs.getString("Reviewed"), DB.getConnection()),
+                    rs.getDate("DateReviewed")!=null ? rs.getDate("DateReviewed").toLocalDate() :null,
+                    EmployeeDAO.getOne(rs.getString("Approved"), DB.getConnection()),
+                    rs.getDate("DateApproved")!=null ? rs.getDate("DateApproved").toLocalDate() : null
+            );
+            cob.setType(rs.getString("CobType"));
+            cobs.add(cob);
+        }
+
+        return cobs;
+    }
 
 }

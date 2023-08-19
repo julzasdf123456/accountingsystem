@@ -1,5 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.AppDAO;
+
 public class APP {
     private String appId;
     private String year;
@@ -59,5 +61,13 @@ public class APP {
 
     public String getFormattedTotalBudget() {
         return String.format("₱ %,.2f", totalBudget);
+    }
+
+    public double getTotal() throws Exception {
+        return AppDAO.getTotal(this.appId);
+    }
+
+    public String getTotalStr() throws Exception {
+        return String.format("₱ %,.2f", getTotal());
     }
 }

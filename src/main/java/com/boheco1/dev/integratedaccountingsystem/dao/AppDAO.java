@@ -93,4 +93,24 @@ public class AppDAO {
 
         return src;
     }
+
+    public static double getTotal(String appId) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT SUM(c.Amount) AS 'total' FROM COB c WHERE AppId=?");
+        ps.setString(1, appId);
+        ResultSet rs = ps.executeQuery();
+
+        if(rs.next()) return rs.getDouble("total");
+
+        return 0;
+    }
+
+    public static void toggleOpen(APP app) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE APP SET isOpen=? WHERE AppId=?");
+        ps.setBoolean(1, !app.isOpen());
+        ps.setString(2, app.getAppId());
+
+        ps.executeUpdate();
+    }
 }

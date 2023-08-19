@@ -9,6 +9,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.APP;
 import com.boheco1.dev.integratedaccountingsystem.objects.Department;
 import com.boheco1.dev.integratedaccountingsystem.objects.DeptThreshold;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXToggleButton;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -32,11 +33,10 @@ public class ViewAppController extends MenuControllerHandler implements Initiali
     TextField budgetYearText;
     @FXML TextField boardResoText;
     @FXML TextField cobText;
-    @FXML
-    Label appropriationsLabel;
+    @FXML Label appropriationsLabel;
     @FXML Label remainingLabel;
-    @FXML
-    TableView thresholdTable;
+    @FXML TableView<DeptThreshold> thresholdTable;
+    @FXML JFXToggleButton openToggle;
 
     private APP app;
 
@@ -47,6 +47,7 @@ public class ViewAppController extends MenuControllerHandler implements Initiali
 
         budgetYearText.setText(app.getYear());
         boardResoText.setText(app.getBoardRes());
+        openToggle.setSelected(app.isOpen());
         cobText.setText(app.getFormattedTotalBudget());
 
         try {
@@ -65,10 +66,20 @@ public class ViewAppController extends MenuControllerHandler implements Initiali
             }
 
             renderTable();
+
+            computations();
         }catch(Exception ex) {
             ex.printStackTrace();
             AlertDialogBuilder.messgeDialog("Unexpected Error",ex.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }
+    }
+
+    private void computations() throws Exception{
+        double total = this.app.getTotal();
+        appropriationsLabel.setText(String.format("₱ %,.2f", total));
+        double remaining = app.getTotalBudget() - total;
+
+        remainingLabel.setText(String.format("₱ %,.2f", remaining));
     }
 
     private void renderTable() {
@@ -89,7 +100,7 @@ public class ViewAppController extends MenuControllerHandler implements Initiali
             @Override
             public void handle(TableColumn.CellEditEvent<DeptThreshold, String> event) {
                 DeptThreshold dt = event.getRowValue();
-                dt.setThreshAmount(Double.parseDouble(event.getNewValue().replace(",","").replace("₱","").replace(" ",",")));
+                dt.setThreshAmount(Double.parseDouble(event.getNewValue().replace(",","").replace("₱","").replace(" ","")));
             }
         });
 
@@ -151,7 +162,19 @@ public class ViewAppController extends MenuControllerHandler implements Initiali
             }
 
             AppDAO.update(app);
+
+            computations();
+
             AlertDialogBuilder.messgeDialog("APP Saved","The APP has been updated successfully!!!",Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
+        }catch(Exception ex) {
+            ex.printStackTrace();
+            AlertDialogBuilder.messgeDialog("Unexpected Error",ex.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }
+    }
+
+    public void onOpenToggle() {
+        try {
+            AppDAO.toggleOpen(this.app);
         }catch(Exception ex) {
             ex.printStackTrace();
             AlertDialogBuilder.messgeDialog("Unexpected Error",ex.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
