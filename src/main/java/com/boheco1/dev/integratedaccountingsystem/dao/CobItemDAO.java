@@ -19,7 +19,7 @@ public class CobItemDAO {
      */
     public static List<COBItem> getItems(COB cob) throws Exception {
 
-        String sql = "SELECT CItemId, Sequence, Level, ItemId, Description, Cost, Remarks, Qty, NoOfTimes, (Cost * Qty * NoOfTimes) AS Total, Qtr1, Qtr2, Qtr3, Qtr4 " +
+        String sql = "SELECT COBId, CItemId, Sequence, Level, ItemId, Description, Cost, Remarks, Qty, ISNULL((SELECT SUM(RVQty) FROM RVItem r WHERE r.CItemId = ci.CItemId), 0) AS RVQty, NoOfTimes, (Cost * Qty * NoOfTimes) AS Total, Qtr1, Qtr2, Qtr3, Qtr4 " +
                 "FROM COBItem ci ";
 
         //Benefits/Allowances
@@ -138,6 +138,7 @@ public class CobItemDAO {
             //Others
             }else{
                 item = new COBItem();
+                item.setCobId(rs.getString("COBId"));
                 item.setcItemId(rs.getString("CItemId"));
                 item.setItemId(rs.getString("ItemId"));
                 item.setDescription(rs.getString("Description"));
@@ -151,6 +152,7 @@ public class CobItemDAO {
                 item.setSequence(rs.getInt("Sequence"));
                 item.setNoOfTimes(rs.getInt("NoOfTimes"));
                 item.setLevel(rs.getInt("Level"));
+                item.setRvQty(rs.getInt("RVQty"));
             }
 
             items.add(item);

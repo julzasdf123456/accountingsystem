@@ -19,7 +19,6 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.layout.StackPane;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -27,7 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-public class COBListController extends MenuControllerHandler implements Initializable {
+public class RVListController extends MenuControllerHandler implements Initializable {
 
     @FXML
     private Label app_status_lbl;

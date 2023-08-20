@@ -11,6 +11,62 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CobDAO {
+    /**
+     * Returns a COB based on the given Control number
+     * @param cn - control number/COB number
+     * @return
+     * @throws Exception
+     */
+    public static COB get(String cn) throws Exception {
+        String sql = "SELECT COBId" +
+                "      ,Activity" +
+                "      ,Amount" +
+                "      ,Status, Remarks " +
+                "      ,a.AppId" +
+                "      ,FSId, (SELECT Source FROM FundSource fs WHERE c.FSId = fs.FSId) AS source" +
+                "      ,Prepared" +
+                "      ,DatePrepared" +
+                "      ,Reviewed" +
+                "      ,DateReviewed" +
+                "      ,Approved" +
+                "      ,DateApproved" +
+                "      ,cobtype" +
+                "  ,(SELECT COUNT(CItemId) FROM COBItem b WHERE c.COBId = b.COBId) AS NoItems" +
+                "  FROM COB c INNER JOIN App a ON c.AppId = a.AppId" +
+                "  WHERE COBId = ?;";
+
+        PreparedStatement ps = DB.getConnection().prepareStatement(sql);
+        ps.setString(1, cn);
+        ResultSet rs = ps.executeQuery();
+
+        COB cob = null;
+
+        while(rs.next()) {
+            EmployeeInfo preparedBy = EmployeeDAO.getOne(rs.getString("Prepared"), DB.getConnection());
+            EmployeeInfo reviewedBy = EmployeeDAO.getOne(rs.getString("Reviewed"), DB.getConnection());
+            EmployeeInfo approvedBy = EmployeeDAO.getOne(rs.getString("Approved"), DB.getConnection());
+            cob = new COB(
+                    rs.getString("COBId"),
+                    rs.getString("Activity"),
+                    rs.getDouble("Amount"),
+                    rs.getString("Status"),
+                    rs.getString("AppId"),
+                    rs.getString("FSId"),
+                    preparedBy,
+                    rs.getDate("DatePrepared")==null? null: rs.getDate("DatePrepared").toLocalDate(),
+                    reviewedBy,
+                    rs.getDate("DateReviewed")==null? null: rs.getDate("DateReviewed").toLocalDate(),
+                    approvedBy,
+                    rs.getDate("DateApproved")==null? null: rs.getDate("DateApproved").toLocalDate()
+            );
+            cob.setFundSource(new FundSource(rs.getString("FSId"), rs.getString("Source")));
+            cob.setType(rs.getString("CobType"));
+            cob.setNoOfItems(rs.getInt("NoItems"));
+            cob.setRemarks(rs.getString("Remarks"));
+        }
+
+        return cob;
+    }
     public static List<COB> getAll(DeptThreshold dt) throws Exception {
         String sql = "SELECT COBId" +
                 "      ,Activity" +
