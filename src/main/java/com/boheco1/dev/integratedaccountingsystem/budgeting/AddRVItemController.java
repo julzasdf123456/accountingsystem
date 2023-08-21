@@ -120,13 +120,18 @@ public class AddRVItemController extends MenuControllerHandler implements Initia
 
             MenuItem add = new MenuItem("Add Item");
             add.setOnAction(actionEvent -> {
-                this.desc_tf.setText(row.getItem().getDescription());
-                this.cost_tf.setText(Utility.formatDecimal(row.getItem().getCost()));
-                this.unit_tf.setText(row.getItem().getRemarks());
-                this.qty_tf.setText(row.getItem().getRemaining()+"");
-                this.total_tf.setText(Utility.formatDecimal(row.getItem().getAmount()));
-                this.qty_tf.requestFocus();
-                this.add_btn.setDisable(false);
+                this.status_lbl.setText("");
+                if (row.getItem().getRemaining() > 0) {
+                    this.desc_tf.setText(row.getItem().getDescription());
+                    this.cost_tf.setText(Utility.formatDecimal(row.getItem().getCost()));
+                    this.unit_tf.setText(row.getItem().getRemarks());
+                    this.qty_tf.setText(row.getItem().getRemaining() + "");
+                    this.total_tf.setText(Utility.formatDecimal(row.getItem().getAmount()));
+                    this.qty_tf.requestFocus();
+                    this.add_btn.setDisable(false);
+                }else{
+                    this.status_lbl.setText("The current item was fully requisitioned!");
+                }
             });
 
             rowMenu.getItems().addAll(add);
@@ -188,6 +193,13 @@ public class AddRVItemController extends MenuControllerHandler implements Initia
      * @return void
      */
     public void createTable(){
+        TableColumn<COBItem, String> column0 = new TableColumn<>("COB No.");
+        column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? obj.getValue().getCobId() : ""));
+        column0.setStyle("-fx-alignment: center-left;");
+        column0.setPrefWidth(110);
+        column0.setMaxWidth(110);
+        column0.setMinWidth(110);
+
         TableColumn<COBItem, String> column = new TableColumn<>("Description");
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getLevel() == 1 ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
         column.setStyle("-fx-alignment: center-left;");
@@ -224,6 +236,7 @@ public class AddRVItemController extends MenuControllerHandler implements Initia
         this.cob_items.setFixedCellSize(35);
         this.cob_items.setPlaceholder(new Label("No Items added"));
 
+        this.cob_items.getColumns().add(column0);
         this.cob_items.getColumns().add(column);
         this.cob_items.getColumns().add(column1);
         this.cob_items.getColumns().add(column2);
@@ -266,28 +279,6 @@ public class AddRVItemController extends MenuControllerHandler implements Initia
             this.cob_items.getSelectionModel().clearSelection();
             this.resetItem();
         }
-        /*this.status_lbl.setText("");
-        String desc = this.description_tf.getText();
-        String remarks = this.unit_tf.getText();
-        String cost = this.cost_tf.getText();
-        String qty = this.qty_tf.getText();
-
-        if ((!desc.isEmpty() && !cost.isEmpty() && !qty.isEmpty()) || (!desc.isEmpty() && cost.isEmpty() && qty.isEmpty())) {
-            //If item is from database
-            if (this.exists_check.isSelected() && this.selectedItem != null){
-                this.item.setItemId(this.selectedItem.getItemId());
-                this.item.setDescription(this.selectedItem.getParticulars());
-                this.item.setRemarks(this.selectedItem.getUnit());
-            //Else, selected is open-ended item
-            }else{
-                this.item.setDescription(desc);
-                this.item.setRemarks(remarks);
-            }
-            this.parentController.receive(this.item);
-            this.reset();
-        }else{
-            this.status_lbl.setText("Item is not set! Please provide the item details!");
-        }*/
     }
 
     public void setCurrentList(List<RVItem> items){

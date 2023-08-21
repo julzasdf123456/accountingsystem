@@ -246,9 +246,9 @@ public class RVListController extends MenuControllerHandler implements Initializ
         TableColumn<RV, String> column = new TableColumn<>("RV No.");
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getRvNo()));
         column.setStyle("-fx-alignment: center-left;");
-        column.setPrefWidth(100);
-        column.setMaxWidth(100);
-        column.setMinWidth(100);
+        column.setPrefWidth(110);
+        column.setMaxWidth(110);
+        column.setMinWidth(110);
 
         TableColumn<RV, String> column1 = new TableColumn<>("To");
         column1.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getTo()));

@@ -17,7 +17,7 @@ public class RVItemDAO {
      */
     public static List<RVItem> getItems(RV rv) throws Exception {
 
-        String sql = "SELECT RVItemId, ri.CItemId, ri.Sequence, ItemId, Description, Cost, ci.Remarks, RVQty " +
+        String sql = "SELECT RVItemId, ri.CItemId, ri.Sequence, COBId, ItemId, Description, Cost, ci.Remarks, RVQty " +
                 "FROM COBItem ci INNER JOIN RVItem ri ON ci.CItemId=ri.CItemId ";
 
         sql += "WHERE RVNo = ? ORDER BY ri.Sequence ASC;";
@@ -41,6 +41,7 @@ public class RVItemDAO {
             item.setCost(rs.getDouble("Cost"));
             item.setRemarks(rs.getString("Remarks"));
             item.setSequence(rs.getInt("Sequence"));
+            item.setCobId(rs.getString("COBId"));
             items.add(item);
         }
 

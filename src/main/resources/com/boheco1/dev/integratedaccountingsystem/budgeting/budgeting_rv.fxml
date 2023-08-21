@@ -8,7 +8,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -78,7 +77,7 @@
                                     </CheckBox>
                                     <HBox prefHeight="29.0" prefWidth="46.0" HBox.hgrow="ALWAYS" />
                                     <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
-                                    <TextField fx:id="totals_tf" editable="false" styleClass="bold" HBox.hgrow="NEVER" />
+                                    <JFXTextField fx:id="totals_tf" editable="false" styleClass="bold" HBox.hgrow="NEVER" />
                                  </children>
                               </HBox>
                               <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">

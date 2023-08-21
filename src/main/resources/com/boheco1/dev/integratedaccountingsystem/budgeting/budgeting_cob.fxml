@@ -8,7 +8,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -96,7 +95,7 @@
                                           <HBox GridPane.rowIndex="1">
                                              <children>
                                                 <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
-                                                <TextField fx:id="totals_tf" editable="false" styleClass="bold" />
+                                                <JFXTextField fx:id="totals_tf" editable="false" styleClass="bold" />
                                              </children>
                                           </HBox>
                                           <Label prefHeight="25.0" styleClass="bold" text="1st Quarter" GridPane.columnIndex="1" />
@@ -106,25 +105,25 @@
                                           <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
                                              <children>
                                                 <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
-                                                <TextField fx:id="q1_tf" editable="false" styleClass="bold" />
+                                                <JFXTextField fx:id="q1_tf" editable="false" styleClass="bold" />
                                              </children>
                                           </HBox>
                                           <HBox GridPane.columnIndex="2" GridPane.rowIndex="1">
                                              <children>
                                                 <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
-                                                <TextField fx:id="q2_tf" editable="false" styleClass="bold" />
+                                                <JFXTextField fx:id="q2_tf" editable="false" styleClass="bold" />
                                              </children>
                                           </HBox>
                                           <HBox GridPane.columnIndex="3" GridPane.rowIndex="1">
                                              <children>
                                                 <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
-                                                <TextField fx:id="q3_tf" editable="false" styleClass="bold" />
+                                                <JFXTextField fx:id="q3_tf" editable="false" styleClass="bold" />
                                              </children>
                                           </HBox>
                                           <HBox GridPane.columnIndex="4" GridPane.rowIndex="1">
                                              <children>
                                                 <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
-                                                <TextField fx:id="q4_tf" editable="false" styleClass="bold" />
+                                                <JFXTextField fx:id="q4_tf" editable="false" styleClass="bold" />
                                              </children>
                                           </HBox>
                                        </children>

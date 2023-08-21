@@ -203,6 +203,13 @@ public class RVApprovalController extends MenuControllerHandler implements Initi
      * @return void
      */
     public void createTable(){
+        TableColumn<RVItem, String> column0 = new TableColumn<>("COB No.");
+        column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? obj.getValue().getCobId() : ""));
+        column0.setStyle("-fx-alignment: center-left;");
+        column0.setPrefWidth(110);
+        column0.setMaxWidth(110);
+        column0.setMinWidth(110);
+
         TableColumn<RVItem, String> column = new TableColumn<>("Articles");
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getLevel() == 1 ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
         column.setStyle("-fx-alignment: center-left;");
@@ -239,6 +246,7 @@ public class RVApprovalController extends MenuControllerHandler implements Initi
         this.rv_items.setFixedCellSize(35);
         this.rv_items.setPlaceholder(new Label("No Items added"));
 
+        this.rv_items.getColumns().add(column0);
         this.rv_items.getColumns().add(column);
         this.rv_items.getColumns().add(column1);
         this.rv_items.getColumns().add(column2);
