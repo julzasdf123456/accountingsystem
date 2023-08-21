@@ -409,5 +409,8 @@ public class Utility {
     }
 
     public static String COB_APPROVAL = "budget officer";
+    public static String RV_APPROVAL = "general manager";
+    public static String RV_RECOMMENDATION = "manager";
+    public static String RV_CERTIFICATION = "budget officer";
     public static String COB_REVIEWER = "manager";
 }

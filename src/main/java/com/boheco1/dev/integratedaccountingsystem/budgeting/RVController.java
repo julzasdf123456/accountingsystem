@@ -1,8 +1,5 @@
 package com.boheco1.dev.integratedaccountingsystem.budgeting;
 
-import com.boheco1.dev.integratedaccountingsystem.dao.AppDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.CobDAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.DeptThresholdDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.RVDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
@@ -29,8 +26,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class RVController extends MenuControllerHandler implements Initializable, ObjectTransaction {
-    @FXML
-    private Label category_lbl;
 
     @FXML
     private JFXButton add_btn;
@@ -171,7 +166,7 @@ public class RVController extends MenuControllerHandler implements Initializable
         }
     }
     /**
-     * Initializes the COB Items (Supplies and Materials, and other budget which follows Description, Cost, Unit, Quantity, Amount) table
+     * Initializes the RV Items (Supplies and Materials, and other budget which follows Description, Cost, Unit, Quantity, Amount) table
      * @return void
      */
     public void createTable(){
@@ -312,6 +307,7 @@ public class RVController extends MenuControllerHandler implements Initializable
         this.purpose_tf.setText("");
         this.to_tf.setText("The General Manager");
         this.certify_cb.setSelected(false);
+        this.submit_btn.setDisable(true);
     }
 
     @Override

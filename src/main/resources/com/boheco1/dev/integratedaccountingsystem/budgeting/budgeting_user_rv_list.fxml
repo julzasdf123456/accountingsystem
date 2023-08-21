@@ -52,7 +52,7 @@
                     <children>
                        <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <children>
-                             <Label text="List of For Revision COBs" />
+                             <Label text="List of RVs advised for revision" />
                              <TableView fx:id="revision_table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                 <columnResizePolicy>
                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -88,7 +88,7 @@
                  </AnchorPane>
               </content>
            </Tab>
-          <Tab fx:id="pending_tab" text="Pending COBs">
+          <Tab fx:id="pending_tab" text="Pending RVs">
                <content>
                   <BorderPane prefHeight="200.0" prefWidth="200.0">
                      <center>
@@ -96,7 +96,7 @@
                            <children>
                               <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <Label text="List of Pending COBs" />
+                                    <Label text="List of RVs pending recommendation" />
                                     <TableView fx:id="pending_table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                        <columnResizePolicy>
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -133,13 +133,13 @@
                   </BorderPane>
                </content>
             </Tab>
-           <Tab fx:id="reviewed_tab" text="Reviewed COBs">
+           <Tab fx:id="reviewed_tab" text="Recommended RVs">
               <content>
                  <AnchorPane>
                     <children>
                        <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <children>
-                             <Label text="List of Reviewed COBs" />
+                             <Label text="List of RVs recommended by Department Head" />
                              <TableView fx:id="approval_table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                 <columnResizePolicy>
                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -175,13 +175,55 @@
                  </AnchorPane>
               </content>
            </Tab>
-          <Tab fx:id="approved_tab" text="Approved COBs">
+           <Tab fx:id="budgeted_tab" text="Checked RVs">
+              <content>
+                 <AnchorPane>
+                    <children>
+                       <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <children>
+                             <Label text="List of RVs endorsed by Budget Officer" />
+                             <TableView fx:id="certified_table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                                <columnResizePolicy>
+                                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                </columnResizePolicy>
+                                <VBox.margin>
+                                   <Insets />
+                                </VBox.margin>
+                             </TableView>
+                             <VBox>
+                                <children>
+                                   <Separator prefWidth="200.0" />
+                                   <HBox>
+                                      <children>
+                                         <Label text="No. of Records : " />
+                                         <Label fx:id="certified_lbl" styleClass="bold" text="0">
+                                            <HBox.margin>
+                                               <Insets left="16.0" />
+                                            </HBox.margin>
+                                         </Label>
+                                      </children>
+                                      <padding>
+                                         <Insets bottom="8.0" top="8.0" />
+                                      </padding>
+                                   </HBox>
+                                </children>
+                             </VBox>
+                          </children>
+                          <padding>
+                             <Insets top="8.0" />
+                          </padding>
+                       </VBox>
+                    </children>
+                 </AnchorPane>
+              </content>
+           </Tab>
+          <Tab fx:id="approved_tab" text="Approved RVs">
                <content>
                   <AnchorPane>
                      <children>
                         <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <Label text="List of Approved COBs" />
+                              <Label text="List of Approved RVs" />
                               <TableView fx:id="approved_table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                  <columnResizePolicy>
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

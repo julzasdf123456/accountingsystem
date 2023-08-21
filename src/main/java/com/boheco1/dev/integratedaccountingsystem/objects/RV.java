@@ -4,6 +4,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class RV {
+    public static final String PENDING_CERTIFICATION = "Pending Certification";
+    public static final String PENDING_REVISION = "Pending Revision";
+    public static final String PENDING_RECOMMENDATION = "Pending Review";
+    public static final String PENDING_APPROVAL = "Pending Approval";
+
+    public static final String APPROVED = "Approved";
     private String rvNo;
     private String to;
     private String purpose;
@@ -12,14 +18,32 @@ public class RV {
     private LocalDate dateBudgeted;
     private LocalDate dateApproved;
     private String status;
+    private String remarks;
     private EmployeeInfo requisitioner;
     private EmployeeInfo recommended;
     private EmployeeInfo budgetOfficer;
     private EmployeeInfo approved;
     private double amount;
     private List<RVItem> items;
-
+    private int NoOfItems = 0;
     public RV() {}
+
+    public RV(String no, String to, String purpose, double amount, String status, String remarks, EmployeeInfo r, EmployeeInfo m, EmployeeInfo b, EmployeeInfo gm, LocalDate rvDate, LocalDate dateRec, LocalDate dateBudg, LocalDate dateAppr) {
+        this.rvNo = no;
+        this.to = to;
+        this.purpose = purpose;
+        this.amount = amount;
+        this.status = status;
+        this.remarks = remarks;
+        this.requisitioner = r;
+        this.recommended = m;
+        this.budgetOfficer = b;
+        this.approved = gm;
+        this.rvDate = rvDate;
+        this.dateRecommended = dateRec;
+        this.dateBudgeted = dateBudg;
+        this.dateApproved = dateAppr;
+    }
 
     public String getRvNo() {
         return rvNo;
@@ -131,5 +155,21 @@ public class RV {
 
     public void setItems(List<RVItem> items) {
         this.items = items;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public int getNoOfItems() {
+        return NoOfItems;
+    }
+
+    public void setNoOfItems(int noOfItems) {
+        NoOfItems = noOfItems;
     }
 }

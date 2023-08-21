@@ -77,7 +77,7 @@ public class HomeController implements Initializable {
     public JFXButton viewBills;
 
     //BUDGETING
-    public JFXButton cob,rv, user_cob, user_rv, manage_app;
+    public JFXButton cob, rv, user_cob, user_rv, manage_app;
 
     //CASHIER
     public JFXButton orView ,orCancel, orUpdate, bulk_or, supplier_or, consumer_teller_or, bankRemittance, acknowledgement_receipts;
@@ -134,8 +134,9 @@ public class HomeController implements Initializable {
         viewBills = new JFXButton("View Consumer Bills");
 
         cob = new JFXButton("Prepare C.O.B.");
-        user_cob = new JFXButton("Budgeting");
+        user_cob = new JFXButton("Cash Operating Budgets");
         rv = new JFXButton("Prepare RV");
+        user_rv = new JFXButton("Requisition Vouchers");
         manage_app = new JFXButton("Manage APP");
 
         String brStr = "Bank Remittance";
@@ -161,25 +162,37 @@ public class HomeController implements Initializable {
         checkVoucher = new JFXButton("Check Voucher");
         journalVoucher = new JFXButton("Journal Voucher");
 
-        if(ActiveUser.getUser().can("prepare-budget") || ActiveUser.getUser().can("manage-app")) {
+        if (ActiveUser.getUser().can("manage-rv")
+                || ActiveUser.getUser().can("prepare-rv")
+                || ActiveUser.getUser().can("manage-budget")
+                || ActiveUser.getUser().can("prepare-budget")
+                || ActiveUser.getUser().can("manage-app")) {
             NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Budgeting"), new FontIcon("mdi2c-cash-register"), homeStackPane);
-            if(ActiveUser.getUser().can("prepare-budget")){
-                NavMenuHelper.addMenu(navMenuBox, user_cob, homeStackPane);
-                APP current = null;
-                try {
-                    current = AppDAO.getOpen(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        }
+        if (ActiveUser.getUser().can("manage-budget"))
+            NavMenuHelper.addMenu(navMenuBox, user_cob, homeStackPane);
 
-                if (current != null) {
-                    NavMenuHelper.addMenu(navMenuBox, cob, homeStackPane);
-                }
-                NavMenuHelper.addMenu(navMenuBox, rv, homeStackPane);
+        if (ActiveUser.getUser().can("prepare-budget")){
+            APP current = null;
+            try {
+                current = AppDAO.getOpen(true);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            if(ActiveUser.getUser().can("manage-app")) {
-                NavMenuHelper.addMenu(navMenuBox, manage_app, homeStackPane);
+
+            if (current != null) {
+                NavMenuHelper.addMenu(navMenuBox, cob, homeStackPane);
             }
+        }
+
+        if (ActiveUser.getUser().can("manage-rv"))
+            NavMenuHelper.addMenu(navMenuBox, user_rv, homeStackPane);
+
+        if (ActiveUser.getUser().can("prepare-rv"))
+            NavMenuHelper.addMenu(navMenuBox, rv, homeStackPane);
+
+        if(ActiveUser.getUser().can("manage-app")) {
+            NavMenuHelper.addMenu(navMenuBox, manage_app, homeStackPane);
         }
 
         // ADD ALL ITEMS TO NAV SEQUENTIALLY
@@ -259,11 +272,18 @@ public class HomeController implements Initializable {
         drawerMenus = new ArrayList<>();
 
         //BUDGETING
-        if(ActiveUser.getUser().can("prepare-budget")) {
+        if(ActiveUser.getUser().can("manage-budget"))
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(user_cob, new FontIcon("mdi2v-view-dashboard"), drawerMenus, user_cob.getText(), contentPane, "budgeting/budgeting_user_cob_list.fxml", subToolbar, null, title);
+
+        if(ActiveUser.getUser().can("prepare-budget"))
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(cob, new FontIcon("mdi2c-cash-usd"), drawerMenus, cob.getText(), contentPane, "budgeting/budgeting_cob.fxml", subToolbar, null, title);
+
+        if(ActiveUser.getUser().can("manage-rv"))
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(user_rv, new FontIcon("mdi2v-view-dashboard-variant"), drawerMenus, user_rv.getText(), contentPane, "budgeting/budgeting_user_rv_list.fxml", subToolbar, null, title);
+
+        if(ActiveUser.getUser().can("prepare-rv"))
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(rv, new FontIcon("mdi2c-cash-usd"), drawerMenus, rv.getText(), contentPane, "budgeting/budgeting_rv.fxml", subToolbar, null, title);
-        }
+
         if(ActiveUser.getUser().can("manage-app")) {
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(manage_app, new FontIcon("mdi2f-file-document-edit"), drawerMenus, manage_app.getText(), contentPane, "budgeting/manage_app.fxml", subToolbar, null, title);
         }
