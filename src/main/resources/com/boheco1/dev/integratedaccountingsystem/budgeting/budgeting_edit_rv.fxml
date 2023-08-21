@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="514.0" prefWidth="700.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.budgeting.RVController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="514.0" prefWidth="700.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.budgeting.EditRVController">
    <children>
       <BorderPane layoutY="116.0" prefHeight="399.0" prefWidth="687.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <center>
@@ -116,7 +116,7 @@
                                  </HBox.margin>
                               </JFXTextField>
                               <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                              <JFXButton fx:id="reset_btn" focusTraversable="false" maxWidth="1.7976931348623157E308" minHeight="28.0" prefHeight="28.0" prefWidth="75.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Reset" textFill="WHITE">
+                              <JFXButton fx:id="reset_btn" focusTraversable="false" maxWidth="1.7976931348623157E308" minHeight="28.0" prefHeight="28.0" prefWidth="75.0" style="-fx-background-color: #f9f9f9; -fx-text-fill: #000000;" text="Cancel" textFill="WHITE">
                                  <effect>
                                     <DropShadow />
                                  </effect>
@@ -182,7 +182,7 @@
                   </HBox>
                   <HBox>
                      <children>
-                        <JFXTextField fx:id="rvno_tf" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                        <JFXTextField fx:id="rvno_tf" editable="false" focusColor="#00ad8e" labelFloat="true" prefHeight="33.0" prefWidth="184.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                            <font>
                               <Font size="14.0" />
                            </font>

@@ -3,8 +3,10 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,5 +48,104 @@ public class RVItemDAO {
         }
 
         return items;
+    }
+
+    public static void update(RVItem item) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE RVItem SET RVQty=? WHERE RVItemId=?");
+
+        ps.setInt(1, item.getQty());
+        ps.setString(2, item.getcItemId());
+
+        ps.executeUpdate();
+    }
+
+    /**
+     * Create RV and items
+     * @param rv RV object with items list
+     * @return void
+     * @throws Exception obligatory from DB.getConnection()
+     */
+    public static void add(RV rv, RVItem item) throws Exception {
+        //Set autocommit to false
+        Connection conn = DB.getConnection();
+        conn.setAutoCommit(false);
+
+        //Queries
+        String sql = "UPDATE RequisitionVoucher SET Amount = Amount + ? WHERE RVNo =?;";
+
+        String item_sql = "INSERT INTO RVItem (RVNo, RVQty, CItemId, Sequence) " +
+                "VALUES (?, ?, ?, ?)";
+
+        //Prepared statements
+        PreparedStatement ps_rv = DB.getConnection().prepareStatement(sql);
+        PreparedStatement ps_item = DB.getConnection().prepareStatement(item_sql);
+
+        //Transact
+        try {
+            //Update RV
+            ps_rv.setDouble(1, item.getAmount());
+            ps_rv.setString(2, rv.getRvNo());
+            ps_rv.executeUpdate();
+
+
+            ps_item.setString(1, rv.getRvNo());
+            ps_item.setInt(2, item.getQty());
+            ps_item.setString(3, item.getcItemId());
+            ps_item.setInt(4, item.getSequence());
+            ps_item.executeUpdate();
+
+            //Commit insert
+            conn.commit();
+        }catch (SQLException e){
+            e.printStackTrace();
+            //If error, rollback
+            conn.rollback();
+        }
+
+        //Close connections
+        ps_rv.close();
+        ps_item.close();
+
+        //Set autocommit to true
+        conn.setAutoCommit(true);
+    }
+
+    /**
+     * Delete RV item from revised RV
+     * @param rv - RV reference
+     * @param item - RV item reference to delete
+     * @throws Exception
+     */
+    public static void delete(RV rv, RVItem item) throws Exception {
+        //Set autocommit to false
+        Connection conn = DB.getConnection();
+        conn.setAutoCommit(false);
+
+        String sql = "DELETE FROM RVItem WHERE RVItemId=?;";
+        String sql2 = "UPDATE RequisitionVoucher SET Amount = Amount - ? WHERE RVNo = ?;";
+
+        PreparedStatement ps = DB.getConnection().prepareStatement(sql);
+        PreparedStatement ps_cob = DB.getConnection().prepareStatement(sql2);
+        try {
+            ps.setInt(1, item.getRVItemId());
+            ps.executeUpdate();
+
+            ps_cob.setDouble(1, item.getAmount());
+            ps_cob.setString(2, rv.getRvNo());
+            ps_cob.executeUpdate();
+            //Commit insert
+            conn.commit();
+        }catch (SQLException se){
+            se.printStackTrace();
+            //If error, rollback
+            conn.rollback();
+        }
+        //Close connections
+        ps.close();
+        ps_cob.close();
+
+        //Set autocommit to true
+        conn.setAutoCommit(true);
     }
 }

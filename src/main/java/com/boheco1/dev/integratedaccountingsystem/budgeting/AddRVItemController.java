@@ -58,9 +58,6 @@ public class AddRVItemController extends MenuControllerHandler implements Initia
     private JFXTextField qty_tf;
 
     @FXML
-    private JFXTextField total_tf;
-
-    @FXML
     private JFXButton add_btn;
 
     @FXML
@@ -96,7 +93,6 @@ public class AddRVItemController extends MenuControllerHandler implements Initia
             }catch (Exception e){
 
             }
-            this.total_tf.setText(Utility.formatDecimal(this.cob_items.getSelectionModel().getSelectedItem().getCost()*qty));
         });
 
         this.view_btn.setOnAction(evt -> {
@@ -126,11 +122,10 @@ public class AddRVItemController extends MenuControllerHandler implements Initia
                     this.cost_tf.setText(Utility.formatDecimal(row.getItem().getCost()));
                     this.unit_tf.setText(row.getItem().getRemarks());
                     this.qty_tf.setText(row.getItem().getRemaining() + "");
-                    this.total_tf.setText(Utility.formatDecimal(row.getItem().getAmount()));
                     this.qty_tf.requestFocus();
                     this.add_btn.setDisable(false);
                 }else{
-                    this.status_lbl.setText("The current item was fully requisitioned!");
+                    this.status_lbl.setText("The current item is currently fully requisitioned!");
                 }
             });
 
@@ -157,7 +152,6 @@ public class AddRVItemController extends MenuControllerHandler implements Initia
         this.cost_tf.setText("");
         this.unit_tf.setText("");
         this.qty_tf.setText("");
-        this.total_tf.setText("");
         this.add_btn.setDisable(true);
     }
     /**
@@ -194,7 +188,7 @@ public class AddRVItemController extends MenuControllerHandler implements Initia
      */
     public void createTable(){
         TableColumn<COBItem, String> column0 = new TableColumn<>("COB No.");
-        column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? obj.getValue().getCobId() : ""));
+        column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCobId()));
         column0.setStyle("-fx-alignment: center-left;");
         column0.setPrefWidth(110);
         column0.setMaxWidth(110);
@@ -226,13 +220,6 @@ public class AddRVItemController extends MenuControllerHandler implements Initia
         column3.setStyle("-fx-alignment: center;");
 
 
-        TableColumn<COBItem, String> column4 = new TableColumn<>("Amount");
-        column4.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getCost() != 0 ? Utility.formatDecimal(obj.getValue().getAmount()) : ""));
-        column4.setPrefWidth(100);
-        column4.setMaxWidth(100);
-        column4.setMinWidth(100);
-        column4.setStyle("-fx-alignment: center-right;");
-
         this.cob_items.setFixedCellSize(35);
         this.cob_items.setPlaceholder(new Label("No Items added"));
 
@@ -241,7 +228,6 @@ public class AddRVItemController extends MenuControllerHandler implements Initia
         this.cob_items.getColumns().add(column1);
         this.cob_items.getColumns().add(column2);
         this.cob_items.getColumns().add(column3);
-        this.cob_items.getColumns().add(column4);
     }
     public void addItem(){
         this.status_lbl.setText("");

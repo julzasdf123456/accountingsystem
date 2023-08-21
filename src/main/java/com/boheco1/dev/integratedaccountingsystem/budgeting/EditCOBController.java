@@ -309,19 +309,11 @@ public class EditCOBController extends MenuControllerHandler implements Initiali
                 }
             });
 
-            MenuItem removeAll = new MenuItem("Clear Items");
-            removeAll.setOnAction(actionEvent -> {
-                this.items = FXCollections.observableArrayList(new ArrayList<>());
-                this.cob_items.setItems(this.items);
-                this.cob_items.refresh();
-                this.setAmount();
-            });
-
             String n = this.type_cb.getSelectionModel().getSelectedItem();
             if (n.equals(COBItem.TYPES[1]) || n.equals(COBItem.TYPES[2])) {
-                rowMenu.getItems().addAll(edit, new SeparatorMenuItem(), remove, new SeparatorMenuItem(), child, parent, new SeparatorMenuItem(), removeAll);
+                rowMenu.getItems().addAll(edit, new SeparatorMenuItem(), remove, new SeparatorMenuItem(), child, parent);
             }else {
-                rowMenu.getItems().addAll(edit, new SeparatorMenuItem(), remove, new SeparatorMenuItem(), child, parent, new SeparatorMenuItem(), dist, q1, q2, q3, q4, new SeparatorMenuItem(), removeAll);
+                rowMenu.getItems().addAll(edit, new SeparatorMenuItem(), remove, new SeparatorMenuItem(), child, parent, new SeparatorMenuItem(), dist, q1, q2, q3, q4);
             }
 
             row.contextMenuProperty().bind(
@@ -980,7 +972,11 @@ public class EditCOBController extends MenuControllerHandler implements Initiali
                 protected Void call() {
                     try {
                         COBItem item = (COBItem) o;
-                        item.setSequence(items.size() + 1);
+                        if (items.size() == 0) {
+                            item.setSequence(items.size() + 1);
+                        }else{
+                            item.setSequence(items.get(items.size() - 1).getSequence() + 1);
+                        }
                         CobItemDAO.add(current, item);
                         items.add(item);
                     }catch (Exception e){

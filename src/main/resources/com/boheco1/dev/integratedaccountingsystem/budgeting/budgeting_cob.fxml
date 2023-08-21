@@ -94,7 +94,10 @@
                                           <Label prefHeight="25.0" styleClass="bold" text="TOTAL" />
                                           <HBox GridPane.rowIndex="1">
                                              <children>
-                                                <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
+                                                <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ ">
+                                                   <HBox.margin>
+                                                      <Insets top="4.0" />
+                                                   </HBox.margin></Label>
                                                 <JFXTextField fx:id="totals_tf" editable="false" styleClass="bold" />
                                              </children>
                                           </HBox>
@@ -104,25 +107,37 @@
                                           <Label prefHeight="25.0" styleClass="bold" text="4th Quarter" GridPane.columnIndex="4" />
                                           <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
                                              <children>
-                                                <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
+                                                <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ ">
+                                                   <HBox.margin>
+                                                      <Insets top="4.0" />
+                                                   </HBox.margin></Label>
                                                 <JFXTextField fx:id="q1_tf" editable="false" styleClass="bold" />
                                              </children>
                                           </HBox>
                                           <HBox GridPane.columnIndex="2" GridPane.rowIndex="1">
                                              <children>
-                                                <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
+                                                <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ ">
+                                                   <HBox.margin>
+                                                      <Insets top="4.0" />
+                                                   </HBox.margin></Label>
                                                 <JFXTextField fx:id="q2_tf" editable="false" styleClass="bold" />
                                              </children>
                                           </HBox>
                                           <HBox GridPane.columnIndex="3" GridPane.rowIndex="1">
                                              <children>
-                                                <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
+                                                <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ ">
+                                                   <HBox.margin>
+                                                      <Insets top="4.0" />
+                                                   </HBox.margin></Label>
                                                 <JFXTextField fx:id="q3_tf" editable="false" styleClass="bold" />
                                              </children>
                                           </HBox>
                                           <HBox GridPane.columnIndex="4" GridPane.rowIndex="1">
                                              <children>
-                                                <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ " />
+                                                <Label prefHeight="20.0" style="-fx-font-size: 16px;" styleClass="bold" text="₱ ">
+                                                   <HBox.margin>
+                                                      <Insets top="4.0" />
+                                                   </HBox.margin></Label>
                                                 <JFXTextField fx:id="q4_tf" editable="false" styleClass="bold" />
                                              </children>
                                           </HBox>

@@ -127,12 +127,6 @@
                               <Insets bottom="16.0" />
                            </VBox.margin>
                         </JFXTextField>
-                        <Label layoutX="10.0" layoutY="202.0" text="Total Amount" />
-                        <JFXTextField fx:id="total_tf" editable="false" focusColor="#00ad8e" layoutX="10.0" layoutY="221.0" unFocusColor="#b5b5b5">
-                           <VBox.margin>
-                              <Insets bottom="16.0" />
-                           </VBox.margin>
-                        </JFXTextField>
                         <HBox>
                            <children>
                               <JFXButton fx:id="add_btn" buttonType="RAISED" prefHeight="35.0" prefWidth="142.0" styleClass="btn-sucess" text="Add Item" textFill="WHITE">

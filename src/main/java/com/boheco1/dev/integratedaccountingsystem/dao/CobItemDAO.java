@@ -27,17 +27,17 @@ public class CobItemDAO {
 
         //Representation
         } else if (cob.getType().equals(COBItem.TYPES[1])) {
-            sql = "SELECT Rid, ci.CItemId, Sequence, Level, ItemId, Description, Cost, Remarks, Qty, NoOfTimes, (Cost * Qty * NoOfTimes) AS Total, reprnAllowance, reimbursableAllowance, otherAllowance " +
+            sql = "SELECT COBId, Rid, ci.CItemId, Sequence, Level, ItemId, Description, Cost, Remarks, Qty, NoOfTimes, (Cost * Qty * NoOfTimes) AS Total, reprnAllowance, reimbursableAllowance, otherAllowance " +
                     "FROM COBItem ci INNER JOIN Representation c ON ci.CItemId = c.CItemId ";
         //Salaries
         }else if (cob.getType().equals(COBItem.TYPES[2])) {
-            sql = "SELECT SalId, ci.CItemId, Sequence, Level, ItemId, Description AS Position, Cost AS BasicSalary, Remarks, Qty AS Persons, NoOfTimes, " +
+            sql = "SELECT COBId, SalId, ci.CItemId, Sequence, Level, ItemId, Description AS Position, Cost AS BasicSalary, Remarks, Qty AS Persons, NoOfTimes, " +
                     "Longetivity, SSSPhilH, CashGift, Bonus13, " +
                     "(Cost * Qty * NoOfTimes * 12) As AnnualTotal " +
                     "FROM COBItem ci INNER JOIN Salaries s ON ci.CItemId = s.CItemId ";
         //Travels/Seminars
         }else if (cob.getType().equals(COBItem.TYPES[3])) {
-            sql = "SELECT TrId, ci.CItemId, Sequence, Level, ItemId, Description, " +
+            sql = "SELECT COBId, TrId, ci.CItemId, Sequence, Level, ItemId, Description, " +
                     "Cost AS RatePerDiem, (Cost * NoOfDays * Qty * NoOfTimes)  AS TravelCost, " +
                     "Remarks, Qty AS Persons, NoOfDays, NoOfTimes AS TimesPerYear, " +
                     "Transport, (Transport * Qty * NoOfTimes) AS TotalTransport, " +
@@ -91,6 +91,7 @@ public class CobItemDAO {
                 repr.setSequence(rs.getInt("Sequence"));
                 repr.setNoOfTimes(rs.getInt("NoOfTimes"));
                 repr.setLevel(rs.getInt("Level"));
+                repr.setCobId(rs.getString("COBId"));
                 item = repr;
             //Salaries
             }else if (cob.getType().equals(COBItem.TYPES[2])) {
@@ -109,6 +110,7 @@ public class CobItemDAO {
                 sal.setsSSPhilH(rs.getDouble("SSSPhilH"));
                 sal.setBonus13(rs.getDouble("Bonus13"));
                 sal.setLevel(rs.getInt("Level"));
+                sal.setCobId(rs.getString("COBId"));
                 item = sal;
             //Travels/Seminars
             }else if (cob.getType().equals(COBItem.TYPES[3])) {
@@ -134,6 +136,7 @@ public class CobItemDAO {
                 trav.setQtr3(rs.getDouble("Qtr3"));
                 trav.setQtr4(rs.getDouble("Qtr4"));
                 trav.setLevel(rs.getInt("Level"));
+                trav.setCobId(rs.getString("COBId"));
                 item = trav;
             //Others
             }else{

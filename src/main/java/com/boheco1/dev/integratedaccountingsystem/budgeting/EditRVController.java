@@ -1,9 +1,13 @@
 package com.boheco1.dev.integratedaccountingsystem.budgeting;
 
-import com.boheco1.dev.integratedaccountingsystem.dao.RVDAO;
+import com.boheco1.dev.integratedaccountingsystem.JournalEntriesController;
+import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.jfoenix.controls.*;
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialogLayout;
+import com.jfoenix.controls.JFXTextField;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -25,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class RVController extends MenuControllerHandler implements Initializable, ObjectTransaction {
+public class EditRVController extends MenuControllerHandler implements Initializable, ObjectTransaction {
 
     @FXML
     private JFXButton add_btn;
@@ -70,12 +74,12 @@ public class RVController extends MenuControllerHandler implements Initializable
     private CheckBox certify_cb;
 
     private ObservableList<RVItem> items = FXCollections.observableArrayList(new ArrayList<>());
-    private EmployeeInfo emp = null;
-    private Department dept = null;
-
     private double rvAmount = 0;
+    private RV current = null;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        this.current = (RV) Utility.getSelectedObject();
+
         this.submit_btn.setDisable(true);
 
         this.certify_cb.setOnAction(evt -> {
@@ -94,42 +98,30 @@ public class RVController extends MenuControllerHandler implements Initializable
         });
 
         this.remove_btn.setOnAction(evt -> {
-            try {
-                int row = this.rv_items.getSelectionModel().getSelectedIndex();
-                this.items.remove(row);
-                this.rv_items.refresh();
-                this.setTable();
-                this.setAmount();
-            }catch (Exception e){
-                //Do nothing
+            RVItem selected = this.rv_items.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                try {
+                    this.deleteItem(selected);
+                } catch (Exception e) {
+                    AlertDialogBuilder.messgeDialog("System Error", "A System error occurred: " + e.getMessage(),
+                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }
+            }else{
+                AlertDialogBuilder.messgeDialog("Delete RV Item", "Please select the item to delete and try again!",
+                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }
         });
         this.rv_items.setRowFactory(tv -> {
             TableRow<RVItem> row = new TableRow<>();
             final ContextMenu rowMenu = new ContextMenu();
 
-            MenuItem edit = new MenuItem("Edit Item");
-            edit.setOnAction(actionEvent -> {
-
-            });
-
             MenuItem remove = new MenuItem("Remove Item");
             remove.setOnAction(actionEvent -> {
-                this.rv_items.getItems().remove(row.getItem());
-                this.rv_items.refresh();
-                this.setAmount();
+                deleteItem(row.getItem());
             });
 
 
-            MenuItem removeAll = new MenuItem("Clear Items");
-            removeAll.setOnAction(actionEvent -> {
-                this.items = FXCollections.observableArrayList(new ArrayList<>());
-                this.rv_items.setItems(this.items);
-                this.rv_items.refresh();
-                this.setAmount();
-            });
-
-            rowMenu.getItems().addAll(edit, new SeparatorMenuItem(), remove, new SeparatorMenuItem(), removeAll);
+            rowMenu.getItems().addAll(remove);
 
 
             row.contextMenuProperty().bind(
@@ -144,7 +136,7 @@ public class RVController extends MenuControllerHandler implements Initializable
         });
 
         this.reset_btn.setOnAction(evt ->{
-            this.reset();
+            Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(JournalEntriesController.class, "budgeting/budgeting_user_rv_list.fxml"));
         });
 
         //Pass this controller to the Add Item controller
@@ -154,13 +146,16 @@ public class RVController extends MenuControllerHandler implements Initializable
     }
     public void setDetails(){
         try{
-            this.emp = ActiveUser.getUser().getEmployeeInfo();
-            this.dept = this.emp.getDepartment();
-            String d = this.dept.getDepartmentName();
-            LocalDate date = Utility.serverDate();
-            this.date_tf.setText(date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
-            this.rvno_tf.setText(date.getYear()+"-"+this.dept.getDepartmentName()+"-"+ (RVDAO.countRv(d)+1));
-            this.prepared_tf.setText(this.emp.getEmployeeFirstName()+" "+this.emp.getEmployeeLastName());
+            this.current.setItems(RVItemDAO.getItems(this.current));
+            this.items = FXCollections.observableArrayList(this.current.getItems());
+            this.rv_items.setItems(this.items);
+            this.rv_items.refresh();
+            this.rvno_tf.setText(this.current.getRvNo());
+            this.to_tf.setText(this.current.getTo());
+            this.purpose_tf.setText(this.current.getPurpose());
+            this.date_tf.setText(this.current.getRvDate().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
+            this.prepared_tf.setText(this.current.getRequisitioner().getEmployeeFirstName()+" "+this.current.getRequisitioner().getEmployeeLastName()+" ("+this.current.getRvDate()+")");
+            this.setAmount();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -225,14 +220,11 @@ public class RVController extends MenuControllerHandler implements Initializable
      * @return void
      */
     public void submitRV(){
-        final String rvno = this.rvno_tf.getText();
+
         final String to = this.to_tf.getText();
         final String purpose = this.purpose_tf.getText();
 
-        if (rvno.isEmpty()) {
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide the RV number! Format: YEAR-DEPT-NO",
-                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-        }else if (to.isEmpty()) {
+        if (to.isEmpty()) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide the TO field title for this request!",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }else if (purpose.isEmpty()) {
@@ -251,17 +243,18 @@ public class RVController extends MenuControllerHandler implements Initializable
             accept.setOnAction(__ -> {
                 dialog.close();
                 try {
-                    RV rv = new RV();
-                    rv.setRvNo(rvno);
-                    rv.setTo(to);
-                    rv.setPurpose(purpose);
-                    rv.setAmount(rvAmount);
-                    rv.setItems(this.items);
-                    RVDAO.createRV(rv);
-                    reset();
-                    LocalDate date = Utility.serverDate();
-                    this.date_tf.setText(date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
-                    this.rvno_tf.setText(date.getYear()+"-"+this.dept.getDepartmentName()+"-"+ (RVDAO.countRv(this.dept.getDepartmentName())+1));
+                    this.current.setTo(to);
+                    this.current.setPurpose(purpose);
+                    this.current.setAmount(rvAmount);
+                    RVDAO.submitRevisedRV(this.current);
+                    this.certify_cb.setSelected(false);
+                    this.submit_btn.setDisable(true);
+                    this.add_btn.setDisable(true);
+                    this.submit_btn.setDisable(true);
+                    this.remove_btn.setDisable(true);
+                    this.add_btn.setVisible(false);
+                    this.submit_btn.setVisible(false);
+                    this.remove_btn.setVisible(false);
                     AlertDialogBuilder.messgeDialog("Submit RV", "The RV was successfully submitted and awaiting review by your department head!",
                             Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
                 } catch (SQLException e) {
@@ -297,7 +290,7 @@ public class RVController extends MenuControllerHandler implements Initializable
     public void setAmount(){
         double total = 0;
 
-        for (COBItem i : this.items){
+        for (RVItem i : this.items){
             total += i.getAmount();
         }
         this.rvAmount = total;
@@ -317,26 +310,36 @@ public class RVController extends MenuControllerHandler implements Initializable
 
     @Override
     public void receive(Object o) {
-        if (o instanceof COBItem) {
+        if (o instanceof RVItem) {
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() {
                     //boolean found = false;
+                    //int index = 0;
                     RVItem item = (RVItem) o;
-                    /*int index = 0;
-                    for (RVItem c : items) {
-                        if (c.getcItemId().equals(item.getcItemId()) && c.getCobId().equals(item.getCobId())){
-                            int requested = item.getQty();
-                            items.get(index).setQty(c.getQty()+requested);
-                            found = true;
-                            break;
+                    try {
+                    /*    for (RVItem c : items) {
+                            if (c.getcItemId().equals(item.getcItemId()) && c.getCobId().equals(item.getCobId())) {
+                                int requested = item.getQty();
+                                items.get(index).setQty(c.getQty() + requested);
+                                RVItemDAO.update(items.get(index));
+                                found = true;
+                                break;
+                            }
+                            index++;
                         }
-                        index++;
+                        if (!found) {*/
+                            if (items.size() == 0) {
+                                item.setSequence(items.size() + 1);
+                            }else{
+                                item.setSequence(items.get(items.size() - 1).getSequence() + 1);
+                            }
+                            RVItemDAO.add(current, item);
+                            items.add(item);
+                        //}
+                    }catch (Exception e){
+                        e.printStackTrace();
                     }
-                    if (!found){*/
-                        item.setSequence(items.size()+1);
-                        items.add(item);
-                    //}
                     return null;
                 }
             };
@@ -386,5 +389,34 @@ public class RVController extends MenuControllerHandler implements Initializable
 
             new Thread(task).start();
         }
+    }
+
+    /**
+     * Method to delete a RV item, automatically update table and values
+     * @param item - RV item reference
+     */
+    public void deleteItem(RVItem item){
+        JFXButton accept = new JFXButton("Proceed");
+        JFXDialog dialog = DialogBuilder.showConfirmDialog("Delete RV Item", "This process is final. Confirm delete?", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+        accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+        accept.setOnAction(__ -> {
+            try{
+                int row = this.rv_items.getSelectionModel().getSelectedIndex();
+                RVItemDAO.delete(current, item);
+                this.items.remove(row);
+                this.setAmount();
+                this.rv_items.refresh();
+                AlertDialogBuilder.messgeDialog("Delete RV Item", "The RV item was successfully removed from the Requistion Voucher!",
+                        Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+            }catch (Exception e){
+                AlertDialogBuilder.messgeDialog("System Error", "An SQL error occurred: " + e.getMessage(),
+                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            }
+            dialog.close();
+        });
+    }
+    public void refreshItems(){
+        this.rv_items.refresh();
+        setAmount();
     }
 }
