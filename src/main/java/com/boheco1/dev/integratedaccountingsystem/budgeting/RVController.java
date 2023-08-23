@@ -155,7 +155,7 @@ public class RVController extends MenuControllerHandler implements Initializable
             LocalDate date = Utility.serverDate();
             this.date_tf.setText(date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
             this.rvno_tf.setText(date.getYear()+"-"+this.dept.getDepartmentName()+"-"+ (RVDAO.countRv(d)+1));
-            this.prepared_tf.setText(this.emp.getEmployeeFirstName()+" "+this.emp.getEmployeeLastName());
+            this.prepared_tf.setText((this.emp.getEmployeeFirstName()+" "+this.emp.getEmployeeLastName()).toUpperCase());
         } catch (Exception e) {
             e.printStackTrace();
         }

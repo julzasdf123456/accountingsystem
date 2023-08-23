@@ -23,7 +23,6 @@ import javafx.scene.paint.Paint;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -154,7 +153,7 @@ public class EditRVController extends MenuControllerHandler implements Initializ
             this.to_tf.setText(this.current.getTo());
             this.purpose_tf.setText(this.current.getPurpose());
             this.date_tf.setText(this.current.getRvDate().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
-            this.prepared_tf.setText(this.current.getRequisitioner().getEmployeeFirstName()+" "+this.current.getRequisitioner().getEmployeeLastName()+" ("+this.current.getRvDate()+")");
+            this.prepared_tf.setText((this.current.getRequisitioner().getEmployeeFirstName()+" "+this.current.getRequisitioner().getEmployeeLastName()+" ("+this.current.getRvDate()+")").toUpperCase());
             this.setAmount();
         } catch (Exception e) {
             e.printStackTrace();

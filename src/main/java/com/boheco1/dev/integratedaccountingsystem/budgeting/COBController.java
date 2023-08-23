@@ -119,7 +119,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
             this.dept = emp.getDepartment().getDepartmentName();
             this.cn_tf.setText(this.app.getYear()+"-"+dept+"-"+ (CobDAO.countCob(dept)+1));
             this.board_res_tf.setText(this.app.getBoardRes());
-            this.prepared_tf.setText(emp.getEmployeeFirstName()+" "+emp.getEmployeeLastName());
+            this.prepared_tf.setText((emp.getEmployeeFirstName()+" "+emp.getEmployeeLastName()).toUpperCase());
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -96,15 +96,15 @@ public class RVApprovalController extends MenuControllerHandler implements Initi
                     //If user is the general manager
                     if (this.currentUser != null && this.currentUser.getDesignation().toLowerCase().equals(Utility.RV_APPROVAL)) {
                         RVDAO.approveRV(this.current);
-                        this.approved_tf.setText(this.currentUser.getEmployeeFirstName() + " " + this.currentUser.getEmployeeLastName());
+                        this.approved_tf.setText((this.currentUser.getEmployeeFirstName() + " " + this.currentUser.getEmployeeLastName()).toUpperCase());
                     //If user is dept manager
                     }else if (this.currentUser != null && this.currentUser.getDesignation().toLowerCase().contains(Utility.RV_RECOMMENDATION)) {
                         RVDAO.recommendRV(this.current);
-                        this.reviewed_tf.setText(this.currentUser.getEmployeeFirstName() + " " + this.currentUser.getEmployeeLastName());
+                        this.reviewed_tf.setText((this.currentUser.getEmployeeFirstName() + " " + this.currentUser.getEmployeeLastName()).toUpperCase());
                     //If user is the budget offer
                     } else if (this.currentUser != null && this.currentUser.getDesignation().toLowerCase().contains(Utility.RV_CERTIFICATION)) {
                         RVDAO.certifyRV(this.current);
-                        this.budget_tf.setText(this.currentUser.getEmployeeFirstName() + " " + this.currentUser.getEmployeeLastName());
+                        this.budget_tf.setText((this.currentUser.getEmployeeFirstName() + " " + this.currentUser.getEmployeeLastName()).toUpperCase());
                     }
                     //Disable the buttons
                     this.approve_btn.setVisible(false);
@@ -271,10 +271,10 @@ public class RVApprovalController extends MenuControllerHandler implements Initi
 
             this.totals_tf.setText(Utility.formatDecimal(this.current.getAmount()));
 
-            this.prepared_tf.setText(this.current.getRequisitioner().getEmployeeFirstName()+" "+this.current.getRequisitioner().getEmployeeLastName()+" ("+this.current.getRvDate()+")");
-            this.reviewed_tf.setText(this.current.getRecommended() != null ? this.current.getRecommended().getEmployeeFirstName()+" "+this.current.getRecommended().getEmployeeLastName()+" ("+this.current.getDateRecommended()+")" : "");
-            this.budget_tf.setText(this.current.getBudgetOfficer() != null ? this.current.getBudgetOfficer().getEmployeeFirstName()+" "+this.current.getBudgetOfficer().getEmployeeLastName()+" ("+this.current.getDateBudgeted()+")" : "");
-            this.approved_tf.setText(this.current.getApproved() != null ? this.current.getApproved().getEmployeeFirstName()+" "+this.current.getApproved().getEmployeeLastName()+" ("+this.current.getDateApproved()+")" : "");
+            this.prepared_tf.setText((this.current.getRequisitioner().getEmployeeFirstName()+" "+this.current.getRequisitioner().getEmployeeLastName()+" ("+this.current.getRvDate()+")").toUpperCase());
+            this.reviewed_tf.setText((this.current.getRecommended() != null ? this.current.getRecommended().getEmployeeFirstName()+" "+this.current.getRecommended().getEmployeeLastName()+" ("+this.current.getDateRecommended()+")" : "").toUpperCase());
+            this.budget_tf.setText((this.current.getBudgetOfficer() != null ? this.current.getBudgetOfficer().getEmployeeFirstName()+" "+this.current.getBudgetOfficer().getEmployeeLastName()+" ("+this.current.getDateBudgeted()+")" : "").toUpperCase());
+            this.approved_tf.setText((this.current.getApproved() != null ? this.current.getApproved().getEmployeeFirstName()+" "+this.current.getApproved().getEmployeeLastName()+" ("+this.current.getDateApproved()+")" : "").toUpperCase());
 
         } catch (Exception e) {
             e.printStackTrace();

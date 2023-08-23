@@ -139,7 +139,7 @@ public class AddPOItemController extends MenuControllerHandler implements Initia
             MenuItem add = new MenuItem("Add Item");
             add.setOnAction(actionEvent -> {
                 this.status_lbl.setText("");
-                if (row.getItem().getRemaining() > 0) {
+                if (row.getItem().getRemainingRV() > 0) {
                     this.desc_tf.setText(row.getItem().getDescription());
                     this.price_tf.setText(row.getItem().getCost()+"");
                     this.unit_tf.setText(row.getItem().getRemarks());
@@ -148,7 +148,7 @@ public class AddPOItemController extends MenuControllerHandler implements Initia
                     this.details_ta.requestFocus();
                     this.add_btn.setDisable(false);
                 }else{
-                    this.status_lbl.setText("The current item is currently fully requisitioned!");
+                    this.status_lbl.setText("The current item is fully purchased!");
                 }
             });
 

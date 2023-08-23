@@ -140,8 +140,8 @@ public class PODAO {
      * @return void
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static void approveRV(PurchaseOrder po) throws Exception{
-        PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE PurchaseOrder SET GeneralManager = ?, Status = ?, DateApproved = getdate() WHERE PONo=?");
+    public static void approvePO(PurchaseOrder po) throws Exception{
+        PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE PurchaseOrder SET GeneralManager = ?, Status = ?, Remarks = NULL WHERE PONo=?");
         ps.setString(1, ActiveUser.getUser().getEmployeeID());
         ps.setString(2, PurchaseOrder.APPROVED);
         ps.setString(3, po.getPoNo());
@@ -193,7 +193,7 @@ public class PODAO {
         String sql = "SELECT PONo" +
                 "      ,PODate" +
                 "      ,[To]" +
-                "      ,Address" +
+                "      ,p.Address" +
                 "      ,Contact" +
                 "      ,Terms" +
                 "      ,Amount" +
@@ -203,10 +203,10 @@ public class PODAO {
                 "      ,DateAccepted" +
                 "      ,GeneralManager" +
                 "      ,Prepared" +
-                "      ,(SELECT COUNT(POItemId) FROM POItem b WHERE p.PONo = b.RVNo) AS NoItems" +
+                "      ,(SELECT COUNT(POItemId) FROM POItem b WHERE p.PONo = b.PONo) AS NoItems" +
                 "  FROM PurchaseOrder p INNER JOIN EmployeeInfo ei ON ei.EmployeeID = p.Prepared INNER JOIN Departments d ON ei.DepartmentId = d.DepartmentID" +
                 "  WHERE PODate LIKE ? AND d.DepartmentId =? AND Status = ?" +
-                "  ORDER BY PODate DESC, RVNo ASC;";
+                "  ORDER BY PODate DESC, PONo ASC;";
 
         PreparedStatement ps = DB.getConnection().prepareStatement(sql);
         ps.setString(1, "%"+year+"%");
@@ -236,71 +236,67 @@ public class PODAO {
                     gm,
                     prepared
             );
-
+            po.setNoOfItems(rs.getInt("NoItems"));
             items.add(po);
         }
         return items;
     }
 
     /**
-     * Returns a list of all RVs from a department having a particular status e.g. Pending Approval (for users except the budget officer)
-     * @param year - Year of RV
-     * @param status - RV status
-     * @return list of RVs
+     * Returns a list of all POs from a department having a particular status e.g. Pending Approval (for users except the budget officer)
+     * @param year - Year of PO
+     * @param status - PO status
+     * @return list of POs
      * @throws Exception
      */
-    public static List<RV> getAll(String year, String status) throws Exception {
-        String sql = "SELECT RVNo" +
+    public static List<PurchaseOrder> getAll(String year, String status) throws Exception {
+        String sql = "SELECT PONo" +
+                "      ,PODate" +
                 "      ,[To]" +
-                "      ,Purpose" +
+                "      ,p.Address" +
+                "      ,Contact" +
+                "      ,Terms" +
                 "      ,Amount" +
                 "      ,Status" +
                 "      ,Remarks" +
-                "      ,Requistioner" +
-                "      ,RVDate" +
-                "      ,Recommended" +
-                "      ,DateRecommended" +
-                "      ,BudgetOfficer" +
-                "      ,DateBudgeted" +
-                "      ,Approved" +
-                "      ,DateApproved" +
-                "      ,(SELECT COUNT(RVItemId) FROM RVItem b WHERE r.RVNo = b.RVNo) AS NoItems" +
-                "  FROM RequisitionVoucher r" +
-                "  WHERE RVDate LIKE ? AND Status = ?" +
-                "  ORDER BY RVDate DESC, RVNo ASC;";
+                "      ,DateBoard" +
+                "      ,DateAccepted" +
+                "      ,GeneralManager" +
+                "      ,Prepared" +
+                "      ,(SELECT COUNT(POItemId) FROM POItem b WHERE p.PONo = b.PONo) AS NoItems" +
+                "  FROM PurchaseOrder p " +
+                "  WHERE PODate LIKE ? AND Status = ?" +
+                "  ORDER BY PODate DESC, PONo ASC;";
 
         PreparedStatement ps = DB.getConnection().prepareStatement(sql);
         ps.setString(1, "%"+year+"%");
         ps.setString(2, status);
         ResultSet rs = ps.executeQuery();
 
-        ArrayList<RV> items = new ArrayList<>();
+        ArrayList<PurchaseOrder> items = new ArrayList<>();
 
-        RV rv = null;
+        PurchaseOrder po = null;
 
         while(rs.next()) {
-            EmployeeInfo preparedBy = EmployeeDAO.getOne(rs.getString("Requistioner"), DB.getConnection());
-            EmployeeInfo reviewedBy = EmployeeDAO.getOne(rs.getString("Recommended"), DB.getConnection());
-            EmployeeInfo budgeted = EmployeeDAO.getOne(rs.getString("BudgetOfficer"), DB.getConnection());
-            EmployeeInfo approvedBy = EmployeeDAO.getOne(rs.getString("Approved"), DB.getConnection());
-            rv = new RV(
-                    rs.getString("RVNo"),
+            EmployeeInfo prepared = EmployeeDAO.getOne(rs.getString("Prepared"), DB.getConnection());
+            EmployeeInfo gm = EmployeeDAO.getOne(rs.getString("GeneralManager"), DB.getConnection());
+            po = new PurchaseOrder(
+                    rs.getString("PONo"),
+                    rs.getDate("PODate")==null? null: rs.getDate("PODate").toLocalDate(),
                     rs.getString("To"),
-                    rs.getString("Purpose"),
+                    rs.getString("Address"),
+                    rs.getString("Contact"),
+                    rs.getString("Terms"),
                     rs.getDouble("Amount"),
                     rs.getString("Status"),
                     rs.getString("Remarks"),
-                    preparedBy,
-                    reviewedBy,
-                    budgeted,
-                    approvedBy,
-                    rs.getDate("RVDate")==null? null: rs.getDate("RVDate").toLocalDate(),
-                    rs.getDate("DateRecommended")==null? null: rs.getDate("DateRecommended").toLocalDate(),
-                    rs.getDate("DateBudgeted")==null? null: rs.getDate("DateBudgeted").toLocalDate(),
-                    rs.getDate("DateApproved")==null? null: rs.getDate("DateApproved").toLocalDate()
+                    rs.getDate("DateBoard")==null? null: rs.getDate("DateBoard").toLocalDate(),
+                    rs.getDate("DateAccepted")==null? null: rs.getDate("DateAccepted").toLocalDate(),
+                    gm,
+                    prepared
             );
-            rv.setNoOfItems(rs.getInt("NoItems"));
-            items.add(rv);
+            po.setNoOfItems(rs.getInt("NoItems"));
+            items.add(po);
         }
         return items;
     }

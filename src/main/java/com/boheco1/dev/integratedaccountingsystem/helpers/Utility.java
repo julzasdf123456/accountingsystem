@@ -413,4 +413,5 @@ public class Utility {
     public static String RV_RECOMMENDATION = "manager";
     public static String RV_CERTIFICATION = "budget officer";
     public static String COB_REVIEWER = "manager";
+    public static String PO_APPROVAL = "general manager";
 }

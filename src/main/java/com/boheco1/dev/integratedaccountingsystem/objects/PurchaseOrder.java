@@ -23,6 +23,7 @@ public class PurchaseOrder {
     private EmployeeInfo generalManager;
     private EmployeeInfo preparer;
     private List<POItem> items = new ArrayList<POItem>();
+    private int noOfItems = 0;
     public PurchaseOrder(){}
 
     public PurchaseOrder(String no, LocalDate date, String to, String address, String contact, String terms, double amount, String status, String remarks, LocalDate board, LocalDate accepted, EmployeeInfo gm, EmployeeInfo preparer){
@@ -158,5 +159,13 @@ public class PurchaseOrder {
 
     public void setDateApproved(LocalDate dateApproved) {
         this.dateApproved = dateApproved;
+    }
+
+    public int getNoOfItems() {
+        return noOfItems;
+    }
+
+    public void setNoOfItems(int noOfItems) {
+        this.noOfItems = noOfItems;
     }
 }

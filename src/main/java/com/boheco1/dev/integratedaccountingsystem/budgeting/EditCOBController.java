@@ -135,7 +135,7 @@ public class EditCOBController extends MenuControllerHandler implements Initiali
             this.dept = emp.getDepartment().getDepartmentName();
             this.cn_tf.setText(this.app.getYear()+"-"+dept+"-"+ (CobDAO.countCob(dept)+1));
             this.board_res_tf.setText(this.app.getBoardRes());
-            this.prepared_tf.setText(emp.getEmployeeFirstName()+" "+emp.getEmployeeLastName());
+            this.prepared_tf.setText((emp.getEmployeeFirstName()+" "+emp.getEmployeeLastName()).toUpperCase());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1060,7 +1060,7 @@ public class EditCOBController extends MenuControllerHandler implements Initiali
             this.cob_items.setItems(this.items);
             this.cob_items.refresh();
 
-            this.prepared_tf.setText(this.current.getPrepared().getEmployeeFirstName()+" "+this.current.getPrepared().getEmployeeLastName()+" ("+this.current.getDatePrepared()+")");
+            this.prepared_tf.setText((this.current.getPrepared().getEmployeeFirstName()+" "+this.current.getPrepared().getEmployeeLastName()+" ("+this.current.getDatePrepared()+")").toUpperCase());
             this.threshold = DeptThresholdDAO.find(this.current.getAppId(), this.current.getPrepared().getDepartmentID());
             this.totalAppropriations = DeptThresholdDAO.getTotalAppropriations(threshold);
             this.appropFromDB = this.totalAppropriations;

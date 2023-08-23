@@ -1,7 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.budgeting;
 
 import com.boheco1.dev.integratedaccountingsystem.dao.PODAO;
-import com.boheco1.dev.integratedaccountingsystem.dao.RVDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
@@ -157,7 +156,7 @@ public class POController extends MenuControllerHandler implements Initializable
             LocalDate date = Utility.serverDate();
             this.date_tf.setText(date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
             this.pono_tf.setText(date.getYear()+"-"+this.dept.getDepartmentName()+"-"+ (PODAO.countPo(d)+1));
-            this.prepared_tf.setText(this.emp.getEmployeeFirstName()+" "+this.emp.getEmployeeLastName());
+            this.prepared_tf.setText((this.emp.getEmployeeFirstName()+" "+this.emp.getEmployeeLastName()).toUpperCase());
         } catch (Exception e) {
             e.printStackTrace();
         }
