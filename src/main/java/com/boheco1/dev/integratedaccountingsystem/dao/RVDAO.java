@@ -41,7 +41,7 @@ public class RVDAO {
                 "      ,DateBudgeted" +
                 "      ,Approved" +
                 "      ,DateApproved" +
-                "  FROM RV " +
+                "  FROM RequisitionVoucher " +
                 "  WHERE RVNo = ?;";
 
         PreparedStatement ps = DB.getConnection().prepareStatement(sql);

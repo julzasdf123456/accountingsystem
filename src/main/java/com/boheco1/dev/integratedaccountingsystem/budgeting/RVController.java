@@ -108,11 +108,6 @@ public class RVController extends MenuControllerHandler implements Initializable
             TableRow<RVItem> row = new TableRow<>();
             final ContextMenu rowMenu = new ContextMenu();
 
-            MenuItem edit = new MenuItem("Edit Item");
-            edit.setOnAction(actionEvent -> {
-
-            });
-
             MenuItem remove = new MenuItem("Remove Item");
             remove.setOnAction(actionEvent -> {
                 this.rv_items.getItems().remove(row.getItem());
@@ -129,7 +124,7 @@ public class RVController extends MenuControllerHandler implements Initializable
                 this.setAmount();
             });
 
-            rowMenu.getItems().addAll(edit, new SeparatorMenuItem(), remove, new SeparatorMenuItem(), removeAll);
+            rowMenu.getItems().addAll(remove, new SeparatorMenuItem(), removeAll);
 
 
             row.contextMenuProperty().bind(
@@ -246,7 +241,7 @@ public class RVController extends MenuControllerHandler implements Initializable
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }else {
             JFXButton accept = new JFXButton("Proceed");
-            JFXDialog dialog = DialogBuilder.showConfirmDialog("Submit RV", "This process is final. Confirm submission?", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+            JFXDialog dialog = DialogBuilder.showConfirmDialog("Submit Requisition Voucher", "This process is final. Confirm submission?", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
             accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
             accept.setOnAction(__ -> {
                 dialog.close();

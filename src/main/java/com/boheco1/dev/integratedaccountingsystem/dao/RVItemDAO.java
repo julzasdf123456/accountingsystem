@@ -19,9 +19,8 @@ public class RVItemDAO {
      */
     public static List<RVItem> getItems(RV rv) throws Exception {
 
-        String sql = "SELECT RVItemId, ri.CItemId, ri.Sequence, COBId, ItemId, Description, Cost, ci.Remarks, RVQty " +
+        String sql = "SELECT RVNo, RVItemId, ri.CItemId, ri.Sequence, COBId, ItemId, Description, Cost, ci.Remarks, Qty, RVQty, ISNULL((SELECT SUM(POQty) FROM COBItem c INNER JOIN RVItem r ON r.CItemId = c.CItemId INNER JOIN POItem p ON p.RVItemId = r.RVItemId WHERE r.CItemId = ci.CItemId), 0) AS POQty " +
                 "FROM COBItem ci INNER JOIN RVItem ri ON ci.CItemId=ri.CItemId ";
-
         sql += "WHERE RVNo = ? ORDER BY ri.Sequence ASC;";
 
         PreparedStatement ps = DB.getConnection().prepareStatement(sql);
@@ -44,6 +43,8 @@ public class RVItemDAO {
             item.setRemarks(rs.getString("Remarks"));
             item.setSequence(rs.getInt("Sequence"));
             item.setCobId(rs.getString("COBId"));
+            item.setRVNo(rs.getString("RVNo"));
+            item.setPoItemsQty(rs.getInt("POQty"));
             items.add(item);
         }
 
