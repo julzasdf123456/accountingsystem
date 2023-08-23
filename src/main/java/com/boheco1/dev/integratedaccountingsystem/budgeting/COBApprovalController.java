@@ -117,12 +117,12 @@ public class COBApprovalController extends MenuControllerHandler implements Init
                     if (this.currentUser != null && this.currentUser.getDesignation().toLowerCase().contains(Utility.COB_REVIEWER)) {
                         CobDAO.reviewCob(this.current);
                         //Set the name in the textfield
-                        this.reviewed_tf.setText(this.currentUser.getEmployeeFirstName()+" "+this.currentUser.getEmployeeLastName());
+                        this.reviewed_tf.setText((this.currentUser.getEmployeeFirstName()+" "+this.currentUser.getEmployeeLastName()).toUpperCase());
                     //If user is the budget offer
                     } else if (this.currentUser != null && this.currentUser.getDesignation().toLowerCase().contains(Utility.COB_APPROVAL)) {
                         CobDAO.approveCob(this.current);
                         //Set the name in the textfield
-                        this.approved_tf.setText(this.currentUser.getEmployeeFirstName()+" "+this.currentUser.getEmployeeLastName());
+                        this.approved_tf.setText((this.currentUser.getEmployeeFirstName()+" "+this.currentUser.getEmployeeLastName()).toUpperCase());
                     }
                     //Disable the buttons
                     this.add_btn.setVisible(false);
@@ -592,9 +592,9 @@ public class COBApprovalController extends MenuControllerHandler implements Init
             this.cob_items.setItems(this.items);
             this.cob_items.refresh();
 
-            this.prepared_tf.setText(this.current.getPrepared().getEmployeeFirstName()+" "+this.current.getPrepared().getEmployeeLastName()+" ("+this.current.getDatePrepared()+")");
-            this.reviewed_tf.setText(this.current.getReviewed() != null ? this.current.getReviewed().getEmployeeFirstName()+" "+this.current.getReviewed().getEmployeeLastName()+" ("+this.current.getDateReviewed()+")" : "");
-            this.approved_tf.setText(this.current.getApproved() != null ? this.current.getApproved().getEmployeeFirstName()+" "+this.current.getApproved().getEmployeeLastName()+" ("+this.current.getDateApproved()+")" : "");
+            this.prepared_tf.setText((this.current.getPrepared().getEmployeeFirstName()+" "+this.current.getPrepared().getEmployeeLastName()+" ("+this.current.getDatePrepared()+")").toUpperCase());
+            this.reviewed_tf.setText((this.current.getReviewed() != null ? this.current.getReviewed().getEmployeeFirstName()+" "+this.current.getReviewed().getEmployeeLastName()+" ("+this.current.getDateReviewed()+")" : "").toUpperCase());
+            this.approved_tf.setText((this.current.getApproved() != null ? this.current.getApproved().getEmployeeFirstName()+" "+this.current.getApproved().getEmployeeLastName()+" ("+this.current.getDateApproved()+")" : "").toUpperCase());
             this.threshold = DeptThresholdDAO.find(this.current.getAppId(), this.current.getPrepared().getDepartmentID());
             this.totalAppropriations = DeptThresholdDAO.getTotalAppropriations(threshold);
             this.appropFromDB = this.totalAppropriations;
