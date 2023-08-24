@@ -12,7 +12,7 @@ import java.util.List;
 
 public class PODAO {
     public static int countPo(String dept) throws Exception {
-        ResultSet rs = DB.getConnection().createStatement().executeQuery("SELECT count(RVNo) AS count FROM RequisitionVoucher a INNER JOIN employeeinfo b ON a.Requistioner = b.EmployeeID INNER JOIN departments c ON b.DepartmentId = c.DepartmentID\n" +
+        ResultSet rs = DB.getConnection().createStatement().executeQuery("SELECT count(PONo) AS count FROM PurchaseOrder a INNER JOIN employeeinfo b ON a.Prepared = b.EmployeeID INNER JOIN departments c ON b.DepartmentId = c.DepartmentID\n" +
                 "WHERE DepartmentName = '"+dept+"'");
         if(rs.next()) {
             return rs.getInt("count");
@@ -169,7 +169,7 @@ public class PODAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static void submitRevisedPO(PurchaseOrder po) throws Exception{
-        PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE PurchaseOrder SET Status = ?, [To] = ?, Address = ?, Contact = ?, Terms = ?, Amount = ?, Prepared = ?, Remarks = NULL, GeneralManager = NULL, DateBoard = NULL, DateAccepted = NULL, DateApproved = NULL WHERE PONo = ?");
+        PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE PurchaseOrder SET Status = ?, [To] = ?, Address = ?, Contact = ?, Terms = ?, Amount = ?, Prepared = ?, Remarks = NULL, GeneralManager = NULL, DateBoard = NULL, DateAccepted = NULL WHERE PONo = ?");
         ps.setString(1, PurchaseOrder.PENDING_APPROVAL);
         ps.setString(2, po.getTo());
         ps.setString(3, po.getAddress());
@@ -177,7 +177,7 @@ public class PODAO {
         ps.setString(5, po.getTerms());
         ps.setDouble(6, po.getAmount());
         ps.setString(7, ActiveUser.getUser().getEmployeeID());
-        ps.setString(6, po.getPoNo());
+        ps.setString(8, po.getPoNo());
         ps.executeUpdate();
     }
 

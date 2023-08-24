@@ -1,6 +1,9 @@
 package com.boheco1.dev.integratedaccountingsystem.budgeting;
 
+import com.boheco1.dev.integratedaccountingsystem.JournalEntriesController;
 import com.boheco1.dev.integratedaccountingsystem.dao.PODAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.POItemDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.RVItemDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
@@ -25,10 +28,9 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
 
-public class POController extends MenuControllerHandler implements Initializable, ObjectTransaction {
+public class EditPOController extends MenuControllerHandler implements Initializable, ObjectTransaction {
 
     @FXML
     private TableView<POItem> po_items;
@@ -73,16 +75,18 @@ public class POController extends MenuControllerHandler implements Initializable
     private JFXButton remove_btn;
 
     private ObservableList<POItem> items = FXCollections.observableArrayList(new ArrayList<>());
-    private EmployeeInfo emp = null;
-    private Department dept = null;
-
     private double poAmount = 0;
     private int no = 1;
+    private PurchaseOrder current = null;
+    private EmployeeInfo currentUser = null;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.setDetails();
+        this.current = (PurchaseOrder) Utility.getSelectedObject();
 
         this.createTable();
+
+        //Set budget details
+        this.setDetails();
 
         this.add_btn.setOnAction(evt -> {
             try {
@@ -93,15 +97,17 @@ public class POController extends MenuControllerHandler implements Initializable
         });
 
         this.remove_btn.setOnAction(evt -> {
-            try {
-                int row = this.po_items.getSelectionModel().getSelectedIndex();
-                this.items.remove(row);
-                this.po_items.refresh();
-                this.setTable();
-                this.setAmount();
-                this.no--;
-            }catch (Exception e){
-                //Do nothing
+            POItem selected = this.po_items.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                try {
+                    this.deleteItem(selected);
+                } catch (Exception e) {
+                    AlertDialogBuilder.messgeDialog("System Error", "A System error occurred: " + e.getMessage(),
+                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }
+            }else{
+                AlertDialogBuilder.messgeDialog("Delete RV Item", "Please select the item to delete and try again!",
+                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }
         });
         this.po_items.setRowFactory(tv -> {
@@ -110,23 +116,10 @@ public class POController extends MenuControllerHandler implements Initializable
 
             MenuItem remove = new MenuItem("Remove Item");
             remove.setOnAction(actionEvent -> {
-                this.po_items.getItems().remove(row.getItem());
-                this.po_items.refresh();
-                this.setAmount();
-                this.no--;
+                deleteItem(row.getItem());
             });
 
-            MenuItem removeAll = new MenuItem("Clear Items");
-            removeAll.setOnAction(actionEvent -> {
-                this.items = FXCollections.observableArrayList(new ArrayList<>());
-                this.po_items.setItems(this.items);
-                this.po_items.refresh();
-                this.setAmount();
-                this.no = 1;
-            });
-
-            rowMenu.getItems().addAll(remove, new SeparatorMenuItem(), removeAll);
-
+            rowMenu.getItems().addAll(remove);
 
             row.contextMenuProperty().bind(
             Bindings.when(row.emptyProperty())
@@ -140,7 +133,7 @@ public class POController extends MenuControllerHandler implements Initializable
         });
 
         this.reset_btn.setOnAction(evt ->{
-            this.reset();
+            Utility.getContentPane().getChildren().setAll(ContentHandler.getNodeFromFxml(JournalEntriesController.class, "budgeting/budgeting_user_po_list.fxml"));
         });
 
         //Pass this controller to the Add Item controller
@@ -150,13 +143,19 @@ public class POController extends MenuControllerHandler implements Initializable
     }
     public void setDetails(){
         try{
-            this.emp = ActiveUser.getUser().getEmployeeInfo();
-            this.dept = this.emp.getDepartment();
-            String d = this.dept.getDepartmentName();
-            LocalDate date = Utility.serverDate();
-            this.date_tf.setText(date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
-            this.pono_tf.setText(date.getYear()+"-"+this.dept.getDepartmentName()+"-"+ (PODAO.countPo(d)+1));
-            this.prepared_tf.setText((this.emp.getEmployeeFirstName()+" "+this.emp.getEmployeeLastName()).toUpperCase());
+            this.current.setItems(POItemDAO.getItems(this.current));
+            this.items = FXCollections.observableArrayList(this.current.getItems());
+            this.poAmount = this.current.getAmount();
+            this.po_items.setItems(this.items);
+            this.po_items.refresh();
+            this.totals_tf.setText(Utility.formatDecimal(this.current.getAmount()));
+            this.pono_tf.setText(this.current.getPoNo());
+            this.date_tf.setText(this.current.getPoDate().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
+            this.to_tf.setText(this.current.getTo());
+            this.address_tf.setText(this.current.getAddress());
+            this.contact_tf.setText(this.current.getContact());
+            this.terms_tf.setText(this.current.getTerms());
+            this.prepared_tf.setText((this.current.getPreparer().getEmployeeFirstName()+" "+this.current.getPreparer().getEmployeeLastName()).toUpperCase());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -224,7 +223,7 @@ public class POController extends MenuControllerHandler implements Initializable
         this.po_items.getColumns().add(column6);
     }
     /**
-     * Insert RV
+     * Insert PO
      * @return void
      */
     public void submitPO(){
@@ -269,12 +268,13 @@ public class POController extends MenuControllerHandler implements Initializable
                     po.setContact(contact);
                     po.setTerms(terms);
                     po.setAmount(poAmount);
-                    po.setItems(this.items);
-                    PODAO.createPO(po);
-                    reset();
-                    LocalDate date = Utility.serverDate();
-                    this.date_tf.setText(date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
-                    this.pono_tf.setText(date.getYear()+"-"+this.dept.getDepartmentName()+"-"+ (PODAO.countPo(this.dept.getDepartmentName())+1));
+                    PODAO.submitRevisedPO(po);
+                    this.add_btn.setDisable(true);
+                    this.submit_btn.setDisable(true);
+                    this.remove_btn.setDisable(true);
+                    this.add_btn.setVisible(false);
+                    this.submit_btn.setVisible(false);
+                    this.remove_btn.setVisible(false);
                     AlertDialogBuilder.messgeDialog("Submit PO", "The Purchase Order was successfully submitted and awaiting review by the General Manager!",
                             Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
                 } catch (SQLException e) {
@@ -334,11 +334,20 @@ public class POController extends MenuControllerHandler implements Initializable
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() {
-                boolean found = false;
                 POItem item = (POItem) o;
-                item.setSequence(items.size()+1);
-                item.setNo(no);
-                items.add(item);no++;
+                try {
+                    //item.setNo(no);
+                    //no++;
+                    if (items.size() == 0) {
+                        item.setSequence(items.size() + 1);
+                    }else{
+                        item.setSequence(items.get(items.size() - 1).getSequence() + 1);
+                    }
+                    POItemDAO.add(current, item);
+                    items.add(item);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 return null;
                 }
             };
@@ -360,5 +369,30 @@ public class POController extends MenuControllerHandler implements Initializable
             new Thread(task).start();
 
         }
+    }
+
+    /**
+     * Method to delete a PO item, automatically update table and values
+     * @param item - PO item reference
+     */
+    public void deleteItem(POItem item){
+        JFXButton accept = new JFXButton("Proceed");
+        JFXDialog dialog = DialogBuilder.showConfirmDialog("Delete PO Item", "This process is final. Confirm delete?", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
+        accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
+        accept.setOnAction(__ -> {
+            try{
+                int row = this.po_items.getSelectionModel().getSelectedIndex();
+                POItemDAO.delete(current, item);
+                this.items.remove(row);
+                this.setAmount();
+                this.po_items.refresh();
+                AlertDialogBuilder.messgeDialog("Delete PO Item", "The PO item was successfully removed from the Purchase Order!",
+                        Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+            }catch (Exception e){
+                AlertDialogBuilder.messgeDialog("System Error", "An SQL error occurred: " + e.getMessage(),
+                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            }
+            dialog.close();
+        });
     }
 }

@@ -79,9 +79,9 @@ public class POListController extends MenuControllerHandler implements Initializ
         }
 
         this.setYears();
-        this.createRVTable(revision_table, "No POs pending for revision.", "View PO", "budgeting_edit_po", "Remarks", "Date Prepared");
-        this.createRVTable(pending_table, "No POs pending approval by the General Manager.", "View PO", "budgeting_po_approval", null, "Date Prepared");
-        this.createRVTable(approved_table, "No POs approved by the General Manager.", "View PO", "budgeting_po_approval", null, "Date Prepared");
+        this.createPOTable(revision_table, "No POs pending for revision.", "View PO", "budgeting_edit_po", "Remarks", "Date Prepared");
+        this.createPOTable(pending_table, "No POs pending approval by the General Manager.", "View PO", "budgeting_po_approval", null, "Date Prepared");
+        this.createPOTable(approved_table, "No POs approved by the General Manager.", "View PO", "budgeting_po_approval", null, "Date Prepared");
         this.setInformation();
 
         this.view_btn.setOnAction(evt -> {
@@ -89,7 +89,7 @@ public class POListController extends MenuControllerHandler implements Initializ
         });
     }
     /**
-     * Displays the information of the RVs
+     * Displays the information of the POs
      */
     public void setInformation(){
         Task<Void> task = new Task<>() {
@@ -203,7 +203,7 @@ public class POListController extends MenuControllerHandler implements Initializ
      * @param remarks the controller to call when the menu item is clicked
      * @param type the type of date to display
      */
-    public void createRVTable(TableView table, String noItem, String viewMenu, String controller, String remarks, String type){
+    public void createPOTable(TableView table, String noItem, String viewMenu, String controller, String remarks, String type){
         TableColumn<PurchaseOrder, String> column = new TableColumn<>("PO No.");
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getPoNo()));
         column.setStyle("-fx-alignment: center-left;");

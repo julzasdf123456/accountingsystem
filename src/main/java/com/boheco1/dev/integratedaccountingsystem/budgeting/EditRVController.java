@@ -247,7 +247,6 @@ public class EditRVController extends MenuControllerHandler implements Initializ
                     this.current.setAmount(rvAmount);
                     RVDAO.submitRevisedRV(this.current);
                     this.certify_cb.setSelected(false);
-                    this.submit_btn.setDisable(true);
                     this.add_btn.setDisable(true);
                     this.submit_btn.setDisable(true);
                     this.remove_btn.setDisable(true);
@@ -405,7 +404,7 @@ public class EditRVController extends MenuControllerHandler implements Initializ
                 this.items.remove(row);
                 this.setAmount();
                 this.rv_items.refresh();
-                AlertDialogBuilder.messgeDialog("Delete RV Item", "The RV item was successfully removed from the Requistion Voucher!",
+                AlertDialogBuilder.messgeDialog("Delete RV Item", "The RV item was successfully removed from the Requisition Voucher!",
                         Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
             }catch (Exception e){
                 AlertDialogBuilder.messgeDialog("System Error", "An SQL error occurred: " + e.getMessage(),
