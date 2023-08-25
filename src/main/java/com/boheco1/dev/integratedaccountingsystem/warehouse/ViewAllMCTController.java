@@ -149,7 +149,7 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
 
                 //Create header info
                 pdf.header(null, "Material Charge Ticket".toUpperCase(), "".toUpperCase());
-                String[] head_info = {" ","MIRS No.:",mct.getMirsNo().replaceAll("/","\n"),"Particulars:",mct.getParticulars(),"Date:", LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yy")),"Address:",mct.getAddress(),"MCT No.:",mct.getMctNo()," ","W.O#:",mct.getWorkOrderNo()};
+                String[] head_info = {" ","MIRS No.:",mct.getMirsNo().replaceAll("/","\n").replaceAll("main-","").replaceAll("sub-",""),"Particulars:",mct.getParticulars(),"Date:", LocalDate.now().format(DateTimeFormatter.ofPattern("MM/dd/yy")),"Address:",mct.getAddress(),"MCT No.:",mct.getMctNo()," ","W.O#:",mct.getWorkOrderNo()};
                 int[] head_span = {4, 1, 2, 1,3,1,2,1,3,1,2,4,1,2};
                 int[] head_aligns = {Element.ALIGN_CENTER, Element.ALIGN_LEFT, Element.ALIGN_RIGHT,
                         Element.ALIGN_LEFT, Element.ALIGN_LEFT,Element.ALIGN_LEFT,Element.ALIGN_RIGHT,
@@ -205,10 +205,14 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                 }
                 pdf.tableContent(rows, header_spans, rows_aligns, Element.ALIGN_TOP, Rectangle.NO_BORDER);
 
+                //create a space
+                pdf.createCell(2,columns.length);
+
                 //Create Total display
-                pdf.createCell(1,3);
-                pdf.createCell("TOTAL", 1, 11, Font.BOLD, Element.ALIGN_CENTER);
-                pdf.createCell(" "+String.format("%,.2f",total), 3, 11, Font.BOLD, Element.ALIGN_LEFT);
+                pdf.createCell(1,2);
+                pdf.createCell("TOTAL", 1, 11, Font.BOLD, Element.ALIGN_RIGHT,Rectangle.NO_BORDER);
+                pdf.createCell(" "+String.format("%,.2f",total), 2, 11, Font.BOLD, Element.ALIGN_RIGHT, Rectangle.NO_BORDER);
+                pdf.createCell(1,2);
 
                 //Create account code summary
                 for(Map.Entry<String, Double> acctCode : acctCodeSummary.entrySet()){

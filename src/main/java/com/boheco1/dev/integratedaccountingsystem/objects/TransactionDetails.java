@@ -135,6 +135,14 @@ public class TransactionDetails {
         this.credit = credit;
     }
 
+    public String getDebitView(){
+        return debit>0 ? Utility.formatDecimal(debit):"-";
+    }
+
+    public String getCreditView(){
+        return credit>0 ? Utility.formatDecimal(credit):"-";
+    }
+
     public String getAmountView(){
         double amount;
         if(credit!=0)
@@ -194,5 +202,26 @@ public class TransactionDetails {
         }else {
             return String.format("(%,.2f)", this.debit);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "TransactionDetails{" +
+                "period=" + period +
+                ", transactionNumber='" + transactionNumber + '\'' +
+                ", transactionCode='" + transactionCode + '\'' +
+                ", transactionDate=" + transactionDate +
+                ", sequenceNumber=" + sequenceNumber +
+                ", accountCode='" + accountCode + '\'' +
+                ", debit=" + debit +
+                ", credit=" + credit +
+                ", orDate=" + orDate +
+                ", bankID='" + bankID + '\'' +
+                ", note='" + note + '\'' +
+                ", checkNumber='" + checkNumber + '\'' +
+                ", particulars='" + particulars + '\'' +
+                ", newParticularsLabel='" + newParticularsLabel + '\'' +
+                ", depositedDate=" + depositedDate +
+                '}';
     }
 }
