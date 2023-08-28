@@ -233,7 +233,7 @@ public class COBListController extends MenuControllerHandler implements Initiali
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<COB, String> column2 = new TableColumn<>("Budget Type");
-        column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getType()));
+        column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getType().getType()));
         column2.setStyle("-fx-alignment: center-left;");
         column2.setPrefWidth(150);
         column2.setMaxWidth(150);
@@ -315,7 +315,7 @@ public class COBListController extends MenuControllerHandler implements Initiali
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<COB, String> column2 = new TableColumn<>("Budget Type");
-        column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getType()));
+        column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getType().getType()));
         column2.setStyle("-fx-alignment: center-left;");
         column2.setPrefWidth(150);
         column2.setMaxWidth(150);
@@ -397,7 +397,7 @@ public class COBListController extends MenuControllerHandler implements Initiali
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<COB, String> column2 = new TableColumn<>("Budget Type");
-        column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getType()));
+        column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getType().getType()));
         column2.setStyle("-fx-alignment: center-left;");
         column2.setPrefWidth(150);
         column2.setMaxWidth(150);
@@ -471,7 +471,7 @@ public class COBListController extends MenuControllerHandler implements Initiali
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<COB, String> column2 = new TableColumn<>("Budget Type");
-        column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getType()));
+        column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getType().getType()));
         column2.setStyle("-fx-alignment: center-left;");
         column2.setPrefWidth(150);
         column2.setMaxWidth(150);

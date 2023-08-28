@@ -48,7 +48,11 @@
                               <Insets right="16.0" />
                            </HBox.margin>
                         </Label>
-                        <Label prefWidth="184.0" text="Type" />
+                        <Label prefWidth="184.0" text="Type">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin></Label>
+                        <Label layoutX="536.0" layoutY="10.0" prefWidth="184.0" text="Category" />
                      </children>
                   </HBox>
                   <HBox>
@@ -82,7 +86,11 @@
                               <Insets right="16.0" />
                            </HBox.margin>
                         </JFXTextField>
-                        <JFXTextField fx:id="type_tf" editable="false" focusTraversable="false" prefHeight="33.0" prefWidth="184.0" />
+                        <JFXTextField fx:id="type_tf" editable="false" focusTraversable="false" prefHeight="33.0" prefWidth="184.0">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin></JFXTextField>
+                        <JFXTextField fx:id="category_tf" editable="false" focusTraversable="false" layoutX="549.0" layoutY="10.0" prefHeight="33.0" prefWidth="184.0" />
                      </children>
                   </HBox>
                   <HBox>

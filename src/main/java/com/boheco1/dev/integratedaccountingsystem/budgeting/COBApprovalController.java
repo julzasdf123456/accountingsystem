@@ -13,8 +13,6 @@ import com.jfoenix.controls.JFXTextField;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -45,6 +43,9 @@ public class COBApprovalController extends MenuControllerHandler implements Init
 
     @FXML
     private JFXTextField type_tf;
+
+    @FXML
+    private JFXTextField category_tf;
 
     @FXML
     private Label threshold_lbl;
@@ -575,15 +576,15 @@ public class COBApprovalController extends MenuControllerHandler implements Init
             this.activity_tf.setText(this.current.getActivity());
             this.board_res_tf.setText(AppDAO.get(this.current.getAppId()).getBoardRes());
             this.fs_tf.setText(this.current.getFundSource().getSource());
-            this.type_tf.setText(this.current.getType());
-
-            if (this.current.getType().equals(COBItem.TYPES[0])) {
+            this.type_tf.setText(this.current.getType().getType());
+            this.category_tf.setText(this.current.getCategory().getCategory());
+            if (this.current.getCategory().getCategory().equals(COBItem.TYPES[0])) {
                 this.createTable();
-            }else if (this.current.getType().equals(COBItem.TYPES[1])) {
+            }else if (this.current.getCategory().getCategory().equals(COBItem.TYPES[1])) {
                 this.createRepresentationTable();
-            }else if (this.current.getType().equals(COBItem.TYPES[2])) {
+            }else if (this.current.getCategory().getCategory().equals(COBItem.TYPES[2])) {
                 this.createSalariesTable();
-            }else if (this.current.getType().equals(COBItem.TYPES[3])) {
+            }else if (this.current.getCategory().getCategory().equals(COBItem.TYPES[3])) {
                 this.createTravelsTable();
             }else{
                 this.createTable();

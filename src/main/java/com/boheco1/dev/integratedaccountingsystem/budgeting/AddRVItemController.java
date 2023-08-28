@@ -102,7 +102,7 @@ public class AddRVItemController extends MenuControllerHandler implements Initia
                 COB current = CobDAO.get(this.cn_datepkr.getSelectionModel().getSelectedItem());
                 this.activity_tf.setText(current.getActivity());
                 this.fs_tf.setText(current.getFundSource().getSource());
-                this.type_tf.setText(current.getType());
+                this.type_tf.setText(current.getCategory().getCategory());
                 cob_items = CobItemDAO.getItems(current);
             } catch (Exception e) {
                 e.printStackTrace();

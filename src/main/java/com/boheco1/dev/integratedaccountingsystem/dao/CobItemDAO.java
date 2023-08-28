@@ -23,20 +23,20 @@ public class CobItemDAO {
                 "FROM COBItem ci ";
 
         //Benefits/Allowances
-        if (cob.getType().equals(COBItem.TYPES[0])){
+        if (cob.getCategory().getCategory().equals(COBItem.TYPES[0])){
 
         //Representation
-        } else if (cob.getType().equals(COBItem.TYPES[1])) {
+        } else if (cob.getCategory().getCategory().equals(COBItem.TYPES[1])) {
             sql = "SELECT COBId, Rid, ci.CItemId, Sequence, Level, ItemId, Description, Cost, Remarks, Qty, NoOfTimes, (Cost * Qty * NoOfTimes) AS Total, reprnAllowance, reimbursableAllowance, otherAllowance " +
                     "FROM COBItem ci INNER JOIN Representation c ON ci.CItemId = c.CItemId ";
         //Salaries
-        }else if (cob.getType().equals(COBItem.TYPES[2])) {
+        }else if (cob.getCategory().getCategory().equals(COBItem.TYPES[2])) {
             sql = "SELECT COBId, SalId, ci.CItemId, Sequence, Level, ItemId, Description AS Position, Cost AS BasicSalary, Remarks, Qty AS Persons, NoOfTimes, " +
                     "Longetivity, SSSPhilH, CashGift, Bonus13, " +
                     "(Cost * Qty * NoOfTimes * 12) As AnnualTotal " +
                     "FROM COBItem ci INNER JOIN Salaries s ON ci.CItemId = s.CItemId ";
         //Travels/Seminars
-        }else if (cob.getType().equals(COBItem.TYPES[3])) {
+        }else if (cob.getCategory().getCategory().equals(COBItem.TYPES[3])) {
             sql = "SELECT COBId, TrId, ci.CItemId, Sequence, Level, ItemId, Description, " +
                     "Cost AS RatePerDiem, (Cost * NoOfDays * Qty * NoOfTimes)  AS TravelCost, " +
                     "Remarks, Qty AS Persons, NoOfDays, NoOfTimes AS TimesPerYear, " +
@@ -53,10 +53,10 @@ public class CobItemDAO {
                     "Qtr1, Qtr2, Qtr3, Qtr4, (Qtr1 + Qtr2 + Qtr3 + Qtr4) AS Total " +
                     "FROM COBItem ci INNER JOIN Travel t ON ci.CItemId = t.CItemId ";
         //Supplies/Materials
-        }else if (cob.getType().equals(COBItem.TYPES[4])) {
+        }else if (cob.getCategory().getCategory().equals(COBItem.TYPES[4])) {
 
         //Transportation
-        }else if (cob.getType().equals(COBItem.TYPES[5])) {
+        }else if (cob.getCategory().getCategory().equals(COBItem.TYPES[5])) {
 
         //Others
         }else{
@@ -76,7 +76,7 @@ public class CobItemDAO {
             COBItem item = new COBItem();
 
             //Representation
-            if (cob.getType().equals(COBItem.TYPES[1])) {
+            if (cob.getCategory().getCategory().equals(COBItem.TYPES[1])) {
                 Representation repr = new Representation();
                 repr.setRId(rs.getInt("RId"));
                 repr.setcItemId(rs.getString("CItemId"));
@@ -94,7 +94,7 @@ public class CobItemDAO {
                 repr.setCobId(rs.getString("COBId"));
                 item = repr;
             //Salaries
-            }else if (cob.getType().equals(COBItem.TYPES[2])) {
+            }else if (cob.getCategory().getCategory().equals(COBItem.TYPES[2])) {
                 Salary sal = new Salary();
                 sal.setSalId(rs.getInt("SalId"));
                 sal.setcItemId(rs.getString("CItemId"));
@@ -113,7 +113,7 @@ public class CobItemDAO {
                 sal.setCobId(rs.getString("COBId"));
                 item = sal;
             //Travels/Seminars
-            }else if (cob.getType().equals(COBItem.TYPES[3])) {
+            }else if (cob.getCategory().getCategory().equals(COBItem.TYPES[3])) {
 
                 Travel trav = new Travel();
                 trav.setTrId(rs.getInt("TrId"));
@@ -266,13 +266,13 @@ public class CobItemDAO {
                 "VALUES (?, ?, ?, ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?, ?)";
 
         String subtype = "";
-        if (cob.getType().equals(COBItem.TYPES[1])){
+        if (cob.getCategory().getCategory().equals(COBItem.TYPES[1])){
             subtype = "INSERT INTO Representation (reprnAllowance, reimbursableAllowance, otherAllowance, CItemId) " +
                     "VALUES (ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?)";
-        }else if (cob.getType().equals(COBItem.TYPES[2])) {
+        }else if (cob.getCategory().getCategory().equals(COBItem.TYPES[2])) {
             subtype = "INSERT INTO Salaries(Longetivity, SSSPhilH, Overtime, CashGift, Bonus13, CItemId) " +
                     "VALUES(ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?)";
-        }else if (cob.getType().equals(COBItem.TYPES[3])){
+        }else if (cob.getCategory().getCategory().equals(COBItem.TYPES[3])){
             subtype = "INSERT INTO Travel (NoOfDays, Transport, Lodging, Registration, Incidental, Mode, CItemId) " +
                     "VALUES(?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?)";
         }
@@ -301,7 +301,7 @@ public class CobItemDAO {
 
             //Insert also to child table if COB Item is representation, Salaries, Travels
             //Representation
-            if (cob.getType().equals(COBItem.TYPES[1])) {
+            if (cob.getCategory().getCategory().equals(COBItem.TYPES[1])) {
                 Representation r = (Representation) item;
                 ps_sub.setDouble(1, r.getRepresentationAllowance());
                 ps_sub.setDouble(2, r.getReimbursableAllowance());
@@ -309,7 +309,7 @@ public class CobItemDAO {
                 ps_sub.setString(4, item.getcItemId());
                 ps_sub.executeUpdate();
                 //Salaries
-            } else if (cob.getType().equals(COBItem.TYPES[2])) {
+            } else if (cob.getCategory().getCategory().equals(COBItem.TYPES[2])) {
                 Salary s = (Salary) item;
                 ps_sub.setDouble(1, s.getLongetivity());
                 ps_sub.setDouble(2, s.getsSSPhilH());
@@ -319,7 +319,7 @@ public class CobItemDAO {
                 ps_sub.setString(6, item.getcItemId());
                 ps_sub.executeUpdate();
                 //Travels/Seminars
-            } else if (cob.getType().equals(COBItem.TYPES[3])) {
+            } else if (cob.getCategory().getCategory().equals(COBItem.TYPES[3])) {
                 Travel t = (Travel) item;
                 ps_sub.setInt(1, t.getNoOfDays());
                 ps_sub.setDouble(2, t.getTransport());
@@ -367,11 +367,11 @@ public class CobItemDAO {
 
         String item_sql = "UPDATE COBItem SET ItemId=?, COBId=?, Qty=?, Remarks=?, Description=?, Cost=ROUND(?, 2), Qtr1=ROUND(?, 2), Qtr2=ROUND(?, 2), Qtr3=ROUND(?, 2), Qtr4=ROUND(?, 2), Sequence=?, NoOfTimes=?, Level=? WHERE CItemId=?";
         String subtype = "";
-        if (cob.getType().equals(COBItem.TYPES[1])){
+        if (cob.getCategory().getCategory().equals(COBItem.TYPES[1])){
             subtype = "UPDATE Representation SET reprnAllowance = (ROUND(?, 2), reimbursableAllowance = (ROUND(?, 2), otherAllowance = (ROUND(?, 2) WHERE RId=?";
-        }else if (cob.getType().equals(COBItem.TYPES[2])) {
+        }else if (cob.getCategory().getCategory().equals(COBItem.TYPES[2])) {
             subtype = "UPDATE Salaries SET Longetivity = (ROUND(?, 2), SSSPhilH = (ROUND(?, 2), Overtime = (ROUND(?, 2), CashGift = (ROUND(?, 2), Bonus13 = (ROUND(?, 2) WHERE SalId=?";
-        }else if (cob.getType().equals(COBItem.TYPES[3])){
+        }else if (cob.getCategory().getCategory().equals(COBItem.TYPES[3])){
             subtype = "UPDATE Travel SET NoOfDays = ?, Transport = ROUND(?, 2), Lodging = ROUND(?, 2), Registration = ROUND(?, 2), Incidental = ROUND(?, 2), Mode = ? WHERE TrId=?";
         }
 
@@ -399,7 +399,7 @@ public class CobItemDAO {
 
             //Insert also to child table if COB Item is representation, Salaries, Travels
             //Representation
-            if (cob.getType().equals(COBItem.TYPES[1])) {
+            if (cob.getCategory().getCategory().equals(COBItem.TYPES[1])) {
                 Representation r = (Representation) item;
                 ps_sub.setDouble(1, r.getRepresentationAllowance());
                 ps_sub.setDouble(2, r.getReimbursableAllowance());
@@ -407,7 +407,7 @@ public class CobItemDAO {
                 ps_sub.setInt(4, r.getRId());
                 ps_sub.executeUpdate();
             //Salaries
-            } else if (cob.getType().equals(COBItem.TYPES[2])) {
+            } else if (cob.getCategory().getCategory().equals(COBItem.TYPES[2])) {
                 Salary s = (Salary) item;
                 ps_sub.setDouble(1, s.getLongetivity());
                 ps_sub.setDouble(2, s.getsSSPhilH());
@@ -417,7 +417,7 @@ public class CobItemDAO {
                 ps_sub.setInt(6, s.getSalId());
                 ps_sub.executeUpdate();
             //Travels/Seminars
-            } else if (cob.getType().equals(COBItem.TYPES[3])) {
+            } else if (cob.getCategory().getCategory().equals(COBItem.TYPES[3])) {
                 Travel t = (Travel) item;
                 ps_sub.setInt(1, t.getNoOfDays());
                 ps_sub.setDouble(2, t.getTransport());
@@ -465,13 +465,13 @@ public class CobItemDAO {
                 "VALUES (?, ?, ?, ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?, ?)";
 
         String subtype = "";
-        if (cob.getType().equals(COBItem.TYPES[1])){
+        if (cob.getCategory().getCategory().equals(COBItem.TYPES[1])){
             subtype = "INSERT INTO Representation (reprnAllowance, reimbursableAllowance, otherAllowance, CItemId) " +
                     "VALUES (ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?)";
-        }else if (cob.getType().equals(COBItem.TYPES[2])) {
+        }else if (cob.getCategory().getCategory().equals(COBItem.TYPES[2])) {
             subtype = "INSERT INTO Salaries(Longetivity, SSSPhilH, Overtime, CashGift, Bonus13, CItemId) " +
                     "VALUES(ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?)";
-        }else if (cob.getType().equals(COBItem.TYPES[3])){
+        }else if (cob.getCategory().getCategory().equals(COBItem.TYPES[3])){
             subtype = "INSERT INTO Travel (NoOfDays, Transport, Lodging, Registration, Incidental, Mode, CItemId) " +
                     "VALUES(?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?)";
         }
@@ -501,7 +501,7 @@ public class CobItemDAO {
 
                 //Insert also to child table if COB Item is representation, Salaries, Travels
                 //Representation
-                if (cob.getType().equals(COBItem.TYPES[1])) {
+                if (cob.getCategory().getCategory().equals(COBItem.TYPES[1])) {
                     Representation r = (Representation) item;
                     ps_sub.setDouble(1, r.getRepresentationAllowance());
                     ps_sub.setDouble(2, r.getReimbursableAllowance());
@@ -509,7 +509,7 @@ public class CobItemDAO {
                     ps_sub.setString(4, item.getcItemId());
                     ps_sub.executeUpdate();
                     //Salaries
-                } else if (cob.getType().equals(COBItem.TYPES[2])) {
+                } else if (cob.getCategory().getCategory().equals(COBItem.TYPES[2])) {
                     Salary s = (Salary) item;
                     ps_sub.setDouble(1, s.getLongetivity());
                     ps_sub.setDouble(2, s.getsSSPhilH());
@@ -519,7 +519,7 @@ public class CobItemDAO {
                     ps_sub.setString(6, item.getcItemId());
                     ps_sub.executeUpdate();
                     //Travels/Seminars
-                } else if (cob.getType().equals(COBItem.TYPES[3])) {
+                } else if (cob.getCategory().getCategory().equals(COBItem.TYPES[3])) {
                     Travel t = (Travel) item;
                     ps_sub.setInt(1, t.getNoOfDays());
                     ps_sub.setDouble(2, t.getTransport());

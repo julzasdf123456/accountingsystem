@@ -5,9 +5,7 @@ import com.boheco1.dev.integratedaccountingsystem.dao.CobItemDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ObjectTransaction;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
-import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
-import com.boheco1.dev.integratedaccountingsystem.objects.COB;
-import com.boheco1.dev.integratedaccountingsystem.objects.COBItem;
+import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import javafx.beans.binding.Bindings;
@@ -33,25 +31,39 @@ public class ImportCOBItemController extends MenuControllerHandler implements In
     private JFXButton import_btn, view_btn;
 
     @FXML
-    private JFXComboBox<String> type_cb;
+    private JFXComboBox<COBType> type_cb;
 
+    @FXML
+    private JFXComboBox<COBCategory> category_cb;
     private ObservableList<COB> approvedItems = FXCollections.observableArrayList(new ArrayList<>());
 
     private ObjectTransaction parentController = null;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.import_btn.setDisable(true);
-        ObservableList<String> types = FXCollections.observableArrayList(COBItem.TYPES);
-        this.type_cb.setItems(types);
+        try{
+            ObservableList<COBType> types = FXCollections.observableArrayList(CobDAO.getTypes());
+            this.type_cb.setItems(types);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        this.type_cb.setOnAction(evt -> {
+            try {
+                ObservableList<COBCategory> types = FXCollections.observableArrayList(CobDAO.getCategories(this.type_cb.getSelectionModel().getSelectedItem()));
+                this.category_cb.setItems(types);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
         this.createApprovedTable();
 
-        this.type_cb.getSelectionModel().selectedItemProperty().addListener((observableValue, o, n) -> {
+        this.category_cb.getSelectionModel().selectedItemProperty().addListener((observableValue, o, n) -> {
             this.setInformation(n);
         });
 
         this.view_btn.setOnAction(evt -> {
             if (this.type_cb.getSelectionModel().getSelectedItem() != null)
-                this.setInformation(this.type_cb.getSelectionModel().getSelectedItem());
+                this.setInformation(this.category_cb.getSelectionModel().getSelectedItem());
         });
 
         this.import_btn.setOnAction(evt -> {
@@ -68,7 +80,7 @@ public class ImportCOBItemController extends MenuControllerHandler implements In
     /**
      * Displays the information of the COBs
      */
-    public void setInformation(String type){
+    public void setInformation(COBCategory type){
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {

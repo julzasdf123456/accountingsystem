@@ -53,6 +53,11 @@
                            <HBox.margin>
                               <Insets right="16.0" />
                            </HBox.margin></JFXComboBox>
+                        <JFXComboBox fx:id="category_cb" layoutX="10.0" layoutY="10.0" prefHeight="33.0" prefWidth="184.0" promptText="Select Category">
+                           <HBox.margin>
+                              <Insets right="16.0" />
+                           </HBox.margin>
+                        </JFXComboBox>
                         <JFXButton fx:id="view_btn" alignment="CENTER" contentDisplay="CENTER" styleClass="btn-info" text=" ">
                            <graphic>
                               <FontIcon iconColor="WHITE" iconLiteral="mdi2e-eye" />

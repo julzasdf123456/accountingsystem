@@ -7,6 +7,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ObjectTransaction;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.COB;
+import com.boheco1.dev.integratedaccountingsystem.objects.COBCategory;
 import com.boheco1.dev.integratedaccountingsystem.objects.COBItem;
 import com.boheco1.dev.integratedaccountingsystem.objects.Item;
 import com.jfoenix.controls.JFXButton;
@@ -75,7 +76,7 @@ public class AddItemController extends MenuControllerHandler implements Initiali
     private COBItem item = null;
     private double oldAmount = 0;
     private Item selectedItem = null;
-    private String type = "";
+    private COBCategory type = null;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.add_btn.setDisable(false);
@@ -417,9 +418,9 @@ public class AddItemController extends MenuControllerHandler implements Initiali
         return this.exists_check;
     }
 
-    public void setType(String type){
+    public void setType(COBCategory type){
         this.type = type;
-        if (type.equals(COBItem.TYPES[0]) || type.equals(COBItem.TYPES[5])){
+        if (this.type.getCategory().equals(COBItem.TYPES[0]) || this.type.getCategory().equals(COBItem.TYPES[5])){
             this.times_tf.setDisable(false);
         }else{
             this.times_tf.setDisable(true);

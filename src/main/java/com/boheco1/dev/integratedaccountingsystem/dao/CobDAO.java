@@ -20,6 +20,7 @@ public class CobDAO {
     public static COB get(String cn) throws Exception {
         String sql = "SELECT COBId" +
                 "      ,Activity" +
+                "      ,ct.TypeNo,Type,c.StypeNo,Stype" +
                 "      ,Amount" +
                 "      ,Status, Remarks " +
                 "      ,a.AppId" +
@@ -30,9 +31,8 @@ public class CobDAO {
                 "      ,DateReviewed" +
                 "      ,Approved" +
                 "      ,DateApproved" +
-                "      ,cobtype" +
                 "  ,(SELECT COUNT(CItemId) FROM COBItem b WHERE c.COBId = b.COBId) AS NoItems" +
-                "  FROM COB c INNER JOIN App a ON c.AppId = a.AppId" +
+                "  FROM COB c INNER JOIN App a ON c.AppId = a.AppId INNER JOIN COBSubType ca ON ca.StypeNo = c.StypeNo INNER JOIN COBType ct ON ca.TypeNo = ct.TypeNo" +
                 "  WHERE COBId = ?;";
 
         PreparedStatement ps = DB.getConnection().prepareStatement(sql);
@@ -59,8 +59,15 @@ public class CobDAO {
                     approvedBy,
                     rs.getDate("DateApproved")==null? null: rs.getDate("DateApproved").toLocalDate()
             );
+            COBCategory category = new COBCategory();
+            category.setStypeNo(rs.getInt("STypeNo"));
+            category.setCategory(rs.getString("SType"));
+            cob.setCategory(category);
+            COBType type = new COBType();
+            type.setTypeNo(rs.getInt("TypeNo"));
+            type.setType(rs.getString("Type"));
+            cob.setType(type);
             cob.setFundSource(new FundSource(rs.getString("FSId"), rs.getString("Source")));
-            cob.setType(rs.getString("CobType"));
             cob.setNoOfItems(rs.getInt("NoItems"));
             cob.setRemarks(rs.getString("Remarks"));
         }
@@ -70,6 +77,7 @@ public class CobDAO {
     public static List<COB> getAll(DeptThreshold dt) throws Exception {
         String sql = "SELECT COBId" +
                 "      ,Activity" +
+                "      ,ct.TypeNo,Type,c.StypeNo,Stype" +
                 "      ,Amount" +
                 "      ,Status, Remarks" +
                 "      ,AppId" +
@@ -80,9 +88,8 @@ public class CobDAO {
                 "      ,DateReviewed" +
                 "      ,Approved" +
                 "      ,DateApproved" +
-                "      ,cobtype" +
                 "  ,(SELECT COUNT(CItemId) FROM COBItem b WHERE c.COBId = b.COBId) AS NoItems" +
-                "  FROM COB c LEFT JOIN EmployeeInfo ei ON c.Prepared = ei.EmployeeID WHERE c.AppId = ? AND ei.DepartmentId =?" +
+                "  FROM COB c LEFT JOIN EmployeeInfo ei ON c.Prepared = ei.EmployeeID INNER JOIN COBSubType ca ON ca.StypeNo = c.StypeNo INNER JOIN COBType ct ON ca.TypeNo = ct.TypeNo WHERE c.AppId = ? AND ei.DepartmentId =?" +
                 "  ORDER BY DatePrepared DESC;";
 
         PreparedStatement ps = DB.getConnection().prepareStatement(sql);
@@ -111,7 +118,14 @@ public class CobDAO {
                     rs.getDate("DateApproved")==null? null: rs.getDate("DateApproved").toLocalDate()
             );
             cob.setFundSource(new FundSource(rs.getString("FSId"), rs.getString("Source")));
-            cob.setType(rs.getString("CobType"));
+            COBCategory category = new COBCategory();
+            category.setStypeNo(rs.getInt("STypeNo"));
+            category.setCategory(rs.getString("SType"));
+            cob.setCategory(category);
+            COBType type = new COBType();
+            type.setTypeNo(rs.getInt("TypeNo"));
+            type.setType(rs.getString("Type"));
+            cob.setType(type);
             cob.setNoOfItems(rs.getInt("NoItems"));
             cob.setRemarks(rs.getString("Remarks"));
 
@@ -131,6 +145,7 @@ public class CobDAO {
     public static List<COB> getAll(String year, Department dept, String status) throws Exception {
         String sql = "SELECT COBId" +
                 "      ,Activity" +
+                "      ,ct.TypeNo,Type,c.StypeNo,Stype" +
                 "      ,Amount" +
                 "      ,Status, Remarks" +
                 "      ,a.AppId" +
@@ -141,9 +156,8 @@ public class CobDAO {
                 "      ,DateReviewed" +
                 "      ,Approved" +
                 "      ,DateApproved" +
-                "      ,cobtype" +
                 "  ,(SELECT COUNT(CItemId) FROM COBItem b WHERE c.COBId = b.COBId) AS NoItems" +
-                "  FROM COB c INNER JOIN App a ON c.AppId = a.AppId INNER JOIN EmployeeInfo ei ON ei.EmployeeID = c.Prepared INNER JOIN Departments d ON ei.DepartmentId = d.DepartmentID" +
+                "  FROM COB c INNER JOIN App a ON c.AppId = a.AppId INNER JOIN EmployeeInfo ei ON ei.EmployeeID = c.Prepared INNER JOIN Departments d ON ei.DepartmentId = d.DepartmentID INNER JOIN COBSubType ca ON ca.StypeNo = c.StypeNo INNER JOIN COBType ct ON ca.TypeNo = ct.TypeNo" +
                 "  WHERE Year = ? AND d.DepartmentId =? AND Status = ?" +
                 "  ORDER BY DatePrepared DESC, COBId ASC;";
 
@@ -174,7 +188,14 @@ public class CobDAO {
                     rs.getDate("DateApproved")==null? null: rs.getDate("DateApproved").toLocalDate()
             );
             cob.setFundSource(new FundSource(rs.getString("FSId"), rs.getString("Source")));
-            cob.setType(rs.getString("CobType"));
+            COBCategory category = new COBCategory();
+            category.setStypeNo(rs.getInt("STypeNo"));
+            category.setCategory(rs.getString("SType"));
+            cob.setCategory(category);
+            COBType type = new COBType();
+            type.setTypeNo(rs.getInt("TypeNo"));
+            type.setType(rs.getString("Type"));
+            cob.setType(type);
             cob.setNoOfItems(rs.getInt("NoItems"));
             cob.setRemarks(rs.getString("Remarks"));
             cobs.add(cob);
@@ -193,6 +214,7 @@ public class CobDAO {
     public static List<COB> getAll(String year, String status) throws Exception {
         String sql = "SELECT COBId" +
                 "      ,Activity" +
+                "      ,ct.TypeNo,Type,c.StypeNo,Stype" +
                 "      ,Amount" +
                 "      ,Status, Remarks " +
                 "      ,a.AppId" +
@@ -203,7 +225,6 @@ public class CobDAO {
                 "      ,DateReviewed" +
                 "      ,Approved" +
                 "      ,DateApproved" +
-                "      ,cobtype" +
                 "  ,(SELECT COUNT(CItemId) FROM COBItem b WHERE c.COBId = b.COBId) AS NoItems" +
                 "  FROM COB c INNER JOIN App a ON c.AppId = a.AppId" +
                 "  WHERE Year = ? AND Status = ?" +
@@ -235,7 +256,14 @@ public class CobDAO {
                     rs.getDate("DateApproved")==null? null: rs.getDate("DateApproved").toLocalDate()
             );
             cob.setFundSource(new FundSource(rs.getString("FSId"), rs.getString("Source")));
-            cob.setType(rs.getString("CobType"));
+            COBCategory category = new COBCategory();
+            category.setStypeNo(rs.getInt("STypeNo"));
+            category.setCategory(rs.getString("SType"));
+            cob.setCategory(category);
+            COBType type = new COBType();
+            type.setTypeNo(rs.getInt("TypeNo"));
+            type.setType(rs.getString("Type"));
+            cob.setType(type);
             cob.setNoOfItems(rs.getInt("NoItems"));
             cob.setRemarks(rs.getString("Remarks"));
             cobs.add(cob);
@@ -254,6 +282,7 @@ public class CobDAO {
     public static List<COB> getAll(Department dept, String status) throws Exception {
         String sql = "SELECT COBId" +
                 "      ,Activity" +
+                "      ,ct.TypeNo,Type,c.StypeNo,Stype" +
                 "      ,Amount" +
                 "      ,Status, Remarks" +
                 "      ,a.AppId" +
@@ -264,9 +293,8 @@ public class CobDAO {
                 "      ,DateReviewed" +
                 "      ,Approved" +
                 "      ,DateApproved" +
-                "      ,cobtype" +
                 "  ,(SELECT COUNT(CItemId) FROM COBItem b WHERE c.COBId = b.COBId) AS NoItems" +
-                "  FROM COB c INNER JOIN App a ON c.AppId = a.AppId INNER JOIN EmployeeInfo ei ON ei.EmployeeID = c.Prepared INNER JOIN Departments d ON ei.DepartmentId = d.DepartmentID" +
+                "  FROM COB c INNER JOIN App a ON c.AppId = a.AppId INNER JOIN EmployeeInfo ei ON ei.EmployeeID = c.Prepared INNER JOIN Departments d ON ei.DepartmentId = d.DepartmentID INNER JOIN COBSubType ca ON ca.StypeNo = c.StypeNo INNER JOIN COBType ct ON ca.TypeNo = ct.TypeNo" +
                 "  WHERE d.DepartmentId =? AND Status = ?";
 
 
@@ -303,7 +331,14 @@ public class CobDAO {
                     rs.getDate("DateApproved")==null? null: rs.getDate("DateApproved").toLocalDate()
             );
             cob.setFundSource(new FundSource(rs.getString("FSId"), rs.getString("Source")));
-            cob.setType(rs.getString("CobType"));
+            COBCategory category = new COBCategory();
+            category.setStypeNo(rs.getInt("STypeNo"));
+            category.setCategory(rs.getString("SType"));
+            cob.setCategory(category);
+            COBType type = new COBType();
+            type.setTypeNo(rs.getInt("TypeNo"));
+            type.setType(rs.getString("Type"));
+            cob.setType(type);
             cob.setNoOfItems(rs.getInt("NoItems"));
             cob.setRemarks(rs.getString("Remarks"));
             cobs.add(cob);
@@ -320,9 +355,10 @@ public class CobDAO {
      * @return list of COBs
      * @throws Exception
      */
-    public static List<COB> getAll(Department dept, String status, String type) throws Exception {
+    public static List<COB> getAll(Department dept, String status, COBCategory type) throws Exception {
         String sql = "SELECT COBId" +
                 "      ,Activity" +
+                "      ,ct.TypeNo,Type,c.StypeNo,Stype" +
                 "      ,Amount" +
                 "      ,Status, Remarks" +
                 "      ,a.AppId" +
@@ -333,9 +369,8 @@ public class CobDAO {
                 "      ,DateReviewed" +
                 "      ,Approved" +
                 "      ,DateApproved" +
-                "      ,cobtype" +
                 "  ,(SELECT COUNT(CItemId) FROM COBItem b WHERE c.COBId = b.COBId) AS NoItems" +
-                "  FROM COB c INNER JOIN App a ON c.AppId = a.AppId INNER JOIN EmployeeInfo ei ON ei.EmployeeID = c.Prepared INNER JOIN Departments d ON ei.DepartmentId = d.DepartmentID" +
+                "  FROM COB c INNER JOIN App a ON c.AppId = a.AppId INNER JOIN EmployeeInfo ei ON ei.EmployeeID = c.Prepared INNER JOIN Departments d ON ei.DepartmentId = d.DepartmentID INNER JOIN COBSubType ca ON ca.StypeNo = c.StypeNo INNER JOIN COBType ct ON ca.TypeNo = ct.TypeNo" +
                 "  WHERE d.DepartmentId =? AND Status = ? AND cobtype = ?";
 
 
@@ -348,7 +383,7 @@ public class CobDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(sql);
         ps.setString(1, dept.getDepartmentID());
         ps.setString(2, status);
-        ps.setString(3, type);
+        ps.setString(3, type.getCategory());
 
         ResultSet rs = ps.executeQuery();
 
@@ -373,7 +408,14 @@ public class CobDAO {
                     rs.getDate("DateApproved")==null? null: rs.getDate("DateApproved").toLocalDate()
             );
             cob.setFundSource(new FundSource(rs.getString("FSId"), rs.getString("Source")));
-            cob.setType(rs.getString("CobType"));
+            COBCategory category = new COBCategory();
+            category.setStypeNo(rs.getInt("STypeNo"));
+            category.setCategory(rs.getString("SType"));
+            cob.setCategory(category);
+            COBType ctype = new COBType();
+            ctype.setTypeNo(rs.getInt("TypeNo"));
+            ctype.setType(rs.getString("Type"));
+            cob.setType(ctype);
             cob.setNoOfItems(rs.getInt("NoItems"));
             cob.setRemarks(rs.getString("Remarks"));
             cobs.add(cob);
@@ -394,20 +436,20 @@ public class CobDAO {
         conn.setAutoCommit(false);
 
         //Queries
-        String cob_sql = "INSERT INTO COB (AppId, COBId, COBType, FSId, Activity, Amount, Status, Prepared, DatePrepared) " +
+        String cob_sql = "INSERT INTO COB (AppId, COBId, STypeNo, FSId, Activity, Amount, Status, Prepared, DatePrepared) " +
                          "VALUES (?, ?, ?, ?, ?, ROUND(?, 2), ?, ?, getdate())";
 
         String item_sql = "INSERT INTO COBItem (CItemId, ItemId, COBId, Qty, Remarks, Description, Cost, Qtr1, Qtr2, Qtr3, Qtr4, Sequence, NoOfTimes, Level) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?, ?)";
 
         String subtype = "";
-        if (cob.getType().equals(COBItem.TYPES[1])){
+        if (cob.getCategory().getCategory().equals(COBItem.TYPES[1])){
             subtype = "INSERT INTO Representation (reprnAllowance, reimbursableAllowance, otherAllowance, CItemId) " +
                     "VALUES (ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?)";
-        }else if (cob.getType().equals(COBItem.TYPES[2])) {
+        }else if (cob.getCategory().getCategory().equals(COBItem.TYPES[2])) {
             subtype = "INSERT INTO Salaries(Longetivity, SSSPhilH, Overtime, CashGift, Bonus13, CItemId) " +
                     "VALUES(ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?)";
-        }else if (cob.getType().equals(COBItem.TYPES[3])){
+        }else if (cob.getCategory().getCategory().equals(COBItem.TYPES[3])){
             subtype = "INSERT INTO Travel (NoOfDays, Transport, Lodging, Registration, Incidental, Mode, CItemId) " +
                     "VALUES(?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?)";
         }
@@ -422,7 +464,7 @@ public class CobDAO {
             //Insert COB
             ps_cob.setString(1, cob.getAppId());
             ps_cob.setString(2, cob.getCobId());
-            ps_cob.setString(3, cob.getType());
+            ps_cob.setInt(3, cob.getCategory().getStypeNo());
             ps_cob.setString(4, cob.getFsId());
             ps_cob.setString(5, cob.getActivity());
             ps_cob.setDouble(6, cob.getAmount());
@@ -450,7 +492,7 @@ public class CobDAO {
 
                 //Insert also to child table if COB Item is representation, Salaries, Travels
                 //Representation
-                if (cob.getType().equals(COBItem.TYPES[1])){
+                if (cob.getCategory().getCategory().equals(COBItem.TYPES[1])){
                     Representation r = (Representation) item;
                     ps_sub.setDouble(1, r.getRepresentationAllowance());
                     ps_sub.setDouble(2, r.getReimbursableAllowance());
@@ -458,7 +500,7 @@ public class CobDAO {
                     ps_sub.setString(4, item.getcItemId());
                     ps_sub.executeUpdate();
                 //Salaries
-                }else if (cob.getType().equals(COBItem.TYPES[2])) {
+                }else if (cob.getCategory().getCategory().equals(COBItem.TYPES[2])) {
                     Salary s = (Salary) item;
                     ps_sub.setDouble(1, s.getLongetivity());
                     ps_sub.setDouble(2, s.getsSSPhilH());
@@ -468,7 +510,7 @@ public class CobDAO {
                     ps_sub.setString(6, item.getcItemId());
                     ps_sub.executeUpdate();
                 //Travels/Seminars
-                }else if (cob.getType().equals(COBItem.TYPES[3])){
+                }else if (cob.getCategory().getCategory().equals(COBItem.TYPES[3])){
                     Travel t = (Travel) item;
                     ps_sub.setInt(1, t.getNoOfDays());
                     ps_sub.setDouble(2, t.getTransport());
@@ -624,10 +666,13 @@ public class CobDAO {
 
     public static List<COB> getAll(String departmentId) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT c.*, fs.FSId, (SELECT Source FROM FundSource fs2 WHERE c.FSId = fs2.FSId) AS source FROM COB c " +
+                "SELECT c.*, fs.FSId, (SELECT Source FROM FundSource fs2 WHERE c.FSId = fs2.FSId) AS source, "+
+                        "TypeNo, Type, StypeNo, Stype " +
+                        "FROM COB c " +
                         "INNER JOIN APP a ON a.AppId=c.AppId " +
                         "INNER JOIN EmployeeInfo e ON e.EmployeeID=c.Prepared " +
                         "INNER JOIN FundSource fs ON fs.FSId=c.FSId " +
+                        "INNER JOIN COBSubType ca ON ca.StypeNo = c.StypeNo INNER JOIN COBType ct ON ca.TypeNo = ct.TypeNo "+
                         "WHERE a.isOpen=1 AND e.DepartmentId=? " +
                         "ORDER BY c.DatePrepared DESC "
         );
@@ -652,7 +697,10 @@ public class CobDAO {
                     EmployeeDAO.getOne(rs.getString("Approved"), DB.getConnection()),
                     rs.getDate("DateApproved")!=null ? rs.getDate("DateApproved").toLocalDate() : null
             );
-            cob.setType(rs.getString("CobType"));
+            COBCategory category = new COBCategory();
+            category.setStypeNo(rs.getInt("STypeNo"));
+            category.setCategory(rs.getString("SType"));
+            cob.setCategory(category);
             cob.setFundSource(new FundSource(rs.getString("FSId"), rs.getString("Source")));
             cobs.add(cob);
         }
@@ -660,4 +708,30 @@ public class CobDAO {
         return cobs;
     }
 
+    public static List<COBType> getTypes() throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM COBType;");
+        ResultSet rs = ps.executeQuery();
+        List<COBType> types = new ArrayList<>();
+        while(rs.next()) {
+            COBType t = new COBType();
+            t.setTypeNo(rs.getInt("TypeNo"));
+            t.setType(rs.getString("Type"));
+            types.add(t);
+        }
+        return types;
+    }
+
+    public static List<COBCategory> getCategories(COBType type) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM COBSubType WHERE TypeNo = ? ORDER BY SType ASC;");
+        ps.setInt(1, type.getTypeNo());
+        ResultSet rs = ps.executeQuery();
+        List<COBCategory> types = new ArrayList<>();
+        while(rs.next()) {
+            COBCategory t = new COBCategory();
+            t.setStypeNo(rs.getInt("STypeNo"));
+            t.setCategory(rs.getString("SType"));
+            types.add(t);
+        }
+        return types;
+    }
 }

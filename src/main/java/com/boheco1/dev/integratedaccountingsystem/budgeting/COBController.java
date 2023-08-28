@@ -54,7 +54,10 @@ public class COBController extends MenuControllerHandler implements Initializabl
     private JFXComboBox<FundSource> fs_cb;
 
     @FXML
-    private JFXComboBox<String> type_cb;
+    private JFXComboBox<COBType> type_cb;
+
+    @FXML
+    private JFXComboBox<COBCategory> category_cb;
 
     @FXML
     private TextField totals_tf;
@@ -89,22 +92,42 @@ public class COBController extends MenuControllerHandler implements Initializabl
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        ObservableList<String> types = FXCollections.observableArrayList(COBItem.TYPES);
-        this.type_cb.setItems(types);
-        this.type_cb.getSelectionModel().select(4);
-        this.type_cb.getSelectionModel().selectedItemProperty().addListener((observableValue, o, n) -> {
+        this.add_btn.setDisable(true);
+        this.remove_btn.setDisable(true);
+        this.import_btn.setDisable(true);
+        try{
+            ObservableList<COBType> types = FXCollections.observableArrayList(CobDAO.getTypes());
+            this.type_cb.setItems(types);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        this.type_cb.setOnAction(evt -> {
+            try {
+                ObservableList<COBCategory> types = FXCollections.observableArrayList(CobDAO.getCategories(this.type_cb.getSelectionModel().getSelectedItem()));
+                this.category_cb.setItems(types);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            this.disableItemControls(true);
+        });
+
+        this.category_cb.getSelectionModel().selectedItemProperty().addListener((c, o, n) -> {
             this.cob_items.getColumns().clear();
             this.cob_items.getItems().clear();
-            if (n.equals(COBItem.TYPES[0])) {
-                this.createTable();
-            }else if (n.equals(COBItem.TYPES[1])) {
-                this.createRepresentationTable();
-            }else if (n.equals(COBItem.TYPES[2])) {
-                this.createSalariesTable();
-            }else if (n.equals(COBItem.TYPES[3])) {
-                this.createTravelsTable();
-            }else{
-                this.createTable();
+
+            if (n != null) {
+                if (n.getCategory().equals(COBItem.TYPES[0])) {
+                    this.createTable();
+                } else if (n.getCategory().equals(COBItem.TYPES[1])) {
+                    this.createRepresentationTable();
+                } else if (n.getCategory().equals(COBItem.TYPES[2])) {
+                    this.createSalariesTable();
+                } else if (n.getCategory().equals(COBItem.TYPES[3])) {
+                    this.createTravelsTable();
+                } else {
+                    this.createTable();
+                }
+                this.disableItemControls(false);
             }
             this.cob_items.setItems(FXCollections.observableArrayList(new ArrayList<>()));
             this.cob_items.refresh();
@@ -133,22 +156,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
         this.createTable();
 
         this.add_btn.setOnAction(evt -> {
-            try {
-                String n = this.type_cb.getSelectionModel().getSelectedItem();
-                if (n.equals(COBItem.TYPES[0])) {
-                    this.showAddItemForm(null);
-                }else if (n.equals(COBItem.TYPES[1])) {
-                    this.showAddReprForm(null);
-                }else if (n.equals(COBItem.TYPES[2])) {
-                    this.showAddSalaryForm(null);
-                }else if (n.equals(COBItem.TYPES[3])) {
-                    this.showAddTravelForm(null);
-                }else{
-                    this.showAddItemForm(null);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            showForms(null);
         });
 
         this.remove_btn.setOnAction(evt -> {
@@ -168,22 +176,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
 
             MenuItem edit = new MenuItem("Edit Item");
             edit.setOnAction(actionEvent -> {
-                try {
-                    String n = this.type_cb.getSelectionModel().getSelectedItem();
-                    if (n.equals(COBItem.TYPES[0])) {
-                        this.showAddItemForm(row.getItem());
-                    }else if (n.equals(COBItem.TYPES[1])) {
-                        this.showAddReprForm((Representation) row.getItem());
-                    }else if (n.equals(COBItem.TYPES[2])) {
-                        this.showAddSalaryForm((Salary) row.getItem());
-                    }else if (n.equals(COBItem.TYPES[3])) {
-                        this.showAddTravelForm((Travel) row.getItem());
-                    }else{
-                        this.showAddItemForm(row.getItem());
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                showForms(row.getItem());
             });
 
             MenuItem remove = new MenuItem("Remove Item");
@@ -264,7 +257,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
                 this.setAmount();
             });
 
-            String n = this.type_cb.getSelectionModel().getSelectedItem();
+            String n = this.category_cb.getSelectionModel().getSelectedItem().getCategory();
             if (n.equals(COBItem.TYPES[1]) || n.equals(COBItem.TYPES[2])) {
                 rowMenu.getItems().addAll(edit, new SeparatorMenuItem(), remove, new SeparatorMenuItem(), child, parent, new SeparatorMenuItem(), removeAll);
             }else {
@@ -298,6 +291,31 @@ public class COBController extends MenuControllerHandler implements Initializabl
         Utility.setParentController(this);
 
         this.progressBar.setVisible(false);
+    }
+
+    public void disableItemControls(boolean set){
+        this.add_btn.setDisable(set);
+        this.remove_btn.setDisable(set);
+        this.import_btn.setDisable(set);
+    }
+
+    public void showForms(COBItem row) {
+        try {
+            COBCategory n = this.category_cb.getSelectionModel().getSelectedItem();
+            if (n.getCategory().equals(COBItem.TYPES[0])) {
+                this.showAddItemForm(row);
+            }else if (n.getCategory().equals(COBItem.TYPES[1])) {
+                this.showAddReprForm((Representation) row);
+            }else if (n.getCategory().equals(COBItem.TYPES[2])) {
+                this.showAddSalaryForm((Salary) row);
+            }else if (n.getCategory().equals(COBItem.TYPES[3]) || n.getCategory().contains("Seminars")) {
+                this.showAddTravelForm((Travel) row);
+            }else{
+                this.showAddItemForm(row);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -694,6 +712,9 @@ public class COBController extends MenuControllerHandler implements Initializabl
         }else if (this.fs_cb.getSelectionModel().getSelectedItem() == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please select the fund source!",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }else if (this.category_cb.getSelectionModel().getSelectedItem() == null) {
+            AlertDialogBuilder.messgeDialog("Invalid Input", "Please select the COB category!",
+                    Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }else if (this.items.size() == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please add the projected expenses for this COB!",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
@@ -709,7 +730,6 @@ public class COBController extends MenuControllerHandler implements Initializabl
                 dialog.close();
                 try {
                     final String fsid = this.fs_cb.getSelectionModel().getSelectedItem().getFsId();
-                    final String type = this.type_cb.getSelectionModel().getSelectedItem();
                     COB cob = new COB();
                     cob.setAppId(this.app.getAppId());
                     cob.setCobId(cn);
@@ -717,7 +737,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
                     cob.setActivity(activity);
                     cob.setAmount(amt);
                     cob.setItems(this.items);
-                    cob.setType(type);
+                    cob.setCategory(this.category_cb.getSelectionModel().getSelectedItem());
                     CobDAO.createCOB(cob);
                     reset();
                     this.cn_tf.setText(this.app.getYear()+"-"+dept+"-"+ (CobDAO.countCob(dept)+1));
@@ -758,9 +778,9 @@ public class COBController extends MenuControllerHandler implements Initializabl
         dialogLayout.setBody(parent);
         JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
         AddItemController ctrl = fxmlLoader.getController();
-        ctrl.setType(this.type_cb.getSelectionModel().getSelectedItem());
-        String n = this.type_cb.getSelectionModel().getSelectedItem();
-        if (!n.equals(COBItem.TYPES[4])) {
+        ctrl.setType(this.category_cb.getSelectionModel().getSelectedItem());
+        COBCategory n = this.category_cb.getSelectionModel().getSelectedItem();
+        if (!n.getCategory().equals(COBItem.TYPES[4])) {
             ctrl.getCheck().setSelected(false);
             ctrl.disableUnit(true);
             ctrl.getCheck().setVisible(false);

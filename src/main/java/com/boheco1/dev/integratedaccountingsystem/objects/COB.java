@@ -23,7 +23,9 @@ public class COB {
     private LocalDate dateApproved;
     private List<COBItem> items;
     private int noOfItems = 0;
-    private String type;
+    private COBType type;
+
+    private COBCategory category;
     public static final String PENDING_REVISION = "Pending Revision";
     public static final String PENDING_REVIEW = "Pending Review";
     public static final String PENDING_APPROVAL = "Pending Approval";
@@ -174,14 +176,6 @@ public class COB {
         return String.format("₱ %,.2f", this.amount);
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public int getNoOfItems() {
         return noOfItems;
     }
@@ -204,5 +198,21 @@ public class COB {
 
     public void setRemarks(String remarks) {
         this.remarks = remarks;
+    }
+
+    public void setType(COBType type) {
+        this.type = type;
+    }
+
+    public COBType getType() {
+        return this.type;
+    }
+
+    public COBCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(COBCategory category) {
+        this.category = category;
     }
 }
