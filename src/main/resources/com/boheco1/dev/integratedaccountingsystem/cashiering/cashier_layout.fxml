@@ -18,7 +18,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane prefHeight="696.0" prefWidth="1138.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.CashierController">
+<AnchorPane maxWidth="1.7976931348623157E308" prefHeight="696.0" prefWidth="1138.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.CashierController">
    <children>
       <HBox layoutX="16.0" layoutY="16.0" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="16.0" AnchorPane.topAnchor="16.0">
          <children>
@@ -120,7 +120,7 @@
                   <Insets />
                </HBox.margin>
             </VBox>
-            <VBox prefHeight="664.0" prefWidth="556.0" HBox.hgrow="ALWAYS">
+            <VBox maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="664.0" prefWidth="556.0" HBox.hgrow="ALWAYS">
                <children>
                   <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 15; -fx-font-weight: bold;" text="OR Info">
                      <font>
@@ -144,7 +144,7 @@
                         <Insets top="6.0" />
                      </VBox.margin>
                   </HBox>
-                  <TableView fx:id="paymentTable" maxWidth="1.7976931348623157E308" prefHeight="392.0" prefWidth="556.0" VBox.vgrow="NEVER">
+                  <TableView fx:id="paymentTable" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefWidth="556.0" VBox.vgrow="ALWAYS">
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
                      </cursor>
@@ -152,7 +152,7 @@
                         <Insets top="8.0" />
                      </VBox.margin>
                   </TableView>
-                  <Pane prefHeight="237.0" prefWidth="614.0" VBox.vgrow="ALWAYS">
+                  <Pane maxHeight="1.7976931348623157E308" prefHeight="237.0" prefWidth="614.0" VBox.vgrow="ALWAYS">
                      <children>
                         <VBox layoutX="15.0" layoutY="14.0">
                            <children>
@@ -187,28 +187,23 @@
                <children>
                   <VBox alignment="CENTER">
                      <children>
-                        <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 15; -fx-font-weight: bold;" text="Prepayment">
-                           <font>
-                              <Font name="System Bold" size="22.0" />
-                           </font>
-                        </Label>
+                        <JFXToggleButton fx:id="addEnergyBillToggle" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" onAction="#switchAddEnergyBillMode" prefHeight="33.0" prefWidth="193.0" style="-fx-font-weight: bold; -fx-font-size: 15;" text="Prepayment" />
                         <Separator prefWidth="200.0" />
-                        <JFXTextField fx:id="accNum" labelFloat="true" onAction="#addPrepayment" prefHeight="30.0" prefWidth="184.0" promptText="Account Number">
+                        <JFXTextField fx:id="addEnergyBillAccNum" labelFloat="true" onAction="#addEnergyBill" prefHeight="30.0" prefWidth="184.0" promptText="Account Number">
+                           <VBox.margin>
+                              <Insets bottom="10.0" top="15.0" />
+                           </VBox.margin>
+                        </JFXTextField>
+                        <JFXTextField fx:id="addEnergyBillAmount" labelFloat="true" onAction="#addEnergyBill" prefHeight="29.0" prefWidth="115.0" promptText="Amount">
                            <VBox.margin>
                               <Insets bottom="10.0" top="10.0" />
                            </VBox.margin>
                         </JFXTextField>
-                        <HBox>
-                           <children>
-                              <JFXTextField fx:id="prepayment" labelFloat="true" onAction="#addPrepayment" prefHeight="29.0" prefWidth="115.0" promptText="Amount">
-                                 <HBox.margin>
-                                    <Insets right="10.0" />
-                                 </HBox.margin>
-                              </JFXTextField>
-                              <JFXButton contentDisplay="CENTER" onAction="#removePrepayment" prefHeight="29.0" prefWidth="62.0" style="-fx-background-color: gray;" text="Cancel " textFill="WHITE" />
-                           </children>
-                        </HBox>
+                        <JFXButton contentDisplay="CENTER" onAction="#removeAdditionalEnergyBill" prefHeight="29.0" prefWidth="62.0" style="-fx-background-color: gray;" text="Cancel " textFill="WHITE" />
                      </children>
+                     <VBox.margin>
+                        <Insets bottom="10.0" />
+                     </VBox.margin>
                   </VBox>
                   <VBox alignment="TOP_CENTER">
                      <children>
@@ -220,7 +215,7 @@
                         <Separator prefWidth="200.0" />
                         <JFXTextField fx:id="energyBill" labelFloat="true" prefHeight="30.0" prefWidth="124.0" promptText="Energy Bill">
                            <VBox.margin>
-                              <Insets bottom="10.0" top="10.0" />
+                              <Insets bottom="10.0" top="15.0" />
                            </VBox.margin>
                         </JFXTextField>
                         <JFXTextField fx:id="vat" labelFloat="true" prefHeight="30.0" prefWidth="124.0" promptText="VAT">
@@ -243,7 +238,7 @@
                         </JFXButton>
                      </children>
                      <VBox.margin>
-                        <Insets top="15.0" />
+                        <Insets bottom="10.0" top="15.0" />
                      </VBox.margin>
                   </VBox>
                   <VBox alignment="CENTER_LEFT">

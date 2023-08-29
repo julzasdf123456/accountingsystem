@@ -34,7 +34,7 @@ import java.util.ResourceBundle;
 public class CashierController extends MenuControllerHandler implements Initializable, ObjectTransaction {
 
     @FXML
-    private JFXToggleButton manualORToggle;
+    private JFXToggleButton manualORToggle, addEnergyBillToggle;
 
     @FXML
     private JFXButton submitBtn, search_btn;
@@ -43,7 +43,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
     private HBox manualORinput;
 
     @FXML
-    private JFXTextField orItem, orItemAmount, serviceFeeAmount, serviceFeeAccounts, name, address, purpose, energyBill, vat, surcharge, prepayment, accNum, tinNo, orNumber, businessStyle;
+    private JFXTextField orItem, orItemAmount, serviceFeeAmount, serviceFeeAccounts, name, address, purpose, energyBill, vat, surcharge, addEnergyBillAmount, addEnergyBillAccNum, tinNo, orNumber, businessStyle;
 
 
     @FXML
@@ -91,8 +91,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
         InputValidation.restrictNumbersOnly(energyBill);
         InputValidation.restrictNumbersOnly(vat);
         InputValidation.restrictNumbersOnly(surcharge);
-        InputValidation.restrictNumbersOnly(prepayment);
-        InputValidation.restrictNumbersOnly(accNum);
+        InputValidation.restrictNumbersOnly(addEnergyBillAmount);
+        InputValidation.restrictNumbersOnly(addEnergyBillAccNum);
         //InputValidation.restrictNumbersOnly(amount);
 
         addManualORItem(orItemAmount);
@@ -177,6 +177,15 @@ public class CashierController extends MenuControllerHandler implements Initiali
             purpose.setEditable(false);
         }
 
+    }
+
+    @FXML
+    private void switchAddEnergyBillMode(ActionEvent event) {
+        if(addEnergyBillToggle.isSelected()){
+            addEnergyBillToggle.setText("Energy Bill");
+        }else{
+            addEnergyBillToggle.setText("Prepayment");
+        }
     }
 
     private void initTableForManualOR() {
@@ -274,8 +283,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
         crmDetails = null;
         customerFromCRM = null;
         tellerInfo = null;
-        accNum.setText("");
-        prepayment.setText("");
+        addEnergyBillAccNum.setText("");
+        addEnergyBillAmount.setText("");
         tinNo.setText("");
         paymentMode.getSelectionModel().selectFirst();
         bankInfo.getSelectionModel().clearSelection();
@@ -488,28 +497,58 @@ public class CashierController extends MenuControllerHandler implements Initiali
     }
 
     @FXML
-    private void addPrepayment(ActionEvent event) {
-        double otherDeduction=0;
-        if (tellerInfo != null) {
-            if(!accNum.getText().isEmpty() && !prepayment.getText().isEmpty()){
-                double amount = Double.parseDouble(prepayment.getText());
-                for(ORItemSummary os : OR_itemList){
-                    if(os.getAccountCode().equals("124101010001")){ //check is Energy Bill - Others is already added
-                        otherDeduction = os.getAmount();
-                        break;
-                    }
-                }
-                if(otherDeduction==0) {
-                    AlertDialogBuilder.messgeDialog("Transaction Error", "Cannot add prepayment, since other deduction is zero.",
-                            Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-                    return;
-                }else if(amount>otherDeduction){
-                    AlertDialogBuilder.messgeDialog("Transaction Error", "Prepayment cannot be more than other deduction.",
-                            Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-                    return;
-                }
+    private void addEnergyBill(ActionEvent event) {
 
-                ORItemSummary items = (ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1);
+        if (tellerInfo != null) {
+            if(addEnergyBillToggle.getText().equals("Prepayment")){
+                addPrepayment();
+            }else{
+                addNewEnergyBill();
+            }
+
+            paymentTable.refresh();
+        }
+    }
+
+    private void addPrepayment(){
+        double otherDeduction=0;
+        if(!addEnergyBillAccNum.getText().isEmpty() && !addEnergyBillAmount.getText().isEmpty()){
+            double amount = Double.parseDouble(addEnergyBillAmount.getText());
+            for(ORItemSummary os : OR_itemList){
+                if(os.getAccountCode().equals("124101010001")){ //check if other deduction is available
+                    otherDeduction = os.getAmount();
+                    break;
+                }
+            }
+            if(otherDeduction==0) {
+                AlertDialogBuilder.messgeDialog("Transaction Error", "Cannot add prepayment, since other deduction is zero.",
+                        Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                return;
+            }else if(amount>otherDeduction){
+                AlertDialogBuilder.messgeDialog("Transaction Error", "Prepayment cannot be more than other deduction.",
+                        Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+                return;
+            }
+
+            //scan table if Energy Prepayment is already added
+            boolean found = false;
+            ObservableList<ORItemSummary> temp = paymentTable.getItems();
+            for(ORItemSummary os : temp){
+                if(os.getDescription().contains("Energy Prepayment")){
+                    os.setAmount(amount);
+                    os.setTotalView(Utility.formatDecimal(amount));
+                    //((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setAmount(amount);
+                    //((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setTotalView(Utility.formatDecimal(amount));
+                    found = true;
+                }
+            }
+
+            if(!found){
+                paymentTable.getItems().add(new ORItemSummary("23220901000","Energy Prepayment-"+ addEnergyBillAccNum.getText(),Double.parseDouble(addEnergyBillAmount.getText())));
+            }
+
+
+                /*ORItemSummary items = (ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1);
                 String[] pre = items.getDescription().split("-");
 
                 if(pre[0].equals("Energy Prepayment")){
@@ -517,23 +556,74 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     ((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setTotalView(Utility.formatDecimal(amount));
                 }else{
                     paymentTable.getItems().add(new ORItemSummary("23220901000","Energy Prepayment-"+accNum.getText(),Double.parseDouble(prepayment.getText())));
+                }*/
+        }
+    }
+
+    private void addNewEnergyBill(){ //will use if there are excess energy bill
+        double otherDeduction=0;
+        if(!addEnergyBillAmount.getText().isEmpty()){
+            double amount = Double.parseDouble(addEnergyBillAmount.getText());
+
+
+            //scan table if the additional Energy Bill is already added
+            boolean found = false;
+            ObservableList<ORItemSummary> temp = paymentTable.getItems();
+            for(ORItemSummary os : temp){
+                if(os.getDescription().contains("*Energy Bill ")){
+                    os.setDescription("*Energy Bill "+ addEnergyBillAccNum.getText());
+                    os.setAmount(amount);
+                    os.setTotalView(Utility.formatDecimal(amount));
+                    found = true;
                 }
             }
-            paymentTable.refresh();
+
+            if(!found){
+                paymentTable.getItems().add(new ORItemSummary("12410101000","*Energy Bill "+ addEnergyBillAccNum.getText(),Double.parseDouble(addEnergyBillAmount.getText())));
+            }
+
+
+                /*ORItemSummary items = (ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1);
+                String[] pre = items.getDescription().split("-");
+
+                if(pre[0].equals("Energy Prepayment")){
+                    ((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setAmount(amount);
+                    ((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setTotalView(Utility.formatDecimal(amount));
+                }else{
+                    paymentTable.getItems().add(new ORItemSummary("23220901000","Energy Prepayment-"+accNum.getText(),Double.parseDouble(prepayment.getText())));
+                }*/
         }
     }
     @FXML
-    private void removePrepayment(ActionEvent event) {
+    private void removeAdditionalEnergyBill(ActionEvent event) {
         int count = paymentTable.getItems().size();
         if(count >= 1) {
             try{
                 if(tellerInfo==null) return;
-                ORItemSummary items = (ORItemSummary) paymentTable.getItems().get(count - 1);
+                //scan table and look for Energy Prepayment
+                ObservableList<ORItemSummary> temp = paymentTable.getItems();
+                for(ORItemSummary os : temp){
+                    if(addEnergyBillToggle.getText().equals("Prepayment")){
+                        if(os.getDescription().contains("Energy Prepayment")){
+                            paymentTable.getItems().remove(os);
+                            paymentTable.refresh();
+                            break;
+                        }
+                    }else{
+                        if(os.getDescription().contains("*Energy Bill")){
+                            paymentTable.getItems().remove(os);
+                            paymentTable.refresh();
+                            break;
+                        }
+                    }
+
+                }
+                /*ORItemSummary items = (ORItemSummary) paymentTable.getItems().get(count - 1);
                 String[] pre = items.getDescription().split("-");
                 if (pre[0].equals("Energy Prepayment")) {
                     paymentTable.getItems().remove(paymentTable.getItems().size() - 1);
                     paymentTable.refresh();
-                }
+                }*/
             }catch (Exception e){
                 e.printStackTrace();
             }
