@@ -13,16 +13,8 @@ import java.util.List;
 
 public class CashierDAO {
 
-    /**
-     * Retrieves DCR Breakdown for OR items from a specified date
-     * @param year The posting year
-     * @param month The posting month
-     * @param day The posting day
-     * @param teller The posting day
-     * @return list The list of dcr breakdown
-     * @throws Exception obligatory from DB.getConnection()
-     */
-    public static List<ORItemSummary> getOrItems(int year, int month, int day, String teller) throws Exception{
+
+    public static List<ORItemSummary> getOrItems(int yearFrom, int monthFrom, int dayFrom, int yearTo, int monthTo, int dayTo, String teller) throws Exception{
         String sql = "SELECT "+
                 "( "+
                 "        (SUM(ISNULL(p.CurrentBills,0)) + SUM(ISNULL(p.Within30Days,0)) + SUM(ISNULL(p.Over30Days,0))) "+
@@ -83,7 +75,7 @@ public class CashierDAO {
                 "INNER JOIN BillsExtension x ON b.AccountNumber=x.AccountNumber AND b.ServicePeriodEnd=x.ServicePeriodEnd "+
                 "INNER JOIN PaidBillsWithRoute p ON b.AccountNumber=p.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd "+
                 "INNER JOIN PaidBills pb ON b.AccountNumber=pb.AccountNumber AND b.ServicePeriodEnd=pb.ServicePeriodEnd "+
-                "WHERE p.PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND p.PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59' AND p.TELLER = ?";
+                "WHERE p.PostingDate >= '"+yearFrom+"-"+monthFrom+"-"+dayFrom+" 00:00:00' AND p.PostingDate <= '"+yearTo+"-"+monthTo+"-"+dayTo+" 23:59:59' AND p.TELLER = ?";
 
         PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
 
@@ -164,11 +156,11 @@ public class CashierDAO {
         return orItems;
     }
 
-    public static int countAccount (int year, int month, int day, String teller) throws SQLException, ClassNotFoundException {
+    public static int countAccount (int yearFrom, int monthFrom, int dayFrom, int yearTo, int monthTo, int dayTo, String teller) throws SQLException, ClassNotFoundException {
         int count = 0;
         PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement("" +
                 "SELECT COUNT ( DISTINCT AccountNumber ) AS countAccount FROM PaidBills WHERE " +
-                "PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59' AND TELLER = '"+teller+"' ");
+                "PostingDate >= '"+yearFrom+"-"+monthFrom+"-"+dayFrom+" 00:00:00' AND PostingDate <= '"+yearTo+"-"+monthTo+"-"+dayTo+" 23:59:59' AND TELLER = '"+teller+"' ");
 
         ResultSet rs = ps.executeQuery();
 

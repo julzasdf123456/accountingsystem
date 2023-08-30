@@ -4,6 +4,7 @@
 <?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -17,7 +18,13 @@
             <HBox alignment="CENTER_LEFT">
                <children>
                   <JFXToggleButton fx:id="toggleSearch" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" onAction="#toggleSearch" prefHeight="6.0" prefWidth="189.0" style="-fx-font-weight: bold; -fx-font-size: 14;" text="Search Consumer" />
-                  <DatePicker fx:id="searchDate" prefHeight="29.0" prefWidth="159.0" />
+                  <DatePicker fx:id="searchDateFrom" prefHeight="29.0" prefWidth="117.0" />
+                  <Label fx:id="labelTo" text="To">
+                     <HBox.margin>
+                        <Insets left="5.0" right="5.0" />
+                     </HBox.margin>
+                  </Label>
+                  <DatePicker fx:id="searchDateTo" prefHeight="29.0" prefWidth="117.0" />
                </children>
             </HBox>
                     <HBox alignment="CENTER_LEFT" maxWidth="-Infinity" prefHeight="39.0" prefWidth="470.0">

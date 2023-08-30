@@ -33,13 +33,16 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
     private AnchorPane contentPane;
 
     @FXML
+    private Label labelTo;
+
+    @FXML
     private JFXTextField searchTf;
 
     @FXML
     private JFXToggleButton toggleSearch;
 
     @FXML
-    private DatePicker searchDate;
+    private DatePicker searchDateFrom, searchDateTo;
 
     @FXML
     private TableView searchResultTable;
@@ -57,6 +60,8 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
     public void initialize(URL url, ResourceBundle resourceBundle) {
        // this.createTable();
 
+        searchDateTo.setVisible(false);
+        labelTo.setVisible(false);
 
         this.searchResultTable.setRowFactory(tv -> {
             TableRow row = new TableRow<>();
@@ -72,15 +77,19 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
         this.searchTf.requestFocus();
         this.toggleSearch.setSelected(Utility.TOGGLE_SEARCH);
         try {
-            this.searchDate.setValue(Utility.serverDate());
+            this.searchDateFrom.setValue(Utility.serverDate());
+            this.searchDateTo.setValue(Utility.serverDate());
         } catch (Exception e) {
-            this.searchDate.setValue(LocalDate.now());
+            this.searchDateFrom.setValue(LocalDate.now());
+            this.searchDateTo.setValue(LocalDate.now());
             throw new RuntimeException(e);
         }
 
         if(this.toggleSearch.isSelected()) {
             this.toggleSearch.setText("Search Consumer");
-            this.searchDate.setVisible(false);
+            this.searchDateFrom.setVisible(false);
+            this.searchDateTo.setVisible(false);
+            this.labelTo.setVisible(false);
             this.searchTf.setPromptText("Reference Number/Last Name/First Name/Address");
 
             ObservableList<CRMQueue> result = null;
@@ -96,12 +105,23 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
             }
         }else {
             this.toggleSearch.setText("Search Teller");
-            this.searchDate.setVisible(true);
+            this.searchDateFrom.setVisible(true);
+            this.searchDateTo.setVisible(true);
+            this.labelTo.setVisible(true);
             this.searchTf.setPromptText("Username/Last Name/First Name");
         }
 
-        searchDate.getEditor().setOnKeyReleased(e ->{
+        searchDateFrom.getEditor().setOnKeyReleased(e ->{
             if (e.getCode() == KeyCode.ENTER) {
+                searchDateTo.setValue(searchDateFrom.getValue());
+                search();
+                searchTf.requestFocus();
+            }
+        });
+
+        searchDateTo.getEditor().setOnKeyReleased(e ->{
+            if (e.getCode() == KeyCode.ENTER) {
+                searchDateFrom.setValue(searchDateTo.getValue());
                 search();
                 searchTf.requestFocus();
             }
@@ -203,12 +223,16 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
         Utility.TOGGLE_SEARCH = toggleSearch.isSelected();
         if(this.toggleSearch.isSelected()) {
             this.toggleSearch.setText("Search Consumer");
-            this.searchDate.setVisible(false);
+            this.searchDateFrom.setVisible(false);
+            this.searchDateTo.setVisible(false);
+            this.labelTo.setVisible(false);
             this.searchTf.setPromptText("Reference Number/Last Name/First Name/Address");
             search();
         }else {
             this.toggleSearch.setText("Search Teller");
-            this.searchDate.setVisible(true);
+            this.searchDateFrom.setVisible(true);
+            this.searchDateTo.setVisible(true);
+            this.labelTo.setVisible(true);
             this.searchTf.setPromptText("Username/Last Name/First Name");
             searchResultTable.getItems().clear();
         }
@@ -231,16 +255,21 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                 Task<Void> task = new Task<>() {
                     @Override
                     protected Void call() throws Exception {
-                        int month = searchDate.getValue().getMonthValue();
-                        int day = searchDate.getValue().getDayOfMonth();
-                        int year = searchDate.getValue().getYear();
+                        int monthFrom = searchDateFrom.getValue().getMonthValue();
+                        int dayFrom = searchDateFrom.getValue().getDayOfMonth();
+                        int yearFrom = searchDateFrom.getValue().getYear();
+
+                        int monthTo = searchDateTo.getValue().getMonthValue();
+                        int dayTo = searchDateTo.getValue().getDayOfMonth();
+                        int yearTo = searchDateTo.getValue().getYear();
+
                         List<ORItemSummary> orItemSummaries =null;
-                        LocalDate period = LocalDate.of(year, month, 1);
+                        LocalDate period = LocalDate.of(yearFrom, monthFrom, 1);
                         User user = UserDAO.get(employeeInfo.getId());
-                        transactionHeader = TransactionHeaderDAO.get(user.getUserName(), searchDate.getValue());
+                        transactionHeader = TransactionHeaderDAO.get(user.getUserName(), searchDateTo.getValue());
                         if(transactionHeader==null) {
-                            orItemSummaries = CashierDAO.getOrItems(year, month, day, user.getUserName());
-                            countAccount = CashierDAO.countAccount(year, month, day, user.getUserName());
+                            orItemSummaries = CashierDAO.getOrItems(yearFrom, monthFrom, dayFrom, yearTo, monthTo, dayTo, user.getUserName());
+                            countAccount = CashierDAO.countAccount(yearFrom, monthFrom, dayFrom, yearTo, monthTo, dayTo, user.getUserName());
                         }else {
                             transactionDetails = TransactionDetailsDAO.get(period, "OR", user);
                             orItemSummaries = new ArrayList<>();
@@ -251,7 +280,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                                 }
                             }
                         }
-                        teller = new Teller(user.getUserName(), employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), searchDate.getValue());
+                        teller = new Teller(user.getUserName(), employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), searchDateTo.getValue());
                         teller.setOrItemSummaries(orItemSummaries);
                         return null;
                     }
@@ -269,7 +298,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                         HashMap<String, Object> result = new HashMap<>();
                         result.put("SearchResult", resultInfo);
                         result.put("TransactionHeader", transactionHeader);
-                        result.put("SearchDate", searchDate.getValue());
+                        result.put("SearchDate", searchDateFrom.getValue());
                         result.put("CountAccount", countAccount);
                         this.parentController.receive(result);
                         taskIsRunning = false;
