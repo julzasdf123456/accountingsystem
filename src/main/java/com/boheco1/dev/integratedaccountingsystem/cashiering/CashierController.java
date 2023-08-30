@@ -488,7 +488,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
             return;
 
         double calculate = 0;
-        for (ORItemSummary t : OR_itemList)
+        ObservableList<ORItemSummary> temp = paymentTable.getItems();
+        for (ORItemSummary t : temp)
             calculate += t.getAmount();
 
         collectionFromTeller=calculate;
@@ -505,7 +506,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             }else{
                 addNewEnergyBill();
             }
-
+            reCompute();
             paymentTable.refresh();
         }
     }
@@ -536,7 +537,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             for(ORItemSummary os : temp){
                 if(os.getDescription().contains("Energy Prepayment")){
                     os.setAmount(amount);
-                    os.setTotalView(Utility.formatDecimal(amount));
+                    //os.setTotalView(Utility.formatDecimal(amount));
                     //((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setAmount(amount);
                     //((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setTotalView(Utility.formatDecimal(amount));
                     found = true;
@@ -573,7 +574,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 if(os.getDescription().contains("*Energy Bill ")){
                     os.setDescription("*Energy Bill "+ addEnergyBillAccNum.getText());
                     os.setAmount(amount);
-                    os.setTotalView(Utility.formatDecimal(amount));
+                    //os.setTotalView(Utility.formatDecimal(amount));
                     found = true;
                 }
             }
