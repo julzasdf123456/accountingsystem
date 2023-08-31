@@ -187,19 +187,28 @@
                <children>
                   <VBox alignment="CENTER">
                      <children>
-                        <JFXToggleButton fx:id="addEnergyBillToggle" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" onAction="#switchAddEnergyBillMode" prefHeight="33.0" prefWidth="193.0" style="-fx-font-weight: bold; -fx-font-size: 15;" text="Prepayment" />
+                        <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 15; -fx-font-weight: bold;" text="Other Item">
+                           <font>
+                              <Font name="System Bold" size="22.0" />
+                           </font>
+                        </Label>
                         <Separator prefWidth="200.0" />
-                        <JFXTextField fx:id="addEnergyBillAccNum" labelFloat="true" onAction="#addEnergyBill" prefHeight="30.0" prefWidth="184.0" promptText="Account Number">
+                        <JFXComboBox fx:id="selectOtherItem" focusColor="#009688" maxWidth="1.7976931348623157E308" prefHeight="29.0" prefWidth="156.0" promptText="Select">
+                           <VBox.margin>
+                              <Insets bottom="10.0" top="15.0" />
+                           </VBox.margin>
+                        </JFXComboBox>
+                        <JFXTextField fx:id="otherItemAccNum" labelFloat="true" onAction="#addOtherItem" prefHeight="30.0" prefWidth="184.0" promptText="Account Number">
                            <VBox.margin>
                               <Insets bottom="10.0" top="15.0" />
                            </VBox.margin>
                         </JFXTextField>
-                        <JFXTextField fx:id="addEnergyBillAmount" labelFloat="true" onAction="#addEnergyBill" prefHeight="29.0" prefWidth="115.0" promptText="Amount">
+                        <JFXTextField fx:id="otherItemAmount" labelFloat="true" onAction="#addOtherItem" prefHeight="29.0" prefWidth="115.0" promptText="Amount">
                            <VBox.margin>
                               <Insets bottom="10.0" top="10.0" />
                            </VBox.margin>
                         </JFXTextField>
-                        <JFXButton contentDisplay="CENTER" onAction="#removeAdditionalEnergyBill" prefHeight="29.0" prefWidth="62.0" style="-fx-background-color: gray;" text="Cancel " textFill="WHITE" />
+                        <JFXButton contentDisplay="CENTER" onAction="#removeAdditionalEnergyBill" prefHeight="29.0" prefWidth="70.0" style="-fx-background-color: gray;" text="Remove" textFill="WHITE" />
                      </children>
                      <VBox.margin>
                         <Insets bottom="10.0" />
@@ -207,7 +216,7 @@
                   </VBox>
                   <VBox alignment="TOP_CENTER">
                      <children>
-                        <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 20; -fx-font-weight: bold;" text="Add Refund">
+                        <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 15; -fx-font-weight: bold;" text="Add Refund">
                            <font>
                               <Font name="System Bold" size="22.0" />
                            </font>

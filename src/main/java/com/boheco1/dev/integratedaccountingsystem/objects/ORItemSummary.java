@@ -10,12 +10,14 @@ public class ORItemSummary {
     private String description;
     private double amount;
 
+    private boolean removable;
     private String totalView;
 
     public ORItemSummary() {    }
     public ORItemSummary(String description) {
         this.description=description;
         totalView = "";
+        setRemovable(false);
     }
 
 
@@ -23,7 +25,7 @@ public class ORItemSummary {
         this.accountCode = accountCode;
         this.description = description;
         this.amount = amount;
-
+        setRemovable(false);
         if (this.amount == 0)
             this.setTotalView(" ");
         else if (this.amount > 0)
@@ -37,6 +39,7 @@ public class ORItemSummary {
         this.description = description;
         this.amount = amount;
         this.setTotalView(Utility.formatDecimal(this.amount)+"");
+        setRemovable(false);
     }
 
     public String getAccountCode() {
@@ -75,5 +78,13 @@ public class ORItemSummary {
 
     public void setTotalView(String totalView) {
         this.totalView = totalView;
+    }
+
+    public boolean isRemovable() {
+        return removable;
+    }
+
+    public void setRemovable(boolean removable) {
+        this.removable = removable;
     }
 }
