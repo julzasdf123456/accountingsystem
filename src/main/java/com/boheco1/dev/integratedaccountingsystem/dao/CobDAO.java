@@ -226,7 +226,7 @@ public class CobDAO {
                 "      ,Approved" +
                 "      ,DateApproved" +
                 "  ,(SELECT COUNT(CItemId) FROM COBItem b WHERE c.COBId = b.COBId) AS NoItems" +
-                "  FROM COB c INNER JOIN App a ON c.AppId = a.AppId" +
+                "  FROM COB c INNER JOIN App a ON c.AppId = a.AppId INNER JOIN COBSubType ca ON ca.StypeNo = c.StypeNo INNER JOIN COBType ct ON ca.TypeNo = ct.TypeNo" +
                 "  WHERE Year = ? AND Status = ?" +
                 "  ORDER BY DatePrepared DESC, COBId ASC;";
 

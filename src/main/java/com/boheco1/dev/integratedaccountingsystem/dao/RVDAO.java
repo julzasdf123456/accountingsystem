@@ -89,7 +89,7 @@ public class RVDAO {
 
         //Queries
         String rv_sql = "INSERT INTO RequisitionVoucher (RVNo, [To], Purpose, Amount, Status, Requistioner, RVDate) " +
-                "VALUES (?, ?, ?, ROUND(?, 2), ?, ?, getdate())";
+                "VALUES (?, ?, ?, ROUND(?, 2), ?, ?, ?)";
 
         String item_sql = "INSERT INTO RVItem (RVNo, RVQty, CItemId, Sequence) " +
                 "VALUES (?, ?, ?, ?)";
@@ -100,16 +100,17 @@ public class RVDAO {
 
         //Transact
         try {
-            //Insert COB
+            //Insert rv
             ps_rv.setString(1, rv.getRvNo());
             ps_rv.setString(2, rv.getTo());
             ps_rv.setString(3, rv.getPurpose());
             ps_rv.setDouble(4, rv.getAmount());
             ps_rv.setString(5, RV.PENDING_RECOMMENDATION);
             ps_rv.setString(6, ActiveUser.getUser().getEmployeeID());
+            ps_rv.setDate(7, java.sql.Date.valueOf(rv.getRvDate()));
             ps_rv.executeUpdate();
 
-            //Insert cob items
+            //Insert rv items
             for (RVItem item : rv.getItems()) {
                 ps_item.setString(1, rv.getRvNo());
                 ps_item.setInt(2, item.getQty());
@@ -197,12 +198,13 @@ public class RVDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static void submitRevisedRV(RV rv) throws Exception{
-        PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE RequisitionVoucher SET Status = ?, [To] = ?, Purpose = ?, Requistioner = ?, Remarks = NULL, Approved = NULL, Recommended = NULL, BudgetOfficer = NULL, DateRecommended = NULL, DateBudgeted = NULL, DateApproved = NULL WHERE RVNo = ?");
+        PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE RequisitionVoucher SET Status = ?, [To] = ?, Purpose = ?, Requistioner = ?, Remarks = NULL, Approved = NULL, Recommended = NULL, BudgetOfficer = NULL, DateRecommended = NULL, DateBudgeted = NULL, DateApproved = NULL, RVDate = ? WHERE RVNo = ?");
         ps.setString(1, RV.PENDING_RECOMMENDATION);
         ps.setString(2, rv.getTo());
         ps.setString(3, rv.getPurpose());
         ps.setString(4, ActiveUser.getUser().getEmployeeID());
-        ps.setString(5, rv.getRvNo());
+        ps.setDate(5, java.sql.Date.valueOf(rv.getRvDate()));
+        ps.setString(6, rv.getRvNo());
         ps.executeUpdate();
     }
 

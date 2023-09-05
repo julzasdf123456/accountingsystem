@@ -67,7 +67,7 @@ public class EditRVController extends MenuControllerHandler implements Initializ
     private JFXTextField purpose_tf;
 
     @FXML
-    private JFXTextField date_tf;
+    private DatePicker date_tf;
 
     @FXML
     private CheckBox certify_cb;
@@ -152,7 +152,7 @@ public class EditRVController extends MenuControllerHandler implements Initializ
             this.rvno_tf.setText(this.current.getRvNo());
             this.to_tf.setText(this.current.getTo());
             this.purpose_tf.setText(this.current.getPurpose());
-            this.date_tf.setText(this.current.getRvDate().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
+            this.date_tf.setValue(this.current.getRvDate());
             this.prepared_tf.setText((this.current.getRequisitioner().getEmployeeFirstName()+" "+this.current.getRequisitioner().getEmployeeLastName()+" ("+this.current.getRvDate()+")").toUpperCase());
             this.setAmount();
         } catch (Exception e) {
@@ -245,6 +245,7 @@ public class EditRVController extends MenuControllerHandler implements Initializ
                     this.current.setTo(to);
                     this.current.setPurpose(purpose);
                     this.current.setAmount(rvAmount);
+                    this.current.setRvDate(this.date_tf.getValue());
                     RVDAO.submitRevisedRV(this.current);
                     this.certify_cb.setSelected(false);
                     this.add_btn.setDisable(true);

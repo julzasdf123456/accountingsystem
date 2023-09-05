@@ -64,7 +64,7 @@ public class RVController extends MenuControllerHandler implements Initializable
     private JFXTextField purpose_tf;
 
     @FXML
-    private JFXTextField date_tf;
+    private DatePicker date_tf;
 
     @FXML
     private CheckBox certify_cb;
@@ -153,7 +153,7 @@ public class RVController extends MenuControllerHandler implements Initializable
             this.dept = this.emp.getDepartment();
             String d = this.dept.getDepartmentName();
             LocalDate date = Utility.serverDate();
-            this.date_tf.setText(date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
+            this.date_tf.setValue(date);
             this.rvno_tf.setText(date.getYear()+"-"+this.dept.getDepartmentName()+"-"+ (RVDAO.countRv(d)+1));
             this.prepared_tf.setText((this.emp.getEmployeeFirstName()+" "+this.emp.getEmployeeLastName()).toUpperCase());
         } catch (Exception e) {
@@ -252,10 +252,11 @@ public class RVController extends MenuControllerHandler implements Initializable
                     rv.setPurpose(purpose);
                     rv.setAmount(rvAmount);
                     rv.setItems(this.items);
+                    rv.setRvDate(this.date_tf.getValue());
                     RVDAO.createRV(rv);
                     reset();
                     LocalDate date = Utility.serverDate();
-                    this.date_tf.setText(date.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
+                    this.date_tf.setValue(date);
                     this.rvno_tf.setText(date.getYear()+"-"+this.dept.getDepartmentName()+"-"+ (RVDAO.countRv(this.dept.getDepartmentName())+1));
                     AlertDialogBuilder.messgeDialog("Submit RV", "The RV was successfully submitted and awaiting review by your department head!",
                             Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
