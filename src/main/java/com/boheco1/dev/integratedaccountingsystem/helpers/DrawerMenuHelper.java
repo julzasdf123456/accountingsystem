@@ -132,6 +132,12 @@ public class DrawerMenuHelper {
                         @Override
                         public void run() {
                             titleHolder.setText(tooltipText);
+                            //to trigger which account code to save cv or jv since they are using the same UI and controller
+                            if(titleHolder.getText().equals("Check Voucher"))
+                                Utility.VOUCHER_TYPE = Utility.CV;
+                            else if(titleHolder.getText().equals("Journal Voucher"))
+                                Utility.VOUCHER_TYPE = Utility.JV;
+
                             for (int i = 0; i < drawerMenuList.size(); i++) {
                                 drawerMenuList.get(i).getStyleClass().remove("active-menu");
                                 FontIcon fontIcon = (FontIcon) drawerMenuList.get(i).getGraphic();

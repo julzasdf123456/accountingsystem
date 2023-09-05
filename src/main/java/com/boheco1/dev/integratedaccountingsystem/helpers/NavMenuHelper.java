@@ -25,7 +25,7 @@ public class NavMenuHelper {
         try {
             menuButton.setFont(Font.font(menuButton.getFont().getFamily(),14));
             menuButton.setPrefWidth(238);
-            menuButton.setStyle("-fx-alignment: LEFT;");
+            menuButton.setStyle("-fx-alignment: CENTER-LEFT;");
             vBox.getChildren().add(menuButton);
         } catch (Exception e) {
             AlertDialogBuilder.messgeDialog("Error creating menu", "An error occurred while adding the menu " + menuButton.getText() + ". (" + e.getMessage() + ")", stackPane, AlertDialogBuilder.INFO_DIALOG);

@@ -308,9 +308,12 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                 });
 
                 task.setOnFailed(wse -> {
-                    dialog.close();
-                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request! Please try again!",
+
+                    Throwable throwable = task.getException();
+                    throwable.printStackTrace();
+                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request! \nError found: "+ throwable.getMessage(),
                             Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    dialog.close();
                 });
 
                 new Thread(task).start();

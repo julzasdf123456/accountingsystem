@@ -40,6 +40,10 @@ public class Utility {
     public static String APPROVED = "approved";
     public static String UNAVAILABLE = "unavailable";
     public static String MIRS_PATH;
+
+    public static String VOUCHER_TYPE;
+    public static String CV = "cv";
+    public static String JV = "jv";
     public static int OR_NUMBER;
 
     public static String ERROR_MSG="";

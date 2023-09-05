@@ -20,8 +20,11 @@ public class TransactionDetails {
     private String checkNumber;
     private String particulars;
 
+    private String specification;
+
     private String newParticularsLabel;
 
+    private boolean editable;
     private LocalDate depositedDate;
 
     public LocalDate getDepositedDate() {
@@ -45,6 +48,22 @@ public class TransactionDetails {
             return particulars;
         else
             return newParticularsLabel;
+    }
+
+    public String getSpecification() {
+        return specification;
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
+
+    public void setSpecification(String specification) {
+        this.specification = specification;
     }
 
     public String getParticulars() {
