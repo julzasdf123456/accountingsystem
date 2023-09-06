@@ -134,6 +134,79 @@ public class CobDAO {
 
         return cobs;
     }
+
+    /**
+     * Returns a list of all COBs from a department having a particular status e.g. Pending Approval (for users except the budget officer)
+     * @param year - Year of preparation in the APP
+     * @param dept - Department who prepared the COB
+     * @param status - COB status
+     * @param procurable - procurable/non-procurable
+     * @return list of COBs
+     * @throws Exception
+     */
+    public static List<COB> getAll(String year, Department dept, String status, boolean procurable) throws Exception {
+        String sql = "SELECT COBId" +
+                "      ,Activity" +
+                "      ,ct.TypeNo,Type,c.StypeNo,Stype" +
+                "      ,Amount" +
+                "      ,Status, Remarks" +
+                "      ,a.AppId" +
+                "      ,FSId, (SELECT Source FROM FundSource fs WHERE c.FSId = fs.FSId) AS source" +
+                "      ,Prepared" +
+                "      ,DatePrepared" +
+                "      ,Reviewed" +
+                "      ,DateReviewed" +
+                "      ,Approved" +
+                "      ,DateApproved" +
+                "  ,(SELECT COUNT(CItemId) FROM COBItem b WHERE c.COBId = b.COBId) AS NoItems" +
+                "  FROM COB c INNER JOIN App a ON c.AppId = a.AppId INNER JOIN EmployeeInfo ei ON ei.EmployeeID = c.Prepared INNER JOIN Departments d ON ei.DepartmentId = d.DepartmentID INNER JOIN COBSubType ca ON ca.StypeNo = c.StypeNo INNER JOIN COBType ct ON ca.TypeNo = ct.TypeNo" +
+                "  WHERE Year = ? AND d.DepartmentId =? AND Status = ? AND isProcurable = ?" +
+                "  ORDER BY DatePrepared DESC, COBId ASC;";
+
+        PreparedStatement ps = DB.getConnection().prepareStatement(sql);
+        ps.setString(1, year);
+        ps.setString(2, dept.getDepartmentID());
+        ps.setString(3, status);
+        ps.setBoolean(4, procurable);
+        ResultSet rs = ps.executeQuery();
+
+        ArrayList<COB> cobs = new ArrayList<>();
+
+        while(rs.next()) {
+            EmployeeInfo preparedBy = EmployeeDAO.getOne(rs.getString("Prepared"), DB.getConnection());
+            EmployeeInfo reviewedBy = EmployeeDAO.getOne(rs.getString("Reviewed"), DB.getConnection());
+            EmployeeInfo approvedBy = EmployeeDAO.getOne(rs.getString("Approved"), DB.getConnection());
+            COB cob = new COB(
+                    rs.getString("COBId"),
+                    rs.getString("Activity"),
+                    rs.getDouble("Amount"),
+                    rs.getString("Status"),
+                    rs.getString("AppId"),
+                    rs.getString("FSId"),
+                    preparedBy,
+                    rs.getDate("DatePrepared")==null? null: rs.getDate("DatePrepared").toLocalDate(),
+                    reviewedBy,
+                    rs.getDate("DateReviewed")==null? null: rs.getDate("DateReviewed").toLocalDate(),
+                    approvedBy,
+                    rs.getDate("DateApproved")==null? null: rs.getDate("DateApproved").toLocalDate()
+            );
+            cob.setFundSource(new FundSource(rs.getString("FSId"), rs.getString("Source")));
+            COBCategory category = new COBCategory();
+            category.setStypeNo(rs.getInt("STypeNo"));
+            category.setCategory(rs.getString("SType"));
+            cob.setCategory(category);
+            COBType type = new COBType();
+            type.setTypeNo(rs.getInt("TypeNo"));
+            type.setType(rs.getString("Type"));
+            cob.setType(type);
+            cob.setNoOfItems(rs.getInt("NoItems"));
+            cob.setRemarks(rs.getString("Remarks"));
+            cobs.add(cob);
+        }
+
+        return cobs;
+    }
+
     /**
      * Returns a list of all COBs from a department having a particular status e.g. Pending Approval (for users except the budget officer)
      * @param year - Year of preparation in the APP

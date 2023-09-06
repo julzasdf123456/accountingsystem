@@ -173,7 +173,7 @@ public class AddRVItemController extends MenuControllerHandler implements Initia
         String year = this.year_pker.getSelectionModel().getSelectedItem();
         ArrayList data = new ArrayList<>();
         try {
-            List<COB> cobs = CobDAO.getAll(year, ActiveUser.getUser().getEmployeeInfo().getDepartment(), COB.APPROVED);
+            List<COB> cobs = CobDAO.getAll(year, ActiveUser.getUser().getEmployeeInfo().getDepartment(), COB.APPROVED, true);
             for(COB c : cobs){
                 data.add(c.getCobId());
             }
