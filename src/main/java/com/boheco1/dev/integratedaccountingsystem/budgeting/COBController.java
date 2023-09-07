@@ -10,6 +10,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -84,6 +85,8 @@ public class COBController extends MenuControllerHandler implements Initializabl
     private ProgressBar progressBar;
 
     private ObservableList<COBItem> items = FXCollections.observableArrayList(new ArrayList<>());
+    private SortedList<COBItem> sortedData = new SortedList<>(items);
+
     private APP app = null;
     private DeptThreshold threshold = null;
     private double totalAppropriations = 0, cobAmount = 0, appropFromDB = 0;
@@ -129,7 +132,10 @@ public class COBController extends MenuControllerHandler implements Initializabl
                 }
                 this.disableItemControls(false);
             }
-            this.cob_items.setItems(FXCollections.observableArrayList(new ArrayList<>()));
+            this.items = FXCollections.observableArrayList(new ArrayList<>());
+            this.sortedData =  new SortedList<>(this.items);
+            this.sortedData.comparatorProperty().bind(this.cob_items.comparatorProperty());
+            this.cob_items.setItems(this.sortedData);
             this.cob_items.refresh();
         });
         try {
@@ -154,7 +160,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
         }
 
         this.createTable();
-
+        this.sortedData.comparatorProperty().bind(this.cob_items.comparatorProperty());
         this.add_btn.setOnAction(evt -> {
             showForms(null);
         });
@@ -181,21 +187,71 @@ public class COBController extends MenuControllerHandler implements Initializabl
 
             MenuItem remove = new MenuItem("Remove Item");
             remove.setOnAction(actionEvent -> {
-                this.cob_items.getItems().remove(row.getItem());
+                this.items.remove(row.getItem());
                 this.cob_items.refresh();
                 this.setAmount();
             });
 
+            MenuItem up = new MenuItem("Move Up");
+            up.setOnAction(actionEvent -> {
+                if (row.getIndex() == 0) {
+
+                }else{
+                    //Get item above position
+                    COBItem above = this.items.get(row.getIndex()-1);
+                    int pos = above.getSequence();
+                    System.out.println("Position Above: "+pos);
+                    //Get current sequence
+                    int curr = row.getItem().getSequence();
+                    System.out.println("Current Position: "+curr);
+
+                    row.getItem().setSequence(pos);
+                    above.setSequence(curr);
+
+                    //set parent to null
+                    row.getItem().setParent(null);
+                    this.cob_items.sort();
+                }
+            });
+
             MenuItem child = new MenuItem("=>");
             child.setOnAction(actionEvent -> {
-                row.getItem().setLevel(2);
+                for (int n = row.getIndex(); n > 0; n--) {
+                    if (this.items.get(n - 1).getCost() == 0) {
+                        row.getItem().setParent(this.items.get(n - 1));
+                        row.getItem().setLevel(2);
+                        break;
+                    }
+                }
                 this.cob_items.refresh();
             });
 
             MenuItem parent = new MenuItem("<=");
             parent.setOnAction(actionEvent -> {
                 row.getItem().setLevel(1);
+                row.getItem().setParent(null);
                 this.cob_items.refresh();
+            });
+
+            MenuItem down = new MenuItem("Move Down");
+            down.setOnAction(actionEvent -> {
+                //Dont move down if already last
+                if (row.getIndex() == this.items.size() - 1) {
+
+                }else{
+                    //Get item below position
+                    COBItem below = this.items.get(row.getIndex()+1);
+                    int pos = below.getSequence();
+                    //Get current sequence
+                    int curr = row.getItem().getSequence();
+
+                    row.getItem().setSequence(pos);
+                    below.setSequence(curr);
+
+                    //set parent to null
+                    row.getItem().setParent(null);
+                    this.cob_items.sort();
+                }
             });
 
             MenuItem dist = new MenuItem("Distribute Per Qtr");
@@ -323,6 +379,13 @@ public class COBController extends MenuControllerHandler implements Initializabl
      * @return void
      */
     public void createTable(){
+        TableColumn<COBItem, String> column0 = new TableColumn<>("No");
+        column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getSequence()+""));
+        column0.setPrefWidth(40);
+        column0.setMaxWidth(40);
+        column0.setMinWidth(40);
+        column0.setStyle("-fx-alignment: center;");
+
         TableColumn<COBItem, String> column = new TableColumn<>("Particulars");
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getLevel() == 1 ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
         column.setStyle("-fx-alignment: center-left;");
@@ -393,6 +456,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
         this.cob_items.setFixedCellSize(35);
         this.cob_items.setPlaceholder(new Label("No Items added"));
 
+        this.cob_items.getColumns().add(column0);
         this.cob_items.getColumns().add(column);
         this.cob_items.getColumns().add(column1);
         this.cob_items.getColumns().add(column2);
@@ -403,6 +467,8 @@ public class COBController extends MenuControllerHandler implements Initializabl
         this.cob_items.getColumns().add(column6);
         this.cob_items.getColumns().add(column7);
         this.cob_items.getColumns().add(column8);
+        column0.setSortType(TableColumn.SortType.ASCENDING);
+        this.cob_items.getSortOrder().addAll(column0);
     }
 
     /**
@@ -410,6 +476,14 @@ public class COBController extends MenuControllerHandler implements Initializabl
      * @return void
      */
     public void createRepresentationTable(){
+        TableColumn<COBItem, String> column0 = new TableColumn<>("No");
+        column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getSequence()+""));
+        column0.setPrefWidth(40);
+        column0.setMaxWidth(40);
+        column0.setMinWidth(40);
+        column0.setStyle("-fx-alignment: center;");
+
+
         TableColumn<Representation, String> column = new TableColumn<>("Particulars");
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getLevel() == 1 ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
         column.setStyle("-fx-alignment: center-left;");
@@ -459,6 +533,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
         this.cob_items.setFixedCellSize(35);
         this.cob_items.setPlaceholder(new Label("No Items added"));
 
+        this.cob_items.getColumns().add(column0);
         this.cob_items.getColumns().add(column);
         this.cob_items.getColumns().add(column1);
         this.cob_items.getColumns().add(column2);
@@ -466,6 +541,8 @@ public class COBController extends MenuControllerHandler implements Initializabl
         this.cob_items.getColumns().add(column4);
         this.cob_items.getColumns().add(column41);
         this.cob_items.getColumns().add(column42);
+        column0.setSortType(TableColumn.SortType.ASCENDING);
+        this.cob_items.getSortOrder().addAll(column0);
     }
 
     /**
@@ -473,6 +550,13 @@ public class COBController extends MenuControllerHandler implements Initializabl
      * @return void
      */
     public void createTravelsTable(){
+        TableColumn<COBItem, String> column0 = new TableColumn<>("No");
+        column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getSequence()+""));
+        column0.setPrefWidth(40);
+        column0.setMaxWidth(40);
+        column0.setMinWidth(40);
+        column0.setStyle("-fx-alignment: center;");
+
         TableColumn<Travel, String> column = new TableColumn<>("Particulars");
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getLevel() == 1 ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
         column.setStyle("-fx-alignment: center-left;");
@@ -585,6 +669,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
         this.cob_items.setFixedCellSize(35);
         this.cob_items.setPlaceholder(new Label("No Items added"));
 
+        this.cob_items.getColumns().add(column0);
         this.cob_items.getColumns().add(column);
         this.cob_items.getColumns().add(column1);
         this.cob_items.getColumns().add(column2);
@@ -601,6 +686,8 @@ public class COBController extends MenuControllerHandler implements Initializabl
         this.cob_items.getColumns().add(column6);
         this.cob_items.getColumns().add(column7);
         this.cob_items.getColumns().add(column8);
+        column0.setSortType(TableColumn.SortType.ASCENDING);
+        this.cob_items.getSortOrder().addAll(column0);
     }
 
     /**
@@ -608,6 +695,13 @@ public class COBController extends MenuControllerHandler implements Initializabl
      * @return void
      */
     public void createSalariesTable(){
+        TableColumn<COBItem, String> column0 = new TableColumn<>("No");
+        column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getSequence()+""));
+        column0.setPrefWidth(40);
+        column0.setMaxWidth(40);
+        column0.setMinWidth(40);
+        column0.setStyle("-fx-alignment: center;");
+
         TableColumn<Salary, String> column = new TableColumn<>("Particulars");
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getLevel() == 1 ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
         column.setStyle("-fx-alignment: center-left;");
@@ -677,7 +771,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
 
         this.cob_items.setFixedCellSize(35);
         this.cob_items.setPlaceholder(new Label("No Items added"));
-
+        this.cob_items.getColumns().add(column0);
         this.cob_items.getColumns().add(column);
         this.cob_items.getColumns().add(column1);
         this.cob_items.getColumns().add(column2);
@@ -688,6 +782,8 @@ public class COBController extends MenuControllerHandler implements Initializabl
         this.cob_items.getColumns().add(column45);
         this.cob_items.getColumns().add(column46);
         this.cob_items.getColumns().add(column47);
+        column0.setSortType(TableColumn.SortType.ASCENDING);
+        this.cob_items.getSortOrder().addAll(column0);
     }
 
     /**
@@ -902,7 +998,7 @@ public class COBController extends MenuControllerHandler implements Initializabl
     }
 
     public void setTable() {
-        this.cob_items.setItems(this.items);
+        this.cob_items.setItems(this.sortedData);
     }
 
     public void setAmount(){
@@ -946,7 +1042,12 @@ public class COBController extends MenuControllerHandler implements Initializabl
                 @Override
                 protected Void call() {
                     COBItem item = (COBItem) o;
-                    item.setSequence(items.size()+1);
+                    int current_size = items.size();
+                    if (current_size == 0) {
+                        item.setSequence(1);
+                    }else {
+                        item.setSequence(items.get(current_size-1).getSequence() + 1);
+                    }
                     items.add(item);
                     return null;
                 }

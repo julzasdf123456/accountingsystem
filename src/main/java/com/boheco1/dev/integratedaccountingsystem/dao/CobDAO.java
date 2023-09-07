@@ -515,6 +515,8 @@ public class CobDAO {
         String item_sql = "INSERT INTO COBItem (CItemId, ItemId, COBId, Qty, Remarks, Description, Cost, Qtr1, Qtr2, Qtr3, Qtr4, Sequence, NoOfTimes, Level) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?, ?)";
 
+        String item_parent_sql = "UPDATE COBItem SET Parent = ? WHERE CItemId = ?";
+
         String subtype = "";
         if (cob.getCategory().getCategory().equals(COBItem.TYPES[1])){
             subtype = "INSERT INTO Representation (reprnAllowance, reimbursableAllowance, otherAllowance, CItemId) " +
@@ -530,6 +532,7 @@ public class CobDAO {
         //Prepared statements
         PreparedStatement ps_cob = DB.getConnection().prepareStatement(cob_sql);
         PreparedStatement ps_item = DB.getConnection().prepareStatement(item_sql);
+        PreparedStatement ps_item_parent = DB.getConnection().prepareStatement(item_parent_sql);
         PreparedStatement ps_sub = DB.getConnection().prepareStatement(subtype);
 
         //Transact
@@ -595,6 +598,14 @@ public class CobDAO {
                     ps_sub.executeUpdate();
                 }
             }
+
+            //Update cob item parent
+            for (COBItem item : cob.getItems()) {
+                ps_item_parent.setString(1, item.getParent() != null ? item.getParent().getcItemId() : null);
+                ps_item_parent.setString(2, item.getcItemId());
+                ps_item_parent.executeUpdate();
+            }
+
             //Commit insert
             conn.commit();
         }catch (SQLException e){

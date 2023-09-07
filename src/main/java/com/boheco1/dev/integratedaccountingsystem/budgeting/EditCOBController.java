@@ -126,8 +126,6 @@ public class EditCOBController extends MenuControllerHandler implements Initiali
             this.threshold_lbl.setText("");
         }
 
-        this.createTable();
-
         this.add_btn.setOnAction(evt -> {
             showForms(null);
         });
@@ -163,20 +161,27 @@ public class EditCOBController extends MenuControllerHandler implements Initiali
 
             MenuItem child = new MenuItem("=>");
             child.setOnAction(actionEvent -> {
-                try {
-                    CobItemDAO.changeLevel(row.getItem(), 2);
-                    row.getItem().setLevel(2);
-                    this.cob_items.refresh();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                for (int n = row.getIndex(); n > 0; n--) {
+                    if (this.items.get(n - 1).getCost() == 0) {
+                        try {
+                            row.getItem().setParent(this.items.get(n - 1));
+                            row.getItem().setLevel(2);
+                            CobItemDAO.changeLevel(row.getItem(), 2);
+                            this.cob_items.refresh();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    }
                 }
             });
 
             MenuItem parent = new MenuItem("<=");
             parent.setOnAction(actionEvent -> {
                 try {
-                    CobItemDAO.changeLevel(row.getItem(), 1);
+                    row.getItem().setParent(null);
                     row.getItem().setLevel(1);
+                    CobItemDAO.changeLevel(row.getItem(), 1);
                     this.cob_items.refresh();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -320,6 +325,13 @@ public class EditCOBController extends MenuControllerHandler implements Initiali
      * @return void
      */
     public void createTable(){
+        TableColumn<COBItem, String> column0 = new TableColumn<>("No");
+        column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getSequence()+""));
+        column0.setPrefWidth(40);
+        column0.setMaxWidth(40);
+        column0.setMinWidth(40);
+        column0.setStyle("-fx-alignment: center;");
+
         TableColumn<COBItem, String> column = new TableColumn<>("Particulars");
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getLevel() == 1 ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
         column.setStyle("-fx-alignment: center-left;");
@@ -390,6 +402,7 @@ public class EditCOBController extends MenuControllerHandler implements Initiali
         this.cob_items.setFixedCellSize(35);
         this.cob_items.setPlaceholder(new Label("No Items added"));
 
+        this.cob_items.getColumns().add(column0);
         this.cob_items.getColumns().add(column);
         this.cob_items.getColumns().add(column1);
         this.cob_items.getColumns().add(column2);
@@ -407,6 +420,13 @@ public class EditCOBController extends MenuControllerHandler implements Initiali
      * @return void
      */
     public void createRepresentationTable(){
+        TableColumn<COBItem, String> column0 = new TableColumn<>("No");
+        column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getSequence()+""));
+        column0.setPrefWidth(40);
+        column0.setMaxWidth(40);
+        column0.setMinWidth(40);
+        column0.setStyle("-fx-alignment: center;");
+
         TableColumn<Representation, String> column = new TableColumn<>("Particulars");
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getLevel() == 1 ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
         column.setStyle("-fx-alignment: center-left;");
@@ -456,6 +476,7 @@ public class EditCOBController extends MenuControllerHandler implements Initiali
         this.cob_items.setFixedCellSize(35);
         this.cob_items.setPlaceholder(new Label("No Items added"));
 
+        this.cob_items.getColumns().add(column0);
         this.cob_items.getColumns().add(column);
         this.cob_items.getColumns().add(column1);
         this.cob_items.getColumns().add(column2);
@@ -470,6 +491,13 @@ public class EditCOBController extends MenuControllerHandler implements Initiali
      * @return void
      */
     public void createTravelsTable(){
+        TableColumn<COBItem, String> column0 = new TableColumn<>("No");
+        column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getSequence()+""));
+        column0.setPrefWidth(40);
+        column0.setMaxWidth(40);
+        column0.setMinWidth(40);
+        column0.setStyle("-fx-alignment: center;");
+
         TableColumn<Travel, String> column = new TableColumn<>("Particulars");
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getLevel() == 1 ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
         column.setStyle("-fx-alignment: center-left;");
@@ -582,6 +610,7 @@ public class EditCOBController extends MenuControllerHandler implements Initiali
         this.cob_items.setFixedCellSize(35);
         this.cob_items.setPlaceholder(new Label("No Items added"));
 
+        this.cob_items.getColumns().add(column0);
         this.cob_items.getColumns().add(column);
         this.cob_items.getColumns().add(column1);
         this.cob_items.getColumns().add(column2);
@@ -605,6 +634,13 @@ public class EditCOBController extends MenuControllerHandler implements Initiali
      * @return void
      */
     public void createSalariesTable(){
+        TableColumn<COBItem, String> column0 = new TableColumn<>("No");
+        column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getSequence()+""));
+        column0.setPrefWidth(40);
+        column0.setMaxWidth(40);
+        column0.setMinWidth(40);
+        column0.setStyle("-fx-alignment: center;");
+
         TableColumn<Salary, String> column = new TableColumn<>("Particulars");
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getLevel() == 1 ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
         column.setStyle("-fx-alignment: center-left;");
@@ -675,6 +711,7 @@ public class EditCOBController extends MenuControllerHandler implements Initiali
         this.cob_items.setFixedCellSize(35);
         this.cob_items.setPlaceholder(new Label("No Items added"));
 
+        this.cob_items.getColumns().add(column0);
         this.cob_items.getColumns().add(column);
         this.cob_items.getColumns().add(column1);
         this.cob_items.getColumns().add(column2);
@@ -1024,6 +1061,19 @@ public class EditCOBController extends MenuControllerHandler implements Initiali
             this.fs_cb.getSelectionModel().select(select);
             this.type_tf.setText(this.current.getType().getType());
             this.category_tf.setText(this.current.getCategory().getCategory());
+
+            if (this.current.getCategory().getCategory().equals(COBItem.TYPES[0])) {
+                this.createTable();
+            }else if (this.current.getCategory().getCategory().equals(COBItem.TYPES[1])) {
+                this.createRepresentationTable();
+            }else if (this.current.getCategory().getCategory().equals(COBItem.TYPES[2])) {
+                this.createSalariesTable();
+            }else if (this.current.getCategory().getCategory().equals(COBItem.TYPES[3])) {
+                this.createTravelsTable();
+            }else{
+                this.createTable();
+            }
+
             this.items = FXCollections.observableArrayList(this.current.getItems());
             this.cob_items.setItems(this.items);
             this.cob_items.refresh();

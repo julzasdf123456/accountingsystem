@@ -18,6 +18,7 @@ public class COBItem extends Item{
     private double qtr4 = 0;
     private double amount=0;
     private String cobId;
+    private COBItem parent;
 
     public COBItem(){}
 
@@ -164,5 +165,13 @@ public class COBItem extends Item{
 
     public int getRemainingRV(){
         return this.qty - this.poItemsQty;
+    }
+
+    public COBItem getParent() {
+        return parent;
+    }
+
+    public void setParent(COBItem parent) {
+        this.parent = parent;
     }
 }

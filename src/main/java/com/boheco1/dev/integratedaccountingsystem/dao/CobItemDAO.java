@@ -227,9 +227,13 @@ public class CobItemDAO {
      */
     public static void changeLevel(COBItem item, int level) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "UPDATE COBItem SET Level = ? WHERE CItemId=?");
+                "UPDATE COBItem SET Level = ?, Parent = ? WHERE CItemId=?");
+        String parent = null;
+        if (item.getParent() != null)
+            parent = item.getParent().getcItemId();
         ps.setInt(1, level);
-        ps.setString(2, item.getcItemId());
+        ps.setString(2, parent);
+        ps.setString(3, item.getcItemId());
         ps.executeUpdate();
     }
 

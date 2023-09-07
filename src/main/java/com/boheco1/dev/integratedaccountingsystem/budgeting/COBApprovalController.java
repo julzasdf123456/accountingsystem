@@ -203,6 +203,13 @@ public class COBApprovalController extends MenuControllerHandler implements Init
      * @return void
      */
     public void createTable(){
+        TableColumn<COBItem, String> column0 = new TableColumn<>("No");
+        column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getSequence()+""));
+        column0.setPrefWidth(40);
+        column0.setMaxWidth(40);
+        column0.setMinWidth(40);
+        column0.setStyle("-fx-alignment: center;");
+
         TableColumn<COBItem, String> column = new TableColumn<>("Particulars");
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getLevel() == 1 ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
         column.setStyle("-fx-alignment: center-left;");
@@ -273,6 +280,7 @@ public class COBApprovalController extends MenuControllerHandler implements Init
         this.cob_items.setFixedCellSize(35);
         this.cob_items.setPlaceholder(new Label("No Items added"));
 
+        this.cob_items.getColumns().add(column0);
         this.cob_items.getColumns().add(column);
         this.cob_items.getColumns().add(column1);
         this.cob_items.getColumns().add(column2);
@@ -289,6 +297,13 @@ public class COBApprovalController extends MenuControllerHandler implements Init
      * @return void
      */
     public void createRepresentationTable(){
+        TableColumn<COBItem, String> column0 = new TableColumn<>("No");
+        column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getSequence()+""));
+        column0.setPrefWidth(40);
+        column0.setMaxWidth(40);
+        column0.setMinWidth(40);
+        column0.setStyle("-fx-alignment: center;");
+
         TableColumn<Representation, String> column = new TableColumn<>("Particulars");
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getLevel() == 1 ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
         column.setStyle("-fx-alignment: center-left;");
@@ -338,6 +353,7 @@ public class COBApprovalController extends MenuControllerHandler implements Init
         this.cob_items.setFixedCellSize(35);
         this.cob_items.setPlaceholder(new Label("No Items added"));
 
+        this.cob_items.getColumns().add(column0);
         this.cob_items.getColumns().add(column);
         this.cob_items.getColumns().add(column1);
         this.cob_items.getColumns().add(column2);
@@ -352,6 +368,13 @@ public class COBApprovalController extends MenuControllerHandler implements Init
      * @return void
      */
     public void createTravelsTable(){
+        TableColumn<COBItem, String> column0 = new TableColumn<>("No");
+        column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getSequence()+""));
+        column0.setPrefWidth(40);
+        column0.setMaxWidth(40);
+        column0.setMinWidth(40);
+        column0.setStyle("-fx-alignment: center;");
+
         TableColumn<Travel, String> column = new TableColumn<>("Particulars");
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getLevel() == 1 ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
         column.setStyle("-fx-alignment: center-left;");
@@ -464,6 +487,7 @@ public class COBApprovalController extends MenuControllerHandler implements Init
         this.cob_items.setFixedCellSize(35);
         this.cob_items.setPlaceholder(new Label("No Items added"));
 
+        this.cob_items.getColumns().add(column0);
         this.cob_items.getColumns().add(column);
         this.cob_items.getColumns().add(column1);
         this.cob_items.getColumns().add(column2);
@@ -487,6 +511,13 @@ public class COBApprovalController extends MenuControllerHandler implements Init
      * @return void
      */
     public void createSalariesTable(){
+        TableColumn<COBItem, String> column0 = new TableColumn<>("No");
+        column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getSequence()+""));
+        column0.setPrefWidth(40);
+        column0.setMaxWidth(40);
+        column0.setMinWidth(40);
+        column0.setStyle("-fx-alignment: center;");
+
         TableColumn<Salary, String> column = new TableColumn<>("Particulars");
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getLevel() == 1 ? obj.getValue().getDescription() : "  "+obj.getValue().getDescription()));
         column.setStyle("-fx-alignment: center-left;");
@@ -557,6 +588,7 @@ public class COBApprovalController extends MenuControllerHandler implements Init
         this.cob_items.setFixedCellSize(35);
         this.cob_items.setPlaceholder(new Label("No Items added"));
 
+        this.cob_items.getColumns().add(column0);
         this.cob_items.getColumns().add(column);
         this.cob_items.getColumns().add(column1);
         this.cob_items.getColumns().add(column2);
