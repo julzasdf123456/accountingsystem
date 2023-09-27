@@ -15,6 +15,9 @@ public class SlimStock {
     private String RRNo;
     private String Code;
     private String localDescription;
+    private boolean controlled;
+    private boolean individualized;
+    private int critical;
 
     public SlimStock(){}
 
@@ -129,5 +132,29 @@ public class SlimStock {
 
     public void setLocalDescription(String localDescription) {
         this.localDescription = localDescription;
+    }
+
+    public boolean isControlled() {
+        return controlled;
+    }
+
+    public void setControlled(boolean controlled) {
+        this.controlled = controlled;
+    }
+
+    public boolean isIndividualized() {
+        return individualized;
+    }
+
+    public void setIndividualized(boolean individualized) {
+        this.individualized = individualized;
+    }
+
+    public int getCritical() {
+        return critical;
+    }
+
+    public void setCritical(int critical) {
+        this.critical = critical;
     }
 }

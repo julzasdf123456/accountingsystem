@@ -26,8 +26,8 @@ public class StockDAO {
                         "ValidityDate, TypeID, Unit, " +
                         "Quantity, Price, NEACode, " +
                         "IsTrashed, Comments, CreatedAt, " +
-                        "UserIDCreated, Critical, id, LocalCode, AcctgCode, Individualized, localDescription) " +
-                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?,?,?,?,?,?,?)");
+                        "UserIDCreated, Critical, id, LocalCode, AcctgCode, Individualized, localDescription, Controlled) " +
+                        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,GETDATE(),?,?,?,?,?,?,?,?)");
 
         if(stock.getId()==null) stock.setId(Utility.generateRandomId());
 
@@ -60,6 +60,7 @@ public class StockDAO {
 
         ps.setBoolean(20, stock.isIndividualized());
         ps.setString(21, stock.getLocalDescription());
+        ps.setBoolean(22, stock.isControlled());
         ps.executeUpdate();
 
         ps.close();
@@ -145,6 +146,7 @@ public class StockDAO {
                     rs.getBoolean("Individualized")
             );
             stock.setLocalDescription(rs.getString("localDescription"));
+            stock.setControlled(rs.getBoolean("Controlled"));
             rs.close();
 
             return stock;
@@ -193,6 +195,7 @@ public class StockDAO {
                     rs.getBoolean("Individualized")
             );
             stock.setLocalDescription(rs.getString("localDescription"));
+            stock.setControlled(rs.getBoolean("Controlled"));
             rs.close();
 
             return stock;
@@ -267,7 +270,7 @@ public class StockDAO {
                         "ValidityDate=?, TypeID=?, Unit=?," +
                         "Quantity=?, Price=?, NEACode=?," +
                         "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=?, Critical=?," +
-                        "LocalCode=?, AcctgCode=?, Individualized=?, localDescription=? " +
+                        "LocalCode=?, AcctgCode=?, Individualized=?, localDescription=?, Controlled=? " +
                         "WHERE id=?");
 
         Stock oldStock = StockDAO.get(stock.getId());
@@ -305,7 +308,8 @@ public class StockDAO {
         ps.setString(17, stock.getAcctgCode());
         ps.setBoolean(18, stock.isIndividualized());
         ps.setString(19, stock.getLocalDescription());
-        ps.setString(20, stock.getId());
+        ps.setBoolean(20, stock.isControlled());
+        ps.setString(21, stock.getId());
         ps.executeUpdate();
 
         //create a Stock History if price was updated.
@@ -337,7 +341,7 @@ public class StockDAO {
                         "ValidityDate=?, TypeID=?, Unit=?," +
                         "Price=?, NEACode=?," +
                         "Comments=?, UpdatedAt=GETDATE(), UserIDCreated=?, " +
-                        "LocalCode=?, AcctgCode=? " +
+                        "LocalCode=?, AcctgCode=?, Controlled=?, Individualized=? " +
                         "WHERE id=?");
         Stock oldStock = StockDAO.get(stock.getId());
         ps.setString(1, stock.getStockName());
@@ -369,8 +373,9 @@ public class StockDAO {
         ps.setString(13, ActiveUser.getUser().getId());
         ps.setString(14, stock.getLocalCode());
         ps.setString(15, stock.getAcctgCode());
-        ps.setString(16, stock.getId());
-
+        ps.setBoolean(16, stock.isControlled());
+        ps.setBoolean(17, stock.isIndividualized());
+        ps.setString(18, stock.getId());
         ps.executeUpdate();
 
         //create a Stock History if price was updated.
@@ -395,7 +400,7 @@ public class StockDAO {
      */
     public static List<SlimStock> search(String key, int trashed) throws Exception  {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "Select TOP 50 id, StockName, Brand, Model, Description, localDescription, Price, Unit, Quantity, NEACode, LocalCode FROM Stocks " +
+                "Select TOP 50 id, StockName, Brand, Model, Description, localDescription, Price, Unit, Quantity, NEACode, LocalCode, Critical, Individualized, Controlled FROM Stocks " +
                         "WHERE (StockName LIKE ? OR Description LIKE ? OR Brand LIKE ? OR Model LIKE ? OR localDescription LIKE ?) " +
                         "AND IsTrashed=? ORDER BY Description");
         ps.setString(1, "%" + key + "%");
@@ -425,6 +430,9 @@ public class StockDAO {
             }else{
                 stock.setCode(rs.getString("LocalCode"));
             }
+            stock.setCritical(rs.getInt("Critical"));
+            stock.setIndividualized(rs.getBoolean("Individualized"));
+            stock.setControlled(rs.getBoolean("Controlled"));
             stocks.add(stock);
         }
 
@@ -486,7 +494,7 @@ public class StockDAO {
      */
     public static List<SlimStock> search_available_in_rr(String key) throws Exception  {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "Select TOP 50 Stocks.id, StockName, Brand, Model, Description, localDescription, StockEntryLogs.Price, Unit, Stocks.Quantity as Quantity, RRNo, NEACode, LocalCode FROM Stocks INNER JOIN StockEntryLogs ON Stocks.id = StockEntryLogs.StockID " +
+                "Select TOP 50 Stocks.id, StockName, Brand, Model, Description, localDescription, StockEntryLogs.Price, Unit, Stocks.Quantity as Quantity, RRNo, NEACode, LocalCode, Critical, Individualized, Controlled FROM Stocks INNER JOIN StockEntryLogs ON Stocks.id = StockEntryLogs.StockID " +
                         "WHERE (StockName LIKE ? OR Description LIKE ? OR Brand LIKE ? OR Model LIKE ? OR localDescription LIKE ?) AND RRno IS NOT NULL " +
                         "AND IsTrashed=0 AND Stocks.Quantity > 0 ORDER BY RRNo");
         ps.setString(1, "%" + key + "%");
@@ -516,6 +524,9 @@ public class StockDAO {
             }else{
                 stock.setCode(rs.getString("LocalCode"));
             }
+            stock.setCritical(rs.getInt("Critical"));
+            stock.setIndividualized(rs.getBoolean("Individualized"));
+            stock.setControlled(rs.getBoolean("Controlled"));
             stocks.add(stock);
         }
 
@@ -566,6 +577,9 @@ public class StockDAO {
             }else{
                 stock.setCode(rs.getString("LocalCode"));
             }
+            stock.setCritical(rs.getInt("Critical"));
+            stock.setIndividualized(rs.getBoolean("Individualized"));
+            stock.setControlled(rs.getBoolean("Controlled"));
             stocks.add(stock);
         }
 
@@ -873,7 +887,7 @@ public class StockDAO {
         ArrayList<Stock> trashedStocks = new ArrayList<>();
 
         while(rs.next()) {
-            trashedStocks.add(new Stock(
+            Stock stock = new Stock(
                     rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
@@ -899,7 +913,9 @@ public class StockDAO {
                     rs.getString("LocalCode"),
                     rs.getString("AcctgCode"),
                     rs.getBoolean("Individualized")
-            ));
+            );
+            stock.setControlled(rs.getBoolean("Controlled"));
+            trashedStocks.add(stock);
         }
 
         rs.close();
@@ -924,7 +940,7 @@ public class StockDAO {
         ArrayList<Stock> criticalStocks = new ArrayList<>();
 
         while(rs.next()) {
-            criticalStocks.add(new Stock(
+            Stock stock = new Stock(
                     rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
@@ -950,7 +966,9 @@ public class StockDAO {
                     rs.getString("LocalCode"),
                     rs.getString("AcctgCode"),
                     rs.getBoolean("Individualized")
-            ));
+            );
+            stock.setControlled(rs.getBoolean("Controlled"));
+            criticalStocks.add(stock);
         }
 
         rs.close();
@@ -980,7 +998,7 @@ public class StockDAO {
         ArrayList<Stock> criticalStocks = new ArrayList<>();
 
         while(rs.next()) {
-            criticalStocks.add(new Stock(
+            Stock stock = new Stock(
                     rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
@@ -1006,8 +1024,9 @@ public class StockDAO {
                     rs.getString("LocalCode"),
                     rs.getString("AcctgCode"),
                     rs.getBoolean("Individualized")
-
-            ));
+            );
+            stock.setControlled(rs.getBoolean("Controlled"));
+            criticalStocks.add(stock);
         }
 
         rs.close();
@@ -1133,7 +1152,7 @@ public class StockDAO {
         ArrayList<Stock> stocks = new ArrayList<>();
 
         while(rs.next()) {
-            stocks.add(new Stock(
+            Stock stock = new Stock(
                     rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
@@ -1159,7 +1178,9 @@ public class StockDAO {
                     rs.getString("LocalCode"),
                     rs.getString("AcctgCode"),
                     rs.getBoolean("Individualized")
-            ));
+            );
+            stock.setControlled(rs.getBoolean("Controlled"));
+            stocks.add(stock);
         }
 
         rs.close();
@@ -1182,7 +1203,7 @@ public class StockDAO {
         ArrayList<Stock> stocks = new ArrayList<>();
 
         while(rs.next()) {
-            stocks.add(new Stock(
+            Stock stock = new Stock(
                     rs.getString("id"),
                     rs.getString("StockName"),
                     rs.getString("Description"),
@@ -1208,7 +1229,9 @@ public class StockDAO {
                     rs.getString("LocalCode"),
                     rs.getString("AcctgCode"),
                     rs.getBoolean("Individualized")
-            ));
+            );
+            stock.setControlled(rs.getBoolean("Controlled"));
+            stocks.add(stock);
         }
 
         rs.close();
@@ -1267,6 +1290,7 @@ public class StockDAO {
                     rs.getString("AcctgCode"),
                     rs.getBoolean("Individualized")
             );
+            stock.setControlled(rs.getBoolean("Controlled"));
             StockEntryLog log = new StockEntryLog();
             log.setId(rs.getString("entryID"));
             log.setStockID(rs.getString("id"));
@@ -1342,6 +1366,7 @@ public class StockDAO {
                     rs.getString("AcctgCode"),
                     rs.getBoolean("Individualized")
             );
+            stock.setControlled(rs.getBoolean("Controlled"));
             StockEntryLog log = new StockEntryLog();
             log.setId(rs.getString("entryID"));
             log.setStockID(rs.getString("id"));
@@ -1412,6 +1437,7 @@ public class StockDAO {
                     rs.getString("AcctgCode"),
                     rs.getBoolean("Individualized")
             );
+            stock.setControlled(rs.getBoolean("Controlled"));
             Releasing log = new Releasing();
             log.setId(rs.getString("releasedID"));
             log.setStockID(rs.getString("id"));
@@ -1487,6 +1513,7 @@ public class StockDAO {
                     rs.getString("AcctgCode"),
                     rs.getBoolean("Individualized")
             );
+            stock.setControlled(rs.getBoolean("Controlled"));
             stocks.add(stock);
         }
 
@@ -1593,7 +1620,7 @@ public class StockDAO {
 
     public static List<SlimStock> getByDescription(String description) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT id, StockName, Brand, Model, Description, Price, Unit, Quantity FROM Stocks " +
+                "SELECT id, StockName, Brand, Model, Description, Price, Unit, Quantity, Critical, Individualized, Controlled FROM Stocks " +
                         "WHERE Description=? and Quantity > 0 and PRICE > 0 ORDER BY Brand");
 
         ps.setString(1, description);
@@ -1611,6 +1638,9 @@ public class StockDAO {
             stock.setPrice(rs.getDouble("Price"));
             stock.setUnit(rs.getString("Unit"));
             stock.setQuantity(rs.getInt("Quantity"));
+            stock.setCritical(rs.getInt("Critical"));
+            stock.setIndividualized(rs.getBoolean("Individualized"));
+            stock.setControlled(rs.getBoolean("Controlled"));
             stocks.add(stock);
         }
 

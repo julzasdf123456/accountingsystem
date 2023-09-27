@@ -2,6 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem.objects;
 
 public class MRTItem {
     private String id;
+    private String Code;
     private String releasingID;
     private String mrtID;
     private int quantity;
@@ -51,5 +52,13 @@ public class MRTItem {
 
     public void setStockID(String stockID) {
         this.stockID = stockID;
+    }
+
+    public String getCode() {
+        return Code;
+    }
+
+    public void setCode(String code) {
+        Code = code;
     }
 }

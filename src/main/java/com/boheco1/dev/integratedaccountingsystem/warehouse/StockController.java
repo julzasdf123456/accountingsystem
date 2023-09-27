@@ -162,23 +162,28 @@ public class StockController extends MenuControllerHandler implements Initializa
         column2.setCellValueFactory(new PropertyValueFactory<>("description"));
         column2.setStyle("-fx-alignment: center-left;");
 
-        TableColumn<SlimStock, String> column3 = new TableColumn<>("Brand");
-        column3.setMinWidth(175);
-        column3.setCellValueFactory(new PropertyValueFactory<>("brand"));
-        column3.setStyle("-fx-alignment: center-left;");
+        TableColumn<SlimStock, String> column3 = new TableColumn<>("Type");
+        column3.setMinWidth(75);
+        column3.setCellValueFactory(stock -> new ReadOnlyObjectWrapper<>(stock.getValue().isControlled() ? "Controlled": "Local"));
+        column3.setStyle("-fx-alignment: center;");
 
-        TableColumn<SlimStock, String> column4 = new TableColumn<>("Model");
-        column4.setMinWidth(175);
-        column4.setCellValueFactory(new PropertyValueFactory<>("model"));
-        column4.setStyle("-fx-alignment: center-left;");
+        TableColumn<SlimStock, String> column31 = new TableColumn<>("Individual");
+        column31.setMinWidth(75);
+        column31.setCellValueFactory(stock -> new ReadOnlyObjectWrapper<>(stock.getValue().isIndividualized() ? "Yes": "No"));
+        column31.setStyle("-fx-alignment: center;");
 
-        TableColumn<SlimStock, String> column5 = new TableColumn<>("Unit");
-        column5.setCellValueFactory(new PropertyValueFactory<>("unit"));
+        TableColumn<SlimStock, String> column4 = new TableColumn<>("Unit");
+        column4.setCellValueFactory(new PropertyValueFactory<>("unit"));
+        column4.setMinWidth(75);
+        column4.setStyle("-fx-alignment: center;");
+
+        TableColumn<SlimStock, String> column5 = new TableColumn<>("Quantity");
+        column5.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         column5.setMinWidth(75);
         column5.setStyle("-fx-alignment: center;");
 
-        TableColumn<SlimStock, String> column6 = new TableColumn<>("Quantity");
-        column6.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        TableColumn<SlimStock, String> column6 = new TableColumn<>("Threshold");
+        column6.setCellValueFactory(new PropertyValueFactory<>("critical"));
         column6.setMinWidth(75);
         column6.setStyle("-fx-alignment: center;");
 
@@ -279,6 +284,7 @@ public class StockController extends MenuControllerHandler implements Initializa
         stocksTable.getColumns().add(column1);
         stocksTable.getColumns().add(column2);
         stocksTable.getColumns().add(column3);
+        stocksTable.getColumns().add(column31);
         stocksTable.getColumns().add(column4);
         stocksTable.getColumns().add(column5);
         stocksTable.getColumns().add(column6);

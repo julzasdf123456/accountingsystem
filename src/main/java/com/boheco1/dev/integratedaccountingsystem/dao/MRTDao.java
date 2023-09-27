@@ -99,7 +99,7 @@ public class MRTDao {
 
     public static List<ReleasedItems> searchReleasedItems(String searchKey) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT r.id, s.Description, r.mct_no, r.Price, r.Quantity, r.Quantity - (SELECT COALESCE(SUM(quantity),0) FROM MRTItem WHERE releasing_id = r.id) as Balance, s.id as stockID " +
+                "SELECT NEACode, LocalCode, AcctgCode, r.id, s.Description, r.mct_no, r.Price, r.Quantity, r.Quantity - (SELECT COALESCE(SUM(quantity),0) FROM MRTItem WHERE releasing_id = r.id) as Balance, s.id as stockID " +
                         "FROM Releasing r\n" +
                         "INNER JOIN Stocks s ON s.id = r.StockID \n" +
                         "WHERE r.Quantity > 0 AND mct_no IS NOT NULL \n" +
@@ -121,6 +121,12 @@ public class MRTDao {
                     rs.getInt("Balance")
             );
             item.setStockID(rs.getString("stockID"));
+            String neaCode = rs.getString("NEACode");
+            if (neaCode != null && neaCode.length() != 0) {
+                item.setCode(neaCode);
+            }else{
+                item.setCode(rs.getString("LocalCode"));
+            }
             items.add(item);
         }
 

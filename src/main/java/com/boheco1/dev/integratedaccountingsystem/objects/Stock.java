@@ -36,6 +36,7 @@ public class Stock {
     private String rrNo;
     private String localDescription;
     private boolean individualized;
+    private boolean controlled;
 
     public Stock() {}
 
@@ -327,5 +328,13 @@ public class Stock {
 
     public void setLocalDescription(String localDescription) {
         this.localDescription = localDescription;
+    }
+
+    public boolean isControlled() {
+        return controlled;
+    }
+
+    public void setControlled(boolean controlled) {
+        this.controlled = controlled;
     }
 }

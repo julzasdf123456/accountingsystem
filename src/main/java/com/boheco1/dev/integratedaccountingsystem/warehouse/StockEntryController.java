@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
@@ -33,7 +34,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
     private JFXTextField stockName, serialNumber, brand, model, quantity, unit, price, neaCode, threshold, localCode, accountCode;
 
     @FXML
-    private JFXTextArea comments, description, local_desc;
+    private TextArea comments, description, local_desc;
 
     @FXML
     private DatePicker manuDate, valDate;
@@ -44,7 +45,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
     @FXML
     private JFXButton saveBtn;
     @FXML
-    private JFXCheckBox individualized_cb;
+    private JFXCheckBox individualized_cb, controlled_cb;
     private Stock stock = null;
 
     private boolean isNew = true;
@@ -121,7 +122,8 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.stock.setNeaCode(neaCode);
         this.stock.setLocalCode(localCode);
         this.stock.setCritical(threshold);
-
+        this.stock.setIndividualized(this.individualized_cb.isSelected());
+        this.stock.setControlled(this.controlled_cb.isSelected());
         if (accountCode.length() < 4 || accountCode == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid accounting code! Minimum of 4 characters!",
                     stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
@@ -148,7 +150,6 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                     this.stock.setQuantity(0);
 
                     this.stock.setAcctgCode(accountCode);
-                    this.stock.setIndividualized(this.individualized_cb.isSelected());
                     try {
                         StockDAO.add(this.stock);
                         //If quantity is set, create stock entry log, otherwise just add record in stocks table
@@ -300,6 +301,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                 valDate.setValue(stock.getValidityDate());
                 threshold.setText(""+stock.getCritical());
                 individualized_cb.setSelected(stock.isIndividualized());
+                controlled_cb.setSelected(stock.isControlled());
                 ObservableList<StockType> stocktypes = type.getItems();
                 int index = 0;
                 for (int i=0;  i < stocktypes.size(); i++){
@@ -325,6 +327,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
                 threshold.setDisable(true);
                 type.setDisable(true);
                 individualized_cb.setDisable(true);
+                controlled_cb.setDisable(true);
             } catch (Exception e) {
                 AlertDialogBuilder.messgeDialog("System Error", e.getMessage(), this.stockStackPane, AlertDialogBuilder.DANGER_DIALOG);
             }
@@ -371,7 +374,7 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.threshold.setDisable(false);
         this.type.setDisable(false);
         this.individualized_cb.setSelected(false);
-        this.individualized_cb.setDisable(false);
+        this.controlled_cb.setDisable(false);
     }
 
     /**

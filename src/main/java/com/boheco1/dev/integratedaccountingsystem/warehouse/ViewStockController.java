@@ -30,10 +30,10 @@ import java.util.ResourceBundle;
 public class ViewStockController implements Initializable {
 
     @FXML
-    private JFXTextField stockName, serialNumber, brand, model, quantity, unit, price, neaCode, threshold, localCode, accountCode, comments;
+    private JFXTextField stockName, serialNumber, brand, model, quantity, unit, price, neaCode, threshold, localCode, accountCode;
 
     @FXML
-    private JFXTextArea description, local_desc;
+    private TextArea description, local_desc, comments;
 
     @FXML
     private DatePicker manuDate, valDate;
@@ -41,7 +41,7 @@ public class ViewStockController implements Initializable {
     @FXML
     private JFXComboBox type;
     @FXML
-    private JFXCheckBox individualized_cb;
+    private JFXCheckBox individualized_cb,controlled_cb;
     @FXML
     private TabPane tabPane;
 
@@ -170,7 +170,7 @@ public class ViewStockController implements Initializable {
         this.stock.setNeaCode(this.neaCode.getText());
         this.stock.setCritical(threshold);
         this.stock.setIndividualized(this.individualized_cb.isSelected());
-
+        this.stock.setControlled(this.controlled_cb.isSelected());
         if (accountCode.length() < 4 || accountCode == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid accounting code! Minimum of 4 characters!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
@@ -180,20 +180,17 @@ public class ViewStockController implements Initializable {
         }else if (desc.length() == 0 || desc == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid NEA description!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (price == 0) {
+        /*}else if (price == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for price!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (quantity == 0) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for quantity!",
-                stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                stackPane, AlertDialogBuilder.DANGER_DIALOG);*/
         }else if (unit == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please enter a valid value for unit!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else if (stockType == null) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please select a valid stock type!",
-                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
-        }else if (threshold == 0){
-            AlertDialogBuilder.messgeDialog("Invalid Input", "Please select enter a valid threshold remaining limit for the stock!",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
         }else {
             try {
@@ -399,6 +396,7 @@ public class ViewStockController implements Initializable {
         }
         this.type.getSelectionModel().select(index);
         this.individualized_cb.setSelected(stock.isIndividualized());
+        this.controlled_cb.setSelected(stock.isControlled());
     }
     /**
      * Initializes the stock entries table

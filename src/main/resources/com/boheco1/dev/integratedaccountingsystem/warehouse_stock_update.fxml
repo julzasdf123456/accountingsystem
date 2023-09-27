@@ -3,13 +3,13 @@
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXCheckBox?>
 <?import com.jfoenix.controls.JFXComboBox?>
-<?import com.jfoenix.controls.JFXTextArea?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -62,10 +62,10 @@
                               <Font size="14.0" />
                            </font>
                            <VBox.margin>
-                              <Insets top="18.0" />
+                              <Insets bottom="8.0" top="18.0" />
                            </VBox.margin>
                         </JFXTextField>
-                        <HBox>
+                        <HBox prefHeight="70.0" prefWidth="466.0">
                            <VBox.margin>
                               <Insets />
                            </VBox.margin>
@@ -73,7 +73,7 @@
                               <VBox prefHeight="78.0" prefWidth="217.0">
                                  <children>
                                     <Label text="NEA Description" />
-                                    <JFXTextArea fx:id="description" focusColor="#00ad8e" labelFloat="true" prefHeight="50.0" prefWidth="217.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5" />
+                                    <TextArea fx:id="description" prefHeight="50.0" prefWidth="217.0" />
                                  </children>
                                  <HBox.margin>
                                     <Insets right="32.0" />
@@ -82,8 +82,11 @@
                               <VBox prefHeight="78.0" prefWidth="217.0">
                                  <children>
                                     <Label text="Local Description" />
-                                    <JFXTextArea fx:id="local_desc" focusColor="#00ad8e" labelFloat="true" minHeight="50.0" prefHeight="50.0" prefWidth="217.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5" />
+                                    <TextArea fx:id="local_desc" minHeight="50.0" prefHeight="50.0" prefWidth="217.0" />
                                  </children>
+                                 <HBox.margin>
+                                    <Insets bottom="8.0" />
+                                 </HBox.margin>
                               </VBox>
                            </children>
                         </HBox>
@@ -107,15 +110,15 @@
                               </JFXTextField>
                            </children>
                            <VBox.margin>
-                              <Insets top="18.0" />
+                              <Insets bottom="8.0" top="8.0" />
                            </VBox.margin>
                         </HBox>
-                        <JFXTextField fx:id="serialNumber" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="514.0" promptText="SerialNumber" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                        <JFXTextField fx:id="serialNumber" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="514.0" promptText="Serial Number" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                            <font>
                               <Font size="14.0" />
                            </font>
                            <VBox.margin>
-                              <Insets top="18.0" />
+                              <Insets bottom="8.0" top="8.0" />
                            </VBox.margin>
                         </JFXTextField>
                         <HBox alignment="CENTER" prefHeight="30.0" prefWidth="514.0">
@@ -140,7 +143,7 @@
                               </VBox>
                            </children>
                            <VBox.margin>
-                              <Insets />
+                              <Insets bottom="8.0" top="8.0" />
                            </VBox.margin>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="514.0">
@@ -168,12 +171,12 @@
                               </JFXTextField>
                            </children>
                            <VBox.margin>
-                              <Insets top="18.0" />
+                              <Insets bottom="8.0" top="8.0" />
                            </VBox.margin>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="514.0">
                            <children>
-                              <JFXTextField fx:id="price" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="134.0" promptText="Price" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="price" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="104.5" promptText="Price" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -181,7 +184,7 @@
                                     <Insets right="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXTextField fx:id="threshold" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="134.0" promptText="Threshold" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <JFXTextField fx:id="threshold" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="104.5" promptText="Threshold" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -189,14 +192,15 @@
                                     <Insets left="16.0" />
                                  </HBox.margin>
                               </JFXTextField>
-                              <JFXCheckBox fx:id="individualized_cb" text="Individualized">
+                              <JFXCheckBox fx:id="individualized_cb" prefWidth="104.5" text="Individualized">
                                  <HBox.margin>
-                                    <Insets left="32.0" />
+                                    <Insets left="32.0" right="32.0" />
                                  </HBox.margin>
                               </JFXCheckBox>
+                              <JFXCheckBox fx:id="controlled_cb" prefWidth="104.5" text="Controlled" />
                            </children>
                            <VBox.margin>
-                              <Insets top="18.0" />
+                              <Insets bottom="8.0" top="8.0" />
                            </VBox.margin>
                         </HBox>
                         <VBox>
@@ -205,11 +209,11 @@
                            </VBox.margin>
                            <children>
                               <Label text="Comments" />
-                              <JFXTextField fx:id="comments" focusColor="#00ad8e" labelFloat="true" prefHeight="30.0" prefWidth="246.0" style="-fx-background-color: #f5f5f5;" unFocusColor="#b5b5b5">
+                              <TextArea fx:id="comments" prefHeight="30.0" prefWidth="246.0">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
-                              </JFXTextField>
+                              </TextArea>
                            </children>
                         </VBox>
                         <Pane prefHeight="41.0" prefWidth="516.0">

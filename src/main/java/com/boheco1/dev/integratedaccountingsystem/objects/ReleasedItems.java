@@ -11,6 +11,7 @@ public class ReleasedItems {
     private double price;
     private double quantity;
     private String stockID;
+    private String code;
     private int balance;
 
     public ReleasedItems(String id, String description, String mctNo, double price, double quantity) {
@@ -64,5 +65,13 @@ public class ReleasedItems {
 
     public void setStockID(String stockID) {
         this.stockID = stockID;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }
