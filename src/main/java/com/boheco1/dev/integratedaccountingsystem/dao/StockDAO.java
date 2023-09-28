@@ -1155,7 +1155,7 @@ public class StockDAO {
     public static List<Stock> getInventory(int limit, int offset) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM Stocks "+
-                        "WHERE IsTrashed=0 " +
+                        "WHERE IsTrashed=0 AND Controlled=0 " +
                         "ORDER BY StockName ASC, Quantity DESC "+
                         "OFFSET ? ROWS " +
                         "FETCH NEXT ? ROWS ONLY");
@@ -1211,7 +1211,7 @@ public class StockDAO {
     public static List<Stock> getInventory() throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM Stocks " +
-                        "WHERE IsTrashed=0 "+
+                        "WHERE IsTrashed=0 AND Controlled=0 "+
                         "ORDER BY StockName ASC, Quantity DESC");
 
         ResultSet rs = ps.executeQuery();

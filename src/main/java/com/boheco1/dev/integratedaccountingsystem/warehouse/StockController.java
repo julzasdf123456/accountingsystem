@@ -31,7 +31,7 @@ import java.io.FileWriter;
 import java.net.URL;
 import java.util.*;
 
-public class StockController extends MenuControllerHandler implements Initializable, SubMenuHelper {
+public class StockController extends MenuControllerHandler implements Initializable, SubMenuHelper, ObjectTransaction {
 
     @FXML
     private StackPane stackPane;
@@ -219,6 +219,7 @@ public class StockController extends MenuControllerHandler implements Initializa
                             Stock stock = StockDAO.get(item.getId());
                             viewButton.setOnAction(actionEvent -> {
                                 Utility.setSelectedObject(stock);
+                                Utility.setParentController(StockController.this);
                                 ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_stock_update.fxml", Utility.getStackPane());
                             });
                         } catch (Exception e) {
@@ -362,4 +363,12 @@ public class StockController extends MenuControllerHandler implements Initializa
         });
     }
 
+    @Override
+    public void receive(Object o) {
+
+    }
+
+    public void refreshTable(){
+        searchStock();
+    }
 }

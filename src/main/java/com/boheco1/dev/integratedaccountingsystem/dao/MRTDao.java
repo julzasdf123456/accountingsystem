@@ -100,12 +100,16 @@ public class MRTDao {
     public static List<ReleasedItems> searchReleasedItems(String searchKey) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT NEACode, LocalCode, AcctgCode, r.id, s.Description, r.mct_no, r.Price, r.Quantity, r.Quantity - (SELECT COALESCE(SUM(quantity),0) FROM MRTItem WHERE releasing_id = r.id) as Balance, s.id as stockID " +
-                        "FROM Releasing r\n" +
+                        "FROM Releasing r \n" +
                         "INNER JOIN Stocks s ON s.id = r.StockID \n" +
-                        "WHERE r.Quantity > 0 AND mct_no IS NOT NULL \n" +
-                        "AND s.Description LIKE ? \n" +
+                        "INNER JOIN MIRSItems mi ON mi.StockID = r.StockID \n" +
+                        "INNER JOIN MIRS m ON m.id = mi.MIRSID \n" +
+                        "WHERE r.Quantity > 0 AND mct_no IS NOT NULL AND (address LIKE ? OR details LIKE ? \n" +
+                        "OR s.Description LIKE ?) \n" +
                         "ORDER BY r.CreatedAt DESC;");
         ps.setString(1, "%" + searchKey + "%");
+        ps.setString(2, "%" + searchKey + "%");
+        ps.setString(3, "%" + searchKey + "%");
 
         ResultSet rs = ps.executeQuery();
 
