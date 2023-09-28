@@ -296,8 +296,8 @@ public class MirsDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT m.*, s.Description FROM MIRSItems m " +
                         "INNER JOIN Stocks s ON m.StockID = s.id " +
-                        "WHERE m.MIRSID = ? AND s.Description NOT IN " +
-                        "(SELECT s2.Description FROM Releasing r " +
+                        "WHERE m.MIRSID = ? AND s.Id NOT IN " +
+                        "(SELECT s2.Id FROM Releasing r " +
                         "INNER JOIN Stocks s2 ON r.StockID=s2.id " +
                         "WHERE r.MIRSID=? AND r.Status='"+Utility.RELEASED+"')");
 
@@ -326,7 +326,7 @@ public class MirsDAO {
                     rs.getBoolean("IsAdditional")
             );
             mirsItem.setParticulars(rs.getString("Description"));
-            System.out.println(mirsItem.getParticulars());
+            //System.out.println(mirsItem.getParticulars());
             items.add(mirsItem);
 
         }
@@ -747,10 +747,11 @@ public class MirsDAO {
         //       "SELECT SUM(Quantity) FROM Releasing r WHERE r.StockID = ? AND MIRSID = ?;");
 
         PreparedStatement ps = DB.getConnection().prepareStatement( "" +
-                "SELECT SUM(r.Quantity) FROM Releasing r inner join Stocks s ON r.StockID = s.id WHERE s.Description = ?;");
+                "SELECT SUM(r.Quantity) FROM Releasing r inner join Stocks s ON r.StockID = s.id WHERE r.MIRSID = ? AND s.id = ?;");
 
-        ps.setString(1, StockDAO.get(item.getStockID()).getDescription());
-        //ps.setString(2, item.getMirsID());
+        ps.setString(1, item.getMirsID());
+        ps.setString(2, item.getStockID());
+
 
         ResultSet rs = ps.executeQuery();
 

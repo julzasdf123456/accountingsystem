@@ -160,6 +160,34 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                         mirsSignatoryList.add(mirsSignatory);
                     }
 
+                    List<MIRSItem> controlledMirsItem = new ArrayList<>();
+                    for (MIRSItem checkForControlledItem : mirsItemRequested){
+                        double requestedQty = checkForControlledItem.getQuantity();
+                        Stock temp = StockDAO.get(checkForControlledItem.getStockID());
+                        double inStocks = StockDAO.countAvailable(temp);
+                        Stock controlledStock = StockDAO.getControlledStock(temp.getDescription());
+                        if(controlledStock==null) continue;
+                        double holdNewQty = inStocks - requestedQty;
+                        System.out.println("inStocks: "+ inStocks);
+                        System.out.println("requested qty: "+checkForControlledItem.getQuantity());
+                        System.out.println("controlledStock qty: "+controlledStock.getQuantity());
+                        System.out.println("holdNewQty: "+holdNewQty);
+                        System.out.println("deducted controlled item: "+(controlledStock.getQuantity() - Math.abs(holdNewQty)));
+                        if(holdNewQty < 0){
+                            checkForControlledItem.setQuantity(inStocks);
+                            MIRSItem mirsItem = new MIRSItem();
+                            mirsItem.setMirsID(checkForControlledItem.getMirsID());
+                            mirsItem.setStockID(controlledStock.getId());
+                            mirsItem.setQuantity(Math.abs(holdNewQty));
+                            mirsItem.setRemarks("Controlled");
+                            controlledMirsItem.add(mirsItem);
+                        }
+                    }
+
+                    for (MIRSItem addControlledItem : controlledMirsItem){
+                        mirsItemRequested.add(addControlledItem);
+                    }
+
                     if(MirsDAO.create(mirs, mirsItemRequested,mirsSignatoryList)){ //return true saved successfully
                         AlertDialogBuilder.messgeDialog("System Message", "MIRS request successfully filed, please wait for the approval, thank you!",
                                 Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
@@ -189,6 +217,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         }else if(quantity.getText().length() == 0 || Double.parseDouble(quantity.getText()) == 0 || Double.parseDouble(quantity.getText()) > StockDAO.countAvailable(stockToBeAdded) ) {
             AlertDialogBuilder.messgeDialog("Invalid Input", "Please provide a valid request quantity!",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            return;
         }
 
         addItem(stockToBeAdded, Double.parseDouble(quantity.getText()), false, Utility.ADDED);
@@ -200,7 +229,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
             if(added.getStockID().equals(stock.getId())){
                 double newQty = added.getQuantity() + qty;
                 if(newQty > StockDAO.countAvailable(stock)){
-                    AlertDialogBuilder.messgeDialog("System Message", "Insufficient stock for item "+stock.getId(),
+                    AlertDialogBuilder.messgeDialog("System Message", "Insufficient stock for item "+stock.getDescription(),
                             Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
                 }else{
                     added.setQuantity(added.getQuantity() + qty);
@@ -248,8 +277,10 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         messageLog = "";
         Stage stage = (Stage) Utility.getStackPane().getScene().getWindow();
         FileChooser fileChooser = new FileChooser();
-        if(Utility.MIRS_PATH.length() > 3)
+        if(Utility.MIRS_PATH != null && Utility.MIRS_PATH.length() > 3)
             fileChooser.setInitialDirectory(new File(Utility.MIRS_PATH));
+        else
+            fileChooser.setInitialDirectory(new File(""));
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("CSV Files", "*.csv")
         );
@@ -502,7 +533,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                     Text text = new Text(mirsItem.getParticulars());
                                     text.setStyle("" +
                                             "-fx-fill: #212121; " +
-                                            "-fx-text-alignment: center-left;" +
+                                            "-fx-alignment: center-left;" +
                                             "-fx-text-wrap: true;");
                                     //setStyle("-fx-background-color: #f7e1df; -fx-text-alignment: center-left;");
                                     text.wrappingWidthProperty().bind(getTableColumn().widthProperty().subtract(35));

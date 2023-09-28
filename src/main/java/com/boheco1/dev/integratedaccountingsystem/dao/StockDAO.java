@@ -162,9 +162,24 @@ public class StockDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static Stock get(String id) throws Exception {
-        PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM Stocks WHERE id=?");
-        ps.setString(1, id);
+        return getStock(id, false);
+    }
+
+    public static Stock getControlledStock(String description) throws Exception {
+        return getStock(description, true);
+    }
+
+
+    private static Stock getStock(String key, boolean controlled) throws Exception{
+        String query;
+        if(controlled){
+            query = "SELECT * FROM Stocks WHERE Description= '"+key+"' AND Controlled = '1'";
+        }else{
+            query = "SELECT * FROM Stocks WHERE id= '"+key+"' ";
+        }
+        PreparedStatement ps = DB.getConnection().prepareStatement(query);
+        //ps.setString(1, id);
+
         ResultSet rs = ps.executeQuery();
         if(rs.next()) {
             Stock stock = new Stock(
@@ -1580,7 +1595,7 @@ public class StockDAO {
      */
     public static List<StockDescription> searchDescription(String key) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT (SELECT TOP 1 id FROM Stocks s2 WHERE s2.Description=s.Description) AS id, Description, SUM(Quantity) as Qty\n" +
+                "SELECT (SELECT TOP 1 id FROM Stocks s2 WHERE s2.Description=s.Description AND Controlled = 0) AS id, Description, SUM(Quantity) as Qty\n" +
                         "FROM Stocks s \n" +
                         "WHERE s.Description LIKE ? AND s.Quantity > 0\n" +
                         "GROUP BY Description\n" +
@@ -1610,7 +1625,7 @@ public class StockDAO {
 
     public static boolean hasMultiple(String description) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT COUNT(id) as count FROM Stocks WHERE Description=?");
+                "SELECT COUNT(id) as count FROM Stocks WHERE Description=? AND Controlled = 1 ");
         ps.setString(1, description);
         ResultSet rs = ps.executeQuery();
         rs.next();

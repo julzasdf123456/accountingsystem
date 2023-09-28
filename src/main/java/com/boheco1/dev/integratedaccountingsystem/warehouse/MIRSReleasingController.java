@@ -119,7 +119,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
 
 
         TableColumn<MIRSItem, String> reqDescriptionCol = new TableColumn<>("Description");
-        reqDescriptionCol.setStyle("-fx-alignment: center-left;");
+        reqDescriptionCol.setStyle("-fx-alignment: CENTER-LEFT;");
         Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>> reqDescriptioncellFactory
                 = //
                 new Callback<TableColumn<MIRSItem, String>, TableCell<MIRSItem, String>>() {
@@ -134,11 +134,17 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                                     setText(null);
                                 } else {
                                     try {
+
                                         MIRSItem mirsItem = getTableView().getItems().get(getIndex());
-                                        Text text = new Text(mirsItem.getParticulars());
+                                        String description ;
+                                        if(mirsItem.getRemarks().contains("Controlled"))
+                                            description = "CON-"+mirsItem.getParticulars();
+                                        else
+                                            description = mirsItem.getParticulars();
+                                        Text text = new Text(description);
                                         text.setStyle("" +
                                                 "-fx-fill: #212121; " +
-                                                "-fx-text-alignment: center-left;" +
+                                                "-fx-alignment: center-left;" +
                                                 "-fx-text-wrap: true;");
                                         //setStyle("-fx-background-color: #f7e1df; -fx-text-alignment: center-left;");
                                         text.wrappingWidthProperty().bind(getTableColumn().widthProperty().subtract(35));
@@ -224,10 +230,15 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                                 } else {
                                     try {
                                         MIRSItem mirsItem = getTableView().getItems().get(getIndex());
-                                        Text text = new Text(mirsItem.getParticulars());
+                                        String description ;
+                                        if(mirsItem.getRemarks().contains("Controlled"))
+                                            description = "CON-"+mirsItem.getParticulars();
+                                        else
+                                            description = mirsItem.getParticulars();
+                                        Text text = new Text(description);
                                         text.setStyle("" +
                                                 "-fx-fill: #212121; " +
-                                                "-fx-text-alignment: center-left;" +
+                                                "-fx-alignment: center-left;" +
                                                 "-fx-text-wrap: true;");
                                         //setStyle("-fx-background-color: #f7e1df; -fx-text-alignment: center-left;");
                                         text.wrappingWidthProperty().bind(getTableColumn().widthProperty().subtract(35));
@@ -525,7 +536,6 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                         Utility.setDictionary(selected_items);
                         ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_mirs_releasing_select_item.fxml", Utility.getStackPane());
                     }else{
-                        System.out.println(mirsItem.getQuantity());
                         releasingItem.add(mirsItem);
                         requestedItem.removeAll(mirsItem);
                         requestedItemTable.refresh();
@@ -706,7 +716,8 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                         */
 
                         for(MIRSItem rem : remainingRequest) {
-                            if (StockDAO.get(rem.getStockID()).getDescription().equals(StockDAO.get(mirsItem.getStockID()).getDescription())) {
+                            //if (StockDAO.get(rem.getStockID()).getDescription().equals(StockDAO.get(mirsItem.getStockID()).getDescription())) {
+                            if (rem.getStockID().equals(mirsItem.getStockID())) {
                                 releasing.setStatus(Utility.PARTIAL_RELEASED);
                                 found = true;
                                 break;
