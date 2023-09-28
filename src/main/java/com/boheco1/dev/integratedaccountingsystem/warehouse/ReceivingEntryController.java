@@ -222,7 +222,7 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
 
         TableColumn<Stock, String> column8 = new TableColumn<>("Amount");
         column8.setMinWidth(100);
-        column8.setPrefWidth(268);
+        column8.setPrefWidth(120);
         column8.setCellValueFactory(stocks -> new SimpleStringProperty(stocks.getValue().getReceivingItem().getQtyAccepted() * stocks.getValue().getReceivingItem().getUnitCost() +""));
         column8.setStyle("-fx-alignment: center-right;");
 

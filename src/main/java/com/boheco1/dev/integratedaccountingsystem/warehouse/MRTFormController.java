@@ -28,7 +28,7 @@ import java.util.ResourceBundle;
 public class MRTFormController extends MenuControllerHandler implements Initializable {
 
     @FXML
-    private JFXTextField searchItem_tf,returned_tf;
+    private JFXTextField searchItem_tf,returned_tf,received_tf;
 
     @FXML
     private TableView releasedItemTable, returnItemTable;
@@ -36,16 +36,17 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
     private ObservableList<MRTItem> mrtItems = null;
     private ObservableList<ReleasedItems> releasedItems = null;
     private MRT currentMRT = null;
-    private EmployeeInfo returnedBy = null;
+    private EmployeeInfo receivedBy = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.initializeReleasedItemTable();
         this.initializeReturnItemTable();
-        this.bindReturnedByAutocomplete(this.returned_tf);
+        this.bindReturnedByAutocomplete(this.received_tf, true);
+        this.bindReturnedByAutocomplete(this.returned_tf, false);
         try {
-            this.returnedBy = ActiveUser.getUser().getEmployeeInfo();
-            this.returned_tf.setText(this.returnedBy.getFullName());
+            this.receivedBy = ActiveUser.getUser().getEmployeeInfo();
+            this.received_tf.setText(this.receivedBy.getFullName());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -134,14 +135,18 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
      */
     @FXML
     public void returnItems(){
-        if (this.returnedBy == null){
-            AlertDialogBuilder.messgeDialog("System Message", "No employee was set!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-        }else {
+        if (this.mrtItems.size() == 0) {
+            AlertDialogBuilder.messgeDialog("System Message", "No items were selected for returning!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }else if (this.returned_tf.getText().isEmpty()) {
+            AlertDialogBuilder.messgeDialog("System Message", "No returned by employee was set!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }else if (this.receivedBy == null) {
+            AlertDialogBuilder.messgeDialog("System Message", "No received by employee was set!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }else  {
             JFXButton accept = new JFXButton("Proceed");
             JFXDialog dialog = DialogBuilder.showConfirmDialog("MRT","This process is final. Confirm Return Item(s)?", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
             accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
             accept.setOnAction(__ -> {
-                this.currentMRT = new MRT(null, this.returnedBy.getId(), ActiveUser.getUser().getEmployeeID(), LocalDate.now());
+                this.currentMRT = new MRT(null, this.returned_tf.getText(), this.receivedBy.getId(), LocalDate.now());
                 try {
                     MRTDao.create(this.currentMRT);
                     MRTDao.addItems(this.currentMRT, this.mrtItems);
@@ -290,7 +295,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
      * Binds the textfield to autosuggest employee
      * @return void
      */
-    public void bindReturnedByAutocomplete(JFXTextField textField){
+    public void bindReturnedByAutocomplete(JFXTextField textField, boolean isReceived){
         AutoCompletionBinding<EmployeeInfo> employeeSuggest = TextFields.bindAutoCompletion(textField,
                 param -> {
                     //Value typed in the textfield
@@ -308,8 +313,8 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
                         }
                     }
 
-                    if (list.size() == 0) {
-                       returnedBy = null;
+                    if (list.size() == 0 && isReceived) {
+                       receivedBy = null;
                     }
 
                     return list;
@@ -330,7 +335,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
         employeeSuggest.setOnAutoCompleted(event -> {
             EmployeeInfo user = event.getCompletion();
             textField.setText(user.getFullName());
-            returnedBy = user;
+            if (isReceived) {receivedBy = user;}
         });
     }
 
@@ -343,7 +348,6 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
         this.mrtItems = FXCollections.observableArrayList();;
         this.releasedItems = FXCollections.observableArrayList();;
         this.currentMRT = null;
-        this.returnedBy = null;
         this.returned_tf.setText("");
         this.searchItem_tf.setText("");
         this.returnItemTable.setItems(this.mrtItems);

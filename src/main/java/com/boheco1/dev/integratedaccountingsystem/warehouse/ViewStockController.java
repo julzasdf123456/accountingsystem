@@ -59,11 +59,12 @@ public class ViewStockController implements Initializable {
     private Stock stock;
 
     private StackPane stackPane;
-
+    private StockController parent;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //Gets the main stackpane and assign to current stackpane
         this.stackPane = Utility.getStackPane();
+        this.parent = (StockController) Utility.getParentController();
         //Displays the stock details
         Platform.runLater(() -> {
             this.stock = (Stock) Utility.getSelectedObject();
@@ -198,6 +199,7 @@ public class ViewStockController implements Initializable {
                 this.stock.setLocalCode(localCode);
                 this.stock.setQuantity(quantity);
                 StockDAO.update(this.stock);
+                this.parent.refreshTable();
                 AlertDialogBuilder.messgeDialog("Update Stock", "Current stock details was successfully updated!", stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
             } catch (Exception e) {
                 AlertDialogBuilder.messgeDialog("System Error", "Stock record was not successfully updated due to:"+e.getMessage()+".", stackPane, AlertDialogBuilder.DANGER_DIALOG);
