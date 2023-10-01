@@ -374,6 +374,8 @@ public class StockEntryController extends MenuControllerHandler implements Initi
         this.threshold.setDisable(false);
         this.type.setDisable(false);
         this.individualized_cb.setSelected(false);
+        this.individualized_cb.setDisable(false);
+        this.controlled_cb.setSelected(false);
         this.controlled_cb.setDisable(false);
     }
 

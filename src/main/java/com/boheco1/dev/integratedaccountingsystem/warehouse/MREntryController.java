@@ -59,8 +59,8 @@ public class MREntryController extends MenuControllerHandler implements Initiali
             this.bindSignatoreesAutocomplete(this.approve_tf);
             //Initializes the MR items table
             this.initializeTable();
-            this.recommending = ActiveUser.getUser().getEmployeeInfo();
-            this.recommending_tf.setText(this.recommending.getFullName());
+            this.approved = EmployeeDAO.getByDesignation("General Manager");
+            this.approve_tf.setText(this.approved.getFullName());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -224,6 +224,12 @@ public class MREntryController extends MenuControllerHandler implements Initiali
             this.fname_tf.setText(this.employee.getEmployeeFirstName());
             this.mname_tf.setText(this.employee.getEmployeeMidName());
             this.lname_tf.setText(this.employee.getEmployeeLastName());
+            try {
+                this.recommending = EmployeeDAO.getByDesignation("Department Manager", this.employee.getDepartmentID());
+                this.recommending_tf.setText(this.recommending.getFullName());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
     /**

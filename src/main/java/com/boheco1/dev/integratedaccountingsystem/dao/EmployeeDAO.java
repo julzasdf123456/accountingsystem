@@ -82,6 +82,32 @@ public class EmployeeDAO {
         }
     }
 
+    public static EmployeeInfo getByDesignation(String id, String dept) throws Exception {
+        System.out.println(dept);
+        PreparedStatement cs = DB.getConnection().prepareStatement(
+                "SELECT * FROM EmployeeInfo WHERE Designation= ? AND DepartmentId=?");
+        cs.setString(1, id);
+        cs.setString(2, dept);
+        ResultSet rs = cs.executeQuery();
+
+        if(rs.next()) {
+            return new EmployeeInfo(
+                    rs.getString("EmployeeID"),
+                    rs.getString("EmployeeFirstName"),
+                    rs.getString("EmployeeMidName"),
+                    rs.getString("EmployeeLastName"),
+                    rs.getString("EmployeeSuffix"),
+                    rs.getString("Address"),
+                    rs.getString("Phone"),
+                    rs.getString("Designation"),
+                    rs.getString("SignatoryLevel"),
+                    rs.getString("DepartmentID")
+            );
+        }else {
+            return null;
+        }
+    }
+
     public static List<EmployeeInfo> getAll(Connection conn) throws Exception
     {
         PreparedStatement ps = conn.prepareStatement(
@@ -142,7 +168,7 @@ public class EmployeeDAO {
      */
     public static List<EmployeeInfo> getEmployeeInfo(String key) throws Exception  {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "Select EmployeeID, EmployeeFirstName, EmployeeMidName, EmployeeLastName, Designation, Address FROM EmployeeInfo " +
+                "Select EmployeeID, EmployeeFirstName, EmployeeMidName, EmployeeLastName, Designation, Address, DepartmentId FROM EmployeeInfo " +
                         "WHERE (EmployeeFirstName LIKE ? OR EmployeeMidName LIKE ? OR EmployeeLastName LIKE ? ) " +
                         "ORDER BY EmployeeLastName");
         ps.setString(1, '%'+ key+'%');
@@ -160,6 +186,7 @@ public class EmployeeDAO {
             employeeInfo.setEmployeeLastName(rs.getString("EmployeeLastName"));
             employeeInfo.setDesignation(rs.getString("Designation"));
             employeeInfo.setEmployeeAddress(rs.getString("Address"));
+            employeeInfo.setDepartmentID(rs.getString("DepartmentId"));
             list.add(employeeInfo);
         }
 

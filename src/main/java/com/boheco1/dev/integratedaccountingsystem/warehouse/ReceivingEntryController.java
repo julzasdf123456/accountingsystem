@@ -74,7 +74,7 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
         this.bindUserAutocomplete(this.verified_tf);
         this.reset();
         try {
-            this.received = ActiveUser.getUser().getEmployeeInfo();
+            this.received = EmployeeDAO.getByDesignation("Warehouseman");
             this.received_tf.setText(this.received.getFullName());
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -174,7 +174,7 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
      */
     @FXML
     public void addStock(){
-        ModalBuilderForWareHouse.showModalFromXMLWithExitPath(WarehouseDashboardController.class, "../warehouse_stock_entry.fxml", Utility.getStackPane(),  "../warehouse_receiving_entry.fxml");
+        ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_stock_entry.fxml", Utility.getStackPane());
     }
     /**
      * Creates the receiving items table
