@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.warehouse;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.ReceivingDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.SupplierDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.UserDAO;
@@ -296,20 +297,20 @@ public class ReceivingReportController extends MenuControllerHandler implements 
         style.setFont(font);
 
         doc.setTitle("Receiving Report");
-        User received_by = UserDAO.get(receiving.getReceivedBy());
-        User received_orig_by = UserDAO.get(receiving.getReceivedOrigBy());
-        User verified_by = UserDAO.get(receiving.getVerifiedBy());
+        EmployeeInfo received_by = EmployeeDAO.getOne(receiving.getReceivedBy(), DB.getConnection());
+        EmployeeInfo received_orig_by = EmployeeDAO.getOne(receiving.getReceivedOrigBy(), DB.getConnection());
+        EmployeeInfo verified_by = EmployeeDAO.getOne(receiving.getVerifiedBy(), DB.getConnection());
         String names[] = {
-                received_by.getEmployeeInfo().getFullName(),
-                received_orig_by.getEmployeeInfo().getFullName(),
-                verified_by.getEmployeeInfo().getFullName(),
+                received_by.getFullName(),
+                received_orig_by.getFullName(),
+                verified_by.getFullName(),
                 " "};
         doc.setNames(names);
 
         String designations[] = {
-                received_by.getEmployeeInfo().getDesignation(),
-                received_orig_by.getEmployeeInfo().getDesignation(),
-                verified_by.getEmployeeInfo().getDesignation(),
+                received_by.getDesignation(),
+                received_orig_by.getDesignation(),
+                verified_by.getDesignation(),
                 "Stock Clerk"};
         doc.setDesignations(designations);
 

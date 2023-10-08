@@ -322,7 +322,7 @@ public class ExcelBuilder {
 
             //Last signatoree name
             Cell cell8 = row5.createCell(0);
-            cell8.setCellValue(names[2]);
+            cell8.setCellValue(names[2].toUpperCase(Locale.ROOT));
             sheet.addMergedRegion(new CellRangeAddress(fifth_row, fifth_row, 0, this.wide - 1));
             this.styleRightBorder(cell8, font_12, HorizontalAlignment.CENTER);
 
@@ -343,12 +343,12 @@ public class ExcelBuilder {
             this.styleRightBorder(cell8, font_11, HorizontalAlignment.CENTER);
 
             Cell cell9 = row5.createCell(0);
-            cell9.setCellValue(this.names[2]);
+            cell9.setCellValue(this.names[2].toUpperCase(Locale.ROOT));
             sheet.addMergedRegion(new CellRangeAddress(fifth_row, fifth_row, 0,width - 1));
             this.styleRightBorder(cell9, font_12, HorizontalAlignment.CENTER);
 
             Cell cell10 = row5.createCell(width);
-            cell10.setCellValue(this.names[3]);
+            cell10.setCellValue(this.names[3].toUpperCase(Locale.ROOT));
             sheet.addMergedRegion(new CellRangeAddress(fifth_row, fifth_row, width,this.wide - 1));
             this.styleRightBorder(cell10, font_12, HorizontalAlignment.CENTER);
 

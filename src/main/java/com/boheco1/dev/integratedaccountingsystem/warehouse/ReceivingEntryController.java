@@ -69,7 +69,6 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.createTable();
         this.bindSupplierAutocomplete(this.supplier_tf);
-        this.bindUserAutocomplete(this.received_tf);
         this.bindUserAutocomplete(this.received_original_tf);
         this.bindUserAutocomplete(this.verified_tf);
         this.reset();
@@ -427,7 +426,6 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
         this.dr_tf.setText("");
         this.rv_tf.setText("");
         this.po_tf.setText("");
-        this.received_tf.setText("");
         this.received_original_tf.setText("");
         this.verified_tf.setText("");
 
@@ -436,7 +434,6 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
         this.net_sales_tf.setText("0");
 
         this.supplier = null;
-        this.received = null;
         this.received_original = null;
         this.verified = null;
     }
@@ -476,20 +473,20 @@ public class ReceivingEntryController extends MenuControllerHandler implements I
                         style.setFont(font);
 
                         doc.setTitle("Receiving Report");
-                        User received_by = UserDAO.get(receiving.getReceivedBy());
-                        User received_orig_by = UserDAO.get(receiving.getReceivedOrigBy());
-                        User verified_by = UserDAO.get(receiving.getVerifiedBy());
+                        EmployeeInfo received_by = EmployeeDAO.getOne(receiving.getReceivedBy(), DB.getConnection());
+                        EmployeeInfo received_orig_by = EmployeeDAO.getOne(receiving.getReceivedOrigBy(), DB.getConnection());
+                        EmployeeInfo verified_by = EmployeeDAO.getOne(receiving.getVerifiedBy(), DB.getConnection());
                         String names[] = {
-                                received_by.getEmployeeInfo().getFullName(),
-                                received_orig_by.getEmployeeInfo().getFullName(),
-                                verified_by.getEmployeeInfo().getFullName(),
+                                received_by.getFullName(),
+                                received_orig_by.getFullName(),
+                                verified_by.getFullName(),
                                 " "};
                         doc.setNames(names);
 
                         String designations[] = {
-                                received_by.getEmployeeInfo().getDesignation(),
-                                received_orig_by.getEmployeeInfo().getDesignation(),
-                                verified_by.getEmployeeInfo().getDesignation(),
+                                received_by.getDesignation(),
+                                received_orig_by.getDesignation(),
+                                verified_by.getDesignation(),
                                 "Stock Clerk"};
                         doc.setDesignations(designations);
 

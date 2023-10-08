@@ -17,11 +17,15 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.kordamp.ikonli.javafx.FontIcon;
+
+import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -46,19 +50,18 @@ public class MREntryController extends MenuControllerHandler implements Initiali
 
     private ObservableList<MrItem> mrItems = null;
 
-    private EmployeeInfo recommending = null, approved = null;
+    private EmployeeInfo recommending = null, approved = null, warehouseman = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
             //Sets autocomplete on the employee textfield
             this.bindEmployeeAutocomplete(this.employee_search_tf);
-            //Sets autocomplete on the recommending textfield
-            this.bindSignatoreesAutocomplete(this.recommending_tf);
-            //Sets autocomplete on the approve textfield
-            this.bindSignatoreesAutocomplete(this.approve_tf);
             //Initializes the MR items table
             this.initializeTable();
+            this.warehouseman = EmployeeDAO.getByDesignation("Head, Warehous");
+            if (this.warehouseman == null)
+                this.warehouseman = EmployeeDAO.getByDesignation("Warehouse");
             this.approved = EmployeeDAO.getByDesignation("General Manager");
             this.approve_tf.setText(this.approved.getFullName());
         } catch (Exception e) {
@@ -99,79 +102,27 @@ public class MREntryController extends MenuControllerHandler implements Initiali
             accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
             accept.setOnAction(__ -> {
                 String purpose = this.purpose_tf.getText();
-                MR mr = new MR(mr_no, employee.getId(), ActiveUser.getUser().getEmployeeID(), LocalDate.now(), Utility.MR_FILED, this.recommending.getId(), this.approved.getId(), purpose);
+                MR mr = new MR(mr_no, employee.getId(), warehouseman.getId(), LocalDate.now(), Utility.MR_FILED, this.recommending.getId(), this.approved.getId(), purpose);
                 try {
                     MrDAO.add(mr, this.mrItems);
                     AlertDialogBuilder.messgeDialog("MR Entry", "The Memorandum Receipt was successfully filed!", stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
+                    Stage stage = (Stage) Utility.getContentPane().getScene().getWindow();
+                    FileChooser fileChooser = new FileChooser();
+                    fileChooser.getExtensionFilters().addAll(
+                            new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
+                    );
+                    fileChooser.setInitialFileName("MR_report_"+mr.getId()+".pdf");
+                    File selectedFile = fileChooser.showSaveDialog(stage);
+                    if (selectedFile != null) {
+                        ViewMRController.printMR(selectedFile, mr, Utility.getStackPane());
+                    }
                     this.reset();
-                    this.recommending = ActiveUser.getUser().getEmployeeInfo();
-                    this.recommending_tf.setText(this.recommending.getFullName());
                 } catch (Exception e) {
                     AlertDialogBuilder.messgeDialog("System Error", "Filing of Memorandum Receipt was not successfully added due to:" + e.getMessage() + " error.", stackPane, AlertDialogBuilder.DANGER_DIALOG);
                 }
                 dialog.close();
             });
         }
-    }
-    /**
-     * Sets the signatorees autocomplete for the employee names
-     * @param textField the textfield to attach the autocomplete
-     * @return void
-     */
-    public void bindSignatoreesAutocomplete(JFXTextField textField){
-        AutoCompletionBinding<EmployeeInfo> employeeSuggest = TextFields.bindAutoCompletion(textField,
-                param -> {
-                    //Value typed in the textfield
-                    String query = param.getUserText();
-
-                    //Initialize list of stocks
-                    List<EmployeeInfo> list = new ArrayList<>();
-
-                    //Perform DB query when length of search string is 2 or above
-                    if (query.length() > 1){
-                        try {
-                            list = EmployeeDAO.getEmployeeInfo(query);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    if (list.size() == 0) {
-                        if (textField == this.recommending_tf) {
-                            this.recommending = null;
-                        }else if (textField == this.approve_tf) {
-                            this.approved = null;
-                        }
-                    }
-
-                    return list;
-                }, new StringConverter<>() {
-                    //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
-                    @Override
-                    public String toString(EmployeeInfo object) {
-                        return object.getFullName();
-                    }
-
-                    @Override
-                    public EmployeeInfo fromString(String string) {
-                        throw new UnsupportedOperationException();
-                    }
-                });
-
-        //This will set the actions once the user clicks an item from the popupmenu.
-        employeeSuggest.setOnAutoCompleted(event -> {
-            EmployeeInfo user = event.getCompletion();
-            textField.setText(user.getFullName());
-            try {
-                if (textField == this.recommending_tf) {
-                    this.recommending = user;
-                }else if (textField == this.approve_tf) {
-                    this.approved = user;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
     }
     /**
      * Sets the assigned employee autocomplete
@@ -237,10 +188,8 @@ public class MREntryController extends MenuControllerHandler implements Initiali
      * @return void
      */
     public void reset(){
-        this.employee = null;
-        this.recommending = null;
-        this.approved = null;
         this.mr_no_tf.setText(NumberGenerator.mrNumber());
+        this.employee = null;
         this.employee_search_tf.setText("");
         this.fname_tf.setText("");
         this.mname_tf.setText("");
@@ -249,8 +198,8 @@ public class MREntryController extends MenuControllerHandler implements Initiali
         this.mrItems =  FXCollections.observableArrayList();
         this.mr_items_table.setItems(this.mrItems);
         this.mr_items_table.setPlaceholder(new Label("No item added!"));
+        this.recommending = null;
         this.recommending_tf.setText("");
-        this.approve_tf.setText("");
     }
 
     @FXML

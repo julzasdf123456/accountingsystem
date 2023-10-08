@@ -60,8 +60,8 @@ public class EmployeeDAO {
 
     public static EmployeeInfo getByDesignation(String id) throws Exception {
         PreparedStatement cs = DB.getConnection().prepareStatement(
-                "SELECT * FROM EmployeeInfo WHERE Designation=?");
-        cs.setString(1, id);
+                "SELECT * FROM EmployeeInfo WHERE Designation LIKE ?");
+        cs.setString(1, "%"+id+"%");
         ResultSet rs = cs.executeQuery();
 
         if(rs.next()) {

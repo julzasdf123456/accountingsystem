@@ -45,8 +45,13 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
         this.bindReturnedByAutocomplete(this.received_tf, true);
         this.bindReturnedByAutocomplete(this.returned_tf, false);
         try {
-            this.receivedBy = ActiveUser.getUser().getEmployeeInfo();
-            this.received_tf.setText(this.receivedBy.getFullName());
+            this.receivedBy = EmployeeDAO.getByDesignation("Head, Warehous");
+            if (this.receivedBy != null)
+                this.received_tf.setText(this.receivedBy.getFullName());
+            else {
+                this.receivedBy = EmployeeDAO.getByDesignation("Warehouse");
+                this.received_tf.setText(this.receivedBy.getFullName());
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

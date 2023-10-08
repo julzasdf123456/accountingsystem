@@ -243,11 +243,11 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
                 date_approved_tf.setText(selected.getDateOfMR().toString());
                 purpose_tf.setText(selected.getPurpose());
                 try {
-                    EmployeeInfo personnel = UserDAO.get(selected.getWarehousePersonnelId()).getEmployeeInfo();
+                    EmployeeInfo personnel = EmployeeDAO.getOne(selected.getWarehousePersonnelId(), DB.getConnection());
                     released_tf.setText(personnel.getEmployeeFirstName()+" "+personnel.getEmployeeLastName());
-                    EmployeeInfo recommending = UserDAO.get(selected.getRecommending()).getEmployeeInfo();
+                    EmployeeInfo recommending =  EmployeeDAO.getOne(selected.getRecommending(), DB.getConnection());
                     recommending_tf.setText(recommending.getEmployeeFirstName()+" "+recommending.getEmployeeLastName());
-                    EmployeeInfo approve = UserDAO.get(selected.getApprovedBy()).getEmployeeInfo();
+                    EmployeeInfo approve = EmployeeDAO.getOne(selected.getApprovedBy(), DB.getConnection());
                     approved_tf.setText(approve.getEmployeeFirstName()+" "+approve.getEmployeeLastName());
                     populateTable(selected);
                     printBtn.setOnAction(actionEvent -> {
@@ -314,7 +314,7 @@ public class ViewMRController extends MenuControllerHandler implements Initializ
                 int[] head_borders = {Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER};
                 mr_pdf.other_details(mr_no, head_span, head_fonts, head_aligns,head_borders, true);
 
-                EmployeeInfo user = UserDAO.get(mr.getWarehousePersonnelId()).getEmployeeInfo();
+                EmployeeInfo user = EmployeeDAO.getOne(mr.getWarehousePersonnelId(), DB.getConnection());
 
                 String[] acknowledge = {"I HEREBY ACKNOWLEDGE to have received from "+user.getEmployeeFirstName().toUpperCase()+" "+user.getEmployeeLastName().toUpperCase()+", "+user.getDesignation() +", the following property for which I am responsible, " +
                         "subject to the provision of the usual accounting and auditing rules and regulations and which will be used for "+mr.getPurpose()+"."};
