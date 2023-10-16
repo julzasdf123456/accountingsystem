@@ -4,7 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.dao.StockDAO;
 
 import java.time.LocalDateTime;
 
-public class MIRSItem {
+public class MIRSItem extends  ItemizedMirsItem{
     private String id;
     private String mirsID;
     private String stockID;
@@ -17,6 +17,9 @@ public class MIRSItem {
     private LocalDateTime updatedAt;
     private boolean isAdditional;
     private boolean isSelected;
+
+
+
 
     public MIRSItem(){}
 
@@ -137,6 +140,18 @@ public class MIRSItem {
 
     public void setSelected(boolean selected) {
         isSelected = selected;
+    }
+
+
+    //temporary store the actual item stock id when releasing
+    private String actualStockId;
+
+    public String getActualStockId() {
+        return actualStockId;
+    }
+
+    public void setActualStockId(String actualStockId) {
+        this.actualStockId = actualStockId;
     }
 
 }

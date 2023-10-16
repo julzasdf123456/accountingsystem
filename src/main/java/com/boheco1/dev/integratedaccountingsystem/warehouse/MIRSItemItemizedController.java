@@ -90,13 +90,13 @@ public class MIRSItemItemizedController implements Initializable {
             prepareTable();
 
 
-            HashMap<String, ItemizedMirsItem> holder = Utility.getItemizedMirsItems();
+            /*HashMap<String, ItemizedMirsItem> holder = Utility.getItemizedMirsItems();
             for (Map.Entry i : holder.entrySet()) {
                 ItemizedMirsItem item = holder.get(i.getKey());
                 if(item.getStockID().equals(mirsItem.getStockID())){
                         itemized.add(item);
                 }
-            }
+            }*/
             itemizedItemTable.refresh();
 
         } catch (Exception e) {
@@ -155,14 +155,14 @@ public class MIRSItemItemizedController implements Initializable {
 
     @FXML
     void saveItemizedItem(ActionEvent event) throws Exception {
-        for(ItemizedMirsItem item : itemizedItemTable.getItems()){
+        /*for(ItemizedMirsItem item : itemizedItemTable.getItems()){
             HashMap<String, ItemizedMirsItem> holder = Utility.getItemizedMirsItems();
             if(holder.containsKey(item.getId())){
                 holder.replace(item.getId(), item);
             }else {
                 holder.put(item.getId(), item);
             }
-        }
+        }*/
 
         AlertDialogBuilder.messgeDialog("System Message", "Mirs item was successfully itemized.",
                 Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);

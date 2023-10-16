@@ -30,11 +30,11 @@ public class ReleasingDAO {
         ps.close();
     }
 
-    public static boolean add(List<Releasing> releasingList, List<MIRSItem> mirsItems,  MIRS mirs) throws Exception {
-        return add(releasingList, mirsItems, null, mirs);
+    public static boolean add(List<Releasing> releasingList, List<ItemizedMirsItem>  itemizedMirsItem, List<MIRSItem> mirsItems,  MIRS mirs) throws Exception {
+        return add(releasingList, itemizedMirsItem, mirsItems, null, mirs);
     }
 
-    public static boolean add(List<Releasing> releasingList, List<MIRSItem> mirsItems, MCT mct, MIRS mirs) throws Exception {
+    public static boolean add(List<Releasing> releasingList, List<ItemizedMirsItem> itemizedMirsItem, List<MIRSItem> mirsItems, MCT mct, MIRS mirs) throws Exception {
         String query = "";
         String mct_number = null;
         if(mct != null) {
@@ -75,9 +75,9 @@ public class ReleasingDAO {
         }
 
         //get all itemized from the global variable itemizedMirsItems
-        for (ItemizedMirsItem i : Utility.getItemizedMirsItems().values()){
-            query+="INSERT INTO itemizedMirsItem (id, MIRSItemID, stockID, brand, serial, remarks, mirsID) " +
-                    "VALUES ('"+i.getId()+"','"+i.getMirsItemID()+"','"+i.getStockID()+"','"+i.getBrand()+"','"+i.getSerial()+"','"+i.getRemarks()+"','"+mirs.getId()+"');\n";
+        for (ItemizedMirsItem i : itemizedMirsItem){
+            query+="INSERT INTO itemizedMirsItem (id, MIRSItemID, stockID, brand, serial, remarks, mirsID, requestedStockId) " +
+                    "VALUES ('"+i.getId()+"','"+i.getMirsItemID()+"','"+i.getStockID()+"','"+i.getBrand()+"','"+i.getSerial()+"','"+i.getRemarks()+"','"+mirs.getId()+"', '"+i.getRequestedStockId()+"');\n";
         }
 
         query+="UPDATE MIRS SET " +
@@ -85,7 +85,7 @@ public class ReleasingDAO {
                         "WHERE id='"+mirs.getId()+"';\n";
 
         for(Releasing releasing : releasingList){
-            Stock temp = StockDAO.get(releasing.getStockID());
+            Stock temp = StockDAO.get(releasing.finalStockItemID());
             double qty = temp.getQuantity() - releasing.getQuantity();
 
             query+="UPDATE Stocks SET quantity='"+qty+"', UpdatedAt=GETDATE(), UserIDUpdated='"+ActiveUser.getUser().getId()+"' " +

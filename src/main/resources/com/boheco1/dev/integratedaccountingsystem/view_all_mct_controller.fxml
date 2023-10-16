@@ -44,7 +44,7 @@
                         <VBox>
                            <children>
                               <Label text="Received by" />
-                              <JFXTextField fx:id="receivedBy" labelFloat="true" prefHeight="37.0" prefWidth="250.0" />
+                              <JFXTextField fx:id="receivedBy" prefHeight="37.0" prefWidth="250.0" promptText="Firstname M.I Lastname" />
                            </children>
                            <HBox.margin>
                               <Insets right="16.0" />

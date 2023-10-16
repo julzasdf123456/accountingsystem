@@ -67,7 +67,7 @@ public class Utility {
     public static String FILE_PATH = "";
     private static AnchorPane contentPane;
     private static MIRS activeMIRS;
-    private static HashMap<String, ItemizedMirsItem> itemizedMirsItems = new HashMap<>();
+   // private static HashMap<String, ItemizedMirsItem> itemizedMirsItems = new HashMap<>();
 
 
     private static StackPane stackPane;
@@ -113,9 +113,9 @@ public class Utility {
         Utility.contentPane = contentPane;
     }
 
-    public static HashMap<String, ItemizedMirsItem> getItemizedMirsItems() {
+    /*public static HashMap<String, ItemizedMirsItem> getItemizedMirsItems() {
         return itemizedMirsItems;
-    }
+    }*/
 
     public static String generateRandomId() {
         return new Date().getTime() + "-" + generateRandomString(15);

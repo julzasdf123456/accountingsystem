@@ -14,6 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
@@ -34,12 +35,20 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
     @FXML private JFXTextField search_box, issuedBy, receivedBy;
 
     private EmployeeInfo issuedByEmployee = null;
-    private EmployeeInfo receivedByEmployee = null;
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initializeMirsTable();
-
+        this.mctTable.setRowFactory(tv -> {
+            TableRow row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    printMCT(null);
+                }
+            });
+            return row ;
+        });
         try {
             issuedByEmployee = EmployeeDAO.getByDesignation("HEAD, WAREHOUSING SECTION");
             if(issuedByEmployee!=null)
@@ -97,7 +106,7 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                 return;
             }
 
-            if(issuedByEmployee == null || receivedByEmployee == null){
+            if(issuedByEmployee == null || receivedBy.getText().isEmpty()){
                 AlertDialogBuilder.messgeDialog("System Message", "Both signatories are required.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
                 return;
             }
@@ -179,28 +188,29 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                 double total=0;
                 HashMap<String, Double> acctCodeSummary = new HashMap<String, Double>();
                 for (Releasing items : fromReleasing) {
-                    System.out.println("ItemizedMirsItem: " + items.getMirsID());
                     List<ItemizedMirsItem> details = MirsDAO.getItemizedMirsItemDetails(items.getStockID(), items.getMirsID());
                     String additionalDescription = "";
                     for(ItemizedMirsItem i : details){
-                        if(i.getStockID().equals(items.getStockID())){
-                            additionalDescription += "\n(Brand: "+i.getBrand()+", Serial: "+i.getSerial()+", Remarks: "+i.getRemarks()+")";
-                        }
+                        //if(i.getStockID().equals(items.getStockID())){
+                        Stock stock = StockDAO.get(items.getStockID());
+                        additionalDescription += "\n("+stock.controlled()+i.getBrand()+", "+i.getSerial()+", "+i.getRemarks()+")";
+                        //}
                     }
-                    Stock stock = StockDAO.get(ReleasingDAO.get(items.getId()).getStockID());
+
+                    Stock stock = StockDAO.get(items.getStockID());
                     String itemCode="-";
                     if(stock.getNeaCode() != null || !stock.getNeaCode().isEmpty())
                         itemCode = stock.getNeaCode();
                     else
                         itemCode = stock.getLocalCode();
-                    String[] val = {stock.getAcctgCode(), itemCode,stock.getDescription()+additionalDescription, String.format("%,.2f", items.getPrice()), String.format("%,.2f", (items.getPrice() * items.getQuantity())), stock.getUnit(), "" + Utility.formatDecimal(items.getQuantity())};
-                    total += items.getPrice() * items.getQuantity();
+                    String[] val = {stock.getAcctgCode(), itemCode,stock.getDescription()+additionalDescription, String.format("%,.2f", stock.getPrice()), String.format("%,.2f", (stock.getPrice() * items.getQuantity())), stock.getUnit(), "" + Utility.formatDecimal(items.getQuantity())};
+                    total += stock.getPrice() * items.getQuantity();
                     rows.add(val);
 
                     if(acctCodeSummary.get(stock.getAcctgCode()) == null){
-                        acctCodeSummary.put(stock.getAcctgCode(),items.getPrice() * items.getQuantity());
+                        acctCodeSummary.put(stock.getAcctgCode(),stock.getPrice() * items.getQuantity());
                     }else{
-                        acctCodeSummary.replace(stock.getAcctgCode(),acctCodeSummary.get(stock.getAcctgCode()) + (items.getPrice() * items.getQuantity()) );
+                        acctCodeSummary.replace(stock.getAcctgCode(),acctCodeSummary.get(stock.getAcctgCode()) + (stock.getPrice() * items.getQuantity()) );
                     }
                 }
                 pdf.tableContent(rows, header_spans, rows_aligns, Element.ALIGN_TOP, Rectangle.NO_BORDER);
@@ -233,7 +243,7 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                                 issuedByEmployee.getEmployeeMidName().toUpperCase().charAt(0)+". " +
                                 issuedByEmployee.getEmployeeLastName().toUpperCase(),3, 11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
 
-                String mname = receivedByEmployee.getEmployeeMidName().toUpperCase();
+                /*String mname = receivedByEmployee.getEmployeeMidName().toUpperCase();
                 String character;
                 if(mname.isEmpty()){
                     character = " ";
@@ -243,11 +253,13 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                 pdf.createCell(
                         receivedByEmployee.getEmployeeFirstName().toUpperCase()+" " +
                                 character +
-                                receivedByEmployee.getEmployeeLastName().toUpperCase(),4, 11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+                                receivedByEmployee.getEmployeeLastName().toUpperCase(),4, 11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);*/
+                pdf.createCell(receivedBy.getText().toUpperCase(),4, 11, Font.BOLD, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
 
                 pdf.createCell(issuedByEmployee.getDesignation(),3, 8, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
 
-                pdf.createCell(receivedByEmployee.getDesignation(),4, 8, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+                //pdf.createCell(receivedByEmployee.getDesignation(),4, 8, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+                pdf.createCell(" ",4, 8, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
 
 
                 pdf.generate();
@@ -279,8 +291,6 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                     if (list.size() == 0) {
                        if(textField == this.issuedBy)
                             issuedByEmployee = null;
-                        else if(textField == this.receivedBy)
-                            receivedByEmployee = null;
                     }
 
                     return list;
@@ -303,9 +313,6 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
             if(textField == this.issuedBy) {
                 issuedByEmployee = event.getCompletion();
                 issuedBy.setText(issuedByEmployee.getFullName());
-            }else if(textField == this.receivedBy) {
-                receivedByEmployee = event.getCompletion();
-                receivedBy.setText(receivedByEmployee.getFullName());
             }
         });
     }

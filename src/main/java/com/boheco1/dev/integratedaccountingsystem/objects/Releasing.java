@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 public class Releasing {
     private String id;
     private String stockID;
+
+    private String actualStockId;
     private String mirsID;
     private double quantity;
     private double price;
@@ -158,5 +160,19 @@ public class Releasing {
 
     public void setAcctCode(String acctgCode) {
         this.acctCode = acctCode;
+    }
+    public String getActualStockId() {
+        return actualStockId;
+    }
+
+    public void setActualStockId(String actualStockId) {
+        this.actualStockId = actualStockId;
+    }
+
+    public String finalStockItemID(){
+        if(actualStockId != null)
+            return actualStockId;
+
+        return stockID;
     }
 }

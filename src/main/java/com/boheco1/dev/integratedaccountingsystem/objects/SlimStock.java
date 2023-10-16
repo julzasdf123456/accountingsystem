@@ -123,6 +123,11 @@ public class SlimStock {
 
     @Override
     public String toString() {
+        if(Brand == null )
+            Brand = "Brand X";
+        if(isControlled())
+            return "CON-"+Brand;
+
         return Brand;
     }
 

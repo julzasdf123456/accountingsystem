@@ -1065,7 +1065,7 @@ public class MirsDAO {
         ps.setString(2, mirsId);*/
 
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "select * from itemizedMirsItem where stockID = ? and mirsID=?");
+                "select * from itemizedMirsItem where RequestedStockId = ? and mirsID=?");
         ps.setString(1, stockId);
         ps.setString(2, mirsId);
 
@@ -1074,14 +1074,17 @@ public class MirsDAO {
         List<ItemizedMirsItem> explodedItems = new ArrayList<>();
 
         while (rs.next()) {
-            explodedItems.add(new ItemizedMirsItem(
+            ItemizedMirsItem item = new ItemizedMirsItem(
                     rs.getString("id"),
                     rs.getString("stockID"),
                     rs.getString("MIRSItemID"),
                     rs.getString("serial"),
                     rs.getString("brand"),
                     rs.getString("remarks")
-            ));
+            );
+            item.setRequestedStockId(rs.getString("RequestedStockId"));
+
+            explodedItems.add(item);
         }
 
         rs.close();

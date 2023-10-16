@@ -53,6 +53,12 @@ public class Stock {
         this.price=price;
     }
 
+    public Stock(String id, String description, int price) {
+        this.id=id;
+        this.description=description;
+        this.price=price;
+    }
+
     /** Constructor with critical **/
     public Stock(String id, String stockName, String description, String serialNumber, String brand, String model, LocalDate manufacturingDate, LocalDate validityDate, String typeID, String unit, double quantity, int critical, double price, String neaCode, boolean isTrashed, String comments, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime trashedAt, String userIDCreated, String userIDUpdated, String userIDTrashed, String localCode, String acctgCode, boolean individualized) {
         this.id = id;
@@ -336,5 +342,9 @@ public class Stock {
 
     public void setControlled(boolean controlled) {
         this.controlled = controlled;
+    }
+
+    public String controlled(){
+        return isControlled() ? "CON-" : "";
     }
 }

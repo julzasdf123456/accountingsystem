@@ -161,7 +161,7 @@ public class MCTDao {
         }
 
         PreparedStatement ps2 = DB.getConnection().prepareStatement(
-                "SELECT * FROM Releasing WHERE mct_no=?");
+                "  SELECT StockID, MIRSID, SUM(Quantity) AS qty FROM Releasing WHERE mct_no=? GROUP BY StockID, MIRSID ");
         ps2.setString(1, mctNo);
 
         ResultSet rs2 = ps2.executeQuery();
@@ -169,8 +169,11 @@ public class MCTDao {
         List<Releasing> releasings = new ArrayList();
 
         while(rs2.next()) {
-            Releasing r = new Releasing(
-                    rs2.getString("id"),
+            Releasing r = new Releasing();
+            r.setStockID(rs2.getString("StockID"));
+            r.setMirsID(rs2.getString("MIRSID"));
+            r.setQuantity(rs2.getDouble("qty"));
+                    /*rs2.getString("id"),
                     rs2.getString("StockID"),
                     rs2.getString("MIRSID"),
                     rs2.getInt("Quantity"),
@@ -178,7 +181,7 @@ public class MCTDao {
                     rs2.getString("UserID"),
                     rs2.getString("Status"),
                     rs2.getString("WorkOrderNo"),
-                    rs2.getString("mct_no"));
+                    rs2.getString("mct_no"));*/
             releasings.add(r);
         }
 

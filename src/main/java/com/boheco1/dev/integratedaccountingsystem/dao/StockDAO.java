@@ -162,23 +162,8 @@ public class StockDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static Stock get(String id) throws Exception {
-        return getStock(id, false);
-    }
-
-    public static Stock getControlledStock(String description) throws Exception {
-        return getStock(description, true);
-    }
-
-
-    private static Stock getStock(String key, boolean controlled) throws Exception{
-        String query;
-        if(controlled){
-            query = "SELECT * FROM Stocks WHERE Description= '"+key+"' AND Controlled = '1'";
-        }else{
-            query = "SELECT * FROM Stocks WHERE id= '"+key+"' ";
-        }
-        PreparedStatement ps = DB.getConnection().prepareStatement(query);
-        //ps.setString(1, id);
+        PreparedStatement ps = DB.getConnection().prepareStatement("SELECT * FROM Stocks WHERE id = ?");
+        ps.setString(1, id);
 
         ResultSet rs = ps.executeQuery();
         if(rs.next()) {
@@ -219,6 +204,31 @@ public class StockDAO {
         return null;
     }
 
+    public static Stock getControlledStock(String description) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT (SELECT TOP 1 id FROM Stocks s2 WHERE s2.Description=s.Description and s2.Quantity > 0 AND Controlled = 1) AS id, Description, SUM(Quantity) as Qty\n" +
+                        "FROM Stocks s \n" +
+                        "WHERE s.Description LIKE ? AND s.Quantity > 0 and s.Controlled = 1 \n" +
+                        "GROUP BY Description\n" +
+                        "ORDER BY Description;");
+
+        ps.setString(1, "%" + description + "%");
+
+
+        ResultSet rs = ps.executeQuery();
+        Stock stock = null;
+        if(rs.next()) {
+            stock = new Stock();
+            stock.setId(rs.getString("id"));
+            stock.setDescription(rs.getString("Description"));
+            stock.setQuantity(rs.getDouble("Qty"));
+        }
+
+        rs.close();
+        ps.close();
+        return stock;
+    }
+
     /**
      * Retrieves a single Stock record
      * @param code the identifier of the Stock record to be retrieved
@@ -227,7 +237,7 @@ public class StockDAO {
      */
     public static Stock getStockViaNEALocalCode(String code) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT id, Description, Unit, Price, localDescription FROM Stocks WHERE (NEACode=? OR LocalCode=?) ");
+                "SELECT id, Description, Unit, Price, localDescription FROM Stocks WHERE PRICE > 0 AND (NEACode=? OR LocalCode=?) ");
         ps.setString(1, code);
         ps.setString(2, code);
 
@@ -258,7 +268,7 @@ public class StockDAO {
 
     public static double getTotalStockViaNEALocalCode(String code) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT SUM(Stocks.Quantity) as Qty FROM Stocks WHERE NEACode=? OR LocalCode=? AND Quantity > 0 ");
+                "SELECT SUM(Stocks.Quantity) as Qty FROM Stocks WHERE NEACode=? OR LocalCode=? AND Quantity > 0 AND PRICE > 0");
         ps.setString(1, code);
         ps.setString(2, code);
         ResultSet rs = ps.executeQuery();
@@ -1595,9 +1605,9 @@ public class StockDAO {
      */
     public static List<StockDescription> searchDescription(String key) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT (SELECT TOP 1 id FROM Stocks s2 WHERE s2.Description=s.Description AND Controlled = 0) AS id, Description, SUM(Quantity) as Qty\n" +
+                "SELECT (SELECT TOP 1 id FROM Stocks s2 WHERE s2.Description=s.Description and s2.Quantity > 0 AND Controlled = 0 ORDER BY Quantity  DESC) AS id, Description, SUM(Quantity) as Qty\n" +
                         "FROM Stocks s \n" +
-                        "WHERE s.Description LIKE ? AND s.Quantity > 0\n" +
+                        "WHERE s.Description LIKE ? AND s.Quantity > 0 AND PRICE > 0\n" +
                         "GROUP BY Description\n" +
                         "ORDER BY Description;");
 
@@ -1611,7 +1621,7 @@ public class StockDAO {
             stockDescriptions.add(new StockDescription(
                     rs.getString("id"),
                     rs.getString("Description"),
-                    rs.getInt("Qty")
+                    rs.getDouble("Qty")
             ));
         }
 
@@ -1620,12 +1630,38 @@ public class StockDAO {
         return stockDescriptions;
     }
 
+    public static Stock getTotalStockQty(String key) throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT (SELECT TOP 1 id FROM Stocks s2 WHERE s2.Description=s.Description AND Controlled = 0) AS id, Description, SUM(Quantity) as Qty\n" +
+                        "FROM Stocks s \n" +
+                        "WHERE s.Description LIKE ? AND s.Quantity > 0 and s.Controlled = 0 \n" +
+                        "GROUP BY Description\n" +
+                        "ORDER BY Description;");
+
+        ps.setString(1, "%" + key + "%");
+
+
+        ResultSet rs = ps.executeQuery();
+        Stock stock = new Stock();
+        if(rs.next()) {
+            stock.setDescription(rs.getString("Description"));
+            stock.setQuantity(rs.getDouble("Qty"));
+        }else{
+            stock.setDescription(key);
+            stock.setQuantity(0.0);
+        }
+
+        rs.close();
+        ps.close();
+        return stock;
+    }
+
 
 
 
     public static boolean hasMultiple(String description) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT COUNT(id) as count FROM Stocks WHERE Description=? AND Controlled = 1 ");
+                "SELECT COUNT(id) as count FROM Stocks WHERE Description=? ");
         ps.setString(1, description);
         ResultSet rs = ps.executeQuery();
         rs.next();
@@ -1633,12 +1669,17 @@ public class StockDAO {
         return rs.getInt("count")>1;
     }
 
-    public static List<SlimStock> getByDescription(String description) throws Exception {
+    public static List<SlimStock> getByDescription(String description, boolean controlled) throws Exception {
+        /*PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT id, StockName, Brand, Model, Description, Price, Unit, Quantity, Critical, Individualized, Controlled FROM Stocks " +
+                        "WHERE Description=? and Quantity > 0 and PRICE > 0 ORDER BY Brand");*/
+
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT id, StockName, Brand, Model, Description, Price, Unit, Quantity, Critical, Individualized, Controlled FROM Stocks " +
-                        "WHERE Description=? and Quantity > 0 and PRICE > 0 ORDER BY Brand");
+                        "WHERE Description=? and Quantity > 0 and PRICE > 0 and Controlled = ? ORDER BY Brand");
 
         ps.setString(1, description);
+        ps.setBoolean(2, controlled);
 
         ResultSet rs = ps.executeQuery();
 

@@ -163,20 +163,22 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                     List<MIRSItem> controlledMirsItem = new ArrayList<>();
                     for (MIRSItem checkForControlledItem : mirsItemRequested){
                         double requestedQty = checkForControlledItem.getQuantity();
-                        Stock temp = StockDAO.get(checkForControlledItem.getStockID());
+                        Stock temp = StockDAO.getTotalStockQty(checkForControlledItem.getParticulars());
+                        System.out.println("Temp total qty: "+ temp.getQuantity());
                         double inStocks = StockDAO.countAvailable(temp);
                         Stock controlledStock = StockDAO.getControlledStock(temp.getDescription());
                         if(controlledStock==null) continue;
                         double holdNewQty = inStocks - requestedQty;
-                        System.out.println("inStocks: "+ inStocks);
-                        System.out.println("requested qty: "+checkForControlledItem.getQuantity());
-                        System.out.println("controlledStock qty: "+controlledStock.getQuantity());
-                        System.out.println("holdNewQty: "+holdNewQty);
-                        System.out.println("deducted controlled item: "+(controlledStock.getQuantity() - Math.abs(holdNewQty)));
+                        System.out.println("Description: "+ checkForControlledItem.getParticulars());
+                        System.out.println("In Stocks: "+ inStocks);
+                        System.out.println("Requested qty: "+checkForControlledItem.getQuantity());
+                        System.out.println("ControlledStock qty: "+controlledStock.getQuantity());
+                        System.out.println("HoldNewQty: "+holdNewQty);
+                        System.out.println("Deducted controlled item: "+(controlledStock.getQuantity() - Math.abs(holdNewQty)));
+                        System.out.println();
                         if(holdNewQty < 0){
                             checkForControlledItem.setQuantity(inStocks);
                             MIRSItem mirsItem = new MIRSItem();
-                            mirsItem.setMirsID(checkForControlledItem.getMirsID());
                             mirsItem.setStockID(controlledStock.getId());
                             mirsItem.setQuantity(Math.abs(holdNewQty));
                             mirsItem.setRemarks("Controlled");
@@ -284,7 +286,14 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("CSV Files", "*.csv")
         );
-        File selectedFile = fileChooser.showOpenDialog(stage);
+        File selectedFile = null;
+        try{
+            selectedFile = fileChooser.showOpenDialog(stage);
+        }catch (Exception e){
+            AlertDialogBuilder.messgeDialog("System Message","Please check MIRS PATH if valid, and try again",Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
+            return;
+        }
+
         JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing command.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
 
         if (selectedFile != null) {
@@ -292,12 +301,13 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                 if (selectedFile != null) {
 
                     // Create a background Task
+                    File finalSelectedFile = selectedFile;
                     Task<Void> task = new Task<>() {
                         @Override
                         protected Void call() {
                             try {
                                 dialog.show();
-                                CSVReader reader = new CSVReader(new FileReader(selectedFile.getAbsolutePath()));
+                                CSVReader reader = new CSVReader(new FileReader(finalSelectedFile.getAbsolutePath()));
 
                                 List<String[]> allRows = reader.readAll();
                                 for(int i = 1; i < allRows.size(); i++) { //start looping at 1 to skip column header
@@ -581,7 +591,7 @@ public class FileMIRSController extends MenuControllerHandler implements Initial
                                     MIRSItem mirsItem = getTableView().getItems().get(getIndex());
                                     //set font color RED if item is added to table using the available stock not the requested quantity
                                     if (mirsItem.getQuantity() > 0){
-                                        System.out.println(mirsItem.getRemarks());
+                                        //System.out.println(mirsItem.getRemarks());
                                         if(mirsItem.getRemarks().contains(Utility.INSUFFICIENT_STOCK)) {
                                             setStyle("" +
                                                     "-fx-background-color: #fae4c3; " +

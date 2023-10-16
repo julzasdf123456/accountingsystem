@@ -65,7 +65,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
     private List<MIRSSignatory> signatories;
     private ObservableList<MIRSItem> requestedItem, releasingItem;
 
-    private HashMap<String, Double> selected_items = new HashMap<>();
+    //private HashMap<String, Double> selected_items = new HashMap<>();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -85,7 +85,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
             initializeRequestTable();
             initializeReleasingTable();
             //clear hashmap that contains all itemized records
-            Utility.getItemizedMirsItems().clear();
+            //Utility.getItemizedMirsItems().clear();
 
             //set Paren tController for ObjectTransaction
             Utility.setParentController(this);
@@ -231,7 +231,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                                     try {
                                         MIRSItem mirsItem = getTableView().getItems().get(getIndex());
                                         String description ;
-                                        if(mirsItem.getRemarks().contains("Controlled"))
+                                        if(mirsItem.getRemarks() != null && mirsItem.getRemarks().contains("Controlled"))
                                             description = "CON-"+mirsItem.getParticulars();
                                         else
                                             description = mirsItem.getParticulars();
@@ -279,7 +279,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
         relBrandCol.setMinWidth(100);
         relBrandCol.setCellValueFactory(cellData -> {
             try {
-                return new SimpleStringProperty(StockDAO.get(cellData.getValue().getStockID()).getBrand());
+                return new SimpleStringProperty(cellData.getValue().getBrand());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -366,12 +366,13 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                                                 @Override
                                                 public void handle(ActionEvent __) {
                                                     releasingItem.remove(mirsItem);
-                                                    if(!selected_items.isEmpty()){
-                                                        //Get quantity of stock in the hashmap
+
+                                                    /*if(!selected_items.isEmpty()){
+
                                                         double qty_current = selected_items.get(mirsItem.getStockID());
                                                         //Deduct from the current quantity and update value in hashmap
                                                         selected_items.put(mirsItem.getStockID(), qty_current - mirsItem.getQuantity());
-                                                    }
+                                                    }*/
 
                                                     if(!mirsItem.isAdditional()) {
                                                         boolean found = false;
@@ -386,6 +387,8 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                                                         if(!found)
                                                             requestedItem.add(mirsItem);
 
+                                                    }else{
+                                                        additionalMirsItem.remove(mirsItem);
                                                     }
                                                     mirsItem.setSelected(false);
                                                     requestedItemTable.refresh();
@@ -415,7 +418,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
         releasingItemTable.getColumns().add(relDescriptionCol);
         releasingItemTable.getColumns().add(relBrandCol);
         releasingItemTable.getColumns().add(relQuantityCol);
-        releasingItemTable.getColumns().add(itemizeItemCol);
+        //releasingItemTable.getColumns().add(itemizeItemCol);
         releasingItemTable.getColumns().add(removeItemCol);
         releasingItemTable.setPlaceholder(new Label("No item found"));
 
@@ -432,9 +435,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
             checkAllBtn.setText("Check All");
         }
         for(MIRSItem m : requestedMirsItem){
-            if(m.getParticulars().toLowerCase().contains("current") ||
-                    m.getParticulars().toLowerCase().contains("fuse")||
-                    m.getParticulars().toLowerCase().contains("Pole"))
+            if(m.getParticulars().toLowerCase().contains("meter") || (m.getParticulars().toLowerCase().contains("current") && m.getParticulars().toLowerCase().contains("transformer")))
                 continue;
             m.setSelected(!m.isSelected());
         }
@@ -468,19 +469,9 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
         AlertDialogBuilder.messgeDialog("MIRS Details", details, Utility.getStackPane(), AlertDialogBuilder.INFO_DIALOG);
     }
 
-    private String hasMultipleBrand() throws Exception {
-        for (MIRSItem mirsItem : requestedItem){
-            if(mirsItem.isSelected()){
-                String description = StockDAO.get(mirsItem.getStockID()).getDescription();
-                if(StockDAO.hasMultiple(description)){
-                    return description;
-                }
-            }
-        }
-        return null;
-    }
 
-    private String isIndividualize() throws Exception {
+
+   /* private String isIndividualize() throws Exception {
         for (MIRSItem mirsItem : requestedItem){
             if(mirsItem.isSelected()){
                 Stock stock = StockDAO.get(mirsItem.getStockID());
@@ -501,7 +492,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
             }
         }
         return null;
-    }
+    }*/
 
     private int countSelected(){
         int counter = 0;
@@ -513,15 +504,18 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
         return counter;
     }
 
-    private String checkForBrandandIndividualized() throws Exception {
-        String msg = "";
-        String hasMultiple = hasMultipleBrand();
-        if(hasMultiple != null)
-            msg += hasMultiple +" has multiple brand and need to be release separately.\n";
+    /*private String hasMultipleBrand(MIRSItem mirsItem) throws Exception {
+        String description = StockDAO.get(mirsItem.getStockID()).getDescription();
+        if(StockDAO.hasMultiple(description)){
+            return description;
+        }
+        return null;
+    }*/
 
-        return msg;
+    private boolean isTransformer(MIRSItem mirsItem) {
+        String description = mirsItem.getParticulars().toLowerCase();
+        return description.contains("current") && description.contains("transformer");
     }
-
     @FXML
     void add(ActionEvent event) throws Exception {
         int countSelected = countSelected();
@@ -530,10 +524,10 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
         }else if(countSelected == 1) {
             for (final MIRSItem mirsItem : requestedItem){
                 if(mirsItem.isSelected()){
-                    String hasMultipleBrand = hasMultipleBrand(); // return description
-                    if(hasMultipleBrand != null){
+                    //String description = hasMultipleBrand(mirsItem); // return description
+                    if(isTransformer(mirsItem)){
                         Utility.setSelectedObject(mirsItem);
-                        Utility.setDictionary(selected_items);
+                        //Utility.setDictionary(selected_items);
                         ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_mirs_releasing_select_item.fxml", Utility.getStackPane());
                     }else{
                         releasingItem.add(mirsItem);
@@ -545,7 +539,12 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                 }
             }
         }else if(countSelected > 1) {
-            String msg = checkForBrandandIndividualized();
+            String msg = "";
+            for (final MIRSItem mirsItem : requestedItem){
+                if(mirsItem.isSelected() && isTransformer(mirsItem))
+                    msg += mirsItem.getParticulars() +"\n";
+
+            }
             if(msg.isEmpty()){
                 for (MIRSItem mirsItem : requestedItem){
                     if(mirsItem.isSelected()){
@@ -557,8 +556,8 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                 releasingItemTable.refresh();
             }else{
                 AlertDialogBuilder.messgeDialog("System Message", "Cannot released selected item. " +
-                        "\n\nReason:\n" +
-                        ""+msg+"\n\n" +
+                        "\n\n" +
+                        ""+msg+" \n\n" +
                         "Note: Items that has multiple brand or requires to be individualized cannot be released in batch.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
             }
         }
@@ -572,9 +571,9 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
         }else if(countSelected == 1){
             for (MIRSItem mirsItem : requestedItem){
                 if(mirsItem.isSelected()){
-                    String hasMultipleBrand = hasMultipleBrand(); // return description
-                    if(hasMultipleBrand != null){
-                        AlertDialogBuilder.messgeDialog("System Message", "Item "+hasMultipleBrand+" has multiple brand available.\n\n" +
+                   // String hasMultipleBrand = hasMultipleBrand(mirsItem); // return description
+                    if(isTransformer(mirsItem)){
+                        AlertDialogBuilder.messgeDialog("System Message", "Current Transformer found.\n\n" +
                                 "Note: Please use regular adding process for item with multiple brand.", Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
                     }else{
                         JFXButton accept = new JFXButton("Accept");
@@ -676,8 +675,9 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                     List<MIRSItem> forReleasing = releasingItem;
                     List<MIRSItem> remainingRequest = requestedItem;
                     List<Releasing> readyForRelease = new ArrayList<>();
+                    List<ItemizedMirsItem> itemizedMirsItems = new ArrayList<>();
 
-                    for (MIRSItem mirsItem : forReleasing){
+                    /*for (MIRSItem mirsItem : forReleasing){
                         Stock stock = StockDAO.get(mirsItem.getStockID());
                         if(stock.isIndividualized()){
                             boolean found = false;
@@ -694,29 +694,19 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                                 return;
                             }
                         }
-                    }
+                    }*/
 
                     for (MIRSItem mirsItem : forReleasing){
                         Releasing releasing = new Releasing();
                         releasing.setStockID(mirsItem.getStockID());
+                        releasing.setActualStockId(mirsItem.getActualStockId());//actual stock ID is used for Itemized MIRS items
                         releasing.setMirsID(mirsItem.getMirsID());
                         releasing.setQuantity(mirsItem.getQuantity());
                         releasing.setPrice(mirsItem.getPrice());
                         releasing.setUserID(ActiveUser.getUser().getId());
 
                         boolean found = false;
-                        /*
-                        for(MIRSItem rem : remainingRequest){
-                            if(rem.getId().equals(mirsItem.getId())) {
-                                releasing.setStatus(Utility.PARTIAL_RELEASED);
-                                found = true;
-                                break;
-                            }
-                        }
-                        */
-
                         for(MIRSItem rem : remainingRequest) {
-                            //if (StockDAO.get(rem.getStockID()).getDescription().equals(StockDAO.get(mirsItem.getStockID()).getDescription())) {
                             if (rem.getStockID().equals(mirsItem.getStockID())) {
                                 releasing.setStatus(Utility.PARTIAL_RELEASED);
                                 found = true;
@@ -726,12 +716,17 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
 
                         if(!found) {
                             releasing.setStatus(Utility.RELEASED);
-                            //ReleasingDAO.updateReleasedItem(releasing);
                         }
+
+                        if(mirsItem.getSerial() != null){
+                            ItemizedMirsItem item = new ItemizedMirsItem(Utility.generateRandomId(), mirsItem.getActualStockId(), mirsItem.getId(), mirsItem.getSerial(), mirsItem.getBrand(), mirsItem.getRemarks());
+                            item.setRequestedStockId(mirsItem.getStockID());
+                            itemizedMirsItems.add(item);
+                        }
+
+
                         readyForRelease.add(releasing);
-                        //ReleasingDAO.add(releasing);
-                        //Stock temp = StockDAO.get(mirsItem.getStockID()); //temp stock object for quantity deduction
-                        //StockDAO.deductStockQuantity(temp, mirsItem.getQuantity());
+
                     }
 
                     if(requestedItem.size() == 0)
@@ -741,9 +736,9 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
 
                     //MirsDAO.update(mirs);
 
-                    if(ReleasingDAO.add(readyForRelease, additionalMirsItem, mirs)) {
+                    if(ReleasingDAO.add(readyForRelease,itemizedMirsItems, additionalMirsItem, mirs)) {
                         //clear hashmap that contains all itemized records
-                        Utility.getItemizedMirsItems().clear();
+                       //Utility.getItemizedMirsItems().clear();
                         String notif_details = "MIRS (" + mirs.getId() + ") was released.";
                         Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
                         NotificationsDAO.create(torequisitioner);
@@ -841,27 +836,28 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
 
     @Override
     public void receive(Object o) {
-        if (o instanceof MIRSItem) {
-            MIRSItem mirsItem = (MIRSItem) o;
-            releasingItem.add(mirsItem);
-            for (MIRSItem m : requestedItem) {
-                if (m.getId().equals(mirsItem.getId())) {
-                    if (m.getQuantity() == 0) {
-                        requestedItem.remove(m);
-                    }
-                    break;
-                }
-            }
-            requestedItemTable.refresh();
-            releasingItemTable.refresh();
-        }else{
+        if (o instanceof ObservableList) {
+            ObservableList<MIRSItem> mirsItems = (ObservableList<MIRSItem>) o;
+            Object obj = Utility.getSelectedObject();
 
+            if (obj instanceof MIRSItem) {
+                MIRSItem requestedMirsItem = (MIRSItem) obj;
+                //adding transformer item
+                releasingItem.addAll(mirsItems);
+
+                //remove requested transformer item if quantity is zero
+                if(requestedMirsItem.getQuantity() == 0)
+                    requestedItem.remove(requestedMirsItem);
+
+                requestedItemTable.refresh();
+                releasingItemTable.refresh();
+            }
         }
     }
 
     @Override
     public void setSubMenus(FlowPane flowPane) {
-        flowPane.getChildren().removeAll();
-        flowPane.getChildren().setAll(new ArrayList<>());
+        //flowPane.getChildren().removeAll();
+        //flowPane.getChildren().setAll(new ArrayList<>());
     }
 }
