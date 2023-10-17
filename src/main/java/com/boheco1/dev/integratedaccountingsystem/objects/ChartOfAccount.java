@@ -111,4 +111,11 @@ public class ChartOfAccount {
         else
             return description;
     }
+
+    public String getCode(){
+        if(oldAccountCode != null && !oldAccountCode.isEmpty())
+            return oldAccountCode;
+        else
+            return accountCode;
+    }
 }

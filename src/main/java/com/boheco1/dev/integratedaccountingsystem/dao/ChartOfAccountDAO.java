@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChartOfAccountDAO {
-    public static List<ChartOfAccount> search(String q) throws Exception {
+    public static List<ChartOfAccount> get(String q) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "SELECT * FROM ChartOfAccounts WHERE Status = 'ACTIVE' AND (AccountCode LIKE '%" + q + "%' OR Description LIKE '%" + q + "%') ");
 

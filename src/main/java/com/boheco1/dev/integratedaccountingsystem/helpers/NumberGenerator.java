@@ -68,6 +68,27 @@ public class NumberGenerator {
         }
     }
 
+    public static String cvNumber() {
+        try {
+            int year = Utility.serverDate().getYear();
+
+            ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                    "SELECT TransactionNumber FROM TransactionHeader WHERE TransactionCode = 'CV' AND TransactionNumber LIKE '" + year + "-%' ORDER BY createdAt DESC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;");
+
+            if(!rs.next()) {
+                return year +  "-00001";
+            }
+
+            String lastId = rs.getString("mct_no");
+
+            return year + "-" + incrementStringID(lastId);
+
+        }catch(Exception ex) {
+            ex.printStackTrace();
+            return Utility.CURRENT_YEAR() + "-";
+        }
+    }
+
 
 
     private static String incrementStringID(String id) throws NumberFormatException {
