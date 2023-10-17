@@ -235,7 +235,8 @@ public class ReceivingDAO {
                         "(RRNo, StockID, QtyDelivered, QtyAccepted, UnitCost) " +
                         "VALUES (?,?,?,?,?)");
 
-        PreparedStatement ps3 = conn.prepareStatement("UPDATE Stocks SET Price=?, Quantity=Quantity+? WHERE id=?");
+        PreparedStatement ps3 = conn.prepareStatement("UPDATE Stocks SET Price= (? + COALESCE(NULLIF(Price,0), ?)) / 2, " +
+                "Quantity=Quantity+? WHERE id=?");
 
         PreparedStatement ps4 = conn.prepareStatement(
                 "INSERT INTO StockHistory (id, StockID, date, price, updatedBy) " +
@@ -279,11 +280,12 @@ public class ReceivingDAO {
                 ps2.setDouble(4, item.getQtyAccepted());
                 ps2.setDouble(5, item.getUnitCost());
                 ps2.addBatch();
-
                 //Update quantity and prices in Stocks
                 ps3.setDouble(1, item.getUnitCost());
-                ps3.setDouble(2, item.getQtyAccepted());
-                ps3.setString(3, item.getStockId());
+                ps3.setDouble(2, item.getUnitCost());
+                ps3.setDouble(3, item.getQtyAccepted());
+                ps3.setString(4, item.getStockId());
+
                 ps3.addBatch();
 
                 if (stock.getPrice() != item.getUnitCost()) {
