@@ -3,6 +3,9 @@ package com.boheco1.dev.integratedaccountingsystem.warehouse;
 import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Rectangle;
 import com.jfoenix.controls.*;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -12,15 +15,20 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -28,7 +36,7 @@ import java.util.ResourceBundle;
 public class MRTFormController extends MenuControllerHandler implements Initializable {
 
     @FXML
-    private JFXTextField searchItem_tf,returned_tf,received_tf;
+    private JFXTextField searchItem_tf,returned_tf,received_tf, mirs_no_tf, mirs_purpose_tf, mirs_address_tf, mrt_no_tf;
 
     @FXML
     private TableView releasedItemTable, returnItemTable;
@@ -37,6 +45,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
     private ObservableList<ReleasedItems> releasedItems = null;
     private MRT currentMRT = null;
     private EmployeeInfo receivedBy = null;
+    private MIRS mirs = null;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -52,6 +61,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
                 this.receivedBy = EmployeeDAO.getByDesignation("Warehouse");
                 this.received_tf.setText(this.receivedBy.getFullName());
             }
+            this.mrt_no_tf.setText(NumberGenerator.mrtNumber());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -69,6 +79,12 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
                 try {
                     this.releasedItems = FXCollections.observableList(MRTDao.searchReleasedItems(key));
                     this.releasedItemTable.getItems().setAll(this.releasedItems);
+                    if (this.releasedItems.size() > 0) {
+                        this.mirs = MirsDAO.getMIRS(this.releasedItems.get(0).getMirsNo());
+                        this.mirs_address_tf.setText(mirs.getAddress());
+                        this.mirs_purpose_tf.setText(mirs.getPurpose());
+                        this.mirs_no_tf.setText(mirs.getId());
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     AlertDialogBuilder.messgeDialog("System Error", "An error occurred while populating table due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
@@ -101,30 +117,32 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
                     AlertDialogBuilder.messgeDialog("System Message", "No return quantity provided", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }else{
                     try{
-                        int qty_to_return = Integer.parseInt(qty_tf.getText());
+                        double qty_to_return = Double.parseDouble(qty_tf.getText());
 
                         if (qty_to_return <= 0){
                             AlertDialogBuilder.messgeDialog("System Message", "No return quantity provided", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                         }else if (qty_to_return > item.getBalance()){
                             AlertDialogBuilder.messgeDialog("System Message", "The return quantity provided should not exceed the maximum released quantity!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                         }else{
+                            item.setBalance(item.getBalance() - qty_to_return);
+                            this.releasedItemTable.refresh();
                             MRTItem returnItem = new MRTItem(null, item.getId(), null, qty_to_return);
                             returnItem.setCode(item.getCode());
                             returnItem.setStockID(item.getStockID());
                             boolean ok = true;
                             for (MRTItem i : this.mrtItems){
                                 if (i.getReleasingID().equals(returnItem.getReleasingID())) {
+                                    i.setQuantity(i.getQuantity() + qty_to_return);
                                     ok = false;
                                     break;
                                 }
                             }
                             if (!ok){
-                                AlertDialogBuilder.messgeDialog("System Message", "The selected item is already found in the return items table!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                                this.returnItemTable.refresh();
                             }else{
                                 this.mrtItems.add(returnItem);
                                 this.returnItemTable.setItems(this.mrtItems);
                             }
-
                         }
                     }catch (Exception e){
                         e.printStackTrace();
@@ -151,10 +169,21 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
             JFXDialog dialog = DialogBuilder.showConfirmDialog("MRT","This process is final. Confirm Return Item(s)?", accept, Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
             accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
             accept.setOnAction(__ -> {
-                this.currentMRT = new MRT(null, this.returned_tf.getText(), this.receivedBy.getId(), LocalDate.now());
+                this.currentMRT = new MRT(this.mrt_no_tf.getText(), this.returned_tf.getText(), this.receivedBy.getId(), LocalDate.now());
                 try {
                     MRTDao.create(this.currentMRT);
                     MRTDao.addItems(this.currentMRT, this.mrtItems);
+                    Stage stage = (Stage) Utility.getContentPane().getScene().getWindow();
+                    FileChooser fileChooser = new FileChooser();
+                    fileChooser.getExtensionFilters().addAll(
+                            new FileChooser.ExtensionFilter("PDF Files", "*.pdf")
+                    );
+                    fileChooser.setInitialFileName("MRT_"+this.currentMRT.getId()+".pdf");
+                    File selectedFile = fileChooser.showSaveDialog(stage);
+                    if (selectedFile != null) {
+                        printMRT(selectedFile, this.currentMRT, this.mirs, Utility.getStackPane());
+                    }
+                    this.mrt_no_tf.setText(NumberGenerator.mrtNumber());
                     AlertDialogBuilder.messgeDialog("Material Return", "The selected released items were successfully returned!", Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
                     this.reset();
                 } catch (Exception e) {
@@ -272,6 +301,13 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
                                         try {
                                             mrtItems.remove(selectedItem);
                                             returnItemTable.setItems(mrtItems);
+                                            for (ReleasedItems i : releasedItems){
+                                                if (i.getId().equals(selectedItem.getReleasingID())) {
+                                                    i.setBalance(selectedItem.getQuantity() + i.getBalance());
+                                                    break;
+                                                }
+                                            }
+                                            releasedItemTable.refresh();
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         }
@@ -350,14 +386,79 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
      */
     @FXML
     public void reset(){
-        this.mrtItems = FXCollections.observableArrayList();;
-        this.releasedItems = FXCollections.observableArrayList();;
+        this.mirs = null;
+        this.mrtItems = FXCollections.observableArrayList();
+        this.releasedItems = FXCollections.observableArrayList();
         this.currentMRT = null;
         this.returned_tf.setText("");
         this.searchItem_tf.setText("");
+        this.mirs_no_tf.setText("");
+        this.mirs_purpose_tf.setText("");
+        this.mirs_address_tf.setText("");
         this.returnItemTable.setItems(this.mrtItems);
         this.releasedItemTable.setItems(this.releasedItems);
         this.returnItemTable.setPlaceholder(new Label("No item added!"));
         this.releasedItemTable.setPlaceholder(new Label("No item searched!"));
+    }
+
+    /**
+     * Generates a pdf containing the MR
+     * @param selectedFile the pointer to the pdf file using the FileChooser
+     * @param mrt the MR object to generate
+     * @param stackpane the stackpane for the dialogs to display
+     * @return void
+     */
+    public static void printMRT(File selectedFile, MRT mrt, MIRS mirs, StackPane stackpane){
+        Platform.runLater(() -> {
+            float[] columns = { .95f, .95f, 2.3f, .95f, 0.95f, .5f, .5f};
+            PrintPDF mrt_pdf = new PrintPDF(selectedFile, columns);
+            //Create Header
+            mrt_pdf.header(null, "MATERIALS RETURN TICKET");
+
+            int[] head_span = {1, 3, 1, 2};
+            int[] head_aligns = {Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_LEFT};
+            int[] head_fonts = {Font.BOLD, Font.NORMAL, Font.BOLD, Font.NORMAL};
+            int[] head_borders = {Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER};
+            String[] mirs_no = {"", "", "MIRS No", mirs.getId()};
+            mrt_pdf.other_details(mirs_no, head_span, head_fonts, head_aligns,head_borders, false);
+            String[] mrt_no = {"Particulars", mirs.getPurpose(), "Date", mirs.getDateFiled().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))};
+            mrt_pdf.other_details(mrt_no, head_span, head_fonts, head_aligns,head_borders, false);
+            String[] addr = {"Address", mirs.getAddress(), "MRT No", mrt.getId()};
+            mrt_pdf.other_details(addr, head_span, head_fonts, head_aligns,head_borders, false);
+
+            //Create Table Header
+            String[] headers = {"Acct Code", "Item Code", "Description", "Unit Cost", "Amount", "Unit", "Qty"};
+            int[] header_spans = {1, 1, 1, 1, 1, 1, 1};
+            mrt_pdf.tableHeader(headers, header_spans);
+            int[] rows_aligns = {Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_RIGHT,
+                    Element.ALIGN_RIGHT, Element.ALIGN_CENTER, Element.ALIGN_RIGHT};
+            ArrayList<String[]> rows = new ArrayList<>();
+            double total = 0;
+            try {
+                List<MRTItem> items = MRTDao.getItems(mrt.getId());
+
+                for (MRTItem item : items) {
+                    String[] data = {item.getAcctCode(), item.getCode(), item.getDescription(), item.getPrice()+"", item.getAmount()+"", item.getUnit(), item.getQuantity()+""};
+                    rows.add(data);
+                    total += item.getAmount();
+                }
+                mrt_pdf.tableContent(rows, header_spans, rows_aligns);
+                String[] amount = {"", "", "", "TOTAL", total+"", "", ""};
+                int[] amount_fonts = {Font.NORMAL, Font.NORMAL, Font.NORMAL, Font.NORMAL, Font.NORMAL, Font.NORMAL, Font.NORMAL};
+                int[] amount_aligns = {Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_RIGHT, Element.ALIGN_LEFT, Element.ALIGN_LEFT};
+                int[] amount_borders = {Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.BOX, Rectangle.BOX, Rectangle.NO_BORDER, Rectangle.NO_BORDER};
+                mrt_pdf.other_details(amount, header_spans, amount_fonts, amount_aligns, amount_borders, true);
+                int[] footer_spans = {2, 1, 4};
+                String[] signatorees = {"Received by:", "", "Returned by:"};
+                EmployeeInfo receivedBy = EmployeeDAO.getOne(mrt.getReceivedBy(), DB.getConnection());
+                String returnedBy = mrt.getReturnedBy();
+                String names[] = {receivedBy.getEmployeeFirstName()+ " "+receivedBy.getEmployeeLastName(), "", returnedBy};
+                String[] designations = {receivedBy.getDesignation(), "", "Contractor/Personnel"};
+                mrt_pdf.footer(signatorees, designations, names, footer_spans, true, Element.ALIGN_CENTER, Element.ALIGN_CENTER);
+                mrt_pdf.generate();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 }

@@ -47,6 +47,27 @@ public class NumberGenerator {
         }
     }
 
+    public static String mrtNumber() {
+        try {
+            int year = Utility.serverDate().getYear();
+
+            ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                    "SELECT id FROM MRT WHERE id LIKE '%" + year + "%' ORDER BY id DESC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;");
+
+            if(!rs.next()) {
+                return year + "-0001";
+            }
+
+            String lastId = rs.getString("id");
+
+            return year + "-" + incrementStringID(lastId);
+
+        }catch(Exception ex) {
+            ex.printStackTrace();
+            return Utility.CURRENT_YEAR() + "-";
+        }
+    }
+
     public static String mctNumber() {
         try {
             int year = Utility.serverDate().getYear();

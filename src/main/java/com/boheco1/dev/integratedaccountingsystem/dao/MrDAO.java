@@ -492,7 +492,7 @@ public class MrDAO {
         ps.setString(2, item.getStockID());
         ps.setString(3, item.getItemName());
         ps.setString(4, item.getDescription());
-        ps.setInt(5, item.getQty());
+        ps.setDouble(5, item.getQty());
         ps.setString(6, item.getRemarks());
         ps.setString(7, mr.getId());
         ps.setString(8, item.getRrNo());
@@ -543,7 +543,7 @@ public class MrDAO {
                 ps2.setString(2, item.getStockID());
                 ps2.setString(3, item.getItemName());
                 ps2.setString(4, item.getDescription());
-                ps2.setInt(5, item.getQty());
+                ps2.setDouble(5, item.getQty());
                 ps2.setString(6, item.getRemarks());
                 ps2.setString(7, mr.getId());
                 ps2.setString(8, item.getRrNo());
@@ -553,7 +553,7 @@ public class MrDAO {
                 ps2.addBatch();
 
                 if (item.getStockID() != null) {
-                    ps3.setInt(1, item.getQty());
+                    ps3.setDouble(1, item.getQty());
                     ps3.setString(2, ActiveUser.getUser().getId());
                     ps3.setString(3, item.getStockID());
                     ps3.addBatch();

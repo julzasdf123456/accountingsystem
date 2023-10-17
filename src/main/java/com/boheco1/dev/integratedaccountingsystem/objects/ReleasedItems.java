@@ -12,7 +12,8 @@ public class ReleasedItems {
     private double quantity;
     private String stockID;
     private String code;
-    private int balance;
+    private double balance;
+    private String mirsNo;
 
     public ReleasedItems(String id, String description, String mctNo, double price, double quantity) {
         this.id = id;
@@ -22,7 +23,7 @@ public class ReleasedItems {
         this.quantity = quantity;
     }
 
-    public ReleasedItems(String id, String description, String mctNo, double price, int quantity, int balance) {
+    public ReleasedItems(String id, String description, String mctNo, double price, double quantity, int balance) {
         this.id = id;
         this.description = description;
         this.mctNo = mctNo;
@@ -51,11 +52,11 @@ public class ReleasedItems {
         return quantity;
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(int balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 
@@ -73,5 +74,17 @@ public class ReleasedItems {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getMirsNo() {
+        return mirsNo;
+    }
+
+    public void setMirsNo(String mirsNo) {
+        this.mirsNo = mirsNo;
+    }
+
+    public void setQuantity(double quantity) {
+        this.quantity = quantity;
     }
 }

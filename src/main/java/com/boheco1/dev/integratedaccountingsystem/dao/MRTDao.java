@@ -6,6 +6,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,8 +16,6 @@ public class MRTDao {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "INSERT INTO MRT (id, dateOfReturned, returnedBy, receivedBy) " +
                         "VALUES (?,?,?,?)");
-
-        if(mrt.getId()==null) mrt.setId(Utility.generateRandomId());
 
         ps.setString(1, mrt.getId());
         ps.setDate(2, Date.valueOf(mrt.getDateOfReturned()));
@@ -58,7 +57,7 @@ public class MRTDao {
                 ps1.setString(1, item.getId()==null ? Utility.generateRandomId() : item.getId());
                 ps1.setString(2, item.getReleasingID());
                 ps1.setString(3, mrt.getId());
-                ps1.setInt(4, item.getQuantity());
+                ps1.setDouble(4, item.getQuantity());
                 ps1.executeUpdate();
 
                 //Update Quantity in Releasing
@@ -69,7 +68,7 @@ public class MRTDao {
                 //Insert StockEntryLogs
                 ps3.setString(1, Utility.generateRandomId());
                 ps3.setString(2, releasing.getStockID());
-                ps3.setInt(3, item.getQuantity());
+                ps3.setDouble(3, item.getQuantity());
                 ps3.setString(4, "Returned");
                 ps3.setDouble(5, releasing.getPrice());
                 ps3.setString(6, ActiveUser.getUser().getId());
@@ -78,7 +77,7 @@ public class MRTDao {
                 ps3.executeUpdate();
 
                 //Update Quantity in Stocks
-                ps4.setInt(1, item.getQuantity());
+                ps4.setDouble(1, item.getQuantity());
                 ps4.setString(2, releasing.getStockID());
                 //System.out.println("Item Quantity: " + item.getQuantity());
                 //System.out.println("releasing.getStockID" + releasing.getStockID());
@@ -97,19 +96,73 @@ public class MRTDao {
         conn.setAutoCommit(true);
     }
 
+    public static MRT getMRT(String mrtno)throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT * FROM MRT WHERE id = ?");
+
+
+        ps.setString(1, mrtno);
+
+
+        ResultSet rs = ps.executeQuery();
+        MRT mrt = null;
+        while(rs.next()) {
+            mrt = new MRT(rs.getString("id"), rs.getString("returnedBy"), rs.getString("receivedBy"), rs.getDate("dateOfReturned").toLocalDate());
+        }
+        rs.close();
+        return mrt;
+    }
+
+    public static List<MRTItem> getItems(String mrtno) throws Exception {
+        List<MRTItem> items = new ArrayList();
+
+        String sql = "SELECT AcctgCode, NEACode, LocalCode, Description, mi.Price, Unit, mti.quantity " +
+                "FROM Stocks s INNER JOIN MIRSItems mi ON s.id = mi.StockID " +
+                "INNER JOIN Releasing r ON r.StockID = s.id " +
+                "INNER JOIN MRTItem mti ON mti.releasing_id = r.id " +
+                "WHERE mti.mrt_id = ?";
+        PreparedStatement ps = DB.getConnection().prepareStatement(sql);
+
+        ps.setString(1, mrtno);
+
+        ResultSet rs = ps.executeQuery();
+
+        while(rs.next()) {
+            MRTItem item = new MRTItem();
+            item.setAcctCode(rs.getString("AcctgCode"));
+            String neaCode = rs.getString("NEACode");
+            if (neaCode != null && neaCode.length() != 0) {
+                item.setCode(neaCode);
+            }else{
+                item.setCode(rs.getString("LocalCode"));
+            }
+            item.setDescription(rs.getString("Description"));
+            item.setPrice(rs.getDouble("Price"));
+            item.setQuantity(rs.getDouble("quantity"));
+            item.setUnit(rs.getString("Unit"));
+            item.setAmount(item.getPrice()*item.getQuantity());
+            items.add(item);
+        }
+
+        rs.close();
+
+        return items;
+    }
+
     public static List<ReleasedItems> searchReleasedItems(String searchKey) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT NEACode, LocalCode, AcctgCode, r.id, s.Description, r.mct_no, r.Price, r.Quantity, r.Quantity - (SELECT COALESCE(SUM(quantity),0) FROM MRTItem WHERE releasing_id = r.id) as Balance, s.id as stockID " +
+                "SELECT NEACode, LocalCode, AcctgCode, m.id as MIRSNo, r.id, s.Description, r.mct_no, r.Price, r.Quantity, r.Quantity - (SELECT COALESCE(SUM(quantity),0) FROM MRTItem WHERE releasing_id = r.id) as Balance, s.id as stockID " +
                         "FROM Releasing r \n" +
                         "INNER JOIN Stocks s ON s.id = r.StockID \n" +
                         "INNER JOIN MIRSItems mi ON mi.StockID = r.StockID \n" +
                         "INNER JOIN MIRS m ON m.id = mi.MIRSID \n" +
-                        "WHERE r.Quantity > 0 AND mct_no IS NOT NULL AND (address LIKE ? OR details LIKE ? \n" +
+                        "WHERE r.Quantity > 0 AND mct_no IS NOT NULL AND (purpose LIKE ? OR address LIKE ? OR details LIKE ? \n" +
                         "OR s.Description LIKE ?) \n" +
                         "ORDER BY r.CreatedAt DESC;");
         ps.setString(1, "%" + searchKey + "%");
         ps.setString(2, "%" + searchKey + "%");
         ps.setString(3, "%" + searchKey + "%");
+        ps.setString(4, "%" + searchKey + "%");
 
         ResultSet rs = ps.executeQuery();
 
@@ -121,7 +174,7 @@ public class MRTDao {
                     rs.getString("Description"),
                     rs.getString("mct_no"),
                     rs.getDouble("price"),
-                    rs.getInt("Quantity"),
+                    rs.getDouble("Quantity"),
                     rs.getInt("Balance")
             );
             item.setStockID(rs.getString("stockID"));
@@ -131,6 +184,7 @@ public class MRTDao {
             }else{
                 item.setCode(rs.getString("LocalCode"));
             }
+            item.setMirsNo(rs.getString("MIRSNo"));
             items.add(item);
         }
 

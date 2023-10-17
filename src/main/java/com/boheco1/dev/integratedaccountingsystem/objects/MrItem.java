@@ -9,7 +9,7 @@ public class MrItem {
     private String stockID;
     private String itemName;
     private String description;
-    private int qty;
+    private double qty;
     private String remarks;
     private Stock stock;
     private String mrNo;
@@ -101,7 +101,7 @@ public class MrItem {
         this.stockID = stockID;
     }
 
-    public int getQty() {
+    public double getQty() {
         return qty;
     }
 
