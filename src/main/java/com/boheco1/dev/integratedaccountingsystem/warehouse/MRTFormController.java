@@ -51,6 +51,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.initializeReleasedItemTable();
         this.initializeReturnItemTable();
+        this.bindSearchAutocomplete(this.searchItem_tf);
         this.bindReturnedByAutocomplete(this.received_tf, true);
         this.bindReturnedByAutocomplete(this.returned_tf, false);
         try {
@@ -64,35 +65,6 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
             this.mrt_no_tf.setText(NumberGenerator.mrtNumber());
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Searches for the released items  and displays them in the released items table
-     * @return void
-     */
-    @FXML
-    public void searchReleasedItem(){
-        String key = this.searchItem_tf.getText();
-        try {
-            Platform.runLater(() -> {
-                try {
-                    this.releasedItems = FXCollections.observableList(MRTDao.searchReleasedItems(key));
-                    this.releasedItemTable.getItems().setAll(this.releasedItems);
-                    if (this.releasedItems.size() > 0) {
-                        this.mirs = MirsDAO.getMIRS(this.releasedItems.get(0).getMirsNo());
-                        this.mirs_address_tf.setText(mirs.getAddress());
-                        this.mirs_purpose_tf.setText(mirs.getPurpose());
-                        this.mirs_no_tf.setText(mirs.getId());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while populating table due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-            AlertDialogBuilder.messgeDialog("System Error", "An error occurred while populating table due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }
     }
 
@@ -330,6 +302,61 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
         this.returnItemTable.getColumns().add(column2);
         this.returnItemTable.getColumns().add(column3);
         this.returnItemTable.getColumns().add(column4);
+    }
+
+    /**
+     * Binds the textfield to autosuggest MIRS
+     * @return void
+     */
+    public void bindSearchAutocomplete(JFXTextField textField){
+        AutoCompletionBinding<MIRS> mirsSuggest = TextFields.bindAutoCompletion(textField,
+                param -> {
+                    //Value typed in the textfield
+                    String query = param.getUserText();
+
+                    //Initialize list of stocks
+                    List<MIRS> list = new ArrayList<>();
+
+                    //Perform DB query when length of search string is 2 or above
+                    if (query.length() > 1){
+                        try {
+                            list = MirsDAO.searchMIRS(query);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    return list;
+                }, new StringConverter<>() {
+                    //This governs what appears on the popupmenu. The given code will let the stockName appear as items in the popupmenu.
+                    @Override
+                    public String toString(MIRS object) {
+                        return object.getId()+": "+ object.getPurpose()+", Address:"+object.getAddress();
+                    }
+
+                    @Override
+                    public MIRS fromString(String string) {
+                        throw new UnsupportedOperationException();
+                    }
+                });
+
+        //This will set the actions once the user clicks an item from the popupmenu.
+        mirsSuggest.setOnAutoCompleted(event -> {
+            MIRS mirs = event.getCompletion();
+            searchItem_tf.setText("");
+            Platform.runLater(() -> {
+                try {
+                    this.releasedItems = FXCollections.observableList(MRTDao.searchReleasedItems(mirs.getId()));
+                    this.releasedItemTable.getItems().setAll(this.releasedItems);
+                    this.mirs_address_tf.setText(mirs.getAddress());
+                    this.mirs_purpose_tf.setText(mirs.getPurpose());
+                    this.mirs_no_tf.setText(mirs.getId());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while populating table due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                }
+            });
+        });
     }
 
     /**

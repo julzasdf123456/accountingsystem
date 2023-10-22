@@ -156,13 +156,9 @@ public class MRTDao {
                         "INNER JOIN Stocks s ON s.id = r.StockID \n" +
                         "INNER JOIN MIRSItems mi ON mi.StockID = r.StockID \n" +
                         "INNER JOIN MIRS m ON m.id = mi.MIRSID \n" +
-                        "WHERE r.Quantity > 0 AND mct_no IS NOT NULL AND (purpose LIKE ? OR address LIKE ? OR details LIKE ? \n" +
-                        "OR s.Description LIKE ?) \n" +
+                        "WHERE r.Quantity > 0 AND mct_no IS NOT NULL AND m.id = ?\n" +
                         "ORDER BY r.CreatedAt DESC;");
-        ps.setString(1, "%" + searchKey + "%");
-        ps.setString(2, "%" + searchKey + "%");
-        ps.setString(3, "%" + searchKey + "%");
-        ps.setString(4, "%" + searchKey + "%");
+        ps.setString(1, searchKey);
 
         ResultSet rs = ps.executeQuery();
 
