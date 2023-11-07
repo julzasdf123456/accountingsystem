@@ -25,7 +25,7 @@ public class BillDAO {
         Connection conn = DB.getConnection(Utility.DB_BILLING);
         conn.setAutoCommit(false);
 
-        String sql = "INSERT INTO PaidBills (" +
+        String sql = "INSERT INTO PaidBills (DCRNumber, " +
                 "PostingDate, "+
                 "AccountNumber, " +
                 "BillNumber, " +
@@ -50,7 +50,7 @@ public class BillDAO {
                 "DepositAmount, " +
                 "CashAmount, " +
                 "CheckAmount) " +
-                " VALUES (SYSDATETIME(), ?, ?, ?, ?, ?, ?, ?, ROUND(?, 2), ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2));";
+                " VALUES (' ', SYSDATETIME(), ?, ?, ?, ?, ?, ?, ?, ROUND(?, 2), ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2));";
 
         String sql_check = "INSERT INTO CheckPayment (AccountNumber, ServicePeriodEnd, Bank, RefNo, Amount) VALUES(?, ?, ?, ?, ROUND(?, 2))";
         String sql_md = "UPDATE MDRefund SET Amount=ROUND(Amount-?, 2) WHERE AccountNumber=?";

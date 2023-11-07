@@ -92,34 +92,34 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     private Label total_payable_lbl;
 
     @FXML
-    private TextField add_charges_tf;
+    private JFXTextField add_charges_tf;
 
     @FXML
-    private TextField surcharge_tf;
+    private JFXTextField surcharge_tf;
 
     @FXML
-    private TextField ppd_tf;
+    private JFXTextField ppd_tf;
 
     @FXML
-    private TextField adj_tf;
+    private JFXTextField adj_tf;
 
     @FXML
-    private TextField daa_tf;
+    private JFXTextField daa_tf;
 
     @FXML
-    private TextField ch2306_2307_tf;
+    private JFXTextField ch2306_2307_tf;
 
     @FXML
-    private TextField power_amt_tf;
+    private JFXTextField power_amt_tf;
 
     @FXML
-    private TextField vat_tf;
+    private JFXTextField vat_tf;
 
     @FXML
-    private TextField katas_tf;
+    private JFXTextField katas_tf;
 
     @FXML
-    private TextField md_refund_tf;
+    private JFXTextField md_refund_tf;
 
     @FXML
     private JFXButton transact_btn;
@@ -491,7 +491,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column2.setCellValueFactory(new PropertyValueFactory<>("dueDate"));
         column2.setStyle("-fx-alignment: center;");
         int amtSize = 93;
-        int smSize = 67;
+        int smSize = 70;
         TableColumn<Bill, String> column3 = new TableColumn<>("Bill Amount");
         column3.setPrefWidth(amtSize);
         column3.setMaxWidth(amtSize);
@@ -528,19 +528,19 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         )));
         column33.setStyle("-fx-alignment: center-right;");
 
-        TableColumn<Bill, String> column4 = new TableColumn<>("Penalty");
-        column4.setPrefWidth(smSize);
-        column4.setMaxWidth(smSize);
-        column4.setMinWidth(smSize);
-        column4.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getSurCharge())));
-        column4.setStyle("-fx-alignment: center-right;");
-
-        TableColumn<Bill, String> column41 = new TableColumn<>("PPD");
+        TableColumn<Bill, String> column41 = new TableColumn<>("Surcharge");
         column41.setPrefWidth(smSize);
         column41.setMaxWidth(smSize);
         column41.setMinWidth(smSize);
-        column41.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getDiscount())));
+        column41.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getSurCharge())));
         column41.setStyle("-fx-alignment: center-right;");
+
+        TableColumn<Bill, String> column4 = new TableColumn<>("PPD");
+        column4.setPrefWidth(smSize);
+        column4.setMaxWidth(smSize);
+        column4.setMinWidth(smSize);
+        column4.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getDiscount())));
+        column4.setStyle("-fx-alignment: center-right;");
 
         TableColumn<Bill, String> column42 = new TableColumn<>("SL Adj");
         column42.setPrefWidth(smSize);

@@ -248,13 +248,7 @@ public class Utility {
             try {
                 PaidBill pd = (PaidBill) b;
                 pd.setTeller(teller);
-                //If current user is a Teller
-                if (ActiveUser.getUser().getEmployeeInfo().getDesignation().equals("Teller")) {
-                    pd.setPaymentType("SUB-OFFICE/STATION");
-                    //Otherwise
-                } else {
-                    pd.setPaymentType("SIT-IN");
-                }
+                pd.setPaymentType("SUB-OFFICE/STATION");
             } catch (Exception e) {
                 e.printStackTrace();
             }
