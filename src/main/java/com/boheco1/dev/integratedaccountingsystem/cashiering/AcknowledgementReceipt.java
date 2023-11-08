@@ -407,7 +407,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         }
     }
 
-    private void generatePrinters() {
+    private void generatePrinters() throws Exception {
         ObservableSet<Printer> printers = Printer.getAllPrinters();
 
         List<Printer> printersList = new ArrayList<>();
@@ -420,6 +420,14 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         ObservableList<Printer> observableList = FXCollections.observableList(printersList);
 
         printersDropdown.setItems(observableList);
+
+        String arPrinterName = Utility.getARPrinterName();
+
+        if(arPrinterName!=null) {
+            for(Printer p: observableList) {
+                if(p.getName().matches(arPrinterName)) printersDropdown.getSelectionModel().select(p);
+            }
+        }
     }
 
     public void onPrint() {
@@ -459,8 +467,16 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
         boolean printed = printJob.printPage( buildPrintableNode() );
 
+        try {
+            Utility.setARPrinter(printer.getName());
+        }catch(Exception ex) {
+            AlertDialogBuilder.messgeDialog("Error!", ex.getMessage(),
+                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }
+
         if(printed) {
             printJob.endJob();
+
         }else {
             System.out.println("Unable to create print job.");
         }

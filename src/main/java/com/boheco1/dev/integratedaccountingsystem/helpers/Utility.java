@@ -406,6 +406,24 @@ public class Utility {
         return line==1 ? str.substring(0, indexOfLastSpace) : str.substring(indexOfLastSpace+1);
     }
 
+    public static String getARPrinterName() throws Exception{
+        Properties props = new Properties();
+        InputStream is = new FileInputStream("application.properties");
+        props.load(is);
+
+        return props.getProperty("ar_printer");
+    }
+
+    public static void setARPrinter(String printerName) throws Exception {
+        Properties props = new Properties();
+        InputStream is = new FileInputStream("application.properties");
+        props.load(is);
+
+        props.setProperty("ar_printer", printerName);
+
+        props.store(new FileOutputStream("application.properties"), LocalDate.now().toString());
+    }
+
     public static String COB_APPROVAL = "budget officer";
     public static String RV_APPROVAL = "general manager";
     public static String RV_RECOMMENDATION = "manager";
