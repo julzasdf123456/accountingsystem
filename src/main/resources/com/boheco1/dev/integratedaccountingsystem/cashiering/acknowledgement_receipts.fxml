@@ -5,6 +5,7 @@
 <?import com.jfoenix.controls.JFXTextArea?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
@@ -18,7 +19,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="669.0" prefWidth="1314.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.AcknowledgementReceipt">
+<AnchorPane prefHeight="669.0" prefWidth="1529.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.AcknowledgementReceipt">
    <children>
       <VBox layoutX="23.0" layoutY="164.0" prefHeight="278.0" prefWidth="304.0" spacing="5.0" AnchorPane.bottomAnchor="226.60000000000002" AnchorPane.leftAnchor="23.0" AnchorPane.topAnchor="164.0">
          <children>
@@ -98,6 +99,7 @@
             <Font size="24.0" />
          </font>
       </Label>
-      <JFXButton fx:id="printButton" layoutX="1199.0" layoutY="25.0" onAction="#onPrint" prefHeight="38.0" prefWidth="89.0" styleClass="btn-theme" text="Print" textFill="WHITE" AnchorPane.rightAnchor="25.400000000000006" AnchorPane.topAnchor="25.0" />
+      <JFXButton fx:id="printButton" layoutX="1415.0" layoutY="89.0" onAction="#onPrint" prefHeight="38.0" prefWidth="89.0" styleClass="btn-theme" text="Print" textFill="WHITE" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="89.0" />
+      <ComboBox fx:id="printersDropdown" layoutX="1278.0" layoutY="51.0" prefHeight="25.0" prefWidth="226.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="51.0" />
    </children>
 </AnchorPane>

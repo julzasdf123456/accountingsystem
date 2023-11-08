@@ -10,6 +10,8 @@ import com.sun.javafx.print.PrintHelper;
 import com.sun.javafx.print.Units;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableListBase;
+import javafx.collections.ObservableSet;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -44,6 +46,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class AcknowledgementReceipt extends MenuControllerHandler implements Initializable, ObjectTransaction {
@@ -67,6 +70,9 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
     @FXML
     JFXButton printButton;
+
+    @FXML
+    ComboBox<Printer> printersDropdown;
 
     private StackPane stackPane;
 
@@ -96,6 +102,8 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
             renderTable();
             breakdownTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+            generatePrinters();
 
         }catch(Exception ex) {
             ex.printStackTrace();
@@ -399,10 +407,39 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         }
     }
 
+    private void generatePrinters() {
+        ObservableSet<Printer> printers = Printer.getAllPrinters();
+
+        List<Printer> printersList = new ArrayList<>();
+
+        for(Printer printer: printers) {
+            //populate printers to comboBox
+            printersList.add(printer);
+        }
+
+        ObservableList<Printer> observableList = FXCollections.observableList(printersList);
+
+        printersDropdown.setItems(observableList);
+    }
+
     public void onPrint() {
         System.out.println("Commence printing...");
-        PrinterJob printJob = PrinterJob.createPrinterJob();
-        Printer printer = printJob.getPrinter();
+
+        Printer printer = printersDropdown.getSelectionModel().getSelectedItem();
+
+        PrinterJob printJob;
+
+        if(printer!=null) {
+            printJob = PrinterJob.createPrinterJob(printer);
+        }else {
+            printJob = PrinterJob.createPrinterJob();
+            printer = printJob.getPrinter();
+        }
+
+        System.out.println("Selected printer: " + printer.getName());
+
+        printJob.setPrinter(printer);
+//        Printer printer = printJob.getPrinter();
 
         Paper arsize = PrintHelper.createPaper("ARR", 18, 3, Units.INCH);
 
