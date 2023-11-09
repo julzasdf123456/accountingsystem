@@ -127,10 +127,7 @@
                         <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
                               <Label text="Transactions" />
-                              <TableView fx:id="dcr_power_table" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
-                                 <columnResizePolicy>
-                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                 </columnResizePolicy>
+                              <TableView fx:id="dcr_power_table" prefHeight="200.0" prefWidth="200.0" styleClass="datatable" VBox.vgrow="ALWAYS">
                                  <VBox.margin>
                                     <Insets />
                                  </VBox.margin>

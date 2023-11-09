@@ -46,7 +46,7 @@ public class ViewConsumerBillsController extends MenuControllerHandler implement
     private JFXTextField acct_no_tf;
 
     @FXML
-    private JFXButton search_btn;
+    private JFXButton search_btn, reset_btn;
 
     @FXML
     private JFXTextField con_addr_tf;
@@ -148,6 +148,54 @@ public class ViewConsumerBillsController extends MenuControllerHandler implement
         this.createPaymentsTable();
 
         Utility.setParentController(this);
+
+        if (Utility.getSelectedObject() != null && Utility.getSelectedObject() instanceof ConsumerInfo){
+            ConsumerInfo consumer = (ConsumerInfo) Utility.getSelectedObject();
+            Task<Void> task = new Task<>() {
+                @Override
+                protected Void call() throws SQLException {
+                    try{
+                        bills = FXCollections.observableArrayList(BillDAO.getConsumerBills(consumer));
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            };
+
+            task.setOnRunning(wse -> {
+                progressBar.setVisible(true);
+            });
+
+            task.setOnSucceeded(wse -> {
+                paidbills = FXCollections.observableArrayList();
+                setConsumerInfo(consumer);
+                if (this.bills.size() > 0) {
+                    fees_table.setItems(bills);
+                    int count = 0;
+                    double amount = 0;
+                    for (BillStanding b: bills) {
+                        if (b.getStatus().equals("UNPAID")) {
+                            count++;
+                            amount += b.getAmountDue();
+                        }else{
+                            paidbills.add(b);
+                        }
+                    }
+                    consumerBills_table.setItems(paidbills);
+                    this.unpaidBills_lbl.setText(count+"");
+                    this.unpaidBills_amount_lbl.setText(Utility.formatDecimal(amount));
+                }
+                progressBar.setVisible(false);
+            });
+
+            task.setOnFailed(wse -> {
+                //Do nothing
+                progressBar.setVisible(false);
+            });
+
+            new Thread(task).start();
+        }
     }
 
 
@@ -194,38 +242,38 @@ public class ViewConsumerBillsController extends MenuControllerHandler implement
      */
     public void createTable(){
         TableColumn<BillStanding, String> column = new TableColumn<>("Service Period");
-        column.setPrefWidth(120);
-        column.setMaxWidth(120);
-        column.setMinWidth(120);
+        column.setPrefWidth(100);
+        column.setMaxWidth(100);
+        column.setMinWidth(100);
         column.setCellValueFactory(new PropertyValueFactory<>("servicePeriodEnd"));
         column.setStyle("-fx-alignment: center;");
 
         TableColumn<BillStanding, String> column0 = new TableColumn<>("Bill Number");
-        column0.setPrefWidth(110);
-        column0.setMaxWidth(110);
-        column0.setMinWidth(110);
+        column0.setPrefWidth(88);
+        column0.setMaxWidth(88);
+        column0.setMinWidth(88);
         column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getBillNo()));
         column0.setStyle("-fx-alignment: center-left;");
 
         TableColumn<BillStanding, String> column01 = new TableColumn<>("Due Date");
-        column01.setPrefWidth(110);
-        column01.setMaxWidth(110);
-        column01.setMinWidth(110);
+        column01.setPrefWidth(88);
+        column01.setMaxWidth(88);
+        column01.setMinWidth(88);
         column01.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getDueDate() == null ? "" : obj.getValue().getDueDate().toString()));
         column01.setStyle("-fx-alignment: center;");
 
 
         TableColumn<BillStanding, String> column1 = new TableColumn<>("Type");
-        column1.setPrefWidth(110);
-        column1.setMaxWidth(110);
-        column1.setMinWidth(110);
+        column1.setPrefWidth(88);
+        column1.setMaxWidth(88);
+        column1.setMinWidth(88);
         column1.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumerType()));
         column1.setStyle("-fx-alignment: center;");
 
         TableColumn<BillStanding, String> column2 = new TableColumn<>("Status");
-        column2.setPrefWidth(100);
-        column2.setMaxWidth(100);
-        column2.setMinWidth(100);
+        column2.setPrefWidth(88);
+        column2.setMaxWidth(88);
+        column2.setMinWidth(88);
         column2.setCellValueFactory(new PropertyValueFactory<>("status"));
         column2.setStyle("-fx-alignment: center;");
 
@@ -256,32 +304,32 @@ public class ViewConsumerBillsController extends MenuControllerHandler implement
      */
     public void createPaymentsTable(){
         TableColumn<BillStanding, String> column = new TableColumn<>("Service Period");
-        column.setPrefWidth(120);
-        column.setMaxWidth(120);
-        column.setMinWidth(120);
+        column.setPrefWidth(100);
+        column.setMaxWidth(100);
+        column.setMinWidth(100);
         column.setCellValueFactory(new PropertyValueFactory<>("servicePeriodEnd"));
         column.setStyle("-fx-alignment: center;");
 
         TableColumn<BillStanding, String> column0 = new TableColumn<>("Bill Number");
-        column0.setPrefWidth(110);
-        column0.setMaxWidth(110);
-        column0.setMinWidth(110);
+        column0.setPrefWidth(88);
+        column0.setMaxWidth(88);
+        column0.setMinWidth(88);
         column0.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getBillNo()));
         column0.setStyle("-fx-alignment: center-left;");
 
 
 
         TableColumn<BillStanding, String> column1 = new TableColumn<>("Date Paid");
-        column1.setPrefWidth(110);
-        column1.setMaxWidth(110);
-        column1.setMinWidth(110);
+        column1.setPrefWidth(88);
+        column1.setMaxWidth(88);
+        column1.setMinWidth(88);
         column1.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getPostingDate() == null ? "" : obj.getValue().getPostingDate().toLocalDate().toString()));
         column1.setStyle("-fx-alignment: center;");
 
         TableColumn<BillStanding, String> column2 = new TableColumn<>("Teller");
-        column2.setPrefWidth(100);
-        column2.setMaxWidth(100);
-        column2.setMinWidth(100);
+        column2.setPrefWidth(150);
+        column2.setMaxWidth(150);
+        column2.setMinWidth(150);
         column2.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getTeller()));
         column2.setStyle("-fx-alignment: center-left;");
 
@@ -293,9 +341,9 @@ public class ViewConsumerBillsController extends MenuControllerHandler implement
         column3.setStyle("-fx-alignment: center-right;");
 
         TableColumn<BillStanding, String> column4 = new TableColumn<>("OR Number");
-        column4.setPrefWidth(110);
-        column4.setMaxWidth(110);
-        column4.setMinWidth(110);
+        column4.setPrefWidth(88);
+        column4.setMaxWidth(88);
+        column4.setMinWidth(88);
         column4.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getDcrNumber()));
         column4.setStyle("-fx-alignment: center;");
 
@@ -379,5 +427,10 @@ public class ViewConsumerBillsController extends MenuControllerHandler implement
         this.type_tf.setText(consumerInfo.getAccountType());
         this.status_tf.setText(consumerInfo.getAccountStatus());
         this.bapa_tf.setText(consumerInfo.getAccountType().equals("BAPA") ? "BAPA Registered" : "");
+        if (consumerInfo.getAccountStatus().toLowerCase().contains("disco")){
+            this.status_tf.setStyle("-fx-text-fill: red;");
+        }else{
+            this.status_tf.setStyle("-fx-text-fill: black;");
+        }
     }
 }

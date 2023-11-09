@@ -513,21 +513,24 @@ public class DCRController extends MenuControllerHandler implements Initializabl
     public void createDCRTransactionsTable(){
         TableColumn<Bill, String> column0 = new TableColumn<>("Bill #");
 
-        column0.setPrefWidth(100);
-        column0.setMaxWidth(100);
-        column0.setMinWidth(100);
+        column0.setPrefWidth(88);
+        column0.setMaxWidth(88);
+        column0.setMinWidth(88);
         column0.setCellValueFactory(new PropertyValueFactory<>("billNo"));
         column0.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Bill, String> column = new TableColumn<>("Account #");
-        column.setPrefWidth(100);
-        column.setMaxWidth(100);
-        column.setMinWidth(100);
+        column.setPrefWidth(88);
+        column.setMaxWidth(88);
+        column.setMinWidth(88);
         column.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumer().getAccountID()));
         column.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Bill, String> column1 = new TableColumn<>("Consumer Name");
         column1.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumer().getConsumerName()));
+        column1.setPrefWidth(250);
+        column1.setMaxWidth(250);
+        column1.setMinWidth(250);
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Bill, String> column2 = new TableColumn<>("Bill Balance");

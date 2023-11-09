@@ -4,6 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.dao.BillDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.ConsumerDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
+import com.boheco1.dev.integratedaccountingsystem.warehouse.StockController;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import javafx.beans.binding.Bindings;
@@ -68,7 +69,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     private JFXTextField bapa_tf;
 
     @FXML
-    private JFXButton view_account_tf;
+    private JFXButton view_account_tf, view_bills_tf;
 
     @FXML
     private TableView<Bill> fees_table;
@@ -160,6 +161,9 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
         this.view_account_tf.setOnAction(actionEvent -> {
             //connect to CRM
+        });
+        this.view_bills_tf.setOnAction(actionEvent -> {
+            viewBills();
         });
         //If account number entered is 10 digits, automatic display
         this.acct_no_tf.setOnKeyReleased(event -> {
@@ -406,7 +410,10 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.total_paid_tf.setDisable(true);
         this.payment_tf.setDisable(true);
         this.bills = FXCollections.observableArrayList(new ArrayList<>());
+        this.excluded_bills = FXCollections.observableArrayList(new ArrayList<>());
         this.fees_table.setItems(this.bills);
+        this.excluded_table.setItems(this.excluded_bills);
+        this.tableBox.getChildren().remove(this.excluded_table);
         this.transact_btn.setDisable(true);
         this.resetChecks();
         this.resetBillInfo();
@@ -450,7 +457,12 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     public void advanceSearch(){
         ModalBuilderForWareHouse.showModalFromXMLNoClose(PowerBillsPaymentController.class, "../tellering/tellering_search_consumer.fxml", Utility.getStackPane());
     }
-
+    public void viewBills(){
+        if (this.consumerInfo != null){
+            Utility.setSelectedObject(this.consumerInfo);
+            ModalBuilderForWareHouse.showModalFromXMLNoClose(PowerBillsPaymentController.class, "../tellering/tellering_consumer_bills.fxml", Utility.getStackPane());
+        }
+    }
     /**
      * Initializes the bills table
      * @return void
@@ -459,7 +471,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         TableColumn<Bill, String> column0 = new TableColumn<>("Bill #");
         column0.setPrefWidth(88);
         column0.setMaxWidth(88);
-        column0.setMinWidth(8);
+        column0.setMinWidth(88);
         column0.setCellValueFactory(new PropertyValueFactory<>("billNo"));
         column0.setStyle("-fx-alignment: center-left;");
 
@@ -499,7 +511,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column3.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(
                 obj.getValue().getAmountDue()
         )));
-        column3.setStyle("-fx-alignment: center-right;");
+        column3.setStyle("-fx-alignment: center-right; -fx-font-weight: bold;");
 
         TableColumn<Bill, String> column31 = new TableColumn<>("Pwr Amount");
         column31.setPrefWidth(amtSize);
@@ -607,7 +619,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
         TableColumn<Bill, String> column7 = new TableColumn<>("Total Amount");
         column7.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getTotalAmount())));
-        column7.setStyle("-fx-alignment: center-right;");
+        column7.setStyle("-fx-alignment: center-right; -fx-font-weight: bold;");
         column7.setPrefWidth(amtSize);
         column7.setMaxWidth(amtSize);
         column7.setMinWidth(amtSize);
@@ -664,7 +676,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         TableColumn<Bill, String> ecolumn0 = new TableColumn<>("Bill #");
         ecolumn0.setPrefWidth(88);
         ecolumn0.setMaxWidth(88);
-        ecolumn0.setMinWidth(8);
+        ecolumn0.setMinWidth(88);
         ecolumn0.setCellValueFactory(new PropertyValueFactory<>("billNo"));
         ecolumn0.setStyle("-fx-alignment: center-left;");
 
@@ -704,7 +716,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         ecolumn3.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(
                 obj.getValue().getAmountDue()
         )));
-        ecolumn3.setStyle("-fx-alignment: center-right;");
+        ecolumn3.setStyle("-fx-alignment: center-right; -fx-font-weight: bold;");
 
         TableColumn<Bill, String> ecolumn31 = new TableColumn<>("Pwr Amount");
         ecolumn31.setPrefWidth(amtSize);
@@ -812,7 +824,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
         TableColumn<Bill, String> ecolumn7 = new TableColumn<>("Total Amount");
         ecolumn7.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getTotalAmount())));
-        ecolumn7.setStyle("-fx-alignment: center-right;");
+        ecolumn7.setStyle("-fx-alignment: center-right; -fx-font-weight: bold;");
         ecolumn7.setPrefWidth(amtSize);
         ecolumn7.setMaxWidth(amtSize);
         ecolumn7.setMinWidth(amtSize);
@@ -844,7 +856,8 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.excluded_table.getColumns().add(ecolumn52);
         this.excluded_table.getColumns().add(ecolumn7);
         this.excluded_table.setFixedCellSize(27.0);
-
+        this.excluded_table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        this.excluded_table.getStyleClass().add("datatable");
         this.excluded_table.setRowFactory(tv -> {
             TableRow<Bill> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -971,6 +984,11 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.meter_no_tf.setText(consumerInfo.getMeterNumber());
         this.type_tf.setText(consumerInfo.getAccountType());
         this.status_tf.setText(consumerInfo.getAccountStatus());
+        if (this.consumerInfo.getAccountStatus().toLowerCase().contains("disco")){
+            this.status_tf.setStyle("-fx-text-fill: red;");
+        }else{
+            this.status_tf.setStyle("-fx-text-fill: black;");
+        }
         this.bapa_tf.setText(consumerInfo.getAccountType().equals("BAPA") ? "BAPA Registered" : "");
     }
     /**
