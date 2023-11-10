@@ -483,9 +483,9 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Bill, String> column_con = new TableColumn<>("(T) - Consumer Name");
-        column_con.setPrefWidth(150);
-        column_con.setMaxWidth(150);
-        column_con.setMinWidth(150);
+        column_con.setPrefWidth(200);
+        column_con.setMaxWidth(200);
+        column_con.setMinWidth(200);
         column_con.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumerType()+" - "+obj.getValue().getConsumer().getConsumerName()));
         column_con.setStyle("-fx-alignment: center-left;");
 
@@ -688,9 +688,9 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         ecolumn.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Bill, String> ecolumn_con = new TableColumn<>("(T) - Consumer Name");
-        ecolumn_con.setPrefWidth(150);
-        ecolumn_con.setMaxWidth(150);
-        ecolumn_con.setMinWidth(150);
+        ecolumn_con.setPrefWidth(200);
+        ecolumn_con.setMaxWidth(200);
+        ecolumn_con.setMinWidth(200);
         ecolumn_con.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumerType()+" - "+obj.getValue().getConsumer().getConsumerName()));
         ecolumn_con.setStyle("-fx-alignment: center-left;");
 

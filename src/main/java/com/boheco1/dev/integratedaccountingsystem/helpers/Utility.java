@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -362,7 +364,15 @@ public class Utility {
             return LocalDate.now();
         }
     }
-
+    public static String serverDateTime() throws SQLException, ClassNotFoundException {
+        ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                "SELECT SYSDATETIME() as serverDate");
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yy hh:mmaa");
+        if(rs.next()) {
+            return dateFormat.format(rs.getTimestamp("serverDate"));
+        }
+        return "";
+    }
     public static ORContent getOrContent() {
         return orContent;
     }

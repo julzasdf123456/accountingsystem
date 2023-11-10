@@ -15,9 +15,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -90,13 +87,13 @@ public class PrintOEBR extends Task {
         String id = bill.getConsumer().getAccountID();
         String meter_no = id.substring(0,2)+"-"+id.substring(2,6)+"-"+id.substring(6);
         String type = "Type: "+bill.getConsumerType();
-        String consumer = bill.getConsumer().getConsumerName();
+        String consumer = bill.getConsumer().getConsumerName().replace("Ñ", "N");
 
         if (consumer.length() > 24)
             consumer = consumer.substring(0, 25);
 
         String billno = bill.getBillNo();
-        String address = bill.getConsumer().getConsumerAddress();
+        String address = bill.getConsumer().getConsumerAddress().replace("Ñ", "N");;
 
         if (address.length() >= 32)
             address = address.substring(0, 32)+"..";
@@ -115,16 +112,14 @@ public class PrintOEBR extends Task {
         //Bill amount is total amount less the sum of vat, surcharge and surchargeVat
         String amount = Utility.formatDecimal(bill.getTotalAmount() - bill.getSurCharge() - surVat);
         String teller = bill.getTeller();
-        DateFormat dateFormat2 = new SimpleDateFormat("MM/dd/yy hh:mmaa");
-        LocalDate serverDate = LocalDate.now();
+        String receivedDate = "";
         try {
-            serverDate = Utility.serverDate();
+            receivedDate = Utility.serverDateTime();
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        String receivedDate = dateFormat2.format(java.sql.Date.valueOf(serverDate));
 
         //Print elements per line
         String[][] cols = {
