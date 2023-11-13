@@ -489,7 +489,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         TableColumn<Bill, String> column_con = new TableColumn<>("(T) - Consumer Name");
         column_con.setPrefWidth(200);
         column_con.setMinWidth(200);
-        column_con.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumerType()+" - "+obj.getValue().getConsumer().getConsumerName()));
+        column_con.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumerType()+" - "+obj.getValue().getConsumer().getConsumerName() + ((obj.getValue().getConsumer().getAccountStatus().contains("DISCO"))? " - DISCONNECTED" : "") + ((obj.getValue().getConsumer().getAccountStatus().contains("ILLEGAL"))? " - ILLEGAL" : "")));
         column_con.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Bill, String> column1 = new TableColumn<>("Billing Month");
@@ -693,7 +693,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         TableColumn<Bill, String> ecolumn_con = new TableColumn<>("(T) - Consumer Name");
         ecolumn_con.setPrefWidth(200);
         ecolumn_con.setMinWidth(200);
-        ecolumn_con.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumerType()+" - "+obj.getValue().getConsumer().getConsumerName()));
+        ecolumn_con.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumerType()+" - "+obj.getValue().getConsumer().getConsumerName() + ((obj.getValue().getConsumer().getAccountStatus().contains("DISCO"))? " - DISCONNECTED" : "") + ((obj.getValue().getConsumer().getAccountStatus().contains("ILLEGAL"))? " - ILLEGAL" : "")));
         ecolumn_con.setStyle("-fx-alignment: center-left;");
 
         TableColumn<Bill, String> ecolumn1 = new TableColumn<>("Billing Month");
@@ -858,7 +858,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.excluded_table.getColumns().add(ecolumn52);
         this.excluded_table.getColumns().add(ecolumn7);
         this.excluded_table.setFixedCellSize(27.0);
-        this.excluded_table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        this.excluded_table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         this.excluded_table.getStyleClass().add("datatable");
         this.excluded_table.setRowFactory(tv -> {
             TableRow<Bill> row = new TableRow<>();
@@ -986,7 +986,11 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.meter_no_tf.setText(consumerInfo.getMeterNumber());
         this.type_tf.setText(consumerInfo.getAccountType());
         this.status_tf.setText(consumerInfo.getAccountStatus());
-        if (this.consumerInfo.getAccountStatus().toLowerCase().contains("disco")){
+        if (this.consumerInfo.getAccountStatus().toLowerCase().contains("disco")) {
+            this.status_tf.setText("DISCONNECTED");
+            this.status_tf.setStyle("-fx-text-fill: red;");
+        }else if (this.consumerInfo.getAccountStatus().toLowerCase().contains("illegal")) {
+            this.status_tf.setText("ILLEGAL");
             this.status_tf.setStyle("-fx-text-fill: red;");
         }else{
             this.status_tf.setStyle("-fx-text-fill: black;");
