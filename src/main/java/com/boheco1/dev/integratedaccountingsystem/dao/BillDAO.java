@@ -259,9 +259,12 @@ public class BillDAO {
                     || bill.getConsumerType().equals("I")
                     || ( (bill.getConsumerType().equals("CL") || bill.getConsumerType().equals("CS")) && bill.getPowerKWH() >= 1000) )
                     && bill.getDaysDelayed() <= 0) {
-                double ppd = 0;
+                double ppd = 0, ppd_rate = 0.01;
+                //3% PPD for BAPA or ECA
+                if (bill.getConsumerType().equals("B")|| bill.getConsumerType().equals("E"))
+                    ppd_rate = 0.03;
                 try {
-                    ppd = BillDAO.getDiscount(bill);
+                    ppd = BillDAO.getDiscount(bill, ppd_rate);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -319,10 +322,11 @@ public class BillDAO {
     /**
      * Retrieves the discounted amount of a bill
      * @param bill The current bill
+     * @param rate The rate of discount (3% for BAPA/ECA, 1% for the rest)
      * @return amount The discounted amount
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static double getDiscount(Bill bill) throws Exception {
+    public static double getDiscount(Bill bill, double rate) throws Exception {
         String sql = "Select NetAmountLessCharges from BillsForDCRRevision where AccountNumber=? and ServicePeriodEnd=?";
 
         PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
@@ -341,7 +345,7 @@ public class BillDAO {
         rs.close();
         ps.close();
 
-        return amount*.01;
+        return amount*rate;
     }
 
     /**

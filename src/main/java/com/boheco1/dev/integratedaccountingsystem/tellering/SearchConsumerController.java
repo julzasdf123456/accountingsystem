@@ -123,27 +123,34 @@ public class SearchConsumerController extends MenuControllerHandler implements I
     public void createTable() {
 
         TableColumn<ConsumerInfo, String> column1 = new TableColumn<>("Account No");
-        column1.setMinWidth(123);
+        column1.setMinWidth(88);
+        column1.setMaxWidth(88);
+        column1.setPrefWidth(88);
         column1.setCellValueFactory(new PropertyValueFactory<>("accountID"));
         column1.setStyle("-fx-alignment: center-left;");
 
         TableColumn<ConsumerInfo, String> column2 = new TableColumn<>("Consumer Name");
-        column2.setMinWidth(265);
         column2.setCellValueFactory(new PropertyValueFactory<>("consumerName"));
         column2.setStyle("-fx-alignment: center-left;");
 
         TableColumn<ConsumerInfo, String> column3 = new TableColumn<>("Address");
         column3.setMinWidth(336);
+        column3.setMaxWidth(336);
+        column3.setPrefWidth(336);
         column3.setCellValueFactory(new PropertyValueFactory<>("consumerAddress"));
         column3.setStyle("-fx-alignment: center-left;");
 
         TableColumn<ConsumerInfo, String> column4 = new TableColumn<>("Account Type");
         column4.setMinWidth(125);
+        column4.setMaxWidth(125);
+        column4.setPrefWidth(125);
         column4.setCellValueFactory(new PropertyValueFactory<>("accountType"));
         column4.setStyle("-fx-alignment: center;");
 
         TableColumn<ConsumerInfo, String> column5 = new TableColumn<>("Status");
         column5.setMinWidth(106);
+        column5.setMaxWidth(106);
+        column5.setPrefWidth(106);
         column5.setCellValueFactory(new PropertyValueFactory<>("accountStatus"));
         column5.setStyle("-fx-alignment: center;");
 
@@ -156,5 +163,9 @@ public class SearchConsumerController extends MenuControllerHandler implements I
         this.consumersTable.getColumns().add(column3);
         this.consumersTable.getColumns().add(column4);
         this.consumersTable.getColumns().add(column5);
+    }
+
+    public JFXTextField getSearch_tf(){
+        return this.query_tf;
     }
 }

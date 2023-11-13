@@ -454,9 +454,13 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
      * @return void
      */
     @FXML
-    public void advanceSearch(){
-        ModalBuilderForWareHouse.showModalFromXMLNoClose(PowerBillsPaymentController.class, "../tellering/tellering_search_consumer.fxml", Utility.getStackPane());
+    public void advanceSearch() throws IOException {
+        this.showSearchConsumer();
     }
+    /**
+     * Shows the View Consumer Bills UI
+     * @return void
+     */
     public void viewBills(){
         if (this.consumerInfo != null){
             Utility.setSelectedObject(this.consumerInfo);
@@ -484,7 +488,6 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
         TableColumn<Bill, String> column_con = new TableColumn<>("(T) - Consumer Name");
         column_con.setPrefWidth(200);
-        column_con.setMaxWidth(200);
         column_con.setMinWidth(200);
         column_con.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumerType()+" - "+obj.getValue().getConsumer().getConsumerName()));
         column_con.setStyle("-fx-alignment: center-left;");
@@ -689,7 +692,6 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
         TableColumn<Bill, String> ecolumn_con = new TableColumn<>("(T) - Consumer Name");
         ecolumn_con.setPrefWidth(200);
-        ecolumn_con.setMaxWidth(200);
         ecolumn_con.setMinWidth(200);
         ecolumn_con.setCellValueFactory(obj -> new SimpleStringProperty(obj.getValue().getConsumerType()+" - "+obj.getValue().getConsumer().getConsumerName()));
         ecolumn_con.setStyle("-fx-alignment: center-left;");
@@ -856,7 +858,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.excluded_table.getColumns().add(ecolumn52);
         this.excluded_table.getColumns().add(ecolumn7);
         this.excluded_table.setFixedCellSize(27.0);
-        this.excluded_table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        this.excluded_table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         this.excluded_table.getStyleClass().add("datatable");
         this.excluded_table.setRowFactory(tv -> {
             TableRow<Bill> row = new TableRow<>();
@@ -1025,6 +1027,22 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.add_charges_tf.setText(Utility.formatDecimal(add_charge_sum));
         this.daa_tf.setText(Utility.formatDecimal(daa+acrm));
     }
+    /**
+     * Displays Search Consumer UI
+     * @return void
+     */
+    public void showSearchConsumer() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_search_consumer.fxml"));
+        Parent parent = fxmlLoader.load();
+        SearchConsumerController ctrl = fxmlLoader.getController();
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setBody(parent);
+        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+        dialog.setOnDialogOpened((event) -> { ctrl.getSearch_tf().requestFocus(); });
+        dialog.setOnDialogClosed((event) -> { payment_tf.requestFocus(); });
+        dialog.show();
+    }
+
     /**
      * Displays Add Check UI
      * @return void
@@ -1226,12 +1244,32 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         });
 
         controller.getCash_tf().setOnKeyReleased(event ->{
+            //Close if ESC is pressed
             if (event.getCode() == KeyCode.ESCAPE) {
                 dialogConfirm.close();
-            }else if (event.getCode() == KeyCode.ALPHANUMERIC) {
+            //Transact if SPACE is pressed
+            }else if (event.getCode() == KeyCode.SPACE){
+                Object obj = controller.getAccount_list().getSelectionModel().getSelectedItem();
+
+                if (obj == null && controller.checkDeposit()) {
+                    controller.getStatus_label().setText("Deposit checkbox is enabled. Select an account to proceed!");
+                    return;
+                }else{
+                    controller.getStatus_label().setText("");
+                }
+                PaidBill selection = null;
+                if (obj != null) selection = (PaidBill) obj;
                 try{
                     cash = Double.parseDouble(controller.getCash_tf().getText().replace(",",""));
                 }catch (Exception e){
+
+                }
+                this.transact(bills, cash, checks, dialogConfirm, controller.checkDeposit(), toDeposit, selection);
+            //If numeric keys, set digits in text field
+            }else if (event.getCode() == KeyCode.ALPHANUMERIC) {
+                try {
+                    cash = Double.parseDouble(controller.getCash_tf().getText().replace(",", ""));
+                } catch (Exception e) {
 
                 }
             }
@@ -1483,7 +1521,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                         dialog.setOnDialogClosed((event) -> {this.payment_tf.requestFocus(); });
                         dialog.show();
                     }else{
-                        AlertDialogBuilder.messgeDialog("System Error", "Only consumer types: BAPA, ECA, and I, CL, CS with more than 1KWH can avail the 1% discount on or before due date!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                        AlertDialogBuilder.messgeDialog("System Error", "Only consumer types: BAPA, ECA, and I, CL, CS with more than 1KWH can avail the 1%/3% discount on or before due date!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                         this.payment_tf.requestFocus();
                     }
                 });
