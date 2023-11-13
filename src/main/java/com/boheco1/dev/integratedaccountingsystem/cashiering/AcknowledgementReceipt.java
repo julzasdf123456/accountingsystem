@@ -142,11 +142,18 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
     }
 
     private void resetItemsEntry() {
-        amount.setText(null);
-        accountDescription.getSelectionModel().clearSelection();
-        amountInWords.setText(null);
-        deleteItemButton.setDisable(true);
-        amount.requestFocus();
+        try {
+            amount.setText(null);
+            accountDescription.getSelectionModel().clearSelection();
+            amountInWords.setText(null);
+//            orDate.setValue(Utility.serverDate());
+            deleteItemButton.setDisable(true);
+            amount.requestFocus();
+        }catch(Exception ex) {
+            ex.printStackTrace();
+            AlertDialogBuilder.messgeDialog("Error!", ex.getMessage(),
+                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }
     }
     public void onNew() {
         resetItemsEntry();
@@ -236,11 +243,12 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
                 orNumber.setText(nextARNumber+"");
             }
 
-            orDate.setValue(null);
+            orDate.setValue(Utility.serverDate());
             paymentFor.setText(null);
             receivedFrom.setText(null);
             paymentFor.setEditable(true);
             receivedFrom.setEditable(true);
+            address.setText(null);
 
             transactionDetails.clear();
 
@@ -291,6 +299,8 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
     public void onAmountEntry() {
         try {
             String entry = amount.getText();
+
+            if(entry==null) return;
 
             if (entry.isEmpty()) {
                 amountInWords.setText(null);
