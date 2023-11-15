@@ -109,6 +109,7 @@
                         <Insets bottom="20.0" top="20.0" />
                      </VBox.margin>
                   </HBox>
+                  <Label fx:id="evatLabel" style="-fx-font-size: 20;" text="Evat:" />
                   <Label text="Remarks">
                      <VBox.margin>
                         <Insets top="50.0" />
@@ -208,7 +209,6 @@
                               <Insets bottom="10.0" top="10.0" />
                            </VBox.margin>
                         </JFXTextField>
-                        <JFXButton contentDisplay="CENTER" onAction="#removeAdditionalEnergyBill" prefHeight="29.0" prefWidth="70.0" style="-fx-background-color: gray;" text="Remove" textFill="WHITE" />
                      </children>
                      <VBox.margin>
                         <Insets bottom="10.0" />
@@ -222,29 +222,21 @@
                            </font>
                         </Label>
                         <Separator prefWidth="200.0" />
-                        <JFXTextField fx:id="energyBill" labelFloat="true" prefHeight="30.0" prefWidth="124.0" promptText="Energy Bill">
+                        <JFXTextField fx:id="energyBill" labelFloat="true" onAction="#addRefund" prefHeight="30.0" prefWidth="124.0" promptText="Energy Bill">
                            <VBox.margin>
                               <Insets bottom="10.0" top="15.0" />
                            </VBox.margin>
                         </JFXTextField>
-                        <JFXTextField fx:id="vat" labelFloat="true" prefHeight="30.0" prefWidth="124.0" promptText="VAT">
+                        <JFXTextField fx:id="vat" labelFloat="true" onAction="#addRefund" prefHeight="30.0" prefWidth="124.0" promptText="VAT">
                            <VBox.margin>
                               <Insets bottom="10.0" top="10.0" />
                            </VBox.margin>
                         </JFXTextField>
-                        <JFXTextField fx:id="surcharge" labelFloat="true" prefHeight="30.0" prefWidth="124.0" promptText="Surcharge ">
+                        <JFXTextField fx:id="surcharge" labelFloat="true" onAction="#addRefund" prefHeight="30.0" prefWidth="124.0" promptText="Surcharge ">
                            <VBox.margin>
                               <Insets bottom="10.0" top="10.0" />
                            </VBox.margin>
                         </JFXTextField>
-                        <JFXButton fx:id="refund_btn" alignment="CENTER" buttonType="RAISED" onAction="#addRefund" prefHeight="29.0" prefWidth="74.0" styleClass="btn-info" text="Refund" textFill="WHITE">
-                           <cursor>
-                              <Cursor fx:constant="HAND" />
-                           </cursor>
-                           <VBox.margin>
-                              <Insets />
-                           </VBox.margin>
-                        </JFXButton>
                      </children>
                      <VBox.margin>
                         <Insets bottom="10.0" top="15.0" />

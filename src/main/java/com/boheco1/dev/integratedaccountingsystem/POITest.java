@@ -4,6 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.CustomPrintHelper;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
+import com.boheco1.dev.integratedaccountingsystem.usermgt.Hash;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -21,16 +22,95 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import pl.allegro.finance.tradukisto.MoneyConverters;
 import pl.allegro.finance.tradukisto.ValueConverters;
 
+
+import java.awt.*;
+import java.awt.print.PageFormat;
+import java.awt.print.Paper;
+import java.awt.print.Printable;
+import java.awt.print.PrinterJob;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import javax.print.DocFlavor;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.SimpleDoc;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.MediaSize;
+import javax.print.attribute.standard.MediaSizeName;
+import javax.print.attribute.standard.PrinterName;
+import javax.print.event.PrintJobAdapter;
+import javax.print.event.PrintJobEvent;
+import javax.swing.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 public class POITest extends Application {
-    public static void main(String[] args) {
-        printOEBR();
+    public static void main(String[] args) throws Exception {
+        //printOEBR();
         //launch(args);
+       // String textToPrint = "Sample";
+     //   printString(textToPrint);
+
+        System.out.println(Hash.hash("1"));
+    }public static void printString(String text) {
+        try {
+            // Get the default printer job
+            PrinterJob printerJob = PrinterJob.getPrinterJob();
+
+            //define custom paper size Short bond paper (w * 72 x h * 72) 612 x 396
+            Paper paper = new Paper();
+            paper.setSize(612, 396); // 1/72 inch
+            paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight()); // no margins
+
+
+
+
+            // Set the text to be printed
+            printerJob.setPrintable((graphics, pageFormat, pageIndex) -> {
+
+                pageFormat.setPaper(paper);
+                graphics.setFont(new Font("Courier New", Font.PLAIN, 8));
+                graphics.setColor(SystemColor.green);
+                FontMetrics fontMetrics = graphics.getFontMetrics();
+                if (pageIndex == 0) {
+                    graphics.drawString("5/5/2020", 38, 75); //date 1
+                    graphics.drawString("77885", 240, 75); //OR 1
+                    graphics.drawString("5/5/2020", 335, 75); //Date 2
+                    graphics.drawString("77558", 540, 75); //OR 2
+
+                    graphics.drawString("Juan Dela Cruz", 33, 100); //name 1
+                    graphics.drawString("Poblacion Sur, Clarin, Bohol", 33, 110); //address 1
+                    graphics.drawString("FOUR MILLION ONE HUNDRED THIRTY-NINE THOUSAND EIGHT", 33, 120); //in-word row
+                    graphics.drawString("HUNDRED SEVENTY-ONE AND 67/100 PESOS", 33, 130); //in-word row
+                    int space = 180;
+                    for(int i=1;i<15;i++){
+                        space+=9;
+                        graphics.drawString("Transformer Rental", 81, space); //O.R particulars 1
+                        graphics.drawString("999,999,999.99", 270 - fontMetrics.stringWidth(text), space); //O.R Price 1
+                    }
+
+
+
+                    System.out.println(pageFormat.getWidth() +" x "+ pageFormat.getHeight());
+                    return Printable.PAGE_EXISTS;
+                }
+                return Printable.NO_SUCH_PAGE;
+            });
+
+            // Print the document
+            if (printerJob.printDialog()) {
+                printerJob.print();
+                System.out.println("Printing completed.");
+            } else {
+                System.out.println("Printing cancelled.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

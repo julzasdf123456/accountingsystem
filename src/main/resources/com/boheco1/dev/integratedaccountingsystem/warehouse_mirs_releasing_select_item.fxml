@@ -8,97 +8,88 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.MIRSReleasingSelectItemController">
+
+<VBox maxHeight="615.0" maxWidth="584.0" minHeight="615.0" minWidth="584.0" prefHeight="615.0" prefWidth="584.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.MIRSReleasingSelectItemController">
    <children>
-      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="447.0" prefWidth="438.0" stylesheets="@style.css">
+      <HBox prefHeight="151.0" prefWidth="554.0">
          <children>
-            <VBox prefHeight="465.0" prefWidth="438.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <VBox prefHeight="154.0" prefWidth="266.0">
                <children>
-                  <HBox prefHeight="151.0" prefWidth="554.0">
+                  <Label text="Description: " />
+                  <TextArea fx:id="description" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="242.0" wrapText="true" />
+                  <HBox>
                      <children>
-                        <VBox prefHeight="154.0" prefWidth="266.0">
-                           <children>
-                              <Label text="Description: " />
-                              <TextArea fx:id="description" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="242.0" wrapText="true" />
-                              <HBox>
-                                 <children>
-                                    <Label fx:id="requestQtyLabel" prefHeight="19.0" prefWidth="95.0" text="Request: 0">
-                                       <font>
-                                          <Font name="System Italic" size="12.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="availableLabel" prefHeight="19.0" prefWidth="94.0" text="Available: 0">
-                                       <font>
-                                          <Font name="System Italic" size="12.0" />
-                                       </font>
-                                    </Label>
-                                 </children>
-                              </HBox>
-                           </children>
-                           <HBox.margin>
-                              <Insets right="6.0" />
-                           </HBox.margin>
-                        </VBox>
-                        <VBox prefWidth="317.0">
-                           <children>
-                              <Label prefHeight="19.0" prefWidth="61.0" text="Brand: " />
-                              <JFXComboBox fx:id="comboBoxBrand" maxWidth="1.7976931348623157E308" onAction="#selectBrand" prefHeight="37.0" prefWidth="223.0" promptText="-" />
-                              <Label text="Serial:">
-                                 <VBox.margin>
-                                    <Insets top="5.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <TextField fx:id="serial" prefHeight="37.0" prefWidth="328.0" />
-                              <Label text="Remarks:">
-                                 <VBox.margin>
-                                    <Insets top="5.0" />
-                                 </VBox.margin>
-                              </Label>
-                              <TextField fx:id="remarks" prefHeight="37.0" prefWidth="328.0" />
-                           </children>
-                        </VBox>
+                        <Label fx:id="requestQtyLabel" prefHeight="19.0" prefWidth="95.0" text="Request: 0">
+                           <font>
+                              <Font name="System Italic" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="availableLabel" prefHeight="19.0" prefWidth="94.0" text="Available: 0">
+                           <font>
+                              <Font name="System Italic" size="12.0" />
+                           </font>
+                        </Label>
                      </children>
+                  </HBox>
+               </children>
+               <HBox.margin>
+                  <Insets right="6.0" />
+               </HBox.margin>
+            </VBox>
+            <VBox prefWidth="317.0">
+               <children>
+                  <Label prefHeight="19.0" prefWidth="61.0" text="Brand: " />
+                  <JFXComboBox fx:id="comboBoxBrand" maxWidth="1.7976931348623157E308" onAction="#selectBrand" prefHeight="37.0" prefWidth="223.0" promptText="-" />
+                  <Label text="Serial:">
                      <VBox.margin>
-                        <Insets />
+                        <Insets top="5.0" />
                      </VBox.margin>
-                     <padding>
-                        <Insets bottom="5.0" />
-                     </padding>
-                  </HBox>
-                  <HBox alignment="BOTTOM_RIGHT">
+                  </Label>
+                  <TextField fx:id="serial" prefHeight="37.0" prefWidth="328.0" />
+                  <Label text="Remarks:">
                      <VBox.margin>
-                        <Insets />
+                        <Insets top="5.0" />
                      </VBox.margin>
-                     <children>
-                        <JFXButton buttonType="RAISED" onAction="#saveToTable" prefHeight="37.0" prefWidth="98.0" styleClass="btn-warning" text="Save" textFill="WHITE" />
-                     </children>
-                     <padding>
-                        <Insets bottom="5.0" top="5.0" />
-                     </padding>
-                  </HBox>
-                  <TableView fx:id="transformerTable" maxHeight="1.7976931348623157E308" prefWidth="200.0">
-                     <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                     </columnResizePolicy>
-                  </TableView>
-                  <Separator prefWidth="200.0" />
-                  <HBox alignment="CENTER">
-                     <children>
-                        <JFXButton fx:id="submit" buttonType="RAISED" onAction="#submitForReleasing" prefHeight="37.0" prefWidth="98.0" styleClass="card-success" text="Submit" textFill="WHITE" />
-                     </children>
-                     <padding>
-                        <Insets bottom="5.0" top="5.0" />
-                     </padding>
-                  </HBox>
+                  </Label>
+                  <TextField fx:id="remarks" prefHeight="37.0" prefWidth="328.0" />
                </children>
             </VBox>
          </children>
-      </AnchorPane>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+         <padding>
+            <Insets bottom="5.0" />
+         </padding>
+      </HBox>
+      <HBox alignment="BOTTOM_RIGHT">
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+         <children>
+            <JFXButton buttonType="RAISED" onAction="#saveToTable" prefHeight="37.0" prefWidth="98.0" styleClass="btn-warning" text="Save" textFill="WHITE" />
+         </children>
+         <padding>
+            <Insets bottom="5.0" top="5.0" />
+         </padding>
+      </HBox>
+      <TableView fx:id="itemizedItemTable" editable="true" maxHeight="1.7976931348623157E308" prefWidth="200.0">
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+      </TableView>
+      <Separator prefWidth="200.0" />
+      <HBox alignment="CENTER">
+         <children>
+            <JFXButton fx:id="submit" buttonType="RAISED" onAction="#submitForReleasing" prefHeight="37.0" prefWidth="98.0" styleClass="card-success" text="Submit" textFill="WHITE" />
+         </children>
+         <padding>
+            <Insets bottom="5.0" top="5.0" />
+         </padding>
+      </HBox>
    </children>
-</StackPane>
+</VBox>
