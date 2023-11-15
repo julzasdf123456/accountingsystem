@@ -84,15 +84,7 @@ public class ORLayoutController implements Initializable {
                 parentController.receive(false);
                 ModalBuilder.MODAL_CLOSE();
             });
-            try {
-                // Start the task
-                new Thread(task).start();
-                // Wait for the task to complete (if needed)
-                task.get();
-            } catch (Exception e) {
-                // Handle the exception here
-                System.err.println("Exception caught: " + e.getMessage());
-            }
+            new Thread(task).start();
 
         } catch (Exception e) {
             AlertDialogBuilder.messgeDialog("System Error (O.R Layout)", "Error encounter while initializing fields: "+e.getMessage(),

@@ -265,7 +265,7 @@ public class SearchOr extends MenuControllerHandler implements Initializable, Ob
             if(!b)
                 System.out.println("Re-print error");
 
-            ModalBuilder.MODAL_CLOSE();
+           // ModalBuilder.MODAL_CLOSE();
         }
     }
 }
