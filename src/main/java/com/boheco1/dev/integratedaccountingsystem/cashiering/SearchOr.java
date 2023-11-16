@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class SearchOr extends MenuControllerHandler implements Initializable {
+public class SearchOr extends MenuControllerHandler implements Initializable, ObjectTransaction  {
 
     @FXML
     private DatePicker transactionDate, searchDate;
@@ -64,6 +64,7 @@ public class SearchOr extends MenuControllerHandler implements Initializable {
     private ObservableList<PieChart.Data> pieChartData;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        Utility.setParentController(this);
         initTable();
         transCode.getItems().add("OR");
         transCode.getItems().add("ORSub");
@@ -98,6 +99,8 @@ public class SearchOr extends MenuControllerHandler implements Initializable {
 
     }
 
+    private  TransactionHeader transactionHeader;
+    private List<TransactionDetails> transactionDetailsList;
     @FXML
     void searchOR(ActionEvent event) throws Exception {
         String searchOr = orNumber.getText();//temporary store search string before reset and clear all field
@@ -106,20 +109,45 @@ public class SearchOr extends MenuControllerHandler implements Initializable {
 
 
         orNumber.setText(searchOr);
-        TransactionHeader transactionHeader = TransactionHeaderDAO.get(searchOr,transCode.getSelectionModel().getSelectedItem(), transactionDate.getValue());
+        transactionHeader = TransactionHeaderDAO.get(searchOr,transCode.getSelectionModel().getSelectedItem(), transactionDate.getValue());
         if(transactionHeader == null){
             AlertDialogBuilder.messgeDialog("System Message", "Transaction info not found.",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }else{
-            List<TransactionDetails> transactionDetails = TransactionDetailsDAO.get(searchOr,transCode.getSelectionModel().getSelectedItem(), transactionDate.getValue());
+            transactionDetailsList = TransactionDetailsDAO.get(searchOr,transCode.getSelectionModel().getSelectedItem(), transactionDate.getValue());
 
-            ObservableList<TransactionDetails> result = FXCollections.observableArrayList(transactionDetails);
+            ObservableList<TransactionDetails> result = FXCollections.observableArrayList(transactionDetailsList);
             orTable.setItems(result);
             name.setText(transactionHeader.getName());
             address.setText(transactionHeader.getAddress());
             totalAmount.setText("Total Amount: "+Utility.formatDecimal(transactionHeader.getAmount()));
         }
 
+    }
+
+
+    @FXML
+    private void reprint(ActionEvent event) throws Exception {
+
+        ObservableList<ORItemSummary> orItemSummaries = FXCollections.observableArrayList();;
+        for(TransactionDetails td : transactionDetailsList){
+            if(!td.getParticulars().equals("Grand Total")){
+                ORItemSummary os = new ORItemSummary(td.getAccountCode(),td.getParticulars(),td.getAmount());
+                orItemSummaries.add(os);
+            }
+        }
+
+        ORContent orContent = new ORContent(null, transactionHeader, transactionDetailsList, true);
+        orContent.setAddress(address.getText());
+        orContent.setDate(transactionDate.getValue());
+        orContent.setOrNumber(orNumber.getText());
+        orContent.setIssuedTo(name.getText());
+        orContent.setTellerCollection(orItemSummaries);
+        EmployeeInfo employeeInfo = ActiveUser.getUser().getEmployeeInfo();
+        orContent.setIssuedBy(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
+        orContent.setTotal(transactionHeader.getAmount());
+        Utility.setOrContent(orContent);
+        ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
     }
 
 
@@ -228,5 +256,16 @@ public class SearchOr extends MenuControllerHandler implements Initializable {
         this.transDetailsTable.getColumns().add(transDetailsTableColumn0);
         this.transDetailsTable.getColumns().add(transDetailsTableColumn1);
         this.transDetailsTable.getColumns().add(transDetailsTableColumn2);
+    }
+
+    @Override
+    public void receive(Object o) {
+        if (o instanceof Boolean) {
+            boolean b = (Boolean) o;
+            if(!b)
+                System.out.println("Re-print error");
+
+           // ModalBuilder.MODAL_CLOSE();
+        }
     }
 }

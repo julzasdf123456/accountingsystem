@@ -14,6 +14,7 @@ public class ORContent {
     private String issuedTo;
     private String issuedBy;
     private double total;
+    private boolean reprint;
     private ObservableList<ORItemSummary> tellerCollection;
 
     private ObservableList<ORItemSummary> supplierItems;
@@ -33,6 +34,13 @@ public class ORContent {
         this.crmQueue = crmQueue;
         this.transactionHeader = transactionHeader;
         this.tds = tds;
+    }
+
+    public ORContent(CRMQueue crmQueue, TransactionHeader transactionHeader, List<TransactionDetails> tds, boolean reprint) {
+        this.crmQueue = crmQueue;
+        this.transactionHeader = transactionHeader;
+        this.tds = tds;
+        this.reprint = reprint;
     }
 
     public ORContent() {    }
@@ -157,5 +165,13 @@ public class ORContent {
 
     public void setBulkPrinting(List<ORItemSummary> bulkPrinting) {
         this.bulkPrinting = bulkPrinting;
+    }
+
+    public boolean isReprint() {
+        return reprint;
+    }
+
+    public void setReprint(boolean reprint) {
+        this.reprint = reprint;
     }
 }

@@ -75,4 +75,9 @@ public class ItemizedMirsItem {
     public void setRequestedStockId(String requestedStockId) {
         this.requestedStockId = requestedStockId;
     }
+
+    public String toString(){
+        return brand;
+    }
+
 }

@@ -45,6 +45,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
     @FXML
     private JFXTextField orItem, orItemAmount, serviceFeeAmount, serviceFeeAccounts, name, address, purpose, energyBill, vat, surcharge, otherItemAmount, otherItemAccNum, tinNo, orNumber, businessStyle;
 
+    @FXML
+    private Label evatLabel;
 
     @FXML
     private JFXComboBox<String> paymentMode;
@@ -118,6 +120,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         selectOtherItem.getItems().add("Prepayment");
         selectOtherItem.getItems().add("Energy Bill");
         selectOtherItem.getItems().add("Miscellaneous Income");
+        selectOtherItem.getItems().add("A/P Others");
 
         try {
             List<BankAccount> bankAccounts = BankAccountDAO.getAll();
@@ -312,7 +315,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
             if(transactionHeader == null){
                 this.name.setText(tellerInfo.getName());
-                this.date.setValue(localDate);
+                //this.date.setValue(localDate);
                 this.address.setText(tellerInfo.getAddress());
                 this.purpose.setText("for DCR O.R");
                 address.setEditable(false);
@@ -323,7 +326,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             }else{
                 this.address.setText(tellerInfo.getAddress());
                 this.name.setText(tellerInfo.getName());
-                this.date.setValue(transactionHeader.getTransactionDate());
+                //this.date.setValue(transactionHeader.getTransactionDate());
                 this.orNumber.setText(transactionHeader.getTransactionNumber());
                 this.purpose.setText("for DCR O.R");
                 this.remarks.setText(transactionHeader.getRemarks());
@@ -493,6 +496,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
         collectionFromTeller=calculate;
         total.setText(""+Utility.formatDecimal(collectionFromTeller));
+        evatLabel.setText("Evat:"+ Utility.formatDecimal(collectionFromTeller * .12));
         //totalDisplay.setText(Utility.formatDecimal(totalAmount));
     }
 
@@ -504,10 +508,11 @@ public class CashierController extends MenuControllerHandler implements Initiali
             if(otherItem.contains("Prepayment")){
                 addPrepayment();
             }else if(otherItem.contains("Energy Bill")){
-
                 addNewEnergyBill();
             }else if(otherItem.contains("Miscellaneous Income")){
                 addMiscellaneousIncome();
+            }else if(otherItem.contains("A/P Others")){
+                addAPOthers();
             }
         }
     }
@@ -607,17 +612,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
             }
 
             resetOtherItemFields();
-
-
-                /*ORItemSummary items = (ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1);
-                String[] pre = items.getDescription().split("-");
-
-                if(pre[0].equals("Energy Prepayment")){
-                    ((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setAmount(amount);
-                    ((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setTotalView(Utility.formatDecimal(amount));
-                }else{
-                    paymentTable.getItems().add(new ORItemSummary("23220901000","Energy Prepayment-"+accNum.getText(),Double.parseDouble(prepayment.getText())));
-                }*/
         }
     }
 
@@ -626,7 +620,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             double amount = Double.parseDouble(otherItemAmount.getText());
 
 
-            //scan table if the additional Energy Bill is already added
+            //scan table if the additional Miscellaneous Income is already added
             boolean found = false;
             ObservableList<ORItemSummary> temp = paymentTable.getItems();
             for(ORItemSummary os : temp){
@@ -646,56 +640,35 @@ public class CashierController extends MenuControllerHandler implements Initiali
             }
 
             resetOtherItemFields();
-
-
-                /*ORItemSummary items = (ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1);
-                String[] pre = items.getDescription().split("-");
-
-                if(pre[0].equals("Energy Prepayment")){
-                    ((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setAmount(amount);
-                    ((ORItemSummary) paymentTable.getItems().get(paymentTable.getItems().size()-1)).setTotalView(Utility.formatDecimal(amount));
-                }else{
-                    paymentTable.getItems().add(new ORItemSummary("23220901000","Energy Prepayment-"+accNum.getText(),Double.parseDouble(prepayment.getText())));
-                }*/
         }
     }
 
-    @FXML
-    private void removeAdditionalEnergyBill(ActionEvent event) {
-        ORItemSummary selectedRow = (ORItemSummary) paymentTable.getSelectionModel().getSelectedItem();
-        if(selectedRow != null && selectedRow.isRemovable()){
-            paymentTable.getItems().remove(selectedRow);
-            reCompute();
-            paymentTable.refresh();
-        }
+    private void addAPOthers(){ //will use if there are excess energy bill
+        if(!otherItemAmount.getText().isEmpty()){
+            double amount = Double.parseDouble(otherItemAmount.getText());
 
-       /* int count = paymentTable.getItems().size();
-        if(count >= 1) {
-            try{
-                if(tellerInfo==null) return;
-                //scan table and look for the item base on the selected combo box
-                String otherItem = selectOtherItem.getSelectionModel().getSelectedItem();
-                ObservableList<ORItemSummary> temp = paymentTable.getItems();
-                for(ORItemSummary os : temp){
-                    if(os.getDescription().contains(otherItem)){
-                        paymentTable.getItems().remove(os);
-                        break;
-                    }
+
+            //scan table if the additional 22220500000 is already added
+            boolean found = false;
+            ObservableList<ORItemSummary> temp = paymentTable.getItems();
+            for(ORItemSummary os : temp){
+                if(os.getDescription().contains("A/P Others")){
+                    os.setDescription("A/P Others");
+                    os.setAmount(amount);
+                    //os.setTotalView(Utility.formatDecimal(amount));
+                    found = true;
+                    break;
                 }
-
-                reCompute();
-                paymentTable.refresh();
-
-                /*ORItemSummary items = (ORItemSummary) paymentTable.getItems().get(count - 1);
-                String[] pre = items.getDescription().split("-");
-                if (pre[0].equals("Energy Prepayment")) {
-                    paymentTable.getItems().remove(paymentTable.getItems().size() - 1);
-                    paymentTable.refresh();
-                }
-            }catch (Exception e){
-                e.printStackTrace();
             }
-        }*/
+
+            if(!found){
+                ORItemSummary orItemSummary = new ORItemSummary("22220500000","A/P Others",Double.parseDouble(otherItemAmount.getText()));
+                orItemSummary.setRemovable(true);
+                paymentTable.getItems().add(orItemSummary);
+            }
+
+            resetOtherItemFields();
+        }
     }
 
     @FXML
@@ -881,7 +854,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             transactionHeader.setAmount(collectionFromCRM);
         }else if(tellerInfo != null) {
             transactionHeader.setSource("Billing");
-            transactionHeader.setEnteredBy(tellerInfo.getUsername());
+            transactionHeader.setEnteredBy(ActiveUser.getUser().getUserName());
             transactionHeader.setAccountID(ActiveUser.getUser().getId());
             transactionHeader.setAmount(collectionFromTeller);
             transactionHeader.setTransactionDate(date.getValue());

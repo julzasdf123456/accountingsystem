@@ -64,7 +64,7 @@ public class ORLayoutController implements Initializable {
 
             task.setOnSucceeded(wse -> {
                 dialog.close();
-                if(Utility.ERROR_MSG == null){
+                if(Utility.ERROR_MSG == null || Utility.ERROR_MSG.isEmpty()){
                     AlertDialogBuilder.messgeDialog("System Message", "Transaction Complete.",
                             Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
                     Utility.OR_NUMBER = Integer.parseInt(orContent.getOrNumber())+1;
@@ -84,7 +84,6 @@ public class ORLayoutController implements Initializable {
                 parentController.receive(false);
                 ModalBuilder.MODAL_CLOSE();
             });
-
             new Thread(task).start();
 
         } catch (Exception e) {
@@ -114,24 +113,7 @@ public class ORLayoutController implements Initializable {
             String description = "", amount = "";
             if(orContent.getTellerCollection()!=null){
                 ObservableList<ORItemSummary> items = orContent.getTellerCollection();
-                /*double energyBillsOthers = 0;
                 for (ORItemSummary a : items) {
-                    if(a.getDescription().equals("Others") || a.getDescription().equals("Other Deduction")){
-                        energyBillsOthers+=a.getAmount();
-                    }
-                }*/
-
-
-                for (ORItemSummary a : items) {
-                        /*if(a.getDescription().equals("Others") || a.getDescription().equals("Other Deduction"))
-                            continue;
-
-                        if(a.getDescription().equals("Surcharge")){
-                            if(energyBillsOthers!=0){
-                                description +="Energy Bills - Others\n";
-                                amount += Utility.formatDecimal(energyBillsOthers)+ "\n";
-                            }
-                        }*/
                     if(!a.getDescription().equals("Grand Total")) {
                         if (a.getDescription().length() > 26) {
                             description += a.getDescription().substring(0, 25) + "...\n";
@@ -202,9 +184,10 @@ public class ORLayoutController implements Initializable {
 
     private void printSaveOR(){
         try{
+            if(!orContent.isReprint())
+                TransactionHeaderDetailDAO.save(orContent.getCrmQueue(), orContent.getTransactionHeader(), orContent.getTds());
 
-            TransactionHeaderDetailDAO.save(orContent.getCrmQueue(), orContent.getTransactionHeader(), orContent.getTds());
-            if(Utility.ERROR_MSG == null){//error message from TransactionHeaderDAO
+            if(Utility.ERROR_MSG == null || Utility.ERROR_MSG.isEmpty()){//error message from TransactionHeaderDAO
                 Node node = printArea;
                 Paper paper = PrintHelper.createPaper("OR", 18, 5.5, Units.INCH);
                 Printer printer = Printer.getDefaultPrinter();

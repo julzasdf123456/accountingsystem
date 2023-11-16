@@ -152,7 +152,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
             }
         });
 
-
+        search();
 
     }
 
@@ -227,7 +227,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
             this.searchDateTo.setVisible(false);
             this.labelTo.setVisible(false);
             this.searchTf.setPromptText("Reference Number/Last Name/First Name/Address");
-            search();
+
         }else {
             this.toggleSearch.setText("Search Teller");
             this.searchDateFrom.setVisible(true);
@@ -236,7 +236,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
             this.searchTf.setPromptText("Username/Last Name/First Name");
             searchResultTable.getItems().clear();
         }
-
+        search();
     }
 
     private int countTableItem(){

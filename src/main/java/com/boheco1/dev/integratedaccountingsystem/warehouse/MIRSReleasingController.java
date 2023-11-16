@@ -435,7 +435,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
             checkAllBtn.setText("Check All");
         }
         for(MIRSItem m : requestedMirsItem){
-            if(m.getParticulars().toLowerCase().contains("meter") || (m.getParticulars().toLowerCase().contains("current") && m.getParticulars().toLowerCase().contains("transformer")))
+            if(m.getParticulars().toLowerCase().contains("meter") || m.getParticulars().toLowerCase().contains("transformer"))
                 continue;
             m.setSelected(!m.isSelected());
         }
@@ -528,7 +528,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                     if(isTransformer(mirsItem)){
                         Utility.setSelectedObject(mirsItem);
                         //Utility.setDictionary(selected_items);
-                        ModalBuilderForWareHouse.showModalFromXMLNoClose(WarehouseDashboardController.class, "../warehouse_mirs_releasing_select_item.fxml", Utility.getStackPane());
+                        ModalBuilderForWareHouse.showModalFromXMLHeader(WarehouseDashboardController.class, "../warehouse_mirs_releasing_select_item.fxml", Utility.getStackPane(),"Brand Distribution");
                     }else{
                         releasingItem.add(mirsItem);
                         requestedItem.removeAll(mirsItem);
@@ -851,7 +851,9 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
 
                 requestedItemTable.refresh();
                 releasingItemTable.refresh();
+                System.out.println(requestedMirsItem.getQuantity());
             }
+
         }
     }
 
