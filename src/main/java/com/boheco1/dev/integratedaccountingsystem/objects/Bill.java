@@ -392,15 +392,17 @@ public class Bill {
                     amount = 0;
                 //Penalty computation for BAPA/ECA
                 }else if (this.consumerType.equals("B") || this.consumerType.equals("E")) {
+                    //No penalty if days delayed less than equal to 5
+                    if (this.getDaysDelayed() <= 5) {
+                        amount = 0;
                     //5% penalty if 30 days and above
-                    if (this.getDaysDelayed() >= 30) {
+                    }else if (this.getDaysDelayed() >= 30) {
                         amount = penalty * 0.05;
                     //3% penalty if 30 days below
                     } else {
                         amount = penalty * 0.03;
                     }
-                    //Set minimum surcharge
-                    if (amount <= 50) amount = 50;
+                    //No minimum surcharge for BAPA/ECA
                 //For Residential
                 } else if (this.consumerType.equals("RM") && (this.getServicePeriodEnd().isEqual(LocalDate.of(2014, 8, 1)) || this.getServicePeriodEnd().isAfter(LocalDate.of(2014, 8, 1)))) {
                     amount = penalty * 0.03;
