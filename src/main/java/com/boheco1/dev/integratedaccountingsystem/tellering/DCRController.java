@@ -1008,28 +1008,41 @@ public class DCRController extends MenuControllerHandler implements Initializabl
      * @return void
      */
     public void showAuthenticate(PaidBill bill, int index) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_authenticate.fxml"));
-        Parent parent = fxmlLoader.load();
-        JFXDialogLayout dialogLayout = new JFXDialogLayout();
-        dialogLayout.setHeading(new Label("MANAGER AUTHENTICATION"));
-        dialogLayout.setBody(parent);
-        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
-        WaiveConfirmationController waiveController = fxmlLoader.getController();
-        waiveController.getAuthenticate_btn().setOnAction(actionEvent -> {
-            boolean ok = waiveController.login();
-            if (ok) {
-                try {
-                    BillDAO.cancelBill(bill);
-                    this.dcr_power_table.getItems().remove(index);
-                    this.dcr_power_table.refresh();
-                } catch (Exception e) {
-                    AlertDialogBuilder.messgeDialog("System Error", "Process failed! "+e.getMessage(),
-                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        //Show authentication form when cancelling a residential type account
+        if (bill.getConsumerType().equals("R") || bill.getConsumerType().equals("RM")) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_authenticate.fxml"));
+            Parent parent = fxmlLoader.load();
+            JFXDialogLayout dialogLayout = new JFXDialogLayout();
+            dialogLayout.setHeading(new Label("MANAGER AUTHENTICATION"));
+            dialogLayout.setBody(parent);
+            JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+            WaiveConfirmationController waiveController = fxmlLoader.getController();
+            waiveController.getAuthenticate_btn().setOnAction(actionEvent -> {
+                boolean ok = waiveController.login();
+                if (ok) {
+                    try {
+                        BillDAO.cancelBill(bill);
+                        this.dcr_power_table.getItems().remove(index);
+                        this.dcr_power_table.refresh();
+                    } catch (Exception e) {
+                        AlertDialogBuilder.messgeDialog("System Error", "Process failed! " + e.getMessage(),
+                                Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    }
+                    dialog.close();
                 }
-                dialog.close();
+            });
+            dialog.show();
+        //Otherwise, cancel directly
+        }else{
+            try {
+                BillDAO.cancelBill(bill);
+                this.dcr_power_table.getItems().remove(index);
+                this.dcr_power_table.refresh();
+            } catch (Exception e) {
+                AlertDialogBuilder.messgeDialog("System Error", "Process failed! " + e.getMessage(),
+                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }
-        });
-        dialog.show();
+        }
     }
 
     public void setDate(){
