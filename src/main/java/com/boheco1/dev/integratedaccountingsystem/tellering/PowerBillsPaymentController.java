@@ -4,7 +4,6 @@ import com.boheco1.dev.integratedaccountingsystem.dao.BillDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.ConsumerDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.boheco1.dev.integratedaccountingsystem.warehouse.StockController;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import javafx.beans.binding.Bindings;
@@ -22,6 +21,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import javafx.fxml.FXML;
@@ -1653,7 +1655,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
      */
     public void transact(List<Bill> bills, double cash, List<Check> checks, JFXDialog dialog, boolean deposit, double change, PaidBill account){
         this.progressBar.setVisible(true);
-
+        ExecutorService exec = Executors.newSingleThreadExecutor();
         try {
             List<Bill> updated = Utility.processor(bills, cash, checks, ActiveUser.getUser().getUserName());
             BillDAO.addPaidBill(updated, change, deposit, account);
@@ -1674,8 +1676,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 });
 
                 Thread t = new Thread(print);
-
-                t.start();
+                exec.submit(t);
             }
             this.reset();
             dialog.close();
@@ -1683,6 +1684,8 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             AlertDialogBuilder.messgeDialog("System Error", "SQL Problem encountered: " + ex.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         } catch (Exception e) {
             AlertDialogBuilder.messgeDialog("System Error", "Problem encountered: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+        }finally {
+            exec.shutdown();
         }
         this.progressBar.setVisible(false);
     }

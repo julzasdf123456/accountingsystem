@@ -426,11 +426,15 @@ public class ViewConsumerBillsController extends MenuControllerHandler implement
         this.meter_no_tf.setText(consumerInfo.getMeterNumber());
         this.type_tf.setText(consumerInfo.getAccountType());
         this.status_tf.setText(consumerInfo.getAccountStatus());
-        this.bapa_tf.setText(consumerInfo.getAccountType().equals("BAPA") ? "BAPA Registered" : "");
-        if (consumerInfo.getAccountStatus().toLowerCase().contains("disco")){
+        if (this.consumerInfo.getAccountStatus().toLowerCase().contains("disco")) {
+            this.status_tf.setText("DISCONNECTED");
+            this.status_tf.setStyle("-fx-text-fill: red;");
+        }else if (this.consumerInfo.getAccountStatus().toLowerCase().contains("illegal")) {
+            this.status_tf.setText("ILLEGAL");
             this.status_tf.setStyle("-fx-text-fill: red;");
         }else{
             this.status_tf.setStyle("-fx-text-fill: black;");
         }
+        this.bapa_tf.setText(consumerInfo.getAccountType().equals("BAPA") ? "BAPA Registered" : "");
     }
 }
