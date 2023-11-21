@@ -173,9 +173,9 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
      */
     public void initializeReleasedItemTable() {
         TableColumn<ReleasedItems, String> column1 = new TableColumn<>("Stock ID");
-        column1.setMinWidth(120);
-        column1.setMaxWidth(120);
-        column1.setPrefWidth(120);
+        column1.setMinWidth(85);
+        column1.setMaxWidth(85);
+        column1.setPrefWidth(85);
         column1.setCellValueFactory(new PropertyValueFactory<>("Code"));
         column1.setStyle("-fx-alignment: center-left;");
 
@@ -184,23 +184,23 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
         column2.setStyle("-fx-alignment: center-left;");
 
         TableColumn<ReleasedItems, String> column3 = new TableColumn<>("MCT No");
-        column3.setMinWidth(115);
-        column3.setMaxWidth(115);
-        column3.setPrefWidth(115);
+        column3.setMinWidth(100);
+        column3.setMaxWidth(100);
+        column3.setPrefWidth(100);
         column3.setCellValueFactory(new PropertyValueFactory<>("mctNo"));
         column3.setStyle("-fx-alignment: center;");
 
         TableColumn<ReleasedItems, String> column4 = new TableColumn<>("Price");
-        column4.setMinWidth(115);
-        column4.setMaxWidth(115);
-        column4.setPrefWidth(115);
+        column4.setMinWidth(100);
+        column4.setMaxWidth(100);
+        column4.setPrefWidth(100);
         column4.setCellValueFactory(new PropertyValueFactory<>("price"));
-        column4.setStyle("-fx-alignment: center-left;");
+        column4.setStyle("-fx-alignment: center-right;");
 
-        TableColumn<ReleasedItems, String> column5 = new TableColumn<>("Quantity");
-        column5.setMinWidth(115);
-        column5.setMaxWidth(115);
-        column5.setPrefWidth(115);
+        TableColumn<ReleasedItems, String> column5 = new TableColumn<>("Qty");
+        column5.setMinWidth(75);
+        column5.setMaxWidth(75);
+        column5.setPrefWidth(75);
         column5.setCellValueFactory(new PropertyValueFactory<>("balance"));
         column5.setStyle("-fx-alignment: center;");
 
@@ -220,9 +220,9 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
      */
     public void initializeReturnItemTable() {
         TableColumn<MRTItem, String> column1 = new TableColumn<>("Stock ID");
-        column1.setMinWidth(120);
-        column1.setMaxWidth(120);
-        column1.setPrefWidth(120);
+        column1.setMinWidth(85);
+        column1.setMaxWidth(85);
+        column1.setPrefWidth(85);
         column1.setCellValueFactory(new PropertyValueFactory<>("Code"));
         column1.setStyle("-fx-alignment: center-left;");
 
@@ -237,7 +237,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
         });
         column2.setStyle("-fx-alignment: center-left;");
 
-        TableColumn<MRTItem, String> column3 = new TableColumn<>("Quantity");
+        TableColumn<MRTItem, String> column3 = new TableColumn<>("Qty");
         column3.setMinWidth(75);
         column3.setMaxWidth(75);
         column3.setPrefWidth(75);

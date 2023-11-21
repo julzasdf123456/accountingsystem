@@ -1150,61 +1150,77 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
      * @return void
      */
     public void showAuthenticate(Bill bill, TableView table, Label total) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_authenticate.fxml"));
-        Parent parent = fxmlLoader.load();
-        JFXDialogLayout dialogLayout = new JFXDialogLayout();
-        dialogLayout.setHeading(new Label("MANAGER AUTHENTICATION"));
-        dialogLayout.setBody(parent);
-        JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
-        WaiveConfirmationController waiveController = fxmlLoader.getController();
-        waiveController.getPassword_tf().setOnAction(actionEvent -> {
-            boolean ok = waiveController.login();
-            if (ok) {
-                dialog.close();
-                bill.setSurChargeTax(0);
-                bill.setSurCharge(0);
-                bill.computeTotalAmount();
-                this.fees_table.setItems(bills);
-                this.setBillInfo(bills);
-                this.setPayables();
-                this.setMenuActions();
-            }
-        });
-        waiveController.getUsername_tf().setOnAction(actionEvent -> {
-            boolean ok = waiveController.login();
-            if (ok) {
-                dialog.close();
-                bill.setSurChargeTax(0);
-                bill.setSurCharge(0);
-                bill.computeTotalAmount();
-                this.fees_table.setItems(bills);
-                this.setBillInfo(bills);
-                this.setPayables();
-                this.setMenuActions();
-            }
-        });
-        waiveController.getUsername_tf().setOnKeyReleased(event -> {
-            if (event.getCode() == KeyCode.ESCAPE){
-                dialog.close();
+        //Show manager authentication when cancelling surcharge for residential bills
+        if (bill.getConsumerType().equals("R") || bill.getConsumerType().equals("RM")) {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_authenticate.fxml"));
+            Parent parent = fxmlLoader.load();
+            JFXDialogLayout dialogLayout = new JFXDialogLayout();
+            dialogLayout.setHeading(new Label("MANAGER AUTHENTICATION"));
+            dialogLayout.setBody(parent);
+            JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
+            WaiveConfirmationController waiveController = fxmlLoader.getController();
+            waiveController.getPassword_tf().setOnAction(actionEvent -> {
+                boolean ok = waiveController.login();
+                if (ok) {
+                    dialog.close();
+                    bill.setSurChargeTax(0);
+                    bill.setSurCharge(0);
+                    bill.computeTotalAmount();
+                    this.fees_table.setItems(bills);
+                    this.setBillInfo(bills);
+                    this.setPayables();
+                    this.setMenuActions();
+                }
+            });
+            waiveController.getUsername_tf().setOnAction(actionEvent -> {
+                boolean ok = waiveController.login();
+                if (ok) {
+                    dialog.close();
+                    bill.setSurChargeTax(0);
+                    bill.setSurCharge(0);
+                    bill.computeTotalAmount();
+                    this.fees_table.setItems(bills);
+                    this.setBillInfo(bills);
+                    this.setPayables();
+                    this.setMenuActions();
+                }
+            });
+            waiveController.getUsername_tf().setOnKeyReleased(event -> {
+                if (event.getCode() == KeyCode.ESCAPE) {
+                    dialog.close();
+                    payment_tf.requestFocus();
+                }
+            });
+            waiveController.getAuthenticate_btn().setOnAction(actionEvent -> {
+                boolean ok = waiveController.login();
+                if (ok) {
+                    dialog.close();
+                    bill.setSurChargeTax(0);
+                    bill.setSurCharge(0);
+                    bill.computeTotalAmount();
+                    this.fees_table.setItems(bills);
+                    this.setBillInfo(bills);
+                    this.setPayables();
+                    this.setMenuActions();
+                }
+            });
+            dialog.setOnDialogOpened((event) -> {
+                waiveController.getUsername_tf().requestFocus();
+            });
+            dialog.setOnDialogClosed((event) -> {
                 payment_tf.requestFocus();
-            }
-        });
-        waiveController.getAuthenticate_btn().setOnAction(actionEvent -> {
-            boolean ok = waiveController.login();
-            if (ok) {
-                dialog.close();
-                bill.setSurChargeTax(0);
-                bill.setSurCharge(0);
-                bill.computeTotalAmount();
-                this.fees_table.setItems(bills);
-                this.setBillInfo(bills);
-                this.setPayables();
-                this.setMenuActions();
-            }
-        });
-        dialog.setOnDialogOpened((event) -> { waiveController.getUsername_tf().requestFocus(); });
-        dialog.setOnDialogClosed((event) -> { payment_tf.requestFocus(); });
-        dialog.show();
+            });
+            dialog.show();
+        //Else, remove surcharge to non-residential bills directly
+        }else{
+            bill.setSurChargeTax(0);
+            bill.setSurCharge(0);
+            bill.computeTotalAmount();
+            this.fees_table.setItems(bills);
+            this.setBillInfo(bills);
+            this.setPayables();
+            this.setMenuActions();
+        }
     }
     /**
      * Displays Payment Confirmation UI
