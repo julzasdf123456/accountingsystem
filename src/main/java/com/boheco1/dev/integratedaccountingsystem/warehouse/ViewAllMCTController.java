@@ -32,7 +32,7 @@ import java.util.*;
 public class ViewAllMCTController extends MenuControllerHandler implements Initializable, SubMenuHelper {
 
     @FXML TableView mctTable;
-    @FXML private JFXTextField search_box, issuedBy, receivedBy;
+    @FXML private JFXTextField search_box, issuedBy, receivedBy, designation;
 
     private EmployeeInfo issuedByEmployee = null;
 
@@ -153,7 +153,7 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
         Platform.runLater(() -> {
             try {
                 MIRS mirs = MirsDAO.getMIRS(mct.getMirsNo());
-                float[] columns = {1f,.8f,3f,.8f,.8f,.5f,.5f};
+                float[] columns = {1.3f,.9f,3f,1.1f,1.1f,.5f,1f};
                 PrintPDF pdf = new PrintPDF(selectedFile, columns);
 
                 //Create header info
@@ -203,7 +203,7 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                         itemCode = stock.getNeaCode();
                     else
                         itemCode = stock.getLocalCode();
-                    String[] val = {stock.getAcctgCode(), itemCode,stock.getDescription()+additionalDescription, String.format("%,.2f", stock.getPrice()), String.format("%,.2f", (stock.getPrice() * items.getQuantity())), stock.getUnit(), "" + Utility.formatDecimal(items.getQuantity())};
+                    String[] val = {stock.getAcctgCode(), itemCode,stock.getDescription()+additionalDescription, String.format("%,.2f", stock.getPrice()), String.format("%,.2f", (stock.getPrice() * items.getQuantity())), stock.getUnit(), "" + Utility.formatQty(items.getQuantity())};
                     total += stock.getPrice() * items.getQuantity();
                     rows.add(val);
 
@@ -259,7 +259,7 @@ public class ViewAllMCTController extends MenuControllerHandler implements Initi
                 pdf.createCell(issuedByEmployee.getDesignation(),3, 8, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
 
                 //pdf.createCell(receivedByEmployee.getDesignation(),4, 8, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
-                pdf.createCell(" ",4, 8, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
+                pdf.createCell(designation.getText(),4, 8, Font.NORMAL, Element.ALIGN_CENTER, Rectangle.NO_BORDER);
 
 
                 pdf.generate();

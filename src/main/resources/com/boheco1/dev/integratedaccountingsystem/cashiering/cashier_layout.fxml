@@ -171,11 +171,6 @@
                            </children>
                         </VBox>
                         <JFXTextField fx:id="orNumber" alignment="CENTER" layoutX="207.0" layoutY="51.0" maxWidth="-Infinity" onAction="#submitForConfirmation" prefHeight="74.0" prefWidth="329.0" promptText="OR Number" style="-fx-font-size: 25; -fx-font-weight: bold;" />
-                        <JFXButton fx:id="submitBtn" buttonType="RAISED" layoutX="228.0" layoutY="144.0" maxWidth="-Infinity" onAction="#submitForConfirmation" prefHeight="31.0" prefWidth="100.0" styleClass="btn-sucess" text="Submit">
-                           <cursor>
-                              <Cursor fx:constant="HAND" />
-                           </cursor>
-                        </JFXButton>
                         <JFXTextField fx:id="businessStyle" labelFloat="true" layoutX="208.0" layoutY="14.0" maxWidth="-Infinity" prefHeight="29.0" prefWidth="329.0" promptText="Business Style" />
                      </children>
                   </Pane>
@@ -270,6 +265,18 @@
                      <VBox.margin>
                         <Insets top="15.0" />
                      </VBox.margin>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER" prefHeight="93.0" prefWidth="193.0" VBox.vgrow="NEVER">
+                     <children>
+                        <JFXButton fx:id="submitBtn" buttonType="RAISED" maxWidth="-Infinity" onAction="#submitForConfirmation" prefHeight="31.0" prefWidth="100.0" styleClass="btn-sucess" text="Submit">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                           <VBox.margin>
+                              <Insets top="60.0" />
+                           </VBox.margin>
+                        </JFXButton>
+                     </children>
                   </VBox>
                </children>
             </VBox>

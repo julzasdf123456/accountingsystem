@@ -233,6 +233,18 @@ public class Utility {
         return String.format("%,.2f",val);
     }
 
+    public static String formatQty(double qty) {
+        // Check if the number has a decimal part
+        if (qty == (int) qty) {
+            // If the number has no decimal, return the whole number as a string
+            return String.format("%d", (int) qty);
+        } else {
+            // If the number has a decimal, format it and return as a string
+            return String.format("%.2f", qty);
+            // You can adjust the format specifier "%.2f" based on your precision needs
+        }
+    }
+
     public static List<Bill> processor(List<Bill> bills, double cash, List<Check> checks, String teller) throws Exception{
 
         Queue<Bill> billQueue = new LinkedList<>(bills);

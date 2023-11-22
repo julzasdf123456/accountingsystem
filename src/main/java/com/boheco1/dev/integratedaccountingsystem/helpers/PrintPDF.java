@@ -10,6 +10,7 @@ import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import org.apache.poi.hssf.usermodel.HeaderFooter;
 
 import java.awt.*;
 import java.io.File;
@@ -166,11 +167,41 @@ public class PrintPDF {
 
         displayOutput(pdf);
     }
+    class PdfEventHandler extends PdfPageEventHelper {
 
+        @Override
+        public void onStartPage(PdfWriter writer, Document document) {
+            // Add header content
+            PdfPTable header = new PdfPTable(1);
+            header.setWidthPercentage(100);
+            header.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+            header.addCell(new Phrase("My PDF Header"));
+            try {
+                document.add(header);
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onEndPage(PdfWriter writer, Document document) {
+            // Add footer content
+            PdfPTable footer = new PdfPTable(1);
+            footer.setWidthPercentage(100);
+            footer.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+            footer.addCell(new Phrase("Page " + writer.getPageNumber()));
+            try {
+                document.add(footer);
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     public void generate() throws Exception{
         document = new Document(PageSize.LETTER,30f,30f,30f,30f);
         Paragraph preface = new Paragraph();
-        PdfWriter.getInstance(document, new FileOutputStream(pdf));
+        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdf));
+        writer.setPageEvent(new PdfEventHandler());
         document.open();
         table.getDefaultCell().setFixedHeight(80);
         table.setWidthPercentage(100);

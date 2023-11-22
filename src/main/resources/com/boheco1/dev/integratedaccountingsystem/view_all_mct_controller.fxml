@@ -19,7 +19,7 @@
                <children>
                   <HBox alignment="BOTTOM_LEFT" prefHeight="48.0" prefWidth="416.0" HBox.hgrow="ALWAYS">
                      <children>
-                        <VBox>
+                        <VBox alignment="BOTTOM_LEFT">
                            <children>
                               <Label text="Search" />
                               <JFXTextField fx:id="search_box" focusColor="#00ad8e" labelFloat="true" onAction="#searchMCT" prefWidth="236.0">
@@ -32,7 +32,7 @@
                               <Insets right="16.0" />
                            </HBox.margin>
                         </VBox>
-                        <VBox>
+                        <VBox alignment="BOTTOM_LEFT">
                            <children>
                               <Label text="Issued By" />
                               <JFXTextField fx:id="issuedBy" prefHeight="37.0" prefWidth="250.0" />
@@ -44,7 +44,11 @@
                         <VBox>
                            <children>
                               <Label text="Received by" />
-                              <JFXTextField fx:id="receivedBy" prefHeight="37.0" prefWidth="250.0" promptText="Firstname M.I Lastname" />
+                              <JFXTextField fx:id="receivedBy" prefHeight="37.0" prefWidth="250.0" promptText="Firstname M.I Lastname">
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                 </VBox.margin></JFXTextField>
+                              <JFXTextField fx:id="designation" prefHeight="37.0" prefWidth="250.0" promptText="Designation/Position" />
                            </children>
                            <HBox.margin>
                               <Insets right="16.0" />
