@@ -293,6 +293,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
         remarks.setText("");
         businessStyle.setText("");
         serviceFeeAccounts.setText("");
+        evatLabel.setText("Evat: 0.0");
     }
     @Override
     public void receive(Object o) {
@@ -496,7 +497,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
         collectionFromTeller=calculate;
         total.setText(""+Utility.formatDecimal(collectionFromTeller));
-        evatLabel.setText("Evat:"+ Utility.formatDecimal(collectionFromTeller * .12));
+        evatLabel.setText("Evat: "+ Utility.formatDecimal(collectionFromTeller * .12));
         //totalDisplay.setText(Utility.formatDecimal(totalAmount));
     }
 

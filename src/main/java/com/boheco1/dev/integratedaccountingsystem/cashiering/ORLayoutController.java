@@ -17,7 +17,9 @@ import javafx.print.*;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -159,8 +161,8 @@ public class ORLayoutController implements Initializable {
             description2.setText(orContent.getAddress());
             orNum1.setText(orContent.getOrNumber());
             orNum2.setText(orContent.getOrNumber());
-            description1.setText(description1.getText()+"\n"+Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£","")+"   "+Utility.formatDecimal(orContent.getTotal()));
-            description2.setText(description2.getText()+"\n"+Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£","")+"   "+Utility.formatDecimal(orContent.getTotal()));
+            description1.setText(description1.getText()+"\n"+Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£","")+"         "+Utility.formatDecimal(orContent.getTotal()));
+            description2.setText(description2.getText()+"\n"+Utility.doubleAmountToWords(orContent.getTotal()).replaceAll("£","")+"         "+Utility.formatDecimal(orContent.getTotal()));
             totalAmount3.setText(Utility.formatDecimal(orContent.getTotal()));
             totalAmount4.setText(Utility.formatDecimal(orContent.getTotal()));
             ref1.setText("");
