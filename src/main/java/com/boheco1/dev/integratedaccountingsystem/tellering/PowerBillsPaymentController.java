@@ -104,13 +104,19 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     private JFXTextField ppd_tf;
 
     @FXML
-    private JFXTextField adj_tf;
+    private JFXTextField sl_adj_tf;
+
+    @FXML
+    private JFXTextField other_adj_tf;
 
     @FXML
     private JFXTextField daa_tf;
 
     @FXML
-    private JFXTextField ch2306_2307_tf;
+    private JFXTextField ch2306_tf;
+
+    @FXML
+    private JFXTextField ch2307_tf;
 
     @FXML
     private JFXTextField power_amt_tf;
@@ -295,7 +301,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         });
 
         this.createTable();
-
+        this.createExcludedTable();
         this.setMenuActions();
 
         this.payment_tf.setOnKeyReleased(keyEvent -> {
@@ -443,8 +449,10 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.add_charges_tf.setText("");
         this.surcharge_tf.setText("");
         this.ppd_tf.setText("");
-        this.adj_tf.setText("");
-        this.ch2306_2307_tf.setText("");
+        this.sl_adj_tf.setText("");
+        this.other_adj_tf.setText("");
+        this.ch2306_tf.setText("");
+        this.ch2307_tf.setText("");
         this.power_amt_tf.setText("");
         this.katas_tf.setText("");
         this.vat_tf.setText("");
@@ -550,28 +558,28 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column41.setMaxWidth(smSize);
         column41.setMinWidth(smSize);
         column41.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getSurCharge())));
-        column41.setStyle("-fx-alignment: center-right;");
+        column41.setStyle("-fx-alignment: center-right; -fx-font-weight: bold;");
 
         TableColumn<Bill, String> column4 = new TableColumn<>("PPD");
         column4.setPrefWidth(smSize);
         column4.setMaxWidth(smSize);
         column4.setMinWidth(smSize);
         column4.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getDiscount())));
-        column4.setStyle("-fx-alignment: center-right;");
+        column4.setStyle("-fx-alignment: center-right; -fx-font-weight: bold;");
 
         TableColumn<Bill, String> column42 = new TableColumn<>("SL Adj");
         column42.setPrefWidth(smSize);
         column42.setMaxWidth(smSize);
         column42.setMinWidth(smSize);
         column42.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getSlAdjustment())));
-        column42.setStyle("-fx-alignment: center-right;");
+        column42.setStyle("-fx-alignment: center-right; -fx-font-weight: bold;");
 
         TableColumn<Bill, String> column43 = new TableColumn<>("Other Adj");
         column43.setPrefWidth(smSize);
         column43.setMaxWidth(smSize);
         column43.setMinWidth(smSize);
         column43.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getOtherAdjustment())));
-        column43.setStyle("-fx-alignment: center-right;");
+        column43.setStyle("-fx-alignment: center-right; -fx-font-weight: bold;");
 
         TableColumn<Bill, String> column44 = new TableColumn<>("KWH");
         column44.setPrefWidth(75);
@@ -606,14 +614,14 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         column5.setMaxWidth(smSize);
         column5.setMinWidth(smSize);
         column5.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal((obj.getValue().getCh2306()))));
-        column5.setStyle("-fx-alignment: center-right;");
+        column5.setStyle("-fx-alignment: center-right; -fx-font-weight: bold;");
 
         TableColumn<Bill, String> column51 = new TableColumn<>("2307 2%");
         column51.setPrefWidth(smSize);
         column51.setMaxWidth(smSize);
         column51.setMinWidth(smSize);
         column51.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal((obj.getValue().getCh2307()))));
-        column51.setStyle("-fx-alignment: center-right;");
+        column51.setStyle("-fx-alignment: center-right; -fx-font-weight: bold;");
 
         TableColumn<Bill, String> column52 = new TableColumn<>("TIN");
         column52.setPrefWidth(smSize);
@@ -749,33 +757,33 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         )));
         ecolumn33.setStyle("-fx-alignment: center-right;");
 
-        TableColumn<Bill, String> ecolumn4 = new TableColumn<>("Penalty");
+        TableColumn<Bill, String> ecolumn4 = new TableColumn<>("Surcharge");
         ecolumn4.setPrefWidth(smSize);
         ecolumn4.setMaxWidth(smSize);
         ecolumn4.setMinWidth(smSize);
         ecolumn4.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getSurCharge())));
-        ecolumn4.setStyle("-fx-alignment: center-right;");
+        ecolumn4.setStyle("-fx-alignment: center-right; -fx-font-weight: bold;");
 
         TableColumn<Bill, String> ecolumn41 = new TableColumn<>("PPD");
         ecolumn41.setPrefWidth(smSize);
         ecolumn41.setMaxWidth(smSize);
         ecolumn41.setMinWidth(smSize);
         ecolumn41.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getDiscount())));
-        ecolumn41.setStyle("-fx-alignment: center-right;");
+        ecolumn41.setStyle("-fx-alignment: center-right; -fx-font-weight: bold;");
 
         TableColumn<Bill, String> ecolumn42 = new TableColumn<>("SL Adj");
         ecolumn42.setPrefWidth(smSize);
         ecolumn42.setMaxWidth(smSize);
         ecolumn42.setMinWidth(smSize);
         ecolumn42.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getSlAdjustment())));
-        ecolumn42.setStyle("-fx-alignment: center-right;");
+        ecolumn42.setStyle("-fx-alignment: center-right; -fx-font-weight: bold;");
 
         TableColumn<Bill, String> ecolumn43 = new TableColumn<>("Other Adj");
         ecolumn43.setPrefWidth(smSize);
         ecolumn43.setMaxWidth(smSize);
         ecolumn43.setMinWidth(smSize);
         ecolumn43.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal(obj.getValue().getOtherAdjustment())));
-        ecolumn43.setStyle("-fx-alignment: center-right;");
+        ecolumn43.setStyle("-fx-alignment: center-right; -fx-font-weight: bold;");
 
         TableColumn<Bill, String> ecolumn44 = new TableColumn<>("KWH");
         ecolumn44.setPrefWidth(75);
@@ -810,14 +818,14 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         ecolumn5.setMaxWidth(smSize);
         ecolumn5.setMinWidth(smSize);
         ecolumn5.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal((obj.getValue().getCh2306()))));
-        ecolumn5.setStyle("-fx-alignment: center-right;");
+        ecolumn5.setStyle("-fx-alignment: center-right; -fx-font-weight: bold;");
 
         TableColumn<Bill, String> ecolumn51 = new TableColumn<>("2307 2%");
         ecolumn51.setPrefWidth(smSize);
         ecolumn51.setMaxWidth(smSize);
         ecolumn51.setMinWidth(smSize);
         ecolumn51.setCellValueFactory(obj -> new SimpleStringProperty(Utility.formatDecimal((obj.getValue().getCh2307()))));
-        ecolumn51.setStyle("-fx-alignment: center-right;");
+        ecolumn51.setStyle("-fx-alignment: center-right; -fx-font-weight: bold;");
 
         TableColumn<Bill, String> ecolumn52 = new TableColumn<>("TIN");
         ecolumn52.setPrefWidth(smSize);
@@ -836,7 +844,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.excluded_bills =  FXCollections.observableArrayList();
         this.excluded_table.setFixedCellSize(35);
         this.excluded_table.setPlaceholder(new Label("No bills added! Search or input the account number!"));
-
+        this.excluded_table.getColumns().removeAll();
         this.excluded_table.getColumns().add(ecolumn0);
         this.excluded_table.getColumns().add(ecolumn);
         this.excluded_table.getColumns().add(ecolumn_con);
@@ -846,8 +854,8 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.excluded_table.getColumns().add(ecolumn31);
         this.excluded_table.getColumns().add(ecolumn32);
         this.excluded_table.getColumns().add(ecolumn33);
-        this.excluded_table.getColumns().add(ecolumn4);
         this.excluded_table.getColumns().add(ecolumn41);
+        this.excluded_table.getColumns().add(ecolumn4);
         this.excluded_table.getColumns().add(ecolumn42);
         this.excluded_table.getColumns().add(ecolumn43);
         this.excluded_table.getColumns().add(ecolumn2);
@@ -1005,14 +1013,16 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
      * @return void
      */
     public void setBillInfo(List<Bill> current_bills){
-        double add_charge_sum = 0, surcharge_sum = 0, ppd_sum = 0, adj_sum = 0, ch06_07_sum=0, power_amt_sum = 0, md_refund_sum = 0,
+        double add_charge_sum = 0, surcharge_sum = 0, ppd_sum = 0, sl_adj_sum = 0, other_adj_sum = 0, ch06_sum=0, ch07_sum=0,power_amt_sum = 0, md_refund_sum = 0,
                 vat_sum = 0, katas_sum = 0, daa = 0, acrm = 0;
         for(Bill b : current_bills){
             add_charge_sum += b.getOtherCharges() + b.getTransformerRental();
             surcharge_sum += b.getSurCharge();
             ppd_sum += b.getDiscount();
-            adj_sum += b.getSlAdjustment() + b.getOtherAdjustment();
-            ch06_07_sum += b.getCh2306() + b.getCh2307();
+            sl_adj_sum += b.getSlAdjustment() ;
+            other_adj_sum += b.getOtherAdjustment();
+            ch06_sum += b.getCh2306();
+            ch07_sum += b.getCh2307();
             power_amt_sum += b.getPowerAmount();
             md_refund_sum += b.getMdRefund();
             vat_sum += b.getVat() + b.getSurChargeTax();
@@ -1024,8 +1034,10 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.billsNo_lbl.setText(bills.size()+"");
         this.surcharge_tf.setText(Utility.formatDecimal(surcharge_sum));
         this.ppd_tf.setText(Utility.formatDecimal(ppd_sum));
-        this.adj_tf.setText(Utility.formatDecimal(adj_sum));
-        this.ch2306_2307_tf.setText(Utility.formatDecimal(ch06_07_sum));
+        this.sl_adj_tf.setText(Utility.formatDecimal(sl_adj_sum));
+        this.other_adj_tf.setText(Utility.formatDecimal(other_adj_sum));
+        this.ch2306_tf.setText(Utility.formatDecimal(ch06_sum));
+        this.ch2307_tf.setText(Utility.formatDecimal(ch07_sum));
         this.power_amt_tf.setText(Utility.formatDecimal(power_amt_sum));
         this.katas_tf.setText(Utility.formatDecimal(katas_sum));
         this.md_refund_tf.setText(Utility.formatDecimal(md_refund_sum));
@@ -1353,6 +1365,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 }
                 dialog.close();
         });
+        dialog.setOnDialogOpened((event) -> {input.requestFocus();});
         dialog.setOnDialogClosed((event) -> {this.payment_tf.requestFocus(); });
         dialog.show();
     }
@@ -1486,7 +1499,6 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 MenuItem itemExcludeBill = new MenuItem("Exclude Bill");
                 itemExcludeBill.setOnAction(actionEvent -> {
                     if (this.excluded_bills.size() == 0){
-                        createExcludedTable();
                         this.tableBox.getChildren().add(excluded_table);
                     }
                     this.excluded_bills.add(row.getItem());

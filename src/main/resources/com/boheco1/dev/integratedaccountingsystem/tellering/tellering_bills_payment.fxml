@@ -240,29 +240,30 @@
                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                         </rowConstraints>
                                                          <children>
                                                             <Label text="Addt'nl Charges" />
                                                             <Label text="Surcharge" GridPane.rowIndex="1" />
                                                             <Label text="Prompt Payment" GridPane.rowIndex="2" />
-                                                            <Label text="SL Adj./Others" GridPane.rowIndex="3" />
-                                                            <Label text="2306/2307" GridPane.rowIndex="4" />
+                                                            <Label text="SL Adj." GridPane.rowIndex="3" />
+                                                            <Label text="2306" GridPane.rowIndex="4" />
                                                             <Label text="Power-Amt" GridPane.columnIndex="2">
                                                                <GridPane.margin>
-                                                                  <Insets left="16.0" />
+                                                                  <Insets left="14.0" />
                                                                </GridPane.margin>
                                                             </Label>
                                                             <Label text="V A T" GridPane.columnIndex="2" GridPane.rowIndex="2">
                                                                <padding>
-                                                                  <Insets left="16.0" />
+                                                                  <Insets left="14.0" />
                                                                </padding>
                                                             </Label>
-                                                            <Label text="LESS KATAS" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                                            <Label text="LESS KATAS" GridPane.rowIndex="5">
                                                                <GridPane.margin>
                                                                   <Insets left="16.0" />
                                                                </GridPane.margin>
                                                             </Label>
-                                                            <Label text="LESS MD Refund" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                                                            <Label text="LESS MD Refund" GridPane.columnIndex="2" GridPane.rowIndex="5">
                                                                <GridPane.margin>
                                                                   <Insets left="16.0" />
                                                                </GridPane.margin>
@@ -276,20 +277,32 @@
                                                             <JFXTextField fx:id="ppd_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" minHeight="23.0" prefHeight="23.0" style="-fx-font-size: 14;" GridPane.columnIndex="1" GridPane.rowIndex="2">
                                                                <styleClass>
                                                                   <String fx:value="bold" />
-                                                                  <String fx:value="blue" />
+                                                                  <String fx:value="red" />
                                                                </styleClass></JFXTextField>
-                                                            <JFXTextField fx:id="adj_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" minHeight="23.0" prefHeight="23.0" style="-fx-font-size: 14;" styleClass="bold" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                                            <JFXTextField fx:id="ch2306_2307_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" minHeight="23.0" prefHeight="23.0" style="-fx-font-size: 14;" styleClass="bold" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                            <JFXTextField fx:id="sl_adj_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" minHeight="23.0" prefHeight="23.0" style="-fx-font-size: 14;" styleClass="bold" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                            <JFXTextField fx:id="ch2306_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" minHeight="23.0" prefHeight="23.0" style="-fx-font-size: 14;" styleClass="bold" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                                             <JFXTextField fx:id="power_amt_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" minHeight="23.0" prefHeight="23.0" style="-fx-font-size: 14;" styleClass="bold" GridPane.columnIndex="3" />
                                                             <JFXTextField fx:id="vat_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" minHeight="23.0" prefHeight="23.0" style="-fx-font-size: 14;" styleClass="bold" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-                                                            <JFXTextField fx:id="katas_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" minHeight="23.0" prefHeight="23.0" style="-fx-font-size: 14;" styleClass="bold" GridPane.columnIndex="3" GridPane.rowIndex="3" />
-                                                            <JFXTextField fx:id="md_refund_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" minHeight="23.0" prefHeight="23.0" style="-fx-font-size: 14;" styleClass="bold" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                                                            <JFXTextField fx:id="katas_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" minHeight="23.0" prefHeight="23.0" style="-fx-font-size: 14;" styleClass="bold" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                            <JFXTextField fx:id="md_refund_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" minHeight="23.0" prefHeight="23.0" style="-fx-font-size: 14;" styleClass="bold" GridPane.columnIndex="3" GridPane.rowIndex="5" />
                                                             <JFXTextField fx:id="daa_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" minHeight="24.0" prefHeight="24.0" style="-fx-font-size: 14;" styleClass="bold" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                                                             <Label text="DAA &amp; ACRM" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                                               <padding>
+                                                                  <Insets left="14.0" />
+                                                               </padding>
+                                                            </Label>
+                                                            <Label text="2307" GridPane.columnIndex="2" GridPane.rowIndex="4">
                                                                <padding>
                                                                   <Insets left="16.0" />
                                                                </padding>
                                                             </Label>
+                                                            <Label text="Other Adj." GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                                               <GridPane.margin>
+                                                                  <Insets left="16.0" />
+                                                               </GridPane.margin>
+                                                            </Label>
+                                                            <JFXTextField fx:id="ch2307_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" minHeight="23.0" prefHeight="23.0" style="-fx-font-size: 14;" styleClass="bold" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                                                            <JFXTextField fx:id="other_adj_tf" alignment="CENTER_RIGHT" editable="false" focusTraversable="false" minHeight="23.0" prefHeight="23.0" style="-fx-font-size: 14;" styleClass="bold" GridPane.columnIndex="3" GridPane.rowIndex="3" />
                                                          </children>
                                                       </GridPane>
                                                    </children>
