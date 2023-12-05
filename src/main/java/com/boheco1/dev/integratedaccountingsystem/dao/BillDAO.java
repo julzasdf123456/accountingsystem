@@ -184,7 +184,8 @@ public class BillDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static List<Bill> getConsumerBills(ConsumerInfo consumerInfo, boolean paid) throws Exception {
-        String sql = "SELECT " +
+        String sql = "SELECT (SELECT ISNULL (SUM(MDRefund), 0) - ISNULL((SELECT Amount FROM MDRefund WHERE AccountNumber = b.AccountNumber),0) FROM PaidBills WHERE AccountNumber = b.AccountNumber) AS mdrefund, " +
+                "(Select NetAmountLessCharges from BillsForDCRRevision where AccountNumber=b.AccountNumber and ServicePeriodEnd=b.ServicePeriodEnd) AS ppd, " +
                 "BillNumber, AccountNumber, ServicePeriodEnd, ServiceDateFrom, ServiceDateTo, DueDate, ISNULL(PR,0) AS PR, (SELECT computemode FROM AccountMaster WHERE AccountNumber = ?) AS ComputeMode, " +
                 "ISNULL((SELECT PowerNew FROM BillsForDCRRevision a WHERE b.AccountNumber = a.AccountNumber AND b.ServicePeriodEnd = a.ServicePeriodEnd), 0) AS PowerNew, " +
                 "ISNULL((SELECT KatasBalance FROM KatasData c WHERE b.AccountNumber = c.AccountNumber AND b.ServicePeriodEnd = c.ServicePeriodEnd), 0) AS KatasAmt, " +
@@ -263,17 +264,13 @@ public class BillDAO {
                 //3% PPD for BAPA or ECA
                 if (bill.getConsumerType().equals("B")|| bill.getConsumerType().equals("E"))
                     ppd_rate = 0.03;
-                try {
-                    ppd = BillDAO.getDiscount(bill, ppd_rate);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                bill.setDiscount(ppd);
+                //Set the discount
+                ppd = rs.getDouble("ppd");
+                bill.setDiscount(ppd*ppd_rate);
             }
             bill.computeTotalAmount();
-
-            double amount = getMDRefund(bill);
-            bill.setMdRefund(amount);
+            //Set the mdrefund
+            bill.setMdRefund(rs.getDouble("mdrefund"));
             bills.add(bill);
         }
 
