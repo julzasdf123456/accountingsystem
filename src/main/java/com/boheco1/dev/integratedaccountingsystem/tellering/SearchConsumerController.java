@@ -5,9 +5,11 @@ import com.boheco1.dev.integratedaccountingsystem.dao.ConsumerDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.ConsumerInfo;
 import com.jfoenix.controls.JFXTextField;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -15,12 +17,13 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class SearchConsumerController extends MenuControllerHandler implements Initializable {
 
@@ -40,7 +43,10 @@ public class SearchConsumerController extends MenuControllerHandler implements I
     private ObjectTransaction parentController = null;
     private Task<Void> task;
     private boolean searching = false;
-    private Timer timer;
+    private long lastPressProcessed = 0;
+    private Timer t = new Timer();
+    private TimerTask tt;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.createTable();
@@ -65,33 +71,32 @@ public class SearchConsumerController extends MenuControllerHandler implements I
         this.parentController = Utility.getParentController();
         this.query_tf.requestFocus();
 
+        this.query_tf.setOnKeyPressed(keyEvent -> {
+            if (tt != null)
+                tt.cancel();
+            tt = null;
+        });
+
         this.query_tf.setOnKeyReleased(keyEvent -> {
-            task = new Task<>() {
+            if (tt != null)
+                return;
+
+            tt = new TimerTask() {
                 @Override
-                protected Void call() throws SQLException {
+                public void run() {
                     if (query_tf.getText().length() > 2) {
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
                         String query = query_tf.getText();
                         try {
                             consumers = FXCollections.observableArrayList(ConsumerDAO.getConsumerRecords(query));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+                        consumersTable.setItems(consumers);
                     }
-                    return null;
                 }
             };
 
-            task.setOnSucceeded(wse -> {
-                consumersTable.setItems(consumers);
-            });
-
-            if (task != null && !task.isRunning())
-                new Thread(task).start();
+            t.scheduleAtFixedRate(tt, 225, 500);
         });
     }
 
