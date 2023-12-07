@@ -562,7 +562,7 @@ public class BillDAO {
         "        + SUM(ISNULL(x.Item17, 0))  "+
         "	) AS Energy, "+
         "SUM(ISNULL(p.pr,0)) AS TransformerRental, "+
-        "SUM(ISNULL(p.others,0)) AS Others, "+
+        "SUM(ISNULL(p.others,0)) - SUM(IIF(p.ConsumerType = 'E', ISNULL(p.others,0), 0)) - SUM(IIF(p.ConsumerType = 'B', ISNULL(p.others,0), 0)) AS Others, "+
         "SUM(ISNULL(p.PromptPayment,0)) AS PPD, "+
         "SUM(ISNULL(p.surcharge,0)) AS Surcharge, "+
         "(SUM(ISNULL(p.Item2, 0)) "+
