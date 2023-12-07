@@ -247,7 +247,7 @@
                                                             <Label text="Surcharge" GridPane.rowIndex="1" />
                                                             <Label text="Prompt Payment" GridPane.rowIndex="2" />
                                                             <Label text="SL Adj." GridPane.rowIndex="3" />
-                                                            <Label text="2306" GridPane.rowIndex="4" />
+                                                            <Label text="2307 5%" GridPane.rowIndex="4" />
                                                             <Label text="Power-Amt" GridPane.columnIndex="2">
                                                                <GridPane.margin>
                                                                   <Insets left="14.0" />
@@ -291,7 +291,7 @@
                                                                   <Insets left="14.0" />
                                                                </padding>
                                                             </Label>
-                                                            <Label text="2307" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                                                            <Label text="2307 2%" GridPane.columnIndex="2" GridPane.rowIndex="4">
                                                                <padding>
                                                                   <Insets left="16.0" />
                                                                </padding>
