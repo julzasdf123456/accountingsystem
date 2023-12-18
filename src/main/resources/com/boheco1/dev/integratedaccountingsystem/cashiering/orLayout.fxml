@@ -25,7 +25,7 @@
             <Label fx:id="totalAmount3" alignment="CENTER" layoutX="159.0" layoutY="331.0" prefHeight="15.0" prefWidth="98.0" style="-fx-font-size: 10;" text="99999999999" />
             <Label fx:id="totalAmount4" alignment="CENTER" layoutX="473.0" layoutY="331.0" prefHeight="15.0" prefWidth="98.0" style="-fx-font-size: 10;" text="99999999999" />
             <Label fx:id="description1" alignment="TOP_LEFT" layoutX="14.0" layoutY="95.0" prefHeight="51.0" prefWidth="254.0" style="-fx-font-size: 8;" text="Address" />
-            <Label fx:id="description2" alignment="TOP_LEFT" layoutX="310.0" layoutY="95.0" prefHeight="51.0" prefWidth="254.0" style="-fx-font-size: 8;" text="Address" />
+            <Label fx:id="description2" alignment="TOP_LEFT" layoutX="310.0" layoutY="95.0" prefHeight="51.0" prefWidth="254.0" style="c: 8;" text="Address" />
          </children>
       </Pane>
    </children>
