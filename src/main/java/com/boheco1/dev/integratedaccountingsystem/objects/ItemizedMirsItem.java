@@ -8,6 +8,8 @@ public class ItemizedMirsItem {
     private String brand;
     private String remarks;
 
+    private double price;
+
     private String requestedStockId;
     public ItemizedMirsItem(){}
 
@@ -79,5 +81,14 @@ public class ItemizedMirsItem {
     public String toString(){
         return brand;
     }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
 
 }

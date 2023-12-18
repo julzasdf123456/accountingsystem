@@ -1,62 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXComboBox?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import com.jfoenix.controls.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-
-<VBox maxHeight="615.0" maxWidth="584.0" minHeight="615.0" minWidth="584.0" prefHeight="615.0" prefWidth="584.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.MIRSReleasingSelectItemController">
+<VBox maxHeight="615.0" maxWidth="584.0" minHeight="615.0" minWidth="584.0" prefHeight="615.0" prefWidth="584.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.warehouse.MIRSReleasingSelectItemController">
    <children>
       <HBox prefHeight="151.0" prefWidth="554.0">
          <children>
-            <VBox prefHeight="154.0" prefWidth="266.0">
+            <VBox HBox.hgrow="ALWAYS">
                <children>
                   <Label text="Description: " />
-                  <TextArea fx:id="description" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="242.0" wrapText="true" />
-                  <HBox>
-                     <children>
-                        <Label fx:id="requestQtyLabel" prefHeight="19.0" prefWidth="95.0" text="Request: 0">
-                           <font>
-                              <Font name="System Italic" size="12.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="availableLabel" prefHeight="19.0" prefWidth="94.0" text="Available: 0">
-                           <font>
-                              <Font name="System Italic" size="12.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </HBox>
+                  <TextArea fx:id="description" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" wrapText="true" />
                </children>
                <HBox.margin>
-                  <Insets right="6.0" />
+                  <Insets />
                </HBox.margin>
-            </VBox>
-            <VBox prefWidth="317.0">
-               <children>
-                  <Label prefHeight="19.0" prefWidth="61.0" text="Brand: " />
-                  <JFXComboBox fx:id="comboBoxBrand" maxWidth="1.7976931348623157E308" onAction="#selectBrand" prefHeight="37.0" prefWidth="223.0" promptText="-" />
-                  <Label text="Serial:">
-                     <VBox.margin>
-                        <Insets top="5.0" />
-                     </VBox.margin>
-                  </Label>
-                  <TextField fx:id="serial" prefHeight="37.0" prefWidth="328.0" />
-                  <Label text="Remarks:">
-                     <VBox.margin>
-                        <Insets top="5.0" />
-                     </VBox.margin>
-                  </Label>
-                  <TextField fx:id="remarks" prefHeight="37.0" prefWidth="328.0" />
-               </children>
             </VBox>
          </children>
          <VBox.margin>
@@ -64,17 +24,6 @@
          </VBox.margin>
          <padding>
             <Insets bottom="5.0" />
-         </padding>
-      </HBox>
-      <HBox alignment="BOTTOM_RIGHT">
-         <VBox.margin>
-            <Insets />
-         </VBox.margin>
-         <children>
-            <JFXButton buttonType="RAISED" onAction="#saveToTable" prefHeight="37.0" prefWidth="98.0" styleClass="btn-warning" text="Save" textFill="WHITE" />
-         </children>
-         <padding>
-            <Insets bottom="5.0" top="5.0" />
          </padding>
       </HBox>
       <TableView fx:id="itemizedItemTable" editable="true" maxHeight="1.7976931348623157E308" prefWidth="200.0">

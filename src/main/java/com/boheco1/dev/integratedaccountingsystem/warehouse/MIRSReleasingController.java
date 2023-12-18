@@ -84,8 +84,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
             signatories = MIRSSignatoryDAO.get(mirs);
             initializeRequestTable();
             initializeReleasingTable();
-            //clear hashmap that contains all itemized records
-            //Utility.getItemizedMirsItems().clear();
+
 
             //set Paren tController for ObjectTransaction
             Utility.setParentController(this);
@@ -470,30 +469,6 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
     }
 
 
-
-   /* private String isIndividualize() throws Exception {
-        for (MIRSItem mirsItem : requestedItem){
-            if(mirsItem.isSelected()){
-                Stock stock = StockDAO.get(mirsItem.getStockID());
-                if(stock.isIndividualized()){
-                    boolean found = false;
-                    HashMap<String, ItemizedMirsItem> holder = Utility.getItemizedMirsItems();
-                    for (Map.Entry i : holder.entrySet()) {
-                        ItemizedMirsItem item = holder.get(i.getKey());
-                        if(item.getMirsItemID().equals(mirsItem.getId())){
-                            found = true;
-                            break;
-                        }
-                    }
-                    if(!found){
-                        return stock.getDescription();
-                    }
-                }
-            }
-        }
-        return null;
-    }*/
-
     private int countSelected(){
         int counter = 0;
         for (MIRSItem mirsItem : requestedItem){
@@ -504,13 +479,6 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
         return counter;
     }
 
-    /*private String hasMultipleBrand(MIRSItem mirsItem) throws Exception {
-        String description = StockDAO.get(mirsItem.getStockID()).getDescription();
-        if(StockDAO.hasMultiple(description)){
-            return description;
-        }
-        return null;
-    }*/
 
     private boolean isTransformer(MIRSItem mirsItem) {
         String description = mirsItem.getParticulars().toLowerCase();
@@ -737,8 +705,6 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                     //MirsDAO.update(mirs);
 
                     if(ReleasingDAO.add(readyForRelease,itemizedMirsItems, additionalMirsItem, mirs)) {
-                        //clear hashmap that contains all itemized records
-                       //Utility.getItemizedMirsItems().clear();
                         String notif_details = "MIRS (" + mirs.getId() + ") was released.";
                         Notifications torequisitioner = new Notifications(notif_details, Utility.NOTIF_INFORMATION, ActiveUser.getUser().getEmployeeID(), mirs.getRequisitionerID(), mirs.getId());
                         NotificationsDAO.create(torequisitioner);
