@@ -1,5 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDAO;
+
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -213,5 +215,9 @@ public class TransactionHeader {
 
     public void setTransactionLog(String transactionLog) {
         TransactionLog = transactionLog;
+    }
+
+    public void cancelTransaction() throws Exception {
+        TransactionHeaderDAO.cancelAR(this);
     }
 }

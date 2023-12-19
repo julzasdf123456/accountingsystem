@@ -62,7 +62,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
     @FXML JFXComboBox<ParticularsAccount> accountDescription;
 
     @FXML
-    JFXButton addItemButton, deleteItemButton;
+    JFXButton addItemButton, deleteItemButton, cancelButton;
 
     @FXML
     TableView breakdownTable;
@@ -112,6 +112,35 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         }
     }
 
+    public void onCancel() {
+        if(currentTransaction!=null) {
+            JFXButton confirm = new JFXButton("Confirm");
+
+            JFXDialog dialog = DialogBuilder.showConfirmDialog("Cancel Transaction?",
+                    "This action will cancel this transaction which will delete all the records concerning this transaction.",
+                    confirm, stackPane, DialogBuilder.WARNING_DIALOG);
+            confirm.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent actionEvent) {
+                    try{
+                        if(currentTransaction!=null) {
+                            currentTransaction.cancelTransaction();
+                        }
+                        loadTransaction();
+                        dialog.close();
+                    }catch(Exception ex) {
+                        ex.printStackTrace();
+                        AlertDialogBuilder.messgeDialog("Error!", ex.getMessage(),
+                                stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                    }
+                }
+            });
+        }else {
+            AlertDialogBuilder.messgeDialog("Error!", "There is no currently opened transaction",
+                    stackPane, AlertDialogBuilder.WARNING_DIALOG);
+        }
+    }
+
     private void renderTable() {
         TableColumn accountCodeCol = new TableColumn<BankAccount, String>("Account Code");
         accountCodeCol.setCellValueFactory(new PropertyValueFactory<TransactionDetails, String>("accountCode"));
@@ -139,6 +168,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             total -= td.getDebit();
         }
         totalLabel.setText(String.format("₱ %,.2f", total));
+
     }
 
     private void resetItemsEntry() {
@@ -390,6 +420,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
     private void loadTransaction() {
         try {
+            System.out.println("Load Transaction...");
             receivedFrom.setText(currentTransaction.getParticulars());
             address.setText(currentTransaction.getAddress());
             paymentFor.setText(currentTransaction.getRemarks());

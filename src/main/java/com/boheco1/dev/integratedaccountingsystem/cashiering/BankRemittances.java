@@ -52,6 +52,9 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
     @FXML JFXButton generateReportBtn;
     @FXML StackPane stackPane;
     @FXML TextField remarksField;
+    @FXML Label totalARAmount;
+    @FXML Label totalORAmount;
+    @FXML Label totalReceiptAmount;
 
     private double totalCollection;
 
@@ -129,6 +132,24 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
         tableList = FXCollections.observableList(new ArrayList<BankRemittance>());
 
         remittanceTable.setItems(tableList);
+
+        showDailyTotals();
+    }
+
+    private void showDailyTotals() {
+        try {
+            System.out.println("Show daily totals....");
+            java.sql.Date today = java.sql.Date.valueOf(LocalDate.now());
+            double orTotal = Utility.getTotalReceipt("OR", today);
+            double arTotal = Utility.getTotalReceipt("AR", today);
+            double totalReceipt = orTotal+arTotal;
+
+            totalARAmount.setText(String.format("₱ %,.2f", arTotal));
+            totalORAmount.setText(String.format("₱ %,.2f", orTotal));
+            totalReceiptAmount.setText(String.format("₱ %,.2f", totalReceipt));
+        }catch(Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void confirmDelete(BankRemittance bankRemittance) {

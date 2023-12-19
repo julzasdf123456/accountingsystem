@@ -10,11 +10,13 @@ import pl.allegro.finance.tradukisto.ValueConverters;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class Utility {
@@ -444,6 +446,25 @@ public class Utility {
         props.setProperty("ar_printer", printerName);
 
         props.store(new FileOutputStream("application.properties"), LocalDate.now().toString());
+    }
+
+    public static double getTotalReceipt(String accountCode, java.sql.Date date) throws Exception {
+        String sql = "SELECT SUM(Credit) FROM TransactionDetails " +
+                "WHERE Debit=? " +
+                "AND TransactionCode=? " +
+                "AND TransactionDate=?";
+        System.out.println(sql);
+        PreparedStatement ps = DB.getConnection().prepareStatement(sql);
+
+        ps.setInt(1, 0);
+        ps.setString(2, accountCode);
+        ps.setDate(3, date);
+
+        ResultSet rs = ps.executeQuery();
+
+        if(rs.next()) return rs.getDouble(1);
+
+        return 0;
     }
 
     public static String COB_APPROVAL = "budget officer";

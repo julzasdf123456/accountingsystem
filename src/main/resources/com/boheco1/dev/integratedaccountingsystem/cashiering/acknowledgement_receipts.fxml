@@ -19,9 +19,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="669.0" prefWidth="1529.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.AcknowledgementReceipt">
+<AnchorPane prefHeight="855.0" prefWidth="1529.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.AcknowledgementReceipt">
    <children>
-      <VBox layoutX="23.0" layoutY="164.0" prefHeight="278.0" prefWidth="304.0" spacing="5.0" AnchorPane.bottomAnchor="226.60000000000002" AnchorPane.leftAnchor="23.0" AnchorPane.topAnchor="164.0">
+      <VBox layoutX="23.0" layoutY="164.0" prefHeight="506.0" prefWidth="304.0" spacing="5.0" AnchorPane.bottomAnchor="185.0" AnchorPane.leftAnchor="23.0" AnchorPane.topAnchor="164.0">
          <children>
             <Label text="Amount:" />
             <JFXTextField fx:id="amount" onAction="#onItemEntry" onKeyReleased="#onAmountEntry" />
@@ -101,5 +101,6 @@
       </Label>
       <JFXButton fx:id="printButton" layoutX="1415.0" layoutY="89.0" onAction="#onPrint" prefHeight="38.0" prefWidth="89.0" styleClass="btn-theme" text="Print" textFill="WHITE" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="89.0" />
       <ComboBox fx:id="printersDropdown" layoutX="1278.0" layoutY="51.0" prefHeight="25.0" prefWidth="226.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="51.0" />
+      <JFXButton fx:id="cancelButton" layoutX="26.0" layoutY="798.0" onAction="#onCancel" prefHeight="29.0" prefWidth="225.0" styleClass="btn-danger" text="Cancel Transaction" textFill="WHITE" />
    </children>
 </AnchorPane>

@@ -346,4 +346,30 @@ public class TransactionHeaderDAO {
         return found;
     }
 
+    public static void cancelAR(TransactionHeader th) throws Exception {
+        //Delete Transaction Details
+        PreparedStatement psdel = DB.getConnection().prepareStatement(
+                "DELETE FROM TransactionDetails WHERE TransactionNumber=? AND TransactionCode=?");
+        psdel.setString(1, th.getTransactionNumber());
+        psdel.setString(2,"AR");
+        psdel.executeUpdate();
+
+        PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE TransactionHeader " +
+                "SET Particulars=?, Address=?, Name=?, Amount=? WHERE TransactionNumber=? AND TransactionCode=? AND TransactionDate=?");
+
+        ps.setString(1, "CANCELLED");
+        ps.setString(2, "");
+        ps.setString(3, "CANCELLED");
+        ps.setDouble(4, 0);
+        ps.setString(5, th.getTransactionNumber());
+        ps.setString(6, th.getTransactionCode());
+        ps.setDate(7, java.sql.Date.valueOf(th.getTransactionDate()));
+
+        ps.executeUpdate();
+
+        th.setParticulars("CANCELLED");
+        th.setName("CANCELLED");
+        th.setAddress("");
+        th.setAmount(0);
+    }
 }

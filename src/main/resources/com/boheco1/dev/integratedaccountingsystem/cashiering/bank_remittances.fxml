@@ -13,15 +13,18 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="698.0" prefWidth="988.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.BankRemittances">
+<AnchorPane prefHeight="698.0" prefWidth="1248.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.cashiering.BankRemittances">
    <children>
       <StackPane fx:id="stackPane" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <AnchorPane prefHeight="698.0" prefWidth="1141.0">
+            <AnchorPane prefHeight="698.0" prefWidth="1094.0">
                <children>
-                  <GridPane gridLinesVisible="true" layoutX="625.0" layoutY="467.0" prefHeight="126.0" prefWidth="318.0" AnchorPane.bottomAnchor="30.0" AnchorPane.rightAnchor="30.0">
+                  <GridPane gridLinesVisible="true" layoutX="625.0" layoutY="467.0" prefHeight="126.0" prefWidth="558.0" AnchorPane.bottomAnchor="30.0" AnchorPane.rightAnchor="30.0">
                     <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="155.0" minWidth="10.0" prefWidth="155.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="176.0" minWidth="10.0" prefWidth="105.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="171.0" minWidth="10.0" prefWidth="42.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="189.0" minWidth="10.0" prefWidth="189.0" />
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
                     <rowConstraints>
@@ -31,7 +34,7 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Label text="Total Cash Amount" GridPane.rowIndex="1">
+                        <Label text="Total Cash Amount" GridPane.columnIndex="3" GridPane.rowIndex="1">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -39,7 +42,7 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </Label>
-                        <Label text="Total Check Amount">
+                        <Label text="Total Check Amount" GridPane.columnIndex="3">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -47,7 +50,7 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </Label>
-                        <Label text="Total Amount" GridPane.rowIndex="2">
+                        <Label text="Total Amount" GridPane.columnIndex="3" GridPane.rowIndex="2">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -55,7 +58,7 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </Label>
-                        <Label text="Bank Remittance No." GridPane.rowIndex="3">
+                        <Label text="Bank Remittance No." GridPane.columnIndex="3" GridPane.rowIndex="3">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -63,7 +66,7 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </Label>
-                        <Label fx:id="totalCheckAmount" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="30.0" prefWidth="240.0" text="0.00" textAlignment="RIGHT" GridPane.columnIndex="1">
+                        <Label fx:id="totalCheckAmount" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="30.0" prefWidth="240.0" text="0.00" textAlignment="RIGHT" GridPane.columnIndex="4">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -71,7 +74,7 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </Label>
-                        <Label fx:id="totalCashAmount" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="30.0" prefWidth="240.0" text="0.00" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label fx:id="totalCashAmount" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="30.0" prefWidth="240.0" text="0.00" textAlignment="RIGHT" GridPane.columnIndex="4" GridPane.rowIndex="1">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -79,7 +82,7 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </Label>
-                        <Label fx:id="totalAmount" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="30.0" prefWidth="240.0" text="0.00" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Label fx:id="totalAmount" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="30.0" prefWidth="240.0" text="0.00" textAlignment="RIGHT" GridPane.columnIndex="4" GridPane.rowIndex="2">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -87,11 +90,67 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </Label>
-                        <TextField fx:id="remittanceNo" alignment="CENTER" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <TextField fx:id="remittanceNo" alignment="CENTER" editable="false" GridPane.columnIndex="4" GridPane.rowIndex="3">
                            <font>
                               <Font name="System Bold" size="18.0" />
                            </font>
                         </TextField>
+                        <Label text="Total AR" GridPane.rowIndex="1">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </Label>
+                        <Label text="Total OR" GridPane.rowIndex="2">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </Label>
+                        <Label text="Total Receipt Amount" GridPane.rowIndex="3">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </Label>
+                        <Label fx:id="totalARAmount" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="30.0" prefWidth="240.0" text="0.00" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </Label>
+                        <Label fx:id="totalORAmount" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="30.0" prefWidth="240.0" text="0.00" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </Label>
+                        <Label fx:id="totalReceiptAmount" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="30.0" prefWidth="240.0" text="0.00" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </Label>
+                        <Label contentDisplay="RIGHT" prefHeight="30.0" prefWidth="240.0" text="TODAY">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </Label>
                      </children>
                   </GridPane>
                   <TableView fx:id="remittanceTable" layoutX="30.0" layoutY="84.0" maxWidth="-Infinity" prefHeight="439.0" prefWidth="928.0" AnchorPane.bottomAnchor="175.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="84.0" />
