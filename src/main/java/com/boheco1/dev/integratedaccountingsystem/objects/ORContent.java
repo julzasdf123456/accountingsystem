@@ -15,6 +15,8 @@ public class ORContent {
     private String issuedBy;
     private double total;
     private boolean reprint;
+
+    private String checkNo = "";
     private ObservableList<ORItemSummary> tellerCollection;
 
     private ObservableList<ORItemSummary> supplierItems;
@@ -173,5 +175,13 @@ public class ORContent {
 
     public void setReprint(boolean reprint) {
         this.reprint = reprint;
+    }
+
+    public String getCheckNo() {
+        return checkNo;
+    }
+
+    public void setCheckNo(String checkNo) {
+        this.checkNo = checkNo;
     }
 }

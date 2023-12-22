@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.finance;
 
+import com.boheco1.dev.integratedaccountingsystem.cashiering.ORLayoutController;
 import com.boheco1.dev.integratedaccountingsystem.dao.*;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
@@ -253,6 +254,31 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     }
 
     @FXML
+    private void print(ActionEvent event) throws Exception {
+
+        ObservableList<ORItemSummary> orItemSummaries = FXCollections.observableArrayList();;
+        for(TransactionDetails td : transactionDetails){
+            if(!td.getParticulars().equals("Grand Total")){
+                ORItemSummary os = new ORItemSummary(td.getAccountCode(),td.getParticulars(),td.getAmount());
+                orItemSummaries.add(os);
+            }
+        }
+
+        ORContent orContent = new ORContent(null, transactionHeader, transactionDetails, true);
+        orContent.setAddress(address.getText());
+        orContent.setDate(transactionDate.getValue());
+        orContent.setOrNumber(orNumber.getText());
+        orContent.setIssuedTo(name.getText());
+        orContent.setTellerCollection(orItemSummaries);
+        EmployeeInfo employeeInfo = ActiveUser.getUser().getEmployeeInfo();
+        orContent.setIssuedBy(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
+        orContent.setTotal(transactionHeader.getAmount());
+        orContent.setCheckNo(transactionDetails.get(0).getCheckNumber());
+        PrintORFinance printORFinance = new PrintORFinance(orContent);
+        printORFinance.print();
+    }
+
+    @FXML
     private void searchOR(ActionEvent event) throws Exception {
         String searchOr = orNumber.getText();//temporary store search string before reset and clear all field
         if(searchOr.isEmpty() || transactionDate.getValue()==null || transCode.getSelectionModel().isEmpty())
@@ -336,7 +362,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
 
                 td.setOrDate(temp.getOrDate());
                 td.setBankID(temp.getBankID());
-                td.setNote(temp.getParticulars()+": "+temp.getNote()+", added as new item during finance update");
+                //td.setNote(temp.getParticulars()+": "+temp.getNote()+", added as new item during finance update");
                 td.setCheckNumber(temp.getCheckNumber());
                 td.setDepositedDate(temp.getDepositedDate());
 

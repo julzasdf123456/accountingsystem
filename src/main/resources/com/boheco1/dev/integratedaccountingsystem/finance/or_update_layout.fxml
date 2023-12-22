@@ -91,5 +91,6 @@
             </Label>
          </children>
       </HBox>
+      <JFXButton layoutX="840.0" layoutY="641.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#print" prefHeight="29.0" prefWidth="84.0" styleClass="btn-info" text="Print" />
    </children>
 </AnchorPane>
