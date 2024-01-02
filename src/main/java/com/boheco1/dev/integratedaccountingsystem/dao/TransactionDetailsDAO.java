@@ -76,6 +76,7 @@ public class TransactionDetailsDAO {
     private static PreparedStatement psAdd, psUpdate, psDelete, psUpdateTransHeader;
     public static void addUpdate(TransactionHeader transactionHeader, List<TransactionDetails> updateRecord, List<TransactionDetails> newRecord) throws Exception {
         try {
+            DB.getConnection().setAutoCommit(false);
             psUpdateTransHeader = DB.getConnection().prepareStatement(
                     "UPDATE TransactionHeader SET DateLastModified = GETDATE(), UpdatedBy = ? " +
                             "WHERE " +
@@ -99,7 +100,7 @@ public class TransactionDetailsDAO {
 
             psDelete = DB.getConnection().prepareStatement("Delete From TransactionDetails WHERE Note='Remove during O.R Update' ");
 
-            DB.getConnection().setAutoCommit(false);
+
             int sequence = updateRecord.size()+2;
             for(TransactionDetails td: newRecord) {
                 psAdd.setDate(1, java.sql.Date.valueOf(td.getPeriod()));
@@ -116,7 +117,7 @@ public class TransactionDetailsDAO {
                 psAdd.setString(12, td.getCheckNumber());
                 psAdd.setString(13,td.getParticulars());
                 psAdd.setDate(14, td.getDepositedDate()==null ? null : java.sql.Date.valueOf(td.getDepositedDate()));
-
+                System.out.println(td);
                 psAdd.addBatch();
             }
 
@@ -132,24 +133,22 @@ public class TransactionDetailsDAO {
             }
 
             psUpdateTransHeader.execute();
-            psAdd.executeBatch();
             psUpdate.executeBatch();
             psDelete.executeUpdate();
-            DB.getConnection().setAutoCommit(true);
+            psAdd.executeBatch();
+            DB.getConnection().commit();
 
-            psAdd.close();
-            psUpdate.close();
-            psDelete.close();
-            psUpdateTransHeader.close();
         } catch (Exception e){
             Utility.ERROR_MSG = e.getMessage();
             DB.getConnection().rollback();
+
+            e.printStackTrace();
+        }finally {
             DB.getConnection().setAutoCommit(true);
             psAdd.close();
             psUpdate.close();
             psDelete.close();
             psUpdateTransHeader.close();
-            e.printStackTrace();
         }
     }
 
