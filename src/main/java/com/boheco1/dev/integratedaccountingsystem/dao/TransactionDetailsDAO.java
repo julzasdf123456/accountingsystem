@@ -4,14 +4,17 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionDetailsDAO {
+    public static Connection connection;
     public static void add(TransactionDetails td) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "INSERT INTO TransactionDetails (" +
@@ -73,11 +76,12 @@ public class TransactionDetailsDAO {
 
         ps.close();
     }
-    private static PreparedStatement psAdd, psUpdate, psDelete, psUpdateTransHeader;
+    private static PreparedStatement psAdd, psUpdate, psUpdateTransHeader;
     public static void addUpdate(TransactionHeader transactionHeader, List<TransactionDetails> updateRecord, List<TransactionDetails> newRecord) throws Exception {
         try {
-            DB.getConnection().setAutoCommit(false);
-            psUpdateTransHeader = DB.getConnection().prepareStatement(
+            connection = DB.getConnection();
+            connection.setAutoCommit(true);
+            psUpdateTransHeader = connection.prepareStatement(
                     "UPDATE TransactionHeader SET DateLastModified = GETDATE(), UpdatedBy = ? " +
                             "WHERE " +
                             "Period = ? AND TransactionNumber = ? AND TransactionCode = ? ;");
@@ -86,28 +90,50 @@ public class TransactionDetailsDAO {
             psUpdateTransHeader.setString(3, transactionHeader.getTransactionNumber());
             psUpdateTransHeader.setString(4, transactionHeader.getTransactionCode());
 
-            psAdd = DB.getConnection().prepareStatement(
+            PreparedStatement psAdd = connection.prepareStatement(
                     "INSERT INTO TransactionDetails (" +
                             "Period, TransactionNumber, TransactionCode, TransactionDate, " +
                             "AccountSequence, AccountCode, Debit, Credit, ORDate, " +
                             "BankID, Note, CheckNumber, Particulars, DepositedDate) " +
                             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
-            psUpdate = DB.getConnection().prepareStatement(
-                    "UPDATE TransactionDetails SET Debit = ?, Credit = ?, Particulars = ? , Note = ? " +
-                            "WHERE " +
-                            "TransactionNumber = ? AND AccountCode = ? and Particulars = ?;");
+            PreparedStatement psDelete = connection.prepareStatement("Delete From TransactionDetails WHERE TransactionNumber='" + transactionHeader.getTransactionNumber() + "'");
 
-            psDelete = DB.getConnection().prepareStatement("Delete From TransactionDetails WHERE Note='Remove during O.R Update' ");
-
-
+            psUpdateTransHeader.execute();
+            psUpdateTransHeader.close();
+            psDelete.execute();
+            psDelete.close();
             int sequence = updateRecord.size()+2;
-            for(TransactionDetails td: newRecord) {
+            for (TransactionDetails td : newRecord) {
+
                 psAdd.setDate(1, java.sql.Date.valueOf(td.getPeriod()));
                 psAdd.setString(2, td.getTransactionNumber());
                 psAdd.setString(3, td.getTransactionCode());
                 psAdd.setDate(4, java.sql.Date.valueOf(td.getTransactionDate()));
-                psAdd.setInt(5, sequence++);
+                psAdd.setInt(5, sequence);
+                psAdd.setString(6, td.getAccountCode());
+                psAdd.setDouble(7, Math.abs(td.getDebit()));
+                psAdd.setDouble(8, td.getCredit());
+                psAdd.setDate(9, td.getOrDate() == null ? null : java.sql.Date.valueOf(td.getOrDate()));
+                psAdd.setString(10, td.getBankID());
+                psAdd.setString(11, td.getNote());
+                psAdd.setString(12, td.getCheckNumber());
+                psAdd.setString(13, td.getParticulars());
+                psAdd.setDate(14, td.getDepositedDate() == null ? null : java.sql.Date.valueOf(td.getDepositedDate()));
+                System.out.println(td);
+
+                psAdd.execute();
+                psAdd.clearParameters();
+
+                sequence++;
+            }
+
+            for(TransactionDetails td: updateRecord) {
+                psAdd.setDate(1, java.sql.Date.valueOf(td.getPeriod()));
+                psAdd.setString(2, td.getTransactionNumber());
+                psAdd.setString(3, td.getTransactionCode());
+                psAdd.setDate(4, java.sql.Date.valueOf(td.getTransactionDate()));
+                psAdd.setInt(5, sequence);
                 psAdd.setString(6, td.getAccountCode());
                 psAdd.setDouble(7, Math.abs(td.getDebit()));
                 psAdd.setDouble(8, td.getCredit());
@@ -118,37 +144,23 @@ public class TransactionDetailsDAO {
                 psAdd.setString(13,td.getParticulars());
                 psAdd.setDate(14, td.getDepositedDate()==null ? null : java.sql.Date.valueOf(td.getDepositedDate()));
                 System.out.println(td);
-                psAdd.addBatch();
+//                    psAdd.addBatch();
+                psAdd.execute();
+                psAdd.clearParameters();
+
+                sequence++;
             }
 
-            for(TransactionDetails td: updateRecord) {
-                psUpdate.setDouble(1, Math.abs(td.getDebit()));
-                psUpdate.setDouble(2, td.getCredit());
-                psUpdate.setString(3, td.getParticularsLabel());
-                psUpdate.setString(4, td.getNote());
-                psUpdate.setString(5, td.getTransactionNumber());
-                psUpdate.setString(6, td.getAccountCode());
-                psUpdate.setString(7,td.getParticulars());
-                psUpdate.addBatch();
-            }
+            psAdd.close();
 
-            psUpdateTransHeader.execute();
-            psUpdate.executeBatch();
-            psDelete.executeUpdate();
-            psAdd.executeBatch();
-            DB.getConnection().commit();
+            PreparedStatement psDeleteZero = connection.prepareStatement("Delete From TransactionDetails WHERE TransactionNumber='" + transactionHeader.getTransactionNumber() + "' AND Debit=0 AND Credit=0");
 
+            psDeleteZero.execute();
+            psDeleteZero.close();
         } catch (Exception e){
             Utility.ERROR_MSG = e.getMessage();
-            DB.getConnection().rollback();
 
             e.printStackTrace();
-        }finally {
-            DB.getConnection().setAutoCommit(true);
-            psAdd.close();
-            psUpdate.close();
-            psDelete.close();
-            psUpdateTransHeader.close();
         }
     }
 

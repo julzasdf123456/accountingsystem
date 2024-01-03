@@ -77,7 +77,7 @@ public class PrintORFinance {
         createCell(orContent.getDate().format(dateFormat), 1,12,Font.NORMAL,Element.ALIGN_LEFT);
 
         createCell("Received From ", 1,12,Font.NORMAL,Element.ALIGN_RIGHT,Rectangle.NO_BORDER);
-        createCell(orContent.getIssuedBy(), 2,12,Font.NORMAL,Element.ALIGN_LEFT);
+        createCell(orContent.getIssuedTo(), 2,12,Font.NORMAL,Element.ALIGN_LEFT);
         createCell("Address ", 1,12,Font.NORMAL,Element.ALIGN_RIGHT,Rectangle.NO_BORDER);
         createCell(orContent.getAddress(), 2,12,Font.NORMAL,Element.ALIGN_LEFT);
         createCell("Amount in Words ", 1,12,Font.NORMAL,Element.ALIGN_RIGHT,Rectangle.NO_BORDER);

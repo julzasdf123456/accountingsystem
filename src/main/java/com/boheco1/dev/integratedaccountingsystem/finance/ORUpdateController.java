@@ -234,6 +234,9 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                     public void handle(ActionEvent __) {
                         try {
                             TransactionDetailsDAO.addUpdate(transactionHeader, transactionDetails,newTransactionDetails);
+//                            for (TransactionDetails details : newTransactionDetails) {
+//                                System.out.println(details);
+//                            }
                             reset();
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -343,28 +346,28 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
             if(!particular.getText().isEmpty() && !newItemAmount.getText().isEmpty()){
                 double amount = Double.parseDouble(newItemAmount.getText());
 
-                TransactionDetails temp = (TransactionDetails) orTable.getItems().get(0);
+//                TransactionDetails temp = (TransactionDetails) orTable.getItems().get(0);
                 TransactionDetails td = new TransactionDetails();
-                td.setPeriod(temp.getPeriod());
-                td.setTransactionNumber(temp.getTransactionNumber());
-                td.setTransactionCode(temp.getTransactionCode());
-                td.setTransactionDate(temp.getTransactionDate());
+                td.setPeriod(transactionHeader.getPeriod());
+                td.setTransactionNumber(transactionHeader.getTransactionNumber());
+                td.setTransactionCode(transactionHeader.getTransactionCode());
+                td.setTransactionDate(transactionHeader.getTransactionDate());
                 //account sequence will be set upon saving
 
                 ParticularsAccount newItem = particularsAccount;
                 td.setAccountCode(newItem.getAccountCode());
-                if(amount > 0){
+                if(amount >= 0){
                     td.setCredit(amount);
-                }else{
+                } else {
                     td.setDebit(amount);
                 }
                 td.setParticulars(newItem.getParticulars());
 
-                td.setOrDate(temp.getOrDate());
-                td.setBankID(temp.getBankID());
+                td.setOrDate(transactionHeader.getTransactionDate());
+                td.setBankID(null);
                 //td.setNote(temp.getParticulars()+": "+temp.getNote()+", added as new item during finance update");
-                td.setCheckNumber(temp.getCheckNumber());
-                td.setDepositedDate(temp.getDepositedDate());
+                td.setCheckNumber(null);
+                td.setDepositedDate(null);
 
                 newTransactionDetails.add(td);
                 ObservableList<TransactionDetails> result = FXCollections.observableArrayList(newTransactionDetails);

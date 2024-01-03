@@ -22,13 +22,19 @@ public class DB {
     public static Connection getConnection() throws SQLException, ClassNotFoundException {
         if(connection==null) {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+//            String conString = "jdbc:sqlserver://"+host+";" +
+//                    "Database="+db_name+";" +
+//                    "user="+db_user+";" +
+//                    "password="+db_pass+";" +
+//                    "encrypt=false;" +
+//                    "trustServerCertificate=false;" +
+//                    "loginTimeout=60";
             String conString = "jdbc:sqlserver://"+host+";" +
                     "Database="+db_name+";" +
                     "user="+db_user+";" +
                     "password="+db_pass+";" +
                     "encrypt=false;" +
-                    "trustServerCertificate=false;" +
-                    "loginTimeout=60";
+                    "trustServerCertificate=false;";
             connection = DriverManager.getConnection(conString);
         }
 
