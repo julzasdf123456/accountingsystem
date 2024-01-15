@@ -24,6 +24,7 @@ import org.controlsfx.control.textfield.TextFields;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,7 +43,7 @@ public class SupplierORController extends MenuControllerHandler implements Initi
     private JFXTextField orNumber, amount, searchSupplier, particular, tinNumber, style;
 
     @FXML
-    private Label totalDisplay;
+    private Label totalDisplay, evatDisplay;
 
     @FXML
     private TableView<ORItemSummary> itemTable;
@@ -51,6 +52,8 @@ public class SupplierORController extends MenuControllerHandler implements Initi
     ParticularsAccount particularsAccount = null;
     private ObservableList<ORItemSummary> observableList;
     private double totalAmount;
+
+    public Connection con;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         bindSupplierInfoAutocomplete(searchSupplier);
@@ -58,6 +61,14 @@ public class SupplierORController extends MenuControllerHandler implements Initi
         initController();
         clearText();
         Utility.setParentController(this);
+
+        try {
+            con = DB.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -67,6 +78,7 @@ public class SupplierORController extends MenuControllerHandler implements Initi
         tinNumber.setText("");
         style.setText("");
         totalDisplay.setText("");
+        evatDisplay.setText("");
         particular.setText("");
         amount.setText("");
         searchSupplier.setText("");
@@ -172,11 +184,13 @@ public class SupplierORController extends MenuControllerHandler implements Initi
 
     private void reCompute() {
         double total = 0;
+        double evat = 0;
         for (ORItemSummary t : observableList)
             total += t.getAmount();
 
         totalAmount=total;
         totalDisplay.setText(Utility.formatDecimal(totalAmount));
+        evatDisplay.setText(Utility.formatDecimal(totalAmount * .12));
     }
 
     @FXML
@@ -291,7 +305,9 @@ public class SupplierORController extends MenuControllerHandler implements Initi
                     //Perform DB query when length of search string is 4 or above
                     if (query.length() >= 1){
                         try {
-                            list = ParticularsAccountDAO.get(query);
+                            if (con != null) {
+                                list = ParticularsAccountDAO.get(con, query);
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

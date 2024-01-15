@@ -279,6 +279,124 @@ public class BillDAO {
 
         return bills;
     }
+
+    public static List<Bill> getConsumerBills(ConsumerInfo consumerInfo, boolean paid, Connection con) throws Exception {
+        String sql = "SELECT " +
+                "(SELECT ISNULL (SUM(MDRefund), 0) - ISNULL((SELECT Amount FROM MDRefund WHERE AccountNumber = b.AccountNumber),0) FROM PaidBills WHERE AccountNumber = b.AccountNumber) AS mdrefund, \n" +
+                "bdcr.NetAmountLessCharges AS ppd, " +
+                "b.BillNumber, " +
+                "am.AccountNumber, " +
+                "b.ServicePeriodEnd, " +
+                "b.ServiceDateFrom, " +
+                "b.ServiceDateTo, " +
+                "b.DueDate, " +
+                "ISNULL(b.PR,0) AS PR, " +
+                "am.ComputeMode, " +
+                "ISNULL(bdcr.PowerNew, 0) AS PowerNew, " +
+                "ISNULL(k.KatasBalance, 0) AS KatasAmt, " +
+                "DATEDIFF(day, b.DueDate, getdate()) AS daysDelayed, " +
+                "ISNULL(b.NetAmount,0) AS NetAmount, " +
+                "ISNULL(b.NetMeteringNetAmount, 0) AS NetMeterAmount, " +
+                "ISNULL(b.ConsumerType,'RM') AS ConsumerType, " +
+                "ISNULL(b.PowerKWH,0) AS PowerKWH, " +
+                "ISNULL(withPenalty, 1) AS withPenalty, " +
+                "ISNULL(b.Item2, 0) AS VATandTaxes, " +
+                "ISNULL(b.PR,0) AS TransformerRental, " +
+                "ISNULL(b.Others,0) AS OthersCharges, " +
+                "ISNULL(b.ACRM_TAFPPCA,0) AS ACRM_TAFPPCA, " +
+                "ISNULL(b.DAA_GRAM,0) AS DAA_GRAM " +
+                "FROM Bills b " +
+                "LEFT JOIN AccountMaster am ON b.AccountNumber=am.AccountNumber " +
+                "LEFT JOIN KatasData k ON b.AccountNumber=k.AccountNumber " +
+                "INNER JOIN BillsForDCRRevision bdcr ON b.AccountNumber=bdcr.AccountNumber AND b.ServicePeriodEnd=bdcr.ServicePeriodEnd ";
+        if (paid)
+            sql += "WHERE b.AccountNumber IN (SELECT AccountNumber FROM PaidBills WHERE AccountNumber = b.AccountNumber AND ServicePeriodEnd = b.ServicePeriodEnd)  AND b.AccountNumber = ? ";
+        else
+            sql += "WHERE b.AccountNumber NOT IN (SELECT AccountNumber FROM PaidBills WHERE AccountNumber = b.AccountNumber AND ServicePeriodEnd = b.ServicePeriodEnd)  AND b.AccountNumber = ? ";
+
+        sql += "ORDER BY b.ServicePeriodEnd";
+
+        System.out.println(sql);
+
+        PreparedStatement ps = con.prepareStatement(sql);
+
+        ps.setString(1, consumerInfo.getAccountID());
+//        ps.setString(2, consumerInfo.getAccountID());
+//        ps.setString(3, consumerInfo.getAccountID());
+
+        ResultSet rs = ps.executeQuery();
+
+        List<Bill> bills = new ArrayList<>();
+        while(rs.next()) {
+            String billNo = rs.getString("BillNumber");
+
+            Bill bill = new PaidBill(
+                    billNo,
+                    rs.getDate("ServiceDateFrom").toLocalDate(),
+                    rs.getDate("ServiceDateTo").toLocalDate(),
+                    rs.getDate("DueDate").toLocalDate(),
+                    rs.getDouble("NetAmount"));
+            //Set ComputeMode
+            bill.setComputeMode(rs.getString("ComputeMode"));
+            //Set NetMeteringAmount for NetMetered compute mode
+            bill.setNetMeteredAmount(rs.getDouble("NetMeterAmount"));
+            //apply other deductions when account is netmetering (based on NetMetered value in the ComputeMode of AccountMaster), set net amount as netmeter amount
+            if (bill.getComputeMode().equals(Bill.NETMETERED)) {
+                bill.setOtherAdjustment(rs.getDouble("NetAmount") - rs.getDouble("NetMeterAmount"));
+            }
+            Date date = rs.getDate("ServicePeriodEnd");
+            LocalDate billMonth = date.toLocalDate();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM YYYY");
+            bill.setWithPenalty(rs.getBoolean("withPenalty"));
+            bill.setBillMonth(formatter.format(billMonth));
+            bill.setServicePeriodEnd(billMonth);
+            bill.setConsumer(consumerInfo);
+            bill.setPowerAmount(rs.getDouble("PowerNew"));
+            bill.setKatas(rs.getDouble("KatasAmt"));
+
+            bill.setConsumerType(rs.getString("ConsumerType"));
+            bill.setPowerKWH(rs.getDouble("PowerKWH"));
+            bill.setTransformerRental(rs.getDouble("TransformerRental"));
+            bill.setOtherCharges(rs.getDouble("OthersCharges"));
+            bill.setPr(rs.getDouble("PR"));
+            bill.setAcrmVat(rs.getDouble("ACRM_TAFPPCA"));
+            bill.setDAAVat(rs.getDouble("DAA_GRAM"));
+            bill.setVat(rs.getDouble("VATandTaxes"));
+            bill.setDaysDelayed(rs.getInt("daysDelayed"));
+            bill.setAddCharges(bill.getPr()+bill.getOtherCharges());
+            //Disable surcharge computation when set in the Bills table withPenalty value of 1
+            if (bill.isWithPenalty()) {
+                bill.setSurCharge(Utility.round(bill.computeSurCharge(), 2));
+                bill.setSurChargeTax(Utility.round(bill.getSurCharge() * 0.12, 2));
+            }else{
+                bill.setSurCharge(0);
+                bill.setSurChargeTax(0);
+            }
+            //Automatic PPD for BAPA, ECA, I, CL, CS with 1000kwh within due date payment
+            if ((bill.getConsumerType().equals("B")
+                    || bill.getConsumerType().equals("E")
+                    || bill.getConsumerType().equals("I")
+                    || ( (bill.getConsumerType().equals("CL") || bill.getConsumerType().equals("CS")) && bill.getPowerKWH() >= 1000) )
+                    && bill.getDaysDelayed() <= 0) {
+                double ppd = 0, ppd_rate = 0.01;
+                //3% PPD for BAPA or ECA
+                if (bill.getConsumerType().equals("B")|| bill.getConsumerType().equals("E"))
+                    ppd_rate = 0.03;
+                //Set the discount
+                ppd = rs.getDouble("ppd");
+                bill.setDiscount(ppd*ppd_rate);
+            }
+            bill.computeTotalAmount();
+            //Set the mdrefund
+            bill.setMdRefund(rs.getDouble("mdrefund"));
+            bills.add(bill);
+        }
+
+        rs.close();
+        ps.close();
+
+        return bills;
+    }
     /**
      * Retrieves all bills of customer based on Account Number (on Billing database)
      * @param consumerInfo The consumer account number

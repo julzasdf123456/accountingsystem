@@ -4,6 +4,8 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.CRMQueue;
 import com.boheco1.dev.integratedaccountingsystem.objects.ConsumerInfo;
+
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -11,6 +13,7 @@ import java.util.List;
 
 public class ConsumerDAO {
 
+    public static Connection connection;
     /**
      * Retrieves a list of ConsumerInfo as a search result based on a search Key (on Billing database, ConsumerInquiry view)
      * @param key The search key
@@ -18,11 +21,46 @@ public class ConsumerDAO {
      * @throws Exception obligatory from DB.getConnection()
      */
     public static List<ConsumerInfo> getConsumerRecords(String key) throws Exception  {
-        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(
-                "SELECT TOP 50 * FROM AccountMaster WHERE ConsumerName LIKE ? OR AccountNumber LIKE ? " +
+        connection = DB.getConnection(Utility.DB_BILLING);
+
+        PreparedStatement ps = connection.prepareStatement(
+                "SELECT TOP 20 * FROM AccountMaster WHERE ConsumerName LIKE '%" + key + "%' OR AccountNumber LIKE '%" + key + "%' OR MeterNumber LIKE '%" + key + "%' " +
                         "ORDER BY ConsumerName");
-        ps.setString(1, '%'+ key+'%');
-        ps.setString(2, '%'+ key+'%');
+//        ps.setString(1, '%'+ key+'%');
+//        ps.setString(2, '%'+ key+'%');
+
+        ResultSet rs = ps.executeQuery();
+
+        List<ConsumerInfo> list = new ArrayList<>();
+        while(rs.next()) {
+            ConsumerInfo record = new ConsumerInfo(
+                    rs.getString("AccountNumber"),
+                    rs.getString("ConsumerName"),
+                    rs.getString("ConsumerAddress"),
+                    rs.getString("TINNo"),
+                    rs.getString("Email"),
+                    rs.getString("ContactNumber")
+            );
+
+            record.setMeterNumber(rs.getString("MeterNumber"));
+            record.setAccountType(rs.getString("ConsumerType"));
+            record.setAccountStatus(rs.getString("AccountStatus"));
+
+            list.add(record);
+        }
+
+        rs.close();
+        ps.close();
+
+        return list;
+    }
+
+    public static List<ConsumerInfo> getConsumerRecords(String key, Connection con) throws Exception  {
+        PreparedStatement ps = con.prepareStatement(
+                "SELECT TOP 20 * FROM AccountMaster WHERE ConsumerName LIKE '%" + key + "%' OR AccountNumber LIKE '%" + key + "%' OR MeterNumber LIKE '%" + key + "%' " +
+                        "ORDER BY ConsumerName");
+//        ps.setString(1, '%'+ key+'%');
+//        ps.setString(2, '%'+ key+'%');
 
         ResultSet rs = ps.executeQuery();
 
@@ -74,6 +112,37 @@ public class ConsumerDAO {
                      rs.getString("TINNo"),
                      rs.getString("Email"),
                      rs.getString("ContactNumber")
+            );
+
+            record.setMeterNumber(rs.getString("MeterNumber"));
+            record.setAccountType(rs.getString("ConsumerType"));
+            record.setAccountStatus(rs.getString("AccountStatus"));
+        }
+
+        rs.close();
+        ps.close();
+
+        return record;
+    }
+
+    public static ConsumerInfo getConsumerRecord(String accountNo, Connection con) throws Exception {
+        PreparedStatement ps = con.prepareStatement("SELECT * FROM AccountMaster WHERE AccountNumber = ? OR MeterNumber = ?");
+
+        ps.setString(1, accountNo);
+        ps.setString(2, accountNo);
+
+        ResultSet rs = ps.executeQuery();
+
+        ConsumerInfo record = null;
+
+        while(rs.next()) {
+            record = new ConsumerInfo(
+                    rs.getString("AccountNumber"),
+                    rs.getString("ConsumerName"),
+                    rs.getString("ConsumerAddress"),
+                    rs.getString("TINNo"),
+                    rs.getString("Email"),
+                    rs.getString("ContactNumber")
             );
 
             record.setMeterNumber(rs.getString("MeterNumber"));

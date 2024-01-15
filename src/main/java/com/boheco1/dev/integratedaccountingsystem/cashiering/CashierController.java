@@ -24,6 +24,8 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -83,6 +85,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
     //private double otherDeduction;
     double collectionFromCRM;
     double originalEvatAmount;
+
+    public Connection con;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Utility.setParentController(this);
@@ -93,6 +97,14 @@ public class CashierController extends MenuControllerHandler implements Initiali
             throw new RuntimeException(e);
         }
         manualORinput.setVisible(false);
+
+        try {
+            con = DB.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
         InputValidation.restrictNumbersOnly(energyBill);
         InputValidation.restrictNumbersOnly(vat);
@@ -482,8 +494,6 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
         this.paymentTable.setPlaceholder(new Label("No consumer records was searched."));
     }
-
-
 
 
     private void reCompute() {
@@ -1008,7 +1018,9 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     //Perform DB query when length of search string is 4 or above
                     if (query.length() >= 1){
                         try {
-                            list = ParticularsAccountDAO.get(query);
+                            if (con != null) {
+                                list = ParticularsAccountDAO.get(con, query);
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -1086,6 +1098,5 @@ public class CashierController extends MenuControllerHandler implements Initiali
             }
         });
     }
-
 
 }

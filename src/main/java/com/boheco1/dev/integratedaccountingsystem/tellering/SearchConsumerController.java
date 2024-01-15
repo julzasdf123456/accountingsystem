@@ -21,6 +21,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -47,56 +49,89 @@ public class SearchConsumerController extends MenuControllerHandler implements I
     private Timer t = new Timer();
     private TimerTask tt;
 
+    public Connection con;
+    public Thread searchThread;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        try {
+            con = DB.getConnection(Utility.DB_BILLING);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         this.createTable();
         this.consumersTable.setRowFactory(tv -> {
             TableRow<ConsumerInfo> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                if (! row.isEmpty()) {
+                    System.out.println("CLICKED");
                     consumerInfo = row.getItem();
                     this.parentController.receive(consumerInfo);
                     try {
-                        if (BillDAO.getConsumerBills(consumerInfo, false).size() == 0)
+                        if (BillDAO.getConsumerBills(consumerInfo, false, con).size() == 0) {
+                            System.out.println("FETCHED");
                             this.setMessage("Consumer has no unpaid bills!");
-                        else
+                        } else {
                             this.setMessage("");
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+
                 }
             });
             return row ;
         });
+        if (searchThread != null && searchThread.isAlive())
+            searchThread.interrupt();
+
         this.parentController = Utility.getParentController();
         this.query_tf.requestFocus();
 
         this.query_tf.setOnKeyPressed(keyEvent -> {
-            if (tt != null)
-                tt.cancel();
-            tt = null;
+            if (searchThread != null && searchThread.isAlive())
+                searchThread.interrupt();
+//            tt = null;
         });
 
         this.query_tf.setOnKeyReleased(keyEvent -> {
-            if (tt != null)
-                return;
+//            if (tt != null)
+//                return;
 
-            tt = new TimerTask() {
+//            tt = new TimerTask() {
+//                @Override
+//                public void run() {
+//                    if (query_tf.getText().length() > 2) {
+//                        String query = query_tf.getText();
+//                        try {
+//                            consumers = FXCollections.observableArrayList(ConsumerDAO.getConsumerRecords(query, con));
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//                        consumersTable.setItems(consumers);
+//                    }
+//                }
+//            };
+//
+//            t.scheduleAtFixedRate(tt, 5, 5);
+            searchThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     if (query_tf.getText().length() > 2) {
                         String query = query_tf.getText();
                         try {
-                            consumers = FXCollections.observableArrayList(ConsumerDAO.getConsumerRecords(query));
+                            consumers = FXCollections.observableArrayList(ConsumerDAO.getConsumerRecords(query, con));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                         consumersTable.setItems(consumers);
                     }
                 }
-            };
+            });
+            searchThread.start();
 
-            t.scheduleAtFixedRate(tt, 225, 500);
         });
     }
 
@@ -108,7 +143,7 @@ public class SearchConsumerController extends MenuControllerHandler implements I
     public void search(){
         String query = this.query_tf.getText();
         try {
-            this.consumers = FXCollections.observableArrayList(ConsumerDAO.getConsumerRecords(query));
+            this.consumers = FXCollections.observableArrayList(ConsumerDAO.getConsumerRecords(query, con));
             this.consumersTable.setItems(this.consumers);
         } catch (Exception e) {
             e.printStackTrace();

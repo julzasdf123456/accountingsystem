@@ -90,6 +90,12 @@
                      </HBox.margin>
                   </Label>
                   <Label fx:id="totalDisplay" style="-fx-font-size: 16;" text="0" />
+                  <Label style="-fx-font-size: 16;" text="EVAT:">
+                     <HBox.margin>
+                        <Insets left="120.0" />
+                     </HBox.margin>
+                  </Label>
+                  <Label fx:id="evatDisplay" style="-fx-font-size: 16;" text="0" />
                </children>
                <VBox.margin>
                   <Insets top="8.0" />

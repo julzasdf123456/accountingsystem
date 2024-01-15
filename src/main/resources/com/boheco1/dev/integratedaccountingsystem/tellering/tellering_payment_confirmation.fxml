@@ -63,7 +63,9 @@
                            <styleClass>
                               <String fx:value="bold" />
                               <String fx:value="blue" />
-                           </styleClass></TextField>
+                                <String fx:value="emphasize" />
+                           </styleClass>
+                        </TextField>
                         <JFXButton fx:id="confirm_btn" buttonType="RAISED" onAction="#confirm" prefHeight="37.0" prefWidth="264.0" styleClass="btn-theme" text="CONFIRM" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                         <CheckBox fx:id="deposit_cb" mnemonicParsing="false" text="Deposit Change" GridPane.rowIndex="5" />
                         <ComboBox fx:id="account_list" prefHeight="25.0" prefWidth="264.0" promptText="Select Account" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />

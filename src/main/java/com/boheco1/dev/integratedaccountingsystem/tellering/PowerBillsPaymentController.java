@@ -17,6 +17,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 public class PowerBillsPaymentController extends MenuControllerHandler implements Initializable, ObjectTransaction {
 
@@ -155,9 +157,21 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     @FXML
     private Label billsNo_lbl;
 
+    public Connection con;
+
+    public boolean isSearchConsumerErrorShown = false;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         confirmEvent = actionEvent -> confirmPayment();
+
+        try {
+            con = DB.getConnection(Utility.DB_BILLING);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
         if (ActiveUser.getUser().can("manage-billing"))
             sidebar_vbox.setVisible(false);
@@ -178,14 +192,14 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             String no = acct_no_tf.getText();
             if (no.strip().length() == 10){
                 try {
-                    this.consumerInfo = ConsumerDAO.getConsumerRecord(no);
+                    this.consumerInfo = ConsumerDAO.getConsumerRecord(no, con);
                     if (this.consumerInfo != null) {
                         Task<Void> task = new Task<>() {
                             @Override
                             protected Void call() throws SQLException {
                                 try{
                                     if (bills.size() == 0) bills = FXCollections.observableArrayList();
-                                    List<Bill> consumerBills = BillDAO.getConsumerBills(consumerInfo, false);
+                                    List<Bill> consumerBills = BillDAO.getConsumerBills(consumerInfo, false, con);
                                     if (consumerBills.size() > 0) {
                                         for (Bill b : consumerBills){
                                             if (!bills.contains(b)) {
@@ -241,7 +255,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.acct_no_tf.setOnAction(actionEvent -> {
             String no = acct_no_tf.getText();
             try {
-                this.consumerInfo = ConsumerDAO.getConsumerRecord(no);
+                this.consumerInfo = ConsumerDAO.getConsumerRecord(no, con);
                 if (this.consumerInfo != null) {
                     Task<Void> task = new Task<>() {
                         @Override
@@ -292,8 +306,9 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     });
 
                     new Thread(task).start();
-                }else{
-                    AlertDialogBuilder.messgeDialog("System Error", "No existing consumer account! Please refine search and try again!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                } else {
+                    Toast.makeText((Stage) contentPane.getScene().getWindow(), "No existing consumer account!\nPlease refine search and try again!", 2500, 200, 200, "rgba(203, 24, 5, 1)");
+//                    AlertDialogBuilder.messgeDialog("System Error", "No existing consumer account! Please refine search and try again!", Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1056,8 +1071,12 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
         dialogLayout.setBody(parent);
         JFXDialog dialog = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM);
-        dialog.setOnDialogOpened((event) -> { ctrl.getSearch_tf().requestFocus(); });
-        dialog.setOnDialogClosed((event) -> { payment_tf.requestFocus(); });
+        dialog.setOnDialogOpened((event) -> {
+            ctrl.getSearch_tf().requestFocus();
+        });
+        dialog.setOnDialogClosed((event) -> {
+            payment_tf.requestFocus();
+        });
         dialog.show();
     }
 
