@@ -4,6 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.objects.Bill;
 import com.jfoenix.controls.JFXButton;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -37,6 +38,7 @@ public class WaiveChargesController extends MenuControllerHandler implements Ini
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        surcharge_tf.requestFocus();
         InputHelper.restrictNumbersOnly(surcharge_tf);
     }
 
@@ -45,7 +47,13 @@ public class WaiveChargesController extends MenuControllerHandler implements Ini
         this.total_lbl = total;
         this.billno_tf.setText(bill.getBillNo());
         this.billing_month_tf.setText(bill.getBillMonth());
-        this.surcharge_tf.setText(bill.getSurCharge()+"");
+
+        if (bill.getSurCharge() == 0) {
+            this.surcharge_tf.setText("");
+        } else {
+            this.surcharge_tf.setText(bill.getSurCharge()+"");
+        }
+
     }
 
     public void setBill(Bill bill) {
