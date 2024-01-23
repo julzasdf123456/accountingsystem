@@ -104,8 +104,21 @@ public class TransactionDetailsDAO {
             psDelete.execute();
             psDelete.close();
             int sequence = updateRecord.size()+2;
-            for (TransactionDetails td : newRecord) {
 
+            TransactionDetails univTd;
+            if (newRecord != null && !newRecord.isEmpty()) {
+                univTd = newRecord.get(0);
+            } else {
+                if (updateRecord != null && !updateRecord.isEmpty()) {
+                    univTd = updateRecord.get(0);
+                } else {
+                    univTd = null;
+                }
+            }
+
+            double totalAmnt = 0.0;
+
+            for (TransactionDetails td : newRecord) {
                 psAdd.setDate(1, java.sql.Date.valueOf(td.getPeriod()));
                 psAdd.setString(2, td.getTransactionNumber());
                 psAdd.setString(3, td.getTransactionCode());
@@ -121,6 +134,8 @@ public class TransactionDetailsDAO {
                 psAdd.setString(13, td.getParticulars());
                 psAdd.setDate(14, td.getDepositedDate() == null ? null : java.sql.Date.valueOf(td.getDepositedDate()));
                 System.out.println(td);
+
+                totalAmnt += td.getAmount();
 
                 psAdd.execute();
                 psAdd.clearParameters();
@@ -144,12 +159,38 @@ public class TransactionDetailsDAO {
                 psAdd.setString(13,td.getParticulars());
                 psAdd.setDate(14, td.getDepositedDate()==null ? null : java.sql.Date.valueOf(td.getDepositedDate()));
                 System.out.println(td);
+
+                totalAmnt += td.getAmount();
+
 //                    psAdd.addBatch();
                 psAdd.execute();
                 psAdd.clearParameters();
 
                 sequence++;
             }
+
+            // INSERT GRAND TOTAL
+            if (univTd != null) {
+                psAdd.setDate(1, java.sql.Date.valueOf(univTd.getPeriod()));
+                psAdd.setString(2, univTd.getTransactionNumber());
+                psAdd.setString(3, univTd.getTransactionCode());
+                psAdd.setDate(4, java.sql.Date.valueOf(univTd.getTransactionDate()));
+                psAdd.setInt(5, sequence);
+                psAdd.setString(6, Utility.getAccountCodeProperty());
+                psAdd.setDouble(7, Math.abs(totalAmnt));
+                psAdd.setDouble(8, 0);
+                psAdd.setDate(9, univTd.getOrDate() == null ? null : java.sql.Date.valueOf(univTd.getOrDate()));
+                psAdd.setString(10, univTd.getBankID());
+                psAdd.setString(11, univTd.getNote());
+                psAdd.setString(12, univTd.getCheckNumber());
+                psAdd.setString(13, "Grand Total");
+                psAdd.setDate(14, univTd.getDepositedDate() == null ? null : java.sql.Date.valueOf(univTd.getDepositedDate()));
+                System.out.println(univTd);
+
+                psAdd.execute();
+                psAdd.clearParameters();
+            }
+
 
             psAdd.close();
 

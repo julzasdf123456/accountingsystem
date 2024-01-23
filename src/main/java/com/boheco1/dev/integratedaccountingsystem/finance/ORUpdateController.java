@@ -233,7 +233,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                     @Override
                     public void handle(ActionEvent __) {
                         try {
-                            TransactionDetailsDAO.addUpdate(transactionHeader, transactionDetails,newTransactionDetails);
+                            TransactionDetailsDAO.addUpdate(transactionHeader, transactionDetails, newTransactionDetails);
 //                            for (TransactionDetails details : newTransactionDetails) {
 //                                System.out.println(details);
 //                            }

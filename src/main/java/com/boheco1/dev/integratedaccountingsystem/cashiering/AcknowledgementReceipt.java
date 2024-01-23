@@ -90,9 +90,9 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
             int nextARNumber = TransactionHeaderDAO.getNextARNumber();
 
-            if(nextARNumber>0) {
-                orNumber.setText(nextARNumber+"");
-            }
+//            if(nextARNumber>0) {
+//                orNumber.setText(nextARNumber+"");
+//            }
 
             accountDescription.setItems(FXCollections.observableList(ParticularsAccountDAO.getByType("AR")));
             transactionDetails = FXCollections.observableList(new ArrayList<>());
