@@ -16,7 +16,9 @@ import java.util.List;
 public class TransactionDetailsDAO {
     public static Connection connection;
     public static void add(TransactionDetails td) throws Exception {
-        PreparedStatement ps = DB.getConnection().prepareStatement(
+        Connection cxn = DB.getConnection();
+        cxn.setAutoCommit(true);
+        PreparedStatement ps = cxn.prepareStatement(
                 "INSERT INTO TransactionDetails (" +
                         "Period, TransactionNumber, TransactionCode, TransactionDate, " +
                         "AccountSequence, AccountCode, Debit, Credit, ORDate, " +
@@ -452,11 +454,15 @@ public class TransactionDetailsDAO {
     }
 
     public static void syncDebit(LocalDate period, String transactionNumber, String transactionCode) throws Exception {
-        PreparedStatement psx = DB.getConnection().prepareStatement("SELECT * FROM TransactionDetails td WHERE td.Period=? AND td.TransactionNumber=? AND td.TransactionCode=? AND td.Debit=0");
+        Connection cxn = DB.getConnection();
+        cxn.setAutoCommit(true);
+        PreparedStatement psx = cxn.prepareStatement("SELECT * FROM TransactionDetails td WHERE td.Period=? AND td.TransactionNumber=? AND td.TransactionCode=? AND td.Debit=0");
         psx.setDate(1, java.sql.Date.valueOf(period));
         psx.setString(2, transactionNumber);
         psx.setString(3, transactionCode);
         ResultSet rs = psx.executeQuery();
+
+
 
         if(rs.next()) {
             PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE TransactionDetails SET Credit=? WHERE Period=? AND TransactionNumber=? AND TransactionCode=? AND Debit=0 AND AccountSequence=999");
@@ -482,7 +488,9 @@ public class TransactionDetailsDAO {
     }
 
     public static void syncAR(TransactionHeader th, double amount) throws Exception {
-        PreparedStatement psx = DB.getConnection().prepareStatement("SELECT * FROM TransactionDetails td WHERE td.Period=? AND td.TransactionNumber=? AND td.TransactionCode=? AND td.AccountSequence=999");
+        Connection cxn = DB.getConnection();
+        cxn.setAutoCommit(true);
+        PreparedStatement psx = cxn.prepareStatement("SELECT * FROM TransactionDetails td WHERE td.Period=? AND td.TransactionNumber=? AND td.TransactionCode=? AND td.AccountSequence=999");
         psx.setDate(1, java.sql.Date.valueOf(th.getPeriod()));
         psx.setString(2, th.getTransactionNumber());
         psx.setString(3, th.getTransactionCode());
@@ -511,6 +519,7 @@ public class TransactionDetailsDAO {
     }
 
     public static void delete(TransactionDetails td) throws Exception {
+        DB.getConnection().setAutoCommit(true);
         PreparedStatement ps = DB.getConnection().prepareStatement("DELETE FROM TransactionDetails " +
                 "WHERE Period=? AND TransactionNumber=? AND TransactionCode=? AND AccountSequence=? AND Debit=?");
 

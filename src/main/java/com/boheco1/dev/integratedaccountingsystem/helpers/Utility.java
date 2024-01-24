@@ -121,6 +121,8 @@ public class Utility {
         return itemizedMirsItems;
     }*/
 
+    public static int currentARNumber = 0;
+
     public static String generateRandomId() {
         return new Date().getTime() + "-" + generateRandomString(15);
     }
@@ -453,7 +455,6 @@ public class Utility {
                 "WHERE Debit=? " +
                 "AND TransactionCode=? " +
                 "AND TransactionDate=?";
-        System.out.println(sql);
         PreparedStatement ps = DB.getConnection().prepareStatement(sql);
 
         ps.setInt(1, 0);

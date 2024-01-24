@@ -12,12 +12,14 @@ import java.time.format.DateTimeFormatter;
 
 public class ArPrint {
     @FXML
-    Text receivedFrom1, receivedFrom2, total1, total2, date1, date2, user1, user2;
+    Text receivedFrom1, receivedFrom2, total1, total2, date1, date2, user1, user2, transNumber1, transNumber2;
 
     @FXML
     Label paymentFor1, amount1, paymentFor2, amount2, totalStr1, totalStr2;
 
-    public void setData(String receivedFrom, String amountStr, float total, String[] paymentFor, double[] amount, LocalDate trDate){
+    public void setData(String trno, String receivedFrom, String amountStr, float total, String[] paymentFor, double[] amount, LocalDate trDate){
+        transNumber1.setText(trno);
+        transNumber2.setText(trno);
         receivedFrom1.setText(receivedFrom);
         receivedFrom2.setText(receivedFrom);
         total1.setText(String.format("%,.2f", total));

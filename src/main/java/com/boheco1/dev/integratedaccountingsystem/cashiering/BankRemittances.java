@@ -133,15 +133,13 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
 
         remittanceTable.setItems(tableList);
 
-        showDailyTotals();
     }
 
     private void showDailyTotals() {
         try {
-            System.out.println("Show daily totals....");
-            java.sql.Date today = java.sql.Date.valueOf(LocalDate.now());
-            double orTotal = Utility.getTotalReceipt("OR", today);
-            double arTotal = Utility.getTotalReceipt("AR", today);
+            java.sql.Date date = java.sql.Date.valueOf(transactionDate.getValue());
+            double orTotal = Utility.getTotalReceipt("OR", date);
+            double arTotal = Utility.getTotalReceipt("AR", date);
             double totalReceipt = orTotal+arTotal;
 
             totalARAmount.setText(String.format("₱ %,.2f", arTotal));
@@ -196,6 +194,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
         totalCashAmount.setText(String.format("₱ %,.2f", cash));
         totalAmount.setText(String.format("₱ %,.2f", check+cash));
         totalCollection = check+cash;
+        showDailyTotals();
     }
 
     @Override

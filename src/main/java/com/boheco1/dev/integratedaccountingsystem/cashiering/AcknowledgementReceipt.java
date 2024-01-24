@@ -88,11 +88,13 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         stackPane = Utility.getStackPane();
         try {
 
-            int nextARNumber = TransactionHeaderDAO.getNextARNumber();
+//            int nextARNumber = TransactionHeaderDAO.getNextARNumber();
+            /** Generate next ARNumber based on static value **/
+            int nextARNumber = Utility.currentARNumber > 0 ? Utility.currentARNumber+1 : 0;
 
-//            if(nextARNumber>0) {
-//                orNumber.setText(nextARNumber+"");
-//            }
+            if(nextARNumber>0) {
+                orNumber.setText(nextARNumber+"");
+            }
 
             accountDescription.setItems(FXCollections.observableList(ParticularsAccountDAO.getByType("AR")));
             transactionDetails = FXCollections.observableList(new ArrayList<>());
@@ -229,11 +231,13 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             currentTransaction.setAmount(total);
             try {
                 TransactionHeaderDAO.add(currentTransaction);
+                Utility.currentARNumber = Integer.parseInt(currentTransaction.getTransactionNumber());
             }catch(Exception ex) {
                 ex.printStackTrace();
                 AlertDialogBuilder.messgeDialog("Error!", ex.getMessage(),
                         stackPane, AlertDialogBuilder.DANGER_DIALOG);
             }
+
         }else {
             //update transaction details
         }
@@ -646,6 +650,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             ArPrint cnt = loader.getController();
 
             String receivedFrom = currentTransaction.getParticulars();
+            String transNumber = currentTransaction.getTransactionNumber();
 
             String[] pmtFor = new String[transactionDetails.size()];
             double[] amount = new double[transactionDetails.size()];
@@ -656,7 +661,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
                 amount[i] = td.getCredit();
             }
 
-            cnt.setData(receivedFrom, Utility.doubleAmountToWords(total), total, pmtFor, amount, currentTransaction.getTransactionDate() );
+            cnt.setData(transNumber, receivedFrom, Utility.doubleAmountToWords(total), total, pmtFor, amount, currentTransaction.getTransactionDate() );
 
             return root;
         }catch(IOException ex) {
