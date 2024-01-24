@@ -1168,8 +1168,10 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                 this.setBillInfo(bills);
                 this.setPayables();
                 this.setMenuActions();
+                dialog.close();
             }
         });
+        dialog.setOnDialogOpened((event) -> { waiveController.getInputField().requestFocus(); });
         dialog.setOnDialogClosed((event) -> { payment_tf.requestFocus(); });
         dialog.show();
     }

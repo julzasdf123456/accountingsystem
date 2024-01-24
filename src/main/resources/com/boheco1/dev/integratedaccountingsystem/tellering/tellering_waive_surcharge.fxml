@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -32,9 +35,19 @@
                         <Label text="Bill Number" />
                         <Label text="Billing Month" GridPane.columnIndex="1" />
                         <Label text="Surcharge" GridPane.columnIndex="2" />
-                        <TextField fx:id="billno_tf" editable="false" GridPane.rowIndex="1" />
-                        <TextField fx:id="billing_month_tf" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <TextField fx:id="surcharge_tf" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <JFXTextField fx:id="billno_tf" editable="false" minHeight="37.0" styleClass="bold" GridPane.rowIndex="1">
+                           <GridPane.margin>
+                              <Insets right="16.0" />
+                           </GridPane.margin></JFXTextField>
+                        <JFXTextField fx:id="billing_month_tf" editable="false" minHeight="37.0" styleClass="bold" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <GridPane.margin>
+                              <Insets right="16.0" />
+                           </GridPane.margin></JFXTextField>
+                        <TextField fx:id="surcharge_tf" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                           <styleClass>
+                              <String fx:value="bold" />
+                              <String fx:value="emphasize" />
+                           </styleClass></TextField>
                      </children>
                   </GridPane>
                </center>

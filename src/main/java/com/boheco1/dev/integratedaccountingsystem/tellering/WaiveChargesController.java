@@ -4,6 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.objects.Bill;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -24,10 +25,10 @@ public class WaiveChargesController extends MenuControllerHandler implements Ini
     private JFXButton save_btn;
 
     @FXML
-    private TextField billno_tf;
+    private JFXTextField billno_tf;
 
     @FXML
-    private TextField billing_month_tf;
+    private JFXTextField billing_month_tf;
 
     @FXML
     private TextField surcharge_tf;
@@ -56,6 +57,9 @@ public class WaiveChargesController extends MenuControllerHandler implements Ini
 
     }
 
+    public TextField getInputField(){
+        return this.surcharge_tf;
+    }
     public void setBill(Bill bill) {
         this.bill = bill;
     }
