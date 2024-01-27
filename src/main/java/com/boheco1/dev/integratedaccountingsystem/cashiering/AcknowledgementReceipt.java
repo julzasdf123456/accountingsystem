@@ -208,6 +208,10 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             AlertDialogBuilder.messgeDialog("Error!","It is required to have at least one item in the breakdown table.",
                     stackPane, AlertDialogBuilder.DANGER_DIALOG);
             return;
+        }else if(currentTransaction!=null && currentTransaction.getParticulars().equals("CANCELLED")) {
+            AlertDialogBuilder.messgeDialog("Error!","Change to this acknowledgement receipt can no longer be updated because it is already cancelled.",
+                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
+            return;
         }
 
         int month = orDate.getValue().getMonthValue();
@@ -243,24 +247,23 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         }
 
         try {
+            TransactionDetailsDAO.deleteByTransactionHeader(currentTransaction);
             int num = 0;
             for(TransactionDetails td: transactionDetails) {
-                if(td.getTransactionNumber()==null) {
-                    td.setTransactionNumber(currentTransaction.getTransactionNumber());
-                    td.setPeriod(currentTransaction.getPeriod());
-                    td.setTransactionDate(currentTransaction.getTransactionDate());
-                    td.setTransactionCode("AR");
-                    td.setOrDate(currentTransaction.getTransactionDate());
-                    TransactionDetailsDAO.add(td);
-                    num++;
-                }
+                td.setTransactionNumber(currentTransaction.getTransactionNumber());
+                td.setPeriod(currentTransaction.getPeriod());
+                td.setTransactionDate(currentTransaction.getTransactionDate());
+                td.setTransactionCode("AR");
+                td.setOrDate(currentTransaction.getTransactionDate());
+                TransactionDetailsDAO.add(td);
+                num++;
             }
             //Add debit entry based on total credits
             recomputeTotal();
             TransactionDetailsDAO.syncAR(currentTransaction, total);
             TransactionHeaderDAO.updateAmount(currentTransaction, total);
 
-            AlertDialogBuilder.messgeDialog("Saved!", (isNew ? "New AR transaction saved with " : "Current AR saved with ") + num + " new " + (num>1? " items." : "item"),
+            AlertDialogBuilder.messgeDialog("Saved!", (isNew ? "New AR transaction saved with " : "Current AR saved with ") + num + " items",
                     stackPane, AlertDialogBuilder.INFO_DIALOG);
         }catch(Exception ex) {
             ex.printStackTrace();
@@ -305,11 +308,6 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             @Override
             public void handle(ActionEvent actionEvent) {
                 try{
-                    if(currentItem.getTransactionNumber()!=null) {
-                        TransactionDetailsDAO.delete(currentItem);
-                        TransactionDetailsDAO.syncDebit(currentTransaction.getPeriod(), currentTransaction.getTransactionNumber(),"AR");
-                    }
-
                     transactionDetails.remove(currentItem);
                     currentItem = null;
                     recomputeTotal();
@@ -424,7 +422,6 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
     private void loadTransaction() {
         try {
-            System.out.println("Load Transaction...");
             receivedFrom.setText(currentTransaction.getParticulars());
             address.setText(currentTransaction.getAddress());
             paymentFor.setText(currentTransaction.getRemarks());
@@ -476,7 +473,6 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
     }
 
     public void onPrint() {
-        System.out.println("Commence printing...");
 
         Printer printer = printersDropdown.getSelectionModel().getSelectedItem();
 
@@ -489,8 +485,6 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             printer = printJob.getPrinter();
         }
 
-        System.out.println("Selected printer: " + printer.getName());
-
         printJob.setPrinter(printer);
 //        Printer printer = printJob.getPrinter();
 
@@ -501,9 +495,6 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 //        Paper a4 = Paper.A4;
 
         PageLayout layout = printer.createPageLayout(arsize, PageOrientation.PORTRAIT, Printer.MarginType.HARDWARE_MINIMUM);
-
-        System.out.println(arsize.getWidth() + "x" + arsize.getHeight() + " ");
-        System.out.println("Printable: " + layout.getPrintableWidth() + "x" + layout.getPrintableHeight());
 
         printJob.setPrinter(printer);
 

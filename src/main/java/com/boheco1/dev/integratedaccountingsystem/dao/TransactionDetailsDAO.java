@@ -490,32 +490,25 @@ public class TransactionDetailsDAO {
     public static void syncAR(TransactionHeader th, double amount) throws Exception {
         Connection cxn = DB.getConnection();
         cxn.setAutoCommit(true);
-        PreparedStatement psx = cxn.prepareStatement("SELECT * FROM TransactionDetails td WHERE td.Period=? AND td.TransactionNumber=? AND td.TransactionCode=? AND td.AccountSequence=999");
+
+        //Delete current debit entry from TransactionDetails if exists...
+        PreparedStatement psx = cxn.prepareStatement("DELETE FROM TransactionDetails WHERE Period=? AND TransactionNumber=? AND TransactionCode=? AND AccountSequence=?");
         psx.setDate(1, java.sql.Date.valueOf(th.getPeriod()));
         psx.setString(2, th.getTransactionNumber());
         psx.setString(3, th.getTransactionCode());
-        ResultSet rs = psx.executeQuery();
+        psx.setInt(4, 999);
+        psx.executeUpdate();
 
-        if(rs.next()) {
-            PreparedStatement ps1 = DB.getConnection().prepareStatement("UPDATE TransactionDetails SET Debit=? " +
-                    "WHERE TransactionDate=? AND TransactionNumber=? AND TransactionCode=? AND Period=? AND AccountSequence=999 ");
-            ps1.setDouble(1, amount);
-            ps1.setDate(2, java.sql.Date.valueOf(th.getTransactionDate()));
-            ps1.setString(3, th.getTransactionNumber());
-            ps1.setString(4, th.getTransactionCode());
-            ps1.setDate(5, java.sql.Date.valueOf(th.getPeriod()));
-            ps1.executeUpdate();
-        }else {
-            TransactionDetails td = new TransactionDetails();
-            td.setPeriod(th.getPeriod());
-            td.setTransactionNumber(th.getTransactionNumber());
-            td.setTransactionCode(th.getTransactionCode());
-            td.setDebit(amount);
-            td.setSequenceNumber(999);
-            td.setTransactionDate(th.getTransactionDate());
-            td.setAccountCode(Utility.getAccountCodeProperty());
-            TransactionDetailsDAO.add(td);
-        }
+        //Insert new Debit entry to TransactionDetails...
+        TransactionDetails td = new TransactionDetails();
+        td.setPeriod(th.getPeriod());
+        td.setTransactionNumber(th.getTransactionNumber());
+        td.setTransactionCode(th.getTransactionCode());
+        td.setDebit(amount);
+        td.setSequenceNumber(999);
+        td.setTransactionDate(th.getTransactionDate());
+        td.setAccountCode(Utility.getAccountCodeProperty());
+        TransactionDetailsDAO.add(td);
     }
 
     public static void delete(TransactionDetails td) throws Exception {
@@ -533,5 +526,14 @@ public class TransactionDetailsDAO {
 
         ps.close();
 
+    }
+
+    public static void deleteByTransactionHeader(TransactionHeader th) throws Exception {
+        DB.getConnection().setAutoCommit(true);
+        PreparedStatement ps = DB.getConnection().prepareStatement("DELETE FROM TransactionDetails WHERE Period=? AND TransactionNumber=? AND TransactionCode=?");
+        ps.setDate(1, java.sql.Date.valueOf(th.getPeriod()));
+        ps.setString(2, th.getTransactionNumber());
+        ps.setString(3, th.getTransactionCode());
+        ps.executeUpdate();
     }
 }
