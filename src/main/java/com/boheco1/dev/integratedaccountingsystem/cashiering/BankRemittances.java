@@ -63,8 +63,6 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
     private TransactionHeader transactionHeader;
 
     private void renderTable() {
-        TableColumn orDateFromColumn = new TableColumn<BankRemittance, LocalDate>("OR Date");
-        orDateFromColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, LocalDate>("orDateStr"));
 
         TableColumn descriptionColumn = new TableColumn<BankRemittance, String>("Bank Account Description");
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<BankRemittance, String>("description"));
@@ -119,8 +117,6 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
             }
         });
 
-
-        remittanceTable.getColumns().add(orDateFromColumn);
         remittanceTable.getColumns().add(descriptionColumn);
         remittanceTable.getColumns().add(accountNoColumn);
         remittanceTable.getColumns().add(accountCodeColumn);

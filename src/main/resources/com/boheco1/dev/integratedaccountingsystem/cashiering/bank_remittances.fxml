@@ -154,7 +154,7 @@
                      </children>
                   </GridPane>
                   <TableView fx:id="remittanceTable" layoutX="30.0" layoutY="84.0" maxWidth="-Infinity" prefHeight="439.0" prefWidth="928.0" AnchorPane.bottomAnchor="175.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="84.0" />
-                  <Label layoutX="850.0" layoutY="34.0" prefHeight="19.0" prefWidth="108.0" text="Transaction Date:" textAlignment="RIGHT" AnchorPane.rightAnchor="220.4000000000001" AnchorPane.topAnchor="34.0" />
+                  <Label layoutX="850.0" layoutY="34.0" prefHeight="19.0" prefWidth="60.0" text="OR Date:" textAlignment="RIGHT" AnchorPane.rightAnchor="220.0" AnchorPane.topAnchor="34.0" />
                   <DatePicker fx:id="transactionDate" layoutX="958.0" layoutY="29.0" onAction="#enableAddEntry" AnchorPane.rightAnchor="30.800000000000182" AnchorPane.topAnchor="29.0" />
                   <Label layoutX="30.0" layoutY="30.0" text="Remarks:" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="34.0" />
                   <TextField fx:id="remarksField" layoutX="89.0" layoutY="29.0" onAction="#onRemarksUpdate" prefHeight="30.0" prefWidth="721.0" AnchorPane.leftAnchor="92.0" AnchorPane.rightAnchor="367.80000000000007" AnchorPane.topAnchor="29.0" />
