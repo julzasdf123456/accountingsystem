@@ -55,7 +55,10 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
     @FXML Label totalARAmount;
     @FXML Label totalORAmount;
     @FXML Label totalReceiptAmount;
+    @FXML Label balancingFigure;
 
+
+    private double totalReceipt;
     private double totalCollection;
 
     ObservableList<BankRemittance> tableList;
@@ -136,11 +139,14 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
             java.sql.Date date = java.sql.Date.valueOf(transactionDate.getValue());
             double orTotal = Utility.getTotalReceipt("OR", date);
             double arTotal = Utility.getTotalReceipt("AR", date);
-            double totalReceipt = orTotal+arTotal;
+            totalReceipt = orTotal+arTotal;
+
+            double balancing = Math.abs(totalReceipt-totalCollection);
 
             totalARAmount.setText(String.format("₱ %,.2f", arTotal));
             totalORAmount.setText(String.format("₱ %,.2f", orTotal));
             totalReceiptAmount.setText(String.format("₱ %,.2f", totalReceipt));
+            balancingFigure.setText(String.format("₱ %,.2f", balancing));
         }catch(Exception ex) {
             ex.printStackTrace();
         }
