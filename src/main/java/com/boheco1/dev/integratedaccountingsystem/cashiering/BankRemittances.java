@@ -15,9 +15,11 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
@@ -61,9 +63,13 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
     private double totalReceipt;
     private double totalCollection;
 
+    private JFXDialog modal;
+
     ObservableList<BankRemittance> tableList;
 
     private TransactionHeader transactionHeader;
+
+    private BankRemittance selectedItem;
 
     private void renderTable() {
 
@@ -88,13 +94,15 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
 
         TableColumn<BankRemittance, BankRemittance> actionCol = new TableColumn<>("Action");
         actionCol.setMinWidth(40);
-        actionCol.setStyle( "-fx-alignment: CENTER-RIGHT;");
+        actionCol.setStyle( "-fx-alignment: CENTER;");
 
         // ADD ACTION BUTTONS
         actionCol.setCellValueFactory(stockStringCellDataFeatures -> new ReadOnlyObjectWrapper<BankRemittance>(stockStringCellDataFeatures.getValue()));
         actionCol.setCellFactory(stockStockTableColumn -> new TableCell<>(){
             FontIcon deleteIcon =  new FontIcon("mdi2t-trash-can");
+            FontIcon editIcon = new FontIcon("mdi2b-book-edit");
             private final JFXButton deleteButton = new JFXButton("", deleteIcon);
+            private final JFXButton editButton = new JFXButton("", editIcon);
 
             @Override
             protected void updateItem(BankRemittance bankRemittance, boolean b) {
@@ -102,17 +110,33 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
 
                 if (bankRemittance != null) {
 
+                    HBox hbox = new HBox();
+                    hbox.setSpacing(10);
+                    hbox.setAlignment(Pos.CENTER);
+
+                    editButton.setStyle("-fx-background-color: green");
+                    editIcon.setIconSize(13);
+                    editIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
+
                     deleteButton.setStyle("-fx-background-color: #f44336;");
                     deleteIcon.setIconSize(13);
                     deleteIcon.setIconColor(Paint.valueOf(ColorPalette.WHITE));
 
-                    final JFXButton confirmDelete = new JFXButton("Confirm");
+                    Pane pn = new Pane();
+
+                    hbox.getChildren().addAll(pn, editButton, deleteButton);
+
+//                    final JFXButton confirmDelete = new JFXButton("Confirm");
 
                     deleteButton.setOnAction(actionEvent -> {
                         confirmDelete(bankRemittance);
                     });
 
-                    setGraphic(deleteButton);
+                    editButton.setOnAction(actionEvent -> {
+                        editEntry(bankRemittance);
+                    });
+
+                    setGraphic(hbox);
                 } else {
                     setGraphic(null);
                     return;
@@ -163,6 +187,11 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
                 confirmDialog.close();
             }
         });
+    }
+
+    private void editEntry(BankRemittance bankRemittance) {
+        Utility.setSelectedObject(bankRemittance);
+        modal = ModalBuilder.showModalFromXML(EditBankRemittance.class, "edit_bank_remittance.fxml", Utility.getStackPane());
     }
 
     private void removeEntry(BankRemittance bankRemittance) {
@@ -314,14 +343,40 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
 
     @Override
     public void receive(Object o) {
+        if(o==null) {
+            modal.close();
+            return;
+        }
+
         if(o instanceof BankRemittance){
-            receiveOne(o);
+            if( ((BankRemittance)o).getIsEdit() ) receiveEdit(o);
+            else receiveOne(o);
             return;
         }
 
         if(o instanceof List) {
             receiveMultiple(o);
         }
+    }
+
+    public void receiveEdit(Object o) {
+
+        if(o instanceof  BankRemittance) {
+            //save changes to existing BR TransactionDetail
+            BankRemittance br = (BankRemittance)o;
+            TransactionDetails td = br.getTransactionDetails();
+            try {
+                TransactionDetailsDAO.updateBR(td, br);
+                TransactionDetailsDAO.syncDebit(td.getPeriod(), td.getTransactionNumber(),transactionHeader.getTransactionCode());
+                this.enableAddEntry();
+                computeTotals();
+            }catch(Exception ex) {
+                ex.printStackTrace();
+                AlertDialogBuilder.messgeDialog("Update Error",ex.getMessage(),stackPane, AlertDialogBuilder.DANGER_DIALOG);
+            }
+        }
+
+        modal.close();
     }
 
     private void receiveMultiple(Object o) {

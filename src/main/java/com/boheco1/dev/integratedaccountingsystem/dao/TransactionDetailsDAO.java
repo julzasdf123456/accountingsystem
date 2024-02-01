@@ -536,4 +536,24 @@ public class TransactionDetailsDAO {
         ps.setString(3, th.getTransactionCode());
         ps.executeUpdate();
     }
+
+    public static void updateBR(TransactionDetails td, BankRemittance br) throws Exception {
+        DB.getConnection().setAutoCommit(true);
+        PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE TransactionDetails SET " +
+                "DepositedDate=?, BankID=?, AccountCode=?, CheckNumber=?, Debit=? " +
+                "WHERE Period=? AND TransactionNumber=? AND AccountSequence=? AND TransactionCode=?");
+        ps.setDate(1, java.sql.Date.valueOf(br.getDepositedDate()));
+        ps.setString(2, br.getBankAccount().getId());
+        ps.setString(3, br.getAccountCode());
+        ps.setString(4, br.getCheckNumber());
+        ps.setDouble(5, br.getAmount());
+        ps.setDate(6, java.sql.Date.valueOf(td.getPeriod()));
+        ps.setString(7, td.getTransactionNumber());
+        ps.setInt(8, td.getSequenceNumber());
+        ps.setString(9, "BR");
+
+        ps.executeUpdate();
+
+        ps.close();
+    }
 }

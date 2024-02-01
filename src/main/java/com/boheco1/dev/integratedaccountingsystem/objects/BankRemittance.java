@@ -19,6 +19,8 @@ public class BankRemittance {
 
     private TransactionDetails transactionDetails;
 
+    private boolean isEdit;
+
 
     public BankRemittance(LocalDate period, LocalDate orDateFrom, LocalDate orDateTo, String checkNumber, double amount, BankAccount bankAccount, String accountCode) {
         this.period = period;
@@ -132,4 +134,7 @@ public class BankRemittance {
     public String getAccountNumber() {
         return bankAccount.getBankAccountNumber();
     }
+
+    public boolean getIsEdit() { return this.isEdit; }
+    public void setIsEdit(boolean isEdit) { this.isEdit = isEdit; }
 }
