@@ -95,7 +95,7 @@
                               <Font name="System Bold" size="18.0" />
                            </font>
                         </TextField>
-                        <Label text="Total AR" GridPane.rowIndex="1">
+                        <Label text="Total AR">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -103,7 +103,7 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </Label>
-                        <Label text="Total OR" GridPane.rowIndex="2">
+                        <Label text="Total OR" GridPane.rowIndex="1">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -111,7 +111,7 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </Label>
-                        <Label text="Total Receipt Amount" GridPane.rowIndex="3">
+                        <Label text="Total Receipt Amount" GridPane.rowIndex="2">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -119,7 +119,7 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </Label>
-                        <Label fx:id="totalARAmount" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="30.0" prefWidth="240.0" text="0.00" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label fx:id="totalARAmount" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="30.0" prefWidth="240.0" text="0.00" textAlignment="RIGHT" GridPane.columnIndex="1">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -127,7 +127,7 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </Label>
-                        <Label fx:id="totalORAmount" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="30.0" prefWidth="240.0" text="0.00" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Label fx:id="totalORAmount" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="30.0" prefWidth="240.0" text="0.00" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -135,17 +135,9 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </Label>
-                        <Label fx:id="totalReceiptAmount" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="30.0" prefWidth="240.0" text="0.00" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <Label fx:id="totalReceiptAmount" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="30.0" prefWidth="240.0" text="0.00" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.rowIndex="2">
                            <font>
                               <Font size="14.0" />
-                           </font>
-                           <padding>
-                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                           </padding>
-                        </Label>
-                        <Label contentDisplay="RIGHT" prefHeight="30.0" prefWidth="240.0" text="TODAY">
-                           <font>
-                              <Font name="System Bold" size="14.0" />
                            </font>
                            <padding>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

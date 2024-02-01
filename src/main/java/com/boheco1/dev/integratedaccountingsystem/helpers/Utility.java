@@ -450,16 +450,18 @@ public class Utility {
         props.store(new FileOutputStream("application.properties"), LocalDate.now().toString());
     }
 
-    public static double getTotalReceipt(String accountCode, java.sql.Date date) throws Exception {
-        String sql = "SELECT SUM(Credit) FROM TransactionDetails " +
-                "WHERE Debit=? " +
+    public static double getTotalReceipt(String transactionCode, java.sql.Date date) throws Exception {
+        String sql = "SELECT SUM(Debit) FROM TransactionDetails " +
+                "WHERE Credit=? " +
                 "AND TransactionCode=? " +
-                "AND TransactionDate=?";
+                "AND TransactionDate=? " +
+                "AND AccountCode=?";
         PreparedStatement ps = DB.getConnection().prepareStatement(sql);
 
         ps.setInt(1, 0);
-        ps.setString(2, accountCode);
+        ps.setString(2, transactionCode);
         ps.setDate(3, date);
+        ps.setString(4, TransactionHeader.getAccountCodeProperty());
 
         ResultSet rs = ps.executeQuery();
 

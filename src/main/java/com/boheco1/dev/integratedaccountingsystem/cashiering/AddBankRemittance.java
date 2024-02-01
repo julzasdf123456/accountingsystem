@@ -22,7 +22,7 @@ import java.util.ResourceBundle;
 
 public class AddBankRemittance extends MenuControllerHandler implements Initializable {
 
-    @FXML DatePicker orDateFrom;
+//    @FXML DatePicker orDateFrom;
     @FXML DatePicker depositedDate;
     @FXML JFXComboBox<BankAccount> bankAccount;
     @FXML JFXTextField accountNumber;
@@ -44,7 +44,7 @@ public class AddBankRemittance extends MenuControllerHandler implements Initiali
 
             LocalDate date = LocalDate.now();
 
-            orDateFrom.setValue(date);
+//            orDateFrom.setValue(date);
 
         }catch(Exception ex) {
             ex.printStackTrace();
@@ -54,14 +54,14 @@ public class AddBankRemittance extends MenuControllerHandler implements Initiali
     public void onAddEntry() {
         if(bankAccount.getSelectionModel().isEmpty() || bankAccount.getSelectionModel().getSelectedItem()==null) {
             AlertDialogBuilder.messgeDialog("Invalid Entry", "Please select a Bank Account", stackPane, AlertDialogBuilder.WARNING_DIALOG);
-        }else if(orDateFrom.getValue()==null){
-            AlertDialogBuilder.messgeDialog("Invalid Entry","Please enter a valid OR Date.",stackPane, AlertDialogBuilder.WARNING_DIALOG);
+//        }else if(orDateFrom.getValue()==null){
+//            AlertDialogBuilder.messgeDialog("Invalid Entry","Please enter a valid OR Date.",stackPane, AlertDialogBuilder.WARNING_DIALOG);
         }else if(amount.getText().isEmpty()) {
             AlertDialogBuilder.messgeDialog("Invalid Entry","Please enter a valid amount.",stackPane, AlertDialogBuilder.WARNING_DIALOG);
         }else {
             try {
                 BankRemittance bankRemittance = new BankRemittance();
-                bankRemittance.setOrDateFrom(orDateFrom.getValue());
+//                bankRemittance.setOrDateFrom(orDateFrom.getValue());
                 bankRemittance.setBankAccount(bankAccount.getSelectionModel().getSelectedItem());
                 bankRemittance.setCheckNumber(checkNumber.getText());
                 bankRemittance.setAmount(Double.parseDouble(amount.getText()));
@@ -94,7 +94,9 @@ public class AddBankRemittance extends MenuControllerHandler implements Initiali
         accountNumber.setText(null);
         checkNumber.setText(null);
         amount.setText(null);
-        orDateFrom.requestFocus();
+        depositedDate.setValue(null);
+        depositedDate.requestFocus();
+//        orDateFrom.requestFocus();
     }
 
 }

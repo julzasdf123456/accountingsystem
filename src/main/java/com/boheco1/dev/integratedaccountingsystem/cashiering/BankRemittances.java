@@ -333,7 +333,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
                 td.setTransactionCode(transactionHeader.getTransactionCode());
                 td.setTransactionNumber(transactionHeader.getTransactionNumber());
                 td.setPeriod(transactionHeader.getPeriod());
-                td.setOrDate(br.getOrDateFrom());
+//                td.setOrDate(br.getOrDateFrom());
                 td.setBankID(br.getBankAccount().getId());
                 td.setAccountCode(br.getBankAccount().getAccountCode());
                 td.setDebit(br.getAmount());
@@ -368,7 +368,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
             td.setTransactionCode(transactionHeader.getTransactionCode());
             td.setTransactionNumber(transactionHeader.getTransactionNumber());
             td.setPeriod(transactionHeader.getPeriod());
-            td.setOrDate(br.getOrDateFrom());
+//            td.setOrDate(br.getOrDateFrom());
             td.setBankID(br.getBankAccount().getId());
             td.setAccountCode(br.getBankAccount().getAccountCode());
             td.setDebit(br.getAmount());
