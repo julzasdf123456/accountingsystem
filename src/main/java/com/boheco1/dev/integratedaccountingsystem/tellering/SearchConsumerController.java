@@ -5,11 +5,9 @@ import com.boheco1.dev.integratedaccountingsystem.dao.ConsumerDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.ConsumerInfo;
 import com.jfoenix.controls.JFXTextField;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -17,7 +15,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 
 import java.net.URL;
@@ -93,29 +90,9 @@ public class SearchConsumerController extends MenuControllerHandler implements I
         this.query_tf.setOnKeyPressed(keyEvent -> {
             if (searchThread != null && searchThread.isAlive())
                 searchThread.interrupt();
-//            tt = null;
         });
 
         this.query_tf.setOnKeyReleased(keyEvent -> {
-//            if (tt != null)
-//                return;
-
-//            tt = new TimerTask() {
-//                @Override
-//                public void run() {
-//                    if (query_tf.getText().length() > 2) {
-//                        String query = query_tf.getText();
-//                        try {
-//                            consumers = FXCollections.observableArrayList(ConsumerDAO.getConsumerRecords(query, con));
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        }
-//                        consumersTable.setItems(consumers);
-//                    }
-//                }
-//            };
-//
-//            t.scheduleAtFixedRate(tt, 5, 5);
             searchThread = new Thread(new Runnable() {
                 @Override
                 public void run() {

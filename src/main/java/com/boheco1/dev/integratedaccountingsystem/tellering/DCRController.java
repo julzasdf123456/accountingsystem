@@ -20,7 +20,10 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
@@ -39,6 +42,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class DCRController extends MenuControllerHandler implements Initializable {
+    @FXML
+    private AnchorPane contentPane;
 
     @FXML
     private ProgressBar progressbar;
@@ -47,7 +52,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
     private DatePicker date_pker;
 
     @FXML
-    private JFXButton view_btn;
+    private JFXButton view_btn, copy_btn;
 
     @FXML
     private JFXButton print_dcr_btn;
@@ -84,6 +89,16 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         this.createDCRSummary();
         this.createDCRBreakDown();
         this.resultsTab.setDisable(true);
+
+        //copy total due amount to clipboard
+        copy_btn.setOnAction(t -> {
+            Clipboard clipboard = Clipboard.getSystemClipboard();
+            ClipboardContent content = new ClipboardContent();
+            content.putString(dcr_total.getText());
+            clipboard.setContent(content);
+            Toast.makeText((Stage) contentPane.getScene().getWindow(), "Total DCR amount copied to clipboard!", 1000, 200, 200, "rgba(4, 100, 5, 1)");
+        });
+
         this.dcr_power_table.setRowFactory(tv -> {
             TableRow<Bill> row = new TableRow<>();
             if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering")) {

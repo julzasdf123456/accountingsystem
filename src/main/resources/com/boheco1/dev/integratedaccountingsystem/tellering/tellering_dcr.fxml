@@ -17,7 +17,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="514.0" prefWidth="687.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.tellering.DCRController">
+<AnchorPane fx:id="contentPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="514.0" prefWidth="687.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.tellering.DCRController">
    <children>
       <HBox layoutX="8.0" layoutY="16.0" AnchorPane.leftAnchor="8.0" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="16.0">
          <children>
@@ -109,6 +109,14 @@
                                           <Insets left="16.0" />
                                        </HBox.margin>
                                     </Label>
+                                    <JFXButton fx:id="copy_btn" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" minHeight="25.0" prefHeight="25.0" styleClass="btn-info" text=" ">
+                                       <graphic>
+                                          <FontIcon iconColor="WHITE" iconLiteral="mdi2c-content-copy" />
+                                       </graphic>
+                                       <HBox.margin>
+                                          <Insets left="16.0" />
+                                       </HBox.margin>
+                                    </JFXButton>
                                  </children>
                                  <padding>
                                     <Insets bottom="8.0" top="8.0" />

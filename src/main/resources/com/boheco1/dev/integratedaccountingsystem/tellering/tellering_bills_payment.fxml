@@ -355,6 +355,14 @@
                                                             <String fx:value="bold" />
                                                          </styleClass>
                                                       </Label>
+                                                      <JFXButton fx:id="copy_btn" alignment="CENTER" buttonType="RAISED" contentDisplay="CENTER" focusTraversable="false" minHeight="25.0" prefHeight="25.0" styleClass="btn-info" text=" ">
+                                                         <graphic>
+                                                            <FontIcon iconColor="WHITE" iconLiteral="mdi2c-content-copy" />
+                                                         </graphic>
+                                                         <HBox.margin>
+                                                            <Insets left="8.0" />
+                                                         </HBox.margin>
+                                                      </JFXButton>
                                                    </children>
                                                 </HBox>
                                                 <VBox fx:id="sidebar_vbox">

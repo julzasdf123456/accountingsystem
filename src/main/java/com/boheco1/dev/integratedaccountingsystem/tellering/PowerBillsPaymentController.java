@@ -31,6 +31,8 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
@@ -61,7 +63,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     private JFXTextField acct_no_tf;
 
     @FXML
-    private JFXButton search_btn;
+    private JFXButton search_btn, copy_btn;
 
     @FXML
     private JFXTextField con_addr_tf;
@@ -159,11 +161,17 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
     public Connection con;
 
-    public boolean isSearchConsumerErrorShown = false;
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         confirmEvent = actionEvent -> confirmPayment();
+        //copy total due amount to clipboard
+        copy_btn.setOnAction(t -> {
+            Clipboard clipboard = Clipboard.getSystemClipboard();
+            ClipboardContent content = new ClipboardContent();
+            content.putString(total_payable_lbl.getText());
+            clipboard.setContent(content);
+            Toast.makeText((Stage) contentPane.getScene().getWindow(), "Total due amount copied to clipboard!", 1000, 200, 200, "rgba(4, 100, 5, 1)");
+        });
 
         try {
             con = DB.getConnection(Utility.DB_BILLING);
@@ -1268,67 +1276,28 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         dialogLayout.setBody(parent);
         dialogConfirm = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM, true);
         PaymentConfirmationController controller = fxmlLoader.getController();
-        controller.setPayments(bills, amount_due, cash, checks);
+        double total_paid = 0;
+        for (Check c : checks) {
+            total_paid += c.getOriginalAmount();
+        }
+        total_paid += cash;
+        controller.setPayments(bills, amount_due, total_paid);
         controller.setBills(bills);
 
         toDeposit = 0;
 
-        try{
-            toDeposit = Double.parseDouble(controller.getChange_tf().getText().replace(",",""));
-        }catch (Exception e){
+        try {
+            toDeposit = Double.parseDouble(controller.getChange_tf().getText().replace(",", ""));
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
-        controller.getCash_tf().setOnAction(actionEvent -> {
-            Object obj = controller.getAccount_list().getSelectionModel().getSelectedItem();
-
-            if (obj == null && controller.checkDeposit()) {
-                controller.getStatus_label().setText("Deposit checkbox is enabled. Select an account to proceed!");
-                return;
-            }else{
-                controller.getStatus_label().setText("");
-            }
-            PaidBill selection = null;
-            if (obj != null) selection = (PaidBill) obj;
-            try{
-                cash = Double.parseDouble(controller.getCash_tf().getText().replace(",",""));
-            }catch (Exception e){
-
-            }
-            this.transact(bills, cash, checks, dialogConfirm, controller.checkDeposit(), toDeposit, selection);
-        });
-
-        controller.getCash_tf().setOnKeyReleased(event ->{
+        controller.getConfirm_btn().setOnKeyReleased(event -> {
             //Close if ESC is pressed
             if (event.getCode() == KeyCode.ESCAPE) {
                 dialogConfirm.close();
-            //Transact if SPACE is pressed
-            }else if (event.getCode() == KeyCode.SPACE){
-                Object obj = controller.getAccount_list().getSelectionModel().getSelectedItem();
-
-                if (obj == null && controller.checkDeposit()) {
-                    controller.getStatus_label().setText("Deposit checkbox is enabled. Select an account to proceed!");
-                    return;
-                }else{
-                    controller.getStatus_label().setText("");
-                }
-                PaidBill selection = null;
-                if (obj != null) selection = (PaidBill) obj;
-                try{
-                    cash = Double.parseDouble(controller.getCash_tf().getText().replace(",",""));
-                }catch (Exception e){
-
-                }
-                this.transact(bills, cash, checks, dialogConfirm, controller.checkDeposit(), toDeposit, selection);
-            //If numeric keys, set digits in text field
-            }else if (event.getCode() == KeyCode.ALPHANUMERIC) {
-                try {
-                    cash = Double.parseDouble(controller.getCash_tf().getText().replace(",", ""));
-                } catch (Exception e) {
-
-                }
             }
         });
+
         controller.getConfirm_btn().setOnAction(action ->{
             Object obj = controller.getAccount_list().getSelectionModel().getSelectedItem();
 
@@ -1341,15 +1310,9 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
             PaidBill selection = null;
             if (obj != null) selection = (PaidBill) obj;
-            try{
-                cash = Double.parseDouble(controller.getCash_tf().getText().replace(",",""));
-            }catch (Exception e){
-
-            }
             this.transact(bills, cash, checks, dialogConfirm, controller.checkDeposit(), toDeposit, selection);
-            //}
         });
-        dialogConfirm.setOnDialogOpened((event) -> { controller.getCash_tf().requestFocus(); });
+        dialogConfirm.setOnDialogOpened((event) -> { controller.getConfirm_btn().requestFocus(); });
         dialogConfirm.setOnDialogClosed((event) -> { payment_tf.requestFocus(); payment_tf.addEventHandler(ActionEvent.ACTION, confirmEvent); });
         dialogConfirm.show();
     }

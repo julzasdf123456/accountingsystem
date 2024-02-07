@@ -57,10 +57,8 @@ public class ConsumerDAO {
 
     public static List<ConsumerInfo> getConsumerRecords(String key, Connection con) throws Exception  {
         PreparedStatement ps = con.prepareStatement(
-                "SELECT TOP 20 * FROM AccountMaster WHERE ConsumerName LIKE '%" + key + "%' OR AccountNumber LIKE '%" + key + "%' OR MeterNumber LIKE '%" + key + "%' " +
+                "SELECT TOP 100 * FROM AccountMaster WHERE ConsumerName LIKE '%" + key + "%' OR AccountNumber LIKE '%" + key + "%' OR MeterNumber LIKE '%" + key + "%' " +
                         "ORDER BY ConsumerName");
-//        ps.setString(1, '%'+ key+'%');
-//        ps.setString(2, '%'+ key+'%');
 
         ResultSet rs = ps.executeQuery();
 
