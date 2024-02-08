@@ -137,6 +137,7 @@ public class TransactionHeaderDAO {
             th.setRemarks(rs.getString("Remarks"));
             th.setName(rs.getString("Name"));
             th.setAddress(rs.getString("Address"));
+            th.setPrinted(rs.getInt("printed")==1);
 
             return th;
         }else {
@@ -173,6 +174,7 @@ public class TransactionHeaderDAO {
             th.setRemarks(rs.getString("Remarks"));
             th.setName(rs.getString("Name"));
             th.setAddress(rs.getString("Address"));
+            th.setPrinted(rs.getInt("printed")==1);
 //            th.setTransactionLog(rs.getString("TransactionLog"));
 
             return th;
@@ -371,5 +373,20 @@ public class TransactionHeaderDAO {
         th.setName("CANCELLED");
         th.setAddress("");
         th.setAmount(0);
+    }
+
+    public static void setPrinted(TransactionHeader th, boolean printed) throws Exception {
+        DB.getConnection().setAutoCommit(true);
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "UPDATE TransactionHeader SET printed=? " +
+                        "WHERE Period=? AND TransactionNumber=? AND TransactionCode=?");
+        ps.setInt(1, printed?1:0);
+        ps.setDate(2, java.sql.Date.valueOf(th.getPeriod()));
+        ps.setString(3, th.getTransactionNumber());
+        ps.setString(4, th.getTransactionCode());
+
+        ps.executeUpdate();
+
+        ps.close();
     }
 }

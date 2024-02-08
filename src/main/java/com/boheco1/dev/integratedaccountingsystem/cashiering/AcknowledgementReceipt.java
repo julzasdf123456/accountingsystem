@@ -74,6 +74,9 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
     @FXML
     ComboBox<Printer> printersDropdown;
 
+    @FXML
+    CheckBox printed;
+
     private StackPane stackPane;
 
     private TransactionHeader currentTransaction;
@@ -420,6 +423,17 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         }
     }
 
+    public void onTogglePrinted() {
+        try {
+            TransactionHeaderDAO.setPrinted(currentTransaction, printed.isSelected());
+            printButton.setDisable(printed.isSelected());
+        }catch(Exception ex) {
+            ex.printStackTrace();
+            AlertDialogBuilder.messgeDialog("Error!", ex.getMessage(),
+                    stackPane, AlertDialogBuilder.DANGER_DIALOG);
+        }
+    }
+
     private void loadTransaction() {
         try {
             receivedFrom.setText(currentTransaction.getParticulars());
@@ -432,6 +446,9 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             transactionDetails.addAll(TransactionDetailsDAO.getAR(currentTransaction.getTransactionDate(), currentTransaction.getTransactionNumber()));
             paymentFor.setEditable(false);
             receivedFrom.setEditable(false);
+            printed.setSelected(currentTransaction.isPrinted());
+            printButton.setDisable(currentTransaction.isPrinted());
+
             recomputeTotal();
         }catch(Exception ex) {
             ex.printStackTrace();
@@ -474,6 +491,9 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
     public void onPrint() {
 
+        //disable print button...
+        printButton.setDisable(true);
+
         Printer printer = printersDropdown.getSelectionModel().getSelectedItem();
 
         PrinterJob printJob;
@@ -512,9 +532,15 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
         if(printed) {
             printJob.endJob();
-
+            try {
+                TransactionHeaderDAO.setPrinted(currentTransaction, true);
+                this.printed.setSelected(true);//set printed checkbox to true/selected/checked
+            }catch(Exception ex) {
+                ex.printStackTrace();
+            }
         }else {
             System.out.println("Unable to create print job.");
+            printButton.setDisable(false);
         }
     }
 

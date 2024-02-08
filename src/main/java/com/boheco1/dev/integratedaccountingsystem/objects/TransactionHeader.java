@@ -35,6 +35,8 @@ public class TransactionHeader {
 
     private String office; //refers to OfficeID in Offices table
 
+    private boolean printed;
+
     public String getOffice() {
         return office;
     }
@@ -220,4 +222,7 @@ public class TransactionHeader {
     public void cancelTransaction() throws Exception {
         TransactionHeaderDAO.cancelAR(this);
     }
+
+    public void setPrinted(boolean printed) { this.printed = printed; }
+    public boolean isPrinted() { return this.printed; }
 }

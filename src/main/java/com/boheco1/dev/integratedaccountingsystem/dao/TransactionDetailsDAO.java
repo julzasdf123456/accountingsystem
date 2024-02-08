@@ -273,6 +273,7 @@ public class TransactionDetailsDAO {
             td.setParticulars(rs.getString("Particulars"));
             td.setDepositedDate(rs.getDate("DepositedDate").toLocalDate());
 
+
             rs.close();
             ps.close();
 

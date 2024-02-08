@@ -42,7 +42,7 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </Label>
-                        <Label text="Total Check Amount" GridPane.columnIndex="3">
+                        <Label text="Total Cheque Amount" GridPane.columnIndex="3">
                            <font>
                               <Font size="14.0" />
                            </font>
