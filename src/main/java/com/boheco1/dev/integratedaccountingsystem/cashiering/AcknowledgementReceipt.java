@@ -119,6 +119,9 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
     public void onCancel() {
         if(currentTransaction!=null) {
+
+            if(Utility.checkPeriodIsLocked(orDate.getValue(), stackPane)) return;
+
             JFXButton confirm = new JFXButton("Confirm");
 
             JFXDialog dialog = DialogBuilder.showConfirmDialog("Cancel Transaction?",
@@ -194,6 +197,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         resetItemsEntry();
     }
     public void onSaveChanges() {
+        if(Utility.checkPeriodIsLocked(orDate.getValue(), stackPane)) return;
 
         if(orDate.getValue()==null) {
             AlertDialogBuilder.messgeDialog("Error!","You must first set the Date",
@@ -304,6 +308,9 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         }
     }
     public void onDelete() {
+
+        if(Utility.checkPeriodIsLocked(orDate.getValue(), stackPane)) return;
+
         JFXButton confirm = new JFXButton("Confirm");
 
         JFXDialog dialog = DialogBuilder.showConfirmDialog("Delete?","Please confirm deleting this item.", confirm, stackPane, DialogBuilder.WARNING_DIALOG);
@@ -361,6 +368,8 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
     }
 
     public void onAddItem() {
+        if(Utility.checkPeriodIsLocked(orDate.getValue(), stackPane)) return;
+
         TransactionDetails td = new TransactionDetails();
         ParticularsAccount pa = accountDescription.getSelectionModel().getSelectedItem();
         try {
@@ -402,6 +411,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
                     paymentFor.setEditable(true);
                     transactionDetails.clear();
                     receivedFrom.requestFocus();
+                    address.setText(null);
                 }
                 deleteItemButton.setDisable(true);
             }catch(Exception ex) {

@@ -8,6 +8,7 @@ import com.boheco1.dev.integratedaccountingsystem.objects.Period;
 import javax.xml.transform.Result;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -107,7 +108,7 @@ public class PeriodDAO {
         ps.setTimestamp(1, timestamp);
         ResultSet rs = ps.executeQuery();
 
-        if(rs.next()) return rs.getString("status").equals("open");
+        if(rs.next()) return rs.getString("status").equals("closed");
 
         rs.close();
         ps.close();
@@ -121,7 +122,7 @@ public class PeriodDAO {
         ps.setInt(2, month);
         ResultSet rs = ps.executeQuery();
 
-        if(rs.next()) return rs.getString("status").equals("open");
+        if(rs.next()) return rs.getString("status").equals("closed");
 
         rs.close();
         ps.close();
@@ -129,15 +130,15 @@ public class PeriodDAO {
         return false;
     }
 
-    public static boolean isLocked(LocalDateTime localDateTime) throws Exception {
+    public static boolean isLocked(LocalDate localDate) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement("SELECT status FROM Periods WHERE YEAR(Period)=? AND MONTH(Period)=?");
-        int year = localDateTime.getYear();
-        int month = localDateTime.getMonthValue();
+        int year = localDate.getYear();
+        int month = localDate.getMonthValue();
         ps.setInt(1, year);
         ps.setInt(2, month);
         ResultSet rs = ps.executeQuery();
 
-        if(rs.next()) return rs.getString("status").equals("open");
+        if(rs.next()) return rs.getString("status").equals("closed");
 
         rs.close();
         ps.close();

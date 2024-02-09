@@ -1,5 +1,6 @@
 package com.boheco1.dev.integratedaccountingsystem.helpers;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.PeriodDAO;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.boheco1.dev.integratedaccountingsystem.warehouse.ViewMRController;
 import javafx.scene.layout.AnchorPane;
@@ -468,6 +469,20 @@ public class Utility {
         if(rs.next()) return rs.getDouble(1);
 
         return 0;
+    }
+
+    public static boolean checkPeriodIsLocked(LocalDate localDate, StackPane stackPane) {
+        try {
+            if(PeriodDAO.isLocked(localDate)) {
+                AlertDialogBuilder.messgeDialog("Period Locked", "Sorry the action cannot be performed because the period related to this transaction is already closed.", stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                return true;
+            }
+        }catch(Exception ex) {
+            AlertDialogBuilder.messgeDialog("Error while checking period",ex.getMessage(),stackPane, AlertDialogBuilder.DANGER_DIALOG);
+            return true;
+        }
+
+        return false;
     }
 
     public static String COB_APPROVAL = "budget officer";

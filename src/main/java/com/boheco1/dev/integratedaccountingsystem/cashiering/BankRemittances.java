@@ -2,6 +2,7 @@ package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
 import com.boheco1.dev.integratedaccountingsystem.JournalEntriesController;
 import com.boheco1.dev.integratedaccountingsystem.dao.BankAccountDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.PeriodDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionDetailsDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
@@ -177,6 +178,8 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
     }
 
     private void confirmDelete(BankRemittance bankRemittance) {
+        if(Utility.checkPeriodIsLocked(transactionDate.getValue(), stackPane)) return;
+
         JFXButton confirm = new JFXButton("Confirm");
 
         final JFXDialog confirmDialog = DialogBuilder.showConfirmDialog("Delete Entry?","You are about to delete this entry.", confirm, stackPane, DialogBuilder.DANGER_DIALOG);;
@@ -190,11 +193,15 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
     }
 
     private void editEntry(BankRemittance bankRemittance) {
+        if(Utility.checkPeriodIsLocked(transactionDate.getValue(), stackPane)) return;
+
         Utility.setSelectedObject(bankRemittance);
         modal = ModalBuilder.showModalFromXML(EditBankRemittance.class, "edit_bank_remittance.fxml", Utility.getStackPane());
     }
 
     private void removeEntry(BankRemittance bankRemittance) {
+        if(Utility.checkPeriodIsLocked(transactionHeader.getPeriod(), stackPane)) return;
+
         try{
             TransactionDetails td = bankRemittance.getTransactionDetails();
             TransactionDetailsDAO.delete(td);
@@ -242,11 +249,13 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
 
     @FXML
     public void onAddEntry() {
+        if(Utility.checkPeriodIsLocked(transactionDate.getValue(), stackPane)) return;
         ModalBuilder.showModalFromXML(AddBankRemittance.class, "add_bank_remittance.fxml", Utility.getStackPane());
     }
 
     @FXML
     public void onBulkEntry() {
+        if(Utility.checkPeriodIsLocked(transactionDate.getValue(), stackPane)) return;
         ModalBuilder.showModalFromXML(BrBulkEntry.class, "br_bulk_entry.fxml", Utility.getStackPane());
     }
 
@@ -329,6 +338,8 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
 
     @FXML
     public void onRemarksUpdate() {
+        if(Utility.checkPeriodIsLocked(transactionDate.getValue(), stackPane)) return;
+
         if(transactionHeader==null) {
             createTransactionHeader();
         }
