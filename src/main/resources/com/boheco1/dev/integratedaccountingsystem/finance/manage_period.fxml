@@ -12,6 +12,6 @@
       <Label layoutX="43.0" layoutY="35.0" text="Year:" AnchorPane.leftAnchor="43.0" AnchorPane.topAnchor="35.0" />
       <TextField fx:id="yearField" layoutX="82.0" layoutY="31.0" prefHeight="25.0" prefWidth="158.0" AnchorPane.leftAnchor="82.0" AnchorPane.topAnchor="31.0" />
       <TableView fx:id="periodsTable" layoutX="43.0" layoutY="86.0" prefHeight="594.0" prefWidth="1153.0" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="45.0" AnchorPane.rightAnchor="45.0" AnchorPane.topAnchor="86.0" />
-      <JFXButton defaultButton="true" layoutX="253.0" layoutY="32.0" onAction="#onGenerateBtn" prefHeight="29.0" prefWidth="101.0" styleClass="btn-info" text="Show Periods" />
+      <JFXButton defaultButton="true" layoutX="253.0" layoutY="32.0" onAction="#onGenerateBtn" prefHeight="29.0" prefWidth="101.0" styleClass="btn-info" text="Show Periods" AnchorPane.leftAnchor="253.0" AnchorPane.topAnchor="32.0" />
    </children>
 </AnchorPane>
