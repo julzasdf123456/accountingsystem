@@ -66,7 +66,7 @@ public class HomeController implements Initializable {
      * Nav Menu Items
      */
     // FINANCE
-    public JFXButton journalEntries, budget, checkVoucher, journalVoucher;
+    public JFXButton journalEntries, budget, checkVoucher, journalVoucher, manage_period;
 
     // BILLING
     public JFXButton allAccounts, orPosting;
@@ -141,6 +141,7 @@ public class HomeController implements Initializable {
         po = new JFXButton("Prepare PO");
         user_po = new JFXButton("Purchase Orders");
         manage_app = new JFXButton("Manage APP");
+        manage_period = new JFXButton("Manage Periods");
 
         String brStr = "Bank Remittance";
 
@@ -213,6 +214,9 @@ public class HomeController implements Initializable {
             NavMenuHelper.addMenu(navMenuBox, checkVoucher, homeStackPane);
             NavMenuHelper.addMenu(navMenuBox, journalVoucher, homeStackPane);
         }
+
+        if(ActiveUser.getUser().can("manage-period") || ActiveUser.getUser().can("unlock-period"))
+            NavMenuHelper.addMenu(navMenuBox, manage_period, homeStackPane);
 
         if(ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-tellering")) {
             NavMenuHelper.addSeparatorLabel(labelList, navMenuBox, new Label("Billing"), new FontIcon("mdi2r-receipt"), homeStackPane);
@@ -309,6 +313,13 @@ public class HomeController implements Initializable {
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(orUpdate, new FontIcon("mdi2f-file"), drawerMenus, orUpdate.getText(), contentPane, "finance/or_update_layout.fxml", null, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(checkVoucher, new FontIcon("mdi2c-checkbox-blank-circle-outline"), drawerMenus, checkVoucher.getText(), contentPane, "finance/voucher_layout.fxml", null, null, title);
             DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(journalVoucher, new FontIcon("mdi2f-file"), drawerMenus, journalVoucher.getText(), contentPane, "finance/voucher_layout.fxml", null, null, title);
+        }
+
+        if(ActiveUser.getUser().can("manage-period")) {
+            DrawerMenuHelper.setMenuButtonWithViewAndSubMenu(manage_period,
+                    new FontIcon("mdi2f-file-document-edit"),
+                    drawerMenus, manage_period.getText(),
+                    contentPane, "finance/manage_period.fxml", subToolbar, null, title);
         }
 
         if(ActiveUser.getUser().can("manage-billing") || ActiveUser.getUser().can("manage-tellering")) {

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane prefHeight="728.0" prefWidth="1238.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.finance.ManagePeriod">
+   <children>
+      <Label layoutX="43.0" layoutY="35.0" text="Year:" AnchorPane.leftAnchor="43.0" AnchorPane.topAnchor="35.0" />
+      <TextField fx:id="yearField" layoutX="82.0" layoutY="31.0" prefHeight="25.0" prefWidth="158.0" AnchorPane.leftAnchor="82.0" AnchorPane.topAnchor="31.0" />
+      <TableView fx:id="periodsTable" layoutX="43.0" layoutY="86.0" prefHeight="594.0" prefWidth="1153.0" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="45.0" AnchorPane.rightAnchor="45.0" AnchorPane.topAnchor="86.0" />
+      <JFXButton defaultButton="true" layoutX="253.0" layoutY="32.0" onAction="#onGenerateBtn" prefHeight="29.0" prefWidth="101.0" styleClass="btn-info" text="Show Periods" />
+   </children>
+</AnchorPane>

@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Period {
     private LocalDateTime period;
@@ -65,5 +66,24 @@ public class Period {
 
     public void setDateUnlocked(LocalDateTime dateUnlocked) {
         this.dateUnlocked = dateUnlocked;
+    }
+
+    public String getFormattedPeriod() {
+        if(period==null) return "---";
+        return this.period.format(DateTimeFormatter.ofPattern("MMMM - YYYY"));
+    }
+
+    public String getFormattedDateLocked() {
+        if(dateLocked==null) return "---";
+        return this.dateLocked.format(DateTimeFormatter.ofPattern("MMMM dd, YYYY hh:mm"));
+    }
+
+    public String getFormattedDateUnlocked() {
+        if(dateUnlocked==null) return "---";
+        return this.dateUnlocked.format(DateTimeFormatter.ofPattern("MMMM dd, YYYY hh:mm"));
+    }
+
+    public boolean isLocked() {
+        return this.status.equals("closed");
     }
 }
