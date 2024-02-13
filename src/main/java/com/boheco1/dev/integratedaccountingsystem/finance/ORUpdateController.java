@@ -226,6 +226,10 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     private void saveTransaction(ActionEvent event) {
         try{
             if(reCompute()){
+
+                //Check for period locking
+                if(Utility.checkPeriodIsLocked(transactionDate.getValue(), Utility.getStackPane())) return;
+
                 JFXButton accept = new JFXButton("Accept");
                 JFXDialog dialog = DialogBuilder.showConfirmDialog("Confirm Transaction.","Continue saving O.R update?", accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
                 accept.setTextFill(Paint.valueOf(ColorPalette.MAIN_COLOR));
@@ -326,6 +330,9 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     private void updateItem(JFXTextField jfxTextField){
         jfxTextField.setOnAction(e -> {
             if(!orItem.getText().isEmpty() && !orItemAmount.getText().isEmpty()) {
+                //Check for period locking
+                if(Utility.checkPeriodIsLocked(transactionDate.getValue(), Utility.getStackPane())) return;
+
                 double amount = Double.parseDouble(orItemAmount.getText());
                 if(amount > 0){
                     selectedItem.setCredit(amount);
@@ -344,6 +351,10 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     private void addNewItem(JFXTextField jfxTextField){
         jfxTextField.setOnAction(e -> {
             if(!particular.getText().isEmpty() && !newItemAmount.getText().isEmpty()){
+
+                //Check for period locking
+                if(Utility.checkPeriodIsLocked(transactionDate.getValue(), Utility.getStackPane())) return;
+
                 double amount = Double.parseDouble(newItemAmount.getText());
 
 //                TransactionDetails temp = (TransactionDetails) orTable.getItems().get(0);

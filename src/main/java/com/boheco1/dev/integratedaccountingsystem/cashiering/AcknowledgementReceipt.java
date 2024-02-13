@@ -230,17 +230,20 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
         //create Transaction Header if null
         if(currentTransaction==null) {
             isNew=true;
-            currentTransaction = new TransactionHeader();
-            currentTransaction.setPeriod(period);
-            currentTransaction.setTransactionCode("AR");
-            currentTransaction.setTransactionNumber(orNumber.getText());
-            currentTransaction.setTransactionDate(orDate.getValue());
-            currentTransaction.setParticulars(receivedFrom.getText());
-            currentTransaction.setRemarks(paymentFor.getText());
-            currentTransaction.setName(receivedFrom.getText());
-            currentTransaction.setAddress(address.getText());
-            currentTransaction.setAmount(total);
             try {
+                currentTransaction = new TransactionHeader();
+                currentTransaction.setPeriod(period);
+                currentTransaction.setTransactionCode("AR");
+                currentTransaction.setTransactionNumber(orNumber.getText());
+                currentTransaction.setTransactionDate(orDate.getValue());
+                currentTransaction.setParticulars(receivedFrom.getText());
+                currentTransaction.setRemarks(paymentFor.getText());
+                currentTransaction.setName(receivedFrom.getText());
+                currentTransaction.setAddress(address.getText());
+                currentTransaction.setAmount(total);
+                currentTransaction.setEnteredBy(ActiveUser.getUser().getUserName());
+                currentTransaction.setDateEntered(Utility.serverDateTimeLD());
+
                 TransactionHeaderDAO.add(currentTransaction);
                 Utility.currentARNumber = Integer.parseInt(currentTransaction.getTransactionNumber());
             }catch(Exception ex) {

@@ -354,6 +354,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
 
     @Override
     public void receive(Object o) {
+
         if(o==null) {
             modal.close();
             return;

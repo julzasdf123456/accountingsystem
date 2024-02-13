@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -390,6 +391,16 @@ public class Utility {
         }
         return "";
     }
+
+    public static LocalDateTime serverDateTimeLD() throws Exception {
+        ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                "SELECT SYSDATETIME() as serverDate");
+        if(rs.next()) {
+            return rs.getTimestamp("serverDate").toLocalDateTime();
+        }
+        return null;
+    }
+
     public static ORContent getOrContent() {
         return orContent;
     }
