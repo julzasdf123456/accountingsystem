@@ -1,7 +1,8 @@
 package com.boheco1.dev.integratedaccountingsystem.finance;
 
-import com.boheco1.dev.integratedaccountingsystem.cashiering.ORLayoutController;
-import com.boheco1.dev.integratedaccountingsystem.dao.*;
+import com.boheco1.dev.integratedaccountingsystem.dao.ParticularsAccountDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.TransactionDetailsDAO;
+import com.boheco1.dev.integratedaccountingsystem.dao.TransactionHeaderDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
 import com.jfoenix.controls.JFXButton;
@@ -11,7 +12,6 @@ import com.jfoenix.controls.JFXTextField;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -26,10 +26,7 @@ import org.controlsfx.control.textfield.TextFields;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
-import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -287,6 +284,8 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
 
     @FXML
     private void searchOR(ActionEvent event) throws Exception {
+        if(Utility.checkPeriodIsLocked(transactionDate.getValue(), Utility.getStackPane())) return;
+
         String searchOr = orNumber.getText();//temporary store search string before reset and clear all field
         if(searchOr.isEmpty() || transactionDate.getValue()==null || transCode.getSelectionModel().isEmpty())
             return;
@@ -330,8 +329,6 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     private void updateItem(JFXTextField jfxTextField){
         jfxTextField.setOnAction(e -> {
             if(!orItem.getText().isEmpty() && !orItemAmount.getText().isEmpty()) {
-                //Check for period locking
-                if(Utility.checkPeriodIsLocked(transactionDate.getValue(), Utility.getStackPane())) return;
 
                 double amount = Double.parseDouble(orItemAmount.getText());
                 if(amount > 0){
@@ -352,8 +349,6 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
         jfxTextField.setOnAction(e -> {
             if(!particular.getText().isEmpty() && !newItemAmount.getText().isEmpty()){
 
-                //Check for period locking
-                if(Utility.checkPeriodIsLocked(transactionDate.getValue(), Utility.getStackPane())) return;
 
                 double amount = Double.parseDouble(newItemAmount.getText());
 

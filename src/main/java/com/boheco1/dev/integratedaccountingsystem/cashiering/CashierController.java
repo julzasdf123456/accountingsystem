@@ -777,8 +777,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
 
     @FXML
     private void submitForConfirmation(ActionEvent event) throws Exception {
-        //if(!submitBtn.isDisable())
-            //checkInputs();
+        if(Utility.checkPeriodIsLocked(date.getValue(), Utility.getStackPane())) return;
+
         if(paymentTable.getItems().isEmpty()){
             AlertDialogBuilder.messgeDialog("System Message", "No item breakdown found",
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);

@@ -2,20 +2,12 @@ package com.boheco1.dev.integratedaccountingsystem.helpers;
 
 import com.boheco1.dev.integratedaccountingsystem.objects.ORContent;
 import com.boheco1.dev.integratedaccountingsystem.objects.ORItemSummary;
-import com.boheco1.dev.integratedaccountingsystem.objects.Teller;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import org.apache.poi.hssf.usermodel.HeaderFooter;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.text.DateFormat;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -25,6 +17,7 @@ public class PrintPDF {
 
     private float[] column = {1f, 1f, 1f, 1f, 1f, 1f};
     private PdfPTable table;
+
     private PdfPCell cell;
     private Document document;
     private File pdf;
@@ -167,41 +160,11 @@ public class PrintPDF {
 
         displayOutput(pdf);
     }
-    class PdfEventHandler extends PdfPageEventHelper {
 
-        @Override
-        public void onStartPage(PdfWriter writer, Document document) {
-            // Add header content
-            PdfPTable header = new PdfPTable(1);
-            header.setWidthPercentage(100);
-            header.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
-            header.addCell(new Phrase("My PDF Header"));
-            try {
-                document.add(header);
-            } catch (DocumentException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onEndPage(PdfWriter writer, Document document) {
-            // Add footer content
-            PdfPTable footer = new PdfPTable(1);
-            footer.setWidthPercentage(100);
-            footer.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
-            footer.addCell(new Phrase("Page " + writer.getPageNumber()));
-            try {
-                document.add(footer);
-            } catch (DocumentException e) {
-                e.printStackTrace();
-            }
-        }
-    }
     public void generate() throws Exception{
         document = new Document(PageSize.LETTER,30f,30f,30f,30f);
         Paragraph preface = new Paragraph();
         PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(pdf));
-        writer.setPageEvent(new PdfEventHandler());
         document.open();
         table.getDefaultCell().setFixedHeight(80);
         table.setWidthPercentage(100);
