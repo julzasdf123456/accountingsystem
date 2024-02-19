@@ -26,6 +26,7 @@ import org.controlsfx.control.textfield.TextFields;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -71,6 +72,12 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     List<TransactionDetails> newTransactionDetails = new ArrayList<>();
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        try {
+            transactionDate.setValue(Utility.serverDate());
+        } catch (Exception e) {
+            transactionDate.setValue(LocalDate.now());
+            throw new RuntimeException(e);
+        }
         initTable();
         tableClick();
         addNewItem(newItemAmount);
@@ -221,11 +228,12 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
 
     @FXML
     private void saveTransaction(ActionEvent event) {
+        //Check for period locking
+        if(!allowed()) return;
         try{
             if(reCompute()){
 
-                //Check for period locking
-                if(Utility.checkPeriodIsLocked(transactionDate.getValue(), Utility.getStackPane())) return;
+
 
                 JFXButton accept = new JFXButton("Accept");
                 JFXDialog dialog = DialogBuilder.showConfirmDialog("Confirm Transaction.","Continue saving O.R update?", accept, Utility.getStackPane(), DialogBuilder.WARNING_DIALOG);
@@ -234,6 +242,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                     @Override
                     public void handle(ActionEvent __) {
                         try {
+                            if(Utility.checkPeriodIsLocked(transactionDate.getValue(), Utility.getStackPane())) return;
                             TransactionDetailsDAO.addUpdate(transactionHeader, transactionDetails, newTransactionDetails);
 //                            for (TransactionDetails details : newTransactionDetails) {
 //                                System.out.println(details);
@@ -246,13 +255,13 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                     }
                 });
             }else{
-                AlertDialogBuilder.messgeDialog("System Message", "New mount did not match the original amount.",
+                AlertDialogBuilder.messgeDialog("System Message", "New amount did not match the original amount.",
                         Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
             }
 
         }catch (Exception e){
             e.printStackTrace();
-            AlertDialogBuilder.messgeDialog("System Error", "Error encounter while Filing MIRS reason may be: "+ e.getMessage(),
+            AlertDialogBuilder.messgeDialog("System Error", "Error encounter while Updating OR reason may be: "+ e.getMessage(),
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
         }
     }
@@ -284,7 +293,6 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
 
     @FXML
     private void searchOR(ActionEvent event) throws Exception {
-        if(Utility.checkPeriodIsLocked(transactionDate.getValue(), Utility.getStackPane())) return;
 
         String searchOr = orNumber.getText();//temporary store search string before reset and clear all field
         if(searchOr.isEmpty() || transactionDate.getValue()==null || transCode.getSelectionModel().isEmpty())
@@ -327,6 +335,8 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     }
 
     private void updateItem(JFXTextField jfxTextField){
+        //Check for period locking
+        //if(!allowed()) return;
         jfxTextField.setOnAction(e -> {
             if(!orItem.getText().isEmpty() && !orItemAmount.getText().isEmpty()) {
 
@@ -346,6 +356,8 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     }
 
     private void addNewItem(JFXTextField jfxTextField){
+        //Check for period locking
+        //if(!allowed()) return;
         jfxTextField.setOnAction(e -> {
             if(!particular.getText().isEmpty() && !newItemAmount.getText().isEmpty()){
 
@@ -406,11 +418,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
 
     private boolean reCompute(){
 
-        if(transactionHeader==null){
-            AlertDialogBuilder.messgeDialog("System Message", "No result found." ,
-                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
-            return false;
-        }
+
         double newTotal=0;
         for(TransactionDetails t : transactionDetails)
             newTotal+=t.getAmount();
@@ -426,6 +434,18 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
             newTotalAmount.setText("");
             return true;
         }
+    }
+
+    private boolean allowed(){
+        if(transactionHeader==null){
+            AlertDialogBuilder.messgeDialog("System Message", "No transaction found." ,
+                    Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+            return false;
+        }
+
+        if(Utility.checkPeriodIsLocked(transactionDate.getValue(), Utility.getStackPane())) return false;
+
+        return true;
     }
 
     private void bindParticularAccountInfoAutocomplete(JFXTextField textField){

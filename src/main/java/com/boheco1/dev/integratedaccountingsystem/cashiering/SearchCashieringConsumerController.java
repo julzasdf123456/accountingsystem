@@ -250,6 +250,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
         resultInfo = row;
         if(resultInfo instanceof EmployeeInfo){
             EmployeeInfo employeeInfo = (EmployeeInfo) resultInfo;
+            if(Utility.checkPeriodIsLocked(searchDateFrom.getValue(), Utility.getStackPane())) return;
             try {
                 JFXDialog dialog = DialogBuilder.showWaitDialog("System Message","Please wait, processing request.",Utility.getStackPane(), DialogBuilder.INFO_DIALOG);
                 Task<Void> task = new Task<>() {
@@ -266,12 +267,12 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                         List<ORItemSummary> orItemSummaries =null;
                         LocalDate period = LocalDate.of(yearFrom, monthFrom, 1);
                         User user = UserDAO.get(employeeInfo.getId());
-                        transactionHeader = TransactionHeaderDAO.get(user.getUserName(), searchDateTo.getValue());
+                        transactionHeader = TransactionHeaderDAO.get(user.getUserName(), searchDateFrom.getValue());
                         if(transactionHeader==null) {
                             orItemSummaries = CashierDAO.getOrItems(yearFrom, monthFrom, dayFrom, yearTo, monthTo, dayTo, user.getUserName());
                             countAccount = CashierDAO.countAccount(yearFrom, monthFrom, dayFrom, yearTo, monthTo, dayTo, user.getUserName());
                         }else {
-                            transactionDetails = TransactionDetailsDAO.get(period, "OR", user);
+                            transactionDetails = TransactionDetailsDAO.get(searchDateFrom.getValue(), "OR", user);
                             orItemSummaries = new ArrayList<>();
                             for(TransactionDetails td : transactionDetails){
                                 if(!td.getParticulars().equals("Grand Total")){

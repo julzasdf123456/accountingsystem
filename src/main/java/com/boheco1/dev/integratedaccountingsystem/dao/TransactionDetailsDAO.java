@@ -326,7 +326,7 @@ public class TransactionDetailsDAO {
         PreparedStatement ps = DB.getConnection().prepareStatement(
                 "Select * from TransactionDetails INNER JOIN TransactionHeader ON TransactionHeader.TransactionNumber = TransactionDetails.TransactionNumber WHERE " +
                         "TransactionHeader.EnteredBy = ? AND " +
-                        "TransactionDetails.Period = ? AND " +
+                        "TransactionDetails.TransactionDate = ? AND " +
                         "TransactionDetails.TransactionCode = ? " +
                         "ORDER by AccountSequence ASC");
         ps.setString(1, userId.getUserName());

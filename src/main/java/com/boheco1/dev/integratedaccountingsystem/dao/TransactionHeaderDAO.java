@@ -225,7 +225,7 @@ public class TransactionHeaderDAO {
     public static TransactionHeader get(String enteredBy, LocalDate transactionDate) throws Exception {
 
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM TransactionHeader WHERE EnteredBy=? AND TransactionDate=? AND NAME != ?");
+                "SELECT * FROM TransactionHeader WHERE source != 'Normal Customer' AND EnteredBy=? AND TransactionDate=? AND NAME != ?");
 
         ps.setString(1, enteredBy);
         ps.setDate(2, java.sql.Date.valueOf(transactionDate));
