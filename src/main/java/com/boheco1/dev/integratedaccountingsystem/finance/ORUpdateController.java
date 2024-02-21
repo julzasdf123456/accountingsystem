@@ -83,8 +83,8 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
         addNewItem(newItemAmount);
         updateItem(orItem);
         updateItem(orItemAmount);
-        InputValidation.restrictNumbersOnly(newItemAmount);
-        InputValidation.restrictNumbersOnly(orItemAmount);
+        //InputValidation.restrictNumbersOnly(newItemAmount);
+        //InputValidation.restrictNumbersOnly(orItemAmount);
         bindParticularAccountInfoAutocomplete(particular);
         totalAmount.setText("");
         newTotalAmount.setText("");
@@ -339,8 +339,22 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
         //if(!allowed()) return;
         jfxTextField.setOnAction(e -> {
             if(!orItem.getText().isEmpty() && !orItemAmount.getText().isEmpty()) {
+                // Remove commas and spaces
+                String cleanValue = orItemAmount.getText().replaceAll("[,\\s]+", "");
 
-                double amount = Double.parseDouble(orItemAmount.getText());
+                // Split by plus sign
+                String[] numbers = cleanValue.split("\\+");
+
+                // Perform addition
+                double amount = 0.0;
+                for (String number : numbers) {
+                    try {
+                        amount += Double.parseDouble(number);
+                    } catch (NumberFormatException ex) {
+                        AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request! \nError found: "+ ex.getMessage(),
+                                Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    }
+                }
                 if(amount > 0){
                     selectedItem.setCredit(amount);
                 }else{
@@ -361,8 +375,22 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
         jfxTextField.setOnAction(e -> {
             if(!particular.getText().isEmpty() && !newItemAmount.getText().isEmpty()){
 
+                // Remove commas and spaces
+                String cleanValue = newItemAmount.getText().replaceAll("[,\\s]+", "");
 
-                double amount = Double.parseDouble(newItemAmount.getText());
+                // Split by plus sign
+                String[] numbers = cleanValue.split("\\+");
+
+                // Perform addition
+                double amount = 0.0;
+                for (String number : numbers) {
+                    try {
+                        amount += Double.parseDouble(number);
+                    } catch (NumberFormatException ex) {
+                        AlertDialogBuilder.messgeDialog("System Error", "An error occurred while processing the request! \nError found: "+ ex.getMessage(),
+                                Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    }
+                }
 
 //                TransactionDetails temp = (TransactionDetails) orTable.getItems().get(0);
                 TransactionDetails td = new TransactionDetails();

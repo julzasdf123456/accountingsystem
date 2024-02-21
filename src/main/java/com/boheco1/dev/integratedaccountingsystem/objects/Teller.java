@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Teller {
+
+    private String id;
     private String username;
     private String name;
     private String address;
@@ -83,6 +85,14 @@ public class Teller {
 
     public void setOrNumber(String orNumber) {
         this.orNumber = orNumber;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getIssuedTo() {

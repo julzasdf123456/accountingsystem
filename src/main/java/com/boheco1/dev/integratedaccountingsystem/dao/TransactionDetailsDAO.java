@@ -322,16 +322,21 @@ public class TransactionDetailsDAO {
         return tds;
     }
 
-    public static List<TransactionDetails> get(LocalDate period, String transactionCode, User userId) throws Exception {
+    public static List<TransactionDetails> get(LocalDate date, String transactionCode, User userId, String tellerID) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "Select * from TransactionDetails INNER JOIN TransactionHeader ON TransactionHeader.TransactionNumber = TransactionDetails.TransactionNumber WHERE " +
-                        "TransactionHeader.EnteredBy = ? AND " +
-                        "TransactionDetails.TransactionDate = ? AND " +
-                        "TransactionDetails.TransactionCode = ? " +
-                        "ORDER by AccountSequence ASC");
+                    "Select * from TransactionDetails INNER JOIN TransactionHeader ON TransactionHeader.TransactionNumber = TransactionDetails.TransactionNumber WHERE " +
+                            "TransactionHeader.EnteredBy = ? AND " +
+                            "TransactionHeader.Source = 'EmployeeInfo' AND " +
+                            "TransactionHeader.TransactionCode ='OR' AND " +
+                            "TransactionDetails.TransactionDate = ? AND " +
+                            "TransactionDetails.TransactionCode = ? AND " +
+                            "TransactionHeader.AccountID = ? " +
+                            "ORDER by AccountSequence ASC");
+
         ps.setString(1, userId.getUserName());
-        ps.setDate(2, java.sql.Date.valueOf(period));
+        ps.setDate(2, java.sql.Date.valueOf(date));
         ps.setString(3, transactionCode);
+        ps.setString(4, tellerID);
 
         ResultSet rs = ps.executeQuery();
 

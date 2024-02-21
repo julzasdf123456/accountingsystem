@@ -111,7 +111,15 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
             this.searchTf.setPromptText("Username/Last Name/First Name");
         }
 
-        searchDateFrom.getEditor().setOnKeyReleased(e ->{
+        searchDateFrom.valueProperty().addListener((observable, oldValue, newValue) -> {
+            // Check if the new value is not null before updating the second DatePicker
+            if (newValue != null) {
+                searchDateTo.setValue(newValue);
+                search();
+                searchTf.requestFocus();
+            }
+        });
+    /*    searchDateFrom.getEditor().setOnKeyReleased(e ->{
             if (e.getCode() == KeyCode.ENTER) {
                 searchDateTo.setValue(searchDateFrom.getValue());
                 search();
@@ -125,7 +133,7 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                 search();
                 searchTf.requestFocus();
             }
-        });
+        });*/
 
         searchTf.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) {
@@ -266,13 +274,13 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
 
                         List<ORItemSummary> orItemSummaries =null;
                         LocalDate period = LocalDate.of(yearFrom, monthFrom, 1);
-                        User user = UserDAO.get(employeeInfo.getId());
-                        transactionHeader = TransactionHeaderDAO.get(user.getUserName(), searchDateFrom.getValue());
+                        User tellerAccount = UserDAO.get(employeeInfo.getId());
+                        transactionHeader = TransactionHeaderDAO.get(ActiveUser.getUser().getUserName(), searchDateFrom.getValue(), employeeInfo.getId());
                         if(transactionHeader==null) {
-                            orItemSummaries = CashierDAO.getOrItems(yearFrom, monthFrom, dayFrom, yearTo, monthTo, dayTo, user.getUserName());
-                            countAccount = CashierDAO.countAccount(yearFrom, monthFrom, dayFrom, yearTo, monthTo, dayTo, user.getUserName());
+                            orItemSummaries = CashierDAO.getOrItems(yearFrom, monthFrom, dayFrom, yearTo, monthTo, dayTo, tellerAccount.getUserName());
+                            countAccount = CashierDAO.countAccount(yearFrom, monthFrom, dayFrom, yearTo, monthTo, dayTo, tellerAccount.getUserName());
                         }else {
-                            transactionDetails = TransactionDetailsDAO.get(searchDateFrom.getValue(), "OR", user);
+                            transactionDetails = TransactionDetailsDAO.get(searchDateFrom.getValue(), "OR", ActiveUser.getUser(), employeeInfo.getId());
                             orItemSummaries = new ArrayList<>();
                             for(TransactionDetails td : transactionDetails){
                                 if(!td.getParticulars().equals("Grand Total")){
@@ -281,7 +289,8 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                                 }
                             }
                         }
-                        teller = new Teller(user.getUserName(), employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), searchDateTo.getValue());
+                        teller = new Teller(tellerAccount.getUserName(), employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), searchDateTo.getValue());
+                        teller.setId(employeeInfo.getId());
                         teller.setOrItemSummaries(orItemSummaries);
                         return null;
                     }

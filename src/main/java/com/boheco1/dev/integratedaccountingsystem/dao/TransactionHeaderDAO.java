@@ -222,14 +222,14 @@ public class TransactionHeaderDAO {
     }
 
 
-    public static TransactionHeader get(String enteredBy, LocalDate transactionDate) throws Exception {
+    public static TransactionHeader get(String enteredBy, LocalDate transactionDate, String tellerID) throws Exception {
 
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT * FROM TransactionHeader WHERE source != 'Normal Customer' AND EnteredBy=? AND TransactionDate=? AND NAME != ?");
-
+                "SELECT * FROM TransactionHeader WHERE Source = 'EmployeeInfo' AND  TransactionCode='OR' AND EnteredBy=? AND TransactionDate=? AND NAME != ? AND AccountID = ?");
         ps.setString(1, enteredBy);
         ps.setDate(2, java.sql.Date.valueOf(transactionDate));
         ps.setString(3, Utility.CANCELLED);
+        ps.setString(4, tellerID);
 
         ResultSet rs = ps.executeQuery();
 
