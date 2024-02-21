@@ -328,7 +328,24 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         this.setMenuActions();
 
         this.payment_tf.setOnKeyReleased(keyEvent -> {
-            this.setPayments();
+            if (keyEvent.getCode() == KeyCode.UP || keyEvent.getCode() == KeyCode.DOWN){
+                int selected = this.fees_table.getSelectionModel().getSelectedIndex();
+                if (keyEvent.getCode() == KeyCode.UP)
+                    selected--;
+                else if(keyEvent.getCode() == KeyCode.DOWN)
+                    selected++;
+
+                if (selected >= this.fees_table.getItems().size()){
+                    selected = this.fees_table.getItems().size() - 1;
+                }else if(selected < 0) {
+                    selected = 0;
+                }
+                this.fees_table.getSelectionModel().clearAndSelect(selected);
+                ConsumerInfo consumer = this.fees_table.getSelectionModel().getSelectedItem().getConsumer();
+                this.setConsumerInfo(consumer);
+            }else {
+                this.setPayments();
+            }
         });
 
         this.payment_tf.addEventHandler(ActionEvent.ACTION, confirmEvent);
@@ -701,6 +718,10 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     this.setBillInfo(this.bills);
                 }
                 this.billsNo_lbl.setText(bills.size()+"");
+            //Keyboard event for up/down keys to show account information
+            }else if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN){
+                ConsumerInfo consumer = this.fees_table.getSelectionModel().getSelectedItem().getConsumer();
+                this.setConsumerInfo(consumer);
             }
         });
     }
@@ -992,6 +1013,7 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                     total_paid_tf.setDisable(false);
                     add_check_btn.setDisable(false);
                     InputHelper.restrictNumbersOnly(payment_tf);
+                    this.fees_table.getSelectionModel().clearAndSelect(this.fees_table.getItems().size()-1);
                 }else{
                     add_check_btn.setDisable(true);
                 }
