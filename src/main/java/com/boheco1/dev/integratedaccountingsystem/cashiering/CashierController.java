@@ -858,15 +858,15 @@ public class CashierController extends MenuControllerHandler implements Initiali
         transactionHeader.setTransactionCode(TransactionHeader.getORTransactionCodeProperty());
         transactionHeader.setOffice(Utility.OFFICE_PREFIX);
         if(customerFromCRM != null) {
-            transactionHeader.setSource(crmQueue.getSource());
+            transactionHeader.setSource("CRM");
             transactionHeader.setAccountID(crmQueue.getSourseId());//CRM Source ID
             transactionHeader.setEnteredBy(ActiveUser.getUser().getUserName());
             transactionHeader.setTransactionDate(date.getValue());
             transactionHeader.setAmount(collectionFromCRM);
         }else if(tellerInfo != null) {
-            transactionHeader.setSource("Billing");
+            transactionHeader.setSource("EmployeeInfo");
             transactionHeader.setEnteredBy(ActiveUser.getUser().getUserName());
-            transactionHeader.setAccountID(ActiveUser.getUser().getId());
+            transactionHeader.setAccountID(tellerInfo.getId());
             transactionHeader.setAmount(collectionFromTeller);
             transactionHeader.setTransactionDate(date.getValue());
         }else{
