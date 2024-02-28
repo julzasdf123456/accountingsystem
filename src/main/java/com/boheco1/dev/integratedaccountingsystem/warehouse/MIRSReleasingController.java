@@ -566,6 +566,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                                         parMirsItem.setRemarks(mirsItem.getRemarks());
                                         parMirsItem.setCreatedAt(mirsItem.getCreatedAt());
                                         parMirsItem.setUpdatedAt(mirsItem.getUpdatedAt());
+                                        parMirsItem.setParticulars(mirsItem.getParticulars());
                                         parMirsItem.setAdditional(false);
                                         releasingItem.add(parMirsItem);
                                         mirsItem.setQuantity(mirsItem.getQuantity()-reqQty);
@@ -614,8 +615,14 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
             mirsItem.setId(Utility.generateRandomId());
             mirsItem.setAdditional(true);
             additionalMirsItem.add(mirsItem);
-            releasingItem.add(mirsItem);
-            releasingItemTable.refresh();
+            if(isTransformer(mirsItem)){
+                Utility.setSelectedObject(mirsItem);
+                //Utility.setDictionary(selected_items);
+                ModalBuilderForWareHouse.showModalFromXMLHeader(WarehouseDashboardController.class, "../warehouse_mirs_releasing_select_item.fxml", Utility.getStackPane(),"Brand Distribution");
+            }else{
+                releasingItem.add(mirsItem);
+                releasingItemTable.refresh();
+            }
 
             selectedStock = null; //set to null for validation
             stockItem.setText("");
@@ -817,7 +824,6 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
 
                 requestedItemTable.refresh();
                 releasingItemTable.refresh();
-                System.out.println(requestedMirsItem.getQuantity());
             }
 
         }

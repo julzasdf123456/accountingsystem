@@ -55,7 +55,7 @@ public class MIRSReleasingSelectItemController implements Initializable {
     private double maxItemPerBrand = 0;
     private int counter=0;
 
-    //private HashMap<String, Double> selected_items;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
@@ -70,9 +70,6 @@ public class MIRSReleasingSelectItemController implements Initializable {
                 //requestQtyLabel.setText("Request: "+maxQtyAllowed);
                 //selected_items = (HashMap<String, Double>) Utility.getDictionary();
 
-                //System.out.println(mirsItemIscontrolled+": "+mirsItem.getParticulars());
-
-
                 itemizedItemObservableList =  FXCollections.observableArrayList();
                 brand = FXCollections.observableArrayList();
                 for (SlimStock slimStock : comboBoxItem){
@@ -80,7 +77,6 @@ public class MIRSReleasingSelectItemController implements Initializable {
                     itemizedMirsItem.setBrand(slimStock.getBrand());
                     itemizedMirsItem.setId(slimStock.getId());
                     itemizedMirsItem.setPrice(slimStock.getPrice());
-                    //System.out.println(slimStock.getDescription());
                     //comboBoxBrand.getItems().add(slimStock);
                     brand.add(itemizedMirsItem);
                 }
@@ -148,7 +144,6 @@ public class MIRSReleasingSelectItemController implements Initializable {
        for(ItemizedMirsItem i : itemizedItemObservableList){
             if(i.getBrand() == null || i.getSerial() == null) continue;
 
-            System.out.println(i.getBrand() +", "+ i.getSerial() +", "+ i.getRemarks() +", "+ i.getId()+", "+ i.getPrice());
 
             MIRSItem mirsItem = new MIRSItem();
             mirsItem.setParticulars(this.mirsItem.getParticulars());
