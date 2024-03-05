@@ -15,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
@@ -37,6 +38,9 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
 
     @FXML
     private JFXTextField searchItem_tf,returned_tf,received_tf, mirs_no_tf, mirs_purpose_tf, mirs_address_tf, mrt_no_tf;
+
+    @FXML
+    private AnchorPane contentPane;
 
     @FXML
     private TableView releasedItemTable, returnItemTable;
@@ -156,11 +160,11 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
                         printMRT(selectedFile, this.currentMRT, this.mirs, Utility.getStackPane());
                     }
                     this.mrt_no_tf.setText(NumberGenerator.mrtNumber());
-                    AlertDialogBuilder.messgeDialog("Material Return", "The selected released items were successfully returned!", Utility.getStackPane(), AlertDialogBuilder.SUCCESS_DIALOG);
+                    Toast.makeText((Stage) this.contentPane.getScene().getWindow(), "The selected released items were successfully returned!", 2500, 200, 200, "rgba(1, 125, 32, 1)");
                     this.reset();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    AlertDialogBuilder.messgeDialog("System Error", "An error occurred while returning the items due to: " + e.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+                    Toast.makeText((Stage) this.contentPane.getScene().getWindow(), "An error occurred while returning the items due to: " + e.getMessage(), 2500, 200, 200, "rgba(203, 24, 5, 1)");
                 }
                 dialog.close();
             });
@@ -346,6 +350,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
             searchItem_tf.setText("");
             Platform.runLater(() -> {
                 try {
+                    this.mirs = mirs;
                     this.releasedItems = FXCollections.observableList(MRTDao.searchReleasedItems(mirs.getId()));
                     this.releasedItemTable.getItems().setAll(this.releasedItems);
                     this.mirs_address_tf.setText(mirs.getAddress());
@@ -448,7 +453,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
             int[] head_borders = {Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER};
             String[] mirs_no = {"", "", "MIRS No", mirs.getId()};
             mrt_pdf.other_details(mirs_no, head_span, head_fonts, head_aligns,head_borders, false);
-            String[] mrt_no = {"Particulars", mirs.getPurpose(), "Date", mirs.getDateFiled().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))};
+            String[] mrt_no = {"Particulars", mirs.getPurpose(), "Date", mrt.getDateOfReturned().format(DateTimeFormatter.ofPattern("MM/dd/yyyy"))};
             mrt_pdf.other_details(mrt_no, head_span, head_fonts, head_aligns,head_borders, false);
             String[] addr = {"Address", mirs.getAddress(), "MRT No", mrt.getId()};
             mrt_pdf.other_details(addr, head_span, head_fonts, head_aligns,head_borders, false);
@@ -470,7 +475,7 @@ public class MRTFormController extends MenuControllerHandler implements Initiali
                     total += item.getAmount();
                 }
                 mrt_pdf.tableContent(rows, header_spans, rows_aligns);
-                String[] amount = {"", "", "", "TOTAL", total+"", "", ""};
+                String[] amount = {"", "", "", "TOTAL", Utility.round(total, 2)+"", "", ""};
                 int[] amount_fonts = {Font.NORMAL, Font.NORMAL, Font.NORMAL, Font.NORMAL, Font.NORMAL, Font.NORMAL, Font.NORMAL};
                 int[] amount_aligns = {Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_LEFT, Element.ALIGN_CENTER, Element.ALIGN_RIGHT, Element.ALIGN_LEFT, Element.ALIGN_LEFT};
                 int[] amount_borders = {Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.NO_BORDER, Rectangle.BOX, Rectangle.BOX, Rectangle.NO_BORDER, Rectangle.NO_BORDER};

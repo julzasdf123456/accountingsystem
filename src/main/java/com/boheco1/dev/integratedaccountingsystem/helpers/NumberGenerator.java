@@ -55,7 +55,7 @@ public class NumberGenerator {
                     "SELECT id FROM MRT WHERE id LIKE '%" + year + "%' ORDER BY id DESC OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;");
 
             if(!rs.next()) {
-                return year + "-0001";
+                return year + "-00001";
             }
 
             String lastId = rs.getString("id");

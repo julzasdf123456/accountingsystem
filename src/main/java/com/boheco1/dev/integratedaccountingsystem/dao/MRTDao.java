@@ -113,13 +113,58 @@ public class MRTDao {
         return mrt;
     }
 
+    public static List<MRT> getAllMRT()throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT DISTINCT mt.id, r.MIRSID, returnedBy, mt.receivedBy, dateOfReturned, purpose \n" +
+                        "FROM MRT mt INNER JOIN MRTItem mti ON mt.id = mti.mrt_id \n" +
+                        "INNER JOIN Releasing r ON r.id = mti.releasing_id \n" +
+                        "INNER JOIN MIRS mrs ON mrs.id = r.MIRSID \n "+
+                        "ORDER BY dateOfReturned DESC");
+        ResultSet rs = ps.executeQuery();
+        List<MRT> items = new ArrayList();
+        while(rs.next()) {
+            MRT mrt = new MRT(rs.getString("id"), rs.getString("returnedBy"), rs.getString("receivedBy"), rs.getDate("dateOfReturned").toLocalDate());
+            mrt.setMirsId(rs.getString("MIRSID"));
+            mrt.setPurpose(rs.getString("purpose"));
+            items.add(mrt);
+        }
+        rs.close();
+        return items;
+    }
+
+    public static List<MRT> searchMRT(String key)throws Exception {
+        PreparedStatement ps = DB.getConnection().prepareStatement(
+                "SELECT DISTINCT mt.id, r.MIRSID, returnedBy, mt.receivedBy, dateOfReturned, purpose \n" +
+                        "FROM MRT mt INNER JOIN MRTItem mti ON mt.id = mti.mrt_id \n" +
+                        "INNER JOIN Releasing r ON r.id = mti.releasing_id \n" +
+                        "INNER JOIN MIRS mrs ON mrs.id = r.MIRSID\n "+
+                        "WHERE mt.id LIKE ? OR returnedBy LIKE ? OR r.MIRSID LIKE ? OR purpose LIKE ? ORDER BY dateOfReturned DESC");
+
+        ps.setString(1, "%" + key + "%");
+        ps.setString(2, "%" + key + "%");
+        ps.setString(3, "%" + key + "%");
+        ps.setString(4, "%" + key + "%");
+
+        ResultSet rs = ps.executeQuery();
+
+        List<MRT> items = new ArrayList();
+        while(rs.next()) {
+            MRT mrt = new MRT(rs.getString("id"), rs.getString("returnedBy"), rs.getString("receivedBy"), rs.getDate("dateOfReturned").toLocalDate());
+            mrt.setMirsId(rs.getString("MIRSID"));
+            mrt.setPurpose(rs.getString("purpose"));
+            items.add(mrt);
+        }
+        rs.close();
+        return items;
+    }
+
     public static List<MRTItem> getItems(String mrtno) throws Exception {
         List<MRTItem> items = new ArrayList();
 
-        String sql = "SELECT AcctgCode, NEACode, LocalCode, Description, mi.Price, Unit, mti.quantity " +
-                "FROM Stocks s INNER JOIN MIRSItems mi ON s.id = mi.StockID " +
-                "INNER JOIN Releasing r ON r.StockID = s.id " +
-                "INNER JOIN MRTItem mti ON mti.releasing_id = r.id " +
+        String sql = "SELECT AcctgCode, NEACode, LocalCode, Description, r.Price, Unit, mti.quantity "+
+                "FROM Stocks s INNER JOIN Releasing r ON r.StockID = s.id "+
+                "INNER JOIN MRTItem mti ON mti.releasing_id = r.id "+
+                "INNER JOIN MRT mrt ON mrt.id = mti.mrt_id "+
                 "WHERE mti.mrt_id = ?";
         PreparedStatement ps = DB.getConnection().prepareStatement(sql);
 
@@ -137,16 +182,35 @@ public class MRTDao {
                 item.setCode(rs.getString("LocalCode"));
             }
             item.setDescription(rs.getString("Description"));
-            item.setPrice(rs.getDouble("Price"));
+            item.setPrice(Utility.round(rs.getDouble("Price"),2));
             item.setQuantity(rs.getDouble("quantity"));
             item.setUnit(rs.getString("Unit"));
-            item.setAmount(item.getPrice()*item.getQuantity());
+            item.setAmount(Utility.round(item.getPrice()*item.getQuantity(),2));
             items.add(item);
         }
 
         rs.close();
 
         return items;
+    }
+
+    public static double getTotal(String mrtno) throws Exception {
+        String sql = "SELECT  SUM(r.Price * mti.quantity) as TOTAL\n" +
+                "                FROM Releasing r INNER JOIN MRTItem mti ON mti.releasing_id = r.id \n" +
+                "                WHERE mti.mrt_id = ?";
+        PreparedStatement ps = DB.getConnection().prepareStatement(sql);
+
+        ps.setString(1, mrtno);
+
+        ResultSet rs = ps.executeQuery();
+        double amount = 0;
+        while(rs.next()) {
+            amount = Utility.round(rs.getDouble("TOTAL"), 2);
+        }
+
+        rs.close();
+
+        return amount;
     }
 
     public static List<ReleasedItems> searchReleasedItems(String searchKey) throws Exception {

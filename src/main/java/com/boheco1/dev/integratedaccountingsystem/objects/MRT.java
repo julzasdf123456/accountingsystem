@@ -1,5 +1,9 @@
 package com.boheco1.dev.integratedaccountingsystem.objects;
 
+import com.boheco1.dev.integratedaccountingsystem.dao.EmployeeDAO;
+import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class MRT {
@@ -7,6 +11,9 @@ public class MRT {
     private String returnedBy;
     private String receivedBy;
     private LocalDate dateOfReturned;
+    private String mirsId;
+    private String purpose;
+    private String receivedEmployee;
 
     public String getId() {
         return id;
@@ -45,5 +52,42 @@ public class MRT {
         this.returnedBy = returnedBy;
         this.receivedBy = receivedBy;
         this.dateOfReturned = dateOfReturned;
+        this.receivedEmployee = "";
+        EmployeeInfo emp = null;
+        try {
+            emp = this.getEmployee();
+            this.receivedEmployee = emp.getEmployeeLastName()+", "+emp.getEmployeeFirstName();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public String getMirsId() {
+        return mirsId;
+    }
+
+    public void setMirsId(String mirsId) {
+        this.mirsId = mirsId;
+    }
+
+    public String getPurpose() {
+        return purpose;
+    }
+
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
+    }
+
+    public EmployeeInfo getEmployee() throws Exception {
+        return EmployeeDAO.getOne(this.receivedBy, DB.getConnection());
+    }
+
+    public String getReceivedEmployee() {
+        return receivedEmployee;
+    }
+
+    public void setReceivedEmployee(String receivedEmployee) {
+        this.receivedEmployee = receivedEmployee;
     }
 }

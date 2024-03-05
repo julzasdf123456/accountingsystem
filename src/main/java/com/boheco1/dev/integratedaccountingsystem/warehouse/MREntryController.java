@@ -61,7 +61,7 @@ public class MREntryController extends MenuControllerHandler implements Initiali
             this.initializeTable();
             this.warehouseman = EmployeeDAO.getByDesignation("Head, Warehous");
             if (this.warehouseman == null)
-                this.warehouseman = EmployeeDAO.getByDesignation("Warehouse");
+                this.warehouseman = EmployeeDAO.getByDesignation("Warehouseman");
             this.approved = EmployeeDAO.getByDesignation("General Manager");
             this.approve_tf.setText(this.approved.getFullName());
         } catch (Exception e) {
@@ -105,7 +105,6 @@ public class MREntryController extends MenuControllerHandler implements Initiali
                 MR mr = new MR(mr_no, employee.getId(), warehouseman.getId(), LocalDate.now(), Utility.MR_FILED, this.recommending.getId(), this.approved.getId(), purpose);
                 try {
                     MrDAO.add(mr, this.mrItems);
-                    AlertDialogBuilder.messgeDialog("MR Entry", "The Memorandum Receipt was successfully filed!", stackPane, AlertDialogBuilder.SUCCESS_DIALOG);
                     Stage stage = (Stage) Utility.getContentPane().getScene().getWindow();
                     FileChooser fileChooser = new FileChooser();
                     fileChooser.getExtensionFilters().addAll(
@@ -118,8 +117,9 @@ public class MREntryController extends MenuControllerHandler implements Initiali
                     }
                     this.reset();
                 } catch (Exception e) {
-                    AlertDialogBuilder.messgeDialog("System Error", "Filing of Memorandum Receipt was not successfully added due to:" + e.getMessage() + " error.", stackPane, AlertDialogBuilder.DANGER_DIALOG);
+                    Toast.makeText((Stage) contentPane.getScene().getWindow(), "Filing of Memorandum Receipt was not successfully added due to:" + e.getMessage() + " error.", 2500, 200, 200, "rgba(203, 24, 5, 1)");
                 }
+                Toast.makeText((Stage) contentPane.getScene().getWindow(), "The Memorandum Receipt was successfully filed!", 2500, 200, 200, "rgba(1, 125, 32, 1)");
                 dialog.close();
             });
         }
@@ -179,6 +179,7 @@ public class MREntryController extends MenuControllerHandler implements Initiali
                 this.recommending = EmployeeDAO.getByDesignation("Department Manager", this.employee.getDepartmentID());
                 this.recommending_tf.setText(this.recommending.getFullName());
             } catch (Exception e) {
+                Toast.makeText((Stage) contentPane.getScene().getWindow(), "No existing Department Manager for the employee!", 2500, 200, 200, "rgba(203, 24, 5, 1)");
                 e.printStackTrace();
             }
         });
