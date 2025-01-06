@@ -315,11 +315,13 @@
                                                 <Insets left="16.0" />
                                              </HBox.margin>
                                           </HBox>
+                                          <JFXTextField fx:id="InvoiceNumber" alignment="CENTER" layoutX="207.0" layoutY="51.0" maxWidth="-Infinity"  prefHeight="74.0" prefWidth="329.0" promptText="INVOICE Number" style="-fx-font-size: 25; -fx-font-weight: bold;" />
                                           <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS" />
                                           <VBox prefHeight="172.0" prefWidth="601.0">
                                              <HBox.margin>
                                                 <Insets top="8.0" />
                                              </HBox.margin>
+
                                              <children>
                                                 <HBox minHeight="25.0" prefHeight="25.0">
                                                    <children>

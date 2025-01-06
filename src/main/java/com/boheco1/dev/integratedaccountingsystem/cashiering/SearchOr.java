@@ -147,7 +147,12 @@ public class SearchOr extends MenuControllerHandler implements Initializable, Ob
         orContent.setIssuedBy(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
         orContent.setTotal(transactionHeader.getAmount());
         Utility.setOrContent(orContent);
-        ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
+
+        //for Official Receipt Printing
+        //ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
+
+        //for Invoice Printing
+        ModalBuilder.showModalFromXMLNoClose(CashierInvoice.class, "../cashiering/CashierInvoiceLayout.fxml", Utility.getStackPane());
     }
 
 

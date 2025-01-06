@@ -12,8 +12,8 @@ public class TransactionDetails {
     private LocalDate transactionDate;
     private int sequenceNumber;
     private String accountCode;
-    private double debit;
-    private double credit;
+    private Double debit;
+    private Double credit;
     private LocalDate orDate;
     private String bankID;
     private String note;
@@ -139,7 +139,11 @@ public class TransactionDetails {
     }
 
     public double getDebit() {
-        return debit;
+        if (debit != null) {
+            return debit;
+        } else {
+            return 0;
+        }
     }
 
     public void setDebit(double debit) {
@@ -147,7 +151,11 @@ public class TransactionDetails {
     }
 
     public double getCredit() {
-        return credit;
+        if (credit != null) {
+            return credit;
+        } else {
+            return 0;
+        }
     }
 
     public void setCredit(double credit) {
@@ -164,7 +172,7 @@ public class TransactionDetails {
 
     public String getAmountView(){
         double amount;
-        if(credit!=0)
+        if(credit != 0)
             amount = credit;
         else
             amount = debit;
@@ -216,10 +224,10 @@ public class TransactionDetails {
     }
 
     public String getFormattedARAmount() {
-        if(this.credit>0) {
-            return String.format("%,.2f", this.credit);
+        if(credit != null && credit > 0) {
+            return Utility.formatNumberTwoDecimal(credit);
         }else {
-            return String.format("(%,.2f)", this.debit);
+            return "(" + Utility.formatNumberTwoDecimal(debit) + ")";
         }
     }
 

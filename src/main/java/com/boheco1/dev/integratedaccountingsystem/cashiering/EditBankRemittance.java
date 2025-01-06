@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.cashiering;
 
-import com.boheco1.dev.integratedaccountingsystem.dao.BankAccountDAO;
+import
+        com.boheco1.dev.integratedaccountingsystem.dao.BankAccountDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.boheco1.dev.integratedaccountingsystem.helpers.ObjectTransaction;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
@@ -67,6 +68,7 @@ public class EditBankRemittance  extends MenuControllerHandler implements Initia
         selectedBR.setIsEdit(true);
 
         parentController.receive(selectedBR);
+
     }
 
     public void onCheckNumberEntry() {

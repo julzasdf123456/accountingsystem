@@ -4,8 +4,7 @@ import com.boheco1.dev.integratedaccountingsystem.dao.BillDAO;
 import com.boheco1.dev.integratedaccountingsystem.dao.ConsumerDAO;
 import com.boheco1.dev.integratedaccountingsystem.helpers.*;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialogLayout;
+import com.jfoenix.controls.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -21,12 +20,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXTextField;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -159,7 +157,15 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
     @FXML
     private Label billsNo_lbl;
 
+    @FXML
+   private JFXTextField InvoiceNumber;
+
+    private JFXComboBox<String> withhold_agent;
+
+
     public Connection con;
+
+    private String with_agent="NO";
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -171,15 +177,24 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             content.putString(total_payable_lbl.getText());
             clipboard.setContent(content);
             Toast.makeText((Stage) contentPane.getScene().getWindow(), "Total due amount copied to clipboard!", 1000, 200, 200, "rgba(4, 100, 5, 1)");
+
         });
 
         try {
             con = DB.getConnection(Utility.DB_BILLING);
+            InvoiceNumber.setText(generateInvoiceNumber(""+(Utility.currentInvoiceNumber-1)));
+
         } catch (SQLException e) {
+            InvoiceNumber.setText("");
             throw new RuntimeException(e);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
+
+        InputValidation.restrictNumbersOnly(InvoiceNumber);
+
+
+
 
         if (ActiveUser.getUser().can("manage-billing"))
             sidebar_vbox.setVisible(false);
@@ -376,12 +391,19 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
             if (totalPayments < totalBills){
                 AlertDialogBuilder.messgeDialog("Partial Payment Warning", "The total payment does not exceed the total payable amount! Please check the amount!",
                         Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
-            }else {
+            }
+           else if(InvoiceNumber.getText().isEmpty())
+            {
+                AlertDialogBuilder.messgeDialog("Invoice Number", "Please input Invoice Number!",
+                        Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+            }
+            else {
                 this.showConfirmation(
                         this.bills,
                         totalBills,
                         this.checks);
             }
+
         } catch (IOException e) {
             AlertDialogBuilder.messgeDialog("System Error", e.getMessage(),
                     Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
@@ -1381,6 +1403,9 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
      * @return void
      */
     public void showTIN(Bill bill, String type) throws Exception{
+
+        with_agent="NO";
+
         payment_tf.removeEventHandler(ActionEvent.ACTION, confirmEvent);
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../tellering/tellering_withholding.fxml"));
         Parent parent = fxmlLoader.load();
@@ -1390,28 +1415,71 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         dialogConfirm = new JFXDialog(Utility.getStackPane(), dialogLayout, JFXDialog.DialogTransition.BOTTOM, true);
         WithHoldingController controller = fxmlLoader.getController();
         double withholding = 0;
+
+        with_agent= BillDAO.getWithHoldAgent(bill);
+        if(with_agent.trim().equals("YES"))
+        {controller.getWithhold_Agent().getSelectionModel().selectFirst();}
+        else{controller.getWithhold_Agent().getSelectionModel().selectLast();}
+
+
         EventHandler saveEvent = evt -> {
             try{
-                double amount = Double.parseDouble(controller.getWithhold().getText());
-                String tn = controller.getTin_tf().getText();
-                if (type.equals("2306")) {
-                    bill.setCh2306(amount);
-                    bill.setForm2306(tn);
-                }else{
-                    bill.setCh2307(amount);
-                    bill.setForm2307(tn);
+
+                if(with_agent.trim().equals("YES"))
+                {
+                    double amount = Double.parseDouble(controller.getWithhold().getText());
+                    String tn = controller.getTin_tf().getText();
+                    if (type.equals("2306")) {
+                        bill.setCh2306(amount);
+                        bill.setForm2306(tn);
+                    }else{
+                        bill.setCh2307(amount);
+                        bill.setForm2307(tn);
+                    }
+                    with_agent=controller.getWithhold_Agent().getSelectionModel().getSelectedItem().toString();
+
+                    ConsumerDAO.updateTIN(bill.getConsumer(), tn);
+                    ConsumerDAO.WithHoldingAgent(bill.getConsumer(), with_agent.trim());
+                    bill.getConsumer().setTINNo(tn);
+                    bill.computeTotalAmount();
+                    this.fees_table.refresh();
+                    this.setBillInfo(bills);
+                    this.setPayables();
+                    dialogConfirm.close();
+
                 }
-                ConsumerDAO.updateTIN(bill.getConsumer(), tn);
-                bill.getConsumer().setTINNo(tn);
-                bill.computeTotalAmount();
-                this.fees_table.refresh();
-                this.setBillInfo(bills);
-                this.setPayables();
-                dialogConfirm.close();
+                else {
+                    AlertDialogBuilder.messgeDialog("System Error", "Sorry, this consumer is NOT a Withholding Agent, this withholding amount cannot be claim. " ,
+                            Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
+
+                    double amount = 0;
+                    String tn = controller.getTin_tf().getText();
+                    if (type.equals("2306")) {
+                        bill.setCh2306(amount);
+                        bill.setForm2306(tn);
+                    }else{
+                        bill.setCh2307(amount);
+                        bill.setForm2307(tn);
+                    }
+                    with_agent=controller.getWithhold_Agent().getSelectionModel().getSelectedItem().toString();
+
+                    ConsumerDAO.WithHoldingAgent(bill.getConsumer(), with_agent.trim());
+                    bill.getConsumer().setTINNo(tn);
+                    bill.computeTotalAmount();
+                    this.fees_table.refresh();
+                    this.setBillInfo(bills);
+                    this.setPayables();
+
+                }
+
+
             }catch (Exception e){
                 e.printStackTrace();
             }
         };
+
+
+        controller.getWithhold_Agent().setOnAction(actionEvent -> { with_agent=controller.getWithhold_Agent().getSelectionModel().getSelectedItem().toString();});
 
         if (type.equals("2306")) {
             withholding = BillDAO.getForm2306(bill);
@@ -1437,7 +1505,11 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                         bill.setCh2307(amount);
                         bill.setForm2307(tn);
                     }
+
+                    with_agent=controller.getWithhold_Agent().getSelectionModel().getSelectedItem().toString();
+
                     ConsumerDAO.updateTIN(bill.getConsumer(), tn);
+                    ConsumerDAO.WithHoldingAgent(bill.getConsumer(), with_agent.trim());
                     bill.getConsumer().setTINNo(tn);
                     bill.computeTotalAmount();
                     this.fees_table.refresh();
@@ -1464,7 +1536,10 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
                         bill.setCh2307(amount);
                         bill.setForm2307(tn);
                     }
+                    with_agent=controller.getWithhold_Agent().getSelectionModel().getSelectedItem().toString();
+
                     ConsumerDAO.updateTIN(bill.getConsumer(), tn);
+                   ConsumerDAO.WithHoldingAgent(bill.getConsumer(), with_agent.trim());
                     bill.getConsumer().setTINNo(tn);
                     bill.computeTotalAmount();
                     this.fees_table.refresh();
@@ -1610,12 +1685,13 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
                 MenuItem item2306 = new MenuItem("2307 5%");
                 item2306.setOnAction(actionEvent -> {
-                    if (row.getItem().getConsumerType().equals("RM")) {
+                   /* if (row.getItem().getConsumerType().equals("RM")) {
                         this.payment_tf.requestFocus();
                         return;
-                    }
+                    }*/
                     try {
                         this.showTIN(row.getItem(), "2306");
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -1623,12 +1699,13 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
                 MenuItem item2307 = new MenuItem("2307 2%");
                 item2307.setOnAction(event -> {
-                    if (row.getItem().getConsumerType().equals("RM")) {
+                    /*if (row.getItem().getConsumerType().equals("RM")) {
                         this.payment_tf.requestFocus();
                         return;
-                    }
+                    }*/
                     try {
                         this.showTIN(row.getItem(), "2307");
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -1692,10 +1769,20 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         ExecutorService exec = Executors.newSingleThreadExecutor();
         try {
             List<Bill> updated = Utility.processor(bills, cash, checks, ActiveUser.getUser().getUserName());
-            BillDAO.addPaidBill(updated, change, deposit, account);
-            for (Bill b : updated) {
+            BillDAO.addPaidBill(updated, change, deposit, account,InvoiceNumber.getText());
 
-                PrintOEBR print = new PrintOEBR((PaidBill) b);
+            InvoiceNumber.setText(generateInvoiceNumber(""+(Utility.currentInvoiceNumber-1)));
+
+            PrintInvoice print = new PrintInvoice(updated);
+            print.print();
+
+
+            //this code is for printing of OEBR
+          /*  for (Bill b : updated) {
+
+                //PrintOEBR print = new PrintOEBR((PaidBill) b);
+                //print.print();
+
 
                 print.setOnFailed(e -> {
                     AlertDialogBuilder.messgeDialog("System Error", "Print error due to: " + print.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
@@ -1711,7 +1798,8 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
 
                 Thread t = new Thread(print);
                 exec.submit(t);
-            }
+
+            }*/
             this.reset();
             dialog.close();
         } catch (SQLException ex) {
@@ -1723,4 +1811,48 @@ public class PowerBillsPaymentController extends MenuControllerHandler implement
         }
         this.progressBar.setVisible(false);
     }
+
+    private static String generateInvoiceNumber(String invoice) throws SQLException
+    {
+        int ctr;
+        String curcode = "000001";
+        try{
+            curcode=invoice;
+
+            ctr= Integer.parseInt(curcode)+1;
+            if(ctr>=1 && ctr<=9)
+            {
+                curcode ="00000"+ctr;
+
+            }
+            else if(ctr>=10 && ctr<=99)
+            {
+                curcode ="0000"+ctr;
+
+            }
+            else if(ctr>=100 && ctr<=999)
+            {
+                curcode ="000"+ctr;
+            }
+            else if(ctr>=1000 && ctr<=9999)
+            {
+                curcode ="00"+ctr;
+            }
+            else if(ctr>=10000 && ctr<=99999)
+            {
+                curcode ="0"+ctr;
+            }
+
+            else{
+                curcode =""+ctr;
+            }
+
+        }
+        catch(Exception e)
+        {
+        }
+        return curcode;
+    }
+
+
 }

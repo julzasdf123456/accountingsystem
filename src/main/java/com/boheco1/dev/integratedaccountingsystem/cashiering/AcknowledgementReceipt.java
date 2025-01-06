@@ -84,7 +84,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
     private ObservableList<TransactionDetails> transactionDetails;
 
-    private float total;
+    private Double total;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -99,7 +99,7 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
                 orNumber.setText(nextARNumber+"");
             }
 
-            accountDescription.setItems(FXCollections.observableList(ParticularsAccountDAO.getByType("AR")));
+            accountDescription.setItems(FXCollections.observableList(ParticularsAccountDAO.getByType2("AR")));
             transactionDetails = FXCollections.observableList(new ArrayList<>());
 
             //set initial date to server date
@@ -170,13 +170,13 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
     }
 
     private void recomputeTotal() {
-        total = 0;
+        total = 0.0;
         for(TransactionDetails td: transactionDetails) {
             total += td.getCredit();
             total -= td.getDebit();
         }
-        totalLabel.setText(String.format("₱ %,.2f", total));
 
+        totalLabel.setText(Utility.formatNumberTwoDecimal(total));
     }
 
     private void resetItemsEntry() {
@@ -353,6 +353,9 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             }
 
             double amt = Double.parseDouble(entry);
+            if (amt < 0) {
+                amt = Math.abs(amt);
+            }
             amountInWords.setText(Utility.doubleAmountToWords(amt));
         }catch(IllegalArgumentException ex1) {
         }catch(Exception ex) {
@@ -379,9 +382,9 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
 
             double amt = Double.parseDouble(amount.getText());
             td.setAccountCode(pa.getAccountCode());
-            td.setParticulars(pa.getParticulars());
+            td.setParticulars(pa.getParticulars().split("\\*")[1].trim());
 
-            if(amt>=0) {
+            if(amt >= 0) {
                 td.setCredit(amt);
             }else {
                 td.setDebit(Math.abs(amt));
@@ -699,6 +702,4 @@ public class AcknowledgementReceipt extends MenuControllerHandler implements Ini
             return null;
         }
     }
-
-
 }

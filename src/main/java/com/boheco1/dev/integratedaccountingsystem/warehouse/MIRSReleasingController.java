@@ -482,7 +482,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
 
     private boolean isTransformer(MIRSItem mirsItem) {
         String description = mirsItem.getParticulars().toLowerCase();
-        return description.contains("current") && description.contains("transformer");
+        return (description.contains("current") && description.contains("transformer")) || (description.contains("pole type") && description.contains("transformer"))  ;
     }
     @FXML
     void add(ActionEvent event) throws Exception {
@@ -652,7 +652,7 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                     List<Releasing> readyForRelease = new ArrayList<>();
                     List<ItemizedMirsItem> itemizedMirsItems = new ArrayList<>();
 
-                    /*for (MIRSItem mirsItem : forReleasing){
+                   /* for (MIRSItem mirsItem : forReleasing){
                         Stock stock = StockDAO.get(mirsItem.getStockID());
                         if(stock.isIndividualized()){
                             boolean found = false;
@@ -670,6 +670,8 @@ public class MIRSReleasingController extends MenuControllerHandler implements In
                             }
                         }
                     }*/
+
+
 
                     for (MIRSItem mirsItem : forReleasing){
                         Releasing releasing = new Releasing();

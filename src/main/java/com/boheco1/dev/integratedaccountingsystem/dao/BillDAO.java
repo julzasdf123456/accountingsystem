@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.dao;
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.*;
+import com.boheco1.dev.integratedaccountingsystem.tellering.PowerBillsPaymentController;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -14,19 +15,21 @@ import java.util.List;
 public class BillDAO {
     /**
      * Insert as PaidDetails
-     * @param bills List of bills
-     * @param change change to deposit
+     *
+     * @param bills   List of bills
+     * @param change  change to deposit
      * @param deposit deposit change
      * @param account paidbill account to deposit
      * @return void
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static void addPaidBill(List<Bill> bills, double change, boolean deposit, PaidBill account) throws Exception{
+    public static void addPaidBill(List<Bill> bills, double change, boolean deposit, PaidBill account,String invoicenumber) throws Exception {
         Connection conn = DB.getConnection(Utility.DB_BILLING);
         conn.setAutoCommit(false);
+        String invoice=invoicenumber;
 
-        String sql = "INSERT INTO PaidBills (DCRNumber, " +
-                "PostingDate, "+
+       // String sql = "INSERT INTO PaidBills (DCRNumber, " +
+        String sql = "INSERT INTO PaidBills (PostingDate, " +
                 "AccountNumber, " +
                 "BillNumber, " +
                 "ServicePeriodEnd, " +
@@ -36,7 +39,7 @@ public class BillDAO {
                 "Others, " +
                 "NetAmount, " +
                 "PaymentType, " +
-                "PostingSequence, "+
+                "PostingSequence, " +
                 "Teller, " +
                 "PromptPayment, " +
                 "Surcharge, " +
@@ -49,8 +52,9 @@ public class BillDAO {
                 "Amount2307, " +
                 "DepositAmount, " +
                 "CashAmount, " +
-                "CheckAmount) " +
-                " VALUES (' ', SYSDATETIME(), ?, ?, ?, ?, ?, ?, ?, ROUND(?, 2), ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2));";
+                "CheckAmount,DCRNumber) " +
+               // " VALUES (' ', SYSDATETIME(), ?, ?, ?, ?, ?, ?, ?, ROUND(?, 2), ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ? );";
+                " VALUES ( SYSDATETIME(), ?, ?, ?, ?, ?, ?, ?, ROUND(?, 2), ?, ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ?, ?, ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ROUND(?, 2), ? );";
 
         String sql_check = "INSERT INTO CheckPayment (AccountNumber, ServicePeriodEnd, Bank, RefNo, Amount) VALUES(?, ?, ?, ?, ROUND(?, 2))";
         String sql_md = "UPDATE MDRefund SET Amount=ROUND(Amount-?, 2) WHERE AccountNumber=?";
@@ -61,22 +65,22 @@ public class BillDAO {
             id = account.getConsumer().getAccountID();
         HashMap<String, Double> deposits = verifyDeposit(id);
 
-        if (deposits == null){
+        if (deposits == null) {
             sql_deposit += "QCLoanAmount, QCMonths) VALUES (?, ?, ?)";
-        }else{
+        } else {
             depUpdate = true;
             sql_deposit = "UPDATE OtherCharges SET ";
             if (deposits.get("QCLoanAmount") != 0) {
                 if (deposits.get("QCAmount") != 0) {
                     if (deposits.get("EPAmount") != 0) {
                         sql_deposit += "PCAmount = ?, PCMonths = ? ";
-                    }else{
+                    } else {
                         sql_deposit += "EPAmount = ?, EPMonths = ? ";
                     }
-                }else{
+                } else {
                     sql_deposit += "QCAmount = ?, QCMonths = ? ";
                 }
-            }else{
+            } else {
                 sql_deposit += "QCLoanAmount = ?, QCMonths = ? ";
             }
             sql_deposit += "WHERE AccountNumber = ?";
@@ -85,6 +89,7 @@ public class BillDAO {
         PreparedStatement ps_check = null;
         PreparedStatement ps_md = null;
         PreparedStatement ps_dep = null;
+
 
         int postingSequence = 1;
         int count = 1;
@@ -122,6 +127,8 @@ public class BillDAO {
 
                 ps.setDouble(22, paid.getCashAmount());
                 ps.setDouble(23, paid.getCheckAmount());
+                ps.setString(24, invoice);
+
 
                 ps.executeUpdate();
 
@@ -144,13 +151,13 @@ public class BillDAO {
                     ps_check.executeUpdate();
                 }
 
-                if (deposit && count == 1){
+                if (deposit && count == 1) {
                     ps_dep = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql_deposit);
                     if (!depUpdate) {
                         ps_dep.setString(1, account.getConsumer().getAccountID());
                         ps_dep.setDouble(2, -change);
                         ps_dep.setInt(3, 1);
-                    }else{
+                    } else {
                         ps_dep.setDouble(1, -change);
                         ps_dep.setInt(2, 1);
                         ps_dep.setString(3, account.getConsumer().getAccountID());
@@ -161,6 +168,8 @@ public class BillDAO {
                 //Update KatasBalance in KatasData?
                 postingSequence += 1;
                 count += 1;
+                invoice= generateInvoiceNumber(invoice);
+
             } catch (SQLException ex) {
                 ex.printStackTrace();
                 conn.rollback();
@@ -174,12 +183,18 @@ public class BillDAO {
         if (ps_md != null) ps_md.close();
         if (ps_dep != null) ps_dep.close();
         conn.setAutoCommit(true);
+
+
+        Utility.currentInvoiceNumber=Integer.parseInt(invoice);
+
+       // PowerBillsPaymentController.refInvoiceNumber.setText(invoice);
     }
 
     /**
      * Retrieves bills of customer based on Account Number (on Billing database)
+     *
      * @param consumerInfo The consumer account number
-     * @param paid The bill status
+     * @param paid         The bill status
      * @return A list of Bill
      * @throws Exception obligatory from DB.getConnection()
      */
@@ -209,7 +224,7 @@ public class BillDAO {
         ResultSet rs = ps.executeQuery();
 
         List<Bill> bills = new ArrayList<>();
-        while(rs.next()) {
+        while (rs.next()) {
             String billNo = rs.getString("BillNumber");
 
             Bill bill = new PaidBill(
@@ -245,12 +260,12 @@ public class BillDAO {
             bill.setDAAVat(rs.getDouble("DAA_GRAM"));
             bill.setVat(rs.getDouble("VATandTaxes"));
             bill.setDaysDelayed(rs.getInt("daysDelayed"));
-            bill.setAddCharges(bill.getPr()+bill.getOtherCharges());
+            bill.setAddCharges(bill.getPr() + bill.getOtherCharges());
             //Disable surcharge computation when set in the Bills table withPenalty value of 1
             if (bill.isWithPenalty()) {
                 bill.setSurCharge(Utility.round(bill.computeSurCharge(), 2));
                 bill.setSurChargeTax(Utility.round(bill.getSurCharge() * 0.12, 2));
-            }else{
+            } else {
                 bill.setSurCharge(0);
                 bill.setSurChargeTax(0);
             }
@@ -258,15 +273,15 @@ public class BillDAO {
             if ((bill.getConsumerType().equals("B")
                     || bill.getConsumerType().equals("E")
                     || bill.getConsumerType().equals("I")
-                    || ( (bill.getConsumerType().equals("CL") || bill.getConsumerType().equals("CS")) && bill.getPowerKWH() >= 1000) )
+                    || ((bill.getConsumerType().equals("CL") || bill.getConsumerType().equals("CS")) && bill.getPowerKWH() >= 1000))
                     && bill.getDaysDelayed() <= 0) {
                 double ppd = 0, ppd_rate = 0.01;
                 //3% PPD for BAPA or ECA
-                if (bill.getConsumerType().equals("B")|| bill.getConsumerType().equals("E"))
+                if (bill.getConsumerType().equals("B") || bill.getConsumerType().equals("E"))
                     ppd_rate = 0.03;
                 //Set the discount
                 ppd = rs.getDouble("ppd");
-                bill.setDiscount(ppd*ppd_rate);
+                bill.setDiscount(ppd * ppd_rate);
             }
             bill.computeTotalAmount();
             //Set the mdrefund
@@ -327,7 +342,7 @@ public class BillDAO {
         ResultSet rs = ps.executeQuery();
 
         List<Bill> bills = new ArrayList<>();
-        while(rs.next()) {
+        while (rs.next()) {
             String billNo = rs.getString("BillNumber");
 
             Bill bill = new PaidBill(
@@ -363,12 +378,12 @@ public class BillDAO {
             bill.setDAAVat(rs.getDouble("DAA_GRAM"));
             bill.setVat(rs.getDouble("VATandTaxes"));
             bill.setDaysDelayed(rs.getInt("daysDelayed"));
-            bill.setAddCharges(bill.getPr()+bill.getOtherCharges());
+            bill.setAddCharges(bill.getPr() + bill.getOtherCharges());
             //Disable surcharge computation when set in the Bills table withPenalty value of 1
             if (bill.isWithPenalty()) {
                 bill.setSurCharge(Utility.round(bill.computeSurCharge(), 2));
                 bill.setSurChargeTax(Utility.round(bill.getSurCharge() * 0.12, 2));
-            }else{
+            } else {
                 bill.setSurCharge(0);
                 bill.setSurChargeTax(0);
             }
@@ -376,15 +391,15 @@ public class BillDAO {
             if ((bill.getConsumerType().equals("B")
                     || bill.getConsumerType().equals("E")
                     || bill.getConsumerType().equals("I")
-                    || ( (bill.getConsumerType().equals("CL") || bill.getConsumerType().equals("CS")) && bill.getPowerKWH() >= 1000) )
+                    || ((bill.getConsumerType().equals("CL") || bill.getConsumerType().equals("CS")) && bill.getPowerKWH() >= 1000))
                     && bill.getDaysDelayed() <= 0) {
                 double ppd = 0, ppd_rate = 0.01;
                 //3% PPD for BAPA or ECA
-                if (bill.getConsumerType().equals("B")|| bill.getConsumerType().equals("E"))
+                if (bill.getConsumerType().equals("B") || bill.getConsumerType().equals("E"))
                     ppd_rate = 0.03;
                 //Set the discount
                 ppd = rs.getDouble("ppd");
-                bill.setDiscount(ppd*ppd_rate);
+                bill.setDiscount(ppd * ppd_rate);
             }
             bill.computeTotalAmount();
             //Set the mdrefund
@@ -397,8 +412,10 @@ public class BillDAO {
 
         return bills;
     }
+
     /**
      * Retrieves all bills of customer based on Account Number (on Billing database)
+     *
      * @param consumerInfo The consumer account number
      * @return A list of Bill (paid or unpaid)
      * @throws Exception obligatory from DB.getConnection()
@@ -415,7 +432,7 @@ public class BillDAO {
 
         ps.setString(1, consumerInfo.getAccountID());
         ResultSet rs = ps.executeQuery();
-        while(rs.next()) {
+        while (rs.next()) {
             BillStanding b = new BillStanding();
             b.setConsumer(consumerInfo);
             b.setServicePeriodEnd(rs.getDate("ServicePeriodEnd").toLocalDate());
@@ -434,8 +451,10 @@ public class BillDAO {
         ps.close();
         return bills;
     }
+
     /**
      * Retrieves the discounted amount of a bill
+     *
      * @param bill The current bill
      * @param rate The rate of discount (3% for BAPA/ECA, 1% for the rest)
      * @return amount The discounted amount
@@ -453,18 +472,19 @@ public class BillDAO {
 
         double amount = 0;
 
-        while(rs.next()) {
+        while (rs.next()) {
             amount = rs.getDouble("NetAmountLessCharges");
         }
 
         rs.close();
         ps.close();
 
-        return amount*rate;
+        return amount * rate;
     }
 
     /**
      * Retrieves the 5% amount of a bill
+     *
      * @param bill The current bill
      * @return amount The amount
      * @throws Exception obligatory from DB.getConnection()
@@ -481,7 +501,7 @@ public class BillDAO {
 
         double amount = 0;
 
-        while(rs.next()) {
+        while (rs.next()) {
             amount = rs.getDouble("Form2306");
         }
 
@@ -491,8 +511,31 @@ public class BillDAO {
         return amount;
     }
 
+    public static String getWithHoldAgent(Bill bill) throws Exception {
+        String sql = "Select isnull(Reserve1,'NO') as Reserve1  from AccountMaster where AccountNumber=?";
+
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
+
+        ps.setString(1, bill.getConsumer().getAccountID());
+
+
+        ResultSet rs = ps.executeQuery();
+
+        String val="NO";
+
+        while (rs.next()) {
+            val = rs.getString("Reserve1");
+        }
+
+        rs.close();
+        ps.close();
+
+        return val;
+    }
+
     /**
      * Retrieves the 2% amount of a bill
+     *
      * @param bill The current bill
      * @return amount The amount
      * @throws Exception obligatory from DB.getConnection()
@@ -509,7 +552,7 @@ public class BillDAO {
 
         double amount = 0;
 
-        while(rs.next()) {
+        while (rs.next()) {
             amount = rs.getDouble("Form2307");
         }
 
@@ -521,6 +564,7 @@ public class BillDAO {
 
     /**
      * Retrieves the remaining MDRefund of the bill
+     *
      * @param bill The current bill
      * @return amount The amount
      * @throws Exception obligatory from DB.getConnection()
@@ -538,7 +582,7 @@ public class BillDAO {
 
         double refund = 0;
 
-        while(rs.next()) {
+        while (rs.next()) {
             refund = rs.getDouble("remaining") - rs.getDouble("total");
         }
 
@@ -547,11 +591,13 @@ public class BillDAO {
 
         return refund;
     }
+
     /**
      * Retrieves paid bills from a specified date
-     * @param year The posting year
+     *
+     * @param year  The posting year
      * @param month The posting month
-     * @param day The posting day
+     * @param day   The posting day
      * @return list The list of paid bills
      * @throws Exception obligatory from DB.getConnection()
      */
@@ -559,14 +605,14 @@ public class BillDAO {
 
         String sql = "SELECT pbx.BillNumber, pbx.AccountNumber, pbx.ConsumerName, pbx.TotalAmount, pbx.ConsumerType, pbx.Period, pbx.GenerationVAT, pbx.TransmissionVAT, b.DueDate, pbx.Teller, " +
                 "(SELECT ConsumerAddress FROM AccountMaster am WHERE am.AccountNumber = pbx.AccountNumber) AS ConsumerAddress, " +
-                "pbx.OthersVAT, pbx.DistributionVAT, pbx.SLVAT, pbx.Item3, pbx.Item2, pbx.SLAdjustment, pbx.PromptPayment, pbx.Surcharge, pbx.NetAmount, pbx.Teller, pbx.ORNumber, pbx.DCRNumber, pbx.ServicePeriodEnd, " +
+                "pbx.OthersVAT, pbx.DistributionVAT, pbx.SLVAT, pbx.Item3, pbx.Item2, pbx.SLAdjustment, pbx.PromptPayment, pbx.Surcharge, pbx.NetAmount, pbx.Teller, Isnull(pbx.ORNumber,'') as ORNumber, pbx.DCRNumber, pbx.ServicePeriodEnd, " +
                 "pbx.PostingDate, pbx.PostingSequence, pbx.CurrentBills, pbx.Within30Days, pbx.Over30Days, pbx.PR, pbx.Others, pbx.Powerkwh, pbx.KatasAMount, pbx.OtherDeduction, " +
                 "pbx.MDRefund, pbx.NetAmountLessMDRefund, pbx.SeniorCitizenDiscount, pbx.GroupTag, pbx.Amount2306, pbx.Amount2307, b.FBHCAmt AS FranchiseTax, x.Item16 AS BusinessTax, " +
                 "x.Item17 AS RealPropertyTax, b.DAA_VAT, b.ACRM_VAT, b.Item1 as GenVatFeb21, FORMAT(pbx.PostingDate,'hh:mm') as PostingTime, ISNULL(CashAmount, pbx.NetAmount) AS CashAmount, ISNULL(CheckAmount, 0) AS CheckAmount, ISNULL(DepositAmount, 0) AS DepositAmount, ISNULL(withPenalty, 1) AS withPenalty " +
                 "FROM PaidBillsWithRoute pbx INNER JOIN Bills b ON pbx.AccountNumber=b.AccountNumber AND pbx.ServicePeriodEnd=b.ServicePeriodEnd " +
                 "INNER JOIN PaidBills p ON p.AccountNumber=b.AccountNumber AND p.ServicePeriodEnd=b.ServicePeriodEnd " +
                 "INNER JOIN BillsExtension x ON  pbx.AccountNumber=x.AccountNumber AND pbx.ServicePeriodEnd=x.ServicePeriodEnd " +
-                "WHERE pbx.PostingDate>='"+year+"-"+month+"-"+day+" 00:00:00' AND pbx.PostingDate<='"+year+"-"+month+"-"+day+" 23:59:59'";
+                "WHERE pbx.PostingDate>='" + year + "-" + month + "-" + day + " 00:00:00' AND pbx.PostingDate<='" + year + "-" + month + "-" + day + " 23:59:59'";
 
         if (teller != null)
             sql += " AND pbx.Teller = ? ";
@@ -582,13 +628,13 @@ public class BillDAO {
 
         List<Bill> bills = new ArrayList<>();
 
-        while(rs.next()) {
+        while (rs.next()) {
             String accountNo = rs.getString("AccountNumber");
             ConsumerInfo consumerInfo = new ConsumerInfo(
                     accountNo,
                     rs.getString("ConsumerName"),
                     rs.getString("ConsumerAddress"),
-                   "",
+                    "",
                     "",
                     ""
             );
@@ -619,6 +665,8 @@ public class BillDAO {
             bill.setCashAmount(rs.getDouble("CashAmount"));
             bill.setCheckAmount(rs.getDouble("CheckAmount"));
             bill.setDeposit(rs.getDouble("DepositAmount"));
+            bill.setInvoiceNumber(rs.getString("ORNumber"));
+
             Bill b = bill;
             b.setPeriod(rs.getString("Period"));
             b.setPowerKWH(rs.getDouble("Powerkwh"));
@@ -635,11 +683,11 @@ public class BillDAO {
             b.setItem3(rs.getDouble("Item3"));
             b.setItem16(rs.getDouble("BusinessTax"));
             b.setItem17(rs.getDouble("RealPropertyTax"));
-            b.setArGen(b.getGenerationVat()+b.getSystemLossVat()+b.getDAAVat()+b.getAcrmVat()+b.getGenVatFeb21());
+            b.setArGen(b.getGenerationVat() + b.getSystemLossVat() + b.getDAAVat() + b.getAcrmVat() + b.getGenVatFeb21());
             b.setArTran(b.getTransmissionVat());
             b.setMdRefund(rs.getDouble("MDRefund"));
             b.setSurCharge(rs.getDouble("Surcharge"));
-            if (b.getSurCharge() > 0) b.setSurChargeTax((b.getSurCharge()*0.12));
+            if (b.getSurCharge() > 0) b.setSurChargeTax((b.getSurCharge() * 0.12));
             b.setSlAdjustment(rs.getDouble("SLAdjustment"));
             b.setServicePeriodEnd(rs.getDate("ServicePeriodEnd").toLocalDate());
             bills.add(bill);
@@ -653,75 +701,76 @@ public class BillDAO {
 
     /**
      * Retrieves DCR Breakdown from a specified date
-     * @param year The posting year
-     * @param month The posting month
-     * @param day The posting day
+     *
+     * @param year   The posting year
+     * @param month  The posting month
+     * @param day    The posting day
      * @param teller The posting day
      * @return list The list of dcr breakdown
      * @throws Exception obligatory from DB.getConnection()
      */
-    public static HashMap<String, List<ItemSummary>> getDCRBreakDown(int year, int month, int day, String teller) throws Exception{
-        String sql = "SELECT "+
-        "( "+
-        "        (SUM(ISNULL(p.CurrentBills,0)) + SUM(ISNULL(p.Within30Days,0)) + SUM(ISNULL(p.Over30Days,0))) "+
-        "        - (SUM(IIF(p.ConsumerType = 'R', ISNULL(p.surcharge*0.12,0), 0))) "+
-        "        - (SUM(ISNULL(p.pr,0)) + SUM(ISNULL(p.others,0))) "+
-        "        - SUM(ISNULL(p.surcharge,0)) "+
-        "        - SUM(ISNULL(p.Item2, 0)) "+
-        "        + (SUM(ISNULL(p.SLAdjustment,0)) + SUM(ISNULL(p.PromptPayment,0))) "+
-        "        + SUM(ISNULL(p.otherdeduction, 0)) "+
-        "        - SUM(ISNULL(p.SeniorCitizenDiscount,0)) "+
-        "        + SUM(IIF(p.ConsumerType = 'E', ISNULL(p.others,0), 0)) "+
-        "        + SUM(IIF(p.ConsumerType = 'B', ISNULL(p.others,0), 0)) "+
-        "        + SUM(ISNULL(p.Amount2306, 0)) "+
-        "        + SUM(ISNULL(p.Amount2307, 0)) "+
-        "        + SUM(ISNULL(b.FBHCAmt, 0)) "+
-        "        + SUM(ISNULL(x.Item16, 0)) "+
-        "        + SUM(ISNULL(x.Item17, 0))  "+
-        "	) AS Energy, "+
-        "SUM(ISNULL(p.pr,0)) AS TransformerRental, "+
-        "SUM(ISNULL(p.others,0)) - SUM(IIF(p.ConsumerType = 'E', ISNULL(p.others,0), 0)) - SUM(IIF(p.ConsumerType = 'B', ISNULL(p.others,0), 0)) AS Others, "+
-        "SUM(ISNULL(p.PromptPayment,0)) AS PPD, "+
-        "SUM(ISNULL(p.surcharge,0)) AS Surcharge, "+
-        "(SUM(ISNULL(p.Item2, 0)) "+
-        "        + (SUM(IIF(p.ConsumerType = 'R', ISNULL(p.surcharge*0.12,0), 0))) "+
-        "        - SUM(ISNULL(b.FBHCAmt, 0)) "+
-        "        - SUM(ISNULL(x.Item17, 0)) "+
-        "        - SUM(ISNULL(x.Item16, 0)) "+
-        "        - SUM(IIF(p.Period >'201502', (ISNULL(p.TransmissionVAT, 0)), 0)) "+
-        "        - "+
-        "        ( "+
-        "                SUM(IIF(p.Period >'201502', (ISNULL(p.GenerationVAT,0)), 0)) "+
-        "                        + SUM(IIF(p.Period >'201503', (ISNULL(p.SLVAT,0)), 0)) "+
-        "                        + SUM(IIF(p.Period >'201503', (ISNULL(b.DAA_VAT,0)), 0)) "+
-        "                        + SUM(IIF(p.Period >'201503', (ISNULL(b.ACRM_VAT,0)), 0)) "+
-        "                        + SUM(IIF(p.Period >'202111', (ISNULL(b.Item1,0)), 0)) "+
-        "        ) "+
-        ") AS Evat, "+
+    public static HashMap<String, List<ItemSummary>> getDCRBreakDown(int year, int month, int day, String teller) throws Exception {
+        String sql = "SELECT " +
+                "( " +
+                "        (SUM(ISNULL(p.CurrentBills,0)) + SUM(ISNULL(p.Within30Days,0)) + SUM(ISNULL(p.Over30Days,0))) " +
+                "        - (SUM(IIF(p.ConsumerType = 'R', ISNULL(p.surcharge*0.12,0), 0))) " +
+                "        - (SUM(ISNULL(p.pr,0)) + SUM(ISNULL(p.others,0))) " +
+                "        - SUM(ISNULL(p.surcharge,0)) " +
+                "        - SUM(ISNULL(p.Item2, 0)) " +
+                "        + (SUM(ISNULL(p.SLAdjustment,0)) + SUM(ISNULL(p.PromptPayment,0))) " +
+                "        + SUM(ISNULL(p.otherdeduction, 0)) " +
+                "        - SUM(ISNULL(p.SeniorCitizenDiscount,0)) " +
+                "        + SUM(IIF(p.ConsumerType = 'E', ISNULL(p.others,0), 0)) " +
+                "        + SUM(IIF(p.ConsumerType = 'B', ISNULL(p.others,0), 0)) " +
+                "        + SUM(ISNULL(p.Amount2306, 0)) " +
+                "        + SUM(ISNULL(p.Amount2307, 0)) " +
+                "        + SUM(ISNULL(b.FBHCAmt, 0)) " +
+                "        + SUM(ISNULL(x.Item16, 0)) " +
+                "        + SUM(ISNULL(x.Item17, 0))  " +
+                "	) AS Energy, " +
+                "SUM(ISNULL(p.pr,0)) AS TransformerRental, " +
+                "SUM(ISNULL(p.others,0)) - SUM(IIF(p.ConsumerType = 'E', ISNULL(p.others,0), 0)) - SUM(IIF(p.ConsumerType = 'B', ISNULL(p.others,0), 0)) AS Others, " +
+                "SUM(ISNULL(p.PromptPayment,0)) AS PPD, " +
+                "SUM(ISNULL(p.surcharge,0)) AS Surcharge, " +
+                "(SUM(ISNULL(p.Item2, 0)) " +
+                "        + (SUM(IIF(p.ConsumerType = 'R', ISNULL(p.surcharge*0.12,0), 0))) " +
+                "        - SUM(ISNULL(b.FBHCAmt, 0)) " +
+                "        - SUM(ISNULL(x.Item17, 0)) " +
+                "        - SUM(ISNULL(x.Item16, 0)) " +
+                "        - SUM(IIF(p.Period >'201502', (ISNULL(p.TransmissionVAT, 0)), 0)) " +
+                "        - " +
+                "        ( " +
+                "                SUM(IIF(p.Period >'201502', (ISNULL(p.GenerationVAT,0)), 0)) " +
+                "                        + SUM(IIF(p.Period >'201503', (ISNULL(p.SLVAT,0)), 0)) " +
+                "                        + SUM(IIF(p.Period >'201503', (ISNULL(b.DAA_VAT,0)), 0)) " +
+                "                        + SUM(IIF(p.Period >'201503', (ISNULL(b.ACRM_VAT,0)), 0)) " +
+                "                        + SUM(IIF(p.Period >'202111', (ISNULL(b.Item1,0)), 0)) " +
+                "        ) " +
+                ") AS Evat, " +
 
-        "SUM(ISNULL(p.SLAdjustment,0)) AS SLAdj, "+
-        "SUM(ISNULL(p.otherdeduction,0)) AS OtherDeduction, "+
-        "SUM(ISNULL(p.Amount2306, 0)) AS Amount2306, "+
-        "SUM(ISNULL(p.Amount2307, 0)) AS Amount2307, "+
-        "SUM(ISNULL(p.MDRefund, 0)) AS MDRefund, "+
-        "SUM(ISNULL(p.PowerKWH, 0)) AS PowerKWH, "+
-        "SUM(ISNULL(p.NetAmount,0)) AS AmountPaid, "+
-        "SUM(ISNULL(pb.cashAmount, p.NetAmount)) AS CashAmount, "+
-        "SUM(ISNULL(pb.checkAmount, 0)) AS CheckAmount, "+
-        "SUM(ISNULL(p.SeniorCitizenDiscount,0)) AS SeniorCitizenDiscount, "+
-        "SUM(ISNULL(b.NetAmount,0)) AS AmountDue, "+
-        "SUM(IIF(p.Period >'201502', (ISNULL(p.TransmissionVAT, 0)), 0)) AS ARVATTrans, "+
-        "(SUM(IIF(p.Period >'201502', (ISNULL(p.GenerationVAT,0)), 0)) "+
-        "        + SUM(IIF(p.Period >'201503', (ISNULL(p.SLVAT,0)), 0)) "+
-        "        + SUM(IIF(p.Period >'201503', (ISNULL(b.DAA_VAT,0)), 0)) "+
-        "        + SUM(IIF(p.Period >'201503', (ISNULL(b.ACRM_VAT,0)), 0)) "+
-        "        + SUM(IIF(p.Period >'202111', (ISNULL(b.Item1,0)), 0))) AS ARVATGen, "+
-        "SUM(ISNULL(p.KatasAMount, 0)) AS KatasNgVAT "+
-        "FROM Bills b "+
-        "INNER JOIN BillsExtension x ON b.AccountNumber=x.AccountNumber AND b.ServicePeriodEnd=x.ServicePeriodEnd "+
-        "INNER JOIN PaidBillsWithRoute p ON b.AccountNumber=p.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd "+
-        "INNER JOIN PaidBills pb ON b.AccountNumber=pb.AccountNumber AND b.ServicePeriodEnd=pb.ServicePeriodEnd "+
-        "WHERE p.PostingDate >= '"+year+"-"+month+"-"+day+" 00:00:00' AND p.PostingDate <= '"+year+"-"+month+"-"+day+" 23:59:59'";
+                "SUM(ISNULL(p.SLAdjustment,0)) AS SLAdj, " +
+                "SUM(ISNULL(p.otherdeduction,0)) AS OtherDeduction, " +
+                "SUM(ISNULL(p.Amount2306, 0)) AS Amount2306, " +
+                "SUM(ISNULL(p.Amount2307, 0)) AS Amount2307, " +
+                "SUM(ISNULL(p.MDRefund, 0)) AS MDRefund, " +
+                "SUM(ISNULL(p.PowerKWH, 0)) AS PowerKWH, " +
+                "SUM(ISNULL(p.NetAmount,0)) AS AmountPaid, " +
+                "SUM(ISNULL(pb.cashAmount, p.NetAmount)) AS CashAmount, " +
+                "SUM(ISNULL(pb.checkAmount, 0)) AS CheckAmount, " +
+                "SUM(ISNULL(p.SeniorCitizenDiscount,0)) AS SeniorCitizenDiscount, " +
+                "SUM(ISNULL(b.NetAmount,0)) AS AmountDue, " +
+                "SUM(IIF(p.Period >'201502', (ISNULL(p.TransmissionVAT, 0)), 0)) AS ARVATTrans, " +
+                "(SUM(IIF(p.Period >'201502', (ISNULL(p.GenerationVAT,0)), 0)) " +
+                "        + SUM(IIF(p.Period >'201503', (ISNULL(p.SLVAT,0)), 0)) " +
+                "        + SUM(IIF(p.Period >'201503', (ISNULL(b.DAA_VAT,0)), 0)) " +
+                "        + SUM(IIF(p.Period >'201503', (ISNULL(b.ACRM_VAT,0)), 0)) " +
+                "        + SUM(IIF(p.Period >'202111', (ISNULL(b.Item1,0)), 0))) AS ARVATGen, " +
+                "SUM(ISNULL(p.KatasAMount, 0)) AS KatasNgVAT " +
+                "FROM Bills b " +
+                "INNER JOIN BillsExtension x ON b.AccountNumber=x.AccountNumber AND b.ServicePeriodEnd=x.ServicePeriodEnd " +
+                "INNER JOIN PaidBillsWithRoute p ON b.AccountNumber=p.AccountNumber AND b.ServicePeriodEnd=p.ServicePeriodEnd " +
+                "INNER JOIN PaidBills pb ON b.AccountNumber=pb.AccountNumber AND b.ServicePeriodEnd=pb.ServicePeriodEnd " +
+                "WHERE p.PostingDate >= '" + year + "-" + month + "-" + day + " 00:00:00' AND p.PostingDate <= '" + year + "-" + month + "-" + day + " 23:59:59'";
 
         if (teller != null)
             sql += " AND p.TELLER = ?";
@@ -737,7 +786,7 @@ public class BillDAO {
         List<ItemSummary> paymentBreakdown = new ArrayList<>();
         List<ItemSummary> misc = new ArrayList<>();
 
-        while(rs.next()) {
+        while (rs.next()) {
             double kwh = rs.getDouble("PowerKWH");
             double energy = rs.getDouble("Energy");
             double tr = rs.getDouble("TransformerRental");
@@ -828,7 +877,8 @@ public class BillDAO {
 
     /**
      * OR Posting (batch update) the list of paid bill transactions (from a teller/collector in given date)
-     * @param bills The list of paid bills
+     *
+     * @param bills     The list of paid bills
      * @param dcrNumber The OR Number/OR Number
      * @return void
      * @throws Exception obligatory from DB.getConnection()
@@ -841,42 +891,46 @@ public class BillDAO {
         String sql = "";
 
         for (Bill bill : bills) {
-            sql += "UPDATE PaidBills SET DCRNumber = '"+dcrNumber+"', ORNumber = '"+dcrNumber+"' " +
-                    "WHERE AccountNumber = '"+bill.getConsumer().getAccountID()+"' AND ServicePeriodEnd = '"+bill.getServicePeriodEnd().toString()+"';";
+            sql += "UPDATE PaidBills SET ORNumber = '" + dcrNumber + "' " +
+                    "WHERE AccountNumber = '" + bill.getConsumer().getAccountID() + "' AND ServicePeriodEnd = '" + bill.getServicePeriodEnd().toString() + "';";
 
         }
         PreparedStatement ps = conn.prepareStatement(sql);
         try {
             ps.executeUpdate();
             conn.commit();
-        }catch (SQLException se){
+        } catch (SQLException se) {
             se.printStackTrace();
             conn.rollback();
         }
         ps.close();
         conn.setAutoCommit(true);
     }
+
     /**
      * Cancel a PaidBill from Paid Bills
+     *
      * @param bill The Paid bill
      * @return void
      * @throws Exception obligatory from DB.getConnection()
      */
     public static void cancelBill(PaidBill bill) throws Exception {
         cancelCheck(bill);
-        String sql = "DELETE FROM PaidBills WHERE AccountNumber = '"+bill.getConsumer().getAccountID()+"' AND ServicePeriodEnd = '"+bill.getServicePeriodEnd().toString()+"';";
+        String sql = "DELETE FROM PaidBills WHERE AccountNumber = '" + bill.getConsumer().getAccountID() + "' AND ServicePeriodEnd = '" + bill.getServicePeriodEnd().toString() + "';";
         PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
         ps.executeUpdate();
         ps.close();
     }
+
     /**
      * Cancel Check Payments for cancelling Paid Bills
+     *
      * @param bill The Paid bill
      * @return void
      * @throws Exception obligatory from DB.getConnection()
      */
     public static void cancelCheck(PaidBill bill) throws Exception {
-        String sql = "DELETE FROM CheckPayment WHERE AccountNumber = '"+bill.getConsumer().getAccountID()+"' AND ServicePeriodEnd = '"+bill.getServicePeriodEnd().toString()+"';";
+        String sql = "DELETE FROM CheckPayment WHERE AccountNumber = '" + bill.getConsumer().getAccountID() + "' AND ServicePeriodEnd = '" + bill.getServicePeriodEnd().toString() + "';";
         PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(sql);
         ps.executeUpdate();
         ps.close();
@@ -884,6 +938,7 @@ public class BillDAO {
 
     /**
      * Check if a deposit is made from AddCharges table
+     *
      * @param accountNumber The account
      * @return HashMap
      * @throws Exception obligatory from DB.getConnection()
@@ -908,10 +963,54 @@ public class BillDAO {
                 result.put("PCMonths", rs.getDouble("PCMonths"));
             }
             ps.close();
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return result;
     }
+
+    private static String generateInvoiceNumber(String invoice) throws SQLException
+    {
+        int ctr;
+        String curcode = "000001";
+        try{
+            curcode=invoice;
+
+            ctr= Integer.parseInt(curcode)+1;
+            if(ctr>=1 && ctr<=9)
+            {
+                curcode ="00000"+ctr;
+
+            }
+            else if(ctr>=10 && ctr<=99)
+            {
+                curcode ="0000"+ctr;
+
+            }
+            else if(ctr>=100 && ctr<=999)
+            {
+                curcode ="000"+ctr;
+            }
+            else if(ctr>=1000 && ctr<=9999)
+            {
+                curcode ="00"+ctr;
+            }
+            else if(ctr>=10000 && ctr<=99999)
+            {
+                curcode ="0"+ctr;
+            }
+
+            else{
+                curcode =""+ctr;
+            }
+
+        }
+        catch(Exception e)
+        {
+        }
+        return curcode;
+    }
+
+
 }

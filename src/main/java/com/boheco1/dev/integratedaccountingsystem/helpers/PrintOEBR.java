@@ -1,6 +1,7 @@
 package com.boheco1.dev.integratedaccountingsystem.helpers;
 
 import com.boheco1.dev.integratedaccountingsystem.objects.PaidBill;
+import com.itextpdf.text.pdf.PdfContentByte;
 import javafx.concurrent.Task;
 
 import javax.print.*;
@@ -12,16 +13,25 @@ import javax.print.attribute.standard.MediaPrintableArea;
 import javax.print.attribute.standard.OrientationRequested;
 import javax.print.attribute.standard.PrinterName;
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import com.itextpdf.text.Image;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
+
 
 public class PrintOEBR extends Task {
 
     private PaidBill bill;
     private String printData;
+
 
     public PrintOEBR(PaidBill bill){
         this.bill = bill;
@@ -33,6 +43,7 @@ public class PrintOEBR extends Task {
      */
     @Override
     protected Object call() throws Exception {
+
         print();
         return null;
     }
@@ -45,6 +56,9 @@ public class PrintOEBR extends Task {
         this.prepareOEBR();
 
         try{
+
+
+
             InputStream is = new ByteArrayInputStream(this.printData.getBytes());
             DocFlavor flavor =  DocFlavor.INPUT_STREAM.AUTOSENSE;
 
@@ -55,12 +69,15 @@ public class PrintOEBR extends Task {
             printRequestAttributeSet.add(new MediaPrintableArea(0, 0, 11, 4, MediaPrintableArea.INCH));
             printRequestAttributeSet.add(OrientationRequested.LANDSCAPE);
 
+
             //Create the print job
             DocPrintJob job = service.createPrintJob();
             Doc doc= new SimpleDoc(is, flavor, null);
 
+
             //Monitor print job events; for the implementation of PrintJobWatcher,
             PrintJobWatcher pjDone = new PrintJobWatcher(job);
+
 
             //Print it
             job.print(doc, printRequestAttributeSet);
@@ -70,6 +87,9 @@ public class PrintOEBR extends Task {
 
             //Close the input stream
             is.close();
+
+
+
         } catch (PrintException | IOException e) {
             throw new Exception(e.getMessage());
         }
@@ -85,18 +105,26 @@ public class PrintOEBR extends Task {
 
         //Print data
         String id = bill.getConsumer().getAccountID();
+        String fdash = "**********************";
+        String textword="INVOICE";
         String meter_no = id.substring(0,2)+"-"+id.substring(2,6)+"-"+id.substring(6);
         String type = "Type: "+bill.getConsumerType();
         String consumer = bill.getConsumer().getConsumerName().replace("Ñ", "N");
 
-        if (consumer.length() > 24)
-            consumer = consumer.substring(0, 25);
+       /* if (consumer.length() > 24)
+            consumer = consumer.substring(0, 25);*/
+
+        if (consumer.length() >= 36)
+            consumer = consumer.substring(0, 36)+"..";
 
         String billno = bill.getBillNo();
         String address = bill.getConsumer().getConsumerAddress().replace("Ñ", "N");;
 
-        if (address.length() >= 32)
-            address = address.substring(0, 32)+"..";
+        /*if (address.length() >= 32)
+            address = address.substring(0, 32)+"..";*/
+
+        if (address.length() > 24)
+            address = address.substring(0, 25);
 
         String[] billing = bill.getBillMonth().split(" ");
         String billmonth = billing[0].substring(0, 3).toUpperCase(Locale.ROOT)+". "+billing[1];
@@ -123,12 +151,13 @@ public class PrintOEBR extends Task {
 
         //Print elements per line
         String[][] cols = {
+                //{" "},
                 {" "},
-                {" "},
+                {textword},
                 {" "},
                 {meter_no, type, meter_no, type},
-                {consumer, billno, consumer, billno},
-                {address, address},
+                {consumer, consumer},
+                {address, billno, address, billno},
                 {" "},
                 {" "},
                 {billmonth, kwhUsed, amount, billmonth, kwhUsed, amount},
@@ -143,12 +172,13 @@ public class PrintOEBR extends Task {
         //Position of elements per line
         int adj = 2; //printing adjusted to two characters to the right
         int[][] layout = {
+                //{0},
                 {0},
-                {0},
-                {0},
-                {1, 24+adj, 40, 65+adj},
+                {49},
+                {40},
                 {1, 24+adj, 40, 65+adj},
                 {1, 40},
+                {1, 24+adj, 40, 65+adj},
                 {0},
                 {0},
                 {1, 13+adj, 24+adj+ (amountDue.length() - amount.length()), 40, 55+adj, 66+adj+ (amountDue.length() - amount.length())},
@@ -175,4 +205,9 @@ public class PrintOEBR extends Task {
         }
         printData += "\n\n\n";
     }
+
+
+
+
+
 }

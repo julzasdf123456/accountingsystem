@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import com.jfoenix.controls.JFXComboBox?>
 
 <StackPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.boheco1.dev.integratedaccountingsystem.tellering.WithHoldingController">
    <children>
@@ -38,8 +39,11 @@
                         <Label fx:id="withhold_lbl" text="2306/07" />
                         <Label text="TIN" GridPane.rowIndex="1" />
                         <TextField fx:id="withholding_tf" GridPane.columnIndex="1" />
-                        <JFXButton fx:id="save_btn" buttonType="RAISED" prefHeight="37.0" prefWidth="264.0" styleClass="btn-theme" text="SAVE" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <JFXButton fx:id="save_btn" buttonType="RAISED" prefHeight="37.0" prefWidth="264.0" styleClass="btn-theme" text="SAVE" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                         <TextField fx:id="tin_tf" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                         <Label text="With. Agent? " GridPane.rowIndex="2" />
+                         <JFXComboBox fx:id="withhold_agent" focusColor="#009688" maxWidth="1.7976931348623157E308" prefHeight="29.0" prefWidth="156.0" promptText="Select" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
                      </children>
                   </GridPane>
                </center>

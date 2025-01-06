@@ -378,6 +378,8 @@ public class Bill {
     }
 
     public double computeSurCharge() {
+
+
         double penalty = this.getAmountDue() - (this.getVat() + this.getTransformerRental() + this.getOtherCharges() + this.getAcrmVat() + this.getDAAVat());
 
         double amount = 0;
@@ -391,7 +393,7 @@ public class Bill {
                 if (this.getServicePeriodEnd().isEqual(LocalDate.of(2021, 12, 1))) {
                     amount = 0;
                 //Penalty computation for BAPA/ECA
-                }else if (this.consumerType.equals("B") || this.consumerType.equals("E")) {
+                }else if (this.consumerType.equals("B") || this.consumerType.equals("E") || this.consumerType.equals("RI")) {
                     //No penalty if days delayed less than equal to 5
                     if (this.getDaysDelayed() <= 5) {
                         amount = 0;

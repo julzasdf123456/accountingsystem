@@ -15,6 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,6 +37,7 @@ public class Utility {
     public static String STATION = "main"; //main or sub
     public static String OFFICE_PREFIX = "OSD";
     public static String DB_BILLING = "BillingBackup";
+    public static String db_accounting2="B1Accounting";
     public static int ROW_PER_PAGE = 20;
     public static String RELEASING = "releasing";
     public static String REJECTED = "rejected";
@@ -124,6 +126,8 @@ public class Utility {
     }*/
 
     public static int currentARNumber = 0;
+
+    public static int currentInvoiceNumber = 0;
 
     public static String generateRandomId() {
         return new Date().getTime() + "-" + generateRandomString(15);
@@ -237,6 +241,10 @@ public class Utility {
 
     public static String formatDecimal(double val){
         return String.format("%,.2f",val);
+    }
+
+    public static String formatDecimal(BigDecimal val){
+        return formatNumberTwoDecimal(val);
     }
 
     public static String formatQty(double qty) {
@@ -496,10 +504,39 @@ public class Utility {
         return false;
     }
 
+    public static String formatNumberTwoDecimal(double number) {
+        try {
+            DecimalFormat formatter = new DecimalFormat("#,###.00");
+
+            if(number<0)
+            {
+                number = number * -1;
+            }
+
+            return formatter.format(number);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public static String formatNumberTwoDecimal(BigDecimal number) {
+        try {
+            DecimalFormat formatter = new DecimalFormat("#,###.00");
+
+            return formatter.format(number);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     public static String COB_APPROVAL = "budget officer";
     public static String RV_APPROVAL = "general manager";
     public static String RV_RECOMMENDATION = "manager";
     public static String RV_CERTIFICATION = "budget officer";
     public static String COB_REVIEWER = "manager";
     public static String PO_APPROVAL = "general manager";
+
+
 }

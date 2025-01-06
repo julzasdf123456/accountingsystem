@@ -57,8 +57,10 @@ public class ConsumerDAO {
 
     public static List<ConsumerInfo> getConsumerRecords(String key, Connection con) throws Exception  {
         PreparedStatement ps = con.prepareStatement(
-                "SELECT TOP 100 * FROM AccountMaster WHERE ConsumerName LIKE '%" + key + "%' OR AccountNumber LIKE '%" + key + "%' OR MeterNumber LIKE '%" + key + "%' " +
+                "SELECT TOP 100 * FROM AccountMaster WHERE ConsumerName LIKE '%" + key + "%' " +
                         "ORDER BY ConsumerName");
+
+        // OR AccountNumber LIKE '%" + key + "%' OR MeterNumber LIKE '%" + key + "%'
 
         ResultSet rs = ps.executeQuery();
 
@@ -85,6 +87,8 @@ public class ConsumerDAO {
 
         return list;
     }
+
+
 
     /**
      * Retrieves a ConsumerInfo based on Account Number (on Billing database, ConsumerInquiry view)
@@ -272,4 +276,16 @@ public class ConsumerDAO {
 
         ps.close();
     }
+    public static void WithHoldingAgent(ConsumerInfo consumer, String Agent) throws Exception {
+        PreparedStatement ps = DB.getConnection(Utility.DB_BILLING).prepareStatement(
+                "UPDATE AccountMaster SET Reserve1=? " +
+                        "WHERE AccountNumber=?");
+        ps.setString(1, Agent);
+        ps.setString(2, consumer.getAccountID());
+
+        ps.executeUpdate();
+
+        ps.close();
+    }
+
 }

@@ -46,4 +46,34 @@ public class ArPrint {
         paymentFor2.setText(paymentForBuff.toString());
         amount2.setText(amountBuff.toString());
     }
+
+    public void setData(String trno, String receivedFrom, String amountStr, Double total, String[] paymentFor, double[] amount, LocalDate trDate){
+        transNumber1.setText(trno);
+        transNumber2.setText(trno);
+        receivedFrom1.setText(receivedFrom);
+        receivedFrom2.setText(receivedFrom);
+        total1.setText(String.format("%,.2f", total));
+        total2.setText(String.format("%,.2f", total));
+        totalStr1.setText(Utility.doubleAmountToWords(total));
+        totalStr2.setText(Utility.doubleAmountToWords(total));
+        String dateStr = trDate.format(DateTimeFormatter.ofPattern("MM/dd/YYYY"));
+        String username = ActiveUser.getUser().getUserName();
+        date1.setText(dateStr);
+        date2.setText(dateStr);
+        user1.setText(username);
+        user2.setText(username);
+
+        StringBuffer paymentForBuff = new StringBuffer();
+        StringBuffer amountBuff = new StringBuffer();
+
+        for(int i=0; i<paymentFor.length; i++) {
+            paymentForBuff.append(paymentFor[i] + "\n");
+            amountBuff.append(String.format("%,.2f",amount[i]) + "\n");
+        }
+
+        paymentFor1.setText(paymentForBuff.toString());
+        amount1.setText(amountBuff.toString());
+        paymentFor2.setText(paymentForBuff.toString());
+        amount2.setText(amountBuff.toString());
+    }
 }

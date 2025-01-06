@@ -247,7 +247,7 @@ public class ORPostingController extends MenuControllerHandler implements Initia
                 int count = 0;
                 for(Bill b : this.bills){
                     PaidBill pd = (PaidBill) b;
-                    if (pd.getDcrNumber() != null && !pd.getDcrNumber().isEmpty())
+                    if (pd.getInvoiceNumber() != null && !pd.getInvoiceNumber().isEmpty())
                         count++;
                     netAmount += b.getTotalAmount();
                     mdRefund += b.getMdRefund();
@@ -344,6 +344,13 @@ public class ORPostingController extends MenuControllerHandler implements Initia
         column7.setCellValueFactory(obj -> new SimpleStringProperty((((PaidBill) obj.getValue()).getDcrNumber())));
         column7.setStyle("-fx-alignment: center-right;");
 
+        TableColumn<Bill, String> column8 = new TableColumn<>("OR No.");
+        column8.setPrefWidth(100);
+        column8.setMaxWidth(100);
+        column8.setMinWidth(100);
+        column8.setCellValueFactory(obj -> new SimpleStringProperty((((PaidBill) obj.getValue()).getInvoiceNumber()+"")));
+        column8.setStyle("-fx-alignment: center-right;");
+
 
         this.bills =  FXCollections.observableArrayList();
         this.paid_bills_table.setFixedCellSize(35);
@@ -358,6 +365,7 @@ public class ORPostingController extends MenuControllerHandler implements Initia
         this.paid_bills_table.getColumns().add(column5);
         this.paid_bills_table.getColumns().add(column6);
         this.paid_bills_table.getColumns().add(column7);
+        this.paid_bills_table.getColumns().add(column8);
     }
     /**
      * Resets the fields

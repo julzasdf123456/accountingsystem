@@ -3,6 +3,7 @@ package com.boheco1.dev.integratedaccountingsystem.tellering;
 import com.boheco1.dev.integratedaccountingsystem.helpers.InputHelper;
 import com.boheco1.dev.integratedaccountingsystem.helpers.MenuControllerHandler;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXComboBox;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -33,14 +34,24 @@ public class WithHoldingController extends MenuControllerHandler implements Init
     @FXML
     private TextField tin_tf;
 
+    @FXML
+    private Label withhold_Agent_lbl;
+
+    @FXML
+    private JFXComboBox<String> withhold_agent;
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         InputHelper.restrictNumbersOnly(this.withholding_tf);
+        withhold_agent.getItems().add("YES");
+        withhold_agent.getItems().add("NO");
     }
     public JFXButton getSave_btn() {
         return save_btn;
     }
+
+    public JFXComboBox getWithhold_Agent() {return this.withhold_agent;}
 
     public TextField getTin_tf(){ return this.tin_tf; }
 

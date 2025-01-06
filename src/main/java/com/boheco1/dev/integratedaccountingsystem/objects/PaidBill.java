@@ -14,6 +14,8 @@ public class PaidBill extends Bill{
     private int orNumber;
     private String teller;
     private String dcrNumber;
+
+    private String InvoiceNumber;
     private Date postingDate;
     private String postingTime;
     private int postingSequence;
@@ -85,8 +87,16 @@ public class PaidBill extends Bill{
         return dcrNumber;
     }
 
+    public String getInvoiceNumber() {
+        return InvoiceNumber;
+    }
+
     public void setDcrNumber(String dcrNumber) {
         this.dcrNumber = dcrNumber;
+    }
+
+    public void setInvoiceNumber(String Number) {
+        this.InvoiceNumber = Number;
     }
 
     public Date getPostingDate() {

@@ -45,6 +45,25 @@ public class ParticularsAccountDAO {
         return pas;
     }
 
+    public static List<ParticularsAccount> getByType2(String type) throws Exception {
+        ResultSet rs = DB.getConnection().createStatement().executeQuery(
+                "SELECT * FROM ParticularsAccount " +
+                        "WHERE type LIKE '%" + type + "%' " +
+                        "ORDER BY Particulars");
+
+        ArrayList<ParticularsAccount> pas = new ArrayList<>();
+
+        while(rs.next()) {
+            pas.add(new ParticularsAccount(
+                    rs.getString("AccountCode") +" * " +  rs.getString("Particulars"),
+                    rs.getString("AccountCode"),
+                    rs.getDouble("Amount")
+            ));
+        }
+
+        return pas;
+    }
+
     public static List<ParticularsAccount> get(String particulars) throws Exception {
         ResultSet rs = DB.getConnection().createStatement().executeQuery(
                 "SELECT * FROM ParticularsAccount " +
@@ -75,6 +94,25 @@ public class ParticularsAccountDAO {
         while(rs.next()) {
             pas.add(new ParticularsAccount(
                     rs.getString("Particulars"),
+                    rs.getString("AccountCode"),
+                    rs.getDouble("Amount")
+            ));
+        }
+
+        return pas;
+    }
+
+    public static List<ParticularsAccount> get2(Connection con, String particulars) throws Exception {
+        ResultSet rs = con.createStatement().executeQuery(
+                "SELECT * FROM ParticularsAccount " +
+                        "WHERE Particulars LIKE '%" + particulars + "%' OR AccountCode LIKE '%" + particulars + "%' " +
+                        "ORDER BY AccountCode");
+
+        ArrayList<ParticularsAccount> pas = new ArrayList<>();
+
+        while(rs.next()) {
+            pas.add(new ParticularsAccount(
+                    rs.getString("AccountCode") +" * " +  rs.getString("Particulars"),
                     rs.getString("AccountCode"),
                     rs.getDouble("Amount")
             ));

@@ -26,6 +26,8 @@ import org.controlsfx.control.textfield.TextFields;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +66,8 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     @FXML
     private JFXTextField newItemAmount;
 
+    public Connection con;
+
     private TransactionDetails selectedItem;
     TransactionHeader transactionHeader = null;
 
@@ -78,6 +82,14 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
             transactionDate.setValue(LocalDate.now());
             throw new RuntimeException(e);
         }
+        try {
+            con = DB.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
         initTable();
         tableClick();
         addNewItem(newItemAmount);
@@ -99,6 +111,11 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
 
     private void initTable(){
 
+        TableColumn<TransactionDetails, String> orTablecolumn0 = new TableColumn<>("Account Code");
+        orTablecolumn0.setMinWidth(80);
+        orTablecolumn0.setStyle("-fx-alignment: center-left;");
+        orTablecolumn0.setCellValueFactory(new PropertyValueFactory<>("accountCode"));
+
         TableColumn<TransactionDetails, String> orTablecolumn1 = new TableColumn<>("Item Description");
         orTablecolumn1.setMinWidth(220);
         orTablecolumn1.setStyle("-fx-alignment: center-left;");
@@ -106,6 +123,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
 
         TableColumn<TransactionDetails, String> orTablecolumn2 = new TableColumn<>("Total Amount");
         orTablecolumn2.setStyle("-fx-alignment: center-right;");
+        orTablecolumn2.setMinWidth(80);
         orTablecolumn2.setCellValueFactory(obj-> new SimpleStringProperty(obj.getValue().getAmountView()));
 
         TableColumn<TransactionDetails, String> orTablecolumnremoveCol = new TableColumn<>(" ");
@@ -160,10 +178,15 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                 };
         orTablecolumnremoveCol.setCellFactory(orTableRemoveColCellFactory);
 
+        this.orTable.getColumns().add(orTablecolumn0); //added by jcgaudicos
         this.orTable.getColumns().add(orTablecolumn1);
         this.orTable.getColumns().add(orTablecolumn2);
         this.orTable.getColumns().add(orTablecolumnremoveCol);
 
+        TableColumn<TransactionDetails, String> newItemTablecolumn0 = new TableColumn<>("Account Code");
+        newItemTablecolumn0.setMinWidth(80);
+        newItemTablecolumn0.setStyle("-fx-alignment: center-left;");
+        newItemTablecolumn0.setCellValueFactory(new PropertyValueFactory<>("accountCode"));
 
         TableColumn<TransactionDetails, String> newItemTablecolumn1 = new TableColumn<>("Item Description");
         newItemTablecolumn1.setMinWidth(220);
@@ -171,6 +194,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
         newItemTablecolumn1.setCellValueFactory(new PropertyValueFactory<>("particulars"));
 
         TableColumn<TransactionDetails, String> newItemTablecolumn2 = new TableColumn<>("Total Amount");
+        newItemTablecolumn2.setMinWidth(80);
         newItemTablecolumn2.setStyle("-fx-alignment: center-right;");
         newItemTablecolumn2.setCellValueFactory(obj-> new SimpleStringProperty((obj.getValue().getAmountView())));
 
@@ -221,6 +245,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                 };
         removeCol.setCellFactory(removeColCellFactory);
 
+        this.newItemTable.getColumns().add(newItemTablecolumn0);
         this.newItemTable.getColumns().add(newItemTablecolumn1);
         this.newItemTable.getColumns().add(newItemTablecolumn2);
         this.newItemTable.getColumns().add(removeCol);
@@ -304,7 +329,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
         transactionHeader = TransactionHeaderDAO.get(searchOr,transCode.getSelectionModel().getSelectedItem(), transactionDate.getValue());
         transactionDetails = TransactionDetailsDAO.get(searchOr,transCode.getSelectionModel().getSelectedItem(), transactionDate.getValue());
         newTotalAmount.setText("");
-        fillUpFields();
+       fillUpFields();
         reCompute();
     }
 
@@ -404,10 +429,16 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                 td.setAccountCode(newItem.getAccountCode());
                 if(amount >= 0){
                     td.setCredit(amount);
+                    td.setDebit(0);
+
                 } else {
+
+                    td.setCredit(0);
                     td.setDebit(amount);
+
+
                 }
-                td.setParticulars(newItem.getParticulars());
+                td.setParticulars(newItem.getParticulars().split("\\*")[1].trim());
 
                 td.setOrDate(transactionHeader.getTransactionDate());
                 td.setBankID(null);
@@ -444,7 +475,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
         newTotalAmount.setText("");
     }
 
-    private boolean reCompute(){
+    private boolean  reCompute(){
 
 
         double newTotal=0;
@@ -479,6 +510,7 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
     private void bindParticularAccountInfoAutocomplete(JFXTextField textField){
         AutoCompletionBinding<ParticularsAccount> suggestion = TextFields.bindAutoCompletion(textField,
                 param -> {
+
                     //Value typed in the textfield
                     String query = param.getUserText();
 
@@ -488,11 +520,12 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                     //Perform DB query when length of search string is 4 or above
                     if (query.length() >= 1){
                         try {
-                            list = ParticularsAccountDAO.get(query);
+                            list = ParticularsAccountDAO.get2(con,query);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
+
 
                     return list;
                 }, new StringConverter<>() {
@@ -507,10 +540,11 @@ public class ORUpdateController extends MenuControllerHandler implements Initial
                         throw new UnsupportedOperationException();
                     }
                 });
-
+        suggestion.setMinWidth(400);
         //This will set the actions once the user clicks an item from the popupmenu.
         suggestion.setOnAutoCompleted(event -> {
             particularsAccount = event.getCompletion();
+            particular.setText(particularsAccount.getParticulars().split("\\*")[1].trim());
         });
     }
 }

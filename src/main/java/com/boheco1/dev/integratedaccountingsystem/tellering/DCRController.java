@@ -104,10 +104,21 @@ public class DCRController extends MenuControllerHandler implements Initializabl
             if (ActiveUser.getUser().can("manage-tellering") || ActiveUser.getUser().can("manage-cashiering")) {
                 final ContextMenu rowMenu = new ContextMenu();
 
-                MenuItem printBill = new MenuItem("Print OEBR");
+                MenuItem printBill = new MenuItem("Print Invoice");
                 printBill.setOnAction(actionEvent -> {
 
-                    PrintOEBR print = new PrintOEBR((PaidBill) row.getItem());
+                   // PrintOEBR print = new PrintOEBR((PaidBill) row.getItem());
+                    ReprintInvoice print = new ReprintInvoice((PaidBill) row.getItem());
+
+                   /* try
+                    {
+                        PrintInvoice print = new PrintInvoice((PaidBill) row.getItem());
+                        print.print();
+
+                    }
+                    catch(Exception e)
+                    {}*/
+
 
                     print.setOnFailed(e -> {
                         AlertDialogBuilder.messgeDialog("System Error", "Print error due to: " + print.getMessage(), Utility.getStackPane(), AlertDialogBuilder.DANGER_DIALOG);
@@ -615,6 +626,15 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         column9.setMinWidth(65);
         column9.setStyle("-fx-alignment: center;");
 
+        TableColumn<Bill, String> column10 = new TableColumn<>("Invoice #");
+        column10.setCellValueFactory(obj -> new SimpleStringProperty(
+                ((PaidBill) obj.getValue()).getDcrNumber()+""
+        ));
+        column10.setPrefWidth(100);
+        column10.setMaxWidth(100);
+        column10.setMinWidth(100);
+        column10.setStyle("-fx-alignment: center;");
+
         this.bills =  FXCollections.observableArrayList();
         this.dcr_power_table.setFixedCellSize(35);
         this.dcr_power_table.setPlaceholder(new Label("No Bills added"));
@@ -631,6 +651,7 @@ public class DCRController extends MenuControllerHandler implements Initializabl
         this.dcr_power_table.getColumns().add(column7);
         this.dcr_power_table.getColumns().add(column8);
         this.dcr_power_table.getColumns().add(column9);
+        this.dcr_power_table.getColumns().add(column10);
     }
 
     public void createDCRBreakDown(){

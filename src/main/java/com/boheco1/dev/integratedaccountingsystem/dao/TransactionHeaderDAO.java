@@ -1,10 +1,12 @@
 package com.boheco1.dev.integratedaccountingsystem.dao;
 
 import com.boheco1.dev.integratedaccountingsystem.helpers.DB;
+import com.boheco1.dev.integratedaccountingsystem.helpers.DialogBuilder;
 import com.boheco1.dev.integratedaccountingsystem.helpers.Utility;
 import com.boheco1.dev.integratedaccountingsystem.objects.ActiveUser;
 import com.boheco1.dev.integratedaccountingsystem.objects.TransactionHeader;
 import com.boheco1.dev.integratedaccountingsystem.objects.User;
+import com.jfoenix.controls.JFXDialog;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -42,6 +44,33 @@ public class TransactionHeaderDAO {
 
         ps.executeUpdate();
         ps.close();
+
+        //added by jcgaudicos for B1Accounting
+            PreparedStatement ps1 = DB.getConnection2().prepareStatement(
+                    "INSERT INTO TransactionMaster " +
+                            "(Period, TransactionNumber, TransactionCode, " +
+                            " Particulars, TransactionDate, " +
+                            "Save26, Save79, EnteredBy, Save01, Save02,Save84,Save85,Save86) " +
+                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
+            ps1.setDate(1, java.sql.Date.valueOf(transactionHeader.getPeriod()));
+            ps1.setString(2, transactionHeader.getTransactionNumber());
+            ps1.setString(3, transactionHeader.getTransactionCode());
+            ps1.setString(4, transactionHeader.getName());
+            ps1.setDate(5, java.sql.Date.valueOf(transactionHeader.getTransactionDate()));
+            ps1.setDouble(6, transactionHeader.getAmount());
+            ps1.setDouble(7, transactionHeader.getAmount());
+            ps1.setString(8, transactionHeader.getEnteredBy());
+            ps1.setString(9,transactionHeader.getName());
+            ps1.setString(10, transactionHeader.getAddress());
+            ps1.setString(11, "");
+            ps1.setString(12, "");
+            ps1.setString(13, "");
+
+            ps1.executeUpdate();
+            ps1.close();
+
+        //End
+
     }
 
     public static void updateRemarks(TransactionHeader th, String remarks) throws Exception {
@@ -107,6 +136,25 @@ public class TransactionHeaderDAO {
         ps.executeUpdate();
 
         ps.close();
+
+        //added by jcgaudicos
+                PreparedStatement ps1 = DB.getConnection2().prepareStatement(
+                        "UPDATE TransactionMaster SET DateLastChanged=?, ChangedBy=? " +
+                                "WHERE TransactionNumber=? AND TransactionCode=? AND Period=?"
+                );
+
+                ps1.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+                ps1.setString(2, activeUser.getUserName());
+                ps1.setString(3, transactionNumber);
+                ps1.setString(4, transactionCode);
+                ps1.setDate(5, java.sql.Date.valueOf(period));
+
+                ps1.executeUpdate();
+
+                ps1.close();
+
+        //end
+
     }
 
     public static TransactionHeader get(String transactionNumber, String transactionCode) throws Exception {
@@ -231,7 +279,10 @@ public class TransactionHeaderDAO {
         ps.setString(3, Utility.CANCELLED);
         ps.setString(4, tellerID);
 
+
+
         ResultSet rs = ps.executeQuery();
+
 
         if(rs.next()){
             TransactionHeader th = new TransactionHeader();
@@ -307,6 +358,21 @@ public class TransactionHeaderDAO {
         ps.setString(2, th.getTransactionNumber());
         ps.setDate(3, java.sql.Date.valueOf(th.getTransactionDate()));
         ps.executeUpdate();
+        ps.close();
+
+        //added by jcgaudicos for B1Accounting
+            PreparedStatement ps1 = DB.getConnection2().prepareStatement(
+                    "UPDATE TransactionMaster SET Save26=?,Save79=? " +
+                            "WHERE TransactionNumber=? " +
+                            "AND TransactionDate=? AND " +
+                            "TransactionCode='AR'");
+        ps1.setDouble(1, amount);
+        ps1.setDouble(2, amount);
+        ps1.setString(3, th.getTransactionNumber());
+        ps1.setDate(4, java.sql.Date.valueOf(th.getTransactionDate()));
+        ps1.executeUpdate();
+        ps1.close();
+        //End
     }
 
     public static int getNextARNumber() throws Exception {
@@ -351,9 +417,10 @@ public class TransactionHeaderDAO {
     public static void cancelAR(TransactionHeader th) throws Exception {
         //Delete Transaction Details
         PreparedStatement psdel = DB.getConnection().prepareStatement(
-                "DELETE FROM TransactionDetails WHERE TransactionNumber=? AND TransactionCode=?");
+                "DELETE FROM TransactionDetails WHERE TransactionNumber=? AND TransactionCode=? and Period=?");
         psdel.setString(1, th.getTransactionNumber());
         psdel.setString(2,"AR");
+        psdel.setDate(3,java.sql.Date.valueOf(th.getPeriod()));
         psdel.executeUpdate();
 
         PreparedStatement ps = DB.getConnection().prepareStatement("UPDATE TransactionHeader " +
@@ -373,6 +440,33 @@ public class TransactionHeaderDAO {
         th.setName("CANCELLED");
         th.setAddress("");
         th.setAmount(0);
+
+        //added by jcgaudicos
+            PreparedStatement psdel1 = DB.getConnection2().prepareStatement(
+                    "DELETE FROM TransactionDetails WHERE TransactionNumber=? AND TransactionCode=? and Period=?");
+            psdel1.setString(1, th.getTransactionNumber());
+            psdel1.setString(2,"AR");
+            psdel1.setDate(3,java.sql.Date.valueOf(th.getPeriod()));
+            psdel1.executeUpdate();
+            psdel1.close();
+
+            PreparedStatement ps1 = DB.getConnection2().prepareStatement("UPDATE TransactionMaster " +
+                    "SET Particulars=?, Save02=?, Save01=?, Save26=?,Save79=?  WHERE TransactionNumber=? AND TransactionCode=? AND TransactionDate=?");
+
+        ps1.setString(1, "CANCELLED");
+        ps1.setString(2, "");
+        ps1.setString(3, "CANCELLED");
+        ps1.setDouble(4, 0);
+        ps1.setDouble(5, 0);
+        ps1.setString(6, th.getTransactionNumber());
+        ps1.setString(7, th.getTransactionCode());
+        ps1.setDate(8, java.sql.Date.valueOf(th.getTransactionDate()));
+
+        ps1.executeUpdate();
+        ps1.close();
+
+        //end
+
     }
 
     public static void setPrinted(TransactionHeader th, boolean printed) throws Exception {
@@ -388,5 +482,7 @@ public class TransactionHeaderDAO {
         ps.executeUpdate();
 
         ps.close();
+
+
     }
 }

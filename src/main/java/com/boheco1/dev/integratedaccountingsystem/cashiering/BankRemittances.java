@@ -24,6 +24,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
+import jdk.jshell.execution.Util;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
@@ -34,6 +35,7 @@ import javax.swing.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -134,6 +136,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
                     });
 
                     editButton.setOnAction(actionEvent -> {
+
                         editEntry(bankRemittance);
                     });
 
@@ -162,16 +165,53 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
     private void showDailyTotals() {
         try {
             java.sql.Date date = java.sql.Date.valueOf(transactionDate.getValue());
-            double orTotal = Utility.getTotalReceipt("OR", date);
-            double arTotal = Utility.getTotalReceipt("AR", date);
+            double orTotal=0;
+            double arTotal=0;
+
+            if(TransactionHeader.getBRTransactionCodeProperty().equals("BR"))
+            {
+                 orTotal = Utility.getTotalReceipt("OR", date);
+                 arTotal = Utility.getTotalReceipt("AR", date);
+            }
+            else {
+                 orTotal = Utility.getTotalReceipt("ORSub", date);
+                 arTotal = Utility.getTotalReceipt("ARSub", date);
+
+            }
+
+
+
             totalReceipt = orTotal+arTotal;
 
             double balancing = Math.abs(totalReceipt-totalCollection);
+            //double balancing = totalReceipt-totalCollection;
 
             totalARAmount.setText(String.format("₱ %,.2f", arTotal));
             totalORAmount.setText(String.format("₱ %,.2f", orTotal));
             totalReceiptAmount.setText(String.format("₱ %,.2f", totalReceipt));
-            balancingFigure.setText(String.format("₱ %,.2f", balancing));
+
+
+
+            if(totalReceipt>=totalCollection)
+            {
+                balancingFigure.setText(String.format("₱ %,.2f", balancing));
+
+            }
+            else {
+
+                String txt=String.format("(%,.2f", balancing) +")";
+                if(txt.trim().equals("(0.00)"))
+                {
+                    balancingFigure.setText("₱ 0.00") ;
+                }
+                else{
+                    balancingFigure.setText("₱ "+txt) ;
+                }
+
+
+            }
+
+
         }catch(Exception ex) {
             ex.printStackTrace();
         }
@@ -410,7 +450,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
                 td.setBankID(br.getBankAccount().getId());
                 td.setAccountCode(br.getBankAccount().getAccountCode());
                 td.setDebit(br.getAmount());
-                td.setSequenceNumber(TransactionDetailsDAO.getNextSequenceNumber(td.getPeriod(), td.getTransactionNumber()));
+                td.setSequenceNumber(TransactionDetailsDAO.getNextSequenceNumber(td.getPeriod(), td.getTransactionNumber(),td.getTransactionCode()));
                 td.setCheckNumber(br.getCheckNumber());
                 td.setTransactionDate(transactionHeader.getTransactionDate());
                 td.setDepositedDate(br.getDepositedDate());
@@ -445,7 +485,7 @@ public class BankRemittances extends MenuControllerHandler implements Initializa
             td.setBankID(br.getBankAccount().getId());
             td.setAccountCode(br.getBankAccount().getAccountCode());
             td.setDebit(br.getAmount());
-            td.setSequenceNumber(TransactionDetailsDAO.getNextSequenceNumber(td.getPeriod(), td.getTransactionNumber()));
+            td.setSequenceNumber(TransactionDetailsDAO.getNextSequenceNumber(td.getPeriod(), td.getTransactionNumber(), td.getTransactionCode()));
             td.setCheckNumber(br.getCheckNumber());
             td.setTransactionDate(transactionHeader.getTransactionDate());
             td.setDepositedDate(br.getDepositedDate());

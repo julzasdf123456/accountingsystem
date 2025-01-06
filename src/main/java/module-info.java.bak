@@ -3,12 +3,16 @@ module com.boheco1.dev.integratedaccountingsystem {
     requires javafx.fxml;
     requires javafx.web;
 
-    requires org.controlsfx.controls;
+    requires controlsfx;
     requires com.dlsc.formsfx;
     requires validatorfx;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
+    requires com.jfoenix;
+    requires java.sql;
+    requires jdk.jfr;
+    requires javafx.graphics;
 
     opens com.boheco1.dev.integratedaccountingsystem to javafx.fxml;
     exports com.boheco1.dev.integratedaccountingsystem;

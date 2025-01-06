@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionDetailsDAO {
-    public static Connection connection;
+    public static Connection connection,connection1;
     public static void add(TransactionDetails td) throws Exception {
         Connection cxn = DB.getConnection();
         cxn.setAutoCommit(true);
@@ -42,6 +42,30 @@ public class TransactionDetailsDAO {
         ps.executeUpdate();
 
         ps.close();
+
+        // added by jcgaudicos for B1Accounting
+        Connection con = DB.getConnection2();
+        con.setAutoCommit(true);
+        PreparedStatement ps1 = con.prepareStatement(
+                "INSERT INTO TransactionDetails (" +
+                        "Period, TransactionNumber, TransactionCode, TransactionDate, " +
+                        "Sequence, AccountCode, Debit, Credit) " +
+                        "VALUES (?,?,?,?,?,?,?,?)");
+        ps1.setDate(1, java.sql.Date.valueOf(td.getPeriod()));
+        ps1.setString(2, td.getTransactionNumber());
+        ps1.setString(3, td.getTransactionCode());
+        ps1.setDate(4, td.getTransactionDate() !=null ? java.sql.Date.valueOf(td.getTransactionDate()):null);
+        ps1.setInt(5, td.getSequenceNumber());
+        ps1.setString(6, td.getAccountCode());
+        ps1.setString(7, Utility.formatNumberTwoDecimal(td.getDebit()));
+        ps1.setString(8, Utility.formatNumberTwoDecimal(td.getCredit()));
+
+        ps1.executeUpdate();
+
+        ps1.close();
+
+        //end
+
     }
 
     public static void add(List<TransactionDetails> tds) throws Exception {
@@ -77,8 +101,40 @@ public class TransactionDetailsDAO {
         DB.getConnection().setAutoCommit(true);
 
         ps.close();
+
+
+        //added by jcgaudicos
+                PreparedStatement ps1 = DB.getConnection2().prepareStatement(
+                        "INSERT INTO TransactionDetails (" +
+                                "Period, TransactionNumber, TransactionCode, TransactionDate, " +
+                                "Sequence, AccountCode, Debit, Credit) " +
+                                "VALUES (?,?,?,?,?,?,?,?)");
+
+                DB.getConnection2().setAutoCommit(false);
+
+                for(TransactionDetails td1: tds) {
+                    ps1.setDate(1, java.sql.Date.valueOf(td1.getPeriod()));
+                    ps1.setString(2, td1.getTransactionNumber());
+                    ps1.setString(3, td1.getTransactionCode());
+                    ps1.setDate(4, java.sql.Date.valueOf(td1.getTransactionDate()));
+                    ps1.setInt(5, td1.getSequenceNumber());
+                    ps1.setString(6, td1.getAccountCode());
+                    ps1.setString(7, Utility.formatNumberTwoDecimal(td1.getDebit()));
+                    ps1.setString(8, Utility.formatNumberTwoDecimal(td1.getCredit()));
+
+
+                    ps1.addBatch();
+                }
+
+                ps1.executeBatch();
+                ps1.getConnection().setAutoCommit(true);
+
+                ps1.close();
+
+        //end
+
     }
-    private static PreparedStatement psAdd, psUpdate, psUpdateTransHeader;
+    private static PreparedStatement psAdd, psUpdate, psUpdateTransHeader,psAdd1, psUpdate1, psUpdateTransHeader1;
     public static void addUpdate(TransactionHeader transactionHeader, List<TransactionDetails> updateRecord, List<TransactionDetails> newRecord) throws Exception {
         try {
             connection = DB.getConnection();
@@ -99,7 +155,7 @@ public class TransactionDetailsDAO {
                             "BankID, Note, CheckNumber, Particulars, DepositedDate) " +
                             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
-            PreparedStatement psDelete = connection.prepareStatement("Delete From TransactionDetails WHERE TransactionNumber='" + transactionHeader.getTransactionNumber() + "'");
+            PreparedStatement psDelete = connection.prepareStatement("Delete From TransactionDetails WHERE TransactionNumber='" + transactionHeader.getTransactionNumber() + "' and Period='"+ java.sql.Date.valueOf(transactionHeader.getPeriod()) +"'  and TransactionCode='"+ transactionHeader.getTransactionCode()  +"' ");
 
             psUpdateTransHeader.execute();
             psUpdateTransHeader.close();
@@ -196,10 +252,122 @@ public class TransactionDetailsDAO {
 
             psAdd.close();
 
-            PreparedStatement psDeleteZero = connection.prepareStatement("Delete From TransactionDetails WHERE TransactionNumber='" + transactionHeader.getTransactionNumber() + "' AND Debit=0 AND Credit=0");
+            PreparedStatement psDeleteZero = connection.prepareStatement("Delete From TransactionDetails WHERE TransactionNumber='" + transactionHeader.getTransactionNumber() + "'  and Period='"+ java.sql.Date.valueOf(transactionHeader.getPeriod()) +"'  and TransactionCode='"+ transactionHeader.getTransactionCode()  +"'  AND Debit=0 AND Credit=0");
 
             psDeleteZero.execute();
             psDeleteZero.close();
+
+            //added by jcgaudicos for B1Accounting
+
+                    connection1 = DB.getConnection2();
+                    connection1.setAutoCommit(true);
+                    psUpdateTransHeader1 = connection1.prepareStatement(
+                            "UPDATE TransactionMaster SET DateLastChanged = GETDATE(), ChangedBy = ? " +
+                                    "WHERE " +
+                                    "Period = ? AND TransactionNumber = ? AND TransactionCode = ? ;");
+                    psUpdateTransHeader1.setString(1, ActiveUser.getUser().getUserName());
+                    psUpdateTransHeader1.setDate(2, java.sql.Date.valueOf(transactionHeader.getPeriod()));
+                    psUpdateTransHeader1.setString(3, transactionHeader.getTransactionNumber());
+                    psUpdateTransHeader1.setString(4, transactionHeader.getTransactionCode());
+
+                    PreparedStatement psAdd1 = connection1.prepareStatement(
+                            "INSERT INTO TransactionDetails (" +
+                                    "Period, TransactionNumber, TransactionCode, TransactionDate, " +
+                                    "Sequence, AccountCode, Debit, Credit) " +
+                                    "VALUES (?,?,?,?,?,?,?,?)");
+
+                    PreparedStatement psDelete1 = connection1.prepareStatement("Delete From TransactionDetails WHERE TransactionNumber='" + transactionHeader.getTransactionNumber() + "' and Period='"+ java.sql.Date.valueOf(transactionHeader.getPeriod()) +"'  and TransactionCode='"+ transactionHeader.getTransactionCode()  +"' ");
+
+                    psUpdateTransHeader1.execute();
+                    psUpdateTransHeader1.close();
+                    psDelete1.execute();
+                    psDelete1.close();
+                    int sequence1 = updateRecord.size()+2;
+
+                    TransactionDetails univTd1;
+                    if (newRecord != null && !newRecord.isEmpty()) {
+                        univTd1 = newRecord.get(0);
+                    } else {
+                        if (updateRecord != null && !updateRecord.isEmpty()) {
+                            univTd1 = updateRecord.get(0);
+                        } else {
+                            univTd1 = null;
+                        }
+                    }
+
+                    double totalAmnt1 = 0.0;
+
+                    for (TransactionDetails td : newRecord) {
+                        psAdd1.setDate(1, java.sql.Date.valueOf(td.getPeriod()));
+                        psAdd1.setString(2, td.getTransactionNumber());
+                        psAdd1.setString(3, td.getTransactionCode());
+                        psAdd1.setDate(4, java.sql.Date.valueOf(td.getTransactionDate()));
+                        psAdd1.setInt(5, sequence1);
+                        psAdd1.setString(6, td.getAccountCode());
+                        psAdd1.setString(7, Utility.formatNumberTwoDecimal(td.getDebit()));
+                        psAdd1.setString(8, Utility.formatNumberTwoDecimal(td.getCredit()));
+
+                        System.out.println(td);
+
+                        totalAmnt1 += td.getAmount();
+
+                        psAdd1.execute();
+                        psAdd1.clearParameters();
+
+                        sequence1++;
+                    }
+
+                    for(TransactionDetails td: updateRecord) {
+                        psAdd1.setDate(1, java.sql.Date.valueOf(td.getPeriod()));
+                        psAdd1.setString(2, td.getTransactionNumber());
+                        psAdd1.setString(3, td.getTransactionCode());
+                        psAdd1.setDate(4, java.sql.Date.valueOf(td.getTransactionDate()));
+                        psAdd1.setInt(5, sequence1);
+                        psAdd1.setString(6, td.getAccountCode());
+                        psAdd1.setString(7, Utility.formatNumberTwoDecimal(td.getDebit()));
+                        psAdd1.setString(8, Utility.formatNumberTwoDecimal(td.getCredit()));
+
+                        System.out.println(td);
+
+                        totalAmnt1 += td.getAmount();
+
+        //                    psAdd.addBatch();
+                        psAdd1.execute();
+                        psAdd1.clearParameters();
+
+                        sequence1++;
+                    }
+
+                    // INSERT GRAND TOTAL
+                    if (univTd != null) {
+                        psAdd1.setDate(1, java.sql.Date.valueOf(univTd.getPeriod()));
+                        psAdd1.setString(2, univTd.getTransactionNumber());
+                        psAdd1.setString(3, univTd.getTransactionCode());
+                        psAdd1.setDate(4, java.sql.Date.valueOf(univTd.getTransactionDate()));
+                        psAdd1.setInt(5, sequence);
+                        psAdd1.setString(6, Utility.getAccountCodeProperty());
+                        psAdd1.setString(7, Utility.formatNumberTwoDecimal(totalAmnt1));
+                        psAdd1.setDouble(8, 0);
+
+                        System.out.println(univTd);
+
+                        psAdd1.execute();
+                        psAdd1.clearParameters();
+                    }
+
+
+                    psAdd1.close();
+
+                    PreparedStatement psDeleteZero1 = connection1.prepareStatement("Delete From TransactionDetails WHERE TransactionNumber='" + transactionHeader.getTransactionNumber() + "'  and Period='"+ java.sql.Date.valueOf(transactionHeader.getPeriod()) +"'  and TransactionCode='"+ transactionHeader.getTransactionCode()  +"'  AND Debit=0 AND Credit=0");
+
+                    psDeleteZero1.execute();
+                    psDeleteZero1.close();
+
+            //End
+
+
+
+
         } catch (Exception e){
             Utility.ERROR_MSG = e.getMessage();
 
@@ -438,11 +606,12 @@ public class TransactionDetailsDAO {
         return tds;
     }
 
-    public static int getNextSequenceNumber(LocalDate period, String transactionNumber) throws Exception {
+    public static int getNextSequenceNumber(LocalDate period, String transactionNumber,String transactionCode) throws Exception {
         PreparedStatement ps = DB.getConnection().prepareStatement(
-                "SELECT MAX(AccountSequence) FROM TransactionDetails td WHERE  Period=? AND TransactionCode ='BR' AND TransactionNumber = ? AND AccountSequence <> 999;");
+                "SELECT MAX(AccountSequence) FROM TransactionDetails td WHERE  Period=? AND TransactionCode =? AND TransactionNumber = ? AND AccountSequence <> 999;");
         ps.setDate(1, java.sql.Date.valueOf(period));
-        ps.setString(2, transactionNumber);
+        ps.setString(2, transactionCode);
+        ps.setString(3, transactionNumber);
         ResultSet rs = ps.executeQuery();
         rs.next();
 
@@ -477,6 +646,19 @@ public class TransactionDetailsDAO {
             ps.setString(3, transactionNumber);
             ps.setString(4, transactionCode);
             ps.executeUpdate();
+            ps.close();
+
+
+            //added by jccgaudicos for B1Accounting
+            PreparedStatement ps1 = DB.getConnection2().prepareStatement("UPDATE TransactionDetails SET Credit=? WHERE Period=? AND TransactionNumber=? AND TransactionCode=? AND Debit=0 AND Sequence=999");
+            ps1.setDouble(1, getTotalDebit(transactionNumber));
+            ps1.setDate(2, java.sql.Date.valueOf(period));
+            ps1.setString(3, transactionNumber);
+            ps1.setString(4, transactionCode);
+            ps1.executeUpdate();
+            ps1.close();
+
+
         }else {
             TransactionHeader th = TransactionHeaderDAO.get(transactionNumber, transactionCode);
             System.out.println(transactionNumber + " - " + transactionCode);
@@ -491,6 +673,8 @@ public class TransactionDetailsDAO {
             td.setAccountCode(Utility.getAccountCodeProperty());
             TransactionDetailsDAO.add(td);
         }
+
+
     }
 
     public static void syncAR(TransactionHeader th, double amount) throws Exception {
@@ -504,6 +688,20 @@ public class TransactionDetailsDAO {
         psx.setString(3, th.getTransactionCode());
         psx.setInt(4, 999);
         psx.executeUpdate();
+        psx.close();
+
+        //added by jcgaudicos for B1Accounting
+        Connection con = DB.getConnection2();
+        con.setAutoCommit(true);
+
+        PreparedStatement ps = con.prepareStatement("DELETE FROM TransactionDetails WHERE Period=? AND TransactionNumber=? AND TransactionCode=? AND Sequence=?");
+        ps.setDate(1, java.sql.Date.valueOf(th.getPeriod()));
+        ps.setString(2, th.getTransactionNumber());
+        ps.setString(3, th.getTransactionCode());
+        ps.setInt(4, 999);
+        ps.executeUpdate();
+        ps.close();
+
 
         //Insert new Debit entry to TransactionDetails...
         TransactionDetails td = new TransactionDetails();
@@ -532,6 +730,21 @@ public class TransactionDetailsDAO {
 
         ps.close();
 
+        //added by jcgaudicos for B1Accounting
+        DB.getConnection2().setAutoCommit(true);
+        PreparedStatement ps1 = DB.getConnection2().prepareStatement("DELETE FROM TransactionDetails " +
+                "WHERE Period=? AND TransactionNumber=? AND TransactionCode=? AND Sequence=? AND Debit=?");
+
+        ps1.setDate(1, java.sql.Date.valueOf(td.getPeriod()));
+        ps1.setString(2, td.getTransactionNumber());
+        ps1.setString(3, td.getTransactionCode());
+        ps1.setInt(4, td.getSequenceNumber());
+        ps1.setDouble(5, td.getDebit());
+
+        ps1.executeUpdate();
+
+        ps1.close();
+
     }
 
     public static void deleteByTransactionHeader(TransactionHeader th) throws Exception {
@@ -541,6 +754,17 @@ public class TransactionDetailsDAO {
         ps.setString(2, th.getTransactionNumber());
         ps.setString(3, th.getTransactionCode());
         ps.executeUpdate();
+        ps.close();
+
+
+        //added by jcgaudicos for B1Accounting
+        DB.getConnection2().setAutoCommit(true);
+        PreparedStatement ps1 = DB.getConnection2().prepareStatement("DELETE FROM TransactionDetails WHERE Period=? AND TransactionNumber=? AND TransactionCode=?");
+        ps1.setDate(1, java.sql.Date.valueOf(th.getPeriod()));
+        ps1.setString(2, th.getTransactionNumber());
+        ps1.setString(3, th.getTransactionCode());
+        ps1.executeUpdate();
+        ps1.close();
     }
 
     public static void updateBR(TransactionDetails td, BankRemittance br) throws Exception {
@@ -556,10 +780,34 @@ public class TransactionDetailsDAO {
         ps.setDate(6, java.sql.Date.valueOf(td.getPeriod()));
         ps.setString(7, td.getTransactionNumber());
         ps.setInt(8, td.getSequenceNumber());
-        ps.setString(9, "BR");
+        //ps.setString(9, "BR");
+        ps.setString(9, td.getTransactionCode());
+
+
 
         ps.executeUpdate();
 
         ps.close();
+
+        //added by jcgaudicos for B1Accounting
+            DB.getConnection2().setAutoCommit(true);
+            PreparedStatement ps1 = DB.getConnection2().prepareStatement("UPDATE TransactionDetails SET " +
+                    "AccountCode=?, Debit=? " +
+                    "WHERE Period=? AND TransactionNumber=? AND Sequence=? AND TransactionCode=?");
+
+
+
+            ps1.setString(1, br.getAccountCode());
+            ps1.setString(2, Utility.formatNumberTwoDecimal(br.getAmount()));
+            ps1.setDate(3, java.sql.Date.valueOf(td.getPeriod()));
+            ps1.setString(4, td.getTransactionNumber());
+            ps1.setInt(5, td.getSequenceNumber());
+            //ps1.setString(6, "BR");
+            ps1.setString(6,td.getTransactionCode());
+
+            ps1.executeUpdate();
+
+            ps1.close();
+
     }
 }

@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
+
 public class CashierController extends MenuControllerHandler implements Initializable, ObjectTransaction {
 
     @FXML
@@ -158,7 +159,7 @@ public class CashierController extends MenuControllerHandler implements Initiali
             if(!orItem.getText().isEmpty() && !orItemAmount.getText().isEmpty()){
                 try{
                     double amount = Double.parseDouble(orItemAmount.getText());
-                    ORItemSummary orItemSummary = new ORItemSummary(particularsAccount.getAccountCode(), particularsAccount.getParticulars(), amount);
+                    ORItemSummary orItemSummary = new ORItemSummary(particularsAccount.getAccountCode(), particularsAccount.getParticulars().split("\\*")[1].trim(), amount);
                     OR_itemList.add(orItemSummary);
                     orItem.requestFocus();
                     orItem.setText("");
@@ -337,16 +338,41 @@ public class CashierController extends MenuControllerHandler implements Initiali
                 submitBtn.setDisable(false);
                 orNumber.requestFocus();
             }else{
-                this.address.setText(tellerInfo.getAddress());
-                this.name.setText(tellerInfo.getName());
-                //this.date.setValue(transactionHeader.getTransactionDate());
-                this.orNumber.setText(transactionHeader.getTransactionNumber());
-                this.purpose.setText("for DCR O.R");
-                this.remarks.setText(transactionHeader.getRemarks());
-                submitBtn.setDisable(true);
-                search_btn.requestFocus();
-                AlertDialogBuilder.messgeDialog("System Message", "Transaction has already been processed and assigned with an OR number." ,
-                        Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+
+                /*double calculate = 0;
+                ObservableList<ORItemSummary> temp = paymentTable.getItems();
+                for (ORItemSummary t : temp)
+                    calculate += t.getAmount();
+
+
+
+
+                if(transactionHeader.getAmount()==calculate)
+                {*/
+                    this.address.setText(tellerInfo.getAddress());
+                    this.name.setText(tellerInfo.getName());
+                    //this.date.setValue(transactionHeader.getTransactionDate());
+                    this.orNumber.setText(transactionHeader.getTransactionNumber());
+                    this.purpose.setText("for DCR O.R");
+                    this.remarks.setText(transactionHeader.getRemarks());
+                    submitBtn.setDisable(true);
+                    search_btn.requestFocus();
+                    AlertDialogBuilder.messgeDialog("System Message", "Transaction has already been processed and assigned with an OR number." ,
+                            Utility.getStackPane(), AlertDialogBuilder.WARNING_DIALOG);
+
+                /*}
+                else {
+                    this.name.setText(tellerInfo.getName());
+                    //this.date.setValue(localDate);
+                    this.address.setText(tellerInfo.getAddress());
+                    this.purpose.setText("for DCR O.R");
+                    address.setEditable(false);
+                    purpose.setEditable(false);
+                    customerFromCRM = null;
+                    submitBtn.setDisable(false);
+                    orNumber.requestFocus();
+                }*/
+
             }
             initTable(tellerInfo);
 
@@ -993,7 +1019,8 @@ public class CashierController extends MenuControllerHandler implements Initiali
             orContent.setOrNumber(orNumber);
             orContent.setIssuedTo(name.getText());
             EmployeeInfo employeeInfo = ActiveUser.getUser().getEmployeeInfo();
-            orContent.setIssuedBy(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
+            //orContent.setIssuedBy(employeeInfo.getEmployeeFirstName().charAt(0)+". "+employeeInfo.getEmployeeLastName());
+            orContent.setIssuedBy("D. Ceballos");
             orContent.setTotal(Double.parseDouble(total.getText().replaceAll(",","")));
             if(customerFromCRM !=null){
                 orContent.setCustomerCollection(paymentTable.getItems());
@@ -1002,7 +1029,13 @@ public class CashierController extends MenuControllerHandler implements Initiali
             }
 
             Utility.setOrContent(orContent);
-            ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
+
+            //for Official Receipt Printing
+           // ModalBuilder.showModalFromXMLNoClose(ORLayoutController.class, "../cashiering/orLayout.fxml", Utility.getStackPane());
+
+            //for Invoice Printing
+            ModalBuilder.showModalFromXMLNoClose(CashierInvoice.class, "../cashiering/CashierInvoiceLayout.fxml", Utility.getStackPane());
+
         }
     }
 
@@ -1015,11 +1048,12 @@ public class CashierController extends MenuControllerHandler implements Initiali
                     //Initialize list of stocks
                     List<ParticularsAccount> list = new ArrayList<>();
 
+
                     //Perform DB query when length of search string is 4 or above
                     if (query.length() >= 1){
                         try {
                             if (con != null) {
-                                list = ParticularsAccountDAO.get(con, query);
+                                list = ParticularsAccountDAO.get2(con, query);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -1039,10 +1073,11 @@ public class CashierController extends MenuControllerHandler implements Initiali
                         throw new UnsupportedOperationException();
                     }
                 });
-
+        suggestion.setMinWidth(450);
         //This will set the actions once the user clicks an item from the popupmenu.
         suggestion.setOnAutoCompleted(event -> {
             particularsAccount = event.getCompletion();
+            orItem.setText(particularsAccount.getParticulars().split("\\*")[1].trim());
             orItemAmount.setText(""+particularsAccount.getAmount());
             orItemAmount.requestFocus();
         });

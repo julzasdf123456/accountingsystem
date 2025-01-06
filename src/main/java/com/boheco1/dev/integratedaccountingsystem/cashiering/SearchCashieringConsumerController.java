@@ -276,18 +276,39 @@ public class SearchCashieringConsumerController extends MenuControllerHandler im
                         LocalDate period = LocalDate.of(yearFrom, monthFrom, 1);
                         User tellerAccount = UserDAO.get(employeeInfo.getId());
                         transactionHeader = TransactionHeaderDAO.get(ActiveUser.getUser().getUserName(), searchDateFrom.getValue(), employeeInfo.getId());
+
+
                         if(transactionHeader==null) {
+
                             orItemSummaries = CashierDAO.getOrItems(yearFrom, monthFrom, dayFrom, yearTo, monthTo, dayTo, tellerAccount.getUserName());
                             countAccount = CashierDAO.countAccount(yearFrom, monthFrom, dayFrom, yearTo, monthTo, dayTo, tellerAccount.getUserName());
+
+
                         }else {
-                            transactionDetails = TransactionDetailsDAO.get(searchDateFrom.getValue(), "OR", ActiveUser.getUser(), employeeInfo.getId());
-                            orItemSummaries = new ArrayList<>();
-                            for(TransactionDetails td : transactionDetails){
-                                if(!td.getParticulars().equals("Grand Total")){
-                                    ORItemSummary os = new ORItemSummary(td.getAccountCode(),td.getParticulars(),td.getAmount());
-                                    orItemSummaries.add(os);
+
+                            /*orItemSummaries = CashierDAO.getOrItems(yearFrom, monthFrom, dayFrom, yearTo, monthTo, dayTo, tellerAccount.getUserName());
+                            countAccount = CashierDAO.countAccount(yearFrom, monthFrom, dayFrom, yearTo, monthTo, dayTo, tellerAccount.getUserName());
+
+                            double calculate = 0;
+                            for (ORItemSummary t : orItemSummaries)
+                                calculate += t.getAmount();
+
+                            System.out.println("Header "+transactionHeader.getAmount());
+                            System.out.println("Total "+calculate);
+
+
+                            if(transactionHeader.getAmount()== calculate)
+                            {*/
+                                transactionDetails = TransactionDetailsDAO.get(searchDateFrom.getValue(), "OR", ActiveUser.getUser(), employeeInfo.getId());
+                                orItemSummaries = new ArrayList<>();
+                                for(TransactionDetails td : transactionDetails){
+                                    if(!td.getParticulars().equals("Grand Total")){
+                                        ORItemSummary os = new ORItemSummary(td.getAccountCode(),td.getParticulars(),td.getAmount());
+                                        orItemSummaries.add(os);
+                                    }
                                 }
-                            }
+                            //}
+
                         }
                         teller = new Teller(tellerAccount.getUserName(), employeeInfo.getSignatoryNameFormat(),employeeInfo.getEmployeeAddress(),employeeInfo.getPhone(), searchDateTo.getValue());
                         teller.setId(employeeInfo.getId());
